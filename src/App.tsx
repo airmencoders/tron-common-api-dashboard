@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useContext, useEffect, useState } from 'react';
 import './App.css';
+import { PersonControl } from './Components/Person/PersonControl';
+import { UserProvider } from './context/PersonProvider';
+import Navbar from 'react-bootstrap/Navbar';
+import Logo from './logo.png'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  
+    return (
+        <UserProvider>
+            <Navbar bg="dark" variant="dark">
+                <Navbar.Brand href="#home">
+                <img
+                    alt=""
+                    src={Logo}
+                    height="30"
+                    className="d-inline-block align-top mr-4"
+                />
+                CommonAPI Dashboard
+                </Navbar.Brand>
+            </Navbar>
+            <div className="App">
+                <PersonControl />
+            </div>
+        </UserProvider>
+    );
 }
 
 export default App;

@@ -1,0 +1,1622 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "TRON Common API",
+        "version": "0.0.1"
+    },
+    "servers": [{
+        "url": "http://localhost:8080/api",
+        "description": "Generated server url"
+    }],
+    "paths": {
+        "/v1/squadron/{id}": {
+            "get": {
+                "tags": ["squadron-controller"],
+                "summary": "Retrieves a single squadron by UUID",
+                "description": "Retrieves single squadron record",
+                "operationId": "getSquadron",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the squadron record",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "404": {
+                        "description": "Resource not found"
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SquadronDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request or malformed UUID",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["squadron-controller"],
+                "summary": "Updates an existing squadron record",
+                "description": "Updates an existing squadron",
+                "operationId": "updateSquadron",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Squadron record ID to update",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SquadronDto"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SquadronDto"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Invalid update request - provided UUID didn't exist or did not match UUID in provided record",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Record not found / Attempt to update squadron that does not exist with provided UUID",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["squadron-controller"],
+                "summary": "Deletes a squadron record",
+                "description": "Removes a squadron record from the database",
+                "operationId": "deleteSquadron",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the squadron record",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation / Request Performed"
+                    },
+                    "404": {
+                        "description": "Record to delete does not exist",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/person/{id}": {
+            "get": {
+                "tags": ["person-controller"],
+                "summary": "Retrieves a person by ID",
+                "description": "Retrieves a person by ID",
+                "operationId": "getPerson",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Person ID to retrieve",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["person-controller"],
+                "summary": "Updates an existing person",
+                "description": "Updates an existing person",
+                "operationId": "updatePerson",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Person ID to update",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["person-controller"],
+                "summary": "Deletes an existing person",
+                "description": "Deletes an existing person",
+                "operationId": "deletePerson",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Person ID to delete",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/organization/{id}": {
+            "get": {
+                "tags": ["organization-controller"],
+                "summary": "Retrieves an organization by ID",
+                "description": "Retrieves an organization by ID",
+                "operationId": "getOrganization",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Organization ID to retrieve",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "404": {
+                        "description": "Resource not found"
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request or malformed UUID",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["organization-controller"],
+                "summary": "Updates an existing organization",
+                "description": "Updates an existing organization",
+                "operationId": "updateOrganization",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Organization ID to update",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrganizationDto"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["organization-controller"],
+                "summary": "Deletes an existing organization",
+                "description": "Deletes an existing organization",
+                "operationId": "deleteOrganization",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Organization ID to delete",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["organization-controller"],
+                "summary": "Updates an existing organization's attributes",
+                "description": "Updates an existing organization's attributes",
+                "operationId": "patchOrganization",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Organization ID to update",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                },
+                                "description": "Object hash containing the keys to modify (set fields to null to clear that field)"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Organization resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "A provided person UUID was invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/airman/{id}": {
+            "get": {
+                "tags": ["airman-controller"],
+                "summary": "Retrieves a single airman by UUID",
+                "description": "Retrieves single airman record",
+                "operationId": "getAirman",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the airman record",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "404": {
+                        "description": "Resource not found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Airman"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["airman-controller"],
+                "summary": "Updates an existing airman record",
+                "description": "Updates an existing airman",
+                "operationId": "updateAirman",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "Airman record ID to update",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Airman"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Invalid update request - provided UUID didn't exist or did not match UUID in provided record or failed to validate data",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Airman"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Record not found / Attempt to update airman record with provided UUID does not exist",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["airman-controller"],
+                "summary": "Deletes an airman record",
+                "description": "Removes an airman record from the database",
+                "operationId": "deleteAirman",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID id of the airman record to delete",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation / Request Performed"
+                    },
+                    "404": {
+                        "description": "Record to delete does not exist",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/squadron": {
+            "get": {
+                "tags": ["squadron-controller"],
+                "summary": "Retrieves all squadrons",
+                "description": "Retrieves all squadron records",
+                "operationId": "getAllSquadrons",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/SquadronDto"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["squadron-controller"],
+                "summary": "Adds a new squadron",
+                "description": "Adds a new squadron, ID field should be null",
+                "operationId": "addSquadron",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SquadronDto"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request / Squadron with this UUID already exists",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SquadronDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/squadron/squadrons": {
+            "post": {
+                "tags": ["squadron-controller"],
+                "summary": "Adds one or more squadron entities",
+                "description": "Adds one or more squadron entities - returns that same array of input squadrons with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new squadrons up to the organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.",
+                "operationId": "addNewSquadrons",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/SquadronDto"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "409": {
+                        "description": "Bad Request / One of the supplied squadrons contained a UUID that already exists or other duplicate data",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SquadronDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad data or validation error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/person": {
+            "get": {
+                "tags": ["person-controller"],
+                "summary": "Retrieves all persons",
+                "description": "Retrieves all persons",
+                "operationId": "getPersons",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Person"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["person-controller"],
+                "summary": "Adds a person",
+                "description": "Adds a person",
+                "operationId": "createPerson",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Person"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Resource already exists with the id provided",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/person/persons": {
+            "post": {
+                "tags": ["person-controller"],
+                "summary": "Add one or more members to the database",
+                "description": "Adds one or more person entities - returns that same array of input persons with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new persons will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.",
+                "operationId": "addPersons",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "description": "Array of persons to add",
+                                "items": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "409": {
+                        "description": "A person already exists with the id provided",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad data or validation error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/organization": {
+            "get": {
+                "tags": ["organization-controller"],
+                "summary": "Retrieves all organizations",
+                "description": "Retrieves all organizations",
+                "operationId": "getOrganizations",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["organization-controller"],
+                "summary": "Adds an organization",
+                "description": "Adds an organization",
+                "operationId": "createOrganization",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OrganizationDto"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "409": {
+                        "description": "Resource already exists with the id provided",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/organization/organizations": {
+            "post": {
+                "tags": ["organization-controller"],
+                "summary": "Adds one or more organization entities",
+                "description": "Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.",
+                "operationId": "addNewOrganizations",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "409": {
+                        "description": "Bad Request / One of the supplied organizations contained a UUID that already exists or other duplicate data",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationDto"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad data or validation error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/airman": {
+            "get": {
+                "tags": ["airman-controller"],
+                "summary": "Retrieves all airmen",
+                "description": "Retrieves all airmen records",
+                "operationId": "getAllAirman",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Airman"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["airman-controller"],
+                "summary": "Adds a new airman",
+                "description": "Adds a new airman, ID field should be null for a new addition.",
+                "operationId": "addAirman",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Airman"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Resource already exists with the provided UUID",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Airman"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/airman/airmen": {
+            "post": {
+                "tags": ["airman-controller"],
+                "summary": "Adds one or more airmen entities",
+                "description": "Adds one or more airmen entities - returns that same array of input airmen with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new airmen will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.",
+                "operationId": "addAirmen",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "description": "Array of Airman to add",
+                                "items": {
+                                    "$ref": "#/components/schemas/Airman"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "409": {
+                        "description": "Bad Request / One of the supplied airman contained a UUID that already exists",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Airman"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad data or validation error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/squadron/{squadronId}": {
+            "patch": {
+                "tags": ["squadron-controller"],
+                "summary": "Modifies a squadron's attributes",
+                "description": "Allows the squadron's attributes to be changed/cleared",
+                "operationId": "modifySquadronAttribs",
+                "parameters": [{
+                    "name": "squadronId",
+                    "in": "path",
+                    "description": "UUID of the squadron to modify",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                },
+                                "description": "Object hash containing the keys to modify (set fields to null to clear that field)"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "A provided airman UUID was invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Successful operation / Request Performed"
+                    },
+                    "404": {
+                        "description": "Provided UUID did not match any existing squadrons",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/squadron/{id}/members": {
+            "delete": {
+                "tags": ["squadron-controller"],
+                "summary": "Deletes a member(s) from the squadron",
+                "description": "Deletes a member(s) from a squadron",
+                "operationId": "deleteSquadronMember",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the squadron record",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "description": "UUID(s) of the member(s) to remove",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Provided squadron UUID was invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Provided airman UUID(s) was/were invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["squadron-controller"],
+                "summary": "Add member(s) to a squadron",
+                "description": "Adds member(s) to a squadron",
+                "operationId": "addSquadronMember",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the squadron record",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "description": "UUID(s) of the member(s) to add",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "404": {
+                        "description": "Provided squadron UUID was invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Successful operation"
+                    },
+                    "400": {
+                        "description": "Provided airman UUID(s) was/were invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/organization/{id}/members": {
+            "delete": {
+                "tags": ["organization-controller"],
+                "summary": "Deletes a member(s) from the organization",
+                "description": "Deletes a member(s) from an organization",
+                "operationId": "deleteOrganizationMember",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the organization to modify",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "description": "UUID(s) of the member(s) to remove",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Provided person UUID(s) was/were invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Provided organization UUID was invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Successful operation"
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["organization-controller"],
+                "summary": "Add member(s) to an organization",
+                "description": "Adds member(s) to an organization",
+                "operationId": "addOrganizationMember",
+                "parameters": [{
+                    "name": "id",
+                    "in": "path",
+                    "description": "UUID of the organization record",
+                    "required": true,
+                    "schema": {
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "description": "UUID(s) of the member(s) to add",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "400": {
+                        "description": "Provided person UUID(s) was/were invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "A organization UUID was invalid",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExceptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/v1/puckboard/extract": {
+            "get": {
+                "tags": ["puckboard-etl-controller"],
+                "operationId": "getPuckboardData",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/list-request-headers": {
+            "get": {
+                "tags": ["header-request-controller"],
+                "operationId": "getHeaders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "SquadronDto": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "leader": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "members": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "parentOrganization": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "subordinateOrganizations": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "operationsDirector": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "chief": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "baseName": {
+                        "type": "string"
+                    },
+                    "majorCommand": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ExceptionResponse": {
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Person": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "middleName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    }
+                }
+            },
+            "OrganizationDto": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "leader": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "members": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "parentOrganization": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "subordinateOrganizations": {
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Airman": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "middleName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "afsc": {
+                        "type": "string"
+                    },
+                    "etsDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "ptDate": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "dodid": {
+                        "type": "string"
+                    },
+                    "imds": {
+                        "type": "string"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "wing": {
+                        "type": "string"
+                    },
+                    "gp": {
+                        "type": "string"
+                    },
+                    "squadron": {
+                        "type": "string"
+                    },
+                    "wc": {
+                        "type": "string"
+                    },
+                    "go81": {
+                        "type": "string"
+                    },
+                    "dor": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deros": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "admin": {
+                        "type": "boolean"
+                    },
+                    "fltChief": {
+                        "type": "string"
+                    },
+                    "approved": {
+                        "type": "boolean"
+                    },
+                    "manNumber": {
+                        "type": "string"
+                    },
+                    "dutyPhone": {
+                        "type": "string"
+                    },
+                    "dutyTitle": {
+                        "type": "string"
+                    },
+                    "rank": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

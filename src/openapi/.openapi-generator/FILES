@@ -1,0 +1,16 @@
+.openapi-generator-ignore
+apis/AirmanControllerApi.ts
+apis/HeaderRequestControllerApi.ts
+apis/OrganizationControllerApi.ts
+apis/PersonControllerApi.ts
+apis/PuckboardEtlControllerApi.ts
+apis/SquadronControllerApi.ts
+apis/index.ts
+index.ts
+models/Airman.ts
+models/ExceptionResponse.ts
+models/OrganizationDto.ts
+models/Person.ts
+models/SquadronDto.ts
+models/index.ts
+runtime.ts
