@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './App.css';
-import { PersonControl } from './Components/Person/PersonControl';
+import { PersonControl } from './components/Person/PersonControl';
 import { UserProvider } from './context/PersonProvider';
 import Navbar from 'react-bootstrap/Navbar';
 import Logo from './logo.png'
@@ -8,7 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 function App() {
-  
+
     return (
         <UserProvider>
             <Navbar bg="dark" variant="dark">
