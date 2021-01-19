@@ -25,7 +25,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:unit": "react-scripts test --coverage --watchAll=false",
+    "test:e2e": "npx cypress run",
+    "test:e2e-ci": "npx cypress run --env configFile=pipeline",
+    "sonar": "sonar-scanner -Dsonar.projectVersion=${version}"
   },
   "eslintConfig": {
     "extends": [
@@ -44,5 +48,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!<rootDir>/node_modules/",
+      "!<rootDir>/src/index.tsx"
+    ]
+  },
+  "devDependencies": {
+    "sonar-scanner": "^3.1.0"
   }
 }
