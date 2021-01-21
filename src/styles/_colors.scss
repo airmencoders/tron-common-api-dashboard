@@ -3,7 +3,9 @@ $dark-shade: #181824;
 $dark-accent: #725d76;
 $main-brand-color: #1a90e1;
 $light-accent: #4ac1db;
-$light-shade: #f5eced;
+$light-shade: rgb(241,244,249);
+
+$page-title-background: #e9edf2;
 
 $success: #3da67c;
 $error: #f44336;
@@ -15,3 +17,4 @@ $error: #f44336;
 .remove-icon-color {
   color: $error;
 }
+
