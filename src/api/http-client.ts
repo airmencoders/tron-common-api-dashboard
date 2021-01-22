@@ -15,16 +15,20 @@ abstract class HttpClient {
         this.initResponseInterceptor();
     }
 
-    private initResponseInterceptor = () => {
+    private initResponseInterceptor() {
         this.instance.interceptors.response.use(
             this.handleResponse,
             this.handleError,
         );
     };
 
-    private handleResponse = ({ data }: AxiosResponse) => data;
+    private handleResponse({ data }: AxiosResponse) {
+        return data;
+    }
 
-    private handleError = (error: any) => Promise.reject(error);
+    private handleError(error: any) {
+        Promise.reject(error);
+    }
 }
 
 export default HttpClient;

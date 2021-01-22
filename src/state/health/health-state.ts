@@ -1,11 +1,13 @@
 import { createState, useState } from '@hookstate/core';
-import HealthApi, { Health } from '../api/health-api';
+import HealthApi from '../../api/health/health-api';
+import Components from '../../api/health/interface/components';
+import Health from '../../api/health/interface/health';
+import HealthService from './interface/health-service';
 
-const healthState = createState<Health | null>(null);
-
+const healthState = createState<Health | undefined>(undefined);
 const fetchData = async () => await HealthApi.getInstance().getHealth();
 
-export function useHealthState() {
+export function useHealthState(): HealthService {
     const state = useState(healthState);
 
     return ({
@@ -17,13 +19,13 @@ export function useHealthState() {
                 setTimeout(() => resolve(fetchData()), 1000)
             }))
         },
-        get isPromised() {
+        get isPromised(): boolean {
             return state.promised;
         },
-        get systemStatus() {
+        get systemStatus(): string | undefined {
             return state.get()?.status;
         },
-        get components() {
+        get components(): Components | undefined {
             return state.get()?.components;
         }
     })
