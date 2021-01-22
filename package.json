@@ -29,7 +29,12 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "test:unit": "react-scripts test --coverage --watchAll=false",
+    "cypress:open": "npx cypress open --env INTEGRATION_TEST_HOST=http://localhost:3000/",
+    "test:e2e-local": "npx cypress run --env INTEGRATION_TEST_HOST=http://localhost:3000/",
+    "test:e2e-ci": "npx cypress run --env INTEGRATION_TEST_HOST=https://tron-common-api.staging.dso.mil/ configFile=pipeline",
+    "sonar": "sonar-scanner -Dsonar.projectVersion=${version}"
   },
   "eslintConfig": {
     "extends": [
@@ -56,6 +61,17 @@
     "@storybook/addon-links": "^6.1.14",
     "@storybook/node-logger": "^6.1.14",
     "@storybook/preset-create-react-app": "^3.1.5",
-    "@storybook/react": "^6.1.14"
+    "@storybook/react": "^6.1.14",
+    "cypress": "^6.3.0",
+    "sonar-scanner": "^3.1.0"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!<rootDir>/node_modules/",
+      "!<rootDir>/src/index.tsx",
+      "!<rootDir>/src/openapi/**/*",
+      "!<rootDir>/src/stories/**/*"
+    ]
   }
 }
