@@ -27,8 +27,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:unit": "react-scripts test --coverage --watchAll=false",
-    "test:e2e": "npx cypress run",
-    "test:e2e-ci": "npx cypress run --env configFile=pipeline",
+    "cypress:open": "npx cypress open --env INTEGRATION_TEST_HOST=http://localhost:3000/",
+    "test:e2e-local": "npx cypress run --env INTEGRATION_TEST_HOST=http://localhost:3000/",
+    "test:e2e-ci": "npx cypress run --env INTEGRATION_TEST_HOST=https://tron-common-api.staging.dso.mil/ configFile=pipeline",
     "sonar": "sonar-scanner -Dsonar.projectVersion=${version}"
   },
   "eslintConfig": {
@@ -57,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^6.3.0",
     "sonar-scanner": "^3.1.0"
   }
 }
