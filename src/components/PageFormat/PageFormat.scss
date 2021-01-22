@@ -14,7 +14,7 @@
 
   &__top-nav {
     height: 60px;
-    border-bottom: 1px solid #dee2e8;
+    border-bottom: 1px solid $page-border-color;
   }
 
   &__page-body {
@@ -26,7 +26,7 @@
     &__title-section {
       flex: 0 0 80px;
       background: $page-title-background;
-      border-bottom: 1px solid #dee2e8;
+      border-bottom: 1px solid $page-border-color;
     }
     &__content {
       flex: 1;
