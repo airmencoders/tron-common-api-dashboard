@@ -1,0 +1,36 @@
+@import "../../styles/colors";
+@import "../../styles/variables";
+
+.page-format {
+  display: flex;
+  &__nav-menu {
+    flex: 0 0 200px;
+    background: $dark-shade;
+    min-height: 100vh;
+  }
+  &__page-body-container {
+    flex: 1;
+  }
+
+  &__top-nav {
+    height: 60px;
+    border-bottom: 1px solid $page-border-color;
+  }
+
+  &__page-body {
+    height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+  }
+  .page-body {
+    &__title-section {
+      flex: 0 0 80px;
+      background: $page-title-background;
+      border-bottom: 1px solid $page-border-color;
+    }
+    &__content {
+      flex: 1;
+      background: $light-shade;
+    }
+  }
+}

@@ -1,0 +1,28 @@
+@import "src/styles/colors";
+
+.dark-shade {
+  background: $dark-shade;
+}
+
+.dark-accent {
+  background: $dark-accent;
+}
+
+.main-brand-color {
+  background: $main-brand-color;
+}
+
+.light-accent {
+  background: $light-accent;
+}
+
+.light-shade {
+  background: $light-shade;
+}
+
+.color-block {
+  .color {
+    width: 200px;
+    height: 200px;
+  }
+}
