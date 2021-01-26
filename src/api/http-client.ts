@@ -1,8 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-
-// declare module 'axios' {
-//     interface AxiosResponse<T = any> extends Promise<T> { }
-// }
+import axios, { AxiosInstance } from 'axios';
 
 abstract class HttpClient {
     protected readonly instance: AxiosInstance;

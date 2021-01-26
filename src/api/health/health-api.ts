@@ -10,7 +10,9 @@ class HealthApi extends HttpClient {
         super(HealthApi.HEALTH_ENDPOINT);
     }
 
-    public getHealth = (): Promise<AxiosResponse<Health>> => this.instance.get<Health>("");
+    public getHealth(): Promise<AxiosResponse<Health>> {
+        return this.instance.get<Health>("");
+    }
 }
 
 export default HealthApi;

@@ -4,8 +4,8 @@ import Components from '../../api/health/interface/components';
 import Health from '../../api/health/interface/health';
 import HealthService from './interface/health-service';
 
-export const healthState = createState<Health | undefined>(undefined);
-export const healthApi: HealthApi = new HealthApi();
+const healthState = createState<Health | undefined>(undefined);
+const healthApi: HealthApi = new HealthApi();
 
 export const wrapState = (state: State<Health | undefined>, healthApi: HealthApi): HealthService => {
     return ({
@@ -24,7 +24,7 @@ export const wrapState = (state: State<Health | undefined>, healthApi: HealthApi
             return state.promised ? undefined : state.get()?.components;
         }
     })
-}
+};
 
-export const accessHealthState = () => wrapState(healthState, healthApi)
-export const useHealthState = () => wrapState(useState(healthState), healthApi)
+export const accessHealthState = () => wrapState(healthState, healthApi);
+export const useHealthState = () => wrapState(useState(healthState), healthApi);
