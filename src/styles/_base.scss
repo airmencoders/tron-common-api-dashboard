@@ -11,7 +11,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 div, span, p {
   font-family: Roboto, Arial, 'sans-serif';
-  @include u-font-size('body', 'md');
+  @include u-font-size('body', 'sm');
   @include u-line-height('body', 5);
 }
 
