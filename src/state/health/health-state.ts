@@ -1,32 +1,30 @@
-import { createState, useState } from '@hookstate/core';
+import { createState, State, useState } from '@hookstate/core';
 import HealthApi from '../../api/health/health-api';
 import Components from '../../api/health/interface/components';
 import Health from '../../api/health/interface/health';
 import HealthService from './interface/health-service';
 
-const healthState = createState<Health | undefined>(undefined);
-const fetchData = async () => await HealthApi.getInstance().getHealth();
+export const healthState = createState<Health | undefined>(undefined);
+export const healthApi: HealthApi = new HealthApi();
 
-export function useHealthState(): HealthService {
-    const state = useState(healthState);
-
+export const wrapState = (state: State<Health | undefined>, healthApi: HealthApi): HealthService => {
     return ({
         fetchAndStoreHealthStatus() {
-            // state.set(fetchData());
+            const healthRes = () => healthApi.getHealth();
 
-            // Emulate a longer loading state
-            state.set(new Promise(resolve => {
-                setTimeout(() => resolve(fetchData()), 1000)
-            }))
+            state.set(healthRes().then(response => response.data));
         },
         get isPromised(): boolean {
             return state.promised;
         },
         get systemStatus(): string | undefined {
-            return state.get()?.status;
+            return state.promised ? undefined : state.get()?.status;
         },
         get components(): Components | undefined {
-            return state.get()?.components;
+            return state.promised ? undefined : state.get()?.components;
         }
     })
 }
+
+export const accessHealthState = () => wrapState(healthState, healthApi)
+export const useHealthState = () => wrapState(useState(healthState), healthApi)

@@ -1,6 +1,5 @@
 import React, { FC, useEffect } from 'react';
-import { Spinner } from 'react-bootstrap';
-import Container from 'react-bootstrap/esm/Container';
+import { Container, Spinner } from 'react-bootstrap';
 import { useHealthState } from '../state/health/health-state';
 
 export const HealthPage: FC = () => {
