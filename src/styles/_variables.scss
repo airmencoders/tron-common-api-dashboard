@@ -1,4 +1,5 @@
 @import "mixins";
+@import "~uswds/dist/scss/core/functions";
 
-$default-panel-padding-y: calculateRem(20px);
-$default-panel-padding-x: calculateRem(20px);
+$default-panel-padding-y: units(2.5); //calculateRem(20px);
+$default-panel-padding-x: units(2.5); //calculateRem(20px);

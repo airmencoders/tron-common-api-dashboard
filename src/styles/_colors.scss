@@ -1,15 +1,28 @@
+$theme-show-compile-warnings: false;
+$theme-show-notifications: false;
 
-$dark-shade: #181824;
-$dark-accent: #725d76;
-$main-brand-color: #1a90e1;
-$light-accent: #4ac1db;
+$theme-color-primary: 'blue-50v';
+$theme-color-secondary-family: 'indigo';
+$theme-color-secondary-lighter: 'indigo-cool-10';
+$theme-color-secondary-light: 'indigo-30';
+$theme-color-secondary: 'indigo-60';
+$theme-color-secondary-vivid: 'indigo-cool-60v';
+$theme-color-secondary-dark: 'indigo-60v';
+$theme-color-secondary-darker: 'indigo-70v';
+
+@import "~uswds/dist/scss/packages/required";
+// reference https://designsystem.digital.gov/design-tokens/color/system-tokens/
+$dark-shade: color('indigo-warm-80');
+$dark-accent: color('violet-40');
+$main-brand-color: color($theme-color-primary);
+$light-accent: color('cyan-10v');
 $light-shade: rgb(241,244,249);
 
 $page-title-background: #e9edf2;
 $page-border-color: #dee2e8;
 
-$success: #3da67c;
-$error: #f44336;
+$success: color($theme-color-success);
+$error: color($theme-color-error);
 
 .success-icon-color {
   color: $success;
