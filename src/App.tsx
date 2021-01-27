@@ -1,13 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import './App.scss';
-import { PersonControl } from './components/Person/PersonControl';
 import { UserProvider } from './context/PersonProvider';
 import Navbar from 'react-bootstrap/Navbar';
 import Logo from './logo.png'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { HealthPage } from './pages/HealthPage';
 import { Route, Switch } from 'react-router-dom';
-
+import routes from './routes';
 
 function App() {
 
@@ -26,8 +24,7 @@ function App() {
             </Navbar>
             <div className="App">
                 <Switch>
-                    <Route path="/" exact component={PersonControl} />
-                    <Route path="/health" component={HealthPage} />
+                    {routes.map((route) => <Route key={route.name} exact={route.path === "/" ? true : false} path={route.path} component={route.component} />)}
                 </Switch>
             </div>
         </UserProvider>
