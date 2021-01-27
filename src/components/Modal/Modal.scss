@@ -14,8 +14,12 @@
       &__close-icon {
         position: absolute;
         right: $default-panel-padding-x;
-        top: 7px;
+        top: 14px;
         cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        display: block;
         .close-icon {
           color: color('gray-40');
         }

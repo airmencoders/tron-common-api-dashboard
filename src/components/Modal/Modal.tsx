@@ -5,8 +5,8 @@ import ReactModal from 'react-modal';
 import './Modal.scss';
 import CloseIcon from '../../icons/CloseIcon';
 
-// required for accesability
-ReactModal.setAppElement('#root');
+// required for accessibility
+ReactModal.setAppElement('body');
 
 function Modal(props: ModalProps) {
   return (
@@ -25,9 +25,10 @@ function Modal(props: ModalProps) {
           <div className="modal-component__container">
             <div className="modal-component__header">
               {props.headerComponent}
-              <div className="header__close-icon" onClick={props.onHide}>
+              <button className="header__close-icon close-btn" onClick={props.onHide}
+                      title="close-modal">
                 <CloseIcon size={1.75} />
-              </div>
+              </button>
             </div>
             <div className="modal-component__body">
               {props.children}
