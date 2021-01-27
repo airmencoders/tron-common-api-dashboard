@@ -4,7 +4,7 @@ import { RouteItem } from '../../routes';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
     return (
-        <nav className="sidebar">
+        <nav className="sidebar" data-testid="sidebar">
             { items.map((item) => <SidebarItem key={item.name} path={item.path} name={item.name} />)}
         </nav>
     );

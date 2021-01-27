@@ -9,7 +9,7 @@ export interface SidebarItemProps {
 
 function SidebarItem({ path, name }: SidebarItemProps) {
     return (
-        <NavLink exact={path === "/" ? true : false} to={path} activeClassName="active" className="sidebar-item">
+        <NavLink exact={path === "/" ? true : false} to={path} activeClassName="active" className="sidebar-item" data-testid="sidebar-item">
             <h3 className="sidebar-item__name">{name}</h3>
         </NavLink>
     );

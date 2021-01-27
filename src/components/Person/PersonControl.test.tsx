@@ -1,15 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import {PersonControl} from './PersonControl';
-import {PersonContext} from '../../context/PersonProviderContext';
+import { PersonControl } from './PersonControl';
+import { PersonContext } from '../../context/PersonProviderContext';
 import { v4 as uuidv4 } from 'uuid';
+import { MemoryRouter } from 'react-router-dom';
 
 
 describe("<PersonControl> Tests", () => {
 
     it("Should load/render ok", () => {
         let obj = {
-            users: [{ id: uuidv4(),
+            users: [{
+                id: uuidv4(),
                 firstName: 'Chris',
                 lastName: 'Zell',
                 title: 'Maj',
@@ -18,9 +20,11 @@ describe("<PersonControl> Tests", () => {
         };
 
         render(
-            <PersonContext.Provider value={obj}>
-                <PersonControl />
-            </PersonContext.Provider>
+            <MemoryRouter>
+                <PersonContext.Provider value={obj}>
+                    <PersonControl />
+                </PersonContext.Provider>
+            </MemoryRouter>
         )
 
         expect(screen.getByTestId(obj.users[0].id)).toBeInTheDocument();
