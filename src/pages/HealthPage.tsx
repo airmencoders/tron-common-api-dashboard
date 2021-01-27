@@ -20,7 +20,12 @@ export const HealthPage: FC = () => {
                     :
                     <div>
                         <h1>Health Page</h1>
-                        <p>System Status: {state.systemStatus}</p>
+                        {state.error ?
+                            <p>{state.error}</p>
+                            :
+                            <p>System Status: {state.systemStatus}</p>
+                        }
+
                     </div>
                 }
             </Container>

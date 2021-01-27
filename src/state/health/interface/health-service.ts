@@ -5,4 +5,5 @@ export default interface HealthService {
     readonly systemStatus?: string,
     readonly components?: Components,
     fetchAndStoreHealthStatus: () => void,
+    readonly error?: string
 }
