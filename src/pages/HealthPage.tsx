@@ -19,7 +19,6 @@ export const HealthPage: FC = () => {
                     </Spinner>
                     :
                     <div>
-                        <h1>Health Page</h1>
                         {state.error ?
                             <p>{state.error}</p>
                             :

@@ -10,6 +10,7 @@
 
         .sidebar-item__name {
             border-left: calculateRem(5px) solid $light-accent;
+            margin-bottom: calculateRem(16px);
         }
     }
 
