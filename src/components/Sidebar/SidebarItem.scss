@@ -3,10 +3,9 @@
 
 .sidebar-item {
 	color: $light-shade;
-	text-decoration: none;
-
+  text-decoration: none;
+  
 	&.active {
-
 		.sidebar-item__name {
 				border-left: calculateRem(5px) solid $light-accent;
 				color: $light-accent;
@@ -14,14 +13,19 @@
 	}
 
 	&__name {
+    transition: 0.5s;
+
 		padding-left: calculateRem(5px);
 		border-left: calculateRem(5px) solid transparent;
 		margin-bottom: calculateRem(16px);
-		color: $light-shade;
+    color: $light-shade;
+    
+    &:hover {
+		  color: $light-accent;
+    }
 	}
 
 	&:hover {
-		color: $light-accent;
 		text-decoration: none;
 	}
 }

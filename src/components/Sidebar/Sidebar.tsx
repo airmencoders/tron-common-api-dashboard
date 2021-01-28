@@ -4,17 +4,20 @@ import { RouteItem } from '../../routes';
 import Logo from '../../logo.png';
 
 import './Sidebar.scss';
+import { Link } from 'react-router-dom';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   return (
     <div className="sidebar" data-testid="sidebar">
       <div className="sidebar__logo-section">
-        <img
-          alt=""
-          src={Logo}
-          height="30"
-          className="d-inline-block align-top mr-4"
-        />
+        <Link to="/" className="logo-section__link">
+          <img
+            alt=""
+            src={Logo}
+            height="30"
+            className="d-inline-block align-top mr-4"
+          />
+        </Link>
       </div>
       <nav className="sidebar__nav">
         {items.map((item) => <SidebarItem key={item.name} path={item.path} name={item.name} />)}
