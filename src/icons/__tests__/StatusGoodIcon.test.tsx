@@ -5,6 +5,6 @@ import StatusGoodIcon from '../StatusGoodIcon';
 test('renders status good icon', async () => {
   render(<StatusGoodIcon size={20} />);
   await waitFor(() => {
-    expect(screen.getByTitle('status-good')).toBeTruthy();
+    expect(screen.getByTitle('good')).toBeTruthy();
   });
 });

@@ -9,13 +9,13 @@ export interface RouteItem {
 
 const routes: RouteItem[] = [
     {
-        path: "/health",
-        name: "Health",
+        path: '/health',
+        name: 'Health',
         component: HealthPage
     },
     {
-        path: "/person",
-        name: "Person",
+        path: '/person',
+        name: 'Person',
         component: PersonControl
     }
 ];

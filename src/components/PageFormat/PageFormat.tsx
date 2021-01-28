@@ -18,10 +18,9 @@ function PageFormat(props: any) {
         </div>
         <div className="page-format__page-body-container">
           <div className="page-format__top-nav  default-panel-padding">
-            <h4>Top Nav</h4>
           </div>
           <div className="page-format__page-body">
-            <div className="page-body__title-section default-panel-padding">
+            <div className="page-body__title-section">
               <PageTitle title={props.pageTitle} />
             </div>
             <div className="page-body__content default-panel-padding">

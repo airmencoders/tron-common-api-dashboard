@@ -1,0 +1,13 @@
+@import "../../styles/base";
+
+.sidebar {
+  &__logo-section {
+    img {
+      margin-bottom: .75rem;
+    }
+  }
+  &__nav {
+    margin-top: calculateRem(30px);
+    margin-left: calculateRem(12px);
+  }
+}
