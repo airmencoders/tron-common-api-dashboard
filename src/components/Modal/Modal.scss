@@ -1,0 +1,41 @@
+@import "../../styles/base";
+
+.modal-component {
+  &__container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  &__header {
+    position: relative;
+    flex: 0 0 units(7);
+    border-bottom: solid 1px $page-border-color;
+    .header {
+      &__close-icon {
+        position: absolute;
+        right: $default-panel-padding-x;
+        top: 14px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+        display: block;
+        .close-icon {
+          color: color('gray-40');
+        }
+        &:hover {
+          .close-icon {
+            color: color('gray-60');
+          }
+        }
+      }
+    }
+  }
+  &__body {
+    flex: 1;
+  }
+  &__footer {
+    flex: 0 0 units(8);
+    border-top: solid 1px $page-border-color;
+  }
+}

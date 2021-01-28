@@ -1,0 +1,7 @@
+@import "../../styles/base";
+
+.modal-footer-submit {
+  padding: $default-panel-padding-x $default-panel-padding-y;
+  display: flex;
+  justify-content: flex-end;
+}
