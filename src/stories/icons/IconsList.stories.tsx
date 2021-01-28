@@ -3,6 +3,7 @@ import {Col, Container, Row} from 'react-bootstrap';
 import StatusGoodIcon from '../../icons/StatusGoodIcon';
 import {Meta} from '@storybook/react';
 import RemoveIcon from '../../icons/RemoveIcon';
+import CloseIcon from '../../icons/CloseIcon';
 
 export const IconList = () => (
     <Container>
@@ -14,6 +15,10 @@ export const IconList = () => (
         <Col>
           <RemoveIcon size={4}/>
           <h6>RemoveIcon</h6>
+        </Col>
+        <Col>
+          <CloseIcon size={4}/>
+          <h6>CloseIcon</h6>
         </Col>
       </Row>
     </Container>
