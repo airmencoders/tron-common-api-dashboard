@@ -6,39 +6,39 @@ import StatusCard from '../components/StatusCard/StatusCard';
 import {StatusType} from '../components/StatusCard/status-type';
 
 export const HealthPage: FC = () => {
-    const state = useHealthState();
+  const state = useHealthState();
 
-    useEffect(() => {
-        state.fetchAndStoreHealthStatus();
-    }, []);
+  useEffect(() => {
+    state.fetchAndStoreHealthStatus();
+  }, []);
 
-    const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
-      if (healthStatus === 'UP') {
-        return StatusType.GOOD;
-      }
-      return StatusType.ERROR;
-    };
+  const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
+    if (healthStatus === 'UP') {
+      return StatusType.GOOD;
+    }
+    return StatusType.ERROR;
+  };
 
-    return (
-        <PageFormat pageTitle={"Health"}>
-            <Container fluid>
-                {state.isPromised ?
-                    <Spinner animation="border" role="status" variant="primary">
-                        <span className="sr-only">Loading...</span>
-                    </Spinner>
-                    :
-                    <div>
-                        {state.error ?
-                            <p>{state.error}</p>
-                            :
-                            <StatusCard status={getStatusTypeFromHealth(state.systemStatus)}
-                                        title="API Service" />
-                        }
+  return (
+    <PageFormat pageTitle={"Health"}>
+      <Container fluid>
+        {state.isPromised ?
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+          :
+          <div>
+            {state.error ?
+              <p>{state.error}</p>
+              :
+              <StatusCard status={getStatusTypeFromHealth(state.systemStatus)}
+                title="API Service" />
+            }
 
-                    </div>
-                }
-            </Container>
-        </PageFormat>
+          </div>
+        }
+      </Container>
+    </PageFormat>
 
-    )
+  )
 }

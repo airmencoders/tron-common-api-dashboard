@@ -2,26 +2,26 @@
 @import "../../styles/mixins";
 
 .sidebar-item {
-    color: $light-shade;
-    text-decoration: none;
+	color: $light-shade;
+	text-decoration: none;
 
-    &.active {
+	&.active {
 
-        .sidebar-item__name {
-            border-left: calculateRem(5px) solid $light-accent;
-            color: $light-accent;
-        }
-    }
+		.sidebar-item__name {
+				border-left: calculateRem(5px) solid $light-accent;
+				color: $light-accent;
+		}
+	}
 
-    &__name {
-        padding-left: calculateRem(5px);
-        border-left: calculateRem(5px) solid transparent;
-        margin-bottom: calculateRem(16px);
-        color: $light-shade;
-    }
+	&__name {
+		padding-left: calculateRem(5px);
+		border-left: calculateRem(5px) solid transparent;
+		margin-bottom: calculateRem(16px);
+		color: $light-shade;
+	}
 
-    &:hover {
-        color: $light-accent;
-        text-decoration: none;
-    }
+	&:hover {
+		color: $light-accent;
+		text-decoration: none;
+	}
 }

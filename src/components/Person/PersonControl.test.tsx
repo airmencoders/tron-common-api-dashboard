@@ -8,28 +8,28 @@ import { MemoryRouter } from 'react-router-dom';
 
 describe("<PersonControl> Tests", () => {
 
-    it("Should load/render ok", () => {
-        let obj = {
-            users: [{
-                id: uuidv4(),
-                firstName: 'Chris',
-                lastName: 'Zell',
-                title: 'Maj',
-                email: 'cz@test.com',
-            }]
-        };
+  it("Should load/render ok", () => {
+    let obj = {
+      users: [{
+        id: uuidv4(),
+        firstName: 'Chris',
+        lastName: 'Zell',
+        title: 'Maj',
+        email: 'cz@test.com',
+      }]
+    };
 
-        render(
-            <MemoryRouter>
-                <PersonContext.Provider value={obj}>
-                    <PersonControl />
-                </PersonContext.Provider>
-            </MemoryRouter>
-        )
+    render(
+      <MemoryRouter>
+        <PersonContext.Provider value={obj}>
+          <PersonControl />
+        </PersonContext.Provider>
+      </MemoryRouter>
+    )
 
-        expect(screen.getByTestId(obj.users[0].id)).toBeInTheDocument();
-        expect(screen.queryByText("New Person")).toBeNull();
-    });
+    expect(screen.getByTestId(obj.users[0].id)).toBeInTheDocument();
+    expect(screen.queryByText("New Person")).toBeNull();
+  });
 
 
 });

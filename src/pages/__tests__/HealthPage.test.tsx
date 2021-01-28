@@ -4,11 +4,11 @@ import { HealthPage } from '../HealthPage';
 import { MemoryRouter } from 'react-router-dom';
 
 it('Test Health Page', async () => {
-    const page = render(
-        <MemoryRouter>
-            <HealthPage />
-        </MemoryRouter>
-    );
+  const page = render(
+    <MemoryRouter>
+      <HealthPage />
+    </MemoryRouter>
+  );
 
-    expect(page.getByText(/Loading/i)).toBeDefined();
+  expect(page.getByText(/Loading/i)).toBeDefined();
 });

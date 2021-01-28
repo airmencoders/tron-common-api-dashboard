@@ -7,22 +7,22 @@ import routes from './routes';
 
 function App() {
 
-    return (
-        <UserProvider>
+  return (
+    <UserProvider>
 
-            <div className="App">
-                <Switch>
-                  <Route
-                      exact
-                      path="/"
-                      render={() => (<Redirect to="/health" />)}
-                  />
-                  {routes.map((route) => <Route key={route.name} exact={route.path === "/" ? true : false}
-                                                  path={route.path} component={route.component} />)}
-                </Switch>
-            </div>
-        </UserProvider>
-    );
+      <div className="App">
+        <Switch>
+          <Route
+            exact
+            path="/"
+            render={() => (<Redirect to="/health" />)}
+          />
+          {routes.map((route) => <Route key={route.name} exact={route.path === "/" ? true : false}
+            path={route.path} component={route.component} />)}
+        </Switch>
+      </div>
+    </UserProvider>
+  );
 }
 
 export default App;

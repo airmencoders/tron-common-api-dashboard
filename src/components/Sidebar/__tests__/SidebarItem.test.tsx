@@ -7,27 +7,27 @@ const path = "/health";
 const name = "Health";
 
 describe('SidebarItem', () => {
-    it('Renders', () => {
-        const pageRender = render(
-            <MemoryRouter>
-                <SidebarItem path={path} name={name} />
-            </MemoryRouter>
-        );
+  it('Renders', () => {
+    const pageRender = render(
+      <MemoryRouter>
+        <SidebarItem path={path} name={name} />
+      </MemoryRouter>
+    );
 
-        const elem = pageRender.getByTestId('sidebar-item');
+    const elem = pageRender.getByTestId('sidebar-item');
 
-        expect(elem).toBeInTheDocument();
-    });
+    expect(elem).toBeInTheDocument();
+  });
 
-    it('Renders home "/" correctly', () => {
-        const pageRender = render(
-            <MemoryRouter>
-                <SidebarItem path={"/"} name={name} />
-            </MemoryRouter>
-        );
+  it('Renders home "/" correctly', () => {
+    const pageRender = render(
+      <MemoryRouter>
+        <SidebarItem path={"/"} name={name} />
+      </MemoryRouter>
+    );
 
-        const elem = pageRender.getByTestId('sidebar-item');
+    const elem = pageRender.getByTestId('sidebar-item');
 
-        expect(elem).toBeInTheDocument();
-    });
+    expect(elem).toBeInTheDocument();
+  });
 });
