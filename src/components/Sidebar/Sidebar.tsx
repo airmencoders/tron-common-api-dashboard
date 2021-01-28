@@ -1,7 +1,6 @@
 import React from 'react';
 import SidebarItem from './SidebarItem';
 import { RouteItem } from '../../routes';
-import Navbar from 'react-bootstrap/Navbar';
 import Logo from '../../logo.png';
 
 import './Sidebar.scss';

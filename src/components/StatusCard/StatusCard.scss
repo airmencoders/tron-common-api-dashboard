@@ -1,0 +1,26 @@
+@import "../../styles/base";
+
+.status-card {
+  max-width: 300px;
+  &__title {
+    text-align: center;
+    .title {
+      &__text {
+        font-weight: normal;
+        text-transform: uppercase;
+        margin: 0;
+      }
+    }
+  }
+
+  &__icon {
+    text-align: center;
+    margin-top: units(2);
+    margin-bottom: units(1);
+  }
+  &__status {
+    text-align: center;
+    text-transform: capitalize;
+    color: $font-color-lighter;
+  }
+}

@@ -27,6 +27,7 @@
       flex: 0 0 80px;
       background: $page-title-background;
       border-bottom: 1px solid $page-border-color;
+      padding: $default-panel-padding-y 2.5rem ;
     }
     &__content {
       flex: 1;

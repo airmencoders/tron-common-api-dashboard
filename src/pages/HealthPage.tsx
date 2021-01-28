@@ -1,7 +1,9 @@
-import React, { FC, useEffect } from 'react';
-import { Container, Spinner } from 'react-bootstrap';
-import { useHealthState } from '../state/health/health-state';
+import React, {FC, useEffect} from 'react';
+import {Container, Spinner} from 'react-bootstrap';
+import {useHealthState} from '../state/health/health-state';
 import PageFormat from '../components/PageFormat/PageFormat';
+import StatusCard from '../components/StatusCard/StatusCard';
+import {StatusType} from '../components/StatusCard/status-type';
 
 export const HealthPage: FC = () => {
     const state = useHealthState();
@@ -9,6 +11,13 @@ export const HealthPage: FC = () => {
     useEffect(() => {
         state.fetchAndStoreHealthStatus();
     }, []);
+
+    const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
+      if (healthStatus === 'UP') {
+        return StatusType.GOOD;
+      }
+      return StatusType.ERROR;
+    };
 
     return (
         <PageFormat pageTitle={"Health"}>
@@ -22,7 +31,8 @@ export const HealthPage: FC = () => {
                         {state.error ?
                             <p>{state.error}</p>
                             :
-                            <p>System Status: {state.systemStatus}</p>
+                            <StatusCard status={getStatusTypeFromHealth(state.systemStatus)}
+                                        title="API Service" />
                         }
 
                     </div>

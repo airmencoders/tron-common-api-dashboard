@@ -4,8 +4,6 @@ import PageTitle from '../PageTitle/PageTitle';
 import Sidebar from '../Sidebar/Sidebar';
 
 import './PageFormat.scss';
-import Navbar from 'react-bootstrap/Navbar';
-import Logo from '../../logo.png';
 
 export interface PageFormatProps {
   pageTitle: string;
@@ -22,7 +20,7 @@ function PageFormat(props: any) {
           <div className="page-format__top-nav  default-panel-padding">
           </div>
           <div className="page-format__page-body">
-            <div className="page-body__title-section default-panel-padding">
+            <div className="page-body__title-section">
               <PageTitle title={props.pageTitle} />
             </div>
             <div className="page-body__content default-panel-padding">

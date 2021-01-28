@@ -3,18 +3,26 @@ import {StatusCardProps} from './StatusCardProps';
 import Card from '../Card/Card';
 import {StatusType} from './status-type';
 import StatusGoodIcon from '../../icons/StatusGoodIcon';
+import CloseIcon from '../../icons/CloseIcon';
+import WarningIcon from '../../icons/WarningIcon';
+
+import './StatusCard.scss';
 
 function renderIcon(status: StatusType): React.ReactNode {
   const iconSize = 4;
-  let returnIcon = (<div></div>);
+  let returnIcon = (<WarningIcon size={iconSize} />);
   switch (status) {
     case StatusType.GOOD:
-      returnIcon = <StatusGoodIcon size={4} />;
+      returnIcon = <StatusGoodIcon size={iconSize}/>;
       break;
     case StatusType.ERROR:
-      // returnIcon = <
-
+      returnIcon = <CloseIcon size={iconSize} iconTitle="error"/>;
+      break;
+    default:
+      // return default div
+      break;
   }
+  return returnIcon;
 }
 
 function StatusCard(props: StatusCardProps) {
@@ -22,15 +30,15 @@ function StatusCard(props: StatusCardProps) {
       <div className="status-card">
         <Card>
           <div className="status-card__title">
-            {props.title}
+            <h3 className="title__text">{props.title}</h3>
           </div>
           <div className="status-card__icon">
             {
-
+              renderIcon(props.status)
             }
           </div>
           <div className="status-card__status">
-            {props.title || 'No Status'}
+            {props.status || 'No Status'}
           </div>
         </Card>
       </div>

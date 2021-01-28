@@ -20,6 +20,10 @@ $light-shade: rgb(241,244,249);
 
 $page-title-background: #e9edf2;
 $page-border-color: #dee2e8;
+$link-color: $main-brand-color;
+
+$font-color-normal: color('gray-cool-80');
+$font-color-lighter: color('gray-cool-50');
 
 $success: color($theme-color-success);
 $error: color($theme-color-error);
@@ -31,6 +35,11 @@ $error: color($theme-color-error);
 .remove-icon-color {
   color: $error;
 }
+
+.warning-icon-color {
+  color: color('orange-30v');
+}
+
 
 
 

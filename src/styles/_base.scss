@@ -8,16 +8,26 @@
 h1, h2, h3, h4, h5, h6 {
   font-family: Lato, 'sans-serif';
   @include u-line-height('heading', 2);
+  color: $font-color-normal;
+  a & {
+    color: $link-color;
+  }
 }
 p {
   font-family: Roboto, Arial, 'sans-serif';
   @include u-font-size('body', 'sm');
   @include u-line-height('body', 5);
+  color: $font-color-normal;
+}
+
+a {
+  color: $main-brand-color;
 }
 
 div, span {
   font-family: Roboto, Arial, 'sans-serif';
   @include u-font-size('body', 'sm');
+  color: $font-color-normal;
 }
 
 

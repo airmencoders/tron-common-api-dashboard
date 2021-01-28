@@ -1,8 +1,9 @@
 @import "../../styles/base";
 @import "~uswds/dist/scss/components/card";
 
-.card {
+.card-component {
   &__container {
     background-color: $light-shade;
+    margin: 0;
   }
 }

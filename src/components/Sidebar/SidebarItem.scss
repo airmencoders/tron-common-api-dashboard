@@ -6,17 +6,18 @@
     text-decoration: none;
 
     &.active {
-        color: $light-accent;
 
         .sidebar-item__name {
             border-left: calculateRem(5px) solid $light-accent;
-            margin-bottom: calculateRem(16px);
+            color: $light-accent;
         }
     }
 
     &__name {
         padding-left: calculateRem(5px);
         border-left: calculateRem(5px) solid transparent;
+        margin-bottom: calculateRem(16px);
+        color: $light-shade;
     }
 
     &:hover {

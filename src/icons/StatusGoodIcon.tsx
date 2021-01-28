@@ -8,7 +8,7 @@ function StatusGoodIcon(props: IconProps) {
   return (
       <i className="status-good-icon bi bi-check-circle-fill success-icon-color"
          style={{fontSize: `${props.size}rem`}}
-         title="status-good"
+         title={ props.iconTitle != null ? props.iconTitle : 'good'}
       ></i>
   );
 }
