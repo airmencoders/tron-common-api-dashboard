@@ -1,7 +1,7 @@
 import { createState, StateMethods } from "@hookstate/core";
 import HealthApi from "../../../api/health/health-api";
 import Health from "../../../api/health/interface/health";
-import { accessHealthState, wrapState } from "../health-state";
+import { accessHealthState, wrapState, HealthState } from "../health-state";
 import { AxiosResponse } from 'axios';
 import HealthService from "../interface/health-service";
 
@@ -18,12 +18,12 @@ describe('Test HealthState', () => {
         headers: {}
     };
 
-    let healthState: StateMethods<Health | undefined>;
+    let healthState: StateMethods<HealthState | undefined>;
     let healthApi: HealthApi;
     let state: HealthService;
 
     beforeEach(() => {
-        healthState = createState<Health | undefined>(undefined);
+        healthState = createState<HealthState | undefined>(undefined);
         healthApi = new HealthApi();
 
         healthApi.getHealth = jest.fn(() => {

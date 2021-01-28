@@ -4,7 +4,7 @@ import Components from '../../api/health/interface/components';
 import Health from '../../api/health/interface/health';
 import HealthService from './interface/health-service';
 
-interface HealthState {
+export interface HealthState {
     error?: string,
     health?: Health
 }
