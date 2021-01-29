@@ -1,26 +1,46 @@
-import React, { FC, useEffect } from 'react';
-import { Container, Spinner } from 'react-bootstrap';
-import { useHealthState } from '../state/health/health-state';
+import React, {FC, useEffect} from 'react';
+import {Container, Spinner} from 'react-bootstrap';
+import {useHealthState} from '../state/health/health-state';
+import PageFormat from '../components/PageFormat/PageFormat';
+import StatusCard from '../components/StatusCard/StatusCard';
+import {StatusType} from '../components/StatusCard/status-type';
 
 export const HealthPage: FC = () => {
-    const state = useHealthState();
+  const state = useHealthState();
 
-    useEffect(() => {
-        state.fetchAndStoreHealthStatus();
-    }, []);
+  useEffect(() => {
+    state.fetchAndStoreHealthStatus();
+  }, []);
 
-    return (
-        <Container fluid>
-            {state.isPromised ?
-                <Spinner animation="border" role="status" variant="primary">
-                    <span className="sr-only">Loading...</span>
-                </Spinner>
-                :
-                <div>
-                    <h1>Health Page</h1>
-                    <p>System Status: {state.systemStatus}</p>
-                </div>
+  const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
+    if (healthStatus === 'UP') {
+      return StatusType.GOOD;
+    }
+    return StatusType.ERROR;
+  };
+
+  const serviceTitle = "API Serivce";
+
+  return (
+    <PageFormat pageTitle={"Health"}>
+      <Container fluid>
+        {state.isPromised ?
+          <Spinner animation="border" role="status" variant="primary">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+          :
+          <div>
+            {state.error ?
+              <StatusCard status={StatusType.ERROR} title={serviceTitle} />
+              :
+              <StatusCard status={getStatusTypeFromHealth(state.systemStatus)}
+                title={serviceTitle} />
             }
-        </Container>
-    )
+
+          </div>
+        }
+      </Container>
+    </PageFormat>
+
+  )
 }

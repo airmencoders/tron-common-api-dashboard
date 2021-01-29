@@ -4,7 +4,7 @@
 .page-format {
   display: flex;
   &__nav-menu {
-    flex: 0 0 200px;
+    flex: 0 0 186px;
     background: $dark-shade;
     min-height: 100vh;
   }
@@ -13,7 +13,7 @@
   }
 
   &__top-nav {
-    height: 60px;
+    height: 70px;
     border-bottom: 1px solid $page-border-color;
   }
 
@@ -27,6 +27,7 @@
       flex: 0 0 80px;
       background: $page-title-background;
       border-bottom: 1px solid $page-border-color;
+      padding: $default-panel-padding-y 2.5rem ;
     }
     &__content {
       flex: 1;

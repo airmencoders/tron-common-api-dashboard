@@ -1,8 +1,5 @@
 import React from 'react';
-
-export interface PageTitleProps {
-  title: string;
-}
+import {PageTitleProps} from './PageTitleProps';
 
 function PageTitle({title}: PageTitleProps) {
   return (

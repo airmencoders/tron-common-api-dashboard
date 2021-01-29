@@ -4,6 +4,7 @@ import StatusGoodIcon from '../../icons/StatusGoodIcon';
 import {Meta} from '@storybook/react';
 import RemoveIcon from '../../icons/RemoveIcon';
 import CloseIcon from '../../icons/CloseIcon';
+import WarningIcon from '../../icons/WarningIcon';
 
 export const IconList = () => (
     <Container>
@@ -19,6 +20,10 @@ export const IconList = () => (
         <Col>
           <CloseIcon size={4}/>
           <h6>CloseIcon</h6>
+        </Col>
+        <Col>
+          <WarningIcon size={4} />
+          <h6>WarningIcon</h6>
         </Col>
       </Row>
     </Container>
