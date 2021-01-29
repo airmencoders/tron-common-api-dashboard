@@ -19,6 +19,8 @@ export const HealthPage: FC = () => {
     return StatusType.ERROR;
   };
 
+  const serviceTitle = "API Serivce";
+
   return (
     <PageFormat pageTitle={"Health"}>
       <Container fluid>
@@ -29,10 +31,10 @@ export const HealthPage: FC = () => {
           :
           <div>
             {state.error ?
-              <p>{state.error}</p>
+              <StatusCard status={StatusType.ERROR} title={serviceTitle} />
               :
               <StatusCard status={getStatusTypeFromHealth(state.systemStatus)}
-                title="API Service" />
+                title={serviceTitle} />
             }
 
           </div>

@@ -1,5 +1,5 @@
 import React, {ReactNode} from 'react';
-import routes from '../../routes';
+import { routes } from '../../routes';
 import PageTitle from '../PageTitle/PageTitle';
 import Sidebar from '../Sidebar/Sidebar';
 

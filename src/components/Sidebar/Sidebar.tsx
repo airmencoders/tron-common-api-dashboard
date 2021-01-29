@@ -1,6 +1,6 @@
 import React from 'react';
 import SidebarItem from './SidebarItem';
-import { RouteItem } from '../../routes';
+import { RouteItem, RoutePath } from '../../routes';
 import Logo from '../../logo.png';
 
 import './Sidebar.scss';
@@ -10,7 +10,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
   return (
     <div className="sidebar" data-testid="sidebar">
       <div className="sidebar__logo-section">
-        <Link to="/" className="logo-section__link">
+        <Link to={RoutePath.HOME} className="logo-section__link">
           <img
             alt=""
             src={Logo}

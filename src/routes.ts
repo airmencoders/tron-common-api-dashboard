@@ -7,17 +7,21 @@ export interface RouteItem {
     component: React.FunctionComponent
 };
 
-const routes: RouteItem[] = [
+export enum RoutePath {
+    HOME = "/",
+    HEALTH = "/health",
+    PERSON = "/person"
+}
+
+export const routes: RouteItem[] = [
     {
-        path: '/health',
+        path: RoutePath.HEALTH,
         name: 'Health',
         component: HealthPage
     },
     {
-        path: '/person',
+        path: RoutePath.PERSON,
         name: 'Person',
         component: PersonControl
     }
 ];
-
-export default routes;
