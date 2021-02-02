@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from "axios";
 import HealthApi from "../health-api";
-import Health from "../interface/health";
 
 jest.mock('axios');
 

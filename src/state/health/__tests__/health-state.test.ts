@@ -35,6 +35,20 @@ describe('Test HealthState', () => {
     state = wrapState(healthState, healthApi);
   });
 
+  it('fetchAndStore', async () => {
+    state.fetchAndStoreHealthStatus = jest.fn(() => {
+      healthState.set({
+        health: response,
+        error: undefined
+      })
+    });
+
+    state.fetchAndStoreHealthStatus();
+
+    expect(state.systemStatus).toEqual(response.status);
+    expect(state.components).toEqual(response.components);
+  });
+
   it('isPromised', () => {
     expect(state.isPromised).toBe(false);
 

@@ -1,4 +1,5 @@
 import { PersonControl } from "./components/Person/PersonControl";
+import { AppClientPage } from "./pages/AppClientPage";
 import { HealthPage } from "./pages/HealthPage";
 
 export interface RouteItem {
@@ -10,7 +11,8 @@ export interface RouteItem {
 export enum RoutePath {
     HOME = "/",
     HEALTH = "/health",
-    PERSON = "/person"
+    PERSON = "/person",
+    APP_CLIENT = "/app-clients"
 }
 
 export const routes: RouteItem[] = [
@@ -23,5 +25,10 @@ export const routes: RouteItem[] = [
         path: RoutePath.PERSON,
         name: 'Person',
         component: PersonControl
+    },
+    {
+        path: RoutePath.APP_CLIENT,
+        name: 'App Clients',
+        component: AppClientPage
     }
 ];
