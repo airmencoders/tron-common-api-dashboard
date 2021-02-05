@@ -5,7 +5,7 @@ import UserInfoService from './user-info-serivce';
 import Config from '../../api/configuration';
 
 export interface UserInfoState {
-  error?: string,
+  error?: any,
   userInfo?: UserInfoDto
 }
 
@@ -17,8 +17,6 @@ const userInfoState = createState<UserInfoState>({
 export const wrapState = (state: State<UserInfoState>, userInfoApi: UserInfoControllerApiInterface): UserInfoService => {
   return new UserInfoService(state, userInfoApi);
 }
-
-console.log(Config.API_URL);
 
 export const useUserInfoState = ():UserInfoService => wrapState(useState(userInfoState),
     new UserInfoControllerApi(new Configuration({
