@@ -17,45 +17,51 @@
 /**
  * 
  * @export
- * @interface Person
+ * @interface UserInfoDto
  */
-export interface Person {
+export interface UserInfoDto {
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof UserInfoDto
      */
-    id?: string;
+    dodId?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof UserInfoDto
      */
-    firstName?: string;
+    givenName?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof UserInfoDto
      */
-    middleName?: string;
+    familyName?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof UserInfoDto
      */
-    lastName?: string;
+    name?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof UserInfoDto
      */
-    title?: string;
+    preferredUsername?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof UserInfoDto
      */
     email?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserInfoDto
+     */
+    organization?: string;
 }
 
 

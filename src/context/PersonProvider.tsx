@@ -1,34 +1,40 @@
 import React, { useEffect } from 'react';
-import { Person, PersonControllerApi } from '../openapi/index';
 import { PersonContext } from './PersonProviderContext';
+import {Person, PersonControllerApi} from '../openapi';
 
 const personController = new PersonControllerApi();
 export function UserProvider({ children } : any) {
     const [ users, setUsers ] = React.useState<Person[]>([]);
-    
+
     useEffect(() => {
-        const initialFetch = async() => setUsers(await personController.getPersons());
+        const initialFetch = async() => {
+            const personsResponse = await personController.getPersons();
+            setUsers(personsResponse.data);
+        }
         initialFetch();
     }, []);
 
     const addUser = async (person : Person) => {
-        await personController.createPerson({ person });
-        setUsers(await personController.getPersons());
+        await personController.createPerson(person );
+        const personsResponse = await personController.getPersons();
+        setUsers(personsResponse.data);
     }
 
     const editUser = async (person : Person) => {
-        await personController.updatePerson({ id: person.id as string, person });
-        setUsers(await personController.getPersons());
+        await personController.updatePerson(person.id as string, person);
+        const personsResponse = await personController.getPersons();
+        setUsers(personsResponse.data);
     }
 
     const deleteUser = async (id : string) => {
-        await personController.deletePerson({ id });
-        setUsers(await personController.getPersons());
+        await personController.deletePerson(id);
+        const personsResponse = await personController.getPersons();
+        setUsers(personsResponse.data);
     }
 
-    const userMgmtObj = { users, addUser, editUser };  
+    const userMgmtObj = { users, addUser, editUser };
     return (
-        <PersonContext.Provider value={userMgmtObj}>
+        <PersonContext.Provider value={undefined}>
             {children}
         </PersonContext.Provider>
     )

@@ -17,45 +17,39 @@
 /**
  * 
  * @export
- * @interface Person
+ * @interface ExceptionResponse
  */
-export interface Person {
+export interface ExceptionResponse {
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof ExceptionResponse
      */
-    id?: string;
+    timestamp?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ExceptionResponse
+     */
+    status?: number;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof ExceptionResponse
      */
-    firstName?: string;
+    error?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof ExceptionResponse
      */
-    middleName?: string;
+    message?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof ExceptionResponse
      */
-    lastName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    title?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    email?: string;
+    path?: string;
 }
 
 

@@ -12,7 +12,8 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+
+
 /**
  * 
  * @export
@@ -63,16 +64,16 @@ export interface Airman {
     afsc?: string;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof Airman
      */
-    etsDate?: Date;
+    etsDate?: string;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof Airman
      */
-    ptDate?: Date;
+    ptDate?: string;
     /**
      * 
      * @type {string}
@@ -123,10 +124,10 @@ export interface Airman {
     go81?: string;
     /**
      * 
-     * @type {Date}
+     * @type {string}
      * @memberof Airman
      */
-    dor?: Date;
+    dor?: string;
     /**
      * 
      * @type {string}
@@ -187,87 +188,6 @@ export interface Airman {
      * @memberof Airman
      */
     rank?: string;
-}
-
-export function AirmanFromJSON(json: any): Airman {
-    return AirmanFromJSONTyped(json, false);
-}
-
-export function AirmanFromJSONTyped(json: any, ignoreDiscriminator: boolean): Airman {
-    if ((json === undefined) || (json === null)) {
-        return json;
-    }
-    return {
-        
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'firstName': !exists(json, 'firstName') ? undefined : json['firstName'],
-        'middleName': !exists(json, 'middleName') ? undefined : json['middleName'],
-        'lastName': !exists(json, 'lastName') ? undefined : json['lastName'],
-        'title': !exists(json, 'title') ? undefined : json['title'],
-        'email': !exists(json, 'email') ? undefined : json['email'],
-        'afsc': !exists(json, 'afsc') ? undefined : json['afsc'],
-        'etsDate': !exists(json, 'etsDate') ? undefined : (new Date(json['etsDate'])),
-        'ptDate': !exists(json, 'ptDate') ? undefined : (new Date(json['ptDate'])),
-        'dodid': !exists(json, 'dodid') ? undefined : json['dodid'],
-        'imds': !exists(json, 'imds') ? undefined : json['imds'],
-        'unit': !exists(json, 'unit') ? undefined : json['unit'],
-        'wing': !exists(json, 'wing') ? undefined : json['wing'],
-        'gp': !exists(json, 'gp') ? undefined : json['gp'],
-        'squadron': !exists(json, 'squadron') ? undefined : json['squadron'],
-        'wc': !exists(json, 'wc') ? undefined : json['wc'],
-        'go81': !exists(json, 'go81') ? undefined : json['go81'],
-        'dor': !exists(json, 'dor') ? undefined : (new Date(json['dor'])),
-        'deros': !exists(json, 'deros') ? undefined : json['deros'],
-        'phone': !exists(json, 'phone') ? undefined : json['phone'],
-        'address': !exists(json, 'address') ? undefined : json['address'],
-        'admin': !exists(json, 'admin') ? undefined : json['admin'],
-        'fltChief': !exists(json, 'fltChief') ? undefined : json['fltChief'],
-        'approved': !exists(json, 'approved') ? undefined : json['approved'],
-        'manNumber': !exists(json, 'manNumber') ? undefined : json['manNumber'],
-        'dutyPhone': !exists(json, 'dutyPhone') ? undefined : json['dutyPhone'],
-        'dutyTitle': !exists(json, 'dutyTitle') ? undefined : json['dutyTitle'],
-        'rank': !exists(json, 'rank') ? undefined : json['rank'],
-    };
-}
-
-export function AirmanToJSON(value?: Airman | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
-    }
-    return {
-        
-        'id': value.id,
-        'firstName': value.firstName,
-        'middleName': value.middleName,
-        'lastName': value.lastName,
-        'title': value.title,
-        'email': value.email,
-        'afsc': value.afsc,
-        'etsDate': value.etsDate === undefined ? undefined : (value.etsDate.toISOString()),
-        'ptDate': value.ptDate === undefined ? undefined : (value.ptDate.toISOString()),
-        'dodid': value.dodid,
-        'imds': value.imds,
-        'unit': value.unit,
-        'wing': value.wing,
-        'gp': value.gp,
-        'squadron': value.squadron,
-        'wc': value.wc,
-        'go81': value.go81,
-        'dor': value.dor === undefined ? undefined : (value.dor.toISOString()),
-        'deros': value.deros,
-        'phone': value.phone,
-        'address': value.address,
-        'admin': value.admin,
-        'fltChief': value.fltChief,
-        'approved': value.approved,
-        'manNumber': value.manNumber,
-        'dutyPhone': value.dutyPhone,
-        'dutyTitle': value.dutyTitle,
-        'rank': value.rank,
-    };
 }
 
 
