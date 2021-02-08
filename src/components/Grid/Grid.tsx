@@ -8,6 +8,7 @@ import {GridReadyEvent} from 'ag-grid-community/dist/lib/events';
 function Grid(props: GridProps) {
   const gridReady = (event: GridReadyEvent) => {
       event.api.sizeColumnsToFit();
+      props.getGridApi && props.getGridApi(event);
   };
 
   return (
@@ -18,6 +19,7 @@ function Grid(props: GridProps) {
             rowData={props.data}
             onGridReady={gridReady}
             domLayout={"autoHeight"}
+            onRowClicked={props.onRowClicked}
         >
           {
             props.columns.map(col => (

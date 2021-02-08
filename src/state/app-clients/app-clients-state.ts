@@ -8,46 +8,38 @@ import AppClientsService from './interface/app-clients-service';
 
 export interface AppClientsState {
   error?: string,
-  clients?: AppClientFlat[]
+  clients: AppClientFlat[]
 }
 
-const appClientsState = createState<AppClientsState | undefined>(undefined);
+const appClientsState = createState<AppClientFlat[]>(
+  new Promise<AppClientFlat[]>(resolve => resolve(new Array<AppClientFlat>()))
+);
+
 const appClientsApi: AppClientsApi = new AppClientsApi();
 
-export const wrapState = (state: State<AppClientsState | undefined>, appClientsApi: AppClientsApi): AppClientsService => {
+export const wrapState = (state: State<AppClientFlat[]>, appClientsApi: AppClientsApi): AppClientsService => {
   return ({
     fetchAndStoreAppClients() {
       const response = () => appClientsApi.getAppClients();
+      const data = new Promise<AppClientFlat[]>(resolve => resolve(response().then(r => this.convertAppClientsToFlat(r.data))));
+      state.set(data);
 
-      state.set(response()
-        .then(response => {
-          return {
-            error: undefined,
-            clients: this.convertAppClientsToFlat(response.data)
-          };
-        })
-        .catch(error => {
-          return {
-            error: error.message,
-            clients: undefined
-          };
-        })
-      );
+      return data;
     },
     convertAppClientsToFlat(clients: AppClient[]) {
       return clients.map(client => {
-        const { id, name, nameAsLower } = client;
+        const { id, name } = client;
 
         const privileges: ClientPrivilege = {
           read: client.privileges?.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
           write: client.privileges?.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
-          dashboard: client.privileges?.find(privilege => privilege.name === PrivilegeType.DASHBOARD) ? true : false
+          dashboard_user: client.privileges?.find(privilege => privilege.name === PrivilegeType.DASHBOARD_USER) ? true : false,
+          dashboard_admin: client.privileges?.find(privilege => privilege.name === PrivilegeType.DASHBOARD_ADMIN) ? true : false
         };
 
         return {
           id,
           name,
-          nameAsLower,
           ...privileges
         };
       });
@@ -55,11 +47,11 @@ export const wrapState = (state: State<AppClientsState | undefined>, appClientsA
     get isPromised(): boolean {
       return state.promised;
     },
-    get appClients(): AppClient[] | undefined {
-      return state.promised ? undefined : state.get()?.clients;
+    get appClients(): State<AppClientFlat[]> {
+      return state;
     },
-    get error(): string | undefined {
-      return state.promised ? undefined : state.get()?.error;
+    get error(): any {
+      return state.error;
     }
   })
 };

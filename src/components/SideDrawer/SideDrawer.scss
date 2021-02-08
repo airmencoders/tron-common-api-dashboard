@@ -1,0 +1,42 @@
+@import"../../styles/base";
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.side-drawer { 
+  height: 100%;
+  background: white;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 25%;
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+  overflow: auto;
+
+  &.open {
+    transform: translateX(0%);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: calculateRem(8px) calculateRem(8px);
+    border-bottom: 1px solid gray;
+  }
+
+  .header {
+    &__title {
+      flex: 1;
+  
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__content {
+    padding: calculateRem(16px) calculateRem(16px);
+  }
+}
+
