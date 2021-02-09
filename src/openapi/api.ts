@@ -15,6 +15,7 @@
 
 
 export * from './apis/airman-controller-api';
+export * from './apis/app-client-controller-api';
 export * from './apis/flight-controller-api';
 export * from './apis/group-controller-api';
 export * from './apis/header-request-controller-api';

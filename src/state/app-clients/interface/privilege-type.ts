@@ -1,0 +1,6 @@
+export enum PrivilegeType {
+  READ = 'READ',
+  WRITE = 'WRITE',
+  DASHBOARD_ADMIN = 'DASHBOARD_ADMIN',
+  DASHBOARD_USER = 'DASHBOARD_USER'
+}

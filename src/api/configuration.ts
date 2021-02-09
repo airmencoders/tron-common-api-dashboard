@@ -12,11 +12,11 @@ class Config {
     }
 
     public static get API_URL(): string {
-        return this.API_BASE_URL + this.API_PATH_PREFIX + this.API_VERSION_PREFIX;
+        return this.API_BASE_URL + this.API_PATH_PREFIX + "/" + this.API_VERSION_PREFIX + "/";
     }
 
     public static get ACTUATOR_URL(): string {
-        return this.API_BASE_URL + this.API_PATH_PREFIX + "actuator/";
+        return this.API_BASE_URL + this.API_PATH_PREFIX + "/actuator/";
     }
 
     public static get ACCESS_TOKEN(): string | undefined {

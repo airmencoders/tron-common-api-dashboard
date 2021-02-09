@@ -24,18 +24,18 @@ paths:
       responses:
         "404":
           description: Resource not found or UUID exists but is not a Wing type
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad Request or malformed UUID
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
     put:
       tags:
       - wing-controller
@@ -57,6 +57,12 @@ paths:
               $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "400":
           description: Bad request - provided unit not a WING
           content:
@@ -69,12 +75,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
     delete:
       tags:
       - wing-controller
@@ -122,6 +122,12 @@ paths:
               description: Object with key value pairs of the attributes to update
         required: true
       responses:
+        "400":
+          description: A provided person UUID was invalid or org was not a WING
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -130,12 +136,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "404":
           description: Organization resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: A provided person UUID was invalid or org was not a WING
           content:
             '*/*':
               schema:
@@ -155,18 +155,18 @@ paths:
           type: string
           format: uuid
       responses:
-        "404":
-          description: Record not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
     put:
       tags:
       - subscriber-controller
@@ -187,12 +187,6 @@ paths:
               $ref: '#/components/schemas/Subscriber'
         required: true
       responses:
-        "404":
-          description: Record not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -211,6 +205,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
     delete:
       tags:
       - subscriber-controller
@@ -225,18 +225,18 @@ paths:
           type: string
           format: uuid
       responses:
-        "404":
-          description: Record not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/squadron/{id}:
     get:
       tags:
@@ -255,18 +255,18 @@ paths:
       responses:
         "404":
           description: Resource not found or UUID exists but is not a Squadron type
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad Request or malformed UUID
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
     put:
       tags:
       - squadron-controller
@@ -288,6 +288,12 @@ paths:
               $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -296,12 +302,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad request - provided unit not a SQUADRON
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Resource not found
           content:
             '*/*':
               schema:
@@ -387,6 +387,12 @@ paths:
           type: string
           format: uuid
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -395,12 +401,6 @@ paths:
                 $ref: '#/components/schemas/Person'
         "400":
           description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Resource not found
           content:
             '*/*':
               schema:
@@ -426,18 +426,18 @@ paths:
               $ref: '#/components/schemas/Person'
         required: true
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Person'
         "404":
           description: Resource not found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Person'
     delete:
       tags:
       - person-controller
@@ -485,6 +485,12 @@ paths:
           type: boolean
           default: false
       responses:
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -493,12 +499,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "404":
           description: Resource not found
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
     put:
       tags:
       - organization-controller
@@ -520,6 +520,12 @@ paths:
               $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -528,12 +534,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Resource not found
           content:
             '*/*':
               schema:
@@ -622,18 +622,18 @@ paths:
       responses:
         "404":
           description: Resource not found or UUID exists but is not a Group type
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad Request or malformed UUID
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
     put:
       tags:
       - group-controller
@@ -655,6 +655,12 @@ paths:
               $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -663,12 +669,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad request - provided unit not a GROUP
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Resource not found
           content:
             '*/*':
               schema:
@@ -726,14 +726,14 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Organization resource not found
+        "400":
+          description: A provided person UUID was invalid or org was not a GROUP
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: A provided person UUID was invalid or org was not a GROUP
+        "404":
+          description: Organization resource not found
           content:
             '*/*':
               schema:
@@ -754,6 +754,12 @@ paths:
           type: string
           format: uuid
       responses:
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -762,12 +768,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "404":
           description: Resource not found or UUID exists but is not a Flight type
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
     put:
       tags:
       - flight-controller
@@ -789,6 +789,12 @@ paths:
               $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -797,12 +803,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "400":
           description: Bad request - provided unit not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Resource not found
           content:
             '*/*':
               schema:
@@ -855,12 +855,6 @@ paths:
               description: Object with key value pairs of the attributes to update
         required: true
       responses:
-        "400":
-          description: A provided person UUID was invalid or org was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -869,6 +863,12 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         "404":
           description: Organization resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: A provided person UUID was invalid or org was not a FLIGHT
           content:
             '*/*':
               schema:
@@ -889,18 +889,18 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Airman'
         "404":
           description: Resource not found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Airman'
     put:
       tags:
       - airman-controller
@@ -929,6 +929,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Airman'
         "400":
           description: Invalid update request - provided UUID didn't exist or did
             not match UUID in provided record or failed to validate data
@@ -936,12 +942,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Airman'
     delete:
       tags:
       - airman-controller
@@ -957,14 +957,14 @@ paths:
           type: string
           format: uuid
       responses:
+        "200":
+          description: Successful operation / Request Performed
         "404":
           description: Record to delete does not exist
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation / Request Performed
   /v1/wing:
     get:
       tags:
@@ -1027,6 +1027,12 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
         "409":
           description: Bad Request / One of the supplied organizations contained a
             UUID that already exists or other duplicate data / An org was provided
@@ -1041,12 +1047,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
   /v1/subscriptions:
     get:
       tags:
@@ -1159,18 +1159,18 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "201":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/person:
     get:
       tags:
@@ -1200,6 +1200,12 @@ paths:
               $ref: '#/components/schemas/Person'
         required: true
       responses:
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "201":
           description: Successful operation
           content:
@@ -1208,12 +1214,6 @@ paths:
                 $ref: '#/components/schemas/Person'
         "400":
           description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "409":
-          description: Resource already exists with the id provided
           content:
             '*/*':
               schema:
@@ -1240,18 +1240,18 @@ paths:
                 $ref: '#/components/schemas/Person'
         required: true
       responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Person'
         "409":
           description: A person already exists with the id provided
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Person'
         "400":
           description: Bad data or validation error
           content:
@@ -1349,8 +1349,9 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
-        "400":
-          description: Bad data or validation error
+        "409":
+          description: Bad Request / One of the supplied organizations contained a
+            UUID that already exists or other duplicate data
           content:
             '*/*':
               schema:
@@ -1361,9 +1362,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Bad Request / One of the supplied organizations contained a
-            UUID that already exists or other duplicate data
+        "400":
+          description: Bad data or validation error
           content:
             '*/*':
               schema:
@@ -1430,12 +1430,6 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "201":
           description: Successful operation
           content:
@@ -1446,6 +1440,12 @@ paths:
           description: Bad Request / One of the supplied organizations contained a
             UUID that already exists or other duplicate data / An org was provided
             that was not a GROUP
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Bad data or validation error
           content:
             '*/*':
               schema:
@@ -1512,6 +1512,12 @@ paths:
                 $ref: '#/components/schemas/OrganizationDto'
         required: true
       responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
         "409":
           description: Bad Request / One of the supplied organizations contained a
             UUID that already exists or other duplicate data / An org was provided
@@ -1526,12 +1532,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
   /v1/airman:
     get:
       tags:
@@ -1646,6 +1646,8 @@ paths:
                 format: uuid
         required: true
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Provided organization UUID was invalid
           content:
@@ -1658,8 +1660,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
     patch:
       tags:
       - wing-controller
@@ -1685,20 +1685,20 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "400":
           description: Provided person UUID(s) was/were invalid or org was not a WING
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/squadron/{id}/members:
     delete:
       tags:
@@ -1725,6 +1725,8 @@ paths:
                 format: uuid
         required: true
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Provided organization UUID was invalid
           content:
@@ -1737,8 +1739,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
     patch:
       tags:
       - squadron-controller
@@ -1764,20 +1764,20 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "400":
           description: Provided person UUID(s) was/were invalid or org was not a SQUADRON
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/organization/{id}/subordinates:
     delete:
       tags:
@@ -1804,6 +1804,8 @@ paths:
                 format: uuid
         required: true
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Host organization UUID was invalid
           content:
@@ -1816,8 +1818,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
     patch:
       tags:
       - organization-controller
@@ -1843,6 +1843,8 @@ paths:
                 format: uuid
         required: true
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Host organization UUID was invalid
           content:
@@ -1855,8 +1857,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
   /v1/organization/{id}/members:
     delete:
       tags:
@@ -1883,6 +1883,8 @@ paths:
                 format: uuid
         required: true
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Provided organization UUID was invalid
           content:
@@ -1895,8 +1897,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
     patch:
       tags:
       - organization-controller
@@ -1922,6 +1922,8 @@ paths:
                 format: uuid
         required: true
       responses:
+        "204":
+          description: Successful operation
         "400":
           description: Provided person UUID(s) was/were invalid
           content:
@@ -1934,8 +1936,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
   /v1/group/{id}/members:
     delete:
       tags:
@@ -1962,20 +1962,20 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: Provided organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "400":
           description: Provided person UUID(s) was/were invalid or org was not a GROUP
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
+        "404":
+          description: Provided organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
     patch:
       tags:
       - group-controller
@@ -2001,20 +2001,20 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "400":
           description: Provided person UUID(s) was/were invalid or org was not a GROUP
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/flight/{id}/members:
     delete:
       tags:
@@ -2041,20 +2041,20 @@ paths:
                 format: uuid
         required: true
       responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "404":
           description: Provided organization UUID was invalid
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
     patch:
       tags:
       - flight-controller
@@ -2080,20 +2080,20 @@ paths:
                 format: uuid
         required: true
       responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "404":
           description: A organization UUID was invalid
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/userinfo:
     get:
       tags:
@@ -2102,18 +2102,18 @@ paths:
       description: Retrieves user information
       operationId: getUserInfo
       responses:
-        "400":
-          description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/puckboard/extract:
     get:
       tags:
@@ -2138,6 +2138,22 @@ paths:
             '*/*':
               schema:
                 type: object
+  /v1/app-client:
+    get:
+      tags:
+      - app-client-controller
+      summary: Retrieves all application client user information
+      description: Retrieves application client user information
+      operationId: getUsers
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppClientUserDto'
 components:
   schemas:
     OrganizationDto:
@@ -2315,4 +2331,27 @@ components:
         email:
           type: string
         organization:
+          type: string
+    AppClientUserDto:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        privileges:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Privilege'
+    Privilege:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
           type: string
