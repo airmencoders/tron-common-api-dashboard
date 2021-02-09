@@ -17,45 +17,41 @@
 /**
  * 
  * @export
- * @interface Person
+ * @interface Subscriber
  */
-export interface Person {
+export interface Subscriber {
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Subscriber
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Subscriber
      */
-    firstName?: string;
+    subscriberAddress: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Subscriber
      */
-    middleName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    lastName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    title?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    email?: string;
+    subscribedEvent: SubscriberSubscribedEventEnum;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum SubscriberSubscribedEventEnum {
+    PersonCreate = 'PERSON_CREATE',
+    PersonChange = 'PERSON_CHANGE',
+    PersonDelete = 'PERSON_DELETE',
+    OrganizationCreate = 'ORGANIZATION_CREATE',
+    OrganizationChange = 'ORGANIZATION_CHANGE',
+    OrganizationDelete = 'ORGANIZATION_DELETE'
+}
+
 
 

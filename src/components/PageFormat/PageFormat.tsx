@@ -4,6 +4,7 @@ import PageTitle from '../PageTitle/PageTitle';
 import Sidebar from '../Sidebar/Sidebar';
 
 import './PageFormat.scss';
+import HeaderUserInfoContainer from '../../containers/HeaderUserInfoContainer';
 
 export interface PageFormatProps {
   pageTitle: string;
@@ -17,7 +18,8 @@ function PageFormat(props: any) {
           <Sidebar items={routes} />
         </div>
         <div className="page-format__page-body-container">
-          <div className="page-format__top-nav  default-panel-padding">
+          <div className="page-format__top-nav">
+            <HeaderUserInfoContainer />
           </div>
           <div className="page-format__page-body">
             <div className="page-body__title-section">
