@@ -27,6 +27,7 @@ const columnHeaders: GridColumn[] = [
 
 export const AppClientPage: FC = () => {
   const state = useAppClientsState();
+  const [gridApi, setGridApi] = useReactState<GridApi | null>(null);
 
   const useSideDrawerState = useState({
     isOpen: false,
@@ -38,7 +39,7 @@ export const AppClientPage: FC = () => {
     state.fetchAndStoreAppClients();
   }, []);
 
-  const [gridApi, setGridApi] = useReactState<GridApi | null>(null);
+
   // const useGridApi = useState<GridApi | null>(null);
 
   function onRowClicked(event: RowClickedEvent): void {
@@ -56,9 +57,14 @@ export const AppClientPage: FC = () => {
     // useGridApi.set(event.api);
   }
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-
-
+  function onSubmit(event: any) {
+    event.preventDefault();
+    console.log('submitted');
+    state.appClients.set((prevState) => {
+      const updated: AppClientFlat[] = Object.assign([], [...prevState]);
+      updated[0].name = 'changed';
+      return updated;
+    });
     // Update the grid item on success
     // gridApi?.getRowNode(useSideDrawerState.rowNodeId.get())?.setData(savedObj);
   }
@@ -80,7 +86,8 @@ export const AppClientPage: FC = () => {
               <StatusCard status={StatusType.ERROR} title={serviceTitle} />
               :
               <>
-                <Grid data={[...accessAppClientsState().appClients.get()]} columns={columnHeaders} onRowClicked={onRowClicked} getGridApi={storeGridApi} />
+                <Grid data={state.appClients.get()} columns={columnHeaders}
+                      onRowClicked={onRowClicked} getGridApi={storeGridApi} />
 
                 {useSideDrawerState.clientId.get().length > 0 &&
                   <SideDrawer title={"Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
@@ -98,7 +105,7 @@ export const AppClientPage: FC = () => {
   )
 }
 
-function ClientAppForm(props: { client?: AppClientFlat, onSubmit: (event: React.FormEvent<HTMLFormElement>) => void }) {
+function ClientAppForm(props: { client?: AppClientFlat, onSubmit: (event: any) => void }) {
   return (
     <>
       {props.client ?
@@ -113,6 +120,7 @@ function ClientAppForm(props: { client?: AppClientFlat, onSubmit: (event: React.
           <Label htmlFor="dashboard_user">Dashboard User</Label>
 
           <Label htmlFor="dashboard_admin">Dashboard Admin</Label>
+          <Button type={'submit'} onClick={props.onSubmit}>Submit</Button>
 
         </Form>
         :

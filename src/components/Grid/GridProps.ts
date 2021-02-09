@@ -4,6 +4,6 @@ import GridColumn from './GridColumn';
 export interface GridProps {
   data: Array<any>;
   columns: Array<GridColumn>;
-  onRowClicked?: (event: RowClickedEvent) => void | undefined;
+  onRowClicked?: (event: RowClickedEvent) => void;
   getGridApi?: (event: GridReadyEvent) => void;
 }
