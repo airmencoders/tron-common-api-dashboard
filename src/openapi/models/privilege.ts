@@ -13,6 +13,25 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface Privilege
+ */
+export interface Privilege {
+    /**
+     * 
+     * @type {number}
+     * @memberof Privilege
+     */
+    id?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Privilege
+     */
+    name?: string;
+}
+
+

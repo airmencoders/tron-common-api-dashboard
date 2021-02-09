@@ -13,49 +13,32 @@
  */
 
 
+import { Privilege } from './privilege';
 
 /**
  * 
  * @export
- * @interface Person
+ * @interface AppClientUserDto
  */
-export interface Person {
+export interface AppClientUserDto {
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof AppClientUserDto
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof AppClientUserDto
      */
-    firstName?: string;
+    name: string;
     /**
      * 
-     * @type {string}
-     * @memberof Person
+     * @type {Set<Privilege>}
+     * @memberof AppClientUserDto
      */
-    middleName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    lastName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    title?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    email?: string;
+    privileges?: Set<Privilege>;
 }
 
 

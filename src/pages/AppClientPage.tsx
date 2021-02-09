@@ -21,9 +21,9 @@ const columnHeaders: GridColumn[] = [
   new GridColumn('name', true, true, 'NAME'),
   new GridColumn('read', true, true, 'READ'),
   new GridColumn('write', true, true, 'WRITE'),
-  new GridColumn('dashboard_admin', true, true, 'DASHBOARD ADMIN'),
-  new GridColumn('dashboard_user', true, true, 'DASHBOARD USER'),
-];
+  new GridColumn('dashboard_admin', true, true, 'DASHBOARD_ADMIN'),
+  new GridColumn('dashboard_user', true, true, 'DASHBOARD_USER')
+]
 
 export const AppClientPage: FC = () => {
   const state = useAppClientsState();

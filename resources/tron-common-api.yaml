@@ -1,0 +1,2357 @@
+openapi: 3.0.1
+info:
+  title: TRON Common API
+  version: 0.0.1
+servers:
+- url: http://localhost:8080/api
+  description: Generated server url
+paths:
+  /v1/wing/{id}:
+    get:
+      tags:
+      - wing-controller
+      summary: Retrieves a USAF WING organization by ID
+      description: Retrieves a USAF WING organization by ID
+      operationId: getWingById
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: Resource not found or UUID exists but is not a Wing type
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    put:
+      tags:
+      - wing-controller
+      summary: Updates an existing WING
+      description: Updates an existing WING
+      operationId: updateWing
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Bad request - provided unit not a WING
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    delete:
+      tags:
+      - wing-controller
+      summary: Deletes an existing WING
+      description: Deletes an existing WING
+      operationId: deleteWing
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - wing-controller
+      summary: Updates an existing WING's attributes
+      description: Updates an existing WING's attributes
+      operationId: patchWing
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+              description: Object with key value pairs of the attributes to update
+        required: true
+      responses:
+        "400":
+          description: A provided person UUID was invalid or org was not a WING
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Organization resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/subscriptions/{id}:
+    get:
+      tags:
+      - subscriber-controller
+      summary: Retrieves a registered subscription
+      description: Retrieve a subscription by its UUID
+      operationId: getSubscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    put:
+      tags:
+      - subscriber-controller
+      summary: Edits an existing subscription
+      description: Edits an existing subscription
+      operationId: updateSubscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscriber'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "409":
+          description: Subscription exists with address/event type pair
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: UUID given does not match UUID in Subscriber entity object
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      tags:
+      - subscriber-controller
+      summary: Deletes a subscription
+      description: Deletes a subscription by its UUID
+      operationId: cancelSubscription
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/squadron/{id}:
+    get:
+      tags:
+      - squadron-controller
+      summary: Retrieves a USAF SQUADRON organization by ID
+      description: Retrieves a USAF SQUADRON organization by ID
+      operationId: getSquadronById
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: Resource not found or UUID exists but is not a Squadron type
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    put:
+      tags:
+      - squadron-controller
+      summary: Updates an existing SQUADRON
+      description: Updates an existing SQUADRON
+      operationId: updateSquadron
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad request - provided unit not a SQUADRON
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      tags:
+      - squadron-controller
+      summary: Deletes an existing SQUADRON
+      description: Deletes an existing SQUADRON
+      operationId: deleteSquadron
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - squadron-controller
+      summary: Updates an existing SQUADRON's attributes
+      description: Updates an existing SQUADRON's attributes
+      operationId: patchSquadron
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+              description: Object with key value pairs of the attributes to update
+        required: true
+      responses:
+        "400":
+          description: A provided person UUID was invalid or org was not a SQUADRON
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Organization resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/person/{id}:
+    get:
+      tags:
+      - person-controller
+      summary: Retrieves a person by ID
+      description: Retrieves a person by ID
+      operationId: getPerson
+      parameters:
+      - name: id
+        in: path
+        description: Person ID to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Person'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    put:
+      tags:
+      - person-controller
+      summary: Updates an existing person
+      description: Updates an existing person
+      operationId: updatePerson
+      parameters:
+      - name: id
+        in: path
+        description: Person ID to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+        required: true
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Person'
+    delete:
+      tags:
+      - person-controller
+      summary: Deletes an existing person
+      description: Deletes an existing person
+      operationId: deletePerson
+      parameters:
+      - name: id
+        in: path
+        description: Person ID to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/organization/{id}:
+    get:
+      tags:
+      - organization-controller
+      summary: Retrieves an organization by ID
+      description: Retrieves an organization by ID
+      operationId: getOrganization
+      parameters:
+      - name: id
+        in: path
+        description: Organization ID to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: flatten
+        in: query
+        description: Whether to flatten out all attached members and organizations
+          contained therein
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Resource not found
+    put:
+      tags:
+      - organization-controller
+      summary: Updates an existing organization
+      description: Updates an existing organization
+      operationId: updateOrganization
+      parameters:
+      - name: id
+        in: path
+        description: Organization ID to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      tags:
+      - organization-controller
+      summary: Deletes an existing organization
+      description: Deletes an existing organization
+      operationId: deleteOrganization
+      parameters:
+      - name: id
+        in: path
+        description: Organization ID to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - organization-controller
+      summary: Updates an existing organization's attributes
+      description: Updates an existing organization's attributes
+      operationId: patchOrganization
+      parameters:
+      - name: id
+        in: path
+        description: Organization ID to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+              description: Object hash containing the keys to modify (set fields to
+                null to clear that field)
+        required: true
+      responses:
+        "400":
+          description: A provided person UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Organization resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/group/{id}:
+    get:
+      tags:
+      - group-controller
+      summary: Retrieves a USAF GROUP organization by ID
+      description: Retrieves a USAF GROUP organization by ID
+      operationId: getGroupById
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: Resource not found or UUID exists but is not a Group type
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    put:
+      tags:
+      - group-controller
+      summary: Updates an existing GROUP
+      description: Updates an existing GROUP
+      operationId: updateGroup
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad request - provided unit not a GROUP
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      tags:
+      - group-controller
+      summary: Deletes an existing GROUP
+      description: Deletes an existing GROUP
+      operationId: deleteGroup
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - group-controller
+      summary: Updates an existing GROUP's attributes
+      description: Updates an existing GROUP's attributes
+      operationId: patchGroup
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+              description: Object with key value pairs of the attributes to update
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: A provided person UUID was invalid or org was not a GROUP
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: Organization resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/flight/{id}:
+    get:
+      tags:
+      - flight-controller
+      summary: Retrieves a USAF FLIGHT organization by ID
+      description: Retrieves a USAF FLIGHT organization by ID
+      operationId: getFlightById
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Resource not found or UUID exists but is not a Flight type
+    put:
+      tags:
+      - flight-controller
+      summary: Updates an existing FLIGHT
+      description: Updates an existing FLIGHT
+      operationId: updateFlight
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad request - provided unit not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      tags:
+      - flight-controller
+      summary: Deletes an existing FLIGHT
+      description: Deletes an existing FLIGHT
+      operationId: deleteFlight
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - flight-controller
+      summary: Updates an existing FLIGHT's attributes
+      description: Updates an existing FLIGHT's attributes.  Non-person/organization
+        fields can be updated using this manner.
+      operationId: patchFlight
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+              description: Object with key value pairs of the attributes to update
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Organization resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: A provided person UUID was invalid or org was not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/airman/{id}:
+    get:
+      tags:
+      - airman-controller
+      summary: Retrieves a single airman by UUID
+      description: Retrieves single airman record
+      operationId: getAirman
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the airman record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Airman'
+    put:
+      tags:
+      - airman-controller
+      summary: Updates an existing airman record
+      description: Updates an existing airman
+      operationId: updateAirman
+      parameters:
+      - name: id
+        in: path
+        description: Airman record ID to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Airman'
+        required: true
+      responses:
+        "404":
+          description: Record not found / Attempt to update airman record with provided
+            UUID does not exist
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Airman'
+        "400":
+          description: Invalid update request - provided UUID didn't exist or did
+            not match UUID in provided record or failed to validate data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    delete:
+      tags:
+      - airman-controller
+      summary: Deletes an airman record
+      description: Removes an airman record from the database
+      operationId: deleteAirman
+      parameters:
+      - name: id
+        in: path
+        description: UUID id of the airman record to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successful operation / Request Performed
+        "404":
+          description: Record to delete does not exist
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/wing:
+    get:
+      tags:
+      - wing-controller
+      summary: Retrieves all organizations of type USAF FLIGHT
+      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
+        \ use '/organization' endpoint to allow more options."
+      operationId: getAllWingTypes
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    post:
+      tags:
+      - wing-controller
+      summary: Adds a new USAF WING organization
+      description: Adds a new USAF WING organization
+      operationId: createNewWing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/wing/wings:
+    post:
+      tags:
+      - wing-controller
+      summary: Adds one or more WING entities
+      description: "Adds one or more WING entities - returns that same array of input\
+        \ organizations with their assigned UUIDs. If the request does NOT return\
+        \ 201 (Created) because of an error (see other return codes), then any new\
+        \ organizations up to that organization that caused the failure will have\
+        \ been committed (but none thereafter)The return error message will list the\
+        \ offending UUID or other data that caused the error."
+      operationId: addNewWings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of the new organization objects to add
+              items:
+                $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Bad Request / One of the supplied organizations contained a
+            UUID that already exists or other duplicate data / An org was provided
+            that was not a WING
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/subscriptions:
+    get:
+      tags:
+      - subscriber-controller
+      summary: Retrieves all registered subscriptions
+      description: Retrieves all subscriptions
+      operationId: getAllSubscriptions
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscriber'
+    post:
+      tags:
+      - subscriber-controller
+      summary: Adds a new subscription
+      description: Adds a new subscription.  Duplicates for the same address/event
+        type won't be accepted
+      operationId: createSubscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscriber'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        "409":
+          description: Subscription already exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/squadron:
+    get:
+      tags:
+      - squadron-controller
+      summary: Retrieves all organizations of type USAF SQUADRON
+      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
+        \ use '/organization' endpoint to allow more options."
+      operationId: getAllSquadronTypes
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    post:
+      tags:
+      - squadron-controller
+      summary: Adds a new USAF SQUADRON organization
+      description: Adds a new USAF SQUADRON organization
+      operationId: createNewSquadron
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/squadron/squadrons:
+    post:
+      tags:
+      - squadron-controller
+      summary: Adds one or more SQUADRON entities
+      description: "Adds one or more SQUADRON entities - returns that same array of\
+        \ input organizations with their assigned UUIDs. If the request does NOT return\
+        \ 201 (Created) because of an error (see other return codes), then any new\
+        \ organizations up to that organization that caused the failure will have\
+        \ been committed (but none thereafter)The return error message will list the\
+        \ offending UUID or other data that caused the error."
+      operationId: addNewSquadrons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of the new organization objects to add
+              items:
+                $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "409":
+          description: Bad Request / One of the supplied organizations contained a
+            UUID that already exists or other duplicate data / An org was provided
+            that was not a SQUADRON
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/person:
+    get:
+      tags:
+      - person-controller
+      summary: Retrieves all persons
+      description: Retrieves all persons
+      operationId: getPersons
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      tags:
+      - person-controller
+      summary: Adds a person
+      description: Adds a person
+      operationId: createPerson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+        required: true
+      responses:
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Person'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/person/persons:
+    post:
+      tags:
+      - person-controller
+      summary: Add one or more members to the database
+      description: "Adds one or more person entities - returns that same array of\
+        \ input persons with their assigned UUIDs. If the request does NOT return\
+        \ 201 (Created) because of an error (see other return codes), then no new\
+        \ persons will have been committed to the database (if one entity fails, the\
+        \ entire operation fails). The return error message will list the offending\
+        \ UUID or other data that caused the error."
+      operationId: addPersons
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: Array of persons to add
+              items:
+                $ref: '#/components/schemas/Person'
+        required: true
+      responses:
+        "409":
+          description: A person already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Person'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/organization:
+    get:
+      tags:
+      - organization-controller
+      summary: Retrieves all organizations
+      description: "Retrieves all organizations.  Optionally can provide 'type' parameter\
+        \ (e.g. 'WING') to filter by Organization type and/or 'branch' parameter to\
+        \ filter by branch of service (e.g 'USAF'). If neither parameter is given,\
+        \ then no filters are applied and request returns all Organizations.  Optionally\
+        \ can also provide 'search' parameter to search on organization names within\
+        \ the result set (case in-sensitive)."
+      operationId: getOrganizations
+      parameters:
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+          default: UNKNOWN
+      - name: branch
+        in: query
+        required: false
+        schema:
+          type: string
+          default: UNKNOWN
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+          default: ""
+      responses:
+        "400":
+          description: Bad Request - likely due to invalid unit type or branch of
+            service specified
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    post:
+      tags:
+      - organization-controller
+      summary: Adds an organization
+      description: Adds an organization
+      operationId: createOrganization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/organization/organizations:
+    post:
+      tags:
+      - organization-controller
+      summary: Adds one or more organization entities
+      description: "Adds one or more organization entities - returns that same array\
+        \ of input organizations with their assigned UUIDs. If the request does NOT\
+        \ return 201 (Created) because of an error (see other return codes), then\
+        \ any new organizations up to that organization that caused the failure will\
+        \ have been committed (but none thereafter)The return error message will list\
+        \ the offending UUID or other data that caused the error."
+      operationId: addNewOrganizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "409":
+          description: Bad Request / One of the supplied organizations contained a
+            UUID that already exists or other duplicate data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/group:
+    get:
+      tags:
+      - group-controller
+      summary: Retrieves all organizations of type USAF GROUP
+      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
+        \ use '/organization' endpoint to allow more options."
+      operationId: getAllGroupTypes
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    post:
+      tags:
+      - group-controller
+      summary: Adds a new USAF GROUP organization
+      description: Adds a new USAF GROUP organization
+      operationId: createNewGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/group/groups:
+    post:
+      tags:
+      - group-controller
+      summary: Adds one or more GROUP entities
+      description: "Adds one or more GROUP entities - returns that same array of input\
+        \ organizations with their assigned UUIDs. If the request does NOT return\
+        \ 201 (Created) because of an error (see other return codes), then any new\
+        \ organizations up to that organization that caused the failure will have\
+        \ been committed (but none thereafter)The return error message will list the\
+        \ offending UUID or other data that caused the error."
+      operationId: addNewGroups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of the new organization objects to add
+              items:
+                $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Bad Request / One of the supplied organizations contained a
+            UUID that already exists or other duplicate data / An org was provided
+            that was not a GROUP
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/flight:
+    get:
+      tags:
+      - flight-controller
+      summary: Retrieves all organizations of type USAF WING
+      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
+        \ use '/organization' endpoint to allow more options."
+      operationId: getAllFlightTypes
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+    post:
+      tags:
+      - flight-controller
+      summary: Adds a new USAF FLIGHT organization
+      description: Adds a new USAF FLIGHT organization
+      operationId: createNewFlight
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/flight/flights:
+    post:
+      tags:
+      - flight-controller
+      summary: Adds one or more FLIGHT entities
+      description: "Adds one or more FLIGHT entities - returns that same array of\
+        \ input organizations with their assigned UUIDs. If the request does NOT return\
+        \ 201 (Created) because of an error (see other return codes), then any new\
+        \ organizations up to that organization that caused the failure will have\
+        \ been committed (but none thereafter)The return error message will list the\
+        \ offending UUID or other data that caused the error."
+      operationId: addNewFlights
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of the new organization objects to add
+              items:
+                $ref: '#/components/schemas/OrganizationDto'
+        required: true
+      responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "409":
+          description: Bad Request / One of the supplied organizations contained a
+            UUID that already exists or other duplicate data / An org was provided
+            that was not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/airman:
+    get:
+      tags:
+      - airman-controller
+      summary: Retrieves all airmen
+      description: Retrieves all airmen records
+      operationId: getAllAirman
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Airman'
+    post:
+      tags:
+      - airman-controller
+      summary: Adds a new airman
+      description: "Adds a new airman, ID field should be null for a new addition."
+      operationId: addAirman
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Airman'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Airman'
+        "409":
+          description: Resource already exists with the provided UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/airman/airmen:
+    post:
+      tags:
+      - airman-controller
+      summary: Adds one or more airmen entities
+      description: "Adds one or more airmen entities - returns that same array of\
+        \ input airmen with their assigned UUIDs. If the request does NOT return 201\
+        \ (Created) because of an error (see other return codes), then no new airmen\
+        \ will have been committed to the database (if one entity fails, the entire\
+        \ operation fails). The return error message will list the offending UUID\
+        \ or other data that caused the error."
+      operationId: addAirmen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: Array of Airman to add
+              items:
+                $ref: '#/components/schemas/Airman'
+        required: true
+      responses:
+        "409":
+          description: Bad Request / One of the supplied airman contained a UUID that
+            already exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Airman'
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/wing/{id}/members:
+    delete:
+      tags:
+      - wing-controller
+      summary: Deletes a member(s) from the WING
+      description: Deletes a member(s) from the WING
+      operationId: deleteWingMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Provided organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a WING
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - wing-controller
+      summary: Add member(s) to a WING
+      description: Adds member(s) to a WING
+      operationId: addWingMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a WING
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/squadron/{id}/members:
+    delete:
+      tags:
+      - squadron-controller
+      summary: Deletes a member(s) from the SQUADRON
+      description: Deletes a member(s) from the SQUADRON
+      operationId: deleteSquadronMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Provided organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a SQUADRON
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - squadron-controller
+      summary: Add member(s) to a SQUADRON
+      description: Adds member(s) to a SQUADRON
+      operationId: addSquadronMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a SQUADRON
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/organization/{id}/subordinates:
+    delete:
+      tags:
+      - organization-controller
+      summary: Remove subordinate organizations from an organization
+      description: Removes subordinate orgs from an organization
+      operationId: removeSubordinateOrganization
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: UUID(s) of subordinate organizations
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Host organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided org UUID(s) was/were invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - organization-controller
+      summary: Add subordinate organizations to an organization
+      description: Adds subordinate orgs to an organization
+      operationId: addSubordinateOrganization
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: UUID(s) of subordinate organizations
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Host organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided org UUID(s) was/were invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/organization/{id}/members:
+    delete:
+      tags:
+      - organization-controller
+      summary: Deletes a member(s) from the organization
+      description: Deletes a member(s) from an organization
+      operationId: deleteOrganizationMember
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization to modify
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: UUID(s) of the member(s) to remove
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Provided organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided person UUID(s) was/were invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - organization-controller
+      summary: Add member(s) to an organization
+      description: Adds member(s) to an organization
+      operationId: addOrganizationMember
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: UUID(s) of the member(s) to add
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/group/{id}/members:
+    delete:
+      tags:
+      - group-controller
+      summary: Deletes a member(s) from the GROUP
+      description: Deletes a member(s) from the GROUP
+      operationId: deleteGroupMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a GROUP
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: Provided organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - group-controller
+      summary: Add member(s) to a GROUP
+      description: Adds member(s) to a GROUP
+      operationId: addGroupMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a GROUP
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/flight/{id}/members:
+    delete:
+      tags:
+      - flight-controller
+      summary: Deletes a member(s) from the FLIGHT
+      description: Deletes a member(s) from the FLIGHT
+      operationId: deleteFlightMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: Provided organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+    patch:
+      tags:
+      - flight-controller
+      summary: Add member(s) to a FLIGHT
+      description: Adds member(s) to a FLIGHT
+      operationId: addFlightMembers
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the host organization record
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of UUIDs of persons to remove from the organization
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Successful operation
+        "404":
+          description: A organization UUID was invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/userinfo:
+    get:
+      tags:
+      - user-info-controller
+      summary: Retrieves the user information from the jwt
+      description: Retrieves user information
+      operationId: getUserInfo
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/puckboard/extract:
+    get:
+      tags:
+      - puckboard-etl-controller
+      operationId: getPuckboardData
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /v1/list-request-headers:
+    get:
+      tags:
+      - header-request-controller
+      operationId: getHeaders
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /v1/app-client:
+    get:
+      tags:
+      - app-client-controller
+      summary: Retrieves all application client user information
+      description: Retrieves application client user information
+      operationId: getUsers
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppClientUserDto'
+components:
+  schemas:
+    OrganizationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        leader:
+          type: string
+          format: uuid
+        members:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+        parentOrganization:
+          type: string
+          format: uuid
+        subordinateOrganizations:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+        orgType:
+          type: string
+          enum:
+          - SQUADRON
+          - GROUP
+          - FLIGHT
+          - WING
+          - OTHER_USAF
+          - ORGANIZATION
+        branchType:
+          type: string
+          enum:
+          - OTHER
+          - USA
+          - USAF
+          - USMC
+          - USN
+          - USSF
+          - USCG
+    ExceptionResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    Subscriber:
+      required:
+      - subscribedEvent
+      - subscriberAddress
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        subscriberAddress:
+          type: string
+        subscribedEvent:
+          type: string
+          enum:
+          - PERSON_CREATE
+          - PERSON_CHANGE
+          - PERSON_DELETE
+          - ORGANIZATION_CREATE
+          - ORGANIZATION_CHANGE
+          - ORGANIZATION_DELETE
+    Person:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        title:
+          type: string
+        email:
+          type: string
+    Airman:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
+          type: string
+        title:
+          type: string
+        email:
+          type: string
+        afsc:
+          type: string
+        etsDate:
+          type: string
+          format: date-time
+        ptDate:
+          type: string
+          format: date-time
+        dodid:
+          type: string
+        imds:
+          type: string
+        unit:
+          type: string
+        wing:
+          type: string
+        gp:
+          type: string
+        squadron:
+          type: string
+        wc:
+          type: string
+        go81:
+          type: string
+        dor:
+          type: string
+          format: date-time
+        deros:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        admin:
+          type: boolean
+        fltChief:
+          type: string
+        approved:
+          type: boolean
+        manNumber:
+          type: string
+        dutyPhone:
+          type: string
+        dutyTitle:
+          type: string
+        rank:
+          type: string
+    UserInfoDto:
+      type: object
+      properties:
+        dodId:
+          type: string
+        givenName:
+          type: string
+        familyName:
+          type: string
+        name:
+          type: string
+        preferredUsername:
+          type: string
+        email:
+          type: string
+        organization:
+          type: string
+    AppClientUserDto:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        privileges:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Privilege'
+    Privilege:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string

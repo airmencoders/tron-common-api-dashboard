@@ -42,7 +42,9 @@
     "cypress:open": "npx cypress open --env INTEGRATION_TEST_HOST=http://localhost:3000/",
     "test:e2e-local": "npx cypress run --env INTEGRATION_TEST_HOST=http://localhost:3000/",
     "test:e2e-ci": "npx cypress run --env INTEGRATION_TEST_HOST=https://tron-common-api.staging.dso.mil/ configFile=pipeline",
-    "sonar": "sonar-scanner -Dsonar.projectVersion=${version}"
+    "sonar": "sonar-scanner -Dsonar.projectVersion=${version}",
+    "clean:generated-api-client": "rimraf src/openapi",
+    "generate-api-client": "npm run clean:generated-api-client && openapi-generator-cli generate -g typescript-axios -i resources/tron-common-api.yaml -o src/openapi --additional-properties=withSeparateModelsAndApi=true,apiPackage=apis,modelPackage=models,withInterfaces=true"
   },
   "eslintConfig": {
     "extends": [
@@ -63,6 +65,7 @@
     ]
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.1.22",
     "@storybook/addon-actions": "^6.1.14",
     "@storybook/addon-docs": "^6.1.14",
     "@storybook/addon-essentials": "^6.1.14",
@@ -72,7 +75,8 @@
     "@storybook/react": "^6.1.14",
     "@types/react-modal": "^3.10.6",
     "@types/react-router-dom": "^5.1.7",
-    "cypress": "^6.3.0"
+    "cypress": "^6.3.0",
+    "rimraf": "^3.0.2"
   },
   "jest": {
     "collectCoverageFrom": [

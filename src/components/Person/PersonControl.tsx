@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react';
-import { Person } from '../../openapi/index';
 import { PersonContext } from '../../context/PersonProviderContext';
 import Table from 'react-bootstrap/Table';
 import Modal from 'react-bootstrap/Modal';
@@ -8,6 +7,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageFormat from '../PageFormat/PageFormat';
+import {Person} from '../../openapi/models';
 
 export const PersonControl: FunctionComponent = () => {
 
@@ -47,7 +47,7 @@ export const PersonControl: FunctionComponent = () => {
                 </tr>
               </thead>
               <tbody>
-                {context.users.map((x: Person) =>
+                {context?.users.map((x: Person) =>
                   <tr key={x.id} data-testid={x.id}>
                     <td>{x.id}</td>
                     <td>{x.firstName}</td>
