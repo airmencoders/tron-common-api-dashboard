@@ -42,8 +42,8 @@ export default class AppClientsService {
     return this.state.promised;
   }
 
-  get appClients(): AppClientFlat[] | undefined {
-    return this.state.promised ? undefined : this.state.get();
+  get appClients(): State<AppClientFlat[]> | undefined {
+    return this.state.promised ? undefined : this.state;
   }
 
   get error(): string | undefined {

@@ -9,8 +9,7 @@ import {GridApi} from 'ag-grid-community';
 function Grid(props: GridProps) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const gridReady = (event: GridReadyEvent) => {
-      event.api.sizeColumnsToFit();
-      props.getGridApi && props.getGridApi(event);
+    event.api.sizeColumnsToFit();
       setGridApi(event.api);
   };
 

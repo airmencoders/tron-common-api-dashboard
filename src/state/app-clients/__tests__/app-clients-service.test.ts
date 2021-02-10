@@ -89,7 +89,7 @@ describe('App Client State Tests', () => {
 
     await state.fetchAndStoreAppClients();
 
-    expect(state.appClients).toEqual(flatClients);
+    expect(state.appClients?.get()).toEqual(flatClients);
   });
 
   it('Test convert client to flat', () => {
@@ -107,7 +107,7 @@ describe('App Client State Tests', () => {
     expect(state.appClients).toBe(undefined);
 
     await fetch;
-    expect(state.appClients).toEqual(flatClients);
+    expect(state.appClients?.get()).toEqual(flatClients);
   });
 
   it('Test error', async () => {

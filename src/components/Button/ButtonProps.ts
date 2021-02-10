@@ -9,4 +9,5 @@ export interface ButtonProps {
   inverse?: boolean;
   disabled?: boolean;
   onClick?: (event?: any) => void;
+  className?: string;
 }

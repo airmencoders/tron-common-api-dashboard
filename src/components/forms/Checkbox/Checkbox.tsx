@@ -3,7 +3,7 @@ import { Checkbox as UswdsCheckbox } from "@trussworks/react-uswds/lib/index";
 
 function Checkbox(props: CheckboxProps) {
   return (
-    <Checkbox {...props} />
+    <UswdsCheckbox {...props} />
   );
 }
 

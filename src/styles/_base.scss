@@ -30,4 +30,8 @@ div, span {
   color: $font-color-normal;
 }
 
-
+$theme-image-path: '~uswds/src/img';
+$theme-font-path: '~uswds/src/fonts';
+$theme-hero-image: '~uswds/src/img/hero.png';
+@import '~uswds/src/stylesheets/packages/_required.scss';
+@import 'uswds'; // <-- this goes at the end, contains USWDS CSS

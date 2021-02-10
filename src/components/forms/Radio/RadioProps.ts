@@ -1,6 +1,4 @@
-import { ChangeEvent } from "react";
-
-export interface CheckboxProps {
+export interface RadioProps {
   id: string
   name: string
   className?: string
@@ -11,6 +9,4 @@ export interface CheckboxProps {
   | React.RefObject<HTMLInputElement>
   | null
   | undefined
-  checked?: boolean
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void
 }

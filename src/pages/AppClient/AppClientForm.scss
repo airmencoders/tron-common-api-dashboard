@@ -1,0 +1,25 @@
+@import "../../styles/mixins";
+
+.client-form {
+  .client-name-container {
+    margin-bottom: calculateRem(10px);
+  }
+
+  .permissions-container {
+    margin-bottom: calculateRem(10px);
+
+    &__options {
+      margin-left: calculateRem(20px);
+
+      .usa-checkbox {
+        &__label {
+          margin-left: calculateRem(5px);
+        }
+      }
+    }
+  }
+
+  .submit-btn {
+    float: right;
+  }
+}
