@@ -22,7 +22,7 @@
   &__header {
     display: flex;
     align-items: center;
-    padding: calculateRem(8px) calculateRem(16px);
+    padding-bottom: calculateRem(10px);
 
     .close-btn {
       padding: 0;
@@ -34,15 +34,11 @@
   .header {
     &__title {
       flex: 1;
-  
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-bottom: 0;
     }
-  }
-
-  &__content {
-    padding: calculateRem(8px) calculateRem(16px);
   }
 }
 

@@ -9,7 +9,6 @@ import Label from "../../components/forms/Label/Label";
 import TextInput from "../../components/forms/TextInput/TextInput";
 import { AppClientFlat } from "../../state/app-clients/interface/app-client-flat";
 import './AppClientForm.scss';
-import Alert from "../../components/Alert/Alert";
 
 interface LooseObject {
   [key: string]: any
@@ -22,11 +21,9 @@ function AppClientForm(props: { client?: AppClientFlat }) {
       name: props.client?.name || "Client Name",
       read: props.client?.read || false,
       write: props.client?.write || false,
-      dashboard_admin: props.client?.dashboard_admin || false,
-      dashboard_user: props.client?.dashboard_user || false
     },
     errors: {
-
+      
     }
   });
 
@@ -50,7 +47,7 @@ function AppClientForm(props: { client?: AppClientFlat }) {
       {props.client ?
         <Form className="client-form" onSubmit={onSubmitClient}>
           <div className="client-name-container">
-            <Label className="client-name-container__label" htmlFor="name"><h5>Client Name</h5></Label>
+            <Label className="client-name-container__label" htmlFor="name"><h4>Name</h4></Label>
             <TextInput
               className="client-name-container__input"
               id="name"
@@ -59,12 +56,20 @@ function AppClientForm(props: { client?: AppClientFlat }) {
               defaultValue={formState.data.name.get()}
               placeholder="Enter Client App Name"
               error={Validation(formState.data.name).invalid()}
-              onChange={(event) => formState.data.name.set(event.target.value)} />
+              onChange={(event) => formState.data.name.set(event.target.value)}
+            />
+            {Validation(formState.data.name).invalid() &&
+              Validation(formState.data.name).errors().map((error, idx) => {
+                return (
+                  <p key={idx} className="client-name-container__error">{error.message}</p>
+                );
+              })
+            }
           </div>
 
           <Fieldset className="permissions-container">
             <div className="permissions-container__title">
-              <h5 className="title__text">Permissions</h5>
+              <h4 className="title__text">Permissions</h4>
             </div>
 
             <div className="permissions-container__options">
@@ -81,38 +86,14 @@ function AppClientForm(props: { client?: AppClientFlat }) {
                 label={<>Write</>}
                 checked={formState.data.write.get()}
                 onChange={(event) => formState.data.write.set(event.target.checked)} />
-
-              <Checkbox className="options__dashboard-user"
-                id="dashboard_user"
-                name="dashboard_user"
-                label={<>Dashboard User</>}
-                checked={formState.data.dashboard_user.get()}
-                onChange={(event) => formState.data.dashboard_user.set(event.target.checked)} />
-
-              <Checkbox className="options__dashboard-admin"
-                id="dashboard_admin"
-                name="dashboard_admin"
-                label={<>Dashboard Admin</>}
-                checked={formState.data.dashboard_admin.get()}
-                onChange={(event) => formState.data.dashboard_admin.set(event.target.checked)} />
             </div>
 
           </Fieldset>
 
-          {Validation(formState).invalid() &&
-            <Alert type="error" heading="Form errors" slim noIcon>
-              {Validation(formState).errors().map((error, idx) => {
-                return (
-                  <React.Fragment key={idx}>{error.message}</React.Fragment>
-                );
-              })}
-            </Alert>
-          }
-
           <Button
             type={'submit'}
             className="submit-btn"
-            disabled={Validation(formState).invalid() ? true : false}
+            disabled={Validation(formState).invalid()}
           >
             Submit
           </Button>

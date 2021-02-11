@@ -11,6 +11,7 @@ import { StatusType } from '../../components/StatusCard/status-type';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import { accessAppClientsState, useAppClientsState } from '../../state/app-clients/app-clients-state';
 import AppClientForm from './AppClientForm';
+import './AppClientPage.scss';
 
 const serviceTitle = "App Client Service";
 
@@ -18,8 +19,6 @@ const columnHeaders: GridColumn[] = [
   new GridColumn('name', true, true, 'NAME'),
   new GridColumn('read', true, true, 'READ'),
   new GridColumn('write', true, true, 'WRITE'),
-  new GridColumn('dashboard_admin', true, true, 'DASHBOARD_ADMIN'),
-  new GridColumn('dashboard_user', true, true, 'DASHBOARD_USER')
 ]
 
 export const AppClientPage: FC = () => {
@@ -61,10 +60,14 @@ export const AppClientPage: FC = () => {
               <StatusCard status={StatusType.ERROR} title={serviceTitle} />
               :
               <>
-                <Grid data={state.appClients?.get() || []} columns={columnHeaders}
-                  onRowClicked={onRowClicked} />
+                <Grid
+                  data={state.appClients?.get() || []}
+                  columns={columnHeaders}
+                  onRowClicked={onRowClicked}
+                  rowClass="ag-grid--row-pointer"
+                />
 
-                <SideDrawer title={"Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
+                <SideDrawer title={"App Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
                   {useSideDrawerState.clientId.get().length > 0 &&
                     <AppClientForm client={getAppClient()} />
                   }

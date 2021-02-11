@@ -10,7 +10,8 @@ function Grid(props: GridProps) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const gridReady = (event: GridReadyEvent) => {
     event.api.sizeColumnsToFit();
-      setGridApi(event.api);
+
+    setGridApi(event.api);
   };
 
   useEffect(() => {
@@ -26,6 +27,7 @@ function Grid(props: GridProps) {
             onGridReady={gridReady}
             domLayout={"autoHeight"}
             onRowClicked={props.onRowClicked}
+            rowClass={props.rowClass}
         >
           {
             props.columns.map(col => (

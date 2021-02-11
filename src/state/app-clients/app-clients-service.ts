@@ -1,6 +1,6 @@
 import { State } from "@hookstate/core";
 import { AppClientFlat } from "./interface/app-client-flat";
-import { ClientPrivilege } from "./interface/client-privilege";
+import { ClientPrivilege } from "./interface/app-client-privilege";
 import { PrivilegeType } from "./interface/privilege-type";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
@@ -26,8 +26,6 @@ export default class AppClientsService {
       const privileges: ClientPrivilege = {
         read: privilegeArr.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
         write: privilegeArr.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
-        dashboard_admin: privilegeArr.find(privilege => privilege.name === PrivilegeType.DASHBOARD_ADMIN) ? true : false,
-        dashboard_user: privilegeArr.find(privilege => privilege.name === PrivilegeType.DASHBOARD_USER) ? true : false,
       };
 
       return {
