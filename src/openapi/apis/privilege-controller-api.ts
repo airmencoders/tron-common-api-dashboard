@@ -19,23 +19,23 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { AppClientUserDto } from '../models';
-// @ts-ignore
 import { ExceptionResponse } from '../models';
+// @ts-ignore
+import { PrivilegeDto } from '../models';
 /**
- * AppClientControllerApi - axios parameter creator
+ * PrivilegeControllerApi - axios parameter creator
  * @export
  */
-export const AppClientControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+export const PrivilegeControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Retrieves application client user information
-         * @summary Retrieves all application client user information
+         * Retrieves Privilege information
+         * @summary Retrieves all Privilege information
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAppClientUsers: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/app-client`;
+        getPrivileges: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/privilege`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -66,23 +66,23 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Updates an existing Application Client
-         * @summary Updates an existing Application Client
-         * @param {string} id App Client ID to update
-         * @param {AppClientUserDto} appClientUserDto 
+         * Updates an existing Privilege
+         * @summary Updates an existing Privilege
+         * @param {number} id App Client ID to update
+         * @param {PrivilegeDto} privilegeDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateAppClient: async (id: string, appClientUserDto: AppClientUserDto, options: any = {}): Promise<RequestArgs> => {
+        updatePrivilege: async (id: number, privilegeDto: PrivilegeDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling updateAppClient.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling updatePrivilege.');
             }
-            // verify required parameter 'appClientUserDto' is not null or undefined
-            if (appClientUserDto === null || appClientUserDto === undefined) {
-                throw new RequiredError('appClientUserDto','Required parameter appClientUserDto was null or undefined when calling updateAppClient.');
+            // verify required parameter 'privilegeDto' is not null or undefined
+            if (privilegeDto === null || privilegeDto === undefined) {
+                throw new RequiredError('privilegeDto','Required parameter privilegeDto was null or undefined when calling updatePrivilege.');
             }
-            const localVarPath = `/v1/app-client/{id}`
+            const localVarPath = `/v1/privilege/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -109,13 +109,13 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof appClientUserDto !== 'string';
+            const nonString = typeof privilegeDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(appClientUserDto !== undefined ? appClientUserDto : {})
-                : (appClientUserDto || "");
+                ? JSON.stringify(privilegeDto !== undefined ? privilegeDto : {})
+                : (privilegeDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -126,34 +126,34 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
 };
 
 /**
- * AppClientControllerApi - functional programming interface
+ * PrivilegeControllerApi - functional programming interface
  * @export
  */
-export const AppClientControllerApiFp = function(configuration?: Configuration) {
+export const PrivilegeControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
-         * Retrieves application client user information
-         * @summary Retrieves all application client user information
+         * Retrieves Privilege information
+         * @summary Retrieves all Privilege information
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAppClientUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AppClientUserDto>>> {
-            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getAppClientUsers(options);
+        async getPrivileges(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
+            const localVarAxiosArgs = await PrivilegeControllerApiAxiosParamCreator(configuration).getPrivileges(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
             };
         },
         /**
-         * Updates an existing Application Client
-         * @summary Updates an existing Application Client
-         * @param {string} id App Client ID to update
-         * @param {AppClientUserDto} appClientUserDto 
+         * Updates an existing Privilege
+         * @summary Updates an existing Privilege
+         * @param {number} id App Client ID to update
+         * @param {PrivilegeDto} privilegeDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateAppClient(id: string, appClientUserDto: AppClientUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientUserDto>> {
-            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).updateAppClient(id, appClientUserDto, options);
+        async updatePrivilege(id: number, privilegeDto: PrivilegeDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrivilegeDto>> {
+            const localVarAxiosArgs = await PrivilegeControllerApiAxiosParamCreator(configuration).updatePrivilege(id, privilegeDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -163,90 +163,90 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
 };
 
 /**
- * AppClientControllerApi - factory interface
+ * PrivilegeControllerApi - factory interface
  * @export
  */
-export const AppClientControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const PrivilegeControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
-         * Retrieves application client user information
-         * @summary Retrieves all application client user information
+         * Retrieves Privilege information
+         * @summary Retrieves all Privilege information
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAppClientUsers(options?: any): AxiosPromise<Array<AppClientUserDto>> {
-            return AppClientControllerApiFp(configuration).getAppClientUsers(options).then((request) => request(axios, basePath));
+        getPrivileges(options?: any): AxiosPromise<Array<PrivilegeDto>> {
+            return PrivilegeControllerApiFp(configuration).getPrivileges(options).then((request) => request(axios, basePath));
         },
         /**
-         * Updates an existing Application Client
-         * @summary Updates an existing Application Client
-         * @param {string} id App Client ID to update
-         * @param {AppClientUserDto} appClientUserDto 
+         * Updates an existing Privilege
+         * @summary Updates an existing Privilege
+         * @param {number} id App Client ID to update
+         * @param {PrivilegeDto} privilegeDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateAppClient(id: string, appClientUserDto: AppClientUserDto, options?: any): AxiosPromise<AppClientUserDto> {
-            return AppClientControllerApiFp(configuration).updateAppClient(id, appClientUserDto, options).then((request) => request(axios, basePath));
+        updatePrivilege(id: number, privilegeDto: PrivilegeDto, options?: any): AxiosPromise<PrivilegeDto> {
+            return PrivilegeControllerApiFp(configuration).updatePrivilege(id, privilegeDto, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * AppClientControllerApi - interface
+ * PrivilegeControllerApi - interface
  * @export
- * @interface AppClientControllerApi
+ * @interface PrivilegeControllerApi
  */
-export interface AppClientControllerApiInterface {
+export interface PrivilegeControllerApiInterface {
     /**
-     * Retrieves application client user information
-     * @summary Retrieves all application client user information
+     * Retrieves Privilege information
+     * @summary Retrieves all Privilege information
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AppClientControllerApiInterface
+     * @memberof PrivilegeControllerApiInterface
      */
-    getAppClientUsers(options?: any): AxiosPromise<Array<AppClientUserDto>>;
+    getPrivileges(options?: any): AxiosPromise<Array<PrivilegeDto>>;
 
     /**
-     * Updates an existing Application Client
-     * @summary Updates an existing Application Client
-     * @param {string} id App Client ID to update
-     * @param {AppClientUserDto} appClientUserDto 
+     * Updates an existing Privilege
+     * @summary Updates an existing Privilege
+     * @param {number} id App Client ID to update
+     * @param {PrivilegeDto} privilegeDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AppClientControllerApiInterface
+     * @memberof PrivilegeControllerApiInterface
      */
-    updateAppClient(id: string, appClientUserDto: AppClientUserDto, options?: any): AxiosPromise<AppClientUserDto>;
+    updatePrivilege(id: number, privilegeDto: PrivilegeDto, options?: any): AxiosPromise<PrivilegeDto>;
 
 }
 
 /**
- * AppClientControllerApi - object-oriented interface
+ * PrivilegeControllerApi - object-oriented interface
  * @export
- * @class AppClientControllerApi
+ * @class PrivilegeControllerApi
  * @extends {BaseAPI}
  */
-export class AppClientControllerApi extends BaseAPI implements AppClientControllerApiInterface {
+export class PrivilegeControllerApi extends BaseAPI implements PrivilegeControllerApiInterface {
     /**
-     * Retrieves application client user information
-     * @summary Retrieves all application client user information
+     * Retrieves Privilege information
+     * @summary Retrieves all Privilege information
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AppClientControllerApi
+     * @memberof PrivilegeControllerApi
      */
-    public getAppClientUsers(options?: any) {
-        return AppClientControllerApiFp(this.configuration).getAppClientUsers(options).then((request) => request(this.axios, this.basePath));
+    public getPrivileges(options?: any) {
+        return PrivilegeControllerApiFp(this.configuration).getPrivileges(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Updates an existing Application Client
-     * @summary Updates an existing Application Client
-     * @param {string} id App Client ID to update
-     * @param {AppClientUserDto} appClientUserDto 
+     * Updates an existing Privilege
+     * @summary Updates an existing Privilege
+     * @param {number} id App Client ID to update
+     * @param {PrivilegeDto} privilegeDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AppClientControllerApi
+     * @memberof PrivilegeControllerApi
      */
-    public updateAppClient(id: string, appClientUserDto: AppClientUserDto, options?: any) {
-        return AppClientControllerApiFp(this.configuration).updateAppClient(id, appClientUserDto, options).then((request) => request(this.axios, this.basePath));
+    public updatePrivilege(id: number, privilegeDto: PrivilegeDto, options?: any) {
+        return PrivilegeControllerApiFp(this.configuration).updatePrivilege(id, privilegeDto, options).then((request) => request(this.axios, this.basePath));
     }
 }

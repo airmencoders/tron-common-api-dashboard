@@ -83,7 +83,7 @@ describe('App Client State Tests', () => {
   })
 
   it('Test fetch and store', async () => {
-    appClientsApi.getUsers = jest.fn(() => {
+    appClientsApi.getAppClientUsers = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => resolve(axiosRes));
     });
 
@@ -99,7 +99,7 @@ describe('App Client State Tests', () => {
   });
 
   it('Test appClients', async () => {
-    appClientsApi.getUsers = jest.fn(() => {
+    appClientsApi.getAppClientUsers = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => setTimeout(() => resolve(axiosRes), 1000));
     });
 
@@ -111,7 +111,7 @@ describe('App Client State Tests', () => {
   });
 
   it('Test error', async () => {
-    appClientsApi.getUsers = jest.fn(() => {
+    appClientsApi.getAppClientUsers = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto[]>>((resolve, reject) => {
         setTimeout(() => {
           reject("Rejected")

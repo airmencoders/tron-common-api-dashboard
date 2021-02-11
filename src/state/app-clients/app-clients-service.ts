@@ -9,7 +9,7 @@ import { AxiosPromise } from "axios";
 export default class AppClientsService {
   constructor(private state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
   fetchAndStoreAppClients(): Promise<AppClientFlat[]> {
-    const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getUsers();
+    const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
 
     const data = new Promise<AppClientFlat[]>((resolve) => resolve(response().then(r => this.convertAppClientsToFlat(r.data))));
     this.state.set(data);
