@@ -10,8 +10,9 @@ import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { StatusType } from '../../components/StatusCard/status-type';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import { accessAppClientsState, useAppClientsState } from '../../state/app-clients/app-clients-state';
-import AppClientForm from './AppClientForm';
 import './AppClientPage.scss';
+import { usePrivilegeState } from '../../state/privilege/privilege-state';
+import AppClientFormContainer from './AppClientFormContainer';
 
 const serviceTitle = "App Client Service";
 
@@ -22,7 +23,8 @@ const columnHeaders: GridColumn[] = [
 ]
 
 export const AppClientPage: FC = () => {
-  const state = useAppClientsState();
+  const appClientState = useAppClientsState();
+  const privilegeState = usePrivilegeState();
 
   const useSideDrawerState = useState({
     isOpen: false,
@@ -30,7 +32,8 @@ export const AppClientPage: FC = () => {
   });
 
   useEffect(() => {
-    state.fetchAndStoreAppClients();
+    appClientState.fetchAndStoreAppClients();
+    privilegeState.fetchAndStorePrivileges();
   }, []);
 
   function onRowClicked(event: RowClickedEvent): void {
@@ -50,18 +53,18 @@ export const AppClientPage: FC = () => {
   return (
     <PageFormat pageTitle={"Application Clients"}>
       <Container fluid style={{ height: '100%' }}>
-        {state.isPromised ?
+        {appClientState.isPromised || privilegeState.error ?
           <Spinner animation="border" role="status" variant="primary">
             <span className="sr-only">Loading...</span>
           </Spinner>
           :
           <div style={{ height: '100%' }}>
-            {state.error ?
+            {appClientState.error || privilegeState.error ?
               <StatusCard status={StatusType.ERROR} title={serviceTitle} />
               :
               <>
                 <Grid
-                  data={state.appClients?.get() || []}
+                  data={appClientState.appClients?.get() || []}
                   columns={columnHeaders}
                   onRowClicked={onRowClicked}
                   rowClass="ag-grid--row-pointer"
@@ -69,7 +72,7 @@ export const AppClientPage: FC = () => {
 
                 <SideDrawer title={"App Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
                   {useSideDrawerState.clientId.get().length > 0 &&
-                    <AppClientForm client={getAppClient()} />
+                    <AppClientFormContainer client={getAppClient()} />
                   }
                 </SideDrawer>
               </>

@@ -19,21 +19,29 @@ export default class AppClientsService {
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
     return clients.map(client => {
-      const { id, name } = client;
-
-      const privilegeArr = Array.from(client.privileges || []);
-
-      const privileges: ClientPrivilege = {
-        read: privilegeArr.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
-        write: privilegeArr.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
-      };
-
-      return {
-        id,
-        name,
-        ...privileges
-      };
+      return this.convertAppClientToFlat(client);
     });
+  }
+
+  convertAppClientToFlat(client: AppClientUserDto): AppClientFlat {
+    const { id, name } = client;
+
+    const privilegeArr = Array.from(client.privileges || []);
+
+    const privileges: ClientPrivilege = {
+      read: privilegeArr.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
+      write: privilegeArr.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
+    };
+
+    return {
+      id,
+      name,
+      ...privileges
+    };
+  }
+
+  sendUpdatedAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
+    return this.appClientsApi.updateAppClient(client.id || "", client);
   }
 
   get isPromised(): boolean {

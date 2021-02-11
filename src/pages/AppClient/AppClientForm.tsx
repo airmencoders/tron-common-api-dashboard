@@ -7,45 +7,26 @@ import Fieldset from "../../components/forms/Fieldset/Fieldset";
 import Form from "../../components/forms/Form/Form";
 import Label from "../../components/forms/Label/Label";
 import TextInput from "../../components/forms/TextInput/TextInput";
-import { AppClientFlat } from "../../state/app-clients/interface/app-client-flat";
 import './AppClientForm.scss';
+import { AppClientFormProps } from './AppClientFormProps';
+import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 
-interface LooseObject {
-  [key: string]: any
-}
-
-function AppClientForm(props: { client?: AppClientFlat }) {
-  const formState = useState({
-    data: {
-      id: props.client?.id,
-      name: props.client?.name || "Client Name",
-      read: props.client?.read || false,
-      write: props.client?.write || false,
-    },
-    errors: {
-      
-    }
+function AppClientForm(props: AppClientFormProps) {
+  const formState = useState<AppClientFlat>({
+    id: props.client?.id,
+    name: props.client?.name || "Client Name",
+    read: props.client?.read || false,
+    write: props.client?.write || false,
   });
 
   formState.attach(Validation);
 
-  Validation(formState.data.name).validate(name => name.length > 0 && name.trim().length > 0, 'Name cannot be empty or blank.', 'error');
-
-  function onSubmitClient(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    formState.errors.set((prev) => {
-      const updated: LooseObject = Object.assign({}, { ...prev });
-      updated.name = "Some error";
-
-      return updated;
-    });
-  }
+  Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'Name cannot be empty or blank.', 'error');
 
   return (
     <>
       {props.client ?
-        <Form className="client-form" onSubmit={onSubmitClient}>
+        <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())}>
           <div className="client-name-container">
             <Label className="client-name-container__label" htmlFor="name"><h4>Name</h4></Label>
             <TextInput
@@ -53,13 +34,13 @@ function AppClientForm(props: { client?: AppClientFlat }) {
               id="name"
               name="name"
               type="text"
-              defaultValue={formState.data.name.get()}
+              defaultValue={formState.name.get()}
               placeholder="Enter Client App Name"
-              error={Validation(formState.data.name).invalid()}
-              onChange={(event) => formState.data.name.set(event.target.value)}
+              error={Validation(formState.name).invalid()}
+              onChange={(event) => formState.name.set(event.target.value)}
             />
-            {Validation(formState.data.name).invalid() &&
-              Validation(formState.data.name).errors().map((error, idx) => {
+            {Validation(formState.name).invalid() &&
+              Validation(formState.name).errors().map((error, idx) => {
                 return (
                   <p key={idx} className="client-name-container__error">{error.message}</p>
                 );
@@ -77,15 +58,15 @@ function AppClientForm(props: { client?: AppClientFlat }) {
                 id="read"
                 name="read"
                 label={<>Read</>}
-                checked={formState.data.read.get()}
-                onChange={(event) => formState.data.read.set(event.target.checked)} />
+                checked={formState.read.get()}
+                onChange={(event) => formState.read.set(event.target.checked)} />
 
               <Checkbox className="options__write"
                 id="write"
                 name="write"
                 label={<>Write</>}
-                checked={formState.data.write.get()}
-                onChange={(event) => formState.data.write.set(event.target.checked)} />
+                checked={formState.write.get()}
+                onChange={(event) => formState.write.set(event.target.checked)} />
             </div>
 
           </Fieldset>
