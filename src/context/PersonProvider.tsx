@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { PersonContext } from './PersonProviderContext';
-import {Person, PersonControllerApi} from '../openapi';
+import {Configuration, Person, PersonControllerApi} from '../openapi';
+import Config from '../api/configuration';
 
-const personController = new PersonControllerApi();
+const personController = new PersonControllerApi(new Configuration({
+    basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
+}));
 export function UserProvider({ children } : any) {
     const [ users, setUsers ] = React.useState<Person[]>([]);
 
