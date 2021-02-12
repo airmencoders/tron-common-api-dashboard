@@ -5,9 +5,12 @@ import { PrivilegeType } from "./interface/privilege-type";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
 import { AxiosPromise } from "axios";
+import { Privilege, PrivilegeDto } from "../../openapi/models";
+import { accessPrivilegeState } from "../privilege/privilege-state";
 
 export default class AppClientsService {
   constructor(private state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
+
   fetchAndStoreAppClients(): Promise<AppClientFlat[]> {
     const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
 
@@ -15,6 +18,14 @@ export default class AppClientsService {
     this.state.set(data);
 
     return data;
+  }
+
+  sendUpdatedAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
+    return this.appClientsApi.updateAppClient(client.id || "", client);
+  }
+
+  sendCreateAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
+    return this.appClientsApi.createAppClientUser(client);
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
@@ -40,8 +51,42 @@ export default class AppClientsService {
     };
   }
 
-  sendUpdatedAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
-    return this.appClientsApi.updateAppClient(client.id || "", client);
+  convertToDto(client: AppClientFlat): AppClientUserDto {
+    return {
+      id: client.id,
+      name: client.name,
+      privileges: this.createAppPrivilegesArr(client)
+    };
+  }
+
+  createAppPrivilegesArr(client: AppClientFlat): Array<Privilege> {
+    return Array.from(this.createAppPrivileges(client));
+  }
+
+  createAppPrivileges(client: AppClientFlat): Set<Privilege> {
+    const privileges = new Set<Privilege>();
+
+    if (client.read) {
+      const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.READ);
+
+      if (privilege) {
+        privileges.add(privilege);
+      }
+    }
+
+    if (client.write) {
+      const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.WRITE);
+
+      if (privilege) {
+        privileges.add(privilege);
+      }
+    }
+
+    return privileges;
+  }
+
+  get privileges(): PrivilegeDto[] | undefined {
+    return accessPrivilegeState().privileges?.get();
   }
 
   get isPromised(): boolean {

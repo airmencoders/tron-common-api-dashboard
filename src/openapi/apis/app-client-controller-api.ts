@@ -29,6 +29,57 @@ import { ExceptionResponse } from '../models';
 export const AppClientControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Adds a App Client User
+         * @summary Adds a App Client User
+         * @param {AppClientUserDto} appClientUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAppClientUser: async (appClientUserDto: AppClientUserDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appClientUserDto' is not null or undefined
+            if (appClientUserDto === null || appClientUserDto === undefined) {
+                throw new RequiredError('appClientUserDto','Required parameter appClientUserDto was null or undefined when calling createAppClientUser.');
+            }
+            const localVarPath = `/v1/app-client`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof appClientUserDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(appClientUserDto !== undefined ? appClientUserDto : {})
+                : (appClientUserDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves application client user information
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
@@ -132,6 +183,20 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
 export const AppClientControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * Adds a App Client User
+         * @summary Adds a App Client User
+         * @param {AppClientUserDto} appClientUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createAppClientUser(appClientUserDto: AppClientUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientUserDto>> {
+            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).createAppClientUser(appClientUserDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves application client user information
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
@@ -169,6 +234,16 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
 export const AppClientControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * Adds a App Client User
+         * @summary Adds a App Client User
+         * @param {AppClientUserDto} appClientUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAppClientUser(appClientUserDto: AppClientUserDto, options?: any): AxiosPromise<AppClientUserDto> {
+            return AppClientControllerApiFp(configuration).createAppClientUser(appClientUserDto, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves application client user information
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
@@ -198,6 +273,16 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
  */
 export interface AppClientControllerApiInterface {
     /**
+     * Adds a App Client User
+     * @summary Adds a App Client User
+     * @param {AppClientUserDto} appClientUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApiInterface
+     */
+    createAppClientUser(appClientUserDto: AppClientUserDto, options?: any): AxiosPromise<AppClientUserDto>;
+
+    /**
      * Retrieves application client user information
      * @summary Retrieves all application client user information
      * @param {*} [options] Override http request option.
@@ -226,6 +311,18 @@ export interface AppClientControllerApiInterface {
  * @extends {BaseAPI}
  */
 export class AppClientControllerApi extends BaseAPI implements AppClientControllerApiInterface {
+    /**
+     * Adds a App Client User
+     * @summary Adds a App Client User
+     * @param {AppClientUserDto} appClientUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApi
+     */
+    public createAppClientUser(appClientUserDto: AppClientUserDto, options?: any) {
+        return AppClientControllerApiFp(this.configuration).createAppClientUser(appClientUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Retrieves application client user information
      * @summary Retrieves all application client user information

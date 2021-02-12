@@ -11,10 +11,6 @@
       width: 100%;
     }
 
-    &__error {
-      color: red;
-    }
-
     .usa-input--error {
       position: relative;
       animation: shake .1s linear;
@@ -41,6 +37,10 @@
 
   .submit-btn {
     float: right;
+  }
+
+  .validation-error {
+    color: red;
   }
 }
 

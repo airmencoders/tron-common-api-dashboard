@@ -2,23 +2,28 @@ import React from 'react';
 import AppClientForm from './AppClientForm';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
-import { AppClientUserDto, Privilege } from '../../openapi';
-import { accessPrivilegeState } from '../../state/privilege/privilege-state';
-import { PrivilegeType } from '../../state/app-clients/interface/privilege-type';
 import { useState } from '@hookstate/core';
+import { AppClientFormError } from './AppClientFormError';
+import { AppClientFormActionType } from './AppClientFormActionType';
 
-function AppClientFormContainer(props: { client?: AppClientFlat }) {
+function AppClientFormContainer(props: { client?: AppClientFlat, type: AppClientFormActionType }) {
   const appClientState = useAppClientsState();
-  const privilegeState = accessPrivilegeState();
   const isSubmitting = useState(false);
-  const errorMsg = useState({});
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>, client: AppClientFlat) {
+  const emptyErrorMsg = {
+    validation: undefined,
+    general: ""
+  };
+  const errorMsg = useState<AppClientFormError>(emptyErrorMsg);
+
+  async function onUpdateSubmit(event: React.FormEvent<HTMLFormElement>, client: AppClientFlat) {
     event.preventDefault();
 
     isSubmitting.set(true);
+    errorMsg.set(emptyErrorMsg);
+
     try {
-      const response = await appClientState.sendUpdatedAppClient(convertToDto(client));
+      const response = await appClientState.sendUpdatedAppClient(appClientState.convertToDto(client));
 
       appClientState.appClients?.set((prev) => {
         const clients = [...prev];
@@ -29,48 +34,71 @@ function AppClientFormContainer(props: { client?: AppClientFlat }) {
         return clients;
       });
     } catch (err) {
-      errorMsg.set(err.response.data);
+      if (err.response) {
+        const validation = err.response.data.errors?.reduce((prev: any, current: any) => {
+          const updated = { ...prev };
+          updated[current.field] = current.defaultMessage;
+
+          return updated;
+        }, {});
+
+        errorMsg.validation.set(validation);
+        errorMsg.general.set(err.response.message);
+      } else if (err.request) {
+        errorMsg.general.set("Error contacting server. Try again later.");
+      } else {
+        errorMsg.general.set("Internal error occurred. Try again later.");
+      }
     } finally {
       isSubmitting.set(false);
     }
   }
 
-  function convertToDto(client: AppClientFlat): AppClientUserDto {
-    return {
-      id: client.id,
-      name: client.name,
-      privileges: createAppPrivilegesArr(client)
-    };
+  async function onAddSubmit(event: React.FormEvent<HTMLFormElement>, client: AppClientFlat) {
+    event.preventDefault();
+
+    isSubmitting.set(true);
+    errorMsg.set(emptyErrorMsg);
+
+    try {
+      const response = await appClientState.sendCreateAppClient(appClientState.convertToDto(client));
+
+      appClientState.appClients?.set((prev) => {
+        const clients = [...prev];
+        clients[clients.length] = appClientState.convertAppClientToFlat(response.data);
+
+        return clients;
+      });
+    } catch (err) {
+      if (err.response) {
+        const validation = err.response.data.errors?.reduce((prev: any, current: any) => {
+          const updated = { ...prev };
+          updated[current.field] = current.defaultMessage;
+
+          return updated;
+        }, {});
+
+        errorMsg.validation.set(validation);
+        errorMsg.general.set(err.response.message);
+      } else if (err.request) {
+        errorMsg.general.set("Error contacting server. Try again later.");
+      } else {
+        errorMsg.general.set("Internal error occurred. Try again later.");
+      }
+    } finally {
+      isSubmitting.set(false);
+    }
   }
 
-  function createAppPrivilegesArr(client: AppClientFlat): Array<Privilege> {
-    return Array.from(createAppPrivileges(client));
-  }
-
-  function createAppPrivileges(client: AppClientFlat): Set<Privilege> {
-    const privileges = new Set<Privilege>();
-
-    if (client.read) {
-      const privilege = privilegeState.privileges?.value.find(priv => priv.name === PrivilegeType.READ);
-
-      if (privilege) {
-        privileges.add(privilege);
-      }
-    }
-
-    if (client.write) {
-      const privilege = privilegeState.privileges?.value.find(priv => priv.name === PrivilegeType.WRITE);
-
-      if (privilege) {
-        privileges.add(privilege);
-      }
-    }
-
-    return privileges;
+  function getSubmitAction() {
+    if (props.type === AppClientFormActionType.ADD)
+      return onAddSubmit;
+    else
+      return onUpdateSubmit;
   }
 
   return (
-    <AppClientForm client={props.client} onSubmit={onSubmit} />
+    <AppClientForm client={props.client} onSubmit={getSubmitAction()} errors={errorMsg.value} type={props.type} isSubmitting={isSubmitting.value} />
   );
 }
 

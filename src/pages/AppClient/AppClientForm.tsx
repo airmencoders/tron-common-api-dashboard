@@ -1,6 +1,8 @@
 import React from 'react';
 import { useState } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
+import { Initial } from "@hookstate/initial";
+import { Touched } from "@hookstate/touched";
 import Button from "../../components/Button/Button";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Fieldset from "../../components/forms/Fieldset/Fieldset";
@@ -10,22 +12,30 @@ import TextInput from "../../components/forms/TextInput/TextInput";
 import './AppClientForm.scss';
 import { AppClientFormProps } from './AppClientFormProps';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
+import { AppClientFormActionType } from './AppClientFormActionType';
+import { Spinner } from 'react-bootstrap';
 
 function AppClientForm(props: AppClientFormProps) {
   const formState = useState<AppClientFlat>({
     id: props.client?.id,
-    name: props.client?.name || "Client Name",
+    name: props.client?.name || "",
     read: props.client?.read || false,
     write: props.client?.write || false,
   });
 
   formState.attach(Validation);
+  formState.attach(Initial);
+  formState.attach(Touched);
 
-  Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'Name cannot be empty or blank.', 'error');
+  Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
+
+  function isFormModified() {
+    return Initial(formState.name).modified() || Initial(formState.read).modified() || Initial(formState.write).modified();
+  }
 
   return (
     <>
-      {props.client ?
+      {(props.client && props.type === AppClientFormActionType.UPDATE) || props.type === AppClientFormActionType.ADD ?
         <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())}>
           <div className="client-name-container">
             <Label className="client-name-container__label" htmlFor="name"><h4>Name</h4></Label>
@@ -42,10 +52,11 @@ function AppClientForm(props: AppClientFormProps) {
             {Validation(formState.name).invalid() &&
               Validation(formState.name).errors().map((error, idx) => {
                 return (
-                  <p key={idx} className="client-name-container__error">{error.message}</p>
+                  <p key={idx} className="client-name-container__error validation-error">*{error.message}</p>
                 );
               })
             }
+            {props.errors?.validation?.name && <p className="client-name-container__error validation-error">*{props.errors?.validation?.name}</p>}
           </div>
 
           <Fieldset className="permissions-container">
@@ -71,12 +82,24 @@ function AppClientForm(props: AppClientFormProps) {
 
           </Fieldset>
 
+          {props.errors?.general && <p className="validation-error">*{props.errors?.general}</p>}
+
           <Button
             type={'submit'}
             className="submit-btn"
-            disabled={Validation(formState).invalid()}
+            disabled={Validation(formState).invalid() || !isFormModified() || props.isSubmitting}
           >
-            Submit
+            {props.isSubmitting ?
+              <Spinner animation="border" role="status" variant="primary">
+                <span className="sr-only">Submitting...</span>
+              </Spinner>
+              :
+              props.type === AppClientFormActionType.ADD ?
+                <>Add</>
+                :
+                <>Submit</>
+
+            }
           </Button>
 
         </Form>

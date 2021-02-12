@@ -13,6 +13,8 @@ import { accessAppClientsState, useAppClientsState } from '../../state/app-clien
 import './AppClientPage.scss';
 import { usePrivilegeState } from '../../state/privilege/privilege-state';
 import AppClientFormContainer from './AppClientFormContainer';
+import { AppClientFormActionType } from './AppClientFormActionType';
+import Button from '../../components/Button/Button';
 
 const serviceTitle = "App Client Service";
 
@@ -20,15 +22,21 @@ const columnHeaders: GridColumn[] = [
   new GridColumn('name', true, true, 'NAME'),
   new GridColumn('read', true, true, 'READ'),
   new GridColumn('write', true, true, 'WRITE'),
-]
+];
+
+interface AppClientPageState {
+  isOpen: boolean,
+  clientId: "",
+  formAction: AppClientFormActionType
+}
 
 export const AppClientPage: FC = () => {
   const appClientState = useAppClientsState();
   const privilegeState = usePrivilegeState();
-
-  const useSideDrawerState = useState({
+  const useSideDrawerState = useState<AppClientPageState>({
     isOpen: false,
     clientId: "",
+    formAction: AppClientFormActionType.UPDATE
   });
 
   useEffect(() => {
@@ -37,17 +45,36 @@ export const AppClientPage: FC = () => {
   }, []);
 
   function onRowClicked(event: RowClickedEvent): void {
-    useSideDrawerState.isOpen.set(true);
-    useSideDrawerState.clientId.set(event.data.id);
+    useSideDrawerState.set({
+      clientId: event.data.id,
+      formAction: AppClientFormActionType.UPDATE,
+      isOpen: true,
+    })
+  }
+
+  function onAddRow() {
+    useSideDrawerState.set({
+      clientId: "",
+      formAction: AppClientFormActionType.ADD,
+      isOpen: true,
+    })
   }
 
   function onCloseHandler() {
-    useSideDrawerState.isOpen.set(false);
-    useSideDrawerState.clientId.set("");
+    useSideDrawerState.set((prev) => {
+      return {
+        ...prev,
+        isOpen: false,
+        clientId: "",
+      }
+    })
   }
 
   function getAppClient(): AppClientFlat | undefined {
-    return accessAppClientsState().appClients?.find(appClient => appClient.id.get() === useSideDrawerState.clientId.get())?.get();
+    if (useSideDrawerState.formAction.value === AppClientFormActionType.UPDATE)
+      return appClientState.appClients?.find(appClient => appClient.id.get() === useSideDrawerState.clientId.get())?.get();
+    else
+      return undefined;
   }
 
   return (
@@ -63,6 +90,10 @@ export const AppClientPage: FC = () => {
               <StatusCard status={StatusType.ERROR} title={serviceTitle} />
               :
               <>
+                <div className="add-app-client">
+                  <Button type="button" className="add-app-client__btn" onClick={onAddRow}>Add App Client</Button>
+                </div>
+
                 <Grid
                   data={appClientState.appClients?.get() || []}
                   columns={columnHeaders}
@@ -71,9 +102,12 @@ export const AppClientPage: FC = () => {
                 />
 
                 <SideDrawer title={"App Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                  {useSideDrawerState.clientId.get().length > 0 &&
-                    <AppClientFormContainer client={getAppClient()} />
+                  {useSideDrawerState.clientId.get().length > 0 ?
+                    <AppClientFormContainer client={getAppClient()} type={useSideDrawerState.formAction.get()} />
+                    :
+                    <AppClientFormContainer client={getAppClient()} type={useSideDrawerState.formAction.get()} />
                   }
+
                 </SideDrawer>
               </>
             }

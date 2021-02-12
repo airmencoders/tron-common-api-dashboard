@@ -1,3 +1,9 @@
+@import"../../styles/mixins";
+
+.add-app-client {
+  margin-bottom: calculateRem(16px);
+}
+
 .ag-grid--row-pointer {
   cursor: pointer;
 }
