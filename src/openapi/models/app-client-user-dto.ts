@@ -35,10 +35,10 @@ export interface AppClientUserDto {
     name: string;
     /**
      * 
-     * @type {Set<Privilege>}
+     * @type {Array<Privilege>}
      * @memberof AppClientUserDto
      */
-    privileges?: Set<Privilege>;
+    privileges?: Array<Privilege>;
 }
 
 

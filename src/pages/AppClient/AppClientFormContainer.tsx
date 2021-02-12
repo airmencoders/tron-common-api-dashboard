@@ -5,10 +5,7 @@ import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { AppClientUserDto, Privilege } from '../../openapi';
 import { accessPrivilegeState } from '../../state/privilege/privilege-state';
 import { PrivilegeType } from '../../state/app-clients/interface/privilege-type';
-import { PrivilegeDto } from '../../openapi/models/privilege-dto';
 import { useState } from '@hookstate/core';
-import axios from 'axios';
-import Config from '../../api/configuration';
 
 function AppClientFormContainer(props: { client?: AppClientFlat }) {
   const appClientState = useAppClientsState();
@@ -21,16 +18,7 @@ function AppClientFormContainer(props: { client?: AppClientFlat }) {
 
     isSubmitting.set(true);
     try {
-      // const response = (await appClientState.sendUpdatedAppClient(convertToDto(client))).data;
-      const response = await axios({
-        method: 'put',
-        url: Config.API_BASE_URL + Config.API_PATH_PREFIX + "/" + Config.API_VERSION_PREFIX + "/" + "app-client/" + client.id,
-        data: {
-          id: client.id,
-          name: client.name,
-          privileges: createAppPrivilegesArr(client)
-        }
-      });
+      const response = await appClientState.sendUpdatedAppClient(convertToDto(client));
 
       appClientState.appClients?.set((prev) => {
         const clients = [...prev];
@@ -51,7 +39,7 @@ function AppClientFormContainer(props: { client?: AppClientFlat }) {
     return {
       id: client.id,
       name: client.name,
-      privileges: createAppPrivileges(client)
+      privileges: createAppPrivilegesArr(client)
     };
   }
 
@@ -59,8 +47,8 @@ function AppClientFormContainer(props: { client?: AppClientFlat }) {
     return Array.from(createAppPrivileges(client));
   }
 
-  function createAppPrivileges(client: AppClientFlat): Set<PrivilegeDto> {
-    const privileges = new Set<PrivilegeDto>();
+  function createAppPrivileges(client: AppClientFlat): Set<Privilege> {
+    const privileges = new Set<Privilege>();
 
     if (client.read) {
       const privilege = privilegeState.privileges?.value.find(priv => priv.name === PrivilegeType.READ);
