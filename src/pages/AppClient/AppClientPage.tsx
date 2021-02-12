@@ -9,7 +9,7 @@ import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { StatusType } from '../../components/StatusCard/status-type';
 import StatusCard from '../../components/StatusCard/StatusCard';
-import { accessAppClientsState, useAppClientsState } from '../../state/app-clients/app-clients-state';
+import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import './AppClientPage.scss';
 import { usePrivilegeState } from '../../state/privilege/privilege-state';
 import AppClientFormContainer from './AppClientFormContainer';
@@ -49,7 +49,7 @@ export const AppClientPage: FC = () => {
       clientId: event.data.id,
       formAction: AppClientFormActionType.UPDATE,
       isOpen: true,
-    })
+    });
   }
 
   function onAddRow() {
@@ -57,7 +57,7 @@ export const AppClientPage: FC = () => {
       clientId: "",
       formAction: AppClientFormActionType.ADD,
       isOpen: true,
-    })
+    });
   }
 
   function onCloseHandler() {
@@ -102,12 +102,13 @@ export const AppClientPage: FC = () => {
                 />
 
                 <SideDrawer title={"App Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                  {useSideDrawerState.clientId.get().length > 0 ?
-                    <AppClientFormContainer client={getAppClient()} type={useSideDrawerState.formAction.get()} />
-                    :
+                  {useSideDrawerState.clientId.get() &&
                     <AppClientFormContainer client={getAppClient()} type={useSideDrawerState.formAction.get()} />
                   }
 
+                  {!useSideDrawerState.clientId.get() &&
+                    <AppClientFormContainer type={useSideDrawerState.formAction.get()} />
+                  }
                 </SideDrawer>
               </>
             }

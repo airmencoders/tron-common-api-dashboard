@@ -43,7 +43,7 @@ function AppClientFormContainer(props: { client?: AppClientFlat, type: AppClient
         }, {});
 
         errorMsg.validation.set(validation);
-        errorMsg.general.set(err.response.message);
+        errorMsg.general.set(err.response.data.message);
       } else if (err.request) {
         errorMsg.general.set("Error contacting server. Try again later.");
       } else {
@@ -79,7 +79,7 @@ function AppClientFormContainer(props: { client?: AppClientFlat, type: AppClient
         }, {});
 
         errorMsg.validation.set(validation);
-        errorMsg.general.set(err.response.message);
+        errorMsg.general.set(err.response.data.message);
       } else if (err.request) {
         errorMsg.general.set("Error contacting server. Try again later.");
       } else {

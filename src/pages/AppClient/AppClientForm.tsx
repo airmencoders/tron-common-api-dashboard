@@ -2,7 +2,6 @@ import React from 'react';
 import { useState } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
-import { Touched } from "@hookstate/touched";
 import Button from "../../components/Button/Button";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Fieldset from "../../components/forms/Fieldset/Fieldset";
@@ -25,7 +24,6 @@ function AppClientForm(props: AppClientFormProps) {
 
   formState.attach(Validation);
   formState.attach(Initial);
-  formState.attach(Touched);
 
   Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
 
