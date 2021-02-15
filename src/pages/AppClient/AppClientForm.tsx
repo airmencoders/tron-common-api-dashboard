@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
+import { Touched } from "@hookstate/touched";
 import Button from "../../components/Button/Button";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Fieldset from "../../components/forms/Fieldset/Fieldset";
@@ -24,6 +25,7 @@ function AppClientForm(props: AppClientFormProps) {
 
   formState.attach(Validation);
   formState.attach(Initial);
+  formState.attach(Touched);
 
   Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
 
@@ -31,23 +33,27 @@ function AppClientForm(props: AppClientFormProps) {
     return Initial(formState.name).modified() || Initial(formState.read).modified() || Initial(formState.write).modified();
   }
 
+  function showNameValidation() {
+    return Touched(formState.name).touched() && Validation(formState.name).invalid()
+  }
+
   return (
     <>
       {(props.client && props.type === AppClientFormActionType.UPDATE) || props.type === AppClientFormActionType.ADD ?
         <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())}>
           <div className="client-name-container">
-            <Label className="client-name-container__label" htmlFor="name"><h4>Name</h4></Label>
+            <Label className="client-name-container__label" htmlFor="name"><h5>Name (required)</h5></Label>
             <TextInput
               className="client-name-container__input"
               id="name"
               name="name"
               type="text"
-              defaultValue={formState.name.get()}
+              defaultValue={formState.name.get() || undefined}
               placeholder="Enter Client App Name"
-              error={Validation(formState.name).invalid()}
+              error={showNameValidation()}
               onChange={(event) => formState.name.set(event.target.value)}
             />
-            {Validation(formState.name).invalid() &&
+            {showNameValidation() &&
               Validation(formState.name).errors().map((error, idx) => {
                 return (
                   <p key={idx} className="client-name-container__error validation-error">*{error.message}</p>
@@ -59,7 +65,7 @@ function AppClientForm(props: AppClientFormProps) {
 
           <Fieldset className="permissions-container">
             <div className="permissions-container__title">
-              <h4 className="title__text">Permissions</h4>
+              <h5 className="title__text">Permissions</h5>
             </div>
 
             <div className="permissions-container__options">

@@ -12,9 +12,10 @@ import StatusCard from '../../components/StatusCard/StatusCard';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import './AppClientPage.scss';
 import { usePrivilegeState } from '../../state/privilege/privilege-state';
-import AppClientFormContainer from './AppClientFormContainer';
 import { AppClientFormActionType } from './AppClientFormActionType';
 import Button from '../../components/Button/Button';
+import AppClientEdit from './AppClientEdit';
+import AppClientAdd from './AppClientAdd';
 
 const serviceTitle = "App Client Service";
 
@@ -26,8 +27,8 @@ const columnHeaders: GridColumn[] = [
 
 interface AppClientPageState {
   isOpen: boolean,
-  clientId: "",
-  formAction: AppClientFormActionType
+  formAction?: AppClientFormActionType,
+  client?: AppClientFlat
 }
 
 export const AppClientPage: FC = () => {
@@ -35,8 +36,8 @@ export const AppClientPage: FC = () => {
   const privilegeState = usePrivilegeState();
   const useSideDrawerState = useState<AppClientPageState>({
     isOpen: false,
-    clientId: "",
-    formAction: AppClientFormActionType.UPDATE
+    formAction: undefined,
+    client: undefined
   });
 
   useEffect(() => {
@@ -46,35 +47,26 @@ export const AppClientPage: FC = () => {
 
   function onRowClicked(event: RowClickedEvent): void {
     useSideDrawerState.set({
-      clientId: event.data.id,
       formAction: AppClientFormActionType.UPDATE,
       isOpen: true,
+      client: event.data
     });
   }
 
   function onAddRow() {
     useSideDrawerState.set({
-      clientId: "",
       formAction: AppClientFormActionType.ADD,
       isOpen: true,
+      client: undefined
     });
   }
 
   function onCloseHandler() {
-    useSideDrawerState.set((prev) => {
-      return {
-        ...prev,
-        isOpen: false,
-        clientId: "",
-      }
-    })
-  }
-
-  function getAppClient(): AppClientFlat | undefined {
-    if (useSideDrawerState.formAction.value === AppClientFormActionType.UPDATE)
-      return appClientState.appClients?.find(appClient => appClient.id.get() === useSideDrawerState.clientId.get())?.get();
-    else
-      return undefined;
+    useSideDrawerState.set({
+      formAction: undefined,
+      client: undefined,
+      isOpen: false,
+    });
   }
 
   return (
@@ -102,12 +94,12 @@ export const AppClientPage: FC = () => {
                 />
 
                 <SideDrawer title={"App Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                  {useSideDrawerState.clientId.get() &&
-                    <AppClientFormContainer client={getAppClient()} type={useSideDrawerState.formAction.get()} />
-                  }
-
-                  {!useSideDrawerState.clientId.get() &&
-                    <AppClientFormContainer type={useSideDrawerState.formAction.get()} />
+                  {useSideDrawerState.client.get() && useSideDrawerState.formAction.value === AppClientFormActionType.UPDATE ?
+                    <AppClientEdit client={useSideDrawerState.client.get()} />
+                    : useSideDrawerState.formAction.value === AppClientFormActionType.ADD ?
+                      <AppClientAdd />
+                      :
+                      <></>
                   }
                 </SideDrawer>
               </>
