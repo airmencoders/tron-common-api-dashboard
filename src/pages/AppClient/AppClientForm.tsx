@@ -37,6 +37,10 @@ function AppClientForm(props: AppClientFormProps) {
     return Touched(formState.name).touched() && Validation(formState.name).invalid()
   }
 
+  function isFormDisabled() {
+    return props.successAction.success;
+  }
+
   return (
     <>
       {(props.client && props.type === AppClientFormActionType.UPDATE) || props.type === AppClientFormActionType.ADD ?
@@ -52,6 +56,7 @@ function AppClientForm(props: AppClientFormProps) {
               placeholder="Enter Client App Name"
               error={showNameValidation()}
               onChange={(event) => formState.name.set(event.target.value)}
+              disabled={isFormDisabled()}
             />
             {showNameValidation() &&
               Validation(formState.name).errors().map((error, idx) => {
@@ -74,37 +79,47 @@ function AppClientForm(props: AppClientFormProps) {
                 name="read"
                 label={<>Read</>}
                 checked={formState.read.get()}
-                onChange={(event) => formState.read.set(event.target.checked)} />
+                onChange={(event) => formState.read.set(event.target.checked)}
+                disabled={isFormDisabled()} />
 
               <Checkbox className="options__write"
                 id="write"
                 name="write"
                 label={<>Write</>}
                 checked={formState.write.get()}
-                onChange={(event) => formState.write.set(event.target.checked)} />
+                onChange={(event) => formState.write.set(event.target.checked)}
+                disabled={isFormDisabled()} />
             </div>
 
           </Fieldset>
 
           {props.errors?.general && <p className="validation-error">*{props.errors?.general}</p>}
+          {props.successAction.successMsg && <p className="successful-operation">{props.successAction.successMsg}</p>}
 
-          <Button
-            type={'submit'}
-            className="submit-btn"
-            disabled={Validation(formState).invalid() || !isFormModified() || props.isSubmitting}
-          >
-            {props.isSubmitting ?
-              <Spinner animation="border" role="status" variant="primary">
-                <span className="sr-only">Submitting...</span>
-              </Spinner>
-              :
-              props.type === AppClientFormActionType.ADD ?
-                <>Add</>
-                :
-                <>Submit</>
+          {!props.successAction.success ?
+            <div className="button-container">
+              <Button
+                type={'submit'}
+                className="button-container__submit"
+                disabled={Validation(formState).invalid() || !isFormModified() || props.isSubmitting}
+              >
+                {props.isSubmitting ?
+                  <Spinner animation="border" role="status" variant="primary">
+                    <span className="sr-only">Submitting...</span>
+                  </Spinner>
+                  :
+                  props.type === AppClientFormActionType.ADD ?
+                    <>Add</>
+                    :
+                    <>Submit</>
 
-            }
-          </Button>
+                }
+              </Button>
+            </div>
+            :
+            null
+          }
+
 
         </Form>
         :

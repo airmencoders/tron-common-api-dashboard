@@ -13,4 +13,5 @@ export interface CheckboxProps {
   | undefined
   checked?: boolean
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
+  disabled?: boolean
 }

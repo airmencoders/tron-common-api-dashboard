@@ -5,6 +5,7 @@ import AppClientForm from './AppClientForm';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { AppClientFormError } from './AppClientFormError';
 import { AppClientFormActionType } from './AppClientFormActionType';
+import { AppClientFormActionSuccess } from './AppClientFormActionSuccess';
 
 function AppClientAdd() {
   const appClientState = useAppClientsState();
@@ -15,6 +16,11 @@ function AppClientAdd() {
     general: ""
   };
   const errorMsg = useState<AppClientFormError>(emptyErrorMsg);
+
+  const successState = useState<AppClientFormActionSuccess>({
+    success: false,
+    successMsg: ""
+  });
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>, client: AppClientFlat) {
     event.preventDefault();
@@ -30,6 +36,11 @@ function AppClientAdd() {
         clients[clients.length] = appClientState.convertAppClientToFlat(response.data);
 
         return clients;
+      });
+
+      successState.set({
+        success: true,
+        successMsg: "Successfully added App Client"
       });
     } catch (err) {
       if (err.response) {
@@ -53,7 +64,13 @@ function AppClientAdd() {
   }
 
   return (
-    <AppClientForm onSubmit={onSubmit} isSubmitting={isSubmitting.get()} type={AppClientFormActionType.ADD} />
+    <AppClientForm
+      onSubmit={onSubmit}
+      isSubmitting={isSubmitting.get()}
+      type={AppClientFormActionType.ADD}
+      errors={errorMsg.get()}
+      successAction={successState.get()}
+    />
   );
 }
 

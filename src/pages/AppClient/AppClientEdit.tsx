@@ -5,6 +5,7 @@ import AppClientForm from './AppClientForm';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { AppClientFormError } from './AppClientFormError';
 import { AppClientFormActionType } from './AppClientFormActionType';
+import { AppClientFormActionSuccess } from './AppClientFormActionSuccess';
 
 function AppClientEdit(props: { client?: AppClientFlat }) {
   const appClientState = useAppClientsState();
@@ -15,6 +16,11 @@ function AppClientEdit(props: { client?: AppClientFlat }) {
     general: ""
   };
   const errorMsg = useState<AppClientFormError>(emptyErrorMsg);
+
+  const successState = useState<AppClientFormActionSuccess>({
+    success: false,
+    successMsg: ""
+  });
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>, client: AppClientFlat) {
     event.preventDefault();
@@ -32,6 +38,11 @@ function AppClientEdit(props: { client?: AppClientFlat }) {
         clients[targetClientIdx] = appClientState.convertAppClientToFlat(response.data);
 
         return clients;
+      });
+
+      successState.set({
+        success: true,
+        successMsg: "Successfully edited App Client"
       });
     } catch (err) {
       if (err.response) {
@@ -55,7 +66,7 @@ function AppClientEdit(props: { client?: AppClientFlat }) {
   }
 
   return (
-    <AppClientForm client={props.client} onSubmit={onSubmit} isSubmitting={isSubmitting.get()} type={AppClientFormActionType.UPDATE} />
+    <AppClientForm client={props.client} onSubmit={onSubmit} isSubmitting={isSubmitting.get()} type={AppClientFormActionType.UPDATE} successAction={successState.get()} />
   );
 }
 

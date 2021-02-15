@@ -35,12 +35,24 @@
     }
   }
 
-  .submit-btn {
-    float: right;
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  @media (min-width: 30em) {
+    .button-container {
+      flex-direction: row;
+    }
   }
 
   .validation-error {
     color: red;
+  }
+
+  .successful-operation {
+    color: green;
   }
 }
 
