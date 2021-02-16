@@ -1,15 +1,19 @@
-import { createState } from "@hookstate/core";
+import { createState, State, StateMethodsDestroy } from "@hookstate/core";
 import { AxiosResponse } from "axios";
 import Config from "../../../api/configuration";
 import { Configuration, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from "../../../openapi";
 import PrivilegeService from "../privilege-service";
 
 describe('Privilege Service', () => {
-  let privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
-  let privilegeApi: PrivilegeControllerApiInterface = new PrivilegeControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
+  let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
+  let privilegeApi: PrivilegeControllerApiInterface;
   let state: PrivilegeService;
   let privilegeDtos: PrivilegeDto[];
   let axiosGetResponse: AxiosResponse;
+
+  afterEach(() => {
+    privilegeState.destroy();
+  })
 
   beforeEach(() => {
     privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());

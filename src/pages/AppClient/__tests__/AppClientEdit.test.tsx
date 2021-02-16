@@ -2,7 +2,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import AppClientEdit from '../AppClientEdit';
 import { AppClientFlat } from '../../../state/app-clients/interface/app-client-flat';
-import { createState } from '@hookstate/core';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, Configuration, Privilege } from '../../../openapi';
 import Config from '../../../api/configuration';
 import { useAppClientsState } from '../../../state/app-clients/app-clients-state';
@@ -18,6 +18,12 @@ describe('App Client Edit', () => {
   let testClientDto: AppClientUserDto;
   let testClientFlat: AppClientFlat;
   let axiosResponse: AxiosResponse;
+  let appClientsState: State<AppClientFlat[]> & StateMethodsDestroy;
+  let appClientsApi: AppClientControllerApiInterface;
+
+  afterEach(() => {
+    appClientsState.destroy();
+  })
 
   beforeEach(() => {
     testClientPrivileges = [
@@ -51,6 +57,9 @@ describe('App Client Edit', () => {
       config: {},
       headers: {}
     };
+
+    appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
+    appClientsApi = new AppClientControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
   });
 
   it('Client', async () => {
@@ -72,11 +81,6 @@ describe('App Client Edit', () => {
   });
 
   it('Submit Update', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
     appClientsApi.updateAppClient = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosResponse));
@@ -100,11 +104,6 @@ describe('App Client Edit', () => {
   });
 
   it('Submit Update - error response', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     const validationDefaultMessage: string = 'name validation';
 
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
@@ -136,11 +135,6 @@ describe('App Client Edit', () => {
   });
 
   it('Submit Update - error request', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
     appClientsApi.updateAppClient = jest.fn().mockRejectedValue({
       request: {
@@ -163,11 +157,6 @@ describe('App Client Edit', () => {
   });
 
   it('Submit Update - error unknown', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
     appClientsApi.updateAppClient = jest.fn().mockRejectedValue({});
 

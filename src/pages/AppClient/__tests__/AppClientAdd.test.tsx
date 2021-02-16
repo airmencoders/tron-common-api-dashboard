@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render } from '@testing-library/react';
 import AppClientAdd from '../AppClientAdd';
-import { createState } from '@hookstate/core';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AppClientFlat } from '../../../state/app-clients/interface/app-client-flat';
 import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, Configuration, Privilege } from '../../../openapi';
 import Config from '../../../api/configuration';
@@ -17,6 +17,13 @@ describe('App Client Add', () => {
   let testClientDto: AppClientUserDto;
   let testClientFlat: AppClientFlat;
   let axiosResponse: AxiosResponse;
+
+  let appClientsState: State<AppClientFlat[]> & StateMethodsDestroy;
+  let appClientsApi: AppClientControllerApiInterface;
+
+  afterEach(() => {
+    appClientsState.destroy();
+  })
 
   beforeEach(() => {
     testClientPrivileges = [
@@ -50,6 +57,9 @@ describe('App Client Add', () => {
       config: {},
       headers: {}
     };
+
+    appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
+    appClientsApi = new AppClientControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
   });
 
 
@@ -63,11 +73,6 @@ describe('App Client Add', () => {
   });
 
   it('Submit Add', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
     appClientsApi.createAppClientUser = jest.fn().mockResolvedValue(axiosResponse);
 
@@ -87,11 +92,6 @@ describe('App Client Add', () => {
 
 
   it('Submit Add - error response', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     const validationDefaultMessage: string = 'name validation';
 
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
@@ -124,11 +124,6 @@ describe('App Client Add', () => {
 
 
   it('Submit Add - error request', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
     appClientsApi.createAppClientUser = jest.fn().mockRejectedValue({
       request: {
@@ -152,11 +147,6 @@ describe('App Client Add', () => {
 
 
   it('Submit Add - error unknown', async () => {
-    const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
-    const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-      new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
-    );
-
     (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
     appClientsApi.createAppClientUser = jest.fn().mockRejectedValue({});
 
