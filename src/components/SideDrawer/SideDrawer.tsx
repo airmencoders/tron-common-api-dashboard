@@ -1,6 +1,7 @@
 import React from 'react';
 import CloseIcon from '../../icons/CloseIcon';
 import BackdropOverlay from '../BackdropOverlay/BackdropOverlay';
+import Button from '../Button/Button';
 
 import './SideDrawer.scss';
 import { SideDrawerProps } from './SideDrawerProps';
@@ -18,6 +19,11 @@ function SideDrawer(props: SideDrawerProps) {
         </div>
         <div className="side-drawer__content">
           {props.children}
+        </div>
+        <div className="side-drawer__footer">
+          <div className="footer__btn-container">
+            <Button className="footer__close-btn" type="button" onClick={props.onCloseHandler}>Close</Button>
+          </div>
         </div>
       </div>
     </>

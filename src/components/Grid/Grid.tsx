@@ -37,6 +37,7 @@ function Grid(props: GridProps) {
                   headerName={col.headerName}
                   sortable={col.sortable}
                   filter={col.filter}
+                  cellRendererFramework={col.cellRenderer}
               />
             ))
           }

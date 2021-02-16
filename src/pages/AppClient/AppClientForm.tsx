@@ -44,7 +44,7 @@ function AppClientForm(props: AppClientFormProps) {
   return (
     <>
       {(props.client && props.type === AppClientFormActionType.UPDATE) || props.type === AppClientFormActionType.ADD ?
-        <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())}>
+        <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())} data-testid="app-client-form">
           <div className="client-name-container">
             <Label className="client-name-container__label" htmlFor="name"><h5>Name (required)</h5></Label>
             <TextInput
@@ -61,11 +61,11 @@ function AppClientForm(props: AppClientFormProps) {
             {showNameValidation() &&
               Validation(formState.name).errors().map((error, idx) => {
                 return (
-                  <p key={idx} className="client-name-container__error validation-error">*{error.message}</p>
+                  <p key={idx} className="client-name-container__error validation-error">* {error.message}</p>
                 );
               })
             }
-            {props.errors?.validation?.name && <p className="client-name-container__error validation-error">*{props.errors?.validation?.name}</p>}
+            {props.errors?.validation?.name && <p className="client-name-container__error validation-error">* {props.errors?.validation?.name}</p>}
           </div>
 
           <Fieldset className="permissions-container">
@@ -93,10 +93,10 @@ function AppClientForm(props: AppClientFormProps) {
 
           </Fieldset>
 
-          {props.errors?.general && <p className="validation-error">*{props.errors?.general}</p>}
+          {props.errors?.general && <p className="validation-error">* {props.errors?.general}</p>}
           {props.successAction.successMsg && <p className="successful-operation">{props.successAction.successMsg}</p>}
 
-          {!props.successAction.success ?
+          {!props.successAction.success &&
             <div className="button-container">
               <Button
                 type={'submit'}
@@ -111,19 +111,16 @@ function AppClientForm(props: AppClientFormProps) {
                   props.type === AppClientFormActionType.ADD ?
                     <>Add</>
                     :
-                    <>Submit</>
-
+                  <>Update</>
                 }
               </Button>
-            </div>
-            :
-            null
+          </div>
           }
-
-
         </Form>
         :
-        <p>There was an error loading client details...</p>
+        <div data-testid="app-client-form__no-data">
+          <p>There was an error loading client details...</p>
+        </div>
       }
     </>
   );

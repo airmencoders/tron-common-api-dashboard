@@ -27,10 +27,6 @@ export default class PrivilegeService {
     return this.state.find(privilege => privilege.name.value === privilegeType)?.value;
   }
 
-  private convertArrayToMap(privileges: PrivilegeDto[]): Map<string, PrivilegeDto> {
-    return new Map<string, PrivilegeDto>(privileges.map((obj) => [obj.name, obj]));
-  }
-
   get isPromised(): boolean {
     return this.state.promised;
   }

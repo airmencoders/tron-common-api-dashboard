@@ -66,7 +66,14 @@ function AppClientEdit(props: { client?: AppClientFlat }) {
   }
 
   return (
-    <AppClientForm client={props.client} onSubmit={onSubmit} isSubmitting={isSubmitting.get()} type={AppClientFormActionType.UPDATE} successAction={successState.get()} />
+    <AppClientForm
+      client={props.client}
+      onSubmit={onSubmit}
+      isSubmitting={isSubmitting.get()}
+      type={AppClientFormActionType.UPDATE}
+      successAction={successState.get()}
+      errors={errorMsg.get()}
+    />
   );
 }
 

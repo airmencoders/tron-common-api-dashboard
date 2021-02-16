@@ -22,7 +22,7 @@
   &__header {
     display: flex;
     align-items: center;
-    padding-bottom: calculateRem(10px);
+    margin-bottom: $default-panel-padding-y;
 
     .close-btn {
       padding: 0;
@@ -38,6 +38,22 @@
       overflow: hidden;
       text-overflow: ellipsis;
       margin-bottom: 0;
+    }
+  }
+
+  &__content {
+    margin-bottom: $default-panel-padding-y;
+  }
+
+  &__footer {
+    margin-bottom: $default-panel-padding-y;
+
+    .footer {
+      &__btn-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
     }
   }
 }

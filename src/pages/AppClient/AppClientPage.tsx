@@ -1,6 +1,6 @@
 import { useState } from '@hookstate/core';
 import { RowClickedEvent } from 'ag-grid-community';
-import React, { FC, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Spinner } from 'react-bootstrap';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 import Grid from '../../components/Grid/Grid';
@@ -16,13 +16,14 @@ import { AppClientFormActionType } from './AppClientFormActionType';
 import Button from '../../components/Button/Button';
 import AppClientEdit from './AppClientEdit';
 import AppClientAdd from './AppClientAdd';
+import PrivilegeCellRenderer from './PrivilegeCellRenderer';
 
 const serviceTitle = "App Client Service";
 
 const columnHeaders: GridColumn[] = [
   new GridColumn('name', true, true, 'NAME'),
-  new GridColumn('read', true, true, 'READ'),
-  new GridColumn('write', true, true, 'WRITE'),
+  new GridColumn('read', true, true, 'READ', PrivilegeCellRenderer),
+  new GridColumn('write', true, true, 'WRITE', PrivilegeCellRenderer),
 ];
 
 interface AppClientPageState {
@@ -31,7 +32,7 @@ interface AppClientPageState {
   client?: AppClientFlat
 }
 
-export const AppClientPage: FC = () => {
+export function AppClientPage() {
   const appClientState = useAppClientsState();
   const privilegeState = usePrivilegeState();
   const useSideDrawerState = useState<AppClientPageState>({
@@ -53,7 +54,7 @@ export const AppClientPage: FC = () => {
     });
   }
 
-  function onAddRow() {
+  function onAddClientClick() {
     useSideDrawerState.set({
       formAction: AppClientFormActionType.ADD,
       isOpen: true,
@@ -83,7 +84,7 @@ export const AppClientPage: FC = () => {
               :
               <>
                 <div className="add-app-client">
-                  <Button type="button" className="add-app-client__btn" onClick={onAddRow}>Add App Client</Button>
+                  <Button type="button" className="add-app-client__btn" onClick={onAddClientClick}>Add App Client</Button>
                 </div>
 
                 <Grid
@@ -99,7 +100,7 @@ export const AppClientPage: FC = () => {
                     : useSideDrawerState.formAction.value === AppClientFormActionType.ADD ?
                       <AppClientAdd />
                       :
-                      <></>
+                      null
                   }
                 </SideDrawer>
               </>

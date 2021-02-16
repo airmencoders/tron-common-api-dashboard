@@ -6,7 +6,8 @@ export default class GridColumn {
       private _field: string,
       private _sortable: boolean,
       private _filter: boolean,
-      private _headerName: string = ''
+      private _headerName: string = '',
+      private _cellRenderer: React.ReactNode = undefined
   ) { }
 
   get field(): string {
@@ -23,5 +24,9 @@ export default class GridColumn {
 
   get headerName(): string {
     return this._headerName;
+  }
+
+  get cellRenderer(): React.ReactNode {
+    return this._cellRenderer;
   }
 }
