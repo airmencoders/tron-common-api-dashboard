@@ -9,6 +9,7 @@ apis/group-controller-api.ts
 apis/header-request-controller-api.ts
 apis/organization-controller-api.ts
 apis/person-controller-api.ts
+apis/privilege-controller-api.ts
 apis/puckboard-etl-controller-api.ts
 apis/squadron-controller-api.ts
 apis/subscriber-controller-api.ts
@@ -24,6 +25,7 @@ models/exception-response.ts
 models/index.ts
 models/organization-dto.ts
 models/person.ts
+models/privilege-dto.ts
 models/privilege.ts
 models/subscriber.ts
 models/user-info-dto.ts

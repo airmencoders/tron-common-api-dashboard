@@ -4,5 +4,6 @@ export * from './exception-response';
 export * from './organization-dto';
 export * from './person';
 export * from './privilege';
+export * from './privilege-dto';
 export * from './subscriber';
 export * from './user-info-dto';

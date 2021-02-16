@@ -1,5 +1,5 @@
 import { PersonControl } from "./components/Person/PersonControl";
-import { AppClientPage } from "./pages/AppClientPage";
+import { AppClientPage } from "./pages/AppClient/AppClientPage";
 import { HealthPage } from "./pages/HealthPage";
 
 export interface RouteItem {

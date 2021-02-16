@@ -1,0 +1,66 @@
+@import "../../styles/base";
+@import "../../styles/mixins";
+@import "../../styles/spacing";
+
+.client-form {
+  .client-name-container {
+    margin-bottom: calculateRem(20px);
+
+    &__input {
+      display: block;
+      width: 100%;
+    }
+
+    .usa-input--error {
+      position: relative;
+      animation: shake .1s linear;
+      animation-iteration-count: 1;
+      border: 2px solid red;
+      border-radius: calculateRem(3px);
+      outline: none;
+    }
+  }
+
+  .permissions-container {
+    margin-bottom: calculateRem(20px);
+
+    .usa-checkbox {
+      &__label {
+        margin-left: calculateRem(10px);
+      }
+
+      &__label, &__input {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  @media (min-width: 30em) {
+    .button-container {
+      flex-direction: row;
+    }
+  }
+
+  .validation-error {
+    color: red;
+  }
+
+  .successful-operation {
+    color: green;
+  }
+}
+
+@keyframes shake {
+  0% {
+    left: calculateRem(5px);
+  }
+  100% {
+    right: calculateRem(5px);
+  }
+}

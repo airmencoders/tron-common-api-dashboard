@@ -8,5 +8,6 @@ export interface ButtonProps {
   outline?: boolean;
   inverse?: boolean;
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (event?: any) => void;
+  className?: string;
 }

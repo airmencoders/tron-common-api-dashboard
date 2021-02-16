@@ -1,0 +1,60 @@
+@import"../../styles/base";
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.side-drawer { 
+  height: 100%;
+  background: white;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 25%;
+  min-width: calculateRem(300px);
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+  overflow: auto;
+
+  &.open {
+    transform: translateX(0%);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    margin-bottom: $default-panel-padding-y;
+
+    .close-btn {
+      padding: 0;
+      border: none;
+      background: none;
+    }
+  }
+
+  .header {
+    &__title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0;
+    }
+  }
+
+  &__content {
+    margin-bottom: $default-panel-padding-y;
+  }
+
+  &__footer {
+    margin-bottom: $default-panel-padding-y;
+
+    .footer {
+      &__btn-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+    }
+  }
+}
+

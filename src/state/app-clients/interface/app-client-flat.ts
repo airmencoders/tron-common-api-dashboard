@@ -1,4 +1,4 @@
-import { ClientPrivilege } from "./client-privilege";
+import { ClientPrivilege } from "./app-client-privilege";
 
 export interface AppClientFlat extends ClientPrivilege {
   id?: string;
