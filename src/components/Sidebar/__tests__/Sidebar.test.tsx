@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Sidebar from '../Sidebar';
-import { HealthPage } from '../../../pages/HealthPage';
+import { HealthPage } from '../../../pages/Health/HealthPage';
 import { PersonControl } from '../../Person/PersonControl';
 import { MemoryRouter } from 'react-router-dom';
 import { RouteItem } from '../../../routes';
