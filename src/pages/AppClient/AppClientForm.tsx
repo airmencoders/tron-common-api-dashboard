@@ -14,8 +14,10 @@ import { AppClientFormProps } from './AppClientFormProps';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 import { AppClientFormActionType } from './AppClientFormActionType';
 import { Spinner } from 'react-bootstrap';
+import {useAppClientPageState} from './app-client-page-state';
 
 function AppClientForm(props: AppClientFormProps) {
+  const appClientPageState = useAppClientPageState();
   const formState = useState<AppClientFlat>({
     id: props.client?.id,
     name: props.client?.name || "",
@@ -41,12 +43,22 @@ function AppClientForm(props: AppClientFormProps) {
     return props.successAction.success;
   }
 
+  function closeForm(event: React.SyntheticEvent) {
+    event.preventDefault();
+
+    appClientPageState.set( prevState => ({
+      isOpen: false,
+      formAction: undefined,
+      client: undefined
+    }));
+  }
+
   return (
     <>
       {(props.client && props.type === AppClientFormActionType.UPDATE) || props.type === AppClientFormActionType.ADD ?
         <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())} data-testid="app-client-form">
           <div className="client-name-container">
-            <Label className="client-name-container__label" htmlFor="name"><h5>Name (required)</h5></Label>
+            <Label className="client-name-container__label" htmlFor="name">Name</Label>
             <TextInput
               className="client-name-container__input"
               id="name"
@@ -70,7 +82,7 @@ function AppClientForm(props: AppClientFormProps) {
 
           <Fieldset className="permissions-container">
             <div className="permissions-container__title">
-              <h5 className="title__text">Permissions</h5>
+              <Label className="client-name-container__label" htmlFor="permissions">Permissions</Label>
             </div>
 
             <div className="permissions-container__options">
@@ -94,12 +106,21 @@ function AppClientForm(props: AppClientFormProps) {
           </Fieldset>
 
           {props.errors?.general && <p className="validation-error">* {props.errors?.general}</p>}
-          {props.successAction.successMsg && <p className="successful-operation">{props.successAction.successMsg}</p>}
+          {
+            props.successAction.successMsg &&
+              <div className="client-form__success-container">
+                <p className="successful-operation">
+                  {props.successAction.successMsg}
+                </p>
+                <Button type="button" onClick={closeForm} className="success-container__close">Close</Button>
+              </div>
+          }
 
           {!props.successAction.success &&
             <div className="button-container">
+              <Button type="button" onClick={props.onCancel} unstyled>Cancel</Button>
               <Button
-                type={'submit'}
+                type="submit"
                 className="button-container__submit"
                 disabled={Validation(formState).invalid() || !isFormModified() || props.isSubmitting}
               >

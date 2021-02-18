@@ -6,9 +6,11 @@ import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { AppClientFormError } from './AppClientFormError';
 import { AppClientFormActionType } from './AppClientFormActionType';
 import { AppClientFormActionSuccess } from './AppClientFormActionSuccess';
+import {useAppClientPageState} from './app-client-page-state';
 
 function AppClientEdit(props: { client?: AppClientFlat }) {
   const appClientState = useAppClientsState();
+  const appClientPageState = useAppClientPageState();
   const isSubmitting = useState(false);
 
   const emptyErrorMsg = {
@@ -65,10 +67,21 @@ function AppClientEdit(props: { client?: AppClientFlat }) {
     }
   }
 
+  function onCancel(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    appClientPageState.set(prevState => ({
+      isOpen: false,
+      formAction: undefined,
+      client: undefined
+    }));
+  }
+
   return (
     <AppClientForm
       client={props.client}
       onSubmit={onSubmit}
+      onCancel={onCancel}
       isSubmitting={isSubmitting.get()}
       type={AppClientFormActionType.UPDATE}
       successAction={successState.get()}

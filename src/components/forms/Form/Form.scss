@@ -1,0 +1,9 @@
+@import "../../../styles/base";
+
+.tron-form {
+  .usa-form {
+    @include at-media("mobile-lg") {
+      max-width: 25rem;
+    }
+  }
+}
