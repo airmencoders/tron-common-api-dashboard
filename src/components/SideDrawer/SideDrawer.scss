@@ -2,7 +2,7 @@
 @import "../../styles/variables";
 @import "../../styles/mixins";
 
-.side-drawer { 
+.side-drawer {
   height: 100%;
   background: white;
   position: fixed;
@@ -43,18 +43,6 @@
 
   &__content {
     margin-bottom: $default-panel-padding-y;
-  }
-
-  &__footer {
-    margin-bottom: $default-panel-padding-y;
-
-    .footer {
-      &__btn-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-      }
-    }
   }
 }
 
