@@ -4,6 +4,8 @@
 @import "./fonts";
 @import "./spacing";
 
+$theme-image-path: '~uswds/dist/img';
+
 /** Overrides */
 h1, h2, h3, h4, h5, h6 {
   font-family: Lato, 'sans-serif';
@@ -29,3 +31,4 @@ div, span {
   @include u-font-size('body', 'sm');
   color: $font-color-normal;
 }
+

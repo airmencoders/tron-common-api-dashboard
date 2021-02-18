@@ -21,9 +21,9 @@ function SideDrawer(props: SideDrawerProps) {
           {props.children}
         </div>
         <div className="side-drawer__footer">
-          <div className="footer__btn-container">
-            <Button className="footer__close-btn" type="button" onClick={props.onCloseHandler}>Close</Button>
-          </div>
+          {/*<div className="footer__btn-container">*/}
+          {/*  <Button className="footer__close-btn" type="button" onClick={props.onCloseHandler}>Close</Button>*/}
+          {/*</div>*/}
         </div>
       </div>
     </>

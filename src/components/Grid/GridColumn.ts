@@ -7,6 +7,7 @@ export default class GridColumn {
       private _sortable: boolean,
       private _filter: boolean,
       private _headerName: string = '',
+      private _headerClass: string = '',
       private _cellRenderer: React.ReactNode = undefined
   ) { }
 
@@ -24,6 +25,10 @@ export default class GridColumn {
 
   get headerName(): string {
     return this._headerName;
+  }
+
+  get headerClass(): string {
+    return this._headerClass;
   }
 
   get cellRenderer(): React.ReactNode {

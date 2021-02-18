@@ -1,8 +1,6 @@
-import { useState } from '@hookstate/core';
 import { RowClickedEvent } from 'ag-grid-community';
 import React, { useEffect } from 'react';
 import { Container, Spinner } from 'react-bootstrap';
-import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 import Grid from '../../components/Grid/Grid';
 import GridColumn from '../../components/Grid/GridColumn';
 import PageFormat from '../../components/PageFormat/PageFormat';
@@ -17,37 +15,38 @@ import Button from '../../components/Button/Button';
 import AppClientEdit from './AppClientEdit';
 import AppClientAdd from './AppClientAdd';
 import PrivilegeCellRenderer from './PrivilegeCellRenderer';
+import {useAppClientPageState} from './app-client-page-state';
 
 const serviceTitle = "App Client Service";
 
 const columnHeaders: GridColumn[] = [
   new GridColumn('name', true, true, 'NAME'),
-  new GridColumn('read', true, true, 'READ', PrivilegeCellRenderer),
-  new GridColumn('write', true, true, 'WRITE', PrivilegeCellRenderer),
+  new GridColumn('read', true, false, 'READ', 'header-center',
+      PrivilegeCellRenderer),
+  new GridColumn('write', true, false, 'WRITE', 'header-center',
+      PrivilegeCellRenderer),
 ];
-
-interface AppClientPageState {
-  isOpen: boolean,
-  formAction?: AppClientFormActionType,
-  client?: AppClientFlat
-}
 
 export function AppClientPage() {
   const appClientState = useAppClientsState();
   const privilegeState = usePrivilegeState();
-  const useSideDrawerState = useState<AppClientPageState>({
-    isOpen: false,
-    formAction: undefined,
-    client: undefined
-  });
+
+  const appClientPageState = useAppClientPageState();
 
   useEffect(() => {
     appClientState.fetchAndStoreAppClients();
     privilegeState.fetchAndStorePrivileges();
+    return () => {
+      appClientPageState.set({
+        isOpen: false,
+        formAction: undefined,
+        client: undefined
+      });
+    }
   }, []);
 
   function onRowClicked(event: RowClickedEvent): void {
-    useSideDrawerState.set({
+    appClientPageState.set({
       formAction: AppClientFormActionType.UPDATE,
       isOpen: true,
       client: event.data
@@ -55,7 +54,7 @@ export function AppClientPage() {
   }
 
   function onAddClientClick() {
-    useSideDrawerState.set({
+    appClientPageState.set({
       formAction: AppClientFormActionType.ADD,
       isOpen: true,
       client: undefined
@@ -63,7 +62,7 @@ export function AppClientPage() {
   }
 
   function onCloseHandler() {
-    useSideDrawerState.set({
+    appClientPageState.set({
       formAction: undefined,
       client: undefined,
       isOpen: false,
@@ -94,10 +93,10 @@ export function AppClientPage() {
                   rowClass="ag-grid--row-pointer"
                 />
 
-                <SideDrawer title={"App Client Editor"} isOpen={useSideDrawerState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                  {useSideDrawerState.client.get() && useSideDrawerState.formAction.value === AppClientFormActionType.UPDATE ?
-                    <AppClientEdit client={useSideDrawerState.client.get()} />
-                    : useSideDrawerState.formAction.value === AppClientFormActionType.ADD ?
+                <SideDrawer title={"App Client Editor"} isOpen={appClientPageState.isOpen.get()} onCloseHandler={onCloseHandler}>
+                  {appClientPageState.client.get() && appClientPageState.formAction.value === AppClientFormActionType.UPDATE ?
+                    <AppClientEdit client={appClientPageState.client.get()} />
+                    : appClientPageState.formAction.value === AppClientFormActionType.ADD ?
                       <AppClientAdd />
                       :
                       null
