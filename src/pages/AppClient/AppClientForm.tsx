@@ -49,7 +49,7 @@ function AppClientForm(props: AppClientFormProps) {
     appClientPageState.set( prevState => ({
       isOpen: false,
       formAction: undefined,
-      client: prevState.client
+      client: undefined
     }));
   }
 
