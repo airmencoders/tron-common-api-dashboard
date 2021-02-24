@@ -46,7 +46,7 @@ export default class AppClientsService {
 
     return {
       id,
-      name,
+      name: name || ''
       ...privileges
     };
   }

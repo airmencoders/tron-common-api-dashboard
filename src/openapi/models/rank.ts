@@ -17,45 +17,48 @@
 /**
  * 
  * @export
- * @interface Person
+ * @interface Rank
  */
-export interface Person {
+export interface Rank {
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Rank
      */
-    id?: string;
+    abbreviation?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Rank
      */
-    firstName?: string;
+    name?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Rank
      */
-    middleName?: string;
+    payGrade?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof Rank
      */
-    lastName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    title?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    email?: string;
+    branchType?: RankBranchTypeEnum;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum RankBranchTypeEnum {
+    Other = 'OTHER',
+    Usa = 'USA',
+    Usaf = 'USAF',
+    Usmc = 'USMC',
+    Usn = 'USN',
+    Ussf = 'USSF',
+    Uscg = 'USCG'
+}
+
 
 

@@ -1,0 +1,24 @@
+@import "../../styles/base";
+@import "../../styles/variables";
+
+.logfile-container {
+  &__header {
+    margin-bottom: $default-panel-padding-y;
+    border-bottom: 1px solid black;
+  }
+
+  &__logs {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 60vh;
+  }
+}
+
+
+.logfile-page-container {
+  .logfile-download-container {
+    &__close-btn {
+      float: right;
+    }
+  }
+}

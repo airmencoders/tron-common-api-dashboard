@@ -1,0 +1,29 @@
+import { State } from '@hookstate/core';
+import { AxiosPromise } from 'axios';
+import LogfileApi from '../../api/logfile/logfile-api';
+import { LogfileDto } from '../../api/logfile/logfile-dto';
+
+export default class PastLogfileService {
+  constructor(private pastLogfileState: State<LogfileDto[]>, private logfileApi: LogfileApi) { }
+
+  fetchAndStorePastLogfiles(): Promise<LogfileDto[]> {
+    const allLogfiles = (): AxiosPromise<LogfileDto[]> => this.logfileApi.getLogfiles();
+    const pastLogRequest = new Promise<LogfileDto[]>(resolve => resolve(allLogfiles().then(r => r.data)));
+
+    this.pastLogfileState.set(pastLogRequest);
+
+    return pastLogRequest;
+  }
+
+  get isPromised(): boolean {
+    return this.pastLogfileState.promised;
+  }
+
+  get getPastLogs(): State<LogfileDto[]> | undefined {
+    return this.pastLogfileState.promised ? undefined : this.pastLogfileState;
+  }
+
+  get error(): string | undefined {
+    return this.pastLogfileState.promised ? undefined : this.pastLogfileState.error;
+  }
+}

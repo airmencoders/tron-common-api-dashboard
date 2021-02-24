@@ -17,177 +17,198 @@
 /**
  * 
  * @export
- * @interface Airman
+ * @interface PersonDto
  */
-export interface Airman {
+export interface PersonDto {
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     firstName?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     middleName?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     lastName?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     title?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     email?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     afsc?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     etsDate?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     ptDate?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     dodid?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     imds?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
+     */
+    rank?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonDto
+     */
+    branch?: PersonDtoBranchEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonDto
      */
     unit?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     wing?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     gp?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     squadron?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     wc?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     go81?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     dor?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     deros?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     phone?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     address?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     admin?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     fltChief?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     approved?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     manNumber?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     dutyPhone?: string;
     /**
      * 
      * @type {string}
-     * @memberof Airman
+     * @memberof PersonDto
      */
     dutyTitle?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Airman
-     */
-    rank?: string;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum PersonDtoBranchEnum {
+    Other = 'OTHER',
+    Usa = 'USA',
+    Usaf = 'USAF',
+    Usmc = 'USMC',
+    Usn = 'USN',
+    Ussf = 'USSF',
+    Uscg = 'USCG'
+}
+
 
 

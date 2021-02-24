@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { PersonContext } from './PersonProviderContext';
-import {Configuration, Person, PersonControllerApi} from '../openapi';
+import {Configuration, PersonDto, PersonControllerApi} from '../openapi';
 import Config from '../api/configuration';
 
 const personController = new PersonControllerApi(new Configuration({
     basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
 }));
 export function UserProvider({ children } : any) {
-    const [ users, setUsers ] = React.useState<Person[]>([]);
+    const [ users, setUsers ] = React.useState<PersonDto[]>([]);
 
     useEffect(() => {
         const initialFetch = async() => {
@@ -17,13 +17,13 @@ export function UserProvider({ children } : any) {
         initialFetch();
     }, []);
 
-    const addUser = async (person : Person) => {
+    const addUser = async (person : PersonDto) => {
         await personController.createPerson(person );
         const personsResponse = await personController.getPersons();
         setUsers(personsResponse.data);
     }
 
-    const editUser = async (person : Person) => {
+    const editUser = async (person : PersonDto) => {
         await personController.updatePerson(person.id as string, person);
         const personsResponse = await personController.getPersons();
         setUsers(personsResponse.data);
