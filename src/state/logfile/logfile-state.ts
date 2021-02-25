@@ -3,7 +3,7 @@ import LogfileActuatorApi from '../../api/logfile/logfile-actuator-api';
 import LogfileApi from '../../api/logfile/logfile-api';
 import { LogfileDto } from '../../api/logfile/logfile-dto';
 import CurrentLogfileService from './current-logfile-service';
-import { CurrentLogfileState } from './current-logfile-state.ts';
+import { CurrentLogfileState } from './current-logfile-state';
 import PastLogfileService from './past-logfile-service';
 
 const logfileState = createState<CurrentLogfileState>({

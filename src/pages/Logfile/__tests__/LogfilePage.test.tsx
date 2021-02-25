@@ -5,7 +5,7 @@ import { LogfilePage } from '../LogfilePage';
 import { useLogfileState, usePastLogfileState } from '../../../state/logfile/logfile-state';
 import CurrentLogfileService from '../../../state/logfile/current-logfile-service';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { CurrentLogfileState } from '../../../state/logfile/current-logfile-state.ts';
+import { CurrentLogfileState } from '../../../state/logfile/current-logfile-state';
 import LogfileActuatorApi from '../../../api/logfile/logfile-actuator-api';
 import { LogfileDto } from '../../../api/logfile/logfile-dto';
 import LogfileApi from '../../../api/logfile/logfile-api';

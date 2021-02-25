@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { CurrentLogfileState } from '../current-logfile-state.ts';
+import { CurrentLogfileState } from '../current-logfile-state';
 import LogfileActuatorApi from '../../../api/logfile/logfile-actuator-api';
 import CurrentLogfileService from '../current-logfile-service';
 import { wrapCurrentLogfileState } from '../logfile-state';

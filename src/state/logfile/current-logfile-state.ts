@@ -1,5 +1,3 @@
-import { LogfileDto } from "../../api/logfile/logfile-dto";
-
 export interface CurrentLogfileState {
   logs: Array<string>;
   maxLines: number;

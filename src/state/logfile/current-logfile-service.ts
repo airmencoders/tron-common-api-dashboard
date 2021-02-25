@@ -1,7 +1,7 @@
 import { State } from '@hookstate/core';
 import { AxiosPromise, AxiosResponse } from 'axios';
 import LogfileActuatorApi from '../../api/logfile/logfile-actuator-api';
-import { CurrentLogfileState } from './current-logfile-state.ts';
+import { CurrentLogfileState } from './current-logfile-state';
 
 export default class CurrentLogfileService {
   constructor(private logfileState: State<CurrentLogfileState>, private logfileActuatorApi: LogfileActuatorApi) { }
@@ -62,14 +62,14 @@ export default class CurrentLogfileService {
     })
   }
 
-  protected getCurrentLogfile(): Promise<AxiosResponse<string>> {
+  private getCurrentLogfile(): Promise<AxiosResponse<string>> {
     if (this.logfileState.length.get() === 0)
       return this.logfileActuatorApi.getLogfile();
     else
       return this.logfileActuatorApi.getLogfileStart(this.logfileState.end.value);
   }
 
-  protected parseContentRangeHeader(range: string): any {
+  private parseContentRangeHeader(range: string): any {
     if (range.includes('*')) {
       const split = range.split('/');
 
