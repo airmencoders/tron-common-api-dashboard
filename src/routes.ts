@@ -1,12 +1,12 @@
 import { PersonControl } from "./components/Person/PersonControl";
 import { AppClientPage } from "./pages/AppClient/AppClientPage";
 import { HealthPage } from "./pages/HealthPage";
-import { LogfilePage } from "./pages/Logfile/LogfilePage";
+import LogfilePage from "./pages/Logfile/LogfilePage";
 
 export interface RouteItem {
     path: string,
     name: string,
-    component: React.FunctionComponent
+    component: React.ComponentType<any>
 };
 
 export enum RoutePath {
