@@ -2,7 +2,6 @@
 .npmignore
 .openapi-generator-ignore
 api.ts
-apis/airman-controller-api.ts
 apis/app-client-controller-api.ts
 apis/flight-controller-api.ts
 apis/group-controller-api.ts
@@ -11,6 +10,7 @@ apis/organization-controller-api.ts
 apis/person-controller-api.ts
 apis/privilege-controller-api.ts
 apis/puckboard-etl-controller-api.ts
+apis/rank-controller-api.ts
 apis/squadron-controller-api.ts
 apis/subscriber-controller-api.ts
 apis/user-info-controller-api.ts
@@ -19,13 +19,13 @@ base.ts
 configuration.ts
 git_push.sh
 index.ts
-models/airman.ts
 models/app-client-user-dto.ts
 models/exception-response.ts
 models/index.ts
 models/organization-dto.ts
-models/person.ts
+models/person-dto.ts
 models/privilege-dto.ts
 models/privilege.ts
+models/rank.ts
 models/subscriber.ts
 models/user-info-dto.ts

@@ -349,10 +349,12 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
          * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+         * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganization: async (id: string, flatten?: boolean, options: any = {}): Promise<RequestArgs> => {
+        getOrganization: async (id: string, flatten?: boolean, people?: string, organizations?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getOrganization.');
@@ -372,6 +374,14 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
 
             if (flatten !== undefined) {
                 localVarQueryParameter['flatten'] = flatten;
+            }
+
+            if (people !== undefined) {
+                localVarQueryParameter['people'] = people;
+            }
+
+            if (organizations !== undefined) {
+                localVarQueryParameter['organizations'] = organizations;
             }
 
 
@@ -395,13 +405,17 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
         /**
          * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
          * @summary Retrieves all organizations
-         * @param {string} [type] 
-         * @param {string} [branch] 
-         * @param {string} [search] 
+         * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+         * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+         * @param {string} [search] Case insensitive search string for org name
+         * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+         * @param {number} [page] Page of content to retrieve
+         * @param {number} [limit] Size of each page
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganizations: async (type?: string, branch?: string, search?: string, options: any = {}): Promise<RequestArgs> => {
+        getOrganizations: async (type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/organization`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -424,6 +438,22 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
 
             if (search !== undefined) {
                 localVarQueryParameter['search'] = search;
+            }
+
+            if (people !== undefined) {
+                localVarQueryParameter['people'] = people;
+            }
+
+            if (organizations !== undefined) {
+                localVarQueryParameter['organizations'] = organizations;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
             }
 
 
@@ -716,11 +746,13 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
          * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+         * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrganization(id: string, flatten?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganization(id, flatten, options);
+        async getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganization(id, flatten, people, organizations, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -729,14 +761,18 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
         /**
          * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
          * @summary Retrieves all organizations
-         * @param {string} [type] 
-         * @param {string} [branch] 
-         * @param {string} [search] 
+         * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+         * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+         * @param {string} [search] Case insensitive search string for org name
+         * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+         * @param {number} [page] Page of content to retrieve
+         * @param {number} [limit] Size of each page
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrganizations(type?: string, branch?: string, search?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizations(type, branch, search, options);
+        async getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -864,23 +900,29 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
          * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+         * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganization(id: string, flatten?: boolean, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).getOrganization(id, flatten, options).then((request) => request(axios, basePath));
+        getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).getOrganization(id, flatten, people, organizations, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
          * @summary Retrieves all organizations
-         * @param {string} [type] 
-         * @param {string} [branch] 
-         * @param {string} [search] 
+         * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+         * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+         * @param {string} [search] Case insensitive search string for org name
+         * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+         * @param {number} [page] Page of content to retrieve
+         * @param {number} [limit] Size of each page
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganizations(type?: string, branch?: string, search?: string, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, options).then((request) => request(axios, basePath));
+        getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates an existing organization\'s attributes
@@ -992,23 +1034,29 @@ export interface OrganizationControllerApiInterface {
      * @summary Retrieves an organization by ID
      * @param {string} id Organization ID to retrieve
      * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+     * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    getOrganization(id: string, flatten?: boolean, options?: any): AxiosPromise<OrganizationDto>;
+    getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
      * @summary Retrieves all organizations
-     * @param {string} [type] 
-     * @param {string} [branch] 
-     * @param {string} [search] 
+     * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+     * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+     * @param {string} [search] Case insensitive search string for org name
+     * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+     * @param {number} [page] Page of content to retrieve
+     * @param {number} [limit] Size of each page
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    getOrganizations(type?: string, branch?: string, search?: string, options?: any): AxiosPromise<OrganizationDto>;
+    getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Updates an existing organization\'s attributes
@@ -1132,26 +1180,32 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @summary Retrieves an organization by ID
      * @param {string} id Organization ID to retrieve
      * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+     * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public getOrganization(id: string, flatten?: boolean, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).getOrganization(id, flatten, options).then((request) => request(this.axios, this.basePath));
+    public getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).getOrganization(id, flatten, people, organizations, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
      * @summary Retrieves all organizations
-     * @param {string} [type] 
-     * @param {string} [branch] 
-     * @param {string} [search] 
+     * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+     * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+     * @param {string} [search] Case insensitive search string for org name
+     * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+     * @param {number} [page] Page of content to retrieve
+     * @param {number} [limit] Size of each page
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public getOrganizations(type?: string, branch?: string, search?: string, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).getOrganizations(type, branch, search, options).then((request) => request(this.axios, this.basePath));
+    public getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,6 +1,6 @@
-import { PersonControl } from "./components/Person/PersonControl";
 import { AppClientPage } from "./pages/AppClient/AppClientPage";
 import { HealthPage } from "./pages/Health/HealthPage";
+import PersonPage from './pages/Person/PersonPage';
 
 export interface RouteItem {
     path: string,
@@ -24,7 +24,7 @@ export const routes: RouteItem[] = [
     {
         path: RoutePath.PERSON,
         name: 'Person',
-        component: PersonControl
+        component: PersonPage
     },
     {
         path: RoutePath.APP_CLIENT,
