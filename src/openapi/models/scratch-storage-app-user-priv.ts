@@ -14,31 +14,32 @@
 
 
 import { Privilege } from './privilege';
+import { ScratchStorageUser } from './scratch-storage-user';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface ScratchStorageAppUserPriv
  */
-export interface AppClientUserDto {
+export interface ScratchStorageAppUserPriv {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof ScratchStorageAppUserPriv
      */
     id?: string;
     /**
      * 
-     * @type {string}
-     * @memberof AppClientUserDto
+     * @type {ScratchStorageUser}
+     * @memberof ScratchStorageAppUserPriv
      */
-    name?: string;
+    user?: ScratchStorageUser;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @type {Privilege}
+     * @memberof ScratchStorageAppUserPriv
      */
-    privileges?: Array<Privilege>;
+    privilege?: Privilege;
 }
 
 

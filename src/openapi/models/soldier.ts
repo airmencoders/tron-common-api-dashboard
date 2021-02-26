@@ -13,14 +13,13 @@
  */
 
 
-import { AirmanAllOf } from './airman-all-of';
 import { PersonDto } from './person-dto';
 
 /**
- * @type Airman
+ * @type Soldier
  * @export
  */
-export type Airman = AirmanAllOf & PersonDto;
+export type Soldier = PersonDto;
 
 
 

@@ -16,27 +16,27 @@
 import { Privilege } from './privilege';
 
 /**
- * 
+ * Dashboard user to add
  * @export
- * @interface AppClientUserDto
+ * @interface DashboardUserDto
  */
-export interface AppClientUserDto {
+export interface DashboardUserDto {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof DashboardUserDto
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof DashboardUserDto
      */
-    name?: string;
+    email?: string;
     /**
      * 
      * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @memberof DashboardUserDto
      */
     privileges?: Array<Privilege>;
 }

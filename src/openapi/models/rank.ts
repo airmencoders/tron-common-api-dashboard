@@ -13,32 +13,52 @@
  */
 
 
-import { Privilege } from './privilege';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface Rank
  */
-export interface AppClientUserDto {
+export interface Rank {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof Rank
      */
-    id?: string;
+    abbreviation?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof Rank
      */
     name?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @type {string}
+     * @memberof Rank
      */
-    privileges?: Array<Privilege>;
+    payGrade?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Rank
+     */
+    branchType?: RankBranchTypeEnum;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum RankBranchTypeEnum {
+    Other = 'OTHER',
+    Usa = 'USA',
+    Usaf = 'USAF',
+    Usmc = 'USMC',
+    Usn = 'USN',
+    Ussf = 'USSF',
+    Uscg = 'USCG'
+}
+
 
 
