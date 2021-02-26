@@ -7,4 +7,5 @@ export interface CreateUpdateFormProps<T> {
   onSubmit: (updated: T) => void;
   onClose: () =>  void;
   successAction: DataCrudSuccessAction;
+  isSubmitting: boolean;
 }

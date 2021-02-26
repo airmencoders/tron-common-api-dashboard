@@ -8,12 +8,13 @@ import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpd
 import {PersonDto} from '../../openapi/models';
 import {createState, useState} from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
-import {Initial} from '@hookstate/initial';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import {FormActionType} from '../../state/crud-page/form-action-type';
+import equal from 'fast-deep-equal/es6';
 
+// use enum values form person dto
 const branches = [
     'USA',
     'USAF',
@@ -29,7 +30,6 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const formState = useState(createState({...props.data}));
 
   formState.attach(Validation);
-  formState.attach(Initial);
   formState.attach(Touched);
 
   const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0
@@ -40,7 +40,18 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
 
 
   const isFormModified = (): boolean => {
-    return Initial(formState).modified();
+    const stateKeys = formState.keys;
+    let isChanged = false;
+    for (let i = 0; i < stateKeys.length; i++) {
+      const key = stateKeys[i];
+      const origValue = props.data[key] == null || props.data[key] === '' ? '' : props.data[key];
+      const formStateValue = formState[key]?.get() == null || formState[key]?.get() === '' ? '' : formState[key]?.get();
+      if (formStateValue !== origValue) {
+        isChanged = true;
+        break;
+      }
+    }
+    return isChanged
   }
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
@@ -134,9 +145,9 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
             <SubmitActions formActionType={FormActionType.ADD}
                            onCancel={props.onClose}
                            onSubmit={submitForm}
-                           isFormValid={true}
-                           isFormModified={true}
-                           isFormSubmitting={false}
+                           isFormValid={Validation(formState).valid()}
+                           isFormModified={isFormModified()}
+                           isFormSubmitting={props.isSubmitting}
             />
           }
         </Form>

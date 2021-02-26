@@ -10,15 +10,20 @@ export interface CrudPageState<T> {
   selected?: T,
   formErrors?: DataCrudFormErrors,
   successAction?: DataCrudSuccessAction;
+  isSubmitting: boolean
 }
 
+export const getInitialCrudPageState = () => ({
+  isOpen: false,
+  formAction: undefined,
+  selected: undefined,
+  formErrors: undefined,
+  isSubmitting: false
+});
+
+
 export function createCrudPageState<T>(): State<CrudPageState<T>> & StateMethodsDestroy {
-  return createState<CrudPageState<T>>({
-    isOpen: false,
-    formAction: undefined,
-    selected: undefined,
-    formErrors: undefined
-  });
+  return createState<CrudPageState<T>>(getInitialCrudPageState());
 }
 
 export function useCrudPageState<T>(): State<CrudPageState<T>> {

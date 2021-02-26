@@ -9,7 +9,7 @@ import StatusCard from '../../components/StatusCard/StatusCard';
 import Button from '../../components/Button/Button';
 import {DataCrudFormPageProps} from './DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
-import {CrudPageState} from '../../state/crud-page/crud-page-state';
+import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
 import {State} from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
@@ -22,13 +22,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   useEffect(() => {
     dataState.fetchAndStoreData();
     return () => {
-      pageState.set({
-        isOpen: false,
-        formAction: undefined,
-        selected: undefined,
-        formErrors: undefined,
-        successAction: undefined
-      });
+      pageState.set(getInitialCrudPageState());
     }
   }, []);
 
@@ -42,7 +36,8 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
         isOpen: true,
         selected: dtoData,
         formErrors: undefined,
-        successAction: undefined
+        successAction: undefined,
+        isSubmitting: false,
       });
     }
   }
@@ -53,21 +48,20 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       isOpen: true,
       selected: undefined,
       formErrors: undefined,
-      successAction: undefined
+      successAction: undefined,
+      isSubmitting: false
     });
   }
 
   function onCloseHandler() {
-    pageState.set({
-      formAction: undefined,
-      isOpen: false,
-      selected: undefined,
-      formErrors: undefined,
-      successAction: undefined
-    });
+    pageState.set(getInitialCrudPageState());
   }
 
   async function updateSubmit(updatedDto: T) {
+    pageState.set(prevState => ({
+      ...prevState,
+      isSubmitting: true
+    }));
     try {
       await dataState.sendUpdate(updatedDto);
       pageState.set( prevState => {
@@ -75,31 +69,53 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
           ...prevState,
           successAction: {
             success: true,
-            successMsg: `Successfully updated ${props.dataTypeName}.`
-          }
+            successMsg: `Successfully updated ${props.dataTypeName}.`,
+          },
+          isSubmitting: false
         }
-      })
+      });
     }
     catch (error) {
-      console.log(error);
       pageState.set(prevState => {
         return {
           ... prevState,
           formErrors: {
             general: error.message
-          }
+          },
+          isSubmitting: false
         }
-      })
+      });
     }
   }
 
   async function createSubmit(newDto: T) {
+    pageState.set(prevState => ({
+      ...prevState,
+      isSubmitting: true
+    }));
     try {
       await dataState.sendCreate(newDto);
+      pageState.set( prevState => {
+        return {
+          ...prevState,
+          successAction: {
+            success: true,
+            successMsg: `Successfully created ${props.dataTypeName}.`,
+          },
+          isSubmitting: false
+        }
+      });
     }
     catch (error) {
-      // set error state here
-      console.log(error);
+      pageState.set(prevState => {
+        return {
+          ... prevState,
+          formErrors: {
+            general: error.message
+          },
+          isSubmitting: false
+        }
+      });
     }
   }
 
@@ -140,6 +156,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                                 onSubmit={updateSubmit}
                                 onClose={onCloseHandler}
                                 successAction={pageState.successAction.get()}
+                                isSubmitting={pageState.isSubmitting.get()}
                             />
                             : pageState.formAction.value === FormActionType.ADD ?
                                 <CreateForm onSubmit={createSubmit}/>
