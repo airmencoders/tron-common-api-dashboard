@@ -2,7 +2,7 @@ import { Spinner } from "react-bootstrap";
 import './UseLoading.scss';
 
 function UseLoading(Component: React.ComponentType<any>) {
-  return function UseLoadingWrapper({ props, isLoading }: { props?: any, isLoading: boolean }) {
+  return function UseLoadingWrapper({ isLoading, ...props }: { isLoading: boolean }) {
     return (
       <>
         <Component {...props} />
