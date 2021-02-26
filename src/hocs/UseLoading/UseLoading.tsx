@@ -5,6 +5,7 @@ function UseLoading(Component: React.ComponentType<any>) {
   return function UseLoadingWrapper({ props, isLoading }: { props?: any, isLoading: boolean }) {
     return (
       <>
+        <Component {...props} />
         {isLoading &&
           <div className='loading-page-container'>
             <Spinner className='loading-page-container__spinner' animation='border' role='status' variant='info'>
@@ -12,7 +13,6 @@ function UseLoading(Component: React.ComponentType<any>) {
             </Spinner>
           </div>
         }
-        <Component {...props} />
       </>
     );
   }

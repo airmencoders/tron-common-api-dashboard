@@ -4,7 +4,7 @@ import { StatusType } from '../../components/StatusCard/status-type';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import { useLogfileState, usePastLogfileState } from '../../state/logfile/logfile-state';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import './LogfilePage.scss';
+import './LogfileContents.scss';
 import { useState } from '@hookstate/core';
 import Button from '../../components/Button/Button';
 
@@ -15,7 +15,7 @@ export function LogfileContents() {
 
   const sideDrawerState = useState<boolean>(false);
 
-  const logsContainer = useRef<HTMLPreElement>(null);
+  const logsContainer = useRef<HTMLDivElement>(null);
   const lastLogElem = useRef<HTMLDivElement>(null);
 
   const timerState = useState<NodeJS.Timeout | undefined>(undefined);
@@ -39,7 +39,8 @@ export function LogfileContents() {
     }
 
     if (shouldScroll)
-      lastLogElem.current?.scrollIntoView();
+      // lastLogElem.current?.scrollIntoView();
+      logsContainer.current?.scrollTo(0, logsContainer.current.scrollHeight);
   }
 
   useEffect(() => {
@@ -89,7 +90,7 @@ export function LogfileContents() {
             <div className='logfile-container__header'>
               <h4 className='header__title'>Current Logfile</h4>
             </div>
-            <pre ref={logsContainer} className='logfile-container__logs'>
+            <div ref={logsContainer} className='logfile-container__logs'>
               {logfileState.getCurrentLog.map((item, index) => {
                 return (
                   <div key={index} className='logs__message'>
@@ -97,8 +98,8 @@ export function LogfileContents() {
                   </div>
                 );
               })}
-              <div ref={lastLogElem}></div>
-            </pre>
+              <div className='logs_message--last-item' ref={lastLogElem}></div>
+            </div>
           </div>
         </div>
       }

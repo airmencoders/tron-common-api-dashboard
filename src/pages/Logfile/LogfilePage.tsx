@@ -1,12 +1,12 @@
-import { accessLogfileState, accessPastLogfileState } from '../../state/logfile/logfile-state';
+import { useLogfileState, usePastLogfileState } from '../../state/logfile/logfile-state';
 import UseLoading from '../../hocs/UseLoading/UseLoading';
 import { LogfileContents } from './LogfileContents';
 
 const Page = UseLoading(LogfileContents);
-const logfileState = accessLogfileState();
-const pastLogfileState = accessPastLogfileState();
 
 function LogfilePage() {
+  const logfileState = useLogfileState();
+  const pastLogfileState = usePastLogfileState();
 
   function isLoading(): boolean {
     return logfileState.isLoading && pastLogfileState.isPromised;
