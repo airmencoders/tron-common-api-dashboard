@@ -17,55 +17,55 @@
 /**
  * 
  * @export
- * @interface BadRequestExceptionCauseStackTrace
+ * @interface RecordNotFoundExceptionCauseStackTrace
  */
-export interface BadRequestExceptionCauseStackTrace {
+export interface RecordNotFoundExceptionCauseStackTrace {
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     methodName?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     fileName?: string;
     /**
      * 
      * @type {number}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     lineNumber?: number;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     className?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     nativeMethod?: boolean;
 }
