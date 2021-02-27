@@ -2,8 +2,9 @@ import { State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import { AxiosPromise } from 'axios';
+import { PrivilegeType } from '../app-clients/interface/privilege-type';
 
-export default class DashboardUserService {
+export default class AuthorizedUserService {
   constructor(private state: State<DashboardUserDto | undefined>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
 
   fetchAndStoreDashboardUser(): Promise<DashboardUserDto> {
@@ -15,11 +16,22 @@ export default class DashboardUserService {
     return data;
   }
 
+  authorizedUserHasPrivilege(privilegeType: PrivilegeType): boolean | undefined {
+    if (this.isStateReady())
+      return this.authorizedUser?.privileges?.find(privilege => privilege.name === privilegeType) ? true : false;
+    else
+      return undefined;
+  }
+
+  private isStateReady(): boolean {
+    return !this.state.error && !this.state.promised;
+  }
+
   get isPromised(): boolean {
     return this.state.promised;
   }
 
-  get dashboardUser(): DashboardUserDto | undefined {
+  get authorizedUser(): DashboardUserDto | undefined {
     return this.state.promised || this.state.error ? undefined : this.state.get();
   }
 

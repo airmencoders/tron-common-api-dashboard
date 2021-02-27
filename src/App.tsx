@@ -5,10 +5,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { routes, RoutePath, ProtectedStatus } from './routes';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
-import { useDashboardUserState } from './state/dashboard-user/dashboard-user-state';
+import { useAuthorizedUserState } from './state/authorized-user/authorized-user-state';
 
 function App() {
-  const useDashboardState = useDashboardUserState();
+  const useDashboardState = useAuthorizedUserState();
 
   useEffect(() => {
     useDashboardState.fetchAndStoreDashboardUser();

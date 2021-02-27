@@ -1,15 +1,16 @@
 
 import { Route, RouteProps } from 'react-router-dom';
 import { NotAuthorizedPage } from '../../pages/NotAuthorized/NotAuthorizedPage';
-import { useDashboardUserState } from '../../state/dashboard-user/dashboard-user-state';
+import { PrivilegeType } from '../../state/app-clients/interface/privilege-type';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { ProtectedRouteProps } from './ProtectedRouteProps';
 
 function ProtectedRoute({ component: Component, ...rest }: ProtectedRouteProps & RouteProps) {
-  const useDashboardState = useDashboardUserState();
+  const useAuthorizedState = useAuthorizedUserState();
 
   return (
     <Route {...rest} render={(props) => (
-      !useDashboardState.error && useDashboardState.dashboardUser?.privileges?.find(privilege => privilege.name === 'DASHBOARD_ADMIN') ?
+      !useAuthorizedState.error && useAuthorizedState.authorizedUser?.privileges?.find(privilege => privilege.name === PrivilegeType.DASHBOARD_ADMIN) ?
         <Component {...props} />
         :
         <NotAuthorizedPage {...props} />
