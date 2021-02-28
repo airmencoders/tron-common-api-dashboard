@@ -23,10 +23,11 @@ function PersonPage() {
           columns={columns}
           createForm={PersonEditForm}
           dataTypeName="Person"
-          pageTitle="Person Management"
+          pageTitle="Persons"
           updateForm={PersonEditForm}
           useDataState={usePersonState}
           usePageState={useCrudPageState}
+          allowEdit={false}
       />
   );
 }

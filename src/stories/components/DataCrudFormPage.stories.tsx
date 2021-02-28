@@ -14,11 +14,10 @@ import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import Form from '../../components/forms/Form/Form';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../../components/Grid/grid-row-data';
-import {DataCrudFormErrors} from '../../components/DataCrudFormPage/data-crud-form-errors';
-import {DataCrudSuccessAction} from '../../components/DataCrudFormPage/data-crud-success-action';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 
 import '../../App.scss';
+import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 
 export default {
   title: 'Data Crud Form Page',
@@ -32,18 +31,18 @@ const Template: Story<DataCrudFormPageProps<any, any>> = (args) => (
 );
 
 interface MockRow extends GridRowData {
-  id: number,
-  name: string;
-  val1: string;
-  val2: number;
+  id?: number,
+  name?: string;
+  val1?: string;
+  val2?: number;
 }
 
 interface MockDto {
-  id: number;
-  name: string;
-  val1: string;
-  val2SubA: number;
-  val2SubB: number;
+  id?: number;
+  name?: string;
+  val1?: string;
+  val2SubA?: number;
+  val2SubB?: number;
 }
 
 const mockData: MockDto[] = [
@@ -57,7 +56,7 @@ const mockRowData: MockRow[] = mockData?.map((dataItem) => ({
   id: dataItem.id,
   name: dataItem.name,
   val1: dataItem.val1,
-  val2: dataItem.val2SubA + dataItem.val2SubB
+  val2: (dataItem.val2SubA || 0) + (dataItem.val2SubB || 0)
 }));
 
 const useStateHook = () => useState(createState<MockRow[]>(mockRowData));
@@ -82,7 +81,7 @@ class MockDataService implements DataService<MockRow, MockDto> {
           id: currentState.length + 1,
           name: toCreate.name,
           val1: toCreate.val1,
-          val2: toCreate.val2SubA + toCreate.val2SubB
+          val2: (toCreate.val2SubA || 0) + (toCreate.val2SubB || 0)
         };
         resolve(newRow);
         currentState.push(newRow);
@@ -92,7 +91,7 @@ class MockDataService implements DataService<MockRow, MockDto> {
   }
 
   sendUpdate(toUpdate: MockDto): Promise<MockRow> {
-    if (toUpdate.val2SubA >= 5) {
+    if ((toUpdate.val2SubA || 0) >= 5) {
       return Promise.reject(new Error('There was a problem with your submission. Val2SubA must be less than 5'));
     }
     this.state.set(currentState => {
@@ -102,7 +101,7 @@ class MockDataService implements DataService<MockRow, MockDto> {
         id: toUpdate.id,
         name: toUpdate.name,
         val1: toUpdate.val1,
-        val2: toUpdate.val2SubA + toUpdate.val2SubB
+        val2: (toUpdate.val2SubA || 0) + (toUpdate.val2SubB || 0)
       };
       return mockRows;
     });
@@ -110,7 +109,7 @@ class MockDataService implements DataService<MockRow, MockDto> {
           id: toUpdate.id,
           name: toUpdate.name,
           val1: toUpdate.val1,
-          val2: toUpdate.val2SubA + toUpdate.val2SubB
+          val2: (toUpdate.val2SubA || 0) + (toUpdate.val2SubB || 0)
     });
   }
 
@@ -126,24 +125,18 @@ const formSuccess = {
 };
 
 // TODO: Set as property interface
-const CreateForm = ({data, onSubmit, formErrors, successAction, onClose}:
-                        { data: MockDto,
-                          formErrors: DataCrudFormErrors
-                          onSubmit: (updated: MockDto) => void,
-                          onClose: () =>  void,
-                          successAction: DataCrudSuccessAction
-                        }) => {
+const CreateForm = (props: CreateUpdateFormProps<MockDto>) => {
   const [dtoState, setDtoState] = reactUseState({
-    ...data
+    ...props.data
   });
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSubmit(dtoState);
+    props.onSubmit(dtoState);
   }
 
   const closeForm = () => {
-    onClose();
+    props.onClose();
   }
 
   const onFieldChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -165,14 +158,14 @@ const CreateForm = ({data, onSubmit, formErrors, successAction, onClose}:
     <Label htmlFor="val2SubB">Val 2 Sub B</Label>
     <TextInput id="val2SubB" name="val2SubB" type="number" value={dtoState.val2SubB}
                onChange={onFieldChange('val2SubB')} />
-    <SuccessErrorMessage successMessage={successAction?.successMsg}
-                         errorMessage={formErrors?.general || ''}
-                         showErrorMessage={formErrors?.general != null}
-                         showSuccessMessage={successAction != null && successAction?.success}
+    <SuccessErrorMessage successMessage={props.successAction?.successMsg}
+                         errorMessage={props.formErrors?.general || ''}
+                         showErrorMessage={props.formErrors?.general != null}
+                         showSuccessMessage={props.successAction != null && props.successAction?.success}
                          showCloseButton={true}
                          onCloseClicked={closeForm} />
     {
-      successAction == null &&
+      props.successAction == null &&
       <SubmitActions formActionType={FormActionType.ADD} onCancel={closeForm} onSubmit={() => {}}
                      isFormValid={true} isFormModified={true} isFormSubmitting={false}
                      />
@@ -196,5 +189,6 @@ TestPage.args = {
   createForm: CreateForm,
   updateForm: CreateForm,
   pageTitle: 'Page Title',
-  dataTypeName: 'Mock Data'
+  dataTypeName: 'Mock Data',
+  allowEdit: true
 };

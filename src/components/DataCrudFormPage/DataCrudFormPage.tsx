@@ -17,7 +17,7 @@ import {GridRowData} from '../Grid/grid-row-data';
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
   const dataState: DataService<any, any> = props.useDataState();
 
-  const pageState: State<CrudPageState<any>> = props.usePageState<T>();
+  const pageState: State<CrudPageState<any>> = props.usePageState();
 
   useEffect(() => {
     dataState.fetchAndStoreData();
@@ -27,22 +27,23 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   }, []);
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-
-    const rowData = event.data;
-    if (rowData != null) {
-      const dtoData = await dataState.getDtoForRowData(rowData);
-      pageState.set({
-        formAction: FormActionType.UPDATE,
-        isOpen: true,
-        selected: dtoData,
-        formErrors: undefined,
-        successAction: undefined,
-        isSubmitting: false,
-      });
+    if (props.allowEdit) {
+      const rowData = event.data;
+      if (rowData != null) {
+        const dtoData = await dataState.getDtoForRowData(rowData);
+        pageState.set({
+          formAction: FormActionType.UPDATE,
+          isOpen: true,
+          selected: dtoData,
+          formErrors: undefined,
+          successAction: undefined,
+          isSubmitting: false,
+        });
+      }
     }
   }
 
-  function onAddClientClick() {
+  function onAddEntityClick() {
     pageState.set({
       formAction: FormActionType.ADD,
       isOpen: true,
@@ -57,7 +58,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
-  async function updateSubmit(updatedDto: T) {
+  async function updateSubmit(updatedDto: R) {
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
@@ -88,7 +89,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }
   }
 
-  async function createSubmit(newDto: T) {
+  async function createSubmit(newDto: R) {
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
@@ -135,11 +136,14 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                     <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
                     :
                     <>
-                      <div className="add-app-client">
-                        <Button type="button" className="add-app-client__btn" onClick={onAddClientClick}>
-                          Add { props.dataTypeName }
-                        </Button>
-                      </div>
+                      {
+                        props.allowEdit &&
+                        <div className="add-app-client">
+                          <Button type="button" className="add-app-client__btn" onClick={onAddEntityClick}>
+                            Add { props.dataTypeName }
+                          </Button>
+                        </div>
+                      }
 
                       <Grid
                           data={dataState.state?.get() || []}
@@ -157,9 +161,17 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                                 onClose={onCloseHandler}
                                 successAction={pageState.successAction.get()}
                                 isSubmitting={pageState.isSubmitting.get()}
+                                formActionType={FormActionType.UPDATE}
                             />
                             : pageState.formAction.value === FormActionType.ADD ?
-                                <CreateForm onSubmit={createSubmit}/>
+                                <CreateForm
+                                    onSubmit={createSubmit}
+                                    formActionType={FormActionType.ADD}
+                                    formErrors={pageState.formErrors.get()}
+                                    onClose={onCloseHandler}
+                                    successAction={pageState.successAction.get()}
+                                    isSubmitting={pageState.isSubmitting.get()}
+                                 />
                                 :
                                 null
                         }

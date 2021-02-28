@@ -2,9 +2,9 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import Sidebar from '../Sidebar';
 import { HealthPage } from '../../../pages/Health/HealthPage';
-import { PersonControl } from '../../Person/PersonControl';
 import { MemoryRouter } from 'react-router-dom';
 import { RouteItem } from '../../../routes';
+import PersonPage from '../../../pages/Person/PersonPage';
 
 const testRoutes: RouteItem[] = [
   {
@@ -15,7 +15,7 @@ const testRoutes: RouteItem[] = [
   {
     path: "/person",
     name: "Person",
-    component: PersonControl
+    component: PersonPage
   }
 ];
 

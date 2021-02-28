@@ -17,7 +17,7 @@ function SubmitActions(props: SubmitActionsProps) {
                       props.isFormSubmitting}
         >
           {props.isFormSubmitting ?
-              <Spinner animation="border" role="status" variant="primary">
+              <Spinner animation="border" role="status" variant="primary" title="submitting">
                 <span className="sr-only">Submitting...</span>
               </Spinner>
               :

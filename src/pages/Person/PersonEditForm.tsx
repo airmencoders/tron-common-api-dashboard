@@ -2,7 +2,6 @@ import React, {FormEvent} from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
-import Label from '../../components/forms/Label/Label';
 import Select from '../../components/forms/Select/Select';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import {PersonDto} from '../../openapi/models';
@@ -11,8 +10,6 @@ import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
-import {FormActionType} from '../../state/crud-page/form-action-type';
-import equal from 'fast-deep-equal/es6';
 
 // use enum values form person dto
 const branches = [
@@ -44,7 +41,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
     let isChanged = false;
     for (let i = 0; i < stateKeys.length; i++) {
       const key = stateKeys[i];
-      const origValue = props.data[key] == null || props.data[key] === '' ? '' : props.data[key];
+      const origValue = props.data?.[key] == null || props.data[key] === '' ? '' : props.data?.[key];
       const formStateValue = formState[key]?.get() == null || formState[key]?.get() === '' ? '' : formState[key]?.get();
       if (formStateValue !== origValue) {
         isChanged = true;
@@ -60,7 +57,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   }
 
   const isFormDisabled = ():boolean => {
-    return props.successAction?.success;
+    return props.successAction?.success || false;
   }
 
   return (
@@ -129,7 +126,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
             >
               {
                 branches.map((branchName) => (
-                    <option value={branchName}>{branchName}</option>
+                    <option key={branchName} value={branchName}>{branchName}</option>
                 ))
               }
             </Select>
@@ -142,7 +139,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                                onCloseClicked={props.onClose} />
           {
             props.successAction == null &&
-            <SubmitActions formActionType={FormActionType.ADD}
+            <SubmitActions formActionType={props.formActionType}
                            onCancel={props.onClose}
                            onSubmit={submitForm}
                            isFormValid={Validation(formState).valid()}

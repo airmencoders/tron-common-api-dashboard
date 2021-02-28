@@ -21,7 +21,17 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { Flight } from '../models';
+// @ts-ignore
+import { Group } from '../models';
+// @ts-ignore
 import { OrganizationDto } from '../models';
+// @ts-ignore
+import { OtherUsaf } from '../models';
+// @ts-ignore
+import { Squadron } from '../models';
+// @ts-ignore
+import { Wing } from '../models';
 /**
  * OrganizationControllerApi - axios parameter creator
  * @export
@@ -31,14 +41,14 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
         /**
          * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
          * @summary Adds one or more organization entities
-         * @param {Array<OrganizationDto>} organizationDto 
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewOrganizations: async (organizationDto: Array<OrganizationDto>, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'organizationDto' is not null or undefined
-            if (organizationDto === null || organizationDto === undefined) {
-                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling addNewOrganizations.');
+        addNewOrganizations: async (organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling addNewOrganizations.');
             }
             const localVarPath = `/v1/organization/organizations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -66,13 +76,13 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof organizationDto !== 'string';
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
-                : (organizationDto || "");
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -196,14 +206,14 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
         /**
          * Adds an organization
          * @summary Adds an organization
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createOrganization: async (organizationDto: OrganizationDto, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'organizationDto' is not null or undefined
-            if (organizationDto === null || organizationDto === undefined) {
-                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling createOrganization.');
+        createOrganization: async (organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling createOrganization.');
             }
             const localVarPath = `/v1/organization`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -231,13 +241,13 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof organizationDto !== 'string';
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
-                : (organizationDto || "");
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -592,18 +602,18 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * Updates an existing organization
          * @summary Updates an existing organization
          * @param {string} id Organization ID to update
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateOrganization: async (id: string, organizationDto: OrganizationDto, options: any = {}): Promise<RequestArgs> => {
+        updateOrganization: async (id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling updateOrganization.');
             }
-            // verify required parameter 'organizationDto' is not null or undefined
-            if (organizationDto === null || organizationDto === undefined) {
-                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling updateOrganization.');
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling updateOrganization.');
             }
             const localVarPath = `/v1/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -632,13 +642,13 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof organizationDto !== 'string';
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
-                : (organizationDto || "");
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -657,12 +667,12 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
         /**
          * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
          * @summary Adds one or more organization entities
-         * @param {Array<OrganizationDto>} organizationDto 
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addNewOrganizations(organizationDto: Array<OrganizationDto>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addNewOrganizations(organizationDto, options);
+        async addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -701,12 +711,12 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
         /**
          * Adds an organization
          * @summary Adds an organization
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createOrganization(organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).createOrganization(organizationDto, options);
+        async createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -812,12 +822,12 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * Updates an existing organization
          * @summary Updates an existing organization
          * @param {string} id Organization ID to update
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateOrganization(id: string, organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).updateOrganization(id, organizationDto, options);
+        async updateOrganization(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).updateOrganization(id, organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -835,12 +845,12 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
         /**
          * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
          * @summary Adds one or more organization entities
-         * @param {Array<OrganizationDto>} organizationDto 
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewOrganizations(organizationDto: Array<OrganizationDto>, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).addNewOrganizations(organizationDto, options).then((request) => request(axios, basePath));
+        addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds member(s) to an organization
@@ -867,12 +877,12 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
         /**
          * Adds an organization
          * @summary Adds an organization
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createOrganization(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).createOrganization(organizationDto, options).then((request) => request(axios, basePath));
+        createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes an existing organization
@@ -950,12 +960,12 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * Updates an existing organization
          * @summary Updates an existing organization
          * @param {string} id Organization ID to update
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateOrganization(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).updateOrganization(id, organizationDto, options).then((request) => request(axios, basePath));
+        updateOrganization(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).updateOrganization(id, organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -969,12 +979,12 @@ export interface OrganizationControllerApiInterface {
     /**
      * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
      * @summary Adds one or more organization entities
-     * @param {Array<OrganizationDto>} organizationDto 
+     * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    addNewOrganizations(organizationDto: Array<OrganizationDto>, options?: any): AxiosPromise<OrganizationDto>;
+    addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Adds member(s) to an organization
@@ -1001,12 +1011,12 @@ export interface OrganizationControllerApiInterface {
     /**
      * Adds an organization
      * @summary Adds an organization
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    createOrganization(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
+    createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Deletes an existing organization
@@ -1084,12 +1094,12 @@ export interface OrganizationControllerApiInterface {
      * Updates an existing organization
      * @summary Updates an existing organization
      * @param {string} id Organization ID to update
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    updateOrganization(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
+    updateOrganization(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto>;
 
 }
 
@@ -1103,13 +1113,13 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     /**
      * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
      * @summary Adds one or more organization entities
-     * @param {Array<OrganizationDto>} organizationDto 
+     * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public addNewOrganizations(organizationDto: Array<OrganizationDto>, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).addNewOrganizations(organizationDto, options).then((request) => request(this.axios, this.basePath));
+    public addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1141,13 +1151,13 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     /**
      * Adds an organization
      * @summary Adds an organization
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public createOrganization(organizationDto: OrganizationDto, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).createOrganization(organizationDto, options).then((request) => request(this.axios, this.basePath));
+    public createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1238,12 +1248,12 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * Updates an existing organization
      * @summary Updates an existing organization
      * @param {string} id Organization ID to update
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public updateOrganization(id: string, organizationDto: OrganizationDto, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).updateOrganization(id, organizationDto, options).then((request) => request(this.axios, this.basePath));
+    public updateOrganization(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).updateOrganization(id, organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 }

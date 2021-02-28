@@ -1,6 +1,6 @@
 
 export interface SuccessErrorMessageProps {
-  successMessage: string;
+  successMessage?: string;
   errorMessage: string;
   showSuccessMessage: boolean;
   showErrorMessage: boolean;
