@@ -15,14 +15,17 @@
 
 
 export * from './apis/app-client-controller-api';
+export * from './apis/dashboard-user-controller-api';
 export * from './apis/flight-controller-api';
 export * from './apis/group-controller-api';
 export * from './apis/header-request-controller-api';
+export * from './apis/logfile-controller-api';
 export * from './apis/organization-controller-api';
 export * from './apis/person-controller-api';
 export * from './apis/privilege-controller-api';
 export * from './apis/puckboard-etl-controller-api';
 export * from './apis/rank-controller-api';
+export * from './apis/scratch-storage-controller-api';
 export * from './apis/squadron-controller-api';
 export * from './apis/subscriber-controller-api';
 export * from './apis/user-info-controller-api';
