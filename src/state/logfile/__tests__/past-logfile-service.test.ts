@@ -45,7 +45,7 @@ describe('Current Logfile Service Tests', () => {
 
     await service.fetchAndStorePastLogfiles();
 
-    expect(service.getPastLogs?.get()).toEqual(logfileDtos);
+    expect(service.getPastLogs).toEqual(logfileDtos);
   });
 
   it('Test promised', async () => {
@@ -68,10 +68,10 @@ describe('Current Logfile Service Tests', () => {
 
     const result = service.fetchAndStorePastLogfiles();
 
-    expect(service.getPastLogs?.get()).toBeUndefined();
+    expect(service.getPastLogs).toBeUndefined();
 
     await result;
-    expect(service.getPastLogs?.get()).toEqual(logfileDtos);
+    expect(service.getPastLogs).toEqual(logfileDtos);
   });
 
   it('Test error', async () => {

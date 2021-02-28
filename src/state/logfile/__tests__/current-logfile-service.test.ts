@@ -37,6 +37,16 @@ describe('Current Logfile Service Tests', () => {
     }
   }
 
+  const getLogfileStartEmptyResponse: AxiosResponse<string> = {
+    data: '',
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {
+      'content-range': '5000-7000/8000'
+    }
+  }
+
   let currentLogfileState: State<CurrentLogfileState> & StateMethodsDestroy;
   let currentLogfileApi: LogfileActuatorApi;
   let service: CurrentLogfileService;
@@ -64,6 +74,15 @@ describe('Current Logfile Service Tests', () => {
 
     await service.fetchAndStoreCurrentLogfile();
     expect(service.getCurrentLog).toEqual([getLogfileResponse.data]);
+
+    await service.fetchAndStoreCurrentLogfile();
+    expect(service.getCurrentLog).toEqual([getLogfileResponse.data, getLogfileStartResponse.data]);
+
+
+    // test empty result
+    currentLogfileApi.getLogfileStart = jest.fn(() => {
+      return new Promise<AxiosResponse<string>>(resolve => resolve(getLogfileStartEmptyResponse));
+    });
 
     await service.fetchAndStoreCurrentLogfile();
     expect(service.getCurrentLog).toEqual([getLogfileResponse.data, getLogfileStartResponse.data]);

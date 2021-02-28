@@ -77,13 +77,13 @@ export function LogfileContents() {
               <ul>
                 {pastLogfileState.getPastLogs?.map((item) => {
                   return (
-                    <li key={item.name.get()}>
-                      <a href={item.downloadUri.get()}>{item.name.get()}</a>
+                    <li key={item.name}>
+                      <a href={item.downloadUri}>{item.name}</a>
                     </li>
                   );
                 })}
               </ul>
-              <Button className='logfile-download-container__close-btn' type={'button'} onClick={() => sideDrawerState.set(false)}>Close</Button>
+              <Button className='logfile-download-container__close-btn' type={'button'} onClick={onCloseHandler}>Close</Button>
             </SideDrawer>
           </div>
           <div className='logfile-container default-panel-padding'>
