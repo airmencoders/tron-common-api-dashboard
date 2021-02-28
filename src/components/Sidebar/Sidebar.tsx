@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
-  const useDashboardState = useAuthorizedUserState();
+  const authorizedUserState = useAuthorizedUserState();
 
   return (
     <div className="sidebar" data-testid="sidebar">
@@ -23,7 +23,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
       </div>
       <nav className="sidebar__nav">
         {items.map((item) => {
-          if (useDashboardState.authorizedUserHasPrivilege(item.requiredPrivilege))
+          if (authorizedUserState.authorizedUserHasPrivilege(item.requiredPrivilege))
             return <SidebarItem key={item.name} path={item.path} name={item.name} />
         })}
       </nav>
