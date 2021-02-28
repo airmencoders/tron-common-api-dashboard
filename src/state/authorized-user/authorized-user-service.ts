@@ -24,7 +24,7 @@ export default class AuthorizedUserService {
   }
 
   private isStateReady(): boolean {
-    return !this.state.error && !this.state.promised;
+    return !this.error && !this.isPromised;
   }
 
   get isPromised(): boolean {
@@ -32,7 +32,7 @@ export default class AuthorizedUserService {
   }
 
   get authorizedUser(): DashboardUserDto | undefined {
-    return this.state.promised || this.state.error ? undefined : this.state.get();
+    return !this.isStateReady() ? undefined : this.state.get();
   }
 
   get error(): any | undefined {

@@ -1,12 +1,13 @@
 import { PersonControl } from "./components/Person/PersonControl";
 import { AppClientPage } from "./pages/AppClient/AppClientPage";
 import { HealthPage } from "./pages/HealthPage";
+import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
 
 export interface RouteItem {
     path: string,
     name: string,
     component: React.FunctionComponent,
-    protectedStatus: ProtectedStatus
+    requiredPrivilege: PrivilegeType
 };
 
 export enum RoutePath {
@@ -16,29 +17,23 @@ export enum RoutePath {
     APP_CLIENT = "/app-clients"
 };
 
-export enum ProtectedStatus {
-    ADMIN,
-    USER,
-    ANONYMOUS
-};
-
 export const routes: RouteItem[] = [
     {
         path: RoutePath.HEALTH,
         name: 'Health',
         component: HealthPage,
-        protectedStatus: ProtectedStatus.ANONYMOUS
+        requiredPrivilege: PrivilegeType.DASHBOARD_USER
     },
     {
         path: RoutePath.PERSON,
         name: 'Person',
         component: PersonControl,
-        protectedStatus: ProtectedStatus.ADMIN
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {
         path: RoutePath.APP_CLIENT,
         name: 'App Clients',
         component: AppClientPage,
-        protectedStatus: ProtectedStatus.ADMIN
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     }
 ];
