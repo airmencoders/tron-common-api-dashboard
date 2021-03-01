@@ -7,7 +7,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageFormat from '../PageFormat/PageFormat';
-import {Person} from '../../openapi/models';
+import { PersonDto } from '../../openapi/models';
 
 export const PersonControl: FunctionComponent = () => {
 
@@ -47,7 +47,7 @@ export const PersonControl: FunctionComponent = () => {
                 </tr>
               </thead>
               <tbody>
-                {context?.users.map((x: Person) =>
+                {context?.users.map((x: PersonDto) =>
                   <tr key={x.id} data-testid={x.id}>
                     <td>{x.id}</td>
                     <td>{x.firstName}</td>

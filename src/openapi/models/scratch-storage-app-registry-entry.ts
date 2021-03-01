@@ -13,49 +13,32 @@
  */
 
 
+import { ScratchStorageAppUserPriv } from './scratch-storage-app-user-priv';
 
 /**
  * 
  * @export
- * @interface Person
+ * @interface ScratchStorageAppRegistryEntry
  */
-export interface Person {
+export interface ScratchStorageAppRegistryEntry {
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof ScratchStorageAppRegistryEntry
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof Person
+     * @memberof ScratchStorageAppRegistryEntry
      */
-    firstName?: string;
+    appName: string;
     /**
      * 
-     * @type {string}
-     * @memberof Person
+     * @type {Set<ScratchStorageAppUserPriv>}
+     * @memberof ScratchStorageAppRegistryEntry
      */
-    middleName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    lastName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    title?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    email?: string;
+    userPrivs?: Set<ScratchStorageAppUserPriv>;
 }
 
 

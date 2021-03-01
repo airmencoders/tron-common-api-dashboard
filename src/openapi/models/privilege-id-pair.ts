@@ -18,27 +18,21 @@ import { Privilege } from './privilege';
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface PrivilegeIdPair
  */
-export interface AppClientUserDto {
+export interface PrivilegeIdPair {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof PrivilegeIdPair
      */
-    id?: string;
+    userPrivPairId?: string;
     /**
      * 
-     * @type {string}
-     * @memberof AppClientUserDto
+     * @type {Privilege}
+     * @memberof PrivilegeIdPair
      */
-    name?: string;
-    /**
-     * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
-     */
-    privileges?: Array<Privilege>;
+    priv?: Privilege;
 }
 
 

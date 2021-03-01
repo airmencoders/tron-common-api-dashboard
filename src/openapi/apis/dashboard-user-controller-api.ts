@@ -19,28 +19,28 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { Airman } from '../models';
+import { DashboardUserDto } from '../models';
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 /**
- * AirmanControllerApi - axios parameter creator
+ * DashboardUserControllerApi - axios parameter creator
  * @export
  */
-export const AirmanControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+export const DashboardUserControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Adds a new airman, ID field should be null for a new addition.
-         * @summary Adds a new airman
-         * @param {Airman} airman 
+         * Adds a Dashboard User
+         * @summary Adds a Dashboard User
+         * @param {DashboardUserDto} dashboardUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addAirman: async (airman: Airman, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'airman' is not null or undefined
-            if (airman === null || airman === undefined) {
-                throw new RequiredError('airman','Required parameter airman was null or undefined when calling addAirman.');
+        addDashboardUser: async (dashboardUserDto: DashboardUserDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'dashboardUserDto' is not null or undefined
+            if (dashboardUserDto === null || dashboardUserDto === undefined) {
+                throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling addDashboardUser.');
             }
-            const localVarPath = `/v1/airman`;
+            const localVarPath = `/v1/dashboard-users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -66,13 +66,13 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof airman !== 'string';
+            const nonString = typeof dashboardUserDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(airman !== undefined ? airman : {})
-                : (airman || "");
+                ? JSON.stringify(dashboardUserDto !== undefined ? dashboardUserDto : {})
+                : (dashboardUserDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -80,69 +80,18 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Adds one or more airmen entities - returns that same array of input airmen with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new airmen will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.
-         * @summary Adds one or more airmen entities
-         * @param {Array<Airman>} airman 
+         * Deletes an existing person
+         * @summary Deletes an existing person
+         * @param {string} id Dashboard ID to delete
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addAirmen: async (airman: Array<Airman>, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'airman' is not null or undefined
-            if (airman === null || airman === undefined) {
-                throw new RequiredError('airman','Required parameter airman was null or undefined when calling addAirmen.');
-            }
-            const localVarPath = `/v1/airman/airmen`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof airman !== 'string';
-            const needsSerialization = nonString && configuration && configuration.isJsonMime
-                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
-                : nonString;
-            localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(airman !== undefined ? airman : {})
-                : (airman || "");
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Removes an airman record from the database
-         * @summary Deletes an airman record
-         * @param {string} id UUID id of the airman record to delete
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteAirman: async (id: string, options: any = {}): Promise<RequestArgs> => {
+        deleteDashboardUser: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteAirman.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteDashboardUser.');
             }
-            const localVarPath = `/v1/airman/{id}`
+            const localVarPath = `/v1/dashboard-users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -174,18 +123,55 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Retrieves single airman record
-         * @summary Retrieves a single airman by UUID
-         * @param {string} id UUID of the airman record
+         * Retrieves all Dashboard Users
+         * @summary Retrieves all Dashboard Users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAirman: async (id: string, options: any = {}): Promise<RequestArgs> => {
+        getAllDashboardUsers: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/dashboard-users`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves a dashboard user by ID
+         * @summary Retrieves a dashboard user by ID
+         * @param {string} id Dashboard User ID to retrieve
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDashboardUser: async (id: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling getAirman.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getDashboardUser.');
             }
-            const localVarPath = `/v1/airman/{id}`
+            const localVarPath = `/v1/dashboard-users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -217,13 +203,13 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Retrieves all airmen records
-         * @summary Retrieves all airmen
+         * Retrieves the authorized dashboard user
+         * @summary Retrieves the currently authorized dashboard user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllAirman: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/airman`;
+        getSelfDashboardUser: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/dashboard-users/self`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -254,23 +240,23 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Updates an existing airman
-         * @summary Updates an existing airman record
-         * @param {string} id Airman record ID to update
-         * @param {Airman} airman 
+         * Updates an existing dashboard user
+         * @summary Updates an existing dashboard user
+         * @param {string} id Dashboard User ID to update
+         * @param {DashboardUserDto} dashboardUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateAirman: async (id: string, airman: Airman, options: any = {}): Promise<RequestArgs> => {
+        updateDashboardUser: async (id: string, dashboardUserDto: DashboardUserDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling updateAirman.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling updateDashboardUser.');
             }
-            // verify required parameter 'airman' is not null or undefined
-            if (airman === null || airman === undefined) {
-                throw new RequiredError('airman','Required parameter airman was null or undefined when calling updateAirman.');
+            // verify required parameter 'dashboardUserDto' is not null or undefined
+            if (dashboardUserDto === null || dashboardUserDto === undefined) {
+                throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling updateDashboardUser.');
             }
-            const localVarPath = `/v1/airman/{id}`
+            const localVarPath = `/v1/dashboard-users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -297,13 +283,13 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof airman !== 'string';
+            const nonString = typeof dashboardUserDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(airman !== undefined ? airman : {})
-                : (airman || "");
+                ? JSON.stringify(dashboardUserDto !== undefined ? dashboardUserDto : {})
+                : (dashboardUserDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -314,90 +300,89 @@ export const AirmanControllerApiAxiosParamCreator = function (configuration?: Co
 };
 
 /**
- * AirmanControllerApi - functional programming interface
+ * DashboardUserControllerApi - functional programming interface
  * @export
  */
-export const AirmanControllerApiFp = function(configuration?: Configuration) {
+export const DashboardUserControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
-         * Adds a new airman, ID field should be null for a new addition.
-         * @summary Adds a new airman
-         * @param {Airman} airman 
+         * Adds a Dashboard User
+         * @summary Adds a Dashboard User
+         * @param {DashboardUserDto} dashboardUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addAirman(airman: Airman, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Airman>> {
-            const localVarAxiosArgs = await AirmanControllerApiAxiosParamCreator(configuration).addAirman(airman, options);
+        async addDashboardUser(dashboardUserDto: DashboardUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardUserDto>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).addDashboardUser(dashboardUserDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
             };
         },
         /**
-         * Adds one or more airmen entities - returns that same array of input airmen with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new airmen will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.
-         * @summary Adds one or more airmen entities
-         * @param {Array<Airman>} airman 
+         * Deletes an existing person
+         * @summary Deletes an existing person
+         * @param {string} id Dashboard ID to delete
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addAirmen(airman: Array<Airman>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Airman>> {
-            const localVarAxiosArgs = await AirmanControllerApiAxiosParamCreator(configuration).addAirmen(airman, options);
+        async deleteDashboardUser(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).deleteDashboardUser(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
             };
         },
         /**
-         * Removes an airman record from the database
-         * @summary Deletes an airman record
-         * @param {string} id UUID id of the airman record to delete
+         * Retrieves all Dashboard Users
+         * @summary Retrieves all Dashboard Users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteAirman(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await AirmanControllerApiAxiosParamCreator(configuration).deleteAirman(id, options);
+        async getAllDashboardUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DashboardUserDto>>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).getAllDashboardUsers(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
             };
         },
         /**
-         * Retrieves single airman record
-         * @summary Retrieves a single airman by UUID
-         * @param {string} id UUID of the airman record
+         * Retrieves a dashboard user by ID
+         * @summary Retrieves a dashboard user by ID
+         * @param {string} id Dashboard User ID to retrieve
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAirman(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Airman>> {
-            const localVarAxiosArgs = await AirmanControllerApiAxiosParamCreator(configuration).getAirman(id, options);
+        async getDashboardUser(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardUserDto>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).getDashboardUser(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
             };
         },
         /**
-         * Retrieves all airmen records
-         * @summary Retrieves all airmen
+         * Retrieves the authorized dashboard user
+         * @summary Retrieves the currently authorized dashboard user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllAirman(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Airman>>> {
-            const localVarAxiosArgs = await AirmanControllerApiAxiosParamCreator(configuration).getAllAirman(options);
+        async getSelfDashboardUser(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardUserDto>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).getSelfDashboardUser(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
             };
         },
         /**
-         * Updates an existing airman
-         * @summary Updates an existing airman record
-         * @param {string} id Airman record ID to update
-         * @param {Airman} airman 
+         * Updates an existing dashboard user
+         * @summary Updates an existing dashboard user
+         * @param {string} id Dashboard User ID to update
+         * @param {DashboardUserDto} dashboardUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateAirman(id: string, airman: Airman, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Airman>> {
-            const localVarAxiosArgs = await AirmanControllerApiAxiosParamCreator(configuration).updateAirman(id, airman, options);
+        async updateDashboardUser(id: string, dashboardUserDto: DashboardUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardUserDto>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).updateDashboardUser(id, dashboardUserDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -407,218 +392,215 @@ export const AirmanControllerApiFp = function(configuration?: Configuration) {
 };
 
 /**
- * AirmanControllerApi - factory interface
+ * DashboardUserControllerApi - factory interface
  * @export
  */
-export const AirmanControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const DashboardUserControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
-         * Adds a new airman, ID field should be null for a new addition.
-         * @summary Adds a new airman
-         * @param {Airman} airman 
+         * Adds a Dashboard User
+         * @summary Adds a Dashboard User
+         * @param {DashboardUserDto} dashboardUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addAirman(airman: Airman, options?: any): AxiosPromise<Airman> {
-            return AirmanControllerApiFp(configuration).addAirman(airman, options).then((request) => request(axios, basePath));
+        addDashboardUser(dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<DashboardUserDto> {
+            return DashboardUserControllerApiFp(configuration).addDashboardUser(dashboardUserDto, options).then((request) => request(axios, basePath));
         },
         /**
-         * Adds one or more airmen entities - returns that same array of input airmen with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new airmen will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.
-         * @summary Adds one or more airmen entities
-         * @param {Array<Airman>} airman 
+         * Deletes an existing person
+         * @summary Deletes an existing person
+         * @param {string} id Dashboard ID to delete
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addAirmen(airman: Array<Airman>, options?: any): AxiosPromise<Airman> {
-            return AirmanControllerApiFp(configuration).addAirmen(airman, options).then((request) => request(axios, basePath));
+        deleteDashboardUser(id: string, options?: any): AxiosPromise<void> {
+            return DashboardUserControllerApiFp(configuration).deleteDashboardUser(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Removes an airman record from the database
-         * @summary Deletes an airman record
-         * @param {string} id UUID id of the airman record to delete
+         * Retrieves all Dashboard Users
+         * @summary Retrieves all Dashboard Users
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteAirman(id: string, options?: any): AxiosPromise<void> {
-            return AirmanControllerApiFp(configuration).deleteAirman(id, options).then((request) => request(axios, basePath));
+        getAllDashboardUsers(options?: any): AxiosPromise<Array<DashboardUserDto>> {
+            return DashboardUserControllerApiFp(configuration).getAllDashboardUsers(options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieves single airman record
-         * @summary Retrieves a single airman by UUID
-         * @param {string} id UUID of the airman record
+         * Retrieves a dashboard user by ID
+         * @summary Retrieves a dashboard user by ID
+         * @param {string} id Dashboard User ID to retrieve
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAirman(id: string, options?: any): AxiosPromise<Airman> {
-            return AirmanControllerApiFp(configuration).getAirman(id, options).then((request) => request(axios, basePath));
+        getDashboardUser(id: string, options?: any): AxiosPromise<DashboardUserDto> {
+            return DashboardUserControllerApiFp(configuration).getDashboardUser(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieves all airmen records
-         * @summary Retrieves all airmen
+         * Retrieves the authorized dashboard user
+         * @summary Retrieves the currently authorized dashboard user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllAirman(options?: any): AxiosPromise<Array<Airman>> {
-            return AirmanControllerApiFp(configuration).getAllAirman(options).then((request) => request(axios, basePath));
+        getSelfDashboardUser(options?: any): AxiosPromise<DashboardUserDto> {
+            return DashboardUserControllerApiFp(configuration).getSelfDashboardUser(options).then((request) => request(axios, basePath));
         },
         /**
-         * Updates an existing airman
-         * @summary Updates an existing airman record
-         * @param {string} id Airman record ID to update
-         * @param {Airman} airman 
+         * Updates an existing dashboard user
+         * @summary Updates an existing dashboard user
+         * @param {string} id Dashboard User ID to update
+         * @param {DashboardUserDto} dashboardUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateAirman(id: string, airman: Airman, options?: any): AxiosPromise<Airman> {
-            return AirmanControllerApiFp(configuration).updateAirman(id, airman, options).then((request) => request(axios, basePath));
+        updateDashboardUser(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<DashboardUserDto> {
+            return DashboardUserControllerApiFp(configuration).updateDashboardUser(id, dashboardUserDto, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * AirmanControllerApi - interface
+ * DashboardUserControllerApi - interface
  * @export
- * @interface AirmanControllerApi
+ * @interface DashboardUserControllerApi
  */
-export interface AirmanControllerApiInterface {
+export interface DashboardUserControllerApiInterface {
     /**
-     * Adds a new airman, ID field should be null for a new addition.
-     * @summary Adds a new airman
-     * @param {Airman} airman 
+     * Adds a Dashboard User
+     * @summary Adds a Dashboard User
+     * @param {DashboardUserDto} dashboardUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApiInterface
+     * @memberof DashboardUserControllerApiInterface
      */
-    addAirman(airman: Airman, options?: any): AxiosPromise<Airman>;
+    addDashboardUser(dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<DashboardUserDto>;
 
     /**
-     * Adds one or more airmen entities - returns that same array of input airmen with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new airmen will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.
-     * @summary Adds one or more airmen entities
-     * @param {Array<Airman>} airman 
+     * Deletes an existing person
+     * @summary Deletes an existing person
+     * @param {string} id Dashboard ID to delete
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApiInterface
+     * @memberof DashboardUserControllerApiInterface
      */
-    addAirmen(airman: Array<Airman>, options?: any): AxiosPromise<Airman>;
+    deleteDashboardUser(id: string, options?: any): AxiosPromise<void>;
 
     /**
-     * Removes an airman record from the database
-     * @summary Deletes an airman record
-     * @param {string} id UUID id of the airman record to delete
+     * Retrieves all Dashboard Users
+     * @summary Retrieves all Dashboard Users
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApiInterface
+     * @memberof DashboardUserControllerApiInterface
      */
-    deleteAirman(id: string, options?: any): AxiosPromise<void>;
+    getAllDashboardUsers(options?: any): AxiosPromise<Array<DashboardUserDto>>;
 
     /**
-     * Retrieves single airman record
-     * @summary Retrieves a single airman by UUID
-     * @param {string} id UUID of the airman record
+     * Retrieves a dashboard user by ID
+     * @summary Retrieves a dashboard user by ID
+     * @param {string} id Dashboard User ID to retrieve
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApiInterface
+     * @memberof DashboardUserControllerApiInterface
      */
-    getAirman(id: string, options?: any): AxiosPromise<Airman>;
+    getDashboardUser(id: string, options?: any): AxiosPromise<DashboardUserDto>;
 
     /**
-     * Retrieves all airmen records
-     * @summary Retrieves all airmen
+     * Retrieves the authorized dashboard user
+     * @summary Retrieves the currently authorized dashboard user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApiInterface
+     * @memberof DashboardUserControllerApiInterface
      */
-    getAllAirman(options?: any): AxiosPromise<Array<Airman>>;
+    getSelfDashboardUser(options?: any): AxiosPromise<DashboardUserDto>;
 
     /**
-     * Updates an existing airman
-     * @summary Updates an existing airman record
-     * @param {string} id Airman record ID to update
-     * @param {Airman} airman 
+     * Updates an existing dashboard user
+     * @summary Updates an existing dashboard user
+     * @param {string} id Dashboard User ID to update
+     * @param {DashboardUserDto} dashboardUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApiInterface
+     * @memberof DashboardUserControllerApiInterface
      */
-    updateAirman(id: string, airman: Airman, options?: any): AxiosPromise<Airman>;
+    updateDashboardUser(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<DashboardUserDto>;
 
 }
 
 /**
- * AirmanControllerApi - object-oriented interface
+ * DashboardUserControllerApi - object-oriented interface
  * @export
- * @class AirmanControllerApi
+ * @class DashboardUserControllerApi
  * @extends {BaseAPI}
  */
-export class AirmanControllerApi extends BaseAPI implements AirmanControllerApiInterface {
+export class DashboardUserControllerApi extends BaseAPI implements DashboardUserControllerApiInterface {
     /**
-     * Adds a new airman, ID field should be null for a new addition.
-     * @summary Adds a new airman
-     * @param {Airman} airman 
+     * Adds a Dashboard User
+     * @summary Adds a Dashboard User
+     * @param {DashboardUserDto} dashboardUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApi
+     * @memberof DashboardUserControllerApi
      */
-    public addAirman(airman: Airman, options?: any) {
-        return AirmanControllerApiFp(this.configuration).addAirman(airman, options).then((request) => request(this.axios, this.basePath));
+    public addDashboardUser(dashboardUserDto: DashboardUserDto, options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).addDashboardUser(dashboardUserDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Adds one or more airmen entities - returns that same array of input airmen with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new airmen will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.
-     * @summary Adds one or more airmen entities
-     * @param {Array<Airman>} airman 
+     * Deletes an existing person
+     * @summary Deletes an existing person
+     * @param {string} id Dashboard ID to delete
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApi
+     * @memberof DashboardUserControllerApi
      */
-    public addAirmen(airman: Array<Airman>, options?: any) {
-        return AirmanControllerApiFp(this.configuration).addAirmen(airman, options).then((request) => request(this.axios, this.basePath));
+    public deleteDashboardUser(id: string, options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).deleteDashboardUser(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Removes an airman record from the database
-     * @summary Deletes an airman record
-     * @param {string} id UUID id of the airman record to delete
+     * Retrieves all Dashboard Users
+     * @summary Retrieves all Dashboard Users
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApi
+     * @memberof DashboardUserControllerApi
      */
-    public deleteAirman(id: string, options?: any) {
-        return AirmanControllerApiFp(this.configuration).deleteAirman(id, options).then((request) => request(this.axios, this.basePath));
+    public getAllDashboardUsers(options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).getAllDashboardUsers(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Retrieves single airman record
-     * @summary Retrieves a single airman by UUID
-     * @param {string} id UUID of the airman record
+     * Retrieves a dashboard user by ID
+     * @summary Retrieves a dashboard user by ID
+     * @param {string} id Dashboard User ID to retrieve
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApi
+     * @memberof DashboardUserControllerApi
      */
-    public getAirman(id: string, options?: any) {
-        return AirmanControllerApiFp(this.configuration).getAirman(id, options).then((request) => request(this.axios, this.basePath));
+    public getDashboardUser(id: string, options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).getDashboardUser(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Retrieves all airmen records
-     * @summary Retrieves all airmen
+     * Retrieves the authorized dashboard user
+     * @summary Retrieves the currently authorized dashboard user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApi
+     * @memberof DashboardUserControllerApi
      */
-    public getAllAirman(options?: any) {
-        return AirmanControllerApiFp(this.configuration).getAllAirman(options).then((request) => request(this.axios, this.basePath));
+    public getSelfDashboardUser(options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).getSelfDashboardUser(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Updates an existing airman
-     * @summary Updates an existing airman record
-     * @param {string} id Airman record ID to update
-     * @param {Airman} airman 
+     * Updates an existing dashboard user
+     * @summary Updates an existing dashboard user
+     * @param {string} id Dashboard User ID to update
+     * @param {DashboardUserDto} dashboardUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AirmanControllerApi
+     * @memberof DashboardUserControllerApi
      */
-    public updateAirman(id: string, airman: Airman, options?: any) {
-        return AirmanControllerApiFp(this.configuration).updateAirman(id, airman, options).then((request) => request(this.axios, this.basePath));
+    public updateDashboardUser(id: string, dashboardUserDto: DashboardUserDto, options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).updateDashboardUser(id, dashboardUserDto, options).then((request) => request(this.axios, this.basePath));
     }
 }

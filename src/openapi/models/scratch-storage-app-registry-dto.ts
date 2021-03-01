@@ -13,32 +13,32 @@
  */
 
 
-import { Privilege } from './privilege';
+import { UserWithPrivs } from './user-with-privs';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface ScratchStorageAppRegistryDto
  */
-export interface AppClientUserDto {
+export interface ScratchStorageAppRegistryDto {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof ScratchStorageAppRegistryDto
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof ScratchStorageAppRegistryDto
      */
-    name?: string;
+    appName: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @type {Set<UserWithPrivs>}
+     * @memberof ScratchStorageAppRegistryDto
      */
-    privileges?: Array<Privilege>;
+    userPrivs?: Set<UserWithPrivs>;
 }
 
 

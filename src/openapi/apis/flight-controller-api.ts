@@ -21,7 +21,17 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { Flight } from '../models';
+// @ts-ignore
+import { Group } from '../models';
+// @ts-ignore
 import { OrganizationDto } from '../models';
+// @ts-ignore
+import { OtherUsaf } from '../models';
+// @ts-ignore
+import { Squadron } from '../models';
+// @ts-ignore
+import { Wing } from '../models';
 /**
  * FlightControllerApi - axios parameter creator
  * @export
@@ -88,14 +98,14 @@ export const FlightControllerApiAxiosParamCreator = function (configuration?: Co
         /**
          * Adds one or more FLIGHT entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
          * @summary Adds one or more FLIGHT entities
-         * @param {Array<OrganizationDto>} organizationDto 
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewFlights: async (organizationDto: Array<OrganizationDto>, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'organizationDto' is not null or undefined
-            if (organizationDto === null || organizationDto === undefined) {
-                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling addNewFlights.');
+        addNewFlights: async (organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling addNewFlights.');
             }
             const localVarPath = `/v1/flight/flights`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -123,13 +133,13 @@ export const FlightControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof organizationDto !== 'string';
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
-                : (organizationDto || "");
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -139,14 +149,14 @@ export const FlightControllerApiAxiosParamCreator = function (configuration?: Co
         /**
          * Adds a new USAF FLIGHT organization
          * @summary Adds a new USAF FLIGHT organization
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createNewFlight: async (organizationDto: OrganizationDto, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'organizationDto' is not null or undefined
-            if (organizationDto === null || organizationDto === undefined) {
-                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling createNewFlight.');
+        createNewFlight: async (organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling createNewFlight.');
             }
             const localVarPath = `/v1/flight`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -174,13 +184,13 @@ export const FlightControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof organizationDto !== 'string';
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
-                : (organizationDto || "");
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -428,18 +438,18 @@ export const FlightControllerApiAxiosParamCreator = function (configuration?: Co
          * Updates an existing FLIGHT
          * @summary Updates an existing FLIGHT
          * @param {string} id UUID of the organization record
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateFlight: async (id: string, organizationDto: OrganizationDto, options: any = {}): Promise<RequestArgs> => {
+        updateFlight: async (id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling updateFlight.');
             }
-            // verify required parameter 'organizationDto' is not null or undefined
-            if (organizationDto === null || organizationDto === undefined) {
-                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling updateFlight.');
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling updateFlight.');
             }
             const localVarPath = `/v1/flight/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -468,13 +478,13 @@ export const FlightControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof organizationDto !== 'string';
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
-                : (organizationDto || "");
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -508,12 +518,12 @@ export const FlightControllerApiFp = function(configuration?: Configuration) {
         /**
          * Adds one or more FLIGHT entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
          * @summary Adds one or more FLIGHT entities
-         * @param {Array<OrganizationDto>} organizationDto 
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addNewFlights(organizationDto: Array<OrganizationDto>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await FlightControllerApiAxiosParamCreator(configuration).addNewFlights(organizationDto, options);
+        async addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await FlightControllerApiAxiosParamCreator(configuration).addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -522,12 +532,12 @@ export const FlightControllerApiFp = function(configuration?: Configuration) {
         /**
          * Adds a new USAF FLIGHT organization
          * @summary Adds a new USAF FLIGHT organization
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createNewFlight(organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await FlightControllerApiAxiosParamCreator(configuration).createNewFlight(organizationDto, options);
+        async createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await FlightControllerApiAxiosParamCreator(configuration).createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -608,12 +618,12 @@ export const FlightControllerApiFp = function(configuration?: Configuration) {
          * Updates an existing FLIGHT
          * @summary Updates an existing FLIGHT
          * @param {string} id UUID of the organization record
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateFlight(id: string, organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await FlightControllerApiAxiosParamCreator(configuration).updateFlight(id, organizationDto, options);
+        async updateFlight(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await FlightControllerApiAxiosParamCreator(configuration).updateFlight(id, organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -642,22 +652,22 @@ export const FlightControllerApiFactory = function (configuration?: Configuratio
         /**
          * Adds one or more FLIGHT entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
          * @summary Adds one or more FLIGHT entities
-         * @param {Array<OrganizationDto>} organizationDto 
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewFlights(organizationDto: Array<OrganizationDto>, options?: any): AxiosPromise<OrganizationDto> {
-            return FlightControllerApiFp(configuration).addNewFlights(organizationDto, options).then((request) => request(axios, basePath));
+        addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto> {
+            return FlightControllerApiFp(configuration).addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds a new USAF FLIGHT organization
          * @summary Adds a new USAF FLIGHT organization
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createNewFlight(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
-            return FlightControllerApiFp(configuration).createNewFlight(organizationDto, options).then((request) => request(axios, basePath));
+        createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto> {
+            return FlightControllerApiFp(configuration).createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes an existing FLIGHT
@@ -714,12 +724,12 @@ export const FlightControllerApiFactory = function (configuration?: Configuratio
          * Updates an existing FLIGHT
          * @summary Updates an existing FLIGHT
          * @param {string} id UUID of the organization record
-         * @param {OrganizationDto} organizationDto 
+         * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateFlight(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
-            return FlightControllerApiFp(configuration).updateFlight(id, organizationDto, options).then((request) => request(axios, basePath));
+        updateFlight(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto> {
+            return FlightControllerApiFp(configuration).updateFlight(id, organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -744,22 +754,22 @@ export interface FlightControllerApiInterface {
     /**
      * Adds one or more FLIGHT entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
      * @summary Adds one or more FLIGHT entities
-     * @param {Array<OrganizationDto>} organizationDto 
+     * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FlightControllerApiInterface
      */
-    addNewFlights(organizationDto: Array<OrganizationDto>, options?: any): AxiosPromise<OrganizationDto>;
+    addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Adds a new USAF FLIGHT organization
      * @summary Adds a new USAF FLIGHT organization
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FlightControllerApiInterface
      */
-    createNewFlight(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
+    createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Deletes an existing FLIGHT
@@ -816,12 +826,12 @@ export interface FlightControllerApiInterface {
      * Updates an existing FLIGHT
      * @summary Updates an existing FLIGHT
      * @param {string} id UUID of the organization record
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FlightControllerApiInterface
      */
-    updateFlight(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
+    updateFlight(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any): AxiosPromise<OrganizationDto>;
 
 }
 
@@ -848,25 +858,25 @@ export class FlightControllerApi extends BaseAPI implements FlightControllerApiI
     /**
      * Adds one or more FLIGHT entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
      * @summary Adds one or more FLIGHT entities
-     * @param {Array<OrganizationDto>} organizationDto 
+     * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FlightControllerApi
      */
-    public addNewFlights(organizationDto: Array<OrganizationDto>, options?: any) {
-        return FlightControllerApiFp(this.configuration).addNewFlights(organizationDto, options).then((request) => request(this.axios, this.basePath));
+    public addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any) {
+        return FlightControllerApiFp(this.configuration).addNewFlights(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Adds a new USAF FLIGHT organization
      * @summary Adds a new USAF FLIGHT organization
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FlightControllerApi
      */
-    public createNewFlight(organizationDto: OrganizationDto, options?: any) {
-        return FlightControllerApiFp(this.configuration).createNewFlight(organizationDto, options).then((request) => request(this.axios, this.basePath));
+    public createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any) {
+        return FlightControllerApiFp(this.configuration).createNewFlight(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -934,12 +944,12 @@ export class FlightControllerApi extends BaseAPI implements FlightControllerApiI
      * Updates an existing FLIGHT
      * @summary Updates an existing FLIGHT
      * @param {string} id UUID of the organization record
-     * @param {OrganizationDto} organizationDto 
+     * @param {OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing} organizationDtoFlightGroupOtherUsafSquadronWing 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof FlightControllerApi
      */
-    public updateFlight(id: string, organizationDto: OrganizationDto, options?: any) {
-        return FlightControllerApiFp(this.configuration).updateFlight(id, organizationDto, options).then((request) => request(this.axios, this.basePath));
+    public updateFlight(id: string, organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any) {
+        return FlightControllerApiFp(this.configuration).updateFlight(id, organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 }
