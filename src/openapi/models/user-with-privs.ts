@@ -13,32 +13,32 @@
  */
 
 
-import { Privilege } from './privilege';
+import { PrivilegeIdPair } from './privilege-id-pair';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface UserWithPrivs
  */
-export interface AppClientUserDto {
+export interface UserWithPrivs {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof UserWithPrivs
      */
-    id?: string;
+    userId?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof UserWithPrivs
      */
-    name?: string;
+    emailAddress?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @type {Set<PrivilegeIdPair>}
+     * @memberof UserWithPrivs
      */
-    privileges?: Array<Privilege>;
+    privs?: Set<PrivilegeIdPair>;
 }
 
 
