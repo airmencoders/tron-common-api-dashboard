@@ -16,7 +16,7 @@
 import { Privilege } from './privilege';
 
 /**
- * Dashboard user to add
+ * 
  * @export
  * @interface DashboardUserDto
  */
