@@ -14,6 +14,12 @@ import {State} from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
 
+/***
+ * Generic page template for CRUD operations on entity arrays.
+ * @param props DataCrudFormPageProps
+ * T Row data type
+ * R Dto Data type
+ */
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
   const dataState: DataService<any, any> = props.useDataState();
 

@@ -1,15 +1,12 @@
-FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/harden-nodejs-12-18-3:8.2.276
-
-EXPOSE 3000
-
-WORKDIR /opt/tron-common-api-dashboard
-
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/base-image/harden-nodejs14:14.15.5 AS builder
+USER root
+WORKDIR /app
 COPY . .
-RUN npm install
+RUN npm ci
 RUN npm run build
-
-RUN npm install -g serve
-
-CMD ["serve", "-s", "build", "-l", "3000"]
-
-
+# Stage 2
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/base-image/harden-nginx-19:1.19.2
+USER appuser
+COPY --from=builder --chown=appuser:appuser /app/build /var/www
+EXPOSE 8080
+CMD [ "nginx", "-g", "daemon off;" ]

@@ -1,12 +1,14 @@
 import { AppClientPage } from "./pages/AppClient/AppClientPage";
 import { HealthPage } from "./pages/Health/HealthPage";
 import PersonPage from './pages/Person/PersonPage';
+import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
 import OrganizationPage from './pages/Organization/OrganizationPage';
 
 export interface RouteItem {
     path: string,
     name: string,
-    component: React.FunctionComponent
+    component: React.FunctionComponent,
+    requiredPrivilege: PrivilegeType
 };
 
 export enum RoutePath {
@@ -21,21 +23,25 @@ export const routes: RouteItem[] = [
     {
         path: RoutePath.HEALTH,
         name: 'Health',
-        component: HealthPage
+        component: HealthPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_USER
     },
     {
         path: RoutePath.PERSON,
-        name: 'People',
-        component: PersonPage
+        name: 'Person',
+        component: PersonPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {
         path: RoutePath.ORGANIZATION,
         name: 'Organizations',
-        component: OrganizationPage
+        component: OrganizationPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {
         path: RoutePath.APP_CLIENT,
         name: 'App Clients',
-        component: AppClientPage
+        component: AppClientPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     }
 ];
