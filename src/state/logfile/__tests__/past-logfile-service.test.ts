@@ -83,19 +83,20 @@ describe('Current Logfile Service Tests', () => {
       headers: {}
     };
 
+    // Test no error
     pastLogfileapi.getLogfiles = jest.fn(() => {
-      return new Promise<AxiosResponse<LogfileDto[]>>((resolve, reject) => setTimeout(() => reject(getLogfilesRejectResponse), 1000));
+      return new Promise<AxiosResponse<LogfileDto[]>>((resolve) => resolve(getLogfilesResponse));
     });
 
-    const result = service.fetchAndStorePastLogfiles();
-
+    await service.fetchAndStorePastLogfiles();
     expect(service.error).toBeUndefined();
 
-    try {
-      await result;
-    } catch (err) {
 
-    }
-    expect(service.error).not.toBeUndefined();
+    // Test error exists
+    pastLogfileapi.getLogfiles = jest.fn(() => {
+      return new Promise<AxiosResponse<LogfileDto[]>>((resolve, reject) => reject(getLogfilesRejectResponse));
+    });
+    await expect(service.fetchAndStorePastLogfiles()).rejects.toEqual(getLogfilesRejectResponse);
+    expect(service.error).toEqual(getLogfilesRejectResponse);
   });
 });
