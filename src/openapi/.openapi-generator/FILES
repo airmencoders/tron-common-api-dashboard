@@ -7,6 +7,7 @@ apis/dashboard-user-controller-api.ts
 apis/flight-controller-api.ts
 apis/group-controller-api.ts
 apis/header-request-controller-api.ts
+apis/logfile-controller-api.ts
 apis/organization-controller-api.ts
 apis/person-controller-api.ts
 apis/privilege-controller-api.ts
@@ -35,6 +36,7 @@ models/flight.ts
 models/group.ts
 models/index.ts
 models/invalid-scratch-space-permissions.ts
+models/logfile-dto.ts
 models/marine.ts
 models/organization-dto.ts
 models/other-usaf.ts

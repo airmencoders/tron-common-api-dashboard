@@ -11,6 +11,7 @@ export * from './exception-response';
 export * from './flight';
 export * from './group';
 export * from './invalid-scratch-space-permissions';
+export * from './logfile-dto';
 export * from './marine';
 export * from './organization-dto';
 export * from './other-usaf';

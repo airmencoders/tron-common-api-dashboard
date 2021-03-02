@@ -1,0 +1,33 @@
+@import "../../styles/base";
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.logfile-page-container {
+  .logfile-download-container {
+    &__close-btn {
+      float: right;
+    }
+  }
+
+  .logfile-container {
+    &__header {
+      margin-bottom: $default-panel-padding-y;
+      border-bottom: 1px solid black;
+    }
+  
+    &__logs {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 50vh;
+      background: white;
+      padding: calculateRem(16px);
+      overflow-y: auto;
+  
+      .logs {
+        &__message {
+          margin-bottom: calculateRem(8px);
+        }
+      }
+    }
+  }
+}
