@@ -43,10 +43,10 @@ export default class AppClientsService {
       read: privilegeArr.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
       write: privilegeArr.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
     };
-    const clientName = name || '';
+
     return {
       id,
-      name: clientName,
+      name: name || '',
       ...privileges
     };
   }
