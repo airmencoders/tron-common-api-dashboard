@@ -1,4 +1,4 @@
-FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/nodejs-14:14.15.1 AS builder
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/nodejs-14:14.15.5 AS builder
 USER root
 WORKDIR /app
 COPY . .
