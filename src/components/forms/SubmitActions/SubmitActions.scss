@@ -1,0 +1,18 @@
+@import "../../../styles/base";
+
+.submit-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  .button-container {
+    &__submit {
+      margin-left: units(2);
+    }
+  }
+
+  @media (min-width: 30em) {
+    &.button-container {
+      flex-direction: row;
+    }
+  }
+}

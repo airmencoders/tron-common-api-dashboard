@@ -13,7 +13,7 @@ export interface PageFormatProps {
 
 function PageFormat(props: any) {
   return (
-      <div className="page-format">
+      <div className={`page-format ${props.className}`}>
         <div className="page-format__nav-menu default-panel-padding">
           <Sidebar items={routes} />
         </div>

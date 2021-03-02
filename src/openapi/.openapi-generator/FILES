@@ -25,6 +25,9 @@ index.ts
 models/airman-all-of.ts
 models/airman.ts
 models/app-client-user-dto.ts
+models/bad-request-exception-cause-stack-trace.ts
+models/bad-request-exception-cause-suppressed.ts
+models/bad-request-exception-cause.ts
 models/bad-request-exception.ts
 models/coast-guardsman.ts
 models/dashboard-user-dto.ts
@@ -42,9 +45,6 @@ models/privilege-dto.ts
 models/privilege-id-pair.ts
 models/privilege.ts
 models/rank.ts
-models/record-not-found-exception-cause-stack-trace.ts
-models/record-not-found-exception-cause-suppressed.ts
-models/record-not-found-exception-cause.ts
 models/record-not-found-exception.ts
 models/resource-already-exists-exception.ts
 models/sailor.ts
