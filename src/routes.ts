@@ -1,6 +1,6 @@
-import { PersonControl } from "./components/Person/PersonControl";
 import { AppClientPage } from "./pages/AppClient/AppClientPage";
-import { HealthPage } from "./pages/HealthPage";
+import { HealthPage } from "./pages/Health/HealthPage";
+import PersonPage from './pages/Person/PersonPage';
 import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
 
 export interface RouteItem {
@@ -27,7 +27,7 @@ export const routes: RouteItem[] = [
     {
         path: RoutePath.PERSON,
         name: 'Person',
-        component: PersonControl,
+        component: PersonPage,
         requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {

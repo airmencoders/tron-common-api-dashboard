@@ -1,30 +1,24 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Sidebar from '../Sidebar';
-import { HealthPage } from '../../../pages/HealthPage';
-import { PersonControl } from '../../Person/PersonControl';
 import { MemoryRouter } from 'react-router-dom';
 import { RouteItem } from '../../../routes';
-import { PrivilegeType } from '../../../state/app-clients/interface/privilege-type';
-import { DashboardUserDto } from '../../../openapi/models/dashboard-user-dto';
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { DashboardUserControllerApi } from '../../../openapi/apis/dashboard-user-controller-api';
-import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
-import { useAuthorizedUserState, wrapAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
-import { AxiosResponse } from 'axios';
+import {HealthPage} from '../../../pages/Health/HealthPage';
+import {PrivilegeType} from '../../../state/app-clients/interface/privilege-type';
+import PersonPage from '../../../pages/Person/PersonPage';
 
 const testRoutes: RouteItem[] = [
   {
     path: '/health',
     name: 'Health',
     component: HealthPage,
-    requiredPrivilege: PrivilegeType.DASHBOARD_USER 
+    requiredPrivilege: PrivilegeType.DASHBOARD_USER
   },
   {
-    path: '/person',
-    name: 'Person',
-    component: PersonControl,
-    requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN 
+    path: "/person",
+    name: "Person",
+    component: PersonPage,
+    requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
   }
 ];
 

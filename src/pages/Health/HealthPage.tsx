@@ -1,9 +1,9 @@
 import React, {FC, useEffect} from 'react';
 import {Container, Spinner} from 'react-bootstrap';
-import {useHealthState} from '../state/health/health-state';
-import PageFormat from '../components/PageFormat/PageFormat';
-import StatusCard from '../components/StatusCard/StatusCard';
-import {StatusType} from '../components/StatusCard/status-type';
+import {useHealthState} from '../../state/health/health-state';
+import PageFormat from '../../components/PageFormat/PageFormat';
+import StatusCard from '../../components/StatusCard/StatusCard';
+import {StatusType} from '../../components/StatusCard/status-type';
 
 export const HealthPage: FC = () => {
   const state = useHealthState();
