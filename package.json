@@ -83,6 +83,7 @@
     "@types/react-modal": "^3.10.6",
     "@types/react-router-dom": "^5.1.7",
     "cypress": "^6.3.0",
+    "msw": "^0.26.1",
     "rimraf": "^3.0.2"
   },
   "jest": {

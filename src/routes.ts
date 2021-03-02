@@ -2,6 +2,7 @@ import { AppClientPage } from "./pages/AppClient/AppClientPage";
 import { HealthPage } from "./pages/Health/HealthPage";
 import PersonPage from './pages/Person/PersonPage';
 import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
+import OrganizationPage from './pages/Organization/OrganizationPage';
 
 export interface RouteItem {
     path: string,
@@ -11,11 +12,12 @@ export interface RouteItem {
 };
 
 export enum RoutePath {
-    HOME = "/",
-    HEALTH = "/health",
-    PERSON = "/person",
-    APP_CLIENT = "/app-clients"
-};
+    HOME = '/',
+    HEALTH = '/health',
+    PERSON = '/person',
+    APP_CLIENT = '/app-clients',
+    ORGANIZATION = '/organization',
+}
 
 export const routes: RouteItem[] = [
     {
@@ -28,6 +30,12 @@ export const routes: RouteItem[] = [
         path: RoutePath.PERSON,
         name: 'Person',
         component: PersonPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+    },
+    {
+        path: RoutePath.ORGANIZATION,
+        name: 'Organizations',
+        component: OrganizationPage,
         requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {
