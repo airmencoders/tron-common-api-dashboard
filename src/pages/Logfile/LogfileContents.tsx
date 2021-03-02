@@ -25,7 +25,7 @@ export function LogfileContents() {
       return;
     }
 
-    let shouldScroll: boolean = false;
+    let shouldScroll = false;
 
     if (logsContainer.current) {
       shouldScroll = logsContainer.current.scrollHeight - logsContainer.current.scrollTop <= logsContainer.current.clientHeight + (logsContainer.current.clientHeight / 3);
