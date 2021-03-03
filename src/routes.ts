@@ -4,6 +4,7 @@ import PersonPage from './pages/Person/PersonPage';
 import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
 import OrganizationPage from './pages/Organization/OrganizationPage';
 import LogfilePage from "./pages/Logfile/LogfilePage";
+import DashboardUserPage from "./pages/DashboardUser/DashboardUserPage";
 
 export interface RouteItem {
     path: string,
@@ -18,7 +19,8 @@ export enum RoutePath {
     PERSON = '/person',
     APP_CLIENT = '/app-clients',
     ORGANIZATION = '/organization',
-    LOGFILE = "/logfile"
+    LOGFILE = '/logfile',
+    DASHBOARD_USER = '/dashboard-user'
 }
 
 export const routes: RouteItem[] = [
@@ -50,6 +52,12 @@ export const routes: RouteItem[] = [
         path: RoutePath.LOGFILE,
         name: 'Logfile',
         component: LogfilePage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+    },
+    {
+        path: RoutePath.DASHBOARD_USER,
+        name: 'Dashboard Users',
+        component: DashboardUserPage,
         requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     }
 ];
