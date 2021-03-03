@@ -9,8 +9,8 @@ function FormGroup(props: FormGroupProps) {
         {props.children}
         {
           props.isError &&
-              props.errorMessages?.map(error => (
-                  <p className="validation-error">* {error}</p>
+              props.errorMessages?.map((error, idx) => (
+                  <p key={idx} className="validation-error">* {error}</p>
               ))
         }
       </>

@@ -10,7 +10,7 @@ export interface RouteItem {
     name: string,
     component: React.FunctionComponent,
     requiredPrivilege: PrivilegeType
-};
+}
 
 export enum RoutePath {
     HOME = '/',
