@@ -34,13 +34,13 @@ describe('Test Dashboard User Page', () => {
   });
 
   it('Test Loading Page', async () => {
-    function mockLogfileState() {
+    function mockDashboardUserState() {
       (useDashboardUserState as jest.Mock).mockReturnValue(new DashboardUserService(dashboardUserState, dashboardUserApi));
 
       jest.spyOn(useDashboardUserState(), 'isPromised', 'get').mockReturnValue(true);
     }
 
-    mockLogfileState();
+    mockDashboardUserState();
 
     const page = render(
       <MemoryRouter>
