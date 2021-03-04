@@ -27,7 +27,7 @@ function PersonPage() {
           updateForm={PersonEditForm}
           useDataState={usePersonState}
           usePageState={useCrudPageState}
-          allowEdit={false}
+          allowEdit={true}
       />
   );
 }

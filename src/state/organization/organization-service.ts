@@ -9,17 +9,12 @@ export default class OrganizationService implements DataService<OrganizationDto,
   }
 
   async fetchAndStoreData(): Promise<OrganizationDto[]> {
-    try {
-      const orgResponsePromise = this.orgApi.getOrganizations()
-          .then(resp => {
-            return resp.data;
-          });
-      this.state.set(orgResponsePromise);
-      return Promise.resolve(orgResponsePromise);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
+    const orgResponsePromise = this.orgApi.getOrganizations()
+        .then(resp => {
+          return resp.data;
+        });
+    this.state.set(orgResponsePromise);
+    return Promise.resolve(orgResponsePromise);
   }
 
   getDtoForRowData(rowData: OrganizationDto): Promise<OrganizationDto> {

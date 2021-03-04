@@ -1,21 +1,23 @@
 import {DataService} from '../data-service/data-service';
 import {State} from '@hookstate/core';
-import {PersonControllerApiInterface, PersonDto} from '../../openapi';
+import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, RankControllerApiInterface} from '../../openapi';
+import {RankStateModel} from './rank-state-model';
+import {data} from 'msw/lib/types/context';
+import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
 
 export default class PersonService implements DataService<PersonDto, PersonDto> {
 
-  constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface) {
+  constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
+              public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
   }
 
   async fetchAndStoreData(): Promise<PersonDto[]> {
-    try {
-      const personResponse = await this.personApi.getPersons();
-      this.state.set(personResponse.data);
-      return Promise.resolve(personResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
+    const personResponsePromise = await this.personApi.getPersons()
+        .then(resp => {
+          return resp.data;
+        });
+    this.state.set(personResponsePromise);
+    return personResponsePromise;
   }
 
   getDtoForRowData(rowData: PersonDto): Promise<PersonDto> {
@@ -38,6 +40,11 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
       const personResponse = await this.personApi.updatePerson(toUpdate.id, toUpdate);
+      this.state.set(currentState => {
+        const currentPersonIndex = currentState.findIndex(person => person.id === personResponse.data.id);
+        currentState[currentPersonIndex] = personResponse.data;
+        return [...currentState];
+      });
       return Promise.resolve(personResponse.data);
     }
     catch (error) {
@@ -53,4 +60,34 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     return this.state.error;
   }
 
+  fetchRankForBranch(branch: string) {
+    // validate that the branch is part of branch enum
+    const branchEnumKey = getEnumKeyByEnumValue(PersonDtoBranchEnum, branch);
+    if (branchEnumKey == null) {
+      return;
+    }
+    const branchEnum = PersonDtoBranchEnum[branchEnumKey];
+    const previousRankState = this.rankState.get();
+
+    // only fetch if not existing
+    if (previousRankState[branchEnum] != null) {
+      this.rankState.set(existingRanks => {
+        return Promise.resolve({...existingRanks})
+      });
+      return;
+    }
+    const updatedRanksPromise = this.rankApi.getRanks1(branch)
+        .then(resp => {
+          return resp.data;
+        });
+    this.rankState.set((existingRanks) => {
+      return updatedRanksPromise
+          .then(branchRanks => {
+            return {
+              ...existingRanks,
+              [branch]: branchRanks
+            }
+          });
+    });
+  }
 }
