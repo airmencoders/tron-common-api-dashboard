@@ -1,4 +1,3 @@
-import {AppClientFormActionType} from '../../pages/AppClient/AppClientFormActionType';
 import {createState, State, StateMethodsDestroy, useState} from '@hookstate/core';
 import {FormActionType} from './form-action-type';
 import {DataCrudFormErrors} from '../../components/DataCrudFormPage/data-crud-form-errors';

@@ -26,8 +26,8 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   formState.attach(Touched);
 
   Validation(formState.email).validate(email => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email), 'Enter a valid email', 'error');
-  Validation(formState.hasDashboardAdmin).validate(() => validatePrivileges(), 'A privilege must be set', 'error');
-  Validation(formState.hasDashboardUser).validate(() => validatePrivileges(), 'A privilege must be set', 'error');
+  Validation(formState.hasDashboardAdmin).validate(() => validatePrivileges(), 'A permission must be set', 'error');
+  Validation(formState.hasDashboardUser).validate(() => validatePrivileges(), 'A permission must be set', 'error');
 
   function isFormModified() {
     return Initial(formState.email).modified() || Initial(formState.hasDashboardAdmin).modified() || Initial(formState.hasDashboardUser).modified();
@@ -39,7 +39,7 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
 
   function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    props.onSubmit(formState.get(), 'id');
+    props.onSubmit(formState.get());
   }
 
   function validatePrivileges(): boolean {

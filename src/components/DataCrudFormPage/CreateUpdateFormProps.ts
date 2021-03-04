@@ -5,7 +5,7 @@ import {FormActionType} from '../../state/crud-page/form-action-type';
 export interface CreateUpdateFormProps<T> {
   data?: T;
   formErrors?: DataCrudFormErrors;
-  onSubmit: (updated: T, uniqueIdentifier: string) => void;
+  onSubmit: (updated: T) => void;
   onClose: () =>  void;
   successAction?: DataCrudSuccessAction;
   isSubmitting: boolean;

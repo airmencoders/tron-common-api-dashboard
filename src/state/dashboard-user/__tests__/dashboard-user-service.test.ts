@@ -1,6 +1,4 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
-import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, DashboardUserDto, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
@@ -174,7 +172,10 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
+    dashboardUserState.set([testUserFlat])
+
     await expect(state.sendUpdate(testUserFlat)).resolves.toEqual(testUserFlat);
+    expect(dashboardUserState.get()).toEqual([testUserFlat]);
   });
 
   it('Test sendUpdate Fail', async () => {
@@ -242,9 +243,8 @@ describe('Dashboard User State Test', () => {
     expect(result).toEqual(testFlat);
   });
 
-  it('Test getDtoForRowData', async () => {
-    const response = await state.getDtoForRowData(testUserFlat);
-    expect(response).toEqual(testUserDto);
+  it('Test convertRowDataToEditableData', async () => {
+    await expect(state.convertRowDataToEditableData(testUserFlat)).resolves.toEqual(testUserFlat);
   });
 
   it('Test convertToDto', async () => {

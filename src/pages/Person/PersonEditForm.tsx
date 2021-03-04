@@ -53,7 +53,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    props.onSubmit(formState.get(), 'id');
+    props.onSubmit(formState.get());
   }
 
   const isFormDisabled = ():boolean => {

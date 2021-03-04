@@ -22,7 +22,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
     }
   }
 
-  getDtoForRowData(rowData: OrganizationDto): Promise<OrganizationDto> {
+  convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
     return Promise.resolve(rowData);
   }
 

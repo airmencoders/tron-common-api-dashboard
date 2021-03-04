@@ -18,7 +18,7 @@ import {GridRowData} from '../Grid/grid-row-data';
  * Generic page template for CRUD operations on entity arrays.
  * @param props DataCrudFormPageProps
  * T Row data type
- * R Dto Data type
+ * R Editable Data type
  */
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
   const dataState: DataService<any, any> = props.useDataState();
@@ -36,11 +36,11 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     if (props.allowEdit) {
       const rowData = event.data;
       if (rowData != null) {
-        // const dtoData = await dataState.getDtoForRowData(rowData);
+        const dtoData = await dataState.convertRowDataToEditableData(rowData);
         pageState.set({
           formAction: FormActionType.UPDATE,
           isOpen: true,
-          selected: rowData,
+          selected: dtoData,
           formErrors: undefined,
           successAction: undefined,
           isSubmitting: false,
@@ -64,16 +64,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
-  async function updateSubmit(updatedDto: T, uniqueIdentifier: string) {
+  async function updateSubmit(updatedDto: R) {
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
     }));
     try {
-      const result = await dataState.sendUpdate(updatedDto);
-
-      const index = dataState.state.get().findIndex(item => item[uniqueIdentifier] === result[uniqueIdentifier]);
-      dataState.state[index].set(result);
+      await dataState.sendUpdate(updatedDto);
 
       pageState.set( prevState => {
         return {
@@ -99,14 +96,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }
   }
 
-  async function createSubmit(newDto: T) {
+  async function createSubmit(newDto: R) {
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
     }));
     try {
-      const result = await dataState.sendCreate(newDto);
-      dataState.state[dataState.state.length].set(result);
+      await dataState.sendCreate(newDto);
 
       pageState.set( prevState => {
         return {

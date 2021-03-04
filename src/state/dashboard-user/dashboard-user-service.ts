@@ -82,7 +82,11 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     try {
       const dashboardUserDto = this.convertToDto(toCreate);
       const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(dashboardUserDto);
-      return Promise.resolve(this.convertToFlat(dashboardUserResponse.data));
+      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+
+      this.state[this.state.length].set(dashboardUserFlat);
+
+      return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
       return Promise.reject(error);
@@ -95,16 +99,21 @@ export default class DashboardUserService implements DataService<DashboardUserFl
         return Promise.reject(new Error('Dashboard User to update has undefined id.'));
       }
       const dashboardUserDto = this.convertToDto(toUpdate);
-      const dsahboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, dashboardUserDto);
-      return Promise.resolve(this.convertToFlat(dsahboardUserResponse.data));
+      const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, dashboardUserDto);
+      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+
+      const index = this.state.get().findIndex(item => item.id === dashboardUserFlat.id);
+      this.state[index].set(dashboardUserFlat);
+
+      return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
       return Promise.reject(error);
     }
   }
 
-  getDtoForRowData(rowData: DashboardUserFlat): Promise<DashboardUserDto> {
-    return Promise.resolve(this.convertToDto(rowData));
+  convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
+    return Promise.resolve(rowData);
   }
 
   private isStateReady(): boolean {

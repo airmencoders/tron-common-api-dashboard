@@ -20,7 +20,7 @@ const columns: GridColumn[] =
 
 export function DashboardUserContent() {
   return (
-    <DataCrudFormPage<DashboardUserFlat, DashboardUserDto>
+    <DataCrudFormPage<DashboardUserFlat, DashboardUserFlat>
       columns={columns}
       dataTypeName="Dashboard User"
       pageTitle="Dashboard Users"

@@ -125,7 +125,7 @@ describe('Test Dashboard User Form', () => {
     fireEvent.click(userCheckbox);
     expect(userCheckbox).not.toBeChecked();
 
-    expect(pageRender.getByText('* A privilege must be set'));
+    expect(pageRender.getByText('* A permission must be set'));
   });
 
   it('Success message', () => {
