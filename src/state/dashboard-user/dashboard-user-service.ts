@@ -61,7 +61,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
     if (dashboardUser.hasDashboardAdmin) {
       const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.DASHBOARD_ADMIN);
-
+      
       if (privilege) {
         privileges.add(privilege);
       }
@@ -78,9 +78,10 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return privileges;
   }
 
-  async sendCreate(toCreate: DashboardUserDto): Promise<DashboardUserFlat> {
+  async sendCreate(toCreate: DashboardUserFlat): Promise<DashboardUserFlat> {
     try {
-      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(toCreate);
+      const dashboardUserDto = this.convertToDto(toCreate);
+      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(dashboardUserDto);
       return Promise.resolve(this.convertToFlat(dashboardUserResponse.data));
     }
     catch (error) {
@@ -88,12 +89,13 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     }
   }
 
-  async sendUpdate(toUpdate: DashboardUserDto): Promise<DashboardUserFlat> {
+  async sendUpdate(toUpdate: DashboardUserFlat): Promise<DashboardUserFlat> {
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Dashboard User to update has undefined id.'));
       }
-      const dsahboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, toUpdate);
+      const dashboardUserDto = this.convertToDto(toUpdate);
+      const dsahboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, dashboardUserDto);
       return Promise.resolve(this.convertToFlat(dsahboardUserResponse.data));
     }
     catch (error) {

@@ -36,11 +36,11 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     if (props.allowEdit) {
       const rowData = event.data;
       if (rowData != null) {
-        const dtoData = await dataState.getDtoForRowData(rowData);
+        // const dtoData = await dataState.getDtoForRowData(rowData);
         pageState.set({
           formAction: FormActionType.UPDATE,
           isOpen: true,
-          selected: dtoData,
+          selected: rowData,
           formErrors: undefined,
           successAction: undefined,
           isSubmitting: false,
@@ -64,13 +64,17 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
-  async function updateSubmit(updatedDto: R) {
+  async function updateSubmit(updatedDto: T, uniqueIdentifier: string) {
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
     }));
     try {
-      await dataState.sendUpdate(updatedDto);
+      const result = await dataState.sendUpdate(updatedDto);
+
+      const index = dataState.state.get().findIndex(item => item[uniqueIdentifier] === result[uniqueIdentifier]);
+      dataState.state[index].set(result);
+
       pageState.set( prevState => {
         return {
           ...prevState,
@@ -95,13 +99,15 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }
   }
 
-  async function createSubmit(newDto: R) {
+  async function createSubmit(newDto: T) {
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
     }));
     try {
-      await dataState.sendCreate(newDto);
+      const result = await dataState.sendCreate(newDto);
+      dataState.state[dataState.state.length].set(result);
+
       pageState.set( prevState => {
         return {
           ...prevState,

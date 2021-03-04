@@ -132,7 +132,7 @@ const CreateForm = (props: CreateUpdateFormProps<MockDto>) => {
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    props.onSubmit(dtoState);
+    props.onSubmit(dtoState, 'id');
   }
 
   const closeForm = () => {
