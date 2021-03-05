@@ -14,7 +14,7 @@ import { AppClientFormActionType } from './AppClientFormActionType';
 import Button from '../../components/Button/Button';
 import AppClientEdit from './AppClientEdit';
 import AppClientAdd from './AppClientAdd';
-import PrivilegeCellRenderer from './PrivilegeCellRenderer';
+import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import {useAppClientPageState} from './app-client-page-state';
 
 const serviceTitle = "App Client Service";

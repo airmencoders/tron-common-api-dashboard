@@ -1,4 +1,3 @@
-import {AxiosPromise} from 'axios';
 import {State} from '@hookstate/core';
 
 /***

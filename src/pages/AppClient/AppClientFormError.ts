@@ -3,4 +3,4 @@ export interface AppClientFormError {
     name?: string,
   }>,
   general?: string
-};
+}
