@@ -16,17 +16,6 @@ import {Initial} from '@hookstate/initial';
 
 import './PersonEditForm.scss';
 
-// use enum values form person dto
-const branches = [
-    'USA',
-    'USAF',
-    'USMC',
-    'USN',
-    'USSF',
-    'USCG',
-    'OTHER',
-];
-
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();
   const formState = useState(createState({...props.data}));
@@ -149,11 +138,43 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                        disabled={isFormDisabled()}
             />
           </FormGroup>
+          <FormGroup labelName="dodid" labelText="DoD Id">
+            <TextInput id="dodid" name="dodid" type="text"
+                       defaultValue={props.data?.dodid || ''}
+                       error={Touched(formState.dodid).touched() && Validation(formState.dodid).invalid()}
+                       onChange={(event) => formState.dodid.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
           <FormGroup labelName="address" labelText="Address">
             <TextInput id="address" name="address" type="text"
                        defaultValue={props.data?.address || ''}
                        error={Touched(formState.address).touched() && Validation(formState.address).invalid()}
                        onChange={(event) => formState.address.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
+          <FormGroup labelName="phone" labelText="Phone">
+            <TextInput id="phone" name="phone" type="text"
+                       defaultValue={props.data?.phone || ''}
+                       error={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
+                       onChange={(event) => formState.phone.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
+          <FormGroup labelName="dutyPhone" labelText="Duty Phone">
+            <TextInput id="dutyPhone" name="dutyPhone" type="text"
+                       defaultValue={props.data?.dutyPhone || ''}
+                       error={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
+                       onChange={(event) => formState.dutyPhone.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
+          <FormGroup labelName="dutyTitle" labelText="Duty Title">
+            <TextInput id="dutyTitle" name="dutyTitle" type="text"
+                       defaultValue={props.data?.dutyTitle || ''}
+                       error={Touched(formState.dutyTitle).touched() && Validation(formState.dutyTitle).invalid()}
+                       onChange={(event) => formState.dutyTitle.set(event.target.value)}
                        disabled={isFormDisabled()}
             />
           </FormGroup>
@@ -164,9 +185,9 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                     disabled={isFormDisabled()}
             >
               {
-                branches.map((branchName) => (
-                    <option key={branchName} value={branchName}>{branchName}</option>
-                ))
+                Object.values(PersonDtoBranchEnum).map((branchName) => {
+                  return <option key={branchName} value={branchName}>{branchName}</option>
+                })
               }
             </Select>
           </FormGroup>

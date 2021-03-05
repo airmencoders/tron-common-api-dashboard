@@ -19,30 +19,31 @@ function Grid(props: GridProps) {
   }, [props.data]);
 
   return (
-      <div className="grid-component ag-theme-alpine"
-           style={{ width: '100%', height: '100%' }}
+      <div className="grid-component"
+           style={{ width: '100%', height: '60vh'}}
       >
-        <AgGridReact
-            rowData={props.data}
-            onGridReady={gridReady}
-            domLayout={"autoHeight"}
-            onRowClicked={props.onRowClicked}
-            rowClass={props.rowClass}
-        >
-          {
-            props.columns.map(col => (
-              <AgGridColumn
-                  key={col.field}
-                  field={col.field}
-                  headerName={col.headerName}
-                  sortable={col.sortable}
-                  filter={col.filter}
-                  headerClass={col.headerClass}
-                  cellRendererFramework={col.cellRenderer}
-              />
-            ))
-          }
-        </AgGridReact>
+        <div className="ag-theme-alpine" style={{ width: '100%', height: '100%'}}>
+          <AgGridReact
+              rowData={props.data}
+              onGridReady={gridReady}
+              onRowClicked={props.onRowClicked}
+              rowClass={props.rowClass}
+          >
+            {
+              props.columns.map(col => (
+                <AgGridColumn
+                    key={col.field}
+                    field={col.field}
+                    headerName={col.headerName}
+                    sortable={col.sortable}
+                    filter={col.filter}
+                    headerClass={col.headerClass}
+                    cellRendererFramework={col.cellRenderer}
+                />
+              ))
+            }
+          </AgGridReact>
+        </div>
       </div>
   );
 }
