@@ -50,4 +50,9 @@ export interface DataCrudFormPageProps<T, R> {
    * True allows the edit and create affordances to be active.
    */
   allowEdit: boolean;
+
+  /**
+   * True creates a new column, placed in the last column position
+   */
+  allowDelete?: boolean;
 }

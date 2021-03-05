@@ -39,6 +39,7 @@ function Grid(props: GridProps) {
                   filter={col.filter}
                   headerClass={col.headerClass}
                   cellRendererFramework={col.cellRenderer}
+                  cellRendererParams={col.cellRendererParams}
               />
             ))
           }

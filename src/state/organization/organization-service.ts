@@ -49,6 +49,9 @@ export default class OrganizationService implements DataService<OrganizationDto,
     }
   }
 
+  async sendDelete(toDelete: OrganizationDto): Promise<void> {
+    return Promise.resolve();
+  }
 
   get isPromised(): boolean {
     return this.state.promised;

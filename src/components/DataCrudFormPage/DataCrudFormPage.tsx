@@ -13,6 +13,8 @@ import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud
 import {State} from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
+import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
+import GridColumn from '../Grid/GridColumn';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -25,15 +27,27 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   const pageState: State<CrudPageState<any>> = props.usePageState();
 
+  const deleteBtnName = 'Delete';
+  let columns: GridColumn[];
+  if (props.allowDelete) {
+    columns = [
+      ...props.columns,
+      new GridColumn('', false, false, deleteBtnName, '', DeleteCellRenderer, { onClick: deleteSubmit })
+    ];
+  } else {
+    columns = props.columns;
+  }
+
   useEffect(() => {
     dataState.fetchAndStoreData();
+    
     return () => {
       pageState.set(getInitialCrudPageState());
     }
   }, []);
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-    if (props.allowEdit) {
+    if (props.allowEdit && !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName)) {
       const rowData = event.data;
       if (rowData != null) {
         const dtoData = await dataState.convertRowDataToEditableData(rowData);
@@ -62,6 +76,39 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   function onCloseHandler() {
     pageState.set(getInitialCrudPageState());
+  }
+
+  async function deleteSubmit(deleteItem: R) {
+    pageState.set(prevState => ({
+      ...prevState,
+      isSubmitting: true
+    }));
+
+    try {
+      await dataState.sendDelete(deleteItem);
+
+      pageState.set(prevState => {
+        return {
+          ...prevState,
+          successAction: {
+            success: true,
+            successMsg: `Successfully created ${props.dataTypeName}.`,
+          },
+          isSubmitting: false
+        }
+      });
+    }
+    catch (error) {
+      pageState.set(prevState => {
+        return {
+          ...prevState,
+          formErrors: {
+            general: error.message
+          },
+          isSubmitting: false
+        }
+      });
+    }
   }
 
   async function updateSubmit(updatedDto: R) {
@@ -155,7 +202,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
                       <Grid
                           data={dataState.state?.get() || []}
-                          columns={props.columns}
+                          columns={columns}
                           onRowClicked={onRowClicked}
                           rowClass="ag-grid--row-pointer"
                       />
