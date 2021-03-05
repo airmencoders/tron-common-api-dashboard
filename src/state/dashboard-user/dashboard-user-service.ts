@@ -61,7 +61,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
     if (dashboardUser.hasDashboardAdmin) {
       const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.DASHBOARD_ADMIN);
-
+      
       if (privilege) {
         privileges.add(privilege);
       }
@@ -78,31 +78,42 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return privileges;
   }
 
-  async sendCreate(toCreate: DashboardUserDto): Promise<DashboardUserFlat> {
+  async sendCreate(toCreate: DashboardUserFlat): Promise<DashboardUserFlat> {
     try {
-      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(toCreate);
-      return Promise.resolve(this.convertToFlat(dashboardUserResponse.data));
+      const dashboardUserDto = this.convertToDto(toCreate);
+      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(dashboardUserDto);
+      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+
+      this.state[this.state.length].set(dashboardUserFlat);
+
+      return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
       return Promise.reject(error);
     }
   }
 
-  async sendUpdate(toUpdate: DashboardUserDto): Promise<DashboardUserFlat> {
+  async sendUpdate(toUpdate: DashboardUserFlat): Promise<DashboardUserFlat> {
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Dashboard User to update has undefined id.'));
       }
-      const dsahboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, toUpdate);
-      return Promise.resolve(this.convertToFlat(dsahboardUserResponse.data));
+      const dashboardUserDto = this.convertToDto(toUpdate);
+      const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, dashboardUserDto);
+      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+
+      const index = this.state.get().findIndex(item => item.id === dashboardUserFlat.id);
+      this.state[index].set(dashboardUserFlat);
+
+      return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
       return Promise.reject(error);
     }
   }
 
-  getDtoForRowData(rowData: DashboardUserFlat): Promise<DashboardUserDto> {
-    return Promise.resolve(this.convertToDto(rowData));
+  convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
+    return Promise.resolve(rowData);
   }
 
   private isStateReady(): boolean {

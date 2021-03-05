@@ -1,6 +1,4 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
-import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, DashboardUserDto, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
@@ -123,10 +121,13 @@ describe('Dashboard User State Test', () => {
     });
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardUserFlat>());
     dashboardUserApi = new DashboardUserControllerApi();
     state = wrapDashboardUserState(dashboardUserState, dashboardUserApi);
+
+    mockPrivilegesState();
+    await accessPrivilegeState().fetchAndStorePrivileges();
   });
 
   afterEach(() => {
@@ -171,7 +172,10 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
-    await expect(state.sendUpdate(testUserDto)).resolves.toEqual(testUserFlat);
+    dashboardUserState.set([testUserFlat])
+
+    await expect(state.sendUpdate(testUserFlat)).resolves.toEqual(testUserFlat);
+    expect(dashboardUserState.get()).toEqual([testUserFlat]);
   });
 
   it('Test sendUpdate Fail', async () => {
@@ -179,12 +183,12 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(rejectMsg));
     });
 
-    await expect(state.sendUpdate(testUserDto)).rejects.toEqual(rejectMsg);
+    await expect(state.sendUpdate(testUserFlat)).rejects.toEqual(rejectMsg);
   });
 
   it('Test sendUpdate Fail No ID', async () => {
-    const noIdUser = {
-      ...testUserDto,
+    const noIdUser: DashboardUserFlat = {
+      ...testUserFlat,
       id: undefined
     };
 
@@ -202,7 +206,7 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
-    await expect(state.sendCreate(testUserDto)).resolves.toEqual(testUserFlat);
+    await expect(state.sendCreate(testUserFlat)).resolves.toEqual(testUserFlat);
   });
 
   it('Test sendCreate Fail', async () => {
@@ -210,7 +214,7 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(rejectMsg));
     });
 
-    await expect(state.sendCreate(testUserDto)).rejects.toEqual(rejectMsg);
+    await expect(state.sendCreate(testUserFlat)).rejects.toEqual(rejectMsg);
   });
 
   it('Test convertDashboardUsersToFlat', () => {
@@ -239,27 +243,44 @@ describe('Dashboard User State Test', () => {
     expect(result).toEqual(testFlat);
   });
 
-  it('Test getDtoForRowData', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
-    const response = await state.getDtoForRowData(testUserFlat);
-    // console.log(response);
-    expect(response).toEqual(testUserDto);
+  it('Test convertRowDataToEditableData', async () => {
+    await expect(state.convertRowDataToEditableData(testUserFlat)).resolves.toEqual(testUserFlat);
   });
 
   it('Test convertToDto', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
     const result = state.convertToDto(testUserFlat);
     expect(result).toEqual(testUserDto);
   });
 
   it('Test createPrivilegesArr', () => {
-    mockPrivilegesState()
-
     const result = state.createPrivilegesArr(testUserFlat);
     expect(result).toEqual(testUserPrivileges);
+  });
+
+  it('Test No privilege user', () => {
+    const noPrivUser = {
+      ...testUserFlat,
+      hasDashboardAdmin: false,
+      hasDashboardUser: false
+    }
+    const result = state.createPrivileges(noPrivUser);
+    expect(result.size).toEqual(0);
+  });
+
+  it('Test Privilege not exist in state', async () => {
+    privilegeApi.getPrivileges = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: [],
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
+    await accessPrivilegeState().fetchAndStorePrivileges();
+
+    const result = state.createPrivileges(testUserFlat);
+    expect(result.size).toEqual(0);
   });
 });

@@ -6,6 +6,7 @@ import { DashboardUserFlat } from '../../state/dashboard-user/dashboard-user-fla
 import { useDashboardUserState } from '../../state/dashboard-user/dashboard-user-state';
 import { useCrudPageState } from '../../state/crud-page/crud-page-state';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
+import DashboardUserForm from './DashboardUserForm';
 
 const columns: GridColumn[] =
   [
@@ -19,15 +20,15 @@ const columns: GridColumn[] =
 
 export function DashboardUserContent() {
   return (
-    <DataCrudFormPage<DashboardUserFlat, DashboardUserDto>
+    <DataCrudFormPage<DashboardUserFlat, DashboardUserFlat>
       columns={columns}
       dataTypeName="Dashboard User"
       pageTitle="Dashboard Users"
-      createForm={() => <></>}
-      updateForm={() => <></>}
+      createForm={DashboardUserForm}
+      updateForm={DashboardUserForm}
       useDataState={useDashboardUserState}
       usePageState={useCrudPageState}
-      allowEdit={false}
+      allowEdit={true}
     />
   )
 }

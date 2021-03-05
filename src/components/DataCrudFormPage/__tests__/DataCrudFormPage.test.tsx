@@ -55,7 +55,7 @@ class TestDataService implements DataService<TestRow, TestDto> {
     return Promise.resolve(toCreate);
   }
 
-  getDtoForRowData(rowData: TestRow): Promise<TestDto> {
+  convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
     const values = this.state.get();
     const foundData = values.find(row => row.id === rowData.id);
     if (foundData == null) {
@@ -98,7 +98,7 @@ class TestDataErrorService implements DataService<TestRow, TestDto> {
     return Promise.resolve(toCreate);
   }
 
-  getDtoForRowData(rowData: TestRow): Promise<TestDto> {
+  convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
     const values = this.state.get();
     const foundData = values.find(row => row.id === rowData.id);
     if (foundData == null) {

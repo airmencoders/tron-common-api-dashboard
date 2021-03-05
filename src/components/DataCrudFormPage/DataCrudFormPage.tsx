@@ -18,7 +18,7 @@ import {GridRowData} from '../Grid/grid-row-data';
  * Generic page template for CRUD operations on entity arrays.
  * @param props DataCrudFormPageProps
  * T Row data type
- * R Dto Data type
+ * R Editable Data type
  */
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
   const dataState: DataService<any, any> = props.useDataState();
@@ -36,7 +36,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     if (props.allowEdit) {
       const rowData = event.data;
       if (rowData != null) {
-        const dtoData = await dataState.getDtoForRowData(rowData);
+        const dtoData = await dataState.convertRowDataToEditableData(rowData);
         pageState.set({
           formAction: FormActionType.UPDATE,
           isOpen: true,
@@ -71,6 +71,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }));
     try {
       await dataState.sendUpdate(updatedDto);
+
       pageState.set( prevState => {
         return {
           ...prevState,
@@ -102,6 +103,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }));
     try {
       await dataState.sendCreate(newDto);
+
       pageState.set( prevState => {
         return {
           ...prevState,

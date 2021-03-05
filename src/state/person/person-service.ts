@@ -18,7 +18,7 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     }
   }
 
-  getDtoForRowData(rowData: PersonDto): Promise<PersonDto> {
+  convertRowDataToEditableData(rowData: PersonDto): Promise<PersonDto> {
     return Promise.resolve(rowData);
   }
 
