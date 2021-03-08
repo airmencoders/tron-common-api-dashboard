@@ -3,6 +3,7 @@ import {State} from '@hookstate/core';
 import {CrudPageState} from '../../state/crud-page/crud-page-state';
 import GridColumn from '../Grid/GridColumn';
 import {CreateUpdateFormProps} from './CreateUpdateFormProps';
+import { DeleteComponentProps } from './DeleteComponentProps';
 
 /***
  * T Row data type.
@@ -37,6 +38,12 @@ export interface DataCrudFormPageProps<T, R> {
   updateForm: (props: CreateUpdateFormProps<R>) => JSX.Element;
 
   /**
+   * React element of the component used to delete the dto.
+   * @param props Used by the delete component.
+   */
+  deleteComponent?: (props: DeleteComponentProps<R>) => JSX.Element;
+
+  /**
    * Page title
    */
   pageTitle: string;
@@ -52,7 +59,8 @@ export interface DataCrudFormPageProps<T, R> {
   allowEdit: boolean;
 
   /**
-   * True creates a new column, placed in the last column position
+   * True creates a new column, placed in the last column position.
+   * {@link deleteComponent} must be defined if {@link allowDelete} is set to true to perform deletions
    */
   allowDelete?: boolean;
 }

@@ -10,7 +10,7 @@ import Button from '../../components/Button/Button';
 import {DataCrudFormPageProps} from './DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
 import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
-import {State} from '@hookstate/core';
+import { State } from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
 import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
@@ -27,12 +27,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   const pageState: State<CrudPageState<any>> = props.usePageState();
 
+  const DeleteComponent = props.deleteComponent;
   const deleteBtnName = 'Delete';
   let columns: GridColumn[];
-  if (props.allowDelete) {
+  if (props.allowDelete && DeleteComponent) {
     columns = [
       ...props.columns,
-      new GridColumn('', false, false, deleteBtnName, '', DeleteCellRenderer, { onClick: deleteSubmit })
+      new GridColumn('', false, false, deleteBtnName, 'header-center', DeleteCellRenderer, { onClick: deleteConfirmation })
     ];
   } else {
     columns = props.columns;
@@ -78,7 +79,23 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
-  async function deleteSubmit(deleteItem: R) {
+  async function deleteConfirmation(deleteItem: R) {
+    if (props.allowDelete && deleteItem != null) {
+      const data = await dataState.convertRowDataToEditableData(deleteItem);
+      pageState.set({
+        formAction: FormActionType.DELETE,
+        isOpen: true,
+        selected: data,
+        formErrors: undefined,
+        successAction: undefined,
+        isSubmitting: false,
+      });
+    }
+  }
+
+  async function deleteSubmit() {
+    const deleteItem = pageState.selected.get();
+
     pageState.set(prevState => ({
       ...prevState,
       isSubmitting: true
@@ -92,7 +109,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
           ...prevState,
           successAction: {
             success: true,
-            successMsg: `Successfully created ${props.dataTypeName}.`,
+            successMsg: `Successfully deleted ${props.dataTypeName}.`,
           },
           isSubmitting: false
         }
@@ -208,27 +225,36 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                       />
 
                       <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                        {pageState.selected.get() && pageState.formAction.value === FormActionType.UPDATE ?
-                            <UpdateForm
-                                data={pageState.selected.get()}
-                                formErrors={pageState.formErrors.get()}
-                                onSubmit={updateSubmit}
-                                onClose={onCloseHandler}
-                                successAction={pageState.successAction.get()}
-                                isSubmitting={pageState.isSubmitting.get()}
-                                formActionType={FormActionType.UPDATE}
-                            />
-                            : pageState.formAction.value === FormActionType.ADD ?
-                                <CreateForm
-                                    onSubmit={createSubmit}
-                                    formActionType={FormActionType.ADD}
-                                    formErrors={pageState.formErrors.get()}
-                                    onClose={onCloseHandler}
-                                    successAction={pageState.successAction.get()}
-                                    isSubmitting={pageState.isSubmitting.get()}
-                                 />
-                                :
-                                null
+                  {
+                    pageState.formAction.value === FormActionType.ADD ?
+                      <CreateForm
+                        onSubmit={createSubmit}
+                        formActionType={FormActionType.ADD}
+                        formErrors={pageState.formErrors.get()}
+                        onClose={onCloseHandler}
+                        successAction={pageState.successAction.get()}
+                        isSubmitting={pageState.isSubmitting.get()}
+                      />
+                      : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
+                        <UpdateForm
+                          data={pageState.selected.get()}
+                          formErrors={pageState.formErrors.get()}
+                          onSubmit={updateSubmit}
+                          onClose={onCloseHandler}
+                          successAction={pageState.successAction.get()}
+                          isSubmitting={pageState.isSubmitting.get()}
+                          formActionType={FormActionType.UPDATE}
+                        />
+                        : pageState.selected.get() && pageState.formAction.value === FormActionType.DELETE && DeleteComponent ?
+                          <DeleteComponent
+                            data={pageState.selected.get()}
+                            formErrors={pageState.formErrors.get()}
+                            onSubmit={deleteSubmit}
+                            onClose={onCloseHandler}
+                            successAction={pageState.successAction.get()}
+                            isSubmitting={pageState.isSubmitting.get()}
+                          /> 
+                          : null
                         }
                       </SideDrawer>
                     </>

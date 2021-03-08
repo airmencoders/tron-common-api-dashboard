@@ -120,8 +120,9 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
       await this.dashboardUserApi.deleteDashboardUser(toDelete.id);
 
-      const item = this.state.find(item => item.id.get() === toDelete.id)
-      item && item.set(none);
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
 
       return Promise.resolve();
     } catch (error) {
@@ -130,7 +131,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
   }
 
   convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
-    return Promise.resolve(rowData);
+    return Promise.resolve(Object.assign({}, rowData));
   }
 
   private isStateReady(): boolean {
@@ -141,7 +142,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return this.state.promised;
   }
 
-  get dashboardUsers(): DashboardUserDto[] | undefined {
+  get dashboardUsers(): DashboardUserDto[] {
     return !this.isStateReady() ? new Array<DashboardUserDto>() : this.state.get();
   }
 

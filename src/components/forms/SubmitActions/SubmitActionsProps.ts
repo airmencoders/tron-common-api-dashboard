@@ -1,5 +1,4 @@
-import {FormActionType} from '../../../state/crud-page/form-action-type';
-import {FormActionSuccess} from './FormActionSuccess';
+import { FormActionType } from '../../../state/crud-page/form-action-type';
 import {FormEvent} from 'react';
 
 export interface SubmitActionsProps {

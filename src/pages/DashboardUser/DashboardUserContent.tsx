@@ -6,6 +6,7 @@ import { useDashboardUserState } from '../../state/dashboard-user/dashboard-user
 import { useCrudPageState } from '../../state/crud-page/crud-page-state';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import DashboardUserForm from './DashboardUserForm';
+import DashboardUserDeleteForm from './DashboardUserDeleteForm';
 
 const columns: GridColumn[] =
   [
@@ -29,6 +30,7 @@ export function DashboardUserContent() {
       usePageState={useCrudPageState}
       allowEdit={true}
       allowDelete
+      deleteComponent={DashboardUserDeleteForm}
     />
   )
 }
