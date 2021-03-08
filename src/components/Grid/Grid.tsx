@@ -20,7 +20,7 @@ function Grid(props: GridProps) {
 
   return (
       <div className="grid-component"
-           style={{ width: '100%', height: '60vh'}}
+           style={{ width: '100%', height: props.height ?? '60vh'}}
       >
         <div className="ag-theme-alpine" style={{ width: '100%', height: '100%'}}>
           <AgGridReact
