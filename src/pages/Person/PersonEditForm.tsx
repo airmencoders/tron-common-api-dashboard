@@ -1,40 +1,58 @@
-import React, {FormEvent} from 'react';
+import React, {ChangeEvent, FormEvent, useEffect} from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Select from '../../components/forms/Select/Select';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import {PersonDto} from '../../openapi/models';
+import {PersonDto, PersonDtoBranchEnum} from '../../openapi/models';
 import {createState, useState} from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
+import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
+import {usePersonState} from '../../state/person/person-state';
+import {Initial} from '@hookstate/initial';
 
-// use enum values form person dto
-const branches = [
-    'USA',
-    'USAF',
-    'USMC',
-    'USN',
-    'USSF',
-    'USCG',
-    'OTHER',
-];
+import './PersonEditForm.scss';
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
-
+  const personState = usePersonState();
   const formState = useState(createState({...props.data}));
 
   formState.attach(Validation);
+  formState.attach(Initial);
   formState.attach(Touched);
 
-  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0
+  useEffect(() => {
+    const branchValue = formState.branch.get();
+    if (branchValue != null) {
+      personState.fetchRankForBranch(branchValue);
+    }
+  }, [formState.branch.get()]);
+
+  useEffect(() => {
+    if (!personState.rankState.promised) {
+      let formRank = formState.branch.get() === props.data?.branch && props.data?.rank != null ?
+          props.data?.rank : undefined;
+      if (formRank == null) {
+        const availFormRanks = personState.rankState.get()[formState.branch.get() || PersonDtoBranchEnum.Other];
+        formRank = availFormRanks != null && availFormRanks.length > 0 && availFormRanks[0].abbreviation ?
+            availFormRanks[0].abbreviation : undefined;
+      }
+      formState.merge({
+        rank: formRank
+      });
+    }
+  }, [personState.rankState.promised]);
+
+  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
+
   const requiredError = 'cannot be empty or blank';
   Validation(formState.email).validate(requiredText, requiredError, 'error');
   Validation(formState.firstName).validate(requiredText, requiredError, 'error');
   Validation(formState.lastName).validate(requiredText, requiredError, 'error');
-
+  Validation(formState.rank).validate(requiredText, requiredError, 'error');
 
   const isFormModified = (): boolean => {
     const stateKeys = formState.keys;
@@ -58,6 +76,16 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
 
   const isFormDisabled = ():boolean => {
     return props.successAction?.success || false;
+  }
+
+  const onBranchChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const stringVal = event.target.value;
+    const branchEnumKey = getEnumKeyByEnumValue(PersonDtoBranchEnum, stringVal);
+    if (branchEnumKey == null) {
+      throw new Error('Selected branch is not part of enum.');
+    }
+    const branchEnum = PersonDtoBranchEnum[branchEnumKey];
+    formState.branch.set(branchEnum);
   }
 
   return (
@@ -110,6 +138,14 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                        disabled={isFormDisabled()}
             />
           </FormGroup>
+          <FormGroup labelName="dodid" labelText="DoD Id">
+            <TextInput id="dodid" name="dodid" type="text"
+                       defaultValue={props.data?.dodid || ''}
+                       error={Touched(formState.dodid).touched() && Validation(formState.dodid).invalid()}
+                       onChange={(event) => formState.dodid.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
           <FormGroup labelName="address" labelText="Address">
             <TextInput id="address" name="address" type="text"
                        defaultValue={props.data?.address || ''}
@@ -118,18 +154,66 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                        disabled={isFormDisabled()}
             />
           </FormGroup>
+          <FormGroup labelName="phone" labelText="Phone">
+            <TextInput id="phone" name="phone" type="text"
+                       defaultValue={props.data?.phone || ''}
+                       error={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
+                       onChange={(event) => formState.phone.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
+          <FormGroup labelName="dutyPhone" labelText="Duty Phone">
+            <TextInput id="dutyPhone" name="dutyPhone" type="text"
+                       defaultValue={props.data?.dutyPhone || ''}
+                       error={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
+                       onChange={(event) => formState.dutyPhone.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
+          <FormGroup labelName="dutyTitle" labelText="Duty Title">
+            <TextInput id="dutyTitle" name="dutyTitle" type="text"
+                       defaultValue={props.data?.dutyTitle || ''}
+                       error={Touched(formState.dutyTitle).touched() && Validation(formState.dutyTitle).invalid()}
+                       onChange={(event) => formState.dutyTitle.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
+          </FormGroup>
           <FormGroup labelName="branch" labelText="Branch">
             <Select id="branch" name="branch"
                     defaultValue={props.data?.branch || ''}
-                    onChange={(event) => formState.rank.set(event.target.value)}
+                    onChange={onBranchChange}
                     disabled={isFormDisabled()}
             >
               {
-                branches.map((branchName) => (
-                    <option key={branchName} value={branchName}>{branchName}</option>
-                ))
+                Object.values(PersonDtoBranchEnum).map((branchName) => {
+                  return <option key={branchName} value={branchName}>{branchName}</option>
+                })
               }
             </Select>
+          </FormGroup>
+          <FormGroup labelName="rank" labelText="Rank"
+                     isError={Touched(formState.rank).touched() && Validation(formState.rank).invalid()}
+                     errorMessages={Validation(formState.rank).errors()
+                         .map(validationError =>validationError.message)}
+          >
+            {
+              personState.rankState.promised ? 'loading ranks...' :
+                  <Select id="rank" name="rank"
+                          onChange={(event) => {
+                            formState.rank.set(event.target.value);
+                          }}
+                          defaultValue={props.data?.rank || ''}
+                          value={formState.get().rank}
+                          disabled={isFormDisabled()}
+                  >
+                    {
+                      formState.get().branch && personState.rankState.get()[formState.get()?.branch ||
+                          PersonDtoBranchEnum.Other]?.map(rank => (
+                          <option key={rank.abbreviation} value={rank.abbreviation}>{rank.abbreviation}</option>
+                      ))
+                    }
+                  </Select>
+            }
           </FormGroup>
           <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                errorMessage={props.formErrors?.general || ''}

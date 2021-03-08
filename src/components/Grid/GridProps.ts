@@ -6,4 +6,5 @@ export interface GridProps {
   columns: Array<GridColumn>;
   onRowClicked?: (event: RowClickedEvent) => void;
   rowClass?: string | string[];
+  height?: string;
 }
