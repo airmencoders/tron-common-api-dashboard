@@ -15,29 +15,17 @@
 
 
 /**
- * Application User-Priv Object
+ * 
  * @export
- * @interface ScratchStorageAppUserPrivDto
+ * @interface FlightAllOf
  */
-export interface ScratchStorageAppUserPrivDto {
+export interface FlightAllOf {
     /**
      * 
      * @type {string}
-     * @memberof ScratchStorageAppUserPrivDto
+     * @memberof FlightAllOf
      */
-    id?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ScratchStorageAppUserPrivDto
-     */
-    email: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ScratchStorageAppUserPrivDto
-     */
-    privilegeId: number;
+    pas?: string;
 }
 
 

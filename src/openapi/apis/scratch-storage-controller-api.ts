@@ -23,6 +23,8 @@ import { BadRequestException } from '../models';
 // @ts-ignore
 import { InvalidScratchSpacePermissions } from '../models';
 // @ts-ignore
+import { PrivilegeDto } from '../models';
+// @ts-ignore
 import { RecordNotFoundException } from '../models';
 // @ts-ignore
 import { ResourceAlreadyExistsException } from '../models';
@@ -94,7 +96,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             };
         },
         /**
-         * Requester has to have DASHBOARD_ADMIN rights
+         * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
          * @summary Adds a user privilege to this app\'s data
          * @param {string} id Application UUID
          * @param {ScratchStorageAppUserPrivDto} scratchStorageAppUserPrivDto 
@@ -609,6 +611,86 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             };
         },
         /**
+         * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
+         * @summary Gets a single Scratch Storage app\'s record that is registered with Common API
+         * @param {string} appId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScratchAppById: async (appId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appId' is not null or undefined
+            if (appId === null || appId === undefined) {
+                throw new RequiredError('appId','Required parameter appId was null or undefined when calling getScratchAppById.');
+            }
+            const localVarPath = `/v1/scratch/apps/{appId}`
+                .replace(`{${"appId"}}`, encodeURIComponent(String(appId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Gets all the SCRATCH space privileges so that privilege names can be mapped to their IDs
+         * @summary Gets all SCRATCH space privileges available
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScratchPrivs: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/scratch/users/privs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
          * @param {*} [options] Override http request option.
@@ -820,7 +902,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
             };
         },
         /**
-         * Requester has to have DASHBOARD_ADMIN rights
+         * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
          * @summary Adds a user privilege to this app\'s data
          * @param {string} id Application UUID
          * @param {ScratchStorageAppUserPrivDto} scratchStorageAppUserPrivDto 
@@ -927,7 +1009,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeyValuePairs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
+        async getAllKeyValuePairs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntry>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeyValuePairs(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -941,7 +1023,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
+        async getAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntry>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeyValuePairsForAppId(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -954,7 +1036,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUser>> {
+        async getAllUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageUser>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllUsers(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -977,12 +1059,39 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
             };
         },
         /**
+         * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
+         * @summary Gets a single Scratch Storage app\'s record that is registered with Common API
+         * @param {string} appId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getScratchAppById(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getScratchAppById(appId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Gets all the SCRATCH space privileges so that privilege names can be mapped to their IDs
+         * @summary Gets all SCRATCH space privileges available
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getScratchPrivs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getScratchPrivs(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getScratchSpaceApps(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
+        async getScratchSpaceApps(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageAppRegistryDto>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getScratchSpaceApps(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1052,7 +1161,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
             return ScratchStorageControllerApiFp(configuration).addNewScratchUser(scratchStorageUser, options).then((request) => request(axios, basePath));
         },
         /**
-         * Requester has to have DASHBOARD_ADMIN rights
+         * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
          * @summary Adds a user privilege to this app\'s data
          * @param {string} id Application UUID
          * @param {ScratchStorageAppUserPrivDto} scratchStorageAppUserPrivDto 
@@ -1131,7 +1240,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeyValuePairs(options?: any): AxiosPromise<ScratchStorageEntry> {
+        getAllKeyValuePairs(options?: any): AxiosPromise<Array<ScratchStorageEntry>> {
             return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairs(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1141,7 +1250,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<ScratchStorageEntry> {
+        getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntry>> {
             return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairsForAppId(appId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1150,7 +1259,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllUsers(options?: any): AxiosPromise<ScratchStorageUser> {
+        getAllUsers(options?: any): AxiosPromise<Array<ScratchStorageUser>> {
             return ScratchStorageControllerApiFp(configuration).getAllUsers(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1165,12 +1274,31 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
             return ScratchStorageControllerApiFp(configuration).getKeyValueByKeyName(appId, keyName, options).then((request) => request(axios, basePath));
         },
         /**
+         * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
+         * @summary Gets a single Scratch Storage app\'s record that is registered with Common API
+         * @param {string} appId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScratchAppById(appId: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
+            return ScratchStorageControllerApiFp(configuration).getScratchAppById(appId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Gets all the SCRATCH space privileges so that privilege names can be mapped to their IDs
+         * @summary Gets all SCRATCH space privileges available
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScratchPrivs(options?: any): AxiosPromise<Array<PrivilegeDto>> {
+            return ScratchStorageControllerApiFp(configuration).getScratchPrivs(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getScratchSpaceApps(options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
+        getScratchSpaceApps(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>> {
             return ScratchStorageControllerApiFp(configuration).getScratchSpaceApps(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1224,7 +1352,7 @@ export interface ScratchStorageControllerApiInterface {
     addNewScratchUser(scratchStorageUser: ScratchStorageUser, options?: any): AxiosPromise<ScratchStorageUser>;
 
     /**
-     * Requester has to have DASHBOARD_ADMIN rights
+     * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
      * @summary Adds a user privilege to this app\'s data
      * @param {string} id Application UUID
      * @param {ScratchStorageAppUserPrivDto} scratchStorageAppUserPrivDto 
@@ -1304,7 +1432,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeyValuePairs(options?: any): AxiosPromise<ScratchStorageEntry>;
+    getAllKeyValuePairs(options?: any): AxiosPromise<Array<ScratchStorageEntry>>;
 
     /**
      * App ID is the UUID of the owning application
@@ -1314,7 +1442,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<ScratchStorageEntry>;
+    getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntry>>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1323,7 +1451,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllUsers(options?: any): AxiosPromise<ScratchStorageUser>;
+    getAllUsers(options?: any): AxiosPromise<Array<ScratchStorageUser>>;
 
     /**
      * App ID is the UUID of the owning application
@@ -1337,13 +1465,32 @@ export interface ScratchStorageControllerApiInterface {
     getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntry>;
 
     /**
+     * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
+     * @summary Gets a single Scratch Storage app\'s record that is registered with Common API
+     * @param {string} appId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApiInterface
+     */
+    getScratchAppById(appId: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
+
+    /**
+     * Gets all the SCRATCH space privileges so that privilege names can be mapped to their IDs
+     * @summary Gets all SCRATCH space privileges available
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApiInterface
+     */
+    getScratchPrivs(options?: any): AxiosPromise<Array<PrivilegeDto>>;
+
+    /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getScratchSpaceApps(options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
+    getScratchSpaceApps(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1398,7 +1545,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
     }
 
     /**
-     * Requester has to have DASHBOARD_ADMIN rights
+     * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
      * @summary Adds a user privilege to this app\'s data
      * @param {string} id Application UUID
      * @param {ScratchStorageAppUserPrivDto} scratchStorageAppUserPrivDto 
@@ -1530,6 +1677,29 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      */
     public getKeyValueByKeyName(appId: string, keyName: string, options?: any) {
         return ScratchStorageControllerApiFp(this.configuration).getKeyValueByKeyName(appId, keyName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
+     * @summary Gets a single Scratch Storage app\'s record that is registered with Common API
+     * @param {string} appId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApi
+     */
+    public getScratchAppById(appId: string, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).getScratchAppById(appId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Gets all the SCRATCH space privileges so that privilege names can be mapped to their IDs
+     * @summary Gets all SCRATCH space privileges available
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApi
+     */
+    public getScratchPrivs(options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).getScratchPrivs(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

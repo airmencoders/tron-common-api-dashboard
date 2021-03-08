@@ -32,6 +32,7 @@ models/bad-request-exception.ts
 models/coast-guardsman.ts
 models/dashboard-user-dto.ts
 models/exception-response.ts
+models/flight-all-of.ts
 models/flight.ts
 models/group.ts
 models/index.ts
