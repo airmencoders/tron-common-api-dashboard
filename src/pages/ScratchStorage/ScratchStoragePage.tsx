@@ -17,12 +17,12 @@ function ScratchStoragePage() {
       <DataCrudFormPage<ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDto>
           columns={columns}
           createForm={ScratchStorageEditForm}
-          dataTypeName="ScratchStorage"
+          dataTypeName="Scratch Storage App"
           pageTitle="Scratch Storage Apps"
           updateForm={ScratchStorageEditForm}
           useDataState={useScratchStorageState}
           usePageState={useCrudPageState}
-          allowEdit={false}
+          allowEdit={true}
       />
   );
 }
