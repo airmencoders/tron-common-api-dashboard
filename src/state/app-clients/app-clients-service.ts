@@ -5,13 +5,14 @@ import { PrivilegeType } from "./interface/privilege-type";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
 import { AxiosPromise } from "axios";
-import { Privilege, PrivilegeDto } from "../../openapi/models";
+import { Privilege } from "../../openapi/models";
 import { accessPrivilegeState } from "../privilege/privilege-state";
+import { DataService } from "../data-service/data-service";
 
-export default class AppClientsService {
-  constructor(private state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
+export default class AppClientsService implements DataService<AppClientFlat, AppClientFlat> {
+  constructor(public state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
 
-  fetchAndStoreAppClients(): Promise<AppClientFlat[]> {
+  fetchAndStoreData(): Promise<AppClientFlat[]> {
     const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
 
     const data = new Promise<AppClientFlat[]>((resolve) => resolve(response().then(r => this.convertAppClientsToFlat(r.data))));
@@ -20,21 +21,51 @@ export default class AppClientsService {
     return data;
   }
 
-  sendUpdatedAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
-    return this.appClientsApi.updateAppClient(client.id || "", client);
+  async sendCreate(toCreate: AppClientFlat): Promise<AppClientFlat> {
+    try {
+      const appClientDto = this.convertToDto(toCreate);
+      const createdResponse = await this.appClientsApi.createAppClientUser(appClientDto);
+      const createdAppClientFlat = this.convertToFlat(createdResponse.data);
+
+      this.state[this.state.length].set(createdAppClientFlat);
+
+      return Promise.resolve(createdAppClientFlat);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
   }
 
-  sendCreateAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
-    return this.appClientsApi.createAppClientUser(client);
+  async sendUpdate(toUpdate: AppClientFlat): Promise<AppClientFlat> {
+    try {
+      if (toUpdate?.id == null) {
+        return Promise.reject(new Error('App Client to update has undefined id.'));
+      }
+      const appClientDto = this.convertToDto(toUpdate);
+      const updatedResponse = await this.appClientsApi.updateAppClient(toUpdate.id, appClientDto);
+      const updatedAppClientFlat = this.convertToFlat(updatedResponse.data);
+
+      const index = this.state.get().findIndex(item => item.id === updatedAppClientFlat.id);
+      this.state[index].set(updatedAppClientFlat);
+
+      return Promise.resolve(updatedAppClientFlat);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
+    return Promise.resolve(Object.assign({}, rowData));
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
     return clients.map(client => {
-      return this.convertAppClientToFlat(client);
+      return this.convertToFlat(client);
     });
   }
 
-  convertAppClientToFlat(client: AppClientUserDto): AppClientFlat {
+  convertToFlat(client: AppClientUserDto): AppClientFlat {
     const { id, name } = client;
 
     const privilegeArr = Array.from(client.privileges || []);
@@ -85,16 +116,16 @@ export default class AppClientsService {
     return privileges;
   }
 
-  get privileges(): PrivilegeDto[] | undefined {
-    return accessPrivilegeState().privileges?.get();
+  private isStateReady(): boolean {
+    return !this.error && !this.isPromised;
   }
 
   get isPromised(): boolean {
     return this.state.promised;
   }
 
-  get appClients(): State<AppClientFlat[]> | undefined {
-    return this.state.promised ? undefined : this.state;
+  get appClients(): AppClientFlat[] {
+    return !this.isStateReady() ? new Array<AppClientFlat>() : this.state.get();
   }
 
   get error(): string | undefined {
