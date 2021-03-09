@@ -22,8 +22,7 @@ function SubmitActions(props: SubmitActionsProps) {
               </Spinner>
               :
               props.formActionType === FormActionType.ADD && <>Add</> ||
-              props.formActionType === FormActionType.UPDATE && <>Update</> ||
-              props.formActionType === FormActionType.DELETE && <>Delete</>
+              props.formActionType === FormActionType.UPDATE && <>Update</>
           }
         </Button>
       </div>

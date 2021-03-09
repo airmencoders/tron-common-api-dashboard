@@ -56,24 +56,6 @@ it('should show update label', async () => {
   );
 });
 
-it('should show delete label', async () => {
-
-    render(
-        <SubmitActions
-            formActionType={FormActionType.DELETE}
-            onCancel={() => { }}
-            onSubmit={() => { }}
-            isFormValid={true}
-            isFormModified={false}
-            isFormSubmitting={false}
-        />
-    );
-
-    await waitFor(
-        () => expect(screen.getByText('Delete')).toBeTruthy()
-    );
-});
-
 it('should not allow submit if form is invalid', async () => {
 
   render(

@@ -1,6 +1,13 @@
 @import "../../styles/base";
 
 .modal-component {
+  &__react-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(255, 255, 255);
+  }
   &__container {
     display: flex;
     flex-direction: column;
@@ -33,6 +40,7 @@
   }
   &__body {
     flex: 1;
+    padding: $default-panel-padding-x $default-panel-padding-y;
   }
   &__footer {
     flex: 0 0 units(8);

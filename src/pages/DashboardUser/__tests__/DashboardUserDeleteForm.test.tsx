@@ -3,7 +3,7 @@ import { render, fireEvent } from '@testing-library/react';
 import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-flat';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
-import DashboardUserDeleteForm from '../DashboardUserDeleteForm';
+import DashboardUserDelete from '../DashboardUserDelete';
 
 describe('Test Dashboard Delete User Form', () => {
   let onSubmit = jest.fn();
@@ -42,39 +42,16 @@ describe('Test Dashboard Delete User Form', () => {
   it('Delete', async () => {
     successAction = undefined;
     const pageRender = render(
-      <DashboardUserDeleteForm
+      <DashboardUserDelete
         data={data}
         formErrors={formErrors}
-        onSubmit={onSubmit}
-        onClose={onClose}
         successAction={successAction}
         isSubmitting={false}
       />
     );
 
-    expect(pageRender.getByTestId('dashboard-user-delete-form')).toBeInTheDocument();
-
-    fireEvent.click(pageRender.getByText('Delete'));
-    expect(onSubmit).toHaveBeenCalledTimes(1);
-  });
-
-  it('Success message', () => {
-    successAction = {
-      success: true,
-      successMsg: 'Success message'
-    };
-
-    const pageRender = render(
-      <DashboardUserDeleteForm
-        data={data}
-        formErrors={formErrors}
-        onSubmit={onSubmit}
-        onClose={onClose}
-        successAction={successAction}
-        isSubmitting={false}
-      />
-    );
-
-    expect(pageRender.getByText(successAction.successMsg));
+    expect(pageRender.getByTestId('dashboard-user-delete')).toBeInTheDocument();
+    expect(pageRender.getByText(data.id!)).toBeInTheDocument();
+    expect(pageRender.getByText(data.email!)).toBeInTheDocument();
   });
 })
