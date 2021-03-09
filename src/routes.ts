@@ -34,7 +34,7 @@ export const routes: RouteItem[] = [
     },
     {
         path: RoutePath.PERSON,
-        name: 'Person',
+        name: 'People',
         component: PersonPage,
         requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
