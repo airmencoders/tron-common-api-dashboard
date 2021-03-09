@@ -56,7 +56,6 @@ it('should show update label', async () => {
   );
 });
 
-
 it('should not allow submit if form is invalid', async () => {
 
   render(

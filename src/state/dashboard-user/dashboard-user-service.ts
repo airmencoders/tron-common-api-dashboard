@@ -1,4 +1,4 @@
-import { State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import { AxiosPromise } from 'axios';
@@ -112,8 +112,26 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     }
   }
 
+  async sendDelete(toDelete: DashboardUserFlat): Promise<void> {
+    try {
+      if (toDelete?.id == null) {
+        return Promise.reject('Dashboard User to delete has undefined id.');
+      }
+
+      await this.dashboardUserApi.deleteDashboardUser(toDelete.id);
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
-    return Promise.resolve(rowData);
+    return Promise.resolve(Object.assign({}, rowData));
   }
 
   private isStateReady(): boolean {
@@ -124,7 +142,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return this.state.promised;
   }
 
-  get dashboardUsers(): DashboardUserDto[] | undefined {
+  get dashboardUsers(): DashboardUserDto[] {
     return !this.isStateReady() ? new Array<DashboardUserDto>() : this.state.get();
   }
 

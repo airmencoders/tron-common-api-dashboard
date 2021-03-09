@@ -1,7 +1,7 @@
 import {render, waitFor, screen, fireEvent} from '@testing-library/react';
 import {DataCrudFormPage} from '../DataCrudFormPage';
 import {DataService} from '../../../state/data-service/data-service';
-import {createState, State, useState} from '@hookstate/core';
+import { createState, none, State, useState } from '@hookstate/core';
 import {useCrudPageState} from '../../../state/crud-page/crud-page-state';
 import GridColumn from '../../Grid/GridColumn';
 import {MemoryRouter} from 'react-router-dom';
@@ -55,6 +55,13 @@ class TestDataService implements DataService<TestRow, TestDto> {
     return Promise.resolve(toCreate);
   }
 
+  sendDelete(toDelete: TestDto): Promise<void> {
+    const indexToUpdate = this.state.get().findIndex(item => item.id === toDelete.id);
+    this.state[indexToUpdate].set(none);
+
+    return Promise.resolve();
+  }
+
   convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
     const values = this.state.get();
     const foundData = values.find(row => row.id === rowData.id);
@@ -96,6 +103,13 @@ class TestDataErrorService implements DataService<TestRow, TestDto> {
       toCreate
     ]));
     return Promise.resolve(toCreate);
+  }
+
+  sendDelete(toDelete: TestDto): Promise<void> {
+    const indexToUpdate = this.state.get().findIndex(item => item.id === toDelete.id);
+    this.state[indexToUpdate].set(none);
+
+    return Promise.resolve();
   }
 
   convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
