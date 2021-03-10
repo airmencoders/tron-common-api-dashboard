@@ -1,4 +1,4 @@
-import { State } from "@hookstate/core";
+import { none, State } from "@hookstate/core";
 import { AppClientFlat } from "./interface/app-client-flat";
 import { ClientPrivilege } from "./interface/app-client-privilege";
 import { PrivilegeType } from "./interface/privilege-type";
@@ -51,6 +51,24 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       return Promise.resolve(updatedAppClientFlat);
     }
     catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async sendDelete(toDelete: AppClientFlat): Promise<void> {
+    try {
+      if (toDelete?.id == null) {
+        return Promise.reject('App Client to delete has undefined id.');
+      }
+
+      await this.appClientsApi.deleteAppClient(toDelete.id);
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
+      return Promise.resolve();
+    } catch (error) {
       return Promise.reject(error);
     }
   }

@@ -94,6 +94,14 @@ describe('App Client State Tests', () => {
     headers: {}
   };
 
+  const axiosDeleteResponse = {
+    data: undefined,
+    status: 204,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+
   const privilegDtos: PrivilegeDto[] = [
     {
       id: 1,
@@ -257,6 +265,40 @@ describe('App Client State Tests', () => {
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendDelete Success', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    await expect(wrappedState.sendDelete(testClientFlat)).resolves.not.toThrow();
+  });
+
+  it('Test sendDelete Fail', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(wrappedState.sendDelete(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendDelete Fail - bad id', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    await expect(wrappedState.sendDelete({ ...testClientFlat, id: undefined })).rejects.toBeDefined();
+  });
+
+  it('Test sendDelete Success - delete from state', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    wrappedState.state.set([testClientFlat]);
+
+    await expect(wrappedState.sendDelete(testClientFlat)).resolves.not.toThrow();
   });
 
   it('Test convertRowDataToEditableData', async () => {

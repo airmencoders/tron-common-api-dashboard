@@ -7,6 +7,7 @@ import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudForm
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 import AppClientForm from './AppClientForm';
 import { useCrudPageState } from '../../state/crud-page/crud-page-state';
+import AppClientDelete from './AppClientDelete';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn('name', true, true, 'NAME'),
@@ -33,6 +34,8 @@ export function AppClientPage() {
       useDataState={useAppClientsState}
       usePageState={useCrudPageState}
       allowEdit={true}
+      allowDelete
+      deleteComponent={AppClientDelete}
     />
   )
 }
