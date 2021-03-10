@@ -6,9 +6,8 @@ import { AppClientControllerApi, AppClientControllerApiInterface } from '../../.
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../interface/privilege-type';
-import { Configuration, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
-import Config from '../../../api/configuration';
 import PrivilegeService from '../../privilege/privilege-service';
 
 jest.mock('../../privilege/privilege-state');
@@ -115,8 +114,8 @@ describe('App Client State Tests', () => {
 
   const rejectMsg = 'failed';
 
-  const privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
-  const privilegeApi: PrivilegeControllerApiInterface = new PrivilegeControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
+  let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
+  let privilegeApi: PrivilegeControllerApiInterface;
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
@@ -131,19 +130,21 @@ describe('App Client State Tests', () => {
     });
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
     appClientsApi = new AppClientControllerApi();
     wrappedState = wrapState(appClientsState, appClientsApi);
+
+    privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
+    privilegeApi = new PrivilegeControllerApi();
+
+    mockPrivilegesState();
+    await accessPrivilegeState().fetchAndStorePrivileges();
   });
 
   afterEach(() => {
     appClientsState.destroy();
-  })
-
-  afterAll((done) => {
     privilegeState.destroy();
-    done();
   })
 
   it('Test fetch and store', async () => {
@@ -206,9 +207,6 @@ describe('App Client State Tests', () => {
   });
 
   it('Test sendUpdate', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
     appClientsApi.updateAppClient = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
@@ -220,9 +218,6 @@ describe('App Client State Tests', () => {
   });
 
   it('Test sendUpdate Fail', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
     appClientsApi.updateAppClient = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
     });
@@ -246,9 +241,6 @@ describe('App Client State Tests', () => {
   });
 
   it('Test sendCreate', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
     appClientsApi.createAppClientUser = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
@@ -257,9 +249,6 @@ describe('App Client State Tests', () => {
   });
 
   it('Test sendCreate Fail', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
     appClientsApi.createAppClientUser = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
     });
@@ -310,24 +299,17 @@ describe('App Client State Tests', () => {
     expect(result).toEqual(testClientFlat);
   });
 
-  it('Test convertToDto', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
+  it('Test convertToDto', () => {
     const result = wrappedState.convertToDto(testClientFlat);
     expect(result).toEqual(testClientDto);
   });
 
   it('Test createAppPrivilegesArr', () => {
-    mockPrivilegesState()
-
     const result = wrappedState.createAppPrivilegesArr(testClientFlat);
     expect(result).toEqual(testClientPrivileges);
   });
 
   it('Test Privilege not exist in state', async () => {
-    mockPrivilegesState();
-
     privilegeApi.getPrivileges = jest.fn(() => {
       return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
         data: [],

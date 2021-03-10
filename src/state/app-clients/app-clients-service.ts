@@ -5,7 +5,7 @@ import { PrivilegeType } from "./interface/privilege-type";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
 import { AxiosPromise } from "axios";
-import { Privilege } from "../../openapi/models";
+import { Privilege, PrivilegeDto } from "../../openapi/models";
 import { accessPrivilegeState } from "../privilege/privilege-state";
 import { DataService } from "../data-service/data-service";
 
@@ -14,8 +14,19 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
   fetchAndStoreData(): Promise<AppClientFlat[]> {
     const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
+    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
 
-    const data = new Promise<AppClientFlat[]>((resolve) => resolve(response().then(r => this.convertAppClientsToFlat(r.data))));
+    const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
+      try {
+        await privilegeResponse();
+        const result = await response();
+
+        resolve(this.convertAppClientsToFlat(result.data));
+      } catch (err) {
+        reject(err);
+      }
+    });
+
     this.state.set(data);
 
     return data;

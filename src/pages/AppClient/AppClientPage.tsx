@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import GridColumn from '../../components/Grid/GridColumn';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
-import { usePrivilegeState } from '../../state/privilege/privilege-state';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
@@ -18,12 +17,6 @@ const columnHeaders: GridColumn[] = [
 ];
 
 export function AppClientPage() {
-  const privilegeState = usePrivilegeState();
-
-  useEffect(() => {
-    privilegeState.fetchAndStorePrivileges();
-  }, []);
-
   return (
     <DataCrudFormPage<AppClientFlat, AppClientFlat>
       columns={columnHeaders}
