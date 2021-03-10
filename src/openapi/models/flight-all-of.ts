@@ -13,32 +13,19 @@
  */
 
 
-import { UserWithPrivs } from './user-with-privs';
 
 /**
  * 
  * @export
- * @interface ScratchStorageAppRegistryDto
+ * @interface FlightAllOf
  */
-export interface ScratchStorageAppRegistryDto {
+export interface FlightAllOf {
     /**
      * 
      * @type {string}
-     * @memberof ScratchStorageAppRegistryDto
+     * @memberof FlightAllOf
      */
-    id?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ScratchStorageAppRegistryDto
-     */
-    appName: string;
-    /**
-     * 
-     * @type {Array<UserWithPrivs>}
-     * @memberof ScratchStorageAppRegistryDto
-     */
-    userPrivs?: Array<UserWithPrivs>;
+    pas?: string;
 }
 
 
