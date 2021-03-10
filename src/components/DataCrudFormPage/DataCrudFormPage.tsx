@@ -10,10 +10,15 @@ import Button from '../../components/Button/Button';
 import {DataCrudFormPageProps} from './DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
 import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
-import {State} from '@hookstate/core';
+import { State } from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
 import './DataCrudFormPage.scss';
+import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
+import GridColumn from '../Grid/GridColumn';
+import Modal from '../Modal/Modal';
+import ModalTitle from '../Modal/ModalTitle';
+import ModalFooterSubmit from '../Modal/ModalFooterSubmit';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -28,30 +33,31 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   useEffect(() => {
     dataState.fetchAndStoreData();
+    
     return () => {
       pageState.set(getInitialCrudPageState());
     }
   }, []);
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-    if (props.allowEdit) {
+    if (props.allowEdit && !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName)) {
       const rowData = event.data;
       if (rowData != null) {
         const dtoData = await dataState.convertRowDataToEditableData(rowData);
-        pageState.set({
+        pageState.merge({
           formAction: FormActionType.UPDATE,
           isOpen: true,
           selected: dtoData,
           formErrors: undefined,
           successAction: undefined,
-          isSubmitting: false,
+          isSubmitting: false
         });
       }
     }
   }
 
   function onAddEntityClick() {
-    pageState.set({
+    pageState.merge({
       formAction: FormActionType.ADD,
       isOpen: true,
       selected: undefined,
@@ -63,6 +69,51 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   function onCloseHandler() {
     pageState.set(getInitialCrudPageState());
+  }
+
+  async function deleteConfirmation(deleteItem: R) {
+    if (props.allowDelete && deleteItem != null) {
+      const data = await dataState.convertRowDataToEditableData(deleteItem);
+
+      pageState.merge({
+        isDeleteConfirmationOpen: true,
+        selected: data,
+        formErrors: undefined,
+        successAction: undefined,
+        isSubmitting: false
+      });
+    }
+  }
+
+  async function deleteSubmit() {
+    const deleteItem = pageState.selected.get();
+
+    if (deleteItem == null)
+      return;
+
+    pageState.isSubmitting.set(true);
+
+    try {
+      await dataState.sendDelete(deleteItem);
+
+      pageState.merge({
+        isDeleteConfirmationOpen: false,
+        successAction: {
+          success: true,
+          successMsg: `Successfully deleted ${props.dataTypeName}.`
+        },
+        isSubmitting: false
+      });
+
+    }
+    catch (error) {
+      pageState.merge({
+        formErrors: {
+          general: error.message
+        },
+        isSubmitting: false
+      });
+    }
   }
 
   async function updateSubmit(updatedDto: R) {
@@ -131,8 +182,21 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   const UpdateForm = props.updateForm;
   const CreateForm = props.createForm;
+  const DeleteComponent = props.deleteComponent;
+
+  const deleteBtnName = 'Delete';
+  let columns: GridColumn[];
+  if (props.allowDelete && DeleteComponent) {
+    columns = [
+      ...props.columns,
+      new GridColumn('', false, false, deleteBtnName, 'header-center', DeleteCellRenderer, { onClick: deleteConfirmation })
+    ];
+  } else {
+    columns = props.columns;
+  }
 
   return (
+    <>
       <PageFormat pageTitle={props.pageTitle}>
         <Container fluid style={{ height: '100%' }}>
           {dataState.isPromised ?
@@ -156,42 +220,61 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
                       <Grid
                           data={dataState.state?.get() || []}
-                          columns={props.columns}
+                          columns={columns}
                           onRowClicked={onRowClicked}
                           rowClass="ag-grid--row-pointer"
                       />
 
                       <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                        {pageState.selected.get() && pageState.formAction.value === FormActionType.UPDATE ?
+                        {
+                          pageState.formAction.value === FormActionType.ADD ?
+                          <CreateForm
+                            onSubmit={createSubmit}
+                            formActionType={FormActionType.ADD}
+                            formErrors={pageState.formErrors.get()}
+                            onClose={onCloseHandler}
+                            successAction={pageState.successAction.get()}
+                            isSubmitting={pageState.isSubmitting.get()}
+                          />
+                          : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
                             <UpdateForm
-                                data={pageState.selected.get()}
-                                formErrors={pageState.formErrors.get()}
-                                onSubmit={updateSubmit}
-                                onClose={onCloseHandler}
-                                successAction={pageState.successAction.get()}
-                                isSubmitting={pageState.isSubmitting.get()}
-                                formActionType={FormActionType.UPDATE}
+                              data={pageState.selected.get()}
+                              formErrors={pageState.formErrors.get()}
+                              onSubmit={updateSubmit}
+                              onClose={onCloseHandler}
+                              successAction={pageState.successAction.get()}
+                              isSubmitting={pageState.isSubmitting.get()}
+                              formActionType={FormActionType.UPDATE}
                             />
-                            : pageState.formAction.value === FormActionType.ADD ?
-                                <CreateForm
-                                    onSubmit={createSubmit}
-                                    formActionType={FormActionType.ADD}
-                                    formErrors={pageState.formErrors.get()}
-                                    onClose={onCloseHandler}
-                                    successAction={pageState.successAction.get()}
-                                    isSubmitting={pageState.isSubmitting.get()}
-                                 />
-                                :
-                                null
+                            : null
                         }
                       </SideDrawer>
                     </>
                 }
-
               </div>
           }
         </Container>
       </PageFormat>
 
+      { props.allowDelete && DeleteComponent && pageState.selected.get() &&
+        <Modal
+          headerComponent={<ModalTitle title="Delete Confirmation" />}
+          footerComponent={<ModalFooterSubmit 
+                              onCancel={onCloseHandler} 
+                              onSubmit={deleteSubmit} 
+                              disableSubmit={pageState.isSubmitting.get() || pageState.successAction.get()?.success} 
+                            />}
+          show={pageState.isDeleteConfirmationOpen.get()}
+          onHide={onCloseHandler}
+        >
+          <DeleteComponent
+            data={pageState.selected.get()}
+            formErrors={pageState.formErrors.get()}
+            successAction={pageState.successAction.get()}
+            isSubmitting={pageState.isSubmitting.get()}
+          />
+        </Modal>
+      }
+    </>
   )
 }

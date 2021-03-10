@@ -52,6 +52,10 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     }
   }
 
+  async sendDelete(toDelete: PersonDto): Promise<void> {
+    return Promise.resolve();
+  }
+
   get isPromised(): boolean {
     return this.state.promised;
   }
