@@ -16,12 +16,6 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
     try {
       const scratchStorageResponse = await this.scratchStorageApi.getScratchSpaceApps();
-      const scratchStorageData = scratchStorageResponse.data;
-      const mappedData = scratchStorageData.map((scratch) => {
-        scratch.userPrivs = scratch.userPrivs != null && scratch.userPrivs?.size > 0 ? scratch.userPrivs : undefined;
-        return scratch;
-      });
-      this.state.set(mappedData);
       return Promise.resolve(scratchStorageResponse.data);
     }
     catch (error) {
