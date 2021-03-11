@@ -1,17 +1,33 @@
-import React, {FC, useEffect} from 'react';
-import {Container, Spinner} from 'react-bootstrap';
-import {useHealthState} from '../../state/health/health-state';
+import React, { useEffect } from 'react';
+import { useHealthState } from '../../state/health/health-state';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import {StatusType} from '../../components/StatusCard/status-type';
+import UseLoading from '../../hocs/UseLoading/UseLoading';
+import HealthService from '../../state/health/interface/health-service';
 
-export const HealthPage: FC = () => {
+function HealthPage() {
   const state = useHealthState();
 
   useEffect(() => {
     state.fetchAndStoreHealthStatus();
   }, []);
 
+  const serviceTitle = "API Serivce";
+
+  return (
+    <PageFormat pageTitle={"Health"}>
+      {state.error ?
+        <StatusCard status={StatusType.ERROR} title={serviceTitle} />
+        :
+        <ContentWithLoading state={state} serviceTitle={serviceTitle} />
+      }
+    </PageFormat>
+
+  )
+}
+
+function HealthPageContent(props: { state: HealthService, serviceTitle: string }) {
   const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
     if (healthStatus === 'UP') {
       return StatusType.GOOD;
@@ -19,28 +35,19 @@ export const HealthPage: FC = () => {
     return StatusType.ERROR;
   };
 
-  const serviceTitle = "API Serivce";
+  const { state, serviceTitle } = props;
 
   return (
-    <PageFormat pageTitle={"Health"}>
-      <Container fluid>
-        {state.isPromised ?
-          <Spinner animation="border" role="status" variant="primary">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
-          :
-          <div>
-            {state.error ?
-              <StatusCard status={StatusType.ERROR} title={serviceTitle} />
-              :
-              <StatusCard status={getStatusTypeFromHealth(state.systemStatus)}
-                title={serviceTitle} />
-            }
-
-          </div>
-        }
-      </Container>
-    </PageFormat>
-
-  )
+    <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
+  );
 }
+
+const PageContentWithLoading = UseLoading(HealthPageContent);
+function ContentWithLoading(props: { state: HealthService, serviceTitle: string }) {
+  return (
+    <PageContentWithLoading isLoading={props.state.isPromised} {...props} />
+  );
+}
+
+
+export default HealthPage;

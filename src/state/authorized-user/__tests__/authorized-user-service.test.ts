@@ -74,7 +74,7 @@ describe('Authorized User Service Test', () => {
   it('Test fetchAndStoreDashboardUser', async () => {
     mockGetSelfDashboardUser();
 
-    await state.fetchAndStoreDashboardUser();
+    await state.fetchAndStoreAuthorizedUser();
 
     expect(state.authorizedUser).toEqual(user);
   });
@@ -82,7 +82,7 @@ describe('Authorized User Service Test', () => {
   it('Test authorizedUserHasPrivilege', async () => {
     mockGetSelfDashboardUserDelay();
 
-    const fetch = state.fetchAndStoreDashboardUser();
+    const fetch = state.fetchAndStoreAuthorizedUser();
     expect(state.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)).toEqual(undefined);
 
     await fetch;
@@ -92,12 +92,12 @@ describe('Authorized User Service Test', () => {
 
   it('Test authorizedUser', async () => {
     mockGetSelfDashboardUserReject();
-    await expect(state.fetchAndStoreDashboardUser()).rejects.toEqual(rejectMsg);
+    await expect(state.fetchAndStoreAuthorizedUser()).rejects.toEqual(rejectMsg);
     expect(state.error).toBeTruthy();
     expect(state.authorizedUser).toEqual(undefined);
 
     mockGetSelfDashboardUser();
-    await state.fetchAndStoreDashboardUser();
+    await state.fetchAndStoreAuthorizedUser();
     expect(state.error).toBeFalsy();
     expect(state.authorizedUser).toEqual(user);
   });
@@ -105,7 +105,7 @@ describe('Authorized User Service Test', () => {
   it('Test error', async () => {
     mockGetSelfDashboardUserRejectDelay();
 
-    const fetch = state.fetchAndStoreDashboardUser();
+    const fetch = state.fetchAndStoreAuthorizedUser();
     expect(state.error).toBe(undefined);
 
     await expect(fetch).rejects.toEqual(rejectMsg);
@@ -116,7 +116,7 @@ describe('Authorized User Service Test', () => {
     mockGetSelfDashboardUserDelay();
 
     expect(state.isPromised).toBeFalsy();
-    state.fetchAndStoreDashboardUser();
+    state.fetchAndStoreAuthorizedUser();
     expect(state.isPromised).toBeTruthy();
   });
 });

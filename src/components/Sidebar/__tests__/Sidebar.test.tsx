@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import Sidebar from '../Sidebar';
 import { MemoryRouter } from 'react-router-dom';
 import { RouteItem } from '../../../routes';
-import {HealthPage} from '../../../pages/Health/HealthPage';
+import HealthPage from '../../../pages/Health/HealthPage';
 import {PrivilegeType} from '../../../state/app-clients/interface/privilege-type';
 import PersonPage from '../../../pages/Person/PersonPage';
 import {DashboardUserDto} from '../../../openapi/models';
@@ -73,7 +73,7 @@ describe('Sidebar', () => {
 
   it('Renders', async () => {
     mockAuthorizedUserState();
-    await useAuthorizedUserState().fetchAndStoreDashboardUser();
+    await useAuthorizedUserState().fetchAndStoreAuthorizedUser();
 
     const pageRender = render(
       createRenderElem(testRoutes)
@@ -86,7 +86,7 @@ describe('Sidebar', () => {
 
   it('Renders all items (admin & user privilege)', async () => {
     mockAuthorizedUserState();
-    await useAuthorizedUserState().fetchAndStoreDashboardUser();
+    await useAuthorizedUserState().fetchAndStoreAuthorizedUser();
 
     const pageRender = render(
       createRenderElem(testRoutes)

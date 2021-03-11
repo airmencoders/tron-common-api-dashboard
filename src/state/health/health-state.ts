@@ -4,48 +4,42 @@ import Components from '../../api/health/interface/components';
 import Health from '../../api/health/interface/health';
 import HealthService from './interface/health-service';
 
-export interface HealthState {
-  error?: string,
-  health?: Health
-}
-
-const healthState = createState<HealthState | undefined>(undefined);
+const healthState = createState<Partial<Health>>({});
 const healthApi: HealthApi = new HealthApi();
 
-export const wrapState = (state: State<HealthState | undefined>, healthApi: HealthApi): HealthService => {
+export const wrapState = (state: State<Partial<Health>>, healthApi: HealthApi): HealthService => {
   return ({
-    fetchAndStoreHealthStatus() {
+    async fetchAndStoreHealthStatus(): Promise<Health> {
       const healthRes = () => healthApi.getHealth();
+      const data = new Promise<Health>((resolve) => setTimeout(() => resolve(healthRes().then(r => r.data)), 2000));
+      // const data = new Promise<Health>((resolve) => resolve(healthRes().then(r => r.data)));
 
-      state.set(healthRes()
-        .then(response => {
-          return {
-            error: undefined,
-            health: response.data
-          };
-        })
-        .catch(error => {
-          return {
-            error: "Could not contact server. Try again at a later date",
-            health: undefined
-          }
-        })
-      );
+      state.set(data);
+
+      return data;
     },
+
+    get isStateReady(): boolean {
+      return !this.isPromised && !this.error;
+    },
+
     get isPromised(): boolean {
       return state.promised;
     },
+
     get systemStatus(): string | undefined {
-      return state.promised ? undefined : state.get()?.health?.status;
+      return this.isStateReady ? state.get().status : undefined;
     },
+
     get components(): Components | undefined {
-      return state.promised ? undefined : state.get()?.health?.components;
+      return this.isStateReady ? state.get().components : undefined;
     },
+
     get error(): string | undefined {
-      return state.promised ? undefined : state.get()?.error;
+      return this.isPromised ? undefined : state.error;
     }
   })
 };
 
-export const accessHealthState = () => wrapState(healthState, healthApi);
-export const useHealthState = () => wrapState(useState(healthState), healthApi);
+export const accessHealthState = (): HealthService => wrapState(healthState, healthApi);
+export const useHealthState = (): HealthService => wrapState(useState(healthState), healthApi);

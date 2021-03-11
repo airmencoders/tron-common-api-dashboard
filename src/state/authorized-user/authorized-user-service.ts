@@ -5,12 +5,12 @@ import { AxiosPromise } from 'axios';
 import { PrivilegeType } from '../app-clients/interface/privilege-type';
 
 export default class AuthorizedUserService {
-  constructor(private state: State<DashboardUserDto | undefined>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
+  constructor(public state: State<DashboardUserDto | undefined>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
 
-  fetchAndStoreDashboardUser(): Promise<DashboardUserDto> {
+  fetchAndStoreAuthorizedUser(): Promise<DashboardUserDto> {
     const response = (): AxiosPromise<DashboardUserDto> => this.dashboardUserApi.getSelfDashboardUser();
 
-    const data = new Promise<DashboardUserDto>((resolve) => resolve(response().then(r => r.data)));
+    const data = new Promise<DashboardUserDto>((resolve) => setTimeout(() => resolve(response().then(r => r.data)), 2000));
     this.state.set(data);
 
     return data;

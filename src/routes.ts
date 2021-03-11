@@ -1,5 +1,5 @@
 import { AppClientPage } from "./pages/AppClient/AppClientPage";
-import { HealthPage } from "./pages/Health/HealthPage";
+import HealthPage from "./pages/Health/HealthPage";
 import PersonPage from './pages/Person/PersonPage';
 import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
 import OrganizationPage from './pages/Organization/OrganizationPage';
