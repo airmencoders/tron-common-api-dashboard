@@ -8,6 +8,7 @@ import DashboardUserService from '../dashboard-user-service';
 import { DashboardUserFlat } from '../dashboard-user-flat';
 import { PrivilegeType } from '../../app-clients/interface/privilege-type';
 import { wrapDashboardUserState } from '../dashboard-user-state';
+import { _ } from 'ag-grid-community';
 
 jest.mock('../../privilege/privilege-state');
 
@@ -98,6 +99,14 @@ describe('Dashboard User State Test', () => {
   const axiosPostPutResponse = {
     data: testUserDto,
     status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+
+  const axiosDeleteResponse = {
+    data: undefined,
+    status: 204,
     statusText: 'OK',
     config: {},
     headers: {}
@@ -215,6 +224,40 @@ describe('Dashboard User State Test', () => {
     });
 
     await expect(state.sendCreate(testUserFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendDelete Success', async () => {
+    dashboardUserApi.deleteDashboardUser = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    await expect(state.sendDelete(testUserFlat)).resolves.not.toThrow();
+  });
+
+  it('Test sendDelete Fail', async () => {
+    dashboardUserApi.deleteDashboardUser = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(state.sendDelete(testUserFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendDelete Fail - bad id', async () => {
+    dashboardUserApi.deleteDashboardUser = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    await expect(state.sendDelete({ ...testUserFlat, id: undefined })).rejects.toBeDefined();
+  });
+
+  it('Test sendDelete Success - delete from state', async () => {
+    dashboardUserApi.deleteDashboardUser = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    state.state.set([testUserFlat]);
+
+    await expect(state.sendDelete(testUserFlat)).resolves.not.toThrow();
   });
 
   it('Test convertDashboardUsersToFlat', () => {

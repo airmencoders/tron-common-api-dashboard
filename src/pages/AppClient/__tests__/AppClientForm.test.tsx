@@ -1,19 +1,24 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import AppClientForm from '../AppClientForm';
-import { AppClientFormActionType } from '../AppClientFormActionType';
-import { AppClientFormActionSuccess } from '../AppClientFormActionSuccess';
 import { AppClientFlat } from '../../../state/app-clients/interface/app-client-flat';
-import { AppClientFormError } from '../AppClientFormError';
+import { FormActionType } from '../../../state/crud-page/form-action-type';
+import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
+import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
 
 describe('Test App Client Form', () => {
   let onSubmit = jest.fn();
-  let successAction: AppClientFormActionSuccess;
+  let onClose = jest.fn();
+  let successAction: DataCrudSuccessAction | undefined;
   let client: AppClientFlat;
 
   beforeEach(() => {
-    onSubmit = jest.fn().mockImplementation((event) => {
-      event.preventDefault();
+    onSubmit = jest.fn().mockImplementation(() => {
+
+    });
+
+    onClose = jest.fn().mockImplementation(() => {
+
     });
 
     successAction = {
@@ -22,6 +27,7 @@ describe('Test App Client Form', () => {
     };
 
     client = {
+      id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       name: 'test',
       read: false,
       write: false
@@ -29,8 +35,10 @@ describe('Test App Client Form', () => {
   });
 
   it('Update', async () => {
+    successAction = undefined;
+
     const pageRender = render(
-      <AppClientForm client={client} onSubmit={onSubmit} type={AppClientFormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
+      <AppClientForm onClose={onClose} data={client} onSubmit={onSubmit} formActionType={FormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
     );
 
     const elem = pageRender.getByTestId('app-client-form');
@@ -48,29 +56,22 @@ describe('Test App Client Form', () => {
     fireEvent.click(readCheckbox);
     expect(readCheckbox).toBeChecked();
 
-    fireEvent.click(pageRender.getByText(/Update/i));
+    fireEvent.click(pageRender.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it('Update no client', async () => {
+  it('Update - no app client', async () => {
     const pageRender = render(
-      <AppClientForm onSubmit={onSubmit} type={AppClientFormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
+      <AppClientForm onSubmit={onSubmit} onClose={onClose} successAction={successAction} isSubmitting={false} formActionType={FormActionType.UPDATE} />
     );
 
-    expect(pageRender.getByText('There was an error loading client details...'));
-  });
-
-  it('Submitting', async () => {
-    const pageRender = render(
-      <AppClientForm client={client} onSubmit={onSubmit} type={AppClientFormActionType.UPDATE} isSubmitting={true} successAction={successAction} />
-    );
-
-    expect(pageRender.getByText('Submitting...'));
+    const nameInput = pageRender.getByLabelText('Name');
+    expect(nameInput).toHaveValue('');
   });
 
   it('Client-side Validation', () => {
     const pageRender = render(
-      <AppClientForm client={client} onSubmit={onSubmit} type={AppClientFormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
+      <AppClientForm onClose={onClose} data={client} onSubmit={onSubmit} formActionType={FormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
     );
 
     const elem = pageRender.getByTestId('app-client-form');
@@ -78,37 +79,39 @@ describe('Test App Client Form', () => {
 
     const nameInput = pageRender.getByDisplayValue(client.name);
     fireEvent.change(nameInput, { target: { value: '' } });
-    expect(pageRender.getByDisplayValue('')).toBeInTheDocument();
+    expect(nameInput).toHaveValue('');
     expect(pageRender.getByText('* cannot be empty or blank.'));
   });
 
   it('Server-side Validation', () => {
-    const nameValidation: string = 'name validation';
+    // const nameValidation: string = 'name validation';
     const generalError: string = 'some error';
-    const errors: AppClientFormError = {
+    const errors: DataCrudFormErrors = {
       validation: {
-        name: nameValidation
+        // name: nameValidation
       },
       general: generalError
     };
 
     const pageRender = render(
-      <AppClientForm errors={errors} client={client} onSubmit={onSubmit} type={AppClientFormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
+      <AppClientForm onClose={onClose} formErrors={errors} data={client} onSubmit={onSubmit} formActionType={FormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
     );
 
     const elem = pageRender.getByTestId('app-client-form');
     expect(elem).toBeInTheDocument();
 
-    expect(pageRender.getByText('* ' + nameValidation));
+    // expect(pageRender.getByText('* ' + nameValidation));
     expect(pageRender.getByText('* ' + generalError));
   });
 
   it('Success message', () => {
-    successAction.success = true;
-    successAction.successMsg = 'Success message';
+    successAction = {
+      success: true,
+      successMsg: 'Success message'
+    };
 
     const pageRender = render(
-      <AppClientForm client={client} onSubmit={onSubmit} type={AppClientFormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
+      <AppClientForm onClose={onClose} data={client} onSubmit={onSubmit} formActionType={FormActionType.UPDATE} isSubmitting={false} successAction={successAction} />
     );
 
     const elem = pageRender.getByTestId('app-client-form');

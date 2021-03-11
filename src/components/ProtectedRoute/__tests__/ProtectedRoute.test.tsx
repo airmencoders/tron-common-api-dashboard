@@ -8,7 +8,6 @@ import { useAuthorizedUserState } from '../../../state/authorized-user/authorize
 import { AxiosResponse } from 'axios';
 import ProtectedRoute from '../ProtectedRoute';
 import { MemoryRouter } from 'react-router-dom';
-import { AppClientPage } from '../../../pages/AppClient/AppClientPage';
 
 const adminPrivilegeUser: DashboardUserDto = {
   id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
@@ -41,20 +40,28 @@ describe('ProtectRoute Test', () => {
     });
   }
 
+  const TestComponent = () => {
+    return (
+      <div data-testid="test-protected-route">
+        <div>Rendered</div>
+      </div>
+    )
+  }
+
   it('Renders', async () => {
     mockAuthorizedUserState();
     await useAuthorizedUserState().fetchAndStoreDashboardUser();
 
     let pageRender = render(
       <MemoryRouter>
-        <ProtectedRoute component={AppClientPage} requiredPrivilege={PrivilegeType.DASHBOARD_ADMIN} />
+        <ProtectedRoute component={TestComponent} requiredPrivilege={PrivilegeType.DASHBOARD_ADMIN} />
       </MemoryRouter>
     );
-    expect(pageRender.getByText('Application Clients')).toBeInTheDocument();
+    expect(pageRender.getByTestId('test-protected-route')).toBeInTheDocument();
 
     pageRender = render(
       <MemoryRouter>
-        <ProtectedRoute component={AppClientPage} requiredPrivilege={PrivilegeType.DASHBOARD_USER} />
+        <ProtectedRoute component={TestComponent} requiredPrivilege={PrivilegeType.DASHBOARD_USER} />
       </MemoryRouter>
     );
     expect(pageRender.getByText('Not Authorized')).toBeInTheDocument();

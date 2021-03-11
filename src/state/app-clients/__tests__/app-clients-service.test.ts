@@ -6,9 +6,8 @@ import { AppClientControllerApi, AppClientControllerApiInterface } from '../../.
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../interface/privilege-type';
-import { Configuration, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
-import Config from '../../../api/configuration';
 import PrivilegeService from '../../privilege/privilege-service';
 
 jest.mock('../../privilege/privilege-state');
@@ -16,7 +15,7 @@ jest.mock('../../privilege/privilege-state');
 describe('App Client State Tests', () => {
   let appClientsState: State<AppClientFlat[]> & StateMethodsDestroy;
   let appClientsApi: AppClientControllerApiInterface;
-  let state: AppClientsService;
+  let wrappedState: AppClientsService;
 
   const flatClients: AppClientFlat[] = [
     {
@@ -94,6 +93,14 @@ describe('App Client State Tests', () => {
     headers: {}
   };
 
+  const axiosDeleteResponse = {
+    data: undefined,
+    status: 204,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+
   const privilegDtos: PrivilegeDto[] = [
     {
       id: 1,
@@ -105,8 +112,10 @@ describe('App Client State Tests', () => {
     }
   ];
 
-  const privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
-  const privilegeApi: PrivilegeControllerApiInterface = new PrivilegeControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
+  const rejectMsg = 'failed';
+
+  let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
+  let privilegeApi: PrivilegeControllerApiInterface;
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
@@ -121,19 +130,21 @@ describe('App Client State Tests', () => {
     });
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
     appClientsApi = new AppClientControllerApi();
-    state = wrapState(appClientsState, appClientsApi);
+    wrappedState = wrapState(appClientsState, appClientsApi);
+
+    privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
+    privilegeApi = new PrivilegeControllerApi();
+
+    mockPrivilegesState();
+    await accessPrivilegeState().fetchAndStorePrivileges();
   });
 
   afterEach(() => {
     appClientsState.destroy();
-  })
-
-  afterAll((done) => {
     privilegeState.destroy();
-    done();
   })
 
   it('Test fetch and store', async () => {
@@ -141,15 +152,30 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => resolve(axiosGetResponse));
     });
 
-    await state.fetchAndStoreAppClients();
+    await wrappedState.fetchAndStoreData();
 
-    expect(state.appClients?.get()).toEqual(flatClients);
+    expect(wrappedState.appClients).toEqual(flatClients);
   });
 
-  it('Test convertAppClientsToFlat', () => {
-    const converted: AppClientFlat[] = state.convertAppClientsToFlat(clients);
+  it('Test convertToFlat', () => {
+    const converted: AppClientFlat[] = wrappedState.convertAppClientsToFlat(clients);
 
     expect(converted).toEqual(flatClients);
+  });
+
+  it('Test convertToFlat empty name', () => {
+    const test = {
+      ...testClientDto,
+      name: undefined
+    };
+
+    const testFlat = {
+      ...testClientFlat,
+      name: ''
+    };
+
+    const result = wrappedState.convertToFlat(test);
+    expect(result).toEqual(testFlat);
   });
 
   it('Test appClients', async () => {
@@ -157,11 +183,11 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
     });
 
-    const fetch = state.fetchAndStoreAppClients();
-    expect(state.appClients).toBe(undefined);
+    const fetch = wrappedState.fetchAndStoreData();
+    expect(wrappedState.appClients).toEqual([]);
 
     await fetch;
-    expect(state.appClients?.get()).toEqual(flatClients);
+    expect(wrappedState.appClients).toEqual(flatClients);
   });
 
   it('Test error', async () => {
@@ -173,49 +199,140 @@ describe('App Client State Tests', () => {
       });
     });
 
-    const fetch = state.fetchAndStoreAppClients();
-    expect(state.error).toBe(undefined);
+    const fetch = wrappedState.fetchAndStoreData();
+    expect(wrappedState.error).toBe(undefined);
 
     await expect(fetch).rejects.toEqual("Rejected");
-    expect(state.error).toBe("Rejected");
+    expect(wrappedState.error).toBe("Rejected");
   });
 
-  it('Test sendUpdatedAppClient', async () => {
+  it('Test sendUpdate', async () => {
     appClientsApi.updateAppClient = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
-    const updatePromise = await state.sendUpdatedAppClient(testClientDto);
-    expect(updatePromise.data).toEqual(testClientDto);
+    appClientsState.set([testClientFlat]);
+
+    await expect(wrappedState.sendUpdate(testClientFlat)).resolves.toEqual(testClientFlat);
+    expect(appClientsState.get()).toEqual([testClientFlat]);
   });
 
-  it('Test sendCreateAppClient', async () => {
+  it('Test sendUpdate Fail', async () => {
+    appClientsApi.updateAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(wrappedState.sendUpdate(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendUpdate Fail No ID', async () => {
+    const noIdAppClient: AppClientFlat = {
+      ...testClientFlat,
+      id: undefined
+    };
+
+    expect.assertions(1);
+
+    try {
+      await wrappedState.sendUpdate(noIdAppClient);
+    } catch (err) {
+      expect(err).toBeDefined();
+    }
+  });
+
+  it('Test sendCreate', async () => {
     appClientsApi.createAppClientUser = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
-    const updatePromise = await state.sendCreateAppClient(testClientDto);
-    expect(updatePromise.data).toEqual(testClientDto);
+    await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(testClientFlat);
+  });
+
+  it('Test sendCreate Fail', async () => {
+    appClientsApi.createAppClientUser = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendDelete Success', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    await expect(wrappedState.sendDelete(testClientFlat)).resolves.not.toThrow();
+  });
+
+  it('Test sendDelete Fail', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(wrappedState.sendDelete(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendDelete Fail - bad id', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    await expect(wrappedState.sendDelete({ ...testClientFlat, id: undefined })).rejects.toBeDefined();
+  });
+
+  it('Test sendDelete Success - delete from state', async () => {
+    appClientsApi.deleteAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+    });
+
+    wrappedState.state.set([testClientFlat]);
+
+    await expect(wrappedState.sendDelete(testClientFlat)).resolves.not.toThrow();
+  });
+
+  it('Test convertRowDataToEditableData', async () => {
+    await expect(wrappedState.convertRowDataToEditableData(testClientFlat)).resolves.toEqual(testClientFlat);
   });
 
   it('Test convertAppClientToFlat', () => {
-    const result = state.convertAppClientToFlat(testClientDto);
+    const result = wrappedState.convertToFlat(testClientDto);
     expect(result).toEqual(testClientFlat);
   });
 
-  it('Test convertToDto', async () => {
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
-    const result = state.convertToDto(testClientFlat);
+  it('Test convertToDto', () => {
+    const result = wrappedState.convertToDto(testClientFlat);
     expect(result).toEqual(testClientDto);
   });
 
   it('Test createAppPrivilegesArr', () => {
-    mockPrivilegesState()
-
-    const result = state.createAppPrivilegesArr(testClientFlat);
+    const result = wrappedState.createAppPrivilegesArr(testClientFlat);
     expect(result).toEqual(testClientPrivileges);
   });
 
+  it('Test Privilege not exist in state', async () => {
+    privilegeApi.getPrivileges = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: [],
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
+    await accessPrivilegeState().fetchAndStorePrivileges();
+
+    const result = wrappedState.createAppPrivileges(testClientFlat);
+    expect(result.size).toEqual(0);
+  });
+
+  it('Test No privilege user', () => {
+    const noPrivUser = {
+      ...testClientFlat,
+      read: false,
+      write: false
+    };
+    const result = wrappedState.createAppPrivileges(noPrivUser);
+    expect(result.size).toEqual(0);
+  });
 });

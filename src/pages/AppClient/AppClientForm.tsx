@@ -1,28 +1,24 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 import { useState } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
-import Button from "../../components/Button/Button";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
-import Fieldset from "../../components/forms/Fieldset/Fieldset";
 import Form from "../../components/forms/Form/Form";
-import Label from "../../components/forms/Label/Label";
 import TextInput from "../../components/forms/TextInput/TextInput";
-import './AppClientForm.scss';
-import { AppClientFormProps } from './AppClientFormProps';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
-import { AppClientFormActionType } from './AppClientFormActionType';
-import { Spinner } from 'react-bootstrap';
-import {useAppClientPageState} from './app-client-page-state';
+import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import FormGroup from '../../components/forms/FormGroup/FormGroup';
+import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 
-function AppClientForm(props: AppClientFormProps) {
-  const appClientPageState = useAppClientPageState();
+function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const formState = useState<AppClientFlat>({
-    id: props.client?.id,
-    name: props.client?.name || "",
-    read: props.client?.read || false,
-    write: props.client?.write || false,
+    id: props.data?.id,
+    name: props.data?.name || "",
+    read: props.data?.read || false,
+    write: props.data?.write || false,
   });
 
   formState.attach(Validation);
@@ -35,115 +31,94 @@ function AppClientForm(props: AppClientFormProps) {
     return Initial(formState.name).modified() || Initial(formState.read).modified() || Initial(formState.write).modified();
   }
 
-  function showNameValidation() {
-    return Touched(formState.name).touched() && Validation(formState.name).invalid()
-  }
-
   function isFormDisabled() {
-    return props.successAction.success;
+    return props.successAction?.success;
   }
 
-  function closeForm(event: React.SyntheticEvent) {
+  function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    appClientPageState.set( prevState => ({
-      isOpen: false,
-      formAction: undefined,
-      client: undefined
-    }));
+    props.onSubmit(formState.get());
   }
 
   return (
-    <>
-      {(props.client && props.type === AppClientFormActionType.UPDATE) || props.type === AppClientFormActionType.ADD ?
-        <Form className="client-form" onSubmit={(event) => props.onSubmit(event, formState.get())} data-testid="app-client-form">
-          <div className="client-name-container">
-            <Label className="client-name-container__label" htmlFor="name">Name</Label>
-            <TextInput
-              className="client-name-container__input"
-              id="name"
-              name="name"
-              type="text"
-              defaultValue={formState.name.get() || undefined}
-              placeholder="Enter Client App Name"
-              error={showNameValidation()}
-              onChange={(event) => formState.name.set(event.target.value)}
-              disabled={isFormDisabled()}
-            />
-            {showNameValidation() &&
-              Validation(formState.name).errors().map((error, idx) => {
-                return (
-                  <p key={idx} className="client-name-container__error validation-error">* {error.message}</p>
-                );
-              })
-            }
-            {props.errors?.validation?.name && <p className="client-name-container__error validation-error">* {props.errors?.validation?.name}</p>}
-          </div>
-
-          <Fieldset className="permissions-container">
-            <div className="permissions-container__title">
-              <Label className="client-name-container__label" htmlFor="permissions">Permissions</Label>
-            </div>
-
-            <div className="permissions-container__options">
-              <Checkbox className="options__read"
-                id="read"
-                name="read"
-                label={<>Read</>}
-                checked={formState.read.get()}
-                onChange={(event) => formState.read.set(event.target.checked)}
-                disabled={isFormDisabled()} />
-
-              <Checkbox className="options__write"
-                id="write"
-                name="write"
-                label={<>Write</>}
-                checked={formState.write.get()}
-                onChange={(event) => formState.write.set(event.target.checked)}
-                disabled={isFormDisabled()} />
-            </div>
-
-          </Fieldset>
-
-          {props.errors?.general && <p className="validation-error">* {props.errors?.general}</p>}
-          {
-            props.successAction.successMsg &&
-              <div className="client-form__success-container">
-                <p className="successful-operation">
-                  {props.successAction.successMsg}
-                </p>
-                <Button type="button" onClick={closeForm} className="success-container__close">Close</Button>
-              </div>
-          }
-
-          {!props.successAction.success &&
-            <div className="button-container">
-              <Button type="button" onClick={props.onCancel} unstyled>Cancel</Button>
-              <Button
-                type="submit"
-                className="button-container__submit"
-                disabled={Validation(formState).invalid() || !isFormModified() || props.isSubmitting}
-              >
-                {props.isSubmitting ?
-                  <Spinner animation="border" role="status" variant="primary">
-                    <span className="sr-only">Submitting...</span>
-                  </Spinner>
-                  :
-                  props.type === AppClientFormActionType.ADD ?
-                    <>Add</>
-                    :
-                  <>Update</>
-                }
-              </Button>
-          </div>
-          }
-        </Form>
-        :
-        <div data-testid="app-client-form__no-data">
-          <p>There was an error loading client details...</p>
-        </div>
+    <Form className="app-client-form" onSubmit={(event) => submitForm(event)} data-testid="app-client-form">
+      {props.formActionType === FormActionType.UPDATE &&
+        <FormGroup
+          labelName="uuid"
+          labelText="UUID"
+          isError={false}
+        >
+          <TextInput
+            id="uuid"
+            name="uuid"
+            type="text"
+            defaultValue={formState.id.get()}
+            disabled={true}
+          />
+        </FormGroup>
       }
-    </>
+
+      <FormGroup
+        labelName="name"
+        labelText="Name"
+        isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
+        errorMessages={Validation(formState.name).errors()
+          .map(validationError => validationError.message)}
+      >
+        <TextInput
+          id="name"
+          name="name"
+          type="text"
+          defaultValue={formState.name.get()}
+          error={Touched(formState.name).touched() && Validation(formState.name).invalid()}
+          onChange={(event) => formState.name.set(event.target.value)}
+          disabled={isFormDisabled()}
+        />
+      </FormGroup>
+
+      <FormGroup
+        labelName="permissions"
+        labelText="Permissions"
+      >
+        <Checkbox
+          id="read"
+          name="read"
+          label={<>Read</>}
+          checked={formState.read.get()}
+          onChange={(event) => formState.read.set(event.target.checked)}
+          disabled={isFormDisabled()}
+        />
+
+        <Checkbox
+          id="write"
+          name="write"
+          label={<>Write</>}
+          checked={formState.write.get()}
+          onChange={(event) => formState.write.set(event.target.checked)}
+          disabled={isFormDisabled()}
+        />
+      </FormGroup>
+
+      <SuccessErrorMessage
+        successMessage={props.successAction?.successMsg}
+        errorMessage={props.formErrors?.general || ''}
+        showErrorMessage={props.formErrors?.general != null}
+        showSuccessMessage={props.successAction != null && props.successAction?.success}
+        showCloseButton={true}
+        onCloseClicked={props.onClose}
+      />
+      {
+        props.successAction == null &&
+        <SubmitActions
+          formActionType={props.formActionType}
+          onCancel={props.onClose}
+          onSubmit={submitForm}
+          isFormValid={Validation(formState).valid()}
+          isFormModified={isFormModified()}
+          isFormSubmitting={props.isSubmitting}
+        />
+      }
+    </Form>
   );
 }
 

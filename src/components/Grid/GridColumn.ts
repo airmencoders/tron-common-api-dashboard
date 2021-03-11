@@ -8,7 +8,8 @@ export default class GridColumn {
       private _filter: boolean,
       private _headerName: string = '',
       private _headerClass: string = '',
-      private _cellRenderer: React.ReactNode = undefined
+      private _cellRenderer: React.ReactNode = undefined,
+      private _cellRendererParams: any = undefined
   ) { }
 
   get field(): string {
@@ -33,5 +34,9 @@ export default class GridColumn {
 
   get cellRenderer(): React.ReactNode {
     return this._cellRenderer;
+  }
+
+  get cellRendererParams(): any {
+    return this._cellRendererParams;
   }
 }

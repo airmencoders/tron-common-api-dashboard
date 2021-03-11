@@ -80,6 +80,49 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
+         * Deletes an existing App Client
+         * @summary Deletes an App Client
+         * @param {string} id App Client ID to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAppClient: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteAppClient.');
+            }
+            const localVarPath = `/v1/app-client/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves application client user information
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
@@ -197,6 +240,20 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
+         * Deletes an existing App Client
+         * @summary Deletes an App Client
+         * @param {string} id App Client ID to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteAppClient(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientUserDto>> {
+            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).deleteAppClient(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves application client user information
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
@@ -244,6 +301,16 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
             return AppClientControllerApiFp(configuration).createAppClientUser(appClientUserDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Deletes an existing App Client
+         * @summary Deletes an App Client
+         * @param {string} id App Client ID to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAppClient(id: string, options?: any): AxiosPromise<AppClientUserDto> {
+            return AppClientControllerApiFp(configuration).deleteAppClient(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves application client user information
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
@@ -281,6 +348,16 @@ export interface AppClientControllerApiInterface {
      * @memberof AppClientControllerApiInterface
      */
     createAppClientUser(appClientUserDto: AppClientUserDto, options?: any): AxiosPromise<AppClientUserDto>;
+
+    /**
+     * Deletes an existing App Client
+     * @summary Deletes an App Client
+     * @param {string} id App Client ID to delete
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApiInterface
+     */
+    deleteAppClient(id: string, options?: any): AxiosPromise<AppClientUserDto>;
 
     /**
      * Retrieves application client user information
@@ -321,6 +398,18 @@ export class AppClientControllerApi extends BaseAPI implements AppClientControll
      */
     public createAppClientUser(appClientUserDto: AppClientUserDto, options?: any) {
         return AppClientControllerApiFp(this.configuration).createAppClientUser(appClientUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Deletes an existing App Client
+     * @summary Deletes an App Client
+     * @param {string} id App Client ID to delete
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApi
+     */
+    public deleteAppClient(id: string, options?: any) {
+        return AppClientControllerApiFp(this.configuration).deleteAppClient(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
