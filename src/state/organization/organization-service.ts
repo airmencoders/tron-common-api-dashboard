@@ -77,11 +77,17 @@ export default class OrganizationService implements DataService<OrganizationDto,
    * Patch updates an org's leader by UUID
    * @param orgId org UUID to patch
    * @param id UUID of the person to make the leader
-   * @returns 
+   * @returns transaction response or the error it raised
    */
-  // async updateLeader(orgId: string, id: string): Promise<any> {
-
-  // }
+  async updateLeader(orgId: string, id: string): Promise<any> {
+    try {
+      const orgResponse = await this.orgApi.patchOrganization(orgId, { leader: id });
+      return orgResponse.data;
+    }
+    catch (error) {
+      return error;
+    }
+  }
 
   get isPromised(): boolean {
     return this.state.promised;

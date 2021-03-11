@@ -1,28 +1,27 @@
-import React, {ChangeEvent, FormEvent, useEffect} from 'react';
+import { createState, useState } from '@hookstate/core';
+import { Initial } from '@hookstate/initial';
+import { Touched } from '@hookstate/touched';
+import { Validation } from '@hookstate/validation';
+import { RowClickedEvent } from 'ag-grid-community';
+import React, { ChangeEvent, FormEvent, useEffect } from 'react';
+import Button from '../../components/Button/Button';
+import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import TextInput from '../../components/forms/TextInput/TextInput';
 import Select from '../../components/forms/Select/Select';
-import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import {OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto} from '../../openapi/models';
-import {createState, useState} from '@hookstate/core';
-import {Validation} from '@hookstate/validation';
-import {Touched} from '@hookstate/touched';
-import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
-import {useOrganizationState} from '../../state/organization/organization-state';
-import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
-import {Initial} from '@hookstate/initial';
-import { FormActionType } from '../../state/crud-page/form-action-type';
+import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import TextInput from '../../components/forms/TextInput/TextInput';
 import Grid from '../../components/Grid/Grid';
-import {GridRowData} from '../../components/Grid/grid-row-data';
 import GridColumn from '../../components/Grid/GridColumn';
-import Button from '../../components/Button/Button';
-import Modal from '../../components/Modal/Modal';
-
-import {usePersonState} from '../../state/person/person-state';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
-import { RowClickedEvent } from 'ag-grid-community';
+import Modal from '../../components/Modal/Modal';
+import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../openapi/models';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { useOrganizationState } from '../../state/organization/organization-state';
+import { usePersonState } from '../../state/person/person-state';
+import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
+
 
 export interface PersonWithDetails {
   id?: string,
@@ -162,13 +161,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   }
 
   // user chose OK to close the chooser dialog
-  const chooserDialogConfirmed = () => {
+  const chooserDialogConfirmed = async () => {
     
     // validate we have some kind of data to PATCH against the org
     if (chooserChosenRow.get() !== undefined) {
       switch (orgEditType.get()) {
         case OrgEditOpType.LEADER_EDIT:
-          
+          const orgResponse = await orgState.updateLeader(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);
+          formState.set(orgResponse);
+          orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+          break;
+        case OrgEditOpType.MEMBERS_EDIT:
+
           break;
         default:
           break;
@@ -180,7 +184,6 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   
   return (
       <div className="organization-edit-form">
-        {console.log(orgDetails.get())}
         <Form onSubmit={submitForm}>
           <FormGroup labelName="orgName" labelText="Organization Name"
                      isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
