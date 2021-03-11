@@ -246,7 +246,7 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteAppClient(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async deleteAppClient(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientUserDto>> {
             const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).deleteAppClient(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -307,7 +307,7 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteAppClient(id: string, options?: any): AxiosPromise<void> {
+        deleteAppClient(id: string, options?: any): AxiosPromise<AppClientUserDto> {
             return AppClientControllerApiFp(configuration).deleteAppClient(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -357,7 +357,7 @@ export interface AppClientControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppClientControllerApiInterface
      */
-    deleteAppClient(id: string, options?: any): AxiosPromise<void>;
+    deleteAppClient(id: string, options?: any): AxiosPromise<AppClientUserDto>;
 
     /**
      * Retrieves application client user information
