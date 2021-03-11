@@ -7,4 +7,6 @@ export interface GridProps {
   onRowClicked?: (event: RowClickedEvent) => void;
   rowClass?: string | string[];
   height?: string;
+  quickFilterText?: string;
+  rowSelection?: string;
 }

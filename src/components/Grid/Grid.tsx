@@ -28,6 +28,8 @@ function Grid(props: GridProps) {
               onGridReady={gridReady}
               onRowClicked={props.onRowClicked}
               rowClass={props.rowClass}
+              quickFilterText={props.quickFilterText || ''}
+              rowSelection={props.rowSelection || 'none'}
           >
             {
               props.columns.map(col => (

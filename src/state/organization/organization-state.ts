@@ -10,8 +10,9 @@ const organizationApi: OrganizationControllerApiInterface = new OrganizationCont
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
-export const wrapState = (state: State<OrganizationDto[]>, orgApi: OrganizationControllerApiInterface) => {
-  return new OrganizationService(state, orgApi);
+export const wrapState = (state: State<OrganizationDto[]>, 
+  orgApi: OrganizationControllerApiInterface) => {
+    return new OrganizationService(state, orgApi);
 }
 
 export const useOrganizationState = () => wrapState(useState(organizationState), organizationApi);

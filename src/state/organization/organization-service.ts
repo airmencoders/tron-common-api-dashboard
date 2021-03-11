@@ -5,16 +5,29 @@ import {OrganizationControllerApiInterface} from '../../openapi';
 
 export default class OrganizationService implements DataService<OrganizationDto, OrganizationDto> {
 
-  constructor(public state: State<OrganizationDto[]>, private orgApi: OrganizationControllerApiInterface) {
+  constructor(
+    public state: State<OrganizationDto[]>, 
+    private orgApi: OrganizationControllerApiInterface) {
   }
 
   async fetchAndStoreData(): Promise<OrganizationDto[]> {
-    const orgResponsePromise = this.orgApi.getOrganizations()
-        .then(resp => {
-          return resp.data;
-        });
-    this.state.set(orgResponsePromise);
-    return Promise.resolve(orgResponsePromise);
+    try {
+      const orgDataResponse = await this.orgApi.getOrganizations();
+      const orgData = orgDataResponse.data;
+      const mappedData = orgData.map((org) => {
+
+        // undef the collection-type fields because of the ag-grid bug
+        //  with hookState and collections (we're not displaying them anyways)
+        org.members = undefined;
+        org.subordinateOrganizations = undefined;
+        return org;
+      });
+      this.state.set(mappedData);      
+      return Promise.resolve(orgData);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
@@ -44,6 +57,31 @@ export default class OrganizationService implements DataService<OrganizationDto,
     }
   }
 
+  /**
+   * Gets organization by id and requests that the people/org type fields be further
+   * resolved to readable information via the query parameters
+   * @param id org UUID to fetch
+   * @returns a JSON structure with requested fields (hence, the <any> return)
+   */
+  async getOrgDetails(id: string): Promise<any> {
+    try {
+      const orgResponse = await this.orgApi.getOrganization(id, false, "id,firstName,lastName", "id,name");
+      return orgResponse.data;
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
+   * Patch updates an org's leader by UUID
+   * @param orgId org UUID to patch
+   * @param id UUID of the person to make the leader
+   * @returns 
+   */
+  // async updateLeader(orgId: string, id: string): Promise<any> {
+
+  // }
 
   get isPromised(): boolean {
     return this.state.promised;
