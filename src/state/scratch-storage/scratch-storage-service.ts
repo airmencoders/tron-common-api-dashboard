@@ -12,7 +12,11 @@ export default class ScratchStorageService implements DataService<ScratchStorage
         .then(resp => {
           return resp.data;
         });
-    this.state.set(scratchStorageResponsePromise);
+    const mappedData = scratchStorageResponsePromise.map((scratch) => {
+      scratch.userPrivs = undefined;
+      return scratch;
+    });
+    this.state.set(mappedData);
     return scratchStorageResponsePromise;
   }
 
