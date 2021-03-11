@@ -13,6 +13,7 @@ import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud
 import { State } from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
+import './DataCrudFormPage.scss';
 import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
 import GridColumn from '../Grid/GridColumn';
 import Modal from '../Modal/Modal';
@@ -210,8 +211,8 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                     <>
                       {
                         props.allowEdit &&
-                        <div className="add-app-client">
-                          <Button type="button" className="add-app-client__btn" onClick={onAddEntityClick}>
+                        <div className="add-data-container">
+                          <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
                             Add { props.dataTypeName }
                           </Button>
                         </div>

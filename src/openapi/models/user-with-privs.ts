@@ -35,10 +35,10 @@ export interface UserWithPrivs {
     emailAddress?: string;
     /**
      * 
-     * @type {Set<PrivilegeIdPair>}
+     * @type {Array<PrivilegeIdPair>}
      * @memberof UserWithPrivs
      */
-    privs?: Set<PrivilegeIdPair>;
+    privs?: Array<PrivilegeIdPair>;
 }
 
 

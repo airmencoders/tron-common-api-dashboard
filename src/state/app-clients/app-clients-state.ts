@@ -14,5 +14,4 @@ export const wrapState = (state: State<AppClientFlat[]>, appClientsApi: AppClien
   return new AppClientsService(state, appClientsApi);
 };
 
-export const accessAppClientsState = () => wrapState(appClientsState, appClientsApi);
 export const useAppClientsState = () => wrapState(useState(appClientsState), appClientsApi);

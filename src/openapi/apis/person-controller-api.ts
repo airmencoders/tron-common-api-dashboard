@@ -189,10 +189,12 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * Retrieves a person by ID
          * @summary Retrieves a person by ID
          * @param {string} id Person ID to retrieve
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPerson: async (id: string, options: any = {}): Promise<RequestArgs> => {
+        getPerson: async (id: string, memberships?: boolean, leaderships?: boolean, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getPerson.');
@@ -209,6 +211,14 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (memberships !== undefined) {
+                localVarQueryParameter['memberships'] = memberships;
+            }
+
+            if (leaderships !== undefined) {
+                localVarQueryParameter['leaderships'] = leaderships;
+            }
 
 
     
@@ -233,10 +243,12 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * @summary Retrieves all persons
          * @param {number} [page] Page of content to retrieve
          * @param {number} [limit] Size of each page
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPersons: async (page?: number, limit?: number, options: any = {}): Promise<RequestArgs> => {
+        getPersons: async (page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -255,6 +267,14 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (memberships !== undefined) {
+                localVarQueryParameter['memberships'] = memberships;
+            }
+
+            if (leaderships !== undefined) {
+                localVarQueryParameter['leaderships'] = leaderships;
             }
 
 
@@ -387,11 +407,13 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * Retrieves a person by ID
          * @summary Retrieves a person by ID
          * @param {string} id Person ID to retrieve
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPerson(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPerson(id, options);
+        async getPerson(id: string, memberships?: boolean, leaderships?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPerson(id, memberships, leaderships, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -402,11 +424,13 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * @summary Retrieves all persons
          * @param {number} [page] Page of content to retrieve
          * @param {number} [limit] Size of each page
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPersons(page?: number, limit?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonDto>>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPersons(page, limit, options);
+        async getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonDto>>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPersons(page, limit, memberships, leaderships, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -470,22 +494,26 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          * Retrieves a person by ID
          * @summary Retrieves a person by ID
          * @param {string} id Person ID to retrieve
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPerson(id: string, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).getPerson(id, options).then((request) => request(axios, basePath));
+        getPerson(id: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).getPerson(id, memberships, leaderships, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves all persons
          * @summary Retrieves all persons
          * @param {number} [page] Page of content to retrieve
          * @param {number} [limit] Size of each page
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPersons(page?: number, limit?: number, options?: any): AxiosPromise<Array<PersonDto>> {
-            return PersonControllerApiFp(configuration).getPersons(page, limit, options).then((request) => request(axios, basePath));
+        getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<Array<PersonDto>> {
+            return PersonControllerApiFp(configuration).getPersons(page, limit, memberships, leaderships, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates an existing person
@@ -541,22 +569,26 @@ export interface PersonControllerApiInterface {
      * Retrieves a person by ID
      * @summary Retrieves a person by ID
      * @param {string} id Person ID to retrieve
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    getPerson(id: string, options?: any): AxiosPromise<PersonDto>;
+    getPerson(id: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Retrieves all persons
      * @summary Retrieves all persons
      * @param {number} [page] Page of content to retrieve
      * @param {number} [limit] Size of each page
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    getPersons(page?: number, limit?: number, options?: any): AxiosPromise<Array<PersonDto>>;
+    getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<Array<PersonDto>>;
 
     /**
      * Updates an existing person
@@ -618,12 +650,14 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      * Retrieves a person by ID
      * @summary Retrieves a person by ID
      * @param {string} id Person ID to retrieve
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public getPerson(id: string, options?: any) {
-        return PersonControllerApiFp(this.configuration).getPerson(id, options).then((request) => request(this.axios, this.basePath));
+    public getPerson(id: string, memberships?: boolean, leaderships?: boolean, options?: any) {
+        return PersonControllerApiFp(this.configuration).getPerson(id, memberships, leaderships, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -631,12 +665,14 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      * @summary Retrieves all persons
      * @param {number} [page] Page of content to retrieve
      * @param {number} [limit] Size of each page
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public getPersons(page?: number, limit?: number, options?: any) {
-        return PersonControllerApiFp(this.configuration).getPersons(page, limit, options).then((request) => request(this.axios, this.basePath));
+    public getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any) {
+        return PersonControllerApiFp(this.configuration).getPersons(page, limit, memberships, leaderships, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
