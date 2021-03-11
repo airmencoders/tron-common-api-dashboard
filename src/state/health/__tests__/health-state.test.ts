@@ -35,6 +35,10 @@ describe('Test HealthState', () => {
     state = wrapState(healthState, healthApi);
   });
 
+  afterEach(() => {
+    healthState.destroy();
+  })
+
   it('fetchAndStore', async () => {
     state.fetchAndStoreHealthStatus = jest.fn(() => {
       healthState.set(response);
