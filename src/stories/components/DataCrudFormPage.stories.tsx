@@ -113,6 +113,10 @@ class MockDataService implements DataService<MockRow, MockDto> {
     });
   }
 
+  sendDelete(toDelete: MockDto): Promise<void> {
+    return Promise.resolve();
+  }
+
   convertRowDataToEditableData(rowData: MockRow): Promise<MockDto> {
     const dataIndex = mockData.findIndex((data) => data.id === rowData.id);
     return Promise.resolve(mockData[dataIndex]);

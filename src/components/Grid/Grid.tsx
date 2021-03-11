@@ -26,6 +26,7 @@ function Grid(props: GridProps) {
           <AgGridReact
               rowData={props.data}
               onGridReady={gridReady}
+              domLayout={"autoHeight"}
               onRowClicked={props.onRowClicked}
               rowClass={props.rowClass}
               quickFilterText={props.quickFilterText || ''}
@@ -41,6 +42,7 @@ function Grid(props: GridProps) {
                     filter={col.filter}
                     headerClass={col.headerClass}
                     cellRendererFramework={col.cellRenderer}
+                    cellRendererParams={col.cellRendererParams}
                 />
               ))
             }

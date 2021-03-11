@@ -12,7 +12,7 @@ function ModalFooterSubmit(props: ModalFooterSubmitProps) {
                   onClick={props.onCancel}>
             Cancel
           </Button>
-          <Button type="submit" onClick={props.onSubmit}>
+          <Button type="submit" onClick={props.onSubmit} disabled={props.disableSubmit}>
             Submit
           </Button>
         </div>

@@ -9,6 +9,7 @@ export * from './coast-guardsman';
 export * from './dashboard-user-dto';
 export * from './exception-response';
 export * from './flight';
+export * from './flight-all-of';
 export * from './group';
 export * from './invalid-scratch-space-permissions';
 export * from './logfile-dto';

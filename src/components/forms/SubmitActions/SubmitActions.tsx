@@ -21,10 +21,8 @@ function SubmitActions(props: SubmitActionsProps) {
                 <span className="sr-only">Submitting...</span>
               </Spinner>
               :
-              props.formActionType === FormActionType.ADD ?
-                  <>Add</>
-                  :
-                  <>Update</>
+              props.formActionType === FormActionType.ADD && <>Add</> ||
+              props.formActionType === FormActionType.UPDATE && <>Update</>
           }
         </Button>
       </div>

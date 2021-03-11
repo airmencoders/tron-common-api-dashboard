@@ -26,6 +26,7 @@ function Modal(props: ModalProps) {
                         borderRadius: '6px'
                       },
                     }}
+                    className="modal-component__react-modal"
         >
           <div className="modal-component__container">
             <div className="modal-component__header">
