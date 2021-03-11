@@ -22,7 +22,7 @@ function ScratchStoragePage() {
           updateForm={ScratchStorageEditForm}
           useDataState={useScratchStorageState}
           usePageState={useCrudPageState}
-          allowEdit={true}
+          allowEdit={false}
       />
   );
 }
