@@ -98,6 +98,18 @@ export interface PersonDto {
      * @memberof PersonDto
      */
     dutyTitle?: string;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof PersonDto
+     */
+    organizationMemberships?: Set<string>;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof PersonDto
+     */
+    organizationLeaderships?: Set<string>;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { State } from "@hookstate/core";
+import { none, State } from "@hookstate/core";
 import { AppClientFlat } from "./interface/app-client-flat";
 import { ClientPrivilege } from "./interface/app-client-privilege";
 import { PrivilegeType } from "./interface/privilege-type";
@@ -7,34 +7,94 @@ import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
 import { AxiosPromise } from "axios";
 import { Privilege, PrivilegeDto } from "../../openapi/models";
 import { accessPrivilegeState } from "../privilege/privilege-state";
+import { DataService } from "../data-service/data-service";
 
-export default class AppClientsService {
-  constructor(private state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
+export default class AppClientsService implements DataService<AppClientFlat, AppClientFlat> {
+  constructor(public state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
 
-  fetchAndStoreAppClients(): Promise<AppClientFlat[]> {
+  fetchAndStoreData(): Promise<AppClientFlat[]> {
     const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
+    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
 
-    const data = new Promise<AppClientFlat[]>((resolve) => resolve(response().then(r => this.convertAppClientsToFlat(r.data))));
+    const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
+      try {
+        await privilegeResponse();
+        const result = await response();
+
+        resolve(this.convertAppClientsToFlat(result.data));
+      } catch (err) {
+        reject(err);
+      }
+    });
+
     this.state.set(data);
 
     return data;
   }
 
-  sendUpdatedAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
-    return this.appClientsApi.updateAppClient(client.id || "", client);
+  async sendCreate(toCreate: AppClientFlat): Promise<AppClientFlat> {
+    try {
+      const appClientDto = this.convertToDto(toCreate);
+      const createdResponse = await this.appClientsApi.createAppClientUser(appClientDto);
+      const createdAppClientFlat = this.convertToFlat(createdResponse.data);
+
+      this.state[this.state.length].set(createdAppClientFlat);
+
+      return Promise.resolve(createdAppClientFlat);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
   }
 
-  sendCreateAppClient(client: AppClientUserDto): AxiosPromise<AppClientUserDto> {
-    return this.appClientsApi.createAppClientUser(client);
+  async sendUpdate(toUpdate: AppClientFlat): Promise<AppClientFlat> {
+    try {
+      if (toUpdate?.id == null) {
+        return Promise.reject(new Error('App Client to update has undefined id.'));
+      }
+      const appClientDto = this.convertToDto(toUpdate);
+      const updatedResponse = await this.appClientsApi.updateAppClient(toUpdate.id, appClientDto);
+      const updatedAppClientFlat = this.convertToFlat(updatedResponse.data);
+
+      const index = this.state.get().findIndex(item => item.id === updatedAppClientFlat.id);
+      this.state[index].set(updatedAppClientFlat);
+
+      return Promise.resolve(updatedAppClientFlat);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async sendDelete(toDelete: AppClientFlat): Promise<void> {
+    try {
+      if (toDelete?.id == null) {
+        return Promise.reject('App Client to delete has undefined id.');
+      }
+
+      await this.appClientsApi.deleteAppClient(toDelete.id);
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
+    return Promise.resolve(Object.assign({}, rowData));
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
     return clients.map(client => {
-      return this.convertAppClientToFlat(client);
+      return this.convertToFlat(client);
     });
   }
 
-  convertAppClientToFlat(client: AppClientUserDto): AppClientFlat {
+  convertToFlat(client: AppClientUserDto): AppClientFlat {
     const { id, name } = client;
 
     const privilegeArr = Array.from(client.privileges || []);
@@ -85,16 +145,16 @@ export default class AppClientsService {
     return privileges;
   }
 
-  get privileges(): PrivilegeDto[] | undefined {
-    return accessPrivilegeState().privileges?.get();
+  private isStateReady(): boolean {
+    return !this.error && !this.isPromised;
   }
 
   get isPromised(): boolean {
     return this.state.promised;
   }
 
-  get appClients(): State<AppClientFlat[]> | undefined {
-    return this.state.promised ? undefined : this.state;
+  get appClients(): AppClientFlat[] {
+    return !this.isStateReady() ? new Array<AppClientFlat>() : this.state.get();
   }
 
   get error(): string | undefined {

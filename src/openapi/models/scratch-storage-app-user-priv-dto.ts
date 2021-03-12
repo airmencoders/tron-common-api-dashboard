@@ -31,7 +31,7 @@ export interface ScratchStorageAppUserPrivDto {
      * @type {string}
      * @memberof ScratchStorageAppUserPrivDto
      */
-    userId: string;
+    email: string;
     /**
      * 
      * @type {number}

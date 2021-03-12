@@ -12,5 +12,6 @@ export interface DataService<T, R> {
   fetchAndStoreData(): Promise<T[]>;
   sendUpdate(toUpdate: R): Promise<T>;
   sendCreate(toCreate: R): Promise<T>;
+  sendDelete(toDelete: R): Promise<void>;
   convertRowDataToEditableData(rowData: T): Promise<R>;
 }

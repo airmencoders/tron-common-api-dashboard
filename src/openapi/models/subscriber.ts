@@ -45,12 +45,14 @@ export interface Subscriber {
     * @enum {string}
     */
 export enum SubscriberSubscribedEventEnum {
-    PersonCreate = 'PERSON_CREATE',
     PersonChange = 'PERSON_CHANGE',
     PersonDelete = 'PERSON_DELETE',
-    OrganizationCreate = 'ORGANIZATION_CREATE',
     OrganizationChange = 'ORGANIZATION_CHANGE',
-    OrganizationDelete = 'ORGANIZATION_DELETE'
+    OrganizationDelete = 'ORGANIZATION_DELETE',
+    PersonOrgAdd = 'PERSON_ORG_ADD',
+    PersonOrgRemove = 'PERSON_ORG_REMOVE',
+    SubOrgAdd = 'SUB_ORG_ADD',
+    SubOrgRemove = 'SUB_ORG_REMOVE'
 }
 
 

@@ -4,12 +4,13 @@ import {DataCrudFormErrors} from '../../components/DataCrudFormPage/data-crud-fo
 import {DataCrudSuccessAction} from '../../components/DataCrudFormPage/data-crud-success-action';
 
 export interface CrudPageState<T> {
-  isOpen: boolean,
-  formAction?: FormActionType,
-  selected?: T,
-  formErrors?: DataCrudFormErrors,
+  isOpen: boolean;
+  formAction?: FormActionType;
+  selected?: T
+  formErrors?: DataCrudFormErrors;
   successAction?: DataCrudSuccessAction;
-  isSubmitting: boolean
+  isSubmitting: boolean;
+  isDeleteConfirmationOpen: boolean;
 }
 
 export const getInitialCrudPageState = () => ({
@@ -17,7 +18,9 @@ export const getInitialCrudPageState = () => ({
   formAction: undefined,
   selected: undefined,
   formErrors: undefined,
-  isSubmitting: false
+  successAction: undefined,
+  isSubmitting: false,
+  isDeleteConfirmationOpen: false
 });
 
 

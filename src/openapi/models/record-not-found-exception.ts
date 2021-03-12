@@ -13,9 +13,9 @@
  */
 
 
-import { BadRequestExceptionCause } from './bad-request-exception-cause';
-import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
-import { BadRequestExceptionCauseSuppressed } from './bad-request-exception-cause-suppressed';
+import { ResourceAlreadyExistsExceptionCause } from './resource-already-exists-exception-cause';
+import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
+import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-already-exists-exception-cause-suppressed';
 
 /**
  * 
@@ -25,16 +25,16 @@ import { BadRequestExceptionCauseSuppressed } from './bad-request-exception-caus
 export interface RecordNotFoundException {
     /**
      * 
-     * @type {BadRequestExceptionCause}
+     * @type {ResourceAlreadyExistsExceptionCause}
      * @memberof RecordNotFoundException
      */
-    cause?: BadRequestExceptionCause;
+    cause?: ResourceAlreadyExistsExceptionCause;
     /**
      * 
-     * @type {Array<BadRequestExceptionCauseStackTrace>}
+     * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
      * @memberof RecordNotFoundException
      */
-    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
+    stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
@@ -43,10 +43,10 @@ export interface RecordNotFoundException {
     message?: string;
     /**
      * 
-     * @type {Array<BadRequestExceptionCauseSuppressed>}
+     * @type {Array<ResourceAlreadyExistsExceptionCauseSuppressed>}
      * @memberof RecordNotFoundException
      */
-    suppressed?: Array<BadRequestExceptionCauseSuppressed>;
+    suppressed?: Array<ResourceAlreadyExistsExceptionCauseSuppressed>;
     /**
      * 
      * @type {string}

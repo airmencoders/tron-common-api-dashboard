@@ -13,13 +13,14 @@
  */
 
 
+import { FlightAllOf } from './flight-all-of';
 import { OrganizationDto } from './organization-dto';
 
 /**
  * @type Flight
  * @export
  */
-export type Flight = OrganizationDto;
+export type Flight = FlightAllOf & OrganizationDto;
 
 
 

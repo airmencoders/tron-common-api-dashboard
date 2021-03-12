@@ -5,6 +5,7 @@ import { PrivilegeType } from "./state/app-clients/interface/privilege-type";
 import OrganizationPage from './pages/Organization/OrganizationPage';
 import LogfilePage from "./pages/Logfile/LogfilePage";
 import DashboardUserPage from "./pages/DashboardUser/DashboardUserPage";
+import ScratchStoragePage from "./pages/ScratchStorage/ScratchStoragePage";
 
 export interface RouteItem {
     path: string,
@@ -20,7 +21,8 @@ export enum RoutePath {
     APP_CLIENT = '/app-clients',
     ORGANIZATION = '/organization',
     LOGFILE = '/logfile',
-    DASHBOARD_USER = '/dashboard-user'
+    DASHBOARD_USER = '/dashboard-user',
+    SCRATCH_STORAGE = '/scratch-storage'
 }
 
 export const routes: RouteItem[] = [
@@ -46,6 +48,12 @@ export const routes: RouteItem[] = [
         path: RoutePath.APP_CLIENT,
         name: 'App Clients',
         component: AppClientPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+    },
+    {
+        path: RoutePath.SCRATCH_STORAGE,
+        name: 'Scratch Storage Apps',
+        component: ScratchStoragePage,
         requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {

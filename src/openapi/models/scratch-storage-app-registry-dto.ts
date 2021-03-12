@@ -35,10 +35,10 @@ export interface ScratchStorageAppRegistryDto {
     appName: string;
     /**
      * 
-     * @type {Set<UserWithPrivs>}
+     * @type {Array<UserWithPrivs>}
      * @memberof ScratchStorageAppRegistryDto
      */
-    userPrivs?: Set<UserWithPrivs>;
+    userPrivs?: Array<UserWithPrivs>;
 }
 
 
