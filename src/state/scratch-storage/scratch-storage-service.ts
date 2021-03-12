@@ -1,5 +1,5 @@
 import {DataService} from '../data-service/data-service';
-import {State} from '@hookstate/core';
+import {none, State} from '@hookstate/core';
 import {ScratchStorageAppRegistryDto, ScratchStorageControllerApiInterface} from '../../openapi';
 
 export default class ScratchStorageService implements DataService<ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDto> {
@@ -32,7 +32,21 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   }
 
   async sendDelete(toDelete: ScratchStorageAppRegistryDto): Promise<void> {
-    return Promise.resolve();
+    try {
+      if (toDelete?.id == null) {
+        return Promise.reject('App Client to delete has undefined id.');
+      }
+
+      await this.scratchStorageApi.deleteExistingAppEntry(toDelete.id);
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   get isPromised(): boolean {

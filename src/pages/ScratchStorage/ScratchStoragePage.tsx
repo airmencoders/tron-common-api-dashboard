@@ -4,6 +4,7 @@ import GridColumn from '../../components/Grid/GridColumn';
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
 import {useCrudPageState} from '../../state/crud-page/crud-page-state';
 import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
+import ScratchStorageDelete from './ScratchStorageDelete';
 import ScratchStorageEditForm from './ScratchStorageEditForm';
 
 const columns: GridColumn[] =
@@ -22,7 +23,9 @@ function ScratchStoragePage() {
           updateForm={ScratchStorageEditForm}
           useDataState={useScratchStorageState}
           usePageState={useCrudPageState}
-          allowEdit={false}
+          allowEdit={true}
+          allowDelete
+          deleteComponent={ScratchStorageDelete}
       />
   );
 }
