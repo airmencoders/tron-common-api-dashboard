@@ -25,7 +25,6 @@ function ItemChooser(props: ChooserProps) {
             <Grid
                 quickFilterText={filterState.get()}
                 height='300px'
-                data-testid='chooser-list'
                 data={props.items || []}
                 columns={props.columns}
                 rowClass='ag-grid--row-pointer'

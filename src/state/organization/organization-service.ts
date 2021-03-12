@@ -44,12 +44,24 @@ export default class OrganizationService implements DataService<OrganizationDto,
     }
   }
 
+  /**
+   * Update non-collections fields - we can't just PUT over the old organization
+   * since we can't send collection of UUIDs for those fields so that leaves really just
+   * name, branch, and type
+   * @param toUpdate
+   */
   async sendUpdate(toUpdate: OrganizationDto): Promise<OrganizationDto> {
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Organization to update has undefined id.'));
       }
-      const orgResponse = await this.orgApi.updateOrganization(toUpdate.id, toUpdate);
+
+      let orgFeatures = {};
+      if (toUpdate.name) { orgFeatures = {...orgFeatures, name: toUpdate.name }; }
+      if (toUpdate.orgType) { orgFeatures = {...orgFeatures, orgType: toUpdate.orgType }; }
+      if (toUpdate.branchType) { orgFeatures = {...orgFeatures, branchType: toUpdate.branchType }; }
+
+      const orgResponse = await this.orgApi.patchOrganization(toUpdate.id, orgFeatures);
       return Promise.resolve(orgResponse.data);
     }
     catch (error) {
@@ -88,6 +100,21 @@ export default class OrganizationService implements DataService<OrganizationDto,
       return error;
     }
   }
+
+  /**
+   * Removes organization leader to no one
+   * @param orgId org id to update
+   * @returns transaction response or the error it raised
+   */
+    async removeLeader(orgId: string): Promise<any> {
+      try {  
+          const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
+          return orgResponse.data;
+      }
+      catch (error) {
+        return error;
+      }
+    }
 
   /**
    * Patch updates an org's members with an additional person

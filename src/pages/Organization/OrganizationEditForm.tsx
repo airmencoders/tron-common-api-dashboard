@@ -1,4 +1,4 @@
-import { createState, useState } from '@hookstate/core';
+import { createState, none, useState } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
@@ -189,9 +189,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
 
   // invoked from clicking `Remove` on the org's leader entry
   const onClearOrgLeader = async () => {
-      const orgResponse = await orgState.updateLeader(orgDetails.get().id || '', 'null');  
-      formState.set(orgResponse);
-      orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+    const orgResponse = await orgState.removeLeader(orgDetails.get().id || '');
+    formState.set(orgResponse);
+    orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
   }
 
   // invoked from clicking `Add` button for Subordinate Orgs
@@ -312,7 +312,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               <>
                 <FormGroup labelName="leaderName" labelText="Leader">
                   <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <TextInput id="leaderName" name="leader" type="text"
+                    <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
                       defaultValue={resolveLeaderName()}
                       value={resolveLeaderName()}
                       disabled={true}
@@ -320,7 +320,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button data-testid='change-org-leader__btn' unstyled type="button" onClick={onEditLeaderClick}>
                       Change
                     </Button>
-                    <Button data-testid='change-org-leader__btn' unstyled type="button" onClick={onClearOrgLeader}>
+                    <Button data-testid='remove-org-leader__btn' unstyled type="button" onClick={onClearOrgLeader}>
                       Remove
                     </Button>
                   </div>

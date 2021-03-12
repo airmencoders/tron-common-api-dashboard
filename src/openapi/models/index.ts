@@ -20,6 +20,7 @@ export * from './person-dto';
 export * from './privilege';
 export * from './privilege-dto';
 export * from './privilege-id-pair';
+export * from './pub-sub-ledger';
 export * from './rank';
 export * from './record-not-found-exception';
 export * from './resource-already-exists-exception';

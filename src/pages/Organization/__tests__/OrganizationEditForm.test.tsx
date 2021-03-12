@@ -2,16 +2,50 @@ import {render, waitFor, fireEvent} from '@testing-library/react';
 import OrganizationEditForm from '../OrganizationEditForm';
 import {OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum} from '../../../openapi/models';
 import {FormActionType} from '../../../state/crud-page/form-action-type';
+import {setupServer} from "msw/node";
+import {rest} from "msw";
 
 
+const existingOrg = {
+    id: 'some id',
+    members: [ { id: 'some id', firstName: 'jon', lastName: 'public' }],
+    subordinateOrganizations: [ { id: 'some id', name: 'some org '}],
+    leader: { id: 'some id', firstName: 'Frank', lastName: 'Summers' },
+    branchType: 'USAF',
+    orgType: 'SQUADRON'
+};
+
+const server = setupServer(
+    rest.get('/api/v1/organization/:id',
+        (req, res, ctx) => {
+      return res(ctx.json(existingOrg))}),
+    rest.get('/api/v1/person', (req, res, ctx) => {
+      return res(ctx.json([{}]))
+    }),
+    rest.get('/api/v1/organization', (req, res, ctx) => {
+        return res(ctx.json([]))
+    }),
+    rest.get('/api/v1/userinfo', (req, res, ctx) => {
+        return res(ctx.json({}))
+    }),
+    rest.patch('/api/v1/organization/:id/leader', (req, res, ctx) => {
+        return res(ctx.json({}))
+    }),
+    rest.get('*', req => console.log(req.url.href))
+)
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 const testOrganization: OrganizationDto = {
 };
 
 const testValidOrganization: OrganizationDto = {
   name: 'TestOrg',
-  members: [],
-  subordinateOrganizations: [],
+  leader: 'some leader id',
+  members: [ 'some ID' ],
+  subordinateOrganizations: [ 'some id' ],
   branchType: OrganizationDtoBranchTypeEnum.Usaf,
   orgType: OrganizationDtoOrgTypeEnum.Squadron,
 };
@@ -130,4 +164,55 @@ it('should set formState for orgType', async () => {
   );
 });
 
+it('should allow to chose leader', async () => {
+  const form = render(
+    <OrganizationEditForm
+        data={testOrganization}
+        formErrors={{}}
+        onSubmit={() => {}}
+        onClose={() => {}}
+        isSubmitting={false}
+        formActionType={FormActionType.UPDATE}
+    />
+  );
 
+  const leaderBtn = await form.getByTestId('change-org-leader__btn');
+  fireEvent.click(leaderBtn, new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+  }));
+
+  await waitFor(
+      () => {
+          expect(form.getByTestId('chooser-ok-btn')).toBeVisible();
+      }
+  );
+});
+
+
+it('should allow to remove leader', async () => {
+    const form = render(
+        <OrganizationEditForm
+            data={testOrganization}
+            formErrors={{}}
+            onSubmit={() => {}}
+            onClose={() => {}}
+            isSubmitting={false}
+            formActionType={FormActionType.UPDATE}
+        />
+    );
+
+    const orgLeaderField = await form.getByTestId('org-leader-name');
+    expect(orgLeaderField).toHaveValue('');
+    const leaderBtn = await form.getByTestId('remove-org-leader__btn');
+    fireEvent.click(leaderBtn, new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+    }));
+
+    await waitFor(
+        () => {
+            expect(orgLeaderField).toHaveValue('');
+        }
+    );
+});
