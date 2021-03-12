@@ -19,7 +19,7 @@ export const HealthPage: FC = () => {
     return StatusType.ERROR;
   };
 
-  const serviceTitle = "API Serivce";
+  const serviceTitle = "API Service";
 
   return (
     <PageFormat pageTitle={"Health"}>

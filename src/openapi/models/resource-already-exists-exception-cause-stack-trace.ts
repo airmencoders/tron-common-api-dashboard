@@ -17,43 +17,43 @@
 /**
  * 
  * @export
- * @interface BadRequestExceptionCauseStackTrace
+ * @interface ResourceAlreadyExistsExceptionCauseStackTrace
  */
-export interface BadRequestExceptionCauseStackTrace {
+export interface ResourceAlreadyExistsExceptionCauseStackTrace {
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     methodName?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     fileName?: string;
     /**
      * 
      * @type {number}
-     * @memberof BadRequestExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     lineNumber?: number;
     /**
@@ -64,8 +64,13 @@ export interface BadRequestExceptionCauseStackTrace {
     nativeMethod?: boolean;
     /**
      * 
+<<<<<<< HEAD:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      * @type {string}
      * @memberof BadRequestExceptionCauseStackTrace
+=======
+     * @type {boolean}
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> origin/master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     className?: string;
 }
