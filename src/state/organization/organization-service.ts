@@ -1,7 +1,7 @@
-import {DataService} from '../data-service/data-service';
-import {OrganizationDto} from '../../openapi/models';
-import {State} from '@hookstate/core';
-import {OrganizationControllerApiInterface} from '../../openapi';
+import { State } from '@hookstate/core';
+import { OrganizationControllerApiInterface } from '../../openapi';
+import { OrganizationDto } from '../../openapi/models';
+import { DataService } from '../data-service/data-service';
 
 export default class OrganizationService implements DataService<OrganizationDto, OrganizationDto> {
 
@@ -81,7 +81,71 @@ export default class OrganizationService implements DataService<OrganizationDto,
    */
   async updateLeader(orgId: string, id: string): Promise<any> {
     try {
-      const orgResponse = await this.orgApi.patchOrganization(orgId, { leader: id });
+        const orgResponse = await this.orgApi.patchOrganization(orgId, { leader: id });
+        return orgResponse.data;     
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
+   * Patch updates an org's members with an additional person
+   * @param orgId org UUID to patch
+   * @param id UUID of the person to add
+   * @returns transaction response or the error it raised
+   */
+   async addMember(orgId: string, id: string): Promise<any> {
+    try {
+      const orgResponse = await this.orgApi.addOrganizationMember(orgId, [id]);
+      return orgResponse.data;
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
+   * Patch updates an org's members with an additional subordinate organization
+   * @param orgId org UUID to patch
+   * @param id UUID of the org to add
+   * @returns transaction response or the error it raised
+   */
+   async addSubOrg(orgId: string, id: string): Promise<any> {
+    try {
+      const orgResponse = await this.orgApi.addSubordinateOrganization(orgId, [id]);
+      return orgResponse.data;
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
+   * Remove an org's member(s)
+   * @param orgId org UUID to patch
+   * @param id UUID of the person(s) to remove
+   * @returns transaction response or the error it raised
+   */
+   async removeMember(orgId: string, ids: string[]): Promise<any> {
+    try {
+      const orgResponse = await this.orgApi.deleteOrganizationMember(orgId, ids);
+      return orgResponse.data;
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
+   * Remove an org's subordinate organization(s)
+   * @param orgId org UUID to patch
+   * @param id UUID of the orgs(s) to remove
+   * @returns transaction response or the error it raised
+   */
+   async removeSubOrg(orgId: string, ids: string[]): Promise<any> {
+    try {
+      const orgResponse = await this.orgApi.removeSubordinateOrganization(orgId, ids);
       return orgResponse.data;
     }
     catch (error) {
@@ -90,7 +154,13 @@ export default class OrganizationService implements DataService<OrganizationDto,
   }
   
   async sendDelete(toDelete: OrganizationDto): Promise<void> {
-    return Promise.resolve();
+    try {
+      const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
+      return orgResponse.data;
+    }
+    catch (error) {
+      return error;
+    }
   }
 
   get isPromised(): boolean {

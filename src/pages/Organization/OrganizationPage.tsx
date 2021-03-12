@@ -1,9 +1,11 @@
 import React from 'react';
-import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
+import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
+import { OrganizationDto } from '../../openapi';
+import { useCrudPageState } from '../../state/crud-page/crud-page-state';
+import { useOrganizationState } from '../../state/organization/organization-state';
+import OrganizationDelete from './OrganizationDelete';
 import OrganizationEditForm from './OrganizationEditForm';
-import {useOrganizationState} from '../../state/organization/organization-state';
-import {useCrudPageState} from '../../state/crud-page/crud-page-state';
 
 const columns: GridColumn[] =
     [
@@ -17,15 +19,17 @@ const columns: GridColumn[] =
 
 function OrganizationPage() {
   return (
-      <DataCrudFormPage
-       allowEdit={true}
-       columns={columns}
-       createForm={OrganizationEditForm}
-       dataTypeName="Organization"
-       pageTitle="Organizations"
-       updateForm={OrganizationEditForm}
-       useDataState={useOrganizationState}
-       usePageState={useCrudPageState}
+      <DataCrudFormPage<OrganizationDto, OrganizationDto>
+        allowEdit={true}
+        columns={columns}
+        createForm={OrganizationEditForm}
+        dataTypeName="Organization"
+        pageTitle="Organizations"
+        updateForm={OrganizationEditForm}
+        useDataState={useOrganizationState}
+        usePageState={useCrudPageState}
+        allowDelete
+        deleteComponent={OrganizationDelete}
       />
   );
 }

@@ -2,7 +2,7 @@ import { createState, useState } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
-import { RowClickedEvent } from 'ag-grid-community';
+import { GridApi, RowClickedEvent } from 'ag-grid-community';
 import React, { ChangeEvent, FormEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
@@ -54,6 +54,8 @@ export enum OrgEditOpType {
 }
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
+  const SELECT_ALL_TEXT = "Select All";
+  const DESELECT_ALL_TEXT = "Unselect All";
   const personState = usePersonState();  // handle to the person-service and state
   const orgState = useOrganizationState();  // handle to the org-service and state
   const formState = useState(createState({...props.data})); // data from the UI form
@@ -61,8 +63,11 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const chooserDataItems = useState(createState(new Array<PersonDto | OrganizationDto>()));  // the data to show in Chooser
   const orgDetails = useState(createState({} as OrganizationDtoWithDetails)); // selected org with extra, resolved information
   const chooserChosenRow = useState(createState({} as RowClickedEvent | undefined));  // the chosen row from the chooser dialog
-  const orgEditType = useState(createState(OrgEditOpType.NONE));  // what part of the org we're changing/editing
-
+  const chooserDataColumns = useState(createState(new Array<GridColumn>()));  // the chosen row from the chooser dialog
+  const orgEditType = useState(createState(OrgEditOpType.NONE));  // what part of the org we're adding to
+  const [membersGridApi, setMembersGridApi] = React.useState({} as GridApi | undefined); // handle to the Grid API for members
+  const [subOrgsGridApi, setSubOrgsGridApi] = React.useState({} as GridApi | undefined); // handle to the Grid API for subordinate orgs
+  
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
@@ -137,14 +142,85 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const onEditLeaderClick = async () => {
 
     // get list of people, go fetch if person state doesn't exist yet
-    if (personState.state.get() == null || personState.state.get().length == 0) {
+    if (personState.state.get() == null || personState.state.get().length === 0) {
       await personState.fetchAndStoreData();
     }
 
     // clone the people list and set to the chooser items
     chooserDataItems.set([...personState.state.get()]);
     orgEditType.set(OrgEditOpType.LEADER_EDIT);
+    chooserDataColumns.set([ 
+      new GridColumn('id', true, true, 'ID'),
+      new GridColumn('firstName', true, true, 'First'),
+      new GridColumn('lastName', true, true, 'Last')
+    ]);
     showChooserDialog.set(true);
+  }
+
+  // invoked from clicking `Add` button for Org Members
+  const onAddMemberClick = async () => {
+
+    // get list of people, go fetch if person state doesn't exist yet
+    if (personState.state.get() == null || personState.state.get().length === 0) {
+      await personState.fetchAndStoreData();
+    }
+
+    // clone the people list and set to the chooser items
+    chooserDataItems.set([...personState.state.get()]);
+    orgEditType.set(OrgEditOpType.MEMBERS_EDIT);
+    chooserDataColumns.set([ 
+      new GridColumn('id', true, true, 'ID'),
+      new GridColumn('firstName', true, true, 'First'),
+      new GridColumn('lastName', true, true, 'Last')
+    ]);
+    showChooserDialog.set(true);
+  }
+
+  // invoked from clicking `Remove` button for Org Members
+  const onRemoveMemberClick = async () => {
+
+    const memberRowSel = membersGridApi?.getSelectedRows();
+    if (memberRowSel && memberRowSel.length > 0) {
+      const orgResponse = await orgState.removeMember(orgDetails.get().id || '', memberRowSel.map(item => item.id));  
+      formState.set(orgResponse);
+      orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+    }
+  }
+
+  // invoked from clicking `Remove` on the org's leader entry
+  const onClearOrgLeader = async () => {
+      const orgResponse = await orgState.updateLeader(orgDetails.get().id || '', 'null');  
+      formState.set(orgResponse);
+      orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+  }
+
+  // invoked from clicking `Add` button for Subordinate Orgs
+  const onAddSubOrgClick = async () => {
+
+    // get list of orgs, go fetch if orgs state doesn't exist yet or is empty
+    if (orgState.state.get() == null || orgState.state.get().length === 0) {
+      await orgState.fetchAndStoreData();
+    }
+
+    // clone the orgs list and set to the chooser items
+    chooserDataItems.set([...orgState.state.get()]);
+    orgEditType.set(OrgEditOpType.SUB_ORGS_EDIT);
+    chooserDataColumns.set([ 
+      new GridColumn('id', true, true, 'ID'),
+      new GridColumn('name', true, true, 'Name')
+    ]);
+    showChooserDialog.set(true);
+  }
+
+  // invoked from clicking `Remove` button for Subordinate Orgs
+  const onRemoveSubOrgClick = async () => {
+
+    const subOrgRowSel = subOrgsGridApi?.getSelectedRows();
+    if (subOrgRowSel && subOrgRowSel.length > 0) {
+      const orgResponse = await orgState.removeSubOrg(orgDetails.get().id || '', subOrgRowSel.map(item => item.id));  
+      formState.set(orgResponse);
+      orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+    }
   }
 
   // a tabular row in the Chooser dialog was clicked, store it to some temp state
@@ -160,23 +236,28 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     showChooserDialog.set(false);
   }
 
-  // user chose OK to close the chooser dialog
+  // user chose OK (confirm an action) to do and close the chooser dialog
   const chooserDialogConfirmed = async () => {
     
     // validate we have some kind of data to PATCH against the org
+    let orgResponse: any;    
     if (chooserChosenRow.get() !== undefined) {
       switch (orgEditType.get()) {
         case OrgEditOpType.LEADER_EDIT:
-          const orgResponse = await orgState.updateLeader(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);
-          formState.set(orgResponse);
-          orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+          orgResponse = await orgState.updateLeader(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);          
           break;
         case OrgEditOpType.MEMBERS_EDIT:
-
+          orgResponse = await orgState.addMember(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);
+          break;
+        case OrgEditOpType.SUB_ORGS_EDIT:
+          orgResponse = await orgState.addSubOrg(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);
           break;
         default:
           break;
       }
+
+      formState.set(orgResponse);
+      orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
     }
 
     chooserDialogClose();
@@ -236,13 +317,32 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       value={resolveLeaderName()}
                       disabled={true}
                     />
-                    <Button unstyled type="button" onClick={onEditLeaderClick}>
+                    <Button data-testid='change-org-leader__btn' unstyled type="button" onClick={onEditLeaderClick}>
                       Change
+                    </Button>
+                    <Button data-testid='change-org-leader__btn' unstyled type="button" onClick={onClearOrgLeader}>
+                      Remove
                     </Button>
                   </div>
                 </FormGroup> 
-                <FormGroup labelName="membersList" labelText={`Organization Members (${orgDetails.get().members?.length})`} >
+                <FormGroup labelName="membersList" labelText={`Organization Members (${orgDetails.get().members?.length || 0})`} >
+                  <div style={{display: 'flex', width: '100%', justifyContent: 'space-around', margin: '1rem', paddingRight: '1rem'}}>
+                    <Button style={{marginTop: 0}} data-testid='org-add-member__btn' unstyled type="button" onClick={onAddMemberClick}>
+                      Add
+                    </Button>
+                    <Button style={{marginTop: 0}} data-testid='org-member-select-all__btn' unstyled type="button" onClick={() => membersGridApi?.selectAllFiltered()}>
+                      {SELECT_ALL_TEXT}
+                    </Button>
+                    <Button style={{marginTop: 0}} data-testid='org-member-deselect-all__btn' unstyled type="button" onClick={() => membersGridApi?.deselectAll()}>
+                      {DESELECT_ALL_TEXT}
+                    </Button>
+                    <Button style={{marginTop: 0}} data-testid='org-member-remove-selected__btn' unstyled type="button" onClick={onRemoveMemberClick}>
+                      Remove
+                    </Button>
+                  </div>
                   <Grid
+                      onGridReady={(event: GridApi | undefined) => setMembersGridApi(event)}
+                      rowSelection='multiple'
                       height="300px"
                       data-testid="membersList"
                       data={orgDetails.get().members || []}
@@ -253,8 +353,24 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       rowClass="ag-grid--row-pointer"
                   />
                 </FormGroup>
-                <FormGroup labelName="subOrgsList" labelText="Subordinate Organizations">
+                <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${orgDetails.get().subordinateOrganizations?.length || 0})`}>
+                  <div style={{display: 'flex', width: '100%', justifyContent: 'space-around', margin: '1rem', paddingRight: '1rem'}}>
+                    <Button style={{marginTop: 0}} data-testid='org-add-suborg__btn' unstyled type="button" onClick={onAddSubOrgClick}>
+                      Add
+                    </Button>
+                    <Button style={{marginTop: 0}} data-testid='org-suborg-select-all__btn' unstyled type="button" onClick={() => subOrgsGridApi?.selectAllFiltered()}>
+                      {SELECT_ALL_TEXT}
+                    </Button>
+                    <Button style={{marginTop: 0}} data-testid='org-suborg-deselect-all__btn' unstyled type="button" onClick={() => subOrgsGridApi?.deselectAll()}>
+                      {DESELECT_ALL_TEXT}
+                    </Button>
+                    <Button style={{marginTop: 0}} data-testid='org-suborg-remove-selected__btn' unstyled type="button" onClick={onRemoveSubOrgClick}>
+                      Remove
+                    </Button>
+                  </div>
                   <Grid
+                      onGridReady={(event: GridApi | undefined) => setSubOrgsGridApi(event)}
+                      rowSelection='multiple'
                       height="300px"
                       data-testid="subOrgsList"
                       data={orgDetails.get().subordinateOrganizations || []}
@@ -304,13 +420,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         >
           <ItemChooser
             items={chooserDataItems.get()}
-            columns={
-              [ 
-                new GridColumn('id', true, true, 'ID'),
-                new GridColumn('firstName', true, true, 'First'),
-                new GridColumn('lastName', true, true, 'Last')
-              ]
-            }
+            columns={chooserDataColumns.get()}
             onRowClicked={chooserRowClicked}
             />
         </Modal>
