@@ -3,7 +3,7 @@ import { useHealthState } from '../../state/health/health-state';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import {StatusType} from '../../components/StatusCard/status-type';
-import UseLoading from '../../hocs/UseLoading/UseLoading';
+import withLoading from '../../hocs/UseLoading/WithLoading';
 import HealthService from '../../state/health/interface/health-service';
 
 function HealthPage() {
@@ -42,7 +42,7 @@ function HealthPageContent(props: { state: HealthService, serviceTitle: string }
   );
 }
 
-const PageContentWithLoading = UseLoading(HealthPageContent);
+const PageContentWithLoading = withLoading(HealthPageContent);
 function ContentWithLoading(props: { state: HealthService, serviceTitle: string }) {
   return (
     <PageContentWithLoading isLoading={props.state.isPromised} {...props} />

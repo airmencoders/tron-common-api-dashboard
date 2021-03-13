@@ -5,7 +5,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { routes, RoutePath } from './routes';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { useAuthorizedUserState } from './state/authorized-user/authorized-user-state';
-import UseLoading from './hocs/UseLoading/UseLoading';
+import withLoading from './hocs/UseLoading/WithLoading';
 
 function App() {
   const authorizedUserState = useAuthorizedUserState();
@@ -42,7 +42,7 @@ function AppContent() {
   );
 }
 
-const AppContentWithLoading = UseLoading(AppContent);
+const AppContentWithLoading = withLoading(AppContent);
 
 function AppWithLoading({ isLoading }: { isLoading: boolean }) {
   return (

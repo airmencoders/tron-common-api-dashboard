@@ -1,8 +1,10 @@
 import { Spinner } from 'react-bootstrap';
-import './UseLoading.scss';
+import './WithLoading.scss';
+import { UseLoadingProps } from './WithLoadingProps';
 
-function UseLoading(Component: React.ComponentType<any>) {
-  return function UseLoadingWrapper({ isLoading, fixed, ...props }: { isLoading: boolean, fixed?: boolean }) {
+function withLoading<P>(Component: React.ComponentType<P>) {
+  return function withLoadingWrapper(props: UseLoadingProps & P) {
+    const { isLoading, fixed } = props;
     return (
       <>
         {isLoading ?
@@ -10,15 +12,15 @@ function UseLoading(Component: React.ComponentType<any>) {
             <div className="loading-page-container__spinner-wrapper">
               <Spinner className="spinner-wrapper__spinner" animation="border" role="status" variant="info">
                 <span className="sr-only">Loading...</span>
-                </Spinner>
-              </div>
+              </Spinner>
+            </div>
           </div>
           :
-          <Component {...props} />
+          <Component {...props as P} />
         }
       </>
     );
   }
 }
 
-export default UseLoading;
+export default withLoading;
