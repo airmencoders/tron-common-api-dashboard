@@ -1,4 +1,4 @@
-import { State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { OrganizationControllerApiInterface } from '../../openapi';
 import { OrganizationDto } from '../../openapi/models';
 import { DataService } from '../data-service/data-service';
@@ -31,12 +31,18 @@ export default class OrganizationService implements DataService<OrganizationDto,
   }
 
   convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
-    return Promise.resolve(rowData);
+    return Promise.resolve(Object.assign({}, rowData));
   }
 
   async sendCreate(toCreate: OrganizationDto): Promise<OrganizationDto> {
     try {
       const orgResponse = await this.orgApi.createOrganization(toCreate);
+
+      const newOrg = orgResponse.data;
+      newOrg.members = undefined;
+      newOrg.subordinateOrganizations = undefined;
+      this.state[this.state.length].set(newOrg);
+
       return Promise.resolve(orgResponse.data);
     }
     catch (error) {
@@ -56,12 +62,20 @@ export default class OrganizationService implements DataService<OrganizationDto,
         return Promise.reject(new Error('Organization to update has undefined id.'));
       }
 
+      console.log(toUpdate.name, toUpdate.branchType, toUpdate.orgType)
       let orgFeatures = {};
       if (toUpdate.name) { orgFeatures = {...orgFeatures, name: toUpdate.name }; }
       if (toUpdate.orgType) { orgFeatures = {...orgFeatures, orgType: toUpdate.orgType }; }
       if (toUpdate.branchType) { orgFeatures = {...orgFeatures, branchType: toUpdate.branchType }; }
 
       const orgResponse = await this.orgApi.patchOrganization(toUpdate.id, orgFeatures);
+
+      const patchedOrg = orgResponse.data;
+      patchedOrg.members = undefined;
+      patchedOrg.subordinateOrganizations = undefined;
+      const index = this.state.get().findIndex(item => item.id === patchedOrg.id);
+      this.state[index].set(patchedOrg);
+      
       return Promise.resolve(orgResponse.data);
     }
     catch (error) {
@@ -94,7 +108,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
   async updateLeader(orgId: string, id: string): Promise<any> {
     try {
         const orgResponse = await this.orgApi.patchOrganization(orgId, { leader: id });
-        return orgResponse.data;     
+        return orgResponse;     
     }
     catch (error) {
       return error;
@@ -106,15 +120,15 @@ export default class OrganizationService implements DataService<OrganizationDto,
    * @param orgId org id to update
    * @returns transaction response or the error it raised
    */
-    async removeLeader(orgId: string): Promise<any> {
-      try {  
-          const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
-          return orgResponse.data;
-      }
-      catch (error) {
-        return error;
-      }
+  async removeLeader(orgId: string): Promise<any> {
+    try {  
+        const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
+        return orgResponse.data;
     }
+    catch (error) {
+      return error;
+    }
+  }
 
   /**
    * Patch updates an org's members with an additional person
@@ -125,7 +139,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    async addMember(orgId: string, id: string): Promise<any> {
     try {
       const orgResponse = await this.orgApi.addOrganizationMember(orgId, [id]);
-      return orgResponse.data;
+      return orgResponse;
     }
     catch (error) {
       return error;
@@ -141,7 +155,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    async addSubOrg(orgId: string, id: string): Promise<any> {
     try {
       const orgResponse = await this.orgApi.addSubordinateOrganization(orgId, [id]);
-      return orgResponse.data;
+      return orgResponse;
     }
     catch (error) {
       return error;
@@ -183,6 +197,14 @@ export default class OrganizationService implements DataService<OrganizationDto,
   async sendDelete(toDelete: OrganizationDto): Promise<void> {
     try {
       const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
+      
+      // easiest way to refresh the data table than interfacing with proxy
+      //await this.fetchAndStoreData();
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
       return orgResponse.data;
     }
     catch (error) {

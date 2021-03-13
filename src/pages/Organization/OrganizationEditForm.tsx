@@ -1,8 +1,9 @@
-import { createState, none, useState } from '@hookstate/core';
+import { createState, useState } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
 import { GridApi, RowClickedEvent } from 'ag-grid-community';
+import { AxiosResponse } from 'axios';
 import React, { ChangeEvent, FormEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
@@ -23,18 +24,18 @@ import { usePersonState } from '../../state/person/person-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 
 
-export interface PersonWithDetails {
+interface PersonWithDetails {
   id?: string,
   firstName?: string,
   lastName?: string,
 }
 
-export interface OrgWithDetails {
+interface OrgWithDetails {
   id?: string,
   name?: string,
 }
 
-export interface OrganizationDtoWithDetails {
+interface OrganizationDtoWithDetails {
   id?: string;
   leader?: PersonWithDetails;
   members?: Array<PersonWithDetails>;
@@ -46,11 +47,17 @@ export interface OrganizationDtoWithDetails {
 }
 
 // complex parts of the org we can edit -- for now...
-export enum OrgEditOpType {
+enum OrgEditOpType {
   NONE = 'NONE',
   LEADER_EDIT = 'LEADER_EDIT',
   MEMBERS_EDIT = 'MEMBERS_EDIT',
   SUB_ORGS_EDIT = 'SUB_ORGS_EDIT',
+}
+
+interface OrgPatchResultOp {
+  code: number,
+  message: string,
+  isError: boolean,
 }
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
@@ -67,6 +74,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const orgEditType = useState(createState(OrgEditOpType.NONE));  // what part of the org we're adding to
   const [membersGridApi, setMembersGridApi] = React.useState({} as GridApi | undefined); // handle to the Grid API for members
   const [subOrgsGridApi, setSubOrgsGridApi] = React.useState({} as GridApi | undefined); // handle to the Grid API for subordinate orgs
+  const [orgPatchLeaderResult, setOrgPatchOpResult] = React.useState<OrgPatchResultOp | undefined>(undefined);
   
   formState.attach(Validation);
   formState.attach(Initial);
@@ -118,6 +126,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     return `${orgDetails.get().leader?.firstName || ''} ${orgDetails.get().leader?.lastName || ''}`.trim();
   }
 
+  // invoked when branch selection is changed
   const onBranchChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const stringVal = event.target.value;
     const branchEnumKey = getEnumKeyByEnumValue(OrganizationDtoBranchTypeEnum, stringVal);
@@ -128,6 +137,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     formState.branchType.set(branchEnum);
   }
 
+  // invoked when org type selection is changed
   const onTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const stringVal = event.target.value;
     const typeEnumKey = getEnumKeyByEnumValue(OrganizationDtoOrgTypeEnum, stringVal);
@@ -236,6 +246,31 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     showChooserDialog.set(false);
   }
 
+  const resolvePatchOpInfo = (orgResponse: AxiosResponse)  => {
+    const retVal = {
+      code: orgResponse.status,
+      isError: orgResponse.status !== 200 && orgResponse.status !== 204,   
+      message: '',   
+    };
+
+    if (retVal.isError) {
+      retVal.message = orgResponse.statusText + ` ${retVal.code}`;
+    }
+    else {
+      retVal.message = 'Organization Updated';
+    }
+
+    setOrgPatchOpResult(retVal);
+  }
+
+  const resolveInvalidPatchOp = (orgResponse : Error) => {
+    setOrgPatchOpResult( {
+      isError: true,
+      code: 0,
+      message: orgResponse.message,
+    })
+  }
+
   // user chose OK (confirm an action) to do and close the chooser dialog
   const chooserDialogConfirmed = async () => {
     
@@ -255,9 +290,15 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         default:
           break;
       }
-
-      formState.set(orgResponse);
-      orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+      
+      if (orgResponse.data) {        
+        resolvePatchOpInfo(orgResponse);
+        formState.set(orgResponse.data);
+        orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+      }
+      else {
+        resolveInvalidPatchOp(orgResponse);
+      }
     }
 
     chooserDialogClose();
@@ -310,6 +351,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           {
             props.formActionType === FormActionType.UPDATE ?
               <>
+
+                {/* Edit/Remove Org Leader Section */}
                 <FormGroup labelName="leaderName" labelText="Leader">
                   <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                     <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
@@ -324,7 +367,17 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       Remove
                     </Button>
                   </div>
+                  <div>
+                  <SuccessErrorMessage successMessage={orgPatchLeaderResult?.message}
+                      errorMessage={orgPatchLeaderResult?.message || ''}
+                      showErrorMessage={orgPatchLeaderResult != null && orgPatchLeaderResult.isError}
+                      showSuccessMessage={orgPatchLeaderResult != null && !orgPatchLeaderResult.isError}
+                      showCloseButton={false}
+                      onCloseClicked={props.onClose} />
+                  </div>
                 </FormGroup> 
+
+                {/* Add/Remove Org Members Section */}
                 <FormGroup labelName="membersList" labelText={`Organization Members (${orgDetails.get().members?.length || 0})`} >
                   <div style={{display: 'flex', width: '100%', justifyContent: 'space-around', margin: '1rem', paddingRight: '1rem'}}>
                     <Button style={{marginTop: 0}} data-testid='org-add-member__btn' unstyled type="button" onClick={onAddMemberClick}>
@@ -353,6 +406,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       rowClass="ag-grid--row-pointer"
                   />
                 </FormGroup>
+
+                {/* Add/Remove Org Subordinate Orgs Section */}
                 <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${orgDetails.get().subordinateOrganizations?.length || 0})`}>
                   <div style={{display: 'flex', width: '100%', justifyContent: 'space-around', margin: '1rem', paddingRight: '1rem'}}>
                     <Button style={{marginTop: 0}} data-testid='org-add-suborg__btn' unstyled type="button" onClick={onAddSubOrgClick}>
