@@ -26,7 +26,6 @@ function Grid(props: GridProps) {
           <AgGridReact
               rowData={props.data}
               onGridReady={gridReady}
-              domLayout={"autoHeight"}
               onRowClicked={props.onRowClicked}
               rowClass={props.rowClass}
           >
