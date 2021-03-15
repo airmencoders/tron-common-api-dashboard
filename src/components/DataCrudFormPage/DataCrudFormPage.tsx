@@ -10,7 +10,7 @@ import Button from '../../components/Button/Button';
 import {DataCrudFormPageProps} from './DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
 import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
-import { State } from '@hookstate/core';
+import { Downgraded, State } from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
 import './DataCrudFormPage.scss';
@@ -27,9 +27,9 @@ import ModalFooterSubmit from '../Modal/ModalFooterSubmit';
  * R Editable Data type
  */
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
-  const dataState: DataService<any, any> = props.useDataState();
+  const dataState: DataService<T, R> = props.useDataState();
 
-  const pageState: State<CrudPageState<any>> = props.usePageState();
+  const pageState: State<CrudPageState<R>> = props.usePageState();
 
   useEffect(() => {
     dataState.fetchAndStoreData();
@@ -71,8 +71,11 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
-  async function deleteConfirmation(deleteItem: R) {
+  async function deleteConfirmation(deleteItem: T) {
     if (props.allowDelete && deleteItem != null) {
+      const dataStateItem = dataState.state.find(item => item.id.get() === deleteItem.id);
+      deleteItem = dataStateItem?.attach(Downgraded).get() ?? Object.assign({}, deleteItem);
+
       const data = await dataState.convertRowDataToEditableData(deleteItem);
 
       pageState.merge({
@@ -219,7 +222,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                       }
 
                       <Grid
-                          data={dataState.state?.get() || []}
+                          data={dataState.state.get()}
                           columns={columns}
                           onRowClicked={onRowClicked}
                           rowClass="ag-grid--row-pointer"
