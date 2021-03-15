@@ -61,12 +61,13 @@ interface OrgPatchResultOp {
 }
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
+  const MESSAGE_DLY_TIME = 3000;  // how long to flash up the SuccessErrorMessage control for PATCH ops
   const SELECT_ALL_TEXT = "Select All";
   const DESELECT_ALL_TEXT = "Unselect All";
   const personState = usePersonState();  // handle to the person-service and state
   const orgState = useOrganizationState();  // handle to the org-service and state
   const formState = useState(createState({...props.data})); // data from the UI form
-  const showChooserDialog = useState(createState(false)); // whether to show the Choose Dialog
+  const showChooserDialog = useState(createState(false)); // whether to show the Chooser Dialog
   const chooserDataItems = useState(createState(new Array<PersonDto | OrganizationDto>()));  // the data to show in Chooser
   const orgDetails = useState(createState({} as OrganizationDtoWithDetails)); // selected org with extra, resolved information
   const chooserChosenRow = useState(createState({} as RowClickedEvent | undefined));  // the chosen row from the chooser dialog
@@ -74,7 +75,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const orgEditType = useState(createState(OrgEditOpType.NONE));  // what part of the org we're adding to
   const [membersGridApi, setMembersGridApi] = React.useState({} as GridApi | undefined); // handle to the Grid API for members
   const [subOrgsGridApi, setSubOrgsGridApi] = React.useState({} as GridApi | undefined); // handle to the Grid API for subordinate orgs
-  const [orgPatchLeaderResult, setOrgPatchOpResult] = React.useState<OrgPatchResultOp | undefined>(undefined);
+  const [orgPatchLeaderResult, setOrgPatchLeaderResult] = React.useState<OrgPatchResultOp | undefined>(undefined); // state container for leader changes
+  const [orgPatchMembersResult, setOrgPatchMembersResult] = React.useState<OrgPatchResultOp | undefined>(undefined);  // state container for member changes
+  const [orgPatchSubOrgsResult, setOrgPatchSubOrgsResult] = React.useState<OrgPatchResultOp | undefined>(undefined);  // state container for sub orgs changes
   
   formState.attach(Validation);
   formState.attach(Initial);
@@ -188,11 +191,12 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
 
   // invoked from clicking `Remove` button for Org Members
   const onRemoveMemberClick = async () => {
-
+    
     const memberRowSel = membersGridApi?.getSelectedRows();
     if (memberRowSel && memberRowSel.length > 0) {
       const orgResponse = await orgState.removeMember(orgDetails.get().id || '', memberRowSel.map(item => item.id));  
-      formState.set(orgResponse);
+      resolvePatchOpInfo(OrgEditOpType.MEMBERS_EDIT, orgResponse);
+      formState.set(orgResponse.data);
       orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
     }
   }
@@ -200,7 +204,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   // invoked from clicking `Remove` on the org's leader entry
   const onClearOrgLeader = async () => {
     const orgResponse = await orgState.removeLeader(orgDetails.get().id || '');
-    formState.set(orgResponse);
+    resolvePatchOpInfo(OrgEditOpType.LEADER_EDIT, orgResponse);
+    formState.set(orgResponse.data);
     orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
   }
 
@@ -228,7 +233,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     const subOrgRowSel = subOrgsGridApi?.getSelectedRows();
     if (subOrgRowSel && subOrgRowSel.length > 0) {
       const orgResponse = await orgState.removeSubOrg(orgDetails.get().id || '', subOrgRowSel.map(item => item.id));  
-      formState.set(orgResponse);
+      resolvePatchOpInfo(OrgEditOpType.SUB_ORGS_EDIT, orgResponse);
+      formState.set(orgResponse.data);
       orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
     }
   }
@@ -246,7 +252,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     showChooserDialog.set(false);
   }
 
-  const resolvePatchOpInfo = (orgResponse: AxiosResponse)  => {
+  // handles a successful org PATCH operation and shows the success message in the 
+  //   applicable area for MESSAGE_DLY_TIME seconds
+  const resolvePatchOpInfo = (opType: OrgEditOpType, orgResponse: AxiosResponse)  => {
     const retVal = {
       code: orgResponse.status,
       isError: orgResponse.status !== 200 && orgResponse.status !== 204,   
@@ -258,28 +266,76 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     }
     else {
       retVal.message = 'Organization Updated';
+    }    
+
+    switch (opType) {
+
+      // update edit leader message area
+      case OrgEditOpType.LEADER_EDIT:
+        setOrgPatchLeaderResult(retVal);
+        setTimeout(() => setOrgPatchLeaderResult(undefined), MESSAGE_DLY_TIME);  // hide update msg after MESSAGE_DLY_TIME
+        break;
+
+      // update edit members message area
+      case OrgEditOpType.MEMBERS_EDIT:
+        setOrgPatchMembersResult(retVal);
+        setTimeout(() => setOrgPatchMembersResult(undefined), MESSAGE_DLY_TIME);  // hide update msg after MESSAGE_DLY_TIME
+        break;
+
+      // update edit sub orgs message area
+      case OrgEditOpType.SUB_ORGS_EDIT:
+        setOrgPatchSubOrgsResult(retVal);
+        setTimeout(() => setOrgPatchSubOrgsResult(undefined), MESSAGE_DLY_TIME);  // hide update msg after MESSAGE_DLY_TIME
+        break;
+      default:
+        break;     
     }
-
-    setOrgPatchOpResult(retVal);
   }
 
-  const resolveInvalidPatchOp = (orgResponse : Error) => {
-    setOrgPatchOpResult( {
-      isError: true,
-      code: 0,
-      message: orgResponse.message,
-    })
-  }
-
-  // user chose OK (confirm an action) to do and close the chooser dialog
-  const chooserDialogConfirmed = async () => {
+  // handles if a PATCH op went bad, and extracts out the error msg/code to show for the
+  //  Success error message in the applicable area
+  const resolveInvalidPatchOp = (opType: OrgEditOpType, orgResponse : Error) => {
     
+    switch (opType) {
+      case OrgEditOpType.LEADER_EDIT:
+        setOrgPatchLeaderResult( {
+          isError: true,
+          code: 0,
+          message: orgResponse.message,
+        });
+        setTimeout(() => setOrgPatchLeaderResult(undefined), MESSAGE_DLY_TIME);
+        break;
+      case OrgEditOpType.MEMBERS_EDIT:
+        setOrgPatchMembersResult( {
+          isError: true,
+          code: 0,
+          message: orgResponse.message,
+        });
+        setTimeout(() => setOrgPatchMembersResult(undefined), MESSAGE_DLY_TIME);
+        break;
+      case OrgEditOpType.SUB_ORGS_EDIT:
+        setOrgPatchSubOrgsResult( {
+          isError: true,
+          code: 0,
+          message: orgResponse.message,
+        });
+        setTimeout(() => setOrgPatchSubOrgsResult(undefined), MESSAGE_DLY_TIME);
+        break;
+      default:
+        break;
+    }
+  }
+
+  // user chose OK (confirmed the action) to do, chooser dialog will be implicitly closed
+  const chooserDialogConfirmed = async () => {
+
     // validate we have some kind of data to PATCH against the org
     let orgResponse: any;    
     if (chooserChosenRow.get() !== undefined) {
       switch (orgEditType.get()) {
-        case OrgEditOpType.LEADER_EDIT:
-          orgResponse = await orgState.updateLeader(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);          
+        case OrgEditOpType.LEADER_EDIT:          
+          orgResponse = await orgState.updateLeader(orgDetails.get().id || '', chooserChosenRow.get()?.data.id); 
+          console.log("sfsdfsdfsdf")
           break;
         case OrgEditOpType.MEMBERS_EDIT:
           orgResponse = await orgState.addMember(orgDetails.get().id || '', chooserChosenRow.get()?.data.id);
@@ -290,14 +346,15 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         default:
           break;
       }
-      
+
       if (orgResponse.data) {        
-        resolvePatchOpInfo(orgResponse);
+        resolvePatchOpInfo(orgEditType.get(), orgResponse);
         formState.set(orgResponse.data);
         orgDetails.set(await orgState.getOrgDetails(formState.get().id || ''));
+        
       }
       else {
-        resolveInvalidPatchOp(orgResponse);
+        resolveInvalidPatchOp(orgEditType.get(), orgResponse);
       }
     }
 
@@ -367,13 +424,20 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       Remove
                     </Button>
                   </div>
+                  <div style={{display: 'none'}}>
+                    <TextInput id="hidden-selected-person" name='chosen-row' type="text" data-testid='org-row-selection'
+                        defaultValue={chooserChosenRow.get()?.data?.firstName || ''}
+                        value={chooserChosenRow.get()?.data?.firstName || ''}
+                        disabled={true}
+                      />
+                  </div>
                   <div>
-                  <SuccessErrorMessage successMessage={orgPatchLeaderResult?.message}
-                      errorMessage={orgPatchLeaderResult?.message || ''}
-                      showErrorMessage={orgPatchLeaderResult != null && orgPatchLeaderResult.isError}
-                      showSuccessMessage={orgPatchLeaderResult != null && !orgPatchLeaderResult.isError}
-                      showCloseButton={false}
-                      onCloseClicked={props.onClose} />
+                    <SuccessErrorMessage successMessage={orgPatchLeaderResult?.message}
+                        errorMessage={orgPatchLeaderResult?.message || ''}
+                        showErrorMessage={orgPatchLeaderResult != null && orgPatchLeaderResult.isError}
+                        showSuccessMessage={orgPatchLeaderResult != null && !orgPatchLeaderResult.isError}
+                        showCloseButton={false}
+                        onCloseClicked={props.onClose} />
                   </div>
                 </FormGroup> 
 
@@ -392,6 +456,14 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button style={{marginTop: 0}} data-testid='org-member-remove-selected__btn' unstyled type="button" onClick={onRemoveMemberClick}>
                       Remove
                     </Button>
+                  </div>
+                  <div>
+                    <SuccessErrorMessage successMessage={orgPatchMembersResult?.message}
+                        errorMessage={orgPatchMembersResult?.message || ''}
+                        showErrorMessage={orgPatchMembersResult != null && orgPatchMembersResult.isError}
+                        showSuccessMessage={orgPatchMembersResult != null && !orgPatchMembersResult.isError}
+                        showCloseButton={false}
+                        onCloseClicked={props.onClose} />
                   </div>
                   <Grid
                       onGridReady={(event: GridApi | undefined) => setMembersGridApi(event)}
@@ -422,6 +494,14 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button style={{marginTop: 0}} data-testid='org-suborg-remove-selected__btn' unstyled type="button" onClick={onRemoveSubOrgClick}>
                       Remove
                     </Button>
+                  </div>
+                  <div>
+                    <SuccessErrorMessage successMessage={orgPatchSubOrgsResult?.message}
+                        errorMessage={orgPatchSubOrgsResult?.message || ''}
+                        showErrorMessage={orgPatchSubOrgsResult != null && orgPatchSubOrgsResult.isError}
+                        showSuccessMessage={orgPatchSubOrgsResult != null && !orgPatchSubOrgsResult.isError}
+                        showCloseButton={false}
+                        onCloseClicked={props.onClose} />
                   </div>
                   <Grid
                       onGridReady={(event: GridApi | undefined) => setSubOrgsGridApi(event)}
@@ -461,10 +541,10 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           headerComponent={(<h2>Pick Person</h2>)}
           footerComponent={(
             <div style={{display: 'flex', justifyContent: 'space-between'}}>
-              <Button type="button" data-testid='chooser-cancel-btn' className="add-app-client__btn" secondary onClick={chooserDialogClose}>
+              <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" secondary onClick={chooserDialogClose}>
                 Cancel
               </Button>
-              <Button type="button" data-testid='chooser-ok-btn' className="add-app-client__btn" secondary onClick={chooserDialogConfirmed}>
+              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" secondary onClick={chooserDialogConfirmed}>
                 OK
               </Button>
             </div>

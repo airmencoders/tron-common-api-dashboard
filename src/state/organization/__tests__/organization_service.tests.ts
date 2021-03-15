@@ -136,7 +136,7 @@ describe('Test OrganizationService', () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
         new MockOrgApi());
 
-    const response = await organizationService.sendDelete('some id');
+    const response = await organizationService.sendDelete({ id: 'some id', name: 'some org' });
     expect(response).toBeTruthy();
   });
 

@@ -62,7 +62,6 @@ export default class OrganizationService implements DataService<OrganizationDto,
         return Promise.reject(new Error('Organization to update has undefined id.'));
       }
 
-      console.log(toUpdate.name, toUpdate.branchType, toUpdate.orgType)
       let orgFeatures = {};
       if (toUpdate.name) { orgFeatures = {...orgFeatures, name: toUpdate.name }; }
       if (toUpdate.orgType) { orgFeatures = {...orgFeatures, orgType: toUpdate.orgType }; }
@@ -123,7 +122,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
   async removeLeader(orgId: string): Promise<any> {
     try {  
         const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
-        return orgResponse.data;
+        return orgResponse;
     }
     catch (error) {
       return error;
@@ -171,7 +170,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    async removeMember(orgId: string, ids: string[]): Promise<any> {
     try {
       const orgResponse = await this.orgApi.deleteOrganizationMember(orgId, ids);
-      return orgResponse.data;
+      return orgResponse;
     }
     catch (error) {
       return error;
@@ -187,7 +186,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    async removeSubOrg(orgId: string, ids: string[]): Promise<any> {
     try {
       const orgResponse = await this.orgApi.removeSubordinateOrganization(orgId, ids);
-      return orgResponse.data;
+      return orgResponse;
     }
     catch (error) {
       return error;
