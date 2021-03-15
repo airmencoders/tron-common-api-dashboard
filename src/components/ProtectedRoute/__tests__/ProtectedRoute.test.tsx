@@ -50,7 +50,7 @@ describe('ProtectRoute Test', () => {
 
   it('Renders', async () => {
     mockAuthorizedUserState();
-    await useAuthorizedUserState().fetchAndStoreDashboardUser();
+    await useAuthorizedUserState().fetchAndStoreAuthorizedUser();
 
     let pageRender = render(
       <MemoryRouter>

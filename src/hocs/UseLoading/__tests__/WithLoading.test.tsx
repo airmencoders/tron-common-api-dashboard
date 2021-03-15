@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import UseLoading from "../UseLoading";
+import withLoading from "../WithLoading";
 
 describe('Test UseLoading HOC', () => {
   function TestComp() {
@@ -9,7 +9,7 @@ describe('Test UseLoading HOC', () => {
   }
 
   it('Loading', () => {
-    const Page = UseLoading(TestComp);
+    const Page = withLoading(TestComp);
 
     const renderedComponent = render(
       <Page isLoading={true} />
@@ -19,7 +19,7 @@ describe('Test UseLoading HOC', () => {
   });
 
   it('Not loading', () => {
-    const Page = UseLoading(TestComp);
+    const Page = withLoading(TestComp);
 
     const renderedComponent = render(
       <Page isLoading={false} />
