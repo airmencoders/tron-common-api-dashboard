@@ -29,7 +29,6 @@ function Grid(props: GridProps) {
           <AgGridReact              
               rowData={props.data}
               onGridReady={gridReady}
-              domLayout={props.height ? 'normal' : 'autoHeight'}  // if height specified, don't use autoHeight
               onRowClicked={props.onRowClicked}
               rowClass={props.rowClass}
               quickFilterText={props.quickFilterText || ''}
