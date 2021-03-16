@@ -9,7 +9,7 @@ import Button from '../../components/Button/Button';
 import {DataCrudFormPageProps} from './DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
 import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
-import { State } from '@hookstate/core';
+import { State, useState } from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
 import './DataCrudFormPage.scss';
@@ -29,14 +29,10 @@ import Spinner from '../Spinner/Spinner';
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
   const dataState: DataService<any, any> = props.useDataState();
 
-  const pageState: State<CrudPageState<any>> = props.usePageState();
+  const pageState: State<CrudPageState<any>> = useState<CrudPageState<T>>(getInitialCrudPageState());
 
   useEffect(() => {
     dataState.fetchAndStoreData();
-    
-    return () => {
-      pageState.set(getInitialCrudPageState());
-    }
   }, []);
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
