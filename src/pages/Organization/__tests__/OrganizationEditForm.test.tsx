@@ -1,12 +1,11 @@
-import {render, waitFor, fireEvent, waitForDomChange} from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
+import { rest } from "msw";
+import { setupServer } from "msw/node";
+import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum } from '../../../openapi/models';
+import { FormActionType } from '../../../state/crud-page/form-action-type';
 import OrganizationEditForm from '../OrganizationEditForm';
-import {OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum} from '../../../openapi/models';
-import {FormActionType} from '../../../state/crud-page/form-action-type';
-import {setupServer} from "msw/node";
-import {rest} from "msw";
-import { act } from 'react-dom/test-utils';
 
-// transforms a custom org back to a OrgDto
+// transforms a "custom org" back to a OrgDto
 const transformOrgToOrgDto = (org: any) => {
   return { ...org, 
     members: org.members.map((i:any) => i.id), 
