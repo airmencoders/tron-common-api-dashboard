@@ -1,7 +1,7 @@
-import { createState, StateMethods } from "@hookstate/core";
+import { createState, State, StateMethodsDestroy } from "@hookstate/core";
 import HealthApi from "../../../api/health/health-api";
 import Health from "../../../api/health/interface/health";
-import { accessHealthState, wrapState, HealthState } from "../health-state";
+import { accessHealthState, wrapState } from "../health-state";
 import { AxiosResponse } from 'axios';
 import HealthService from "../interface/health-service";
 
@@ -18,12 +18,12 @@ describe('Test HealthState', () => {
     headers: {}
   };
 
-  let healthState: StateMethods<HealthState | undefined>;
+  let healthState: State<Partial<Health>> & StateMethodsDestroy;
   let healthApi: HealthApi;
   let state: HealthService;
 
   beforeEach(() => {
-    healthState = createState<HealthState | undefined>(undefined);
+    healthState = createState<Partial<Health>>({});
     healthApi = new HealthApi();
 
     healthApi.getHealth = jest.fn(() => {
@@ -35,12 +35,15 @@ describe('Test HealthState', () => {
     state = wrapState(healthState, healthApi);
   });
 
+  afterEach(() => {
+    healthState.destroy();
+  })
+
   it('fetchAndStore', async () => {
     state.fetchAndStoreHealthStatus = jest.fn(() => {
-      healthState.set({
-        health: response,
-        error: undefined
-      })
+      healthState.set(response);
+
+      return Promise.resolve(response);
     });
 
     state.fetchAndStoreHealthStatus();
@@ -62,11 +65,7 @@ describe('Test HealthState', () => {
       return new Promise<AxiosResponse<Health>>(resolve => resolve(axiosRes));
     });
 
-    state.fetchAndStoreHealthStatus();
-
-    // wait for pending promises are resolved, specifically to get health
-    const flushPromises = () => new Promise(setImmediate);
-    await flushPromises();
+    await state.fetchAndStoreHealthStatus();
 
     expect(state.systemStatus).toEqual(response.status);
   });
@@ -82,11 +81,7 @@ describe('Test HealthState', () => {
       return new Promise<AxiosResponse<Health>>(resolve => resolve(axiosRes));
     });
 
-    state.fetchAndStoreHealthStatus();
-
-    // wait for pending promises are resolved, specifically to get health
-    const flushPromises = () => new Promise(setImmediate);
-    await flushPromises();
+    await state.fetchAndStoreHealthStatus();
 
     expect(state.components).toEqual(response.components);
   });

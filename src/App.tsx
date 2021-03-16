@@ -5,33 +5,48 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { routes, RoutePath } from './routes';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { useAuthorizedUserState } from './state/authorized-user/authorized-user-state';
+import withLoading from './hocs/UseLoading/WithLoading';
 
 function App() {
-  const useDashboardState = useAuthorizedUserState();
+  const authorizedUserState = useAuthorizedUserState();
 
   useEffect(() => {
-    useDashboardState.fetchAndStoreDashboardUser();
+    authorizedUserState.fetchAndStoreAuthorizedUser();
   }, []);
 
   return (
-      <div className="App">
-        <Switch>
-          <Route
-            exact
-            path={RoutePath.HOME}
-            render={() => (<Redirect to={RoutePath.HEALTH} />)}
-          />
-          {routes.map((route) => {
-              return <ProtectedRoute
-                key={route.name}
-                exact={route.path === '/' ? true : false}
-                path={route.path}
-                component={route.component}
-                requiredPrivilege={route.requiredPrivilege}
-              />
-          })}
-        </Switch>
-      </div>
+    <div className="App">
+      <AppWithLoading isLoading={authorizedUserState.isPromised} />
+    </div>
+  );
+}
+
+function AppContent() {
+  return (
+    <Switch>
+      <Route
+        exact
+        path={RoutePath.HOME}
+        render={() => (<Redirect to={RoutePath.HEALTH} />)}
+      />
+      {routes.map((route) => {
+        return <ProtectedRoute
+          key={route.name}
+          exact={route.path === '/' ? true : false}
+          path={route.path}
+          component={route.component}
+          requiredPrivilege={route.requiredPrivilege}
+        />
+      })}
+    </Switch>
+  );
+}
+
+const AppContentWithLoading = withLoading(AppContent);
+
+function AppWithLoading({ isLoading }: { isLoading: boolean }) {
+  return (
+    <AppContentWithLoading isLoading={isLoading} fixed />
   );
 }
 
