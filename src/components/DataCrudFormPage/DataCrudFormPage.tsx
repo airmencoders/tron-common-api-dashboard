@@ -73,6 +73,14 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   async function deleteConfirmation(deleteItem: T) {
     if (props.allowDelete && deleteItem != null) {
+      /**
+       * Find the item in dataState and remove the proxy here.
+       * Uses Hookstate's Downgraded plugin. Wait until we need the raw item
+       * to use Downgraded so that we can keep the benefits of proxy usage until the end.
+       *
+       * The item should always exist in dataState but we keep Object.assign()
+       * as the fallback.
+       */
       const dataStateItem = dataState.state.find(item => item.id.get() === deleteItem.id);
       deleteItem = dataStateItem?.attach(Downgraded).get() ?? Object.assign({}, deleteItem);
 
