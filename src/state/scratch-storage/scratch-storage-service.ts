@@ -1,6 +1,6 @@
 import {DataService} from '../data-service/data-service';
 import {none, State} from '@hookstate/core';
-import {ScratchStorageAppRegistryDto, ScratchStorageControllerApiInterface} from '../../openapi';
+import {ScratchStorageAppRegistryDto, ScratchStorageAppRegistryEntry, ScratchStorageControllerApiInterface} from '../../openapi';
 
 export default class ScratchStorageService implements DataService<ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDto> {
 
@@ -21,14 +21,20 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   }
 
   convertRowDataToEditableData(rowData: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
-    return Promise.resolve(rowData);
+    return Promise.resolve(Object.assign({}, rowData));
   }
 
   sendUpdate(toUpdate: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
     throw new Error('Method not implemented.');
   }
-  sendCreate(toCreate: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
-    throw new Error('Method not implemented.');
+  async sendCreate(toCreate: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
+    try {
+      const scratchStorageResponse = await this.scratchStorageApi.postNewScratchSpaceApp(toCreate as ScratchStorageAppRegistryEntry);
+      return Promise.resolve(scratchStorageResponse.data as ScratchStorageAppRegistryDto);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   async sendDelete(toDelete: ScratchStorageAppRegistryDto): Promise<void> {
