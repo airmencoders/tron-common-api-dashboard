@@ -19,8 +19,8 @@ export default class PastLogfileService {
     return this.pastLogfileState.promised;
   }
 
-  get getPastLogs(): LogfileDto[] | undefined {
-    return this.pastLogfileState.promised ? undefined : this.pastLogfileState.get();
+  get getPastLogs(): LogfileDto[] {
+    return this.pastLogfileState.promised ? [] : this.pastLogfileState.get();
   }
 
   get error(): string | undefined {

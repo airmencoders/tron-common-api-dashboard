@@ -1,6 +1,5 @@
 import { RowClickedEvent } from 'ag-grid-community';
-import React, {useEffect} from 'react';
-import { Container, Spinner } from 'react-bootstrap';
+import React, { useEffect } from 'react';
 import Grid from '../../components/Grid/Grid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
@@ -19,6 +18,7 @@ import GridColumn from '../Grid/GridColumn';
 import Modal from '../Modal/Modal';
 import ModalTitle from '../Modal/ModalTitle';
 import ModalFooterSubmit from '../Modal/ModalFooterSubmit';
+import Spinner from '../Spinner/Spinner';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -201,62 +201,55 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   return (
     <>
       <PageFormat pageTitle={props.pageTitle}>
-        <Container fluid style={{ height: '100%' }}>
-          {dataState.isPromised ?
-              <Spinner animation="border" role="status" variant="primary">
-                <span className="sr-only">Loading...</span>
-              </Spinner>
-              :
-              <div style={{ height: '100%' }}>
-                {dataState.error ?
-                    <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
-                    :
-                    <>
-                      {
-                        props.allowEdit &&
-                        <div className="add-data-container">
-                          <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
-                            Add { props.dataTypeName }
-                          </Button>
-                        </div>
-                      }
+        {dataState.isPromised ? 
+          <Spinner centered />
+          : 
+          dataState.error ?
+            <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
+            :
+            <div style={{ height: '100%' }}>
+              {
+                props.allowEdit &&
+                <div className="add-data-container">
+                  <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
+                    Add { props.dataTypeName }
+                  </Button>
+                </div>
+              }
 
-                      <Grid
-                          data={dataState.state.get()}
-                          columns={columns}
-                          onRowClicked={onRowClicked}
-                          rowClass="ag-grid--row-pointer"
-                      />
+              <Grid
+                data={dataState.state.get()}
+                columns={columns}
+                onRowClicked={onRowClicked}
+                rowClass="ag-grid--row-pointer"
+              />
 
-                      <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
-                        {
-                          pageState.formAction.value === FormActionType.ADD ?
-                          <CreateForm
-                            onSubmit={createSubmit}
-                            formActionType={FormActionType.ADD}
-                            formErrors={pageState.formErrors.get()}
-                            onClose={onCloseHandler}
-                            successAction={pageState.successAction.get()}
-                            isSubmitting={pageState.isSubmitting.get()}
-                          />
-                          : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
-                            <UpdateForm
-                              data={pageState.selected.get()}
-                              formErrors={pageState.formErrors.get()}
-                              onSubmit={updateSubmit}
-                              onClose={onCloseHandler}
-                              successAction={pageState.successAction.get()}
-                              isSubmitting={pageState.isSubmitting.get()}
-                              formActionType={FormActionType.UPDATE}
-                            />
-                            : null
-                        }
-                      </SideDrawer>
-                    </>
+              <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
+                {
+                  pageState.formAction.value === FormActionType.ADD ?
+                  <CreateForm
+                    onSubmit={createSubmit}
+                    formActionType={FormActionType.ADD}
+                    formErrors={pageState.formErrors.get()}
+                    onClose={onCloseHandler}
+                    successAction={pageState.successAction.get()}
+                    isSubmitting={pageState.isSubmitting.get()}
+                  />
+                  : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
+                    <UpdateForm
+                      data={pageState.selected.get()}
+                      formErrors={pageState.formErrors.get()}
+                      onSubmit={updateSubmit}
+                      onClose={onCloseHandler}
+                      successAction={pageState.successAction.get()}
+                      isSubmitting={pageState.isSubmitting.get()}
+                      formActionType={FormActionType.UPDATE}
+                    />
+                    : null
                 }
-              </div>
-          }
-        </Container>
+              </SideDrawer>
+            </div>
+        }
       </PageFormat>
 
       { props.allowDelete && DeleteComponent && pageState.selected.get() &&
