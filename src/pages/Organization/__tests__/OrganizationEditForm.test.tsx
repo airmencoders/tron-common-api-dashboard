@@ -20,6 +20,7 @@ const transformOrgToOrgDto = (org: any) => {
 const existingOrg = {
     id: '13c23dd4-e0d5-4d05-8237-8b88f582b114',
     members: [ { id: 'some id', firstName: 'jon', lastName: 'public' }],
+    parentOrganization: { id: 'some id', name: 'Parent' },
     subordinateOrganizations: [ { id: 'some id', name: 'some org '}],
     leader: { id: 'some id', firstName: 'Frank', lastName: 'Summers' },
     branchType: 'USAF',
@@ -41,7 +42,7 @@ const server = setupServer(
       ]))
     }),
     rest.get('/api/v1/organization', (req, res, ctx) => {
-      return res(ctx.json([]));
+      return res(ctx.json([ { id: 'some id', name: 'blah'}]));
     }),
     rest.get('/api/v1/userinfo', (req, res, ctx) => {
       return res(ctx.json({}));
@@ -57,6 +58,10 @@ const server = setupServer(
       return res(ctx.json(transformOrgToOrgDto(currentOrg)))
     }),
     rest.delete('/api/v1/organization/:id/leader', (req, res, ctx) => {
+      requestCounter++;
+      return res(ctx.json({}))
+    }),
+    rest.delete('/api/v1/organization/:id/parent', (req, res, ctx) => {
       requestCounter++;
       return res(ctx.json({}))
     }),
@@ -214,6 +219,90 @@ it('should set formState for orgType', async () => {
   );
 });
 
+it('should allow to chose parent', async () => {
+  const form = render(
+    <OrganizationEditForm
+        data={testOrganization}
+        formErrors={{}}
+        onSubmit={() => {}}
+        onClose={() => {}}
+        isSubmitting={false}
+        formActionType={FormActionType.UPDATE}
+    />
+  );
+
+  await waitFor(
+    () => expect(form
+        .getByDisplayValue(`${existingOrg.parentOrganization.name}`))
+        .toBeInTheDocument()
+  );
+
+  const parentBtn = await form.getByTestId('change-org-parent__btn');
+  fireEvent.click(parentBtn);
+
+  await waitFor(
+      () => {
+          expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
+      }
+  );
+
+  const orgRow = await form.getByText('blah');
+  fireEvent.click(orgRow);
+
+  // wait for the state change to be detected --- which we do via watching
+  //  hidden element 'hidden-selected-item'
+  await waitFor(
+    () => expect(form.getByDisplayValue('blah')).toBeInTheDocument()   
+  );
+
+  // ack the dialog selection to set the leader
+  const okBtn = await form.getByTestId('chooser-ok__btn');
+  fireEvent.click(okBtn);
+
+  currentOrg.parentOrganization = { id: '216d8f9d-c98b-4adf-910c-55ac8eb3b203', name: 'blah2'};
+
+  await waitFor(
+    () => expect(form
+        .getByDisplayValue('blah2'))
+        .toBeInTheDocument()
+  );
+
+
+  // restore the org data
+  currentOrg = existingOrg;
+
+});
+
+
+it('should allow to remove parent', async () => {
+    const form = render(
+        <OrganizationEditForm
+            data={testOrganization}
+            formErrors={{}}
+            onSubmit={() => {}}
+            onClose={() => {}}
+            isSubmitting={false}
+            formActionType={FormActionType.UPDATE}
+        />
+    );
+
+    await waitFor(
+        () => expect(form
+            .getByDisplayValue(`${existingOrg.parentOrganization.name}`))
+            .toBeInTheDocument()
+    )
+
+    const parentBtn = await form.getByTestId('remove-org-parent__btn');
+    fireEvent.click(parentBtn);
+
+    await waitFor(
+      () => expect(requestCounter).toBeGreaterThan(0)
+    );
+
+    requestCounter=0;
+});
+
+
 it('should allow to chose leader', async () => {
   const form = render(
     <OrganizationEditForm
@@ -258,7 +347,7 @@ it('should allow to chose leader', async () => {
   fireEvent.click(personRow);
 
   // wait for the state change to be detected --- which we do via watching
-  //  hidden element 'hidden-selected-person'
+  //  hidden element 'hidden-selected-item'
   await waitFor(
     () => expect(form.getByDisplayValue('Joey')).toBeInTheDocument()   
   );

@@ -298,6 +298,49 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Deletes/clears out the parent org with no org
+         * @summary Deletes a parent from a subordinate organization
+         * @param {string} id Organization ID to delete the parent from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrgParent: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrgParent.');
+            }
+            const localVarPath = `/v1/organization/{id}/parent`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Deletes an existing organization
          * @summary Deletes an existing organization
          * @param {string} id Organization ID to delete
@@ -780,6 +823,20 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Deletes/clears out the parent org with no org
+         * @summary Deletes a parent from a subordinate organization
+         * @param {string} id Organization ID to delete the parent from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteOrgParent(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrgParent(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Deletes an existing organization
          * @summary Deletes an existing organization
          * @param {string} id Organization ID to delete
@@ -952,6 +1009,16 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).deleteOrgLeader(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * Deletes/clears out the parent org with no org
+         * @summary Deletes a parent from a subordinate organization
+         * @param {string} id Organization ID to delete the parent from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrgParent(id: string, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).deleteOrgParent(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Deletes an existing organization
          * @summary Deletes an existing organization
          * @param {string} id Organization ID to delete
@@ -1094,6 +1161,16 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     deleteOrgLeader(id: string, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
+     * Deletes/clears out the parent org with no org
+     * @summary Deletes a parent from a subordinate organization
+     * @param {string} id Organization ID to delete the parent from
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    deleteOrgParent(id: string, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Deletes an existing organization
@@ -1247,6 +1324,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public deleteOrgLeader(id: string, options?: any) {
         return OrganizationControllerApiFp(this.configuration).deleteOrgLeader(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Deletes/clears out the parent org with no org
+     * @summary Deletes a parent from a subordinate organization
+     * @param {string} id Organization ID to delete the parent from
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public deleteOrgParent(id: string, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).deleteOrgParent(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

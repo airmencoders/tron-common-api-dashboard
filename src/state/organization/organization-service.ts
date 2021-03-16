@@ -115,6 +115,22 @@ export default class OrganizationService implements DataService<OrganizationDto,
   }
 
   /**
+   * Patch updates an org's parent by UUID
+   * @param orgId org UUID to patch
+   * @param id UUID of the org to make the parent
+   * @returns transaction response or the error it raised
+   */
+   async updateParentOrg(orgId: string, id: string): Promise<any> {
+    try {
+        const orgResponse = await this.orgApi.patchOrganization(orgId, { parentOrganization: id });
+        return orgResponse;     
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
    * Removes organization leader to no one
    * @param orgId org id to update
    * @returns transaction response or the error it raised
@@ -122,6 +138,21 @@ export default class OrganizationService implements DataService<OrganizationDto,
   async removeLeader(orgId: string): Promise<any> {
     try {  
         const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
+        return orgResponse;
+    }
+    catch (error) {
+      return error;
+    }
+  }
+
+  /**
+   * Removes organization parent to no one
+   * @param orgId org id to update
+   * @returns transaction response or the error it raised
+   */
+   async removeParent(orgId: string): Promise<any> {
+    try {  
+        const orgResponse = await this.orgApi.deleteOrgParent(orgId);
         return orgResponse;
     }
     catch (error) {
