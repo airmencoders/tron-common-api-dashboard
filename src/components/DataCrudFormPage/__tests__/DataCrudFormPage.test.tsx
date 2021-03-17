@@ -2,7 +2,6 @@ import {render, waitFor, screen, fireEvent} from '@testing-library/react';
 import {DataCrudFormPage} from '../DataCrudFormPage';
 import {DataService} from '../../../state/data-service/data-service';
 import { createState, none, State, useState } from '@hookstate/core';
-import {useCrudPageState} from '../../../state/crud-page/crud-page-state';
 import GridColumn from '../../Grid/GridColumn';
 import {MemoryRouter} from 'react-router-dom';
 
@@ -142,7 +141,6 @@ it('should render', async () => {
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
-            usePageState={useCrudPageState}
             columns={[
               new GridColumn('id', false, false, 'id'),
               new GridColumn('val', false, false, 'val'),
@@ -167,7 +165,6 @@ it('should show sidebar if page in add state', async () => {
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
-            usePageState={useCrudPageState}
             columns={[
               new GridColumn('id', false, false, 'id'),
               new GridColumn('val', false, false, 'val'),
@@ -191,7 +188,6 @@ it('should open the update panel if row clicked', async () => {
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
-            usePageState={useCrudPageState}
             columns={[
               new GridColumn('id', false, false, 'id'),
               new GridColumn('val', false, false, 'val'),
@@ -215,7 +211,6 @@ it('should show error state if request error', async () => {
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedErrorState}
-            usePageState={useCrudPageState}
             columns={[
               new GridColumn('id', false, false, 'id'),
               new GridColumn('val', false, false, 'val'),
@@ -237,7 +232,6 @@ it('should show success message for successful update', async () => {
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
-            usePageState={useCrudPageState}
             columns={[
               new GridColumn('id', false, false, 'id'),
               new GridColumn('val', false, false, 'val'),
@@ -265,7 +259,6 @@ it('should show success message for successful create', async () => {
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
-            usePageState={useCrudPageState}
             columns={[
               new GridColumn('id', false, false, 'id'),
               new GridColumn('val', false, false, 'val'),

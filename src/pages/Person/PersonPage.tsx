@@ -3,7 +3,6 @@ import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPa
 import GridColumn from '../../components/Grid/GridColumn';
 import PersonEditForm from './PersonEditForm';
 import {PersonDto} from '../../openapi/models';
-import {useCrudPageState} from '../../state/crud-page/crud-page-state';
 import {usePersonState} from '../../state/person/person-state';
 
 const columns: GridColumn[] =
@@ -27,7 +26,6 @@ function PersonPage() {
           pageTitle="People"
           updateForm={PersonEditForm}
           useDataState={usePersonState}
-          usePageState={useCrudPageState}
           allowEdit={true}
       />
   );

@@ -1,6 +1,4 @@
 import {DataService} from '../../state/data-service/data-service';
-import {State} from '@hookstate/core';
-import {CrudPageState} from '../../state/crud-page/crud-page-state';
 import GridColumn from '../Grid/GridColumn';
 import {CreateUpdateFormProps} from './CreateUpdateFormProps';
 import { DeleteComponentProps } from './DeleteComponentProps';
@@ -14,11 +12,6 @@ export interface DataCrudFormPageProps<T, R> {
    * Hook used to access the service to fetch and update data.
    * */
   useDataState: () => DataService<T, R>;
-
-  /**
-   * Hook used to track the page state.
-   */
-  usePageState: <R>() => State<CrudPageState<R>>;
 
   /**
    * Grid column definitions.
