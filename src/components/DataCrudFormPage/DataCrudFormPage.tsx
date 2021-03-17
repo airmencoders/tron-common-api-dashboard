@@ -9,7 +9,7 @@ import Button from '../../components/Button/Button';
 import {DataCrudFormPageProps} from './DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
 import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
-import { State } from '@hookstate/core';
+import { Downgraded, State, useState } from '@hookstate/core';
 import {FormActionType} from '../../state/crud-page/form-action-type';
 import {GridRowData} from '../Grid/grid-row-data';
 import './DataCrudFormPage.scss';
@@ -27,16 +27,12 @@ import Spinner from '../Spinner/Spinner';
  * R Editable Data type
  */
 export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
-  const dataState: DataService<any, any> = props.useDataState();
+  const dataState: DataService<T, R> = props.useDataState();
 
-  const pageState: State<CrudPageState<any>> = props.usePageState();
+  const pageState: State<CrudPageState<R>> = useState<CrudPageState<R>>(getInitialCrudPageState());
 
   useEffect(() => {
     dataState.fetchAndStoreData();
-    
-    return () => {
-      pageState.set(getInitialCrudPageState());
-    }
   }, []);
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
@@ -71,8 +67,19 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
-  async function deleteConfirmation(deleteItem: R) {
+  async function deleteConfirmation(deleteItem: T) {
     if (props.allowDelete && deleteItem != null) {
+      /**
+       * Find the item in dataState and remove the proxy here.
+       * Uses Hookstate's Downgraded plugin. Wait until we need the raw item
+       * to use Downgraded so that we can keep the benefits of proxy usage until the end.
+       *
+       * The item should always exist in dataState but we keep Object.assign()
+       * as the fallback.
+       */
+      const dataStateItem = dataState.state.find(item => item.id.get() === deleteItem.id);
+      deleteItem = dataStateItem?.attach(Downgraded).get() ?? Object.assign({}, deleteItem);
+
       const data = await dataState.convertRowDataToEditableData(deleteItem);
 
       pageState.merge({
@@ -215,10 +222,10 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
               }
 
               <Grid
-                  data={dataState.state?.get() || []}
-                  columns={columns}
-                  onRowClicked={onRowClicked}
-                  rowClass="ag-grid--row-pointer"
+                data={dataState.state.get()}
+                columns={columns}
+                onRowClicked={onRowClicked}
+                rowClass="ag-grid--row-pointer"
               />
 
               <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>

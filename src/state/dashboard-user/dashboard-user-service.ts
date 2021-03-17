@@ -9,7 +9,7 @@ import { DataService } from '../data-service/data-service';
 import { Privilege } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 
-export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserDto> {
+export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserFlat> {
   constructor(public state: State<DashboardUserFlat[]>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
 
   fetchAndStoreData(): Promise<DashboardUserFlat[]> {
@@ -131,7 +131,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
   }
 
   convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
-    return Promise.resolve(Object.assign({}, rowData));
+    return Promise.resolve(rowData);
   }
 
   private isStateReady(): boolean {

@@ -2,10 +2,9 @@ import React, {FormEvent} from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
-import Select from '../../components/forms/Select/Select';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
-import {createState, useState} from '@hookstate/core';
+import {useState} from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
@@ -14,7 +13,7 @@ import { Initial } from '@hookstate/initial';
 
 function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageAppRegistryDto>) {
 
-  const formState = useState(createState({id: props.data?.id, appName: props.data?.appName ?? '', userPrivs: props.data?.userPrivs}));
+  const formState = useState({id: props.data?.id, appName: props.data?.appName ?? '', userPrivs: props.data?.userPrivs});
 
   formState.attach(Validation);
   formState.attach(Initial);

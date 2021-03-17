@@ -5,7 +5,6 @@ import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/Privil
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
 import AppClientForm from './AppClientForm';
-import { useCrudPageState } from '../../state/crud-page/crud-page-state';
 import AppClientDelete from './AppClientDelete';
 
 const columnHeaders: GridColumn[] = [
@@ -25,7 +24,6 @@ export function AppClientPage() {
       createForm={AppClientForm}
       updateForm={AppClientForm}
       useDataState={useAppClientsState}
-      usePageState={useCrudPageState}
       allowEdit={true}
       allowDelete
       deleteComponent={AppClientDelete}
