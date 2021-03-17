@@ -4,7 +4,6 @@ import {Meta, Story} from '@storybook/react';
 import {DataCrudFormPageProps} from '../../components/DataCrudFormPage/DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
 import {createState, State, useState} from '@hookstate/core';
-import {useCrudPageState} from '../../state/crud-page/crud-page-state';
 import GridColumn from '../../components/Grid/GridColumn';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Label from '../../components/forms/Label/Label';
@@ -59,7 +58,7 @@ const mockRowData: MockRow[] = mockData?.map((dataItem) => ({
   val2: (dataItem.val2SubA || 0) + (dataItem.val2SubB || 0)
 }));
 
-const useStateHook = () => useState(createState<MockRow[]>(mockRowData));
+const useStateHook = () => useState<MockRow[]>(mockRowData);
 
 class MockDataService implements DataService<MockRow, MockDto> {
 
@@ -188,7 +187,6 @@ const columns = [
 export const TestPage = Template.bind({});
 TestPage.args = {
   useDataState: () => new MockDataService(useStateHook()),
-  usePageState: useCrudPageState,
   columns,
   createForm: CreateForm,
   updateForm: CreateForm,

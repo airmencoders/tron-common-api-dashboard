@@ -2,7 +2,6 @@ import React from 'react';
 import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import {useOrganizationState} from '../../state/organization/organization-state';
-import {useCrudPageState} from '../../state/crud-page/crud-page-state';
 
 const columns: GridColumn[] =
     [
@@ -25,7 +24,6 @@ function OrganizationPage() {
        // Currently disabled
        updateForm={() => <></>}
        useDataState={useOrganizationState}
-       usePageState={useCrudPageState}
       />
   );
 }
