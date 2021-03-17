@@ -3,9 +3,8 @@
 .openapi-generator-ignore
 api.ts
 apis/app-client-controller-api.ts
+apis/app-source-controller-api.ts
 apis/dashboard-user-controller-api.ts
-apis/flight-controller-api.ts
-apis/group-controller-api.ts
 apis/header-request-controller-api.ts
 apis/logfile-controller-api.ts
 apis/organization-controller-api.ts
@@ -14,10 +13,8 @@ apis/privilege-controller-api.ts
 apis/puckboard-etl-controller-api.ts
 apis/rank-controller-api.ts
 apis/scratch-storage-controller-api.ts
-apis/squadron-controller-api.ts
 apis/subscriber-controller-api.ts
 apis/user-info-controller-api.ts
-apis/wing-controller-api.ts
 base.ts
 configuration.ts
 git_push.sh
@@ -25,6 +22,9 @@ index.ts
 models/airman-all-of.ts
 models/airman.ts
 models/app-client-user-dto.ts
+models/app-client-user-priv-dto.ts
+models/app-source-details-dto.ts
+models/app-source-dto.ts
 models/bad-request-exception.ts
 models/coast-guardsman.ts
 models/dashboard-user-dto.ts
