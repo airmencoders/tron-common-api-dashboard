@@ -7,6 +7,7 @@ import LogfilePage from "./pages/Logfile/LogfilePage";
 import DashboardUserPage from "./pages/DashboardUser/DashboardUserPage";
 import ScratchStoragePage from "./pages/ScratchStorage/ScratchStoragePage";
 import HomePage from "./pages/Home/Home";
+import { AppSourcePage } from "./pages/AppSource/AppSourcePage";
 
 export interface RouteItem {
     path: string,
@@ -23,7 +24,8 @@ export enum RoutePath {
     ORGANIZATION = '/organization',
     LOGFILE = '/logfile',
     DASHBOARD_USER = '/dashboard-user',
-    SCRATCH_STORAGE = '/scratch-storage'
+    SCRATCH_STORAGE = '/scratch-storage',
+    APP_SOURCE = '/app-source'
 }
 
 export const routes: RouteItem[] = [
@@ -67,6 +69,12 @@ export const routes: RouteItem[] = [
         path: RoutePath.DASHBOARD_USER,
         name: 'Dashboard Users',
         component: DashboardUserPage,
+        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+    },
+    {
+        path: RoutePath.APP_SOURCE,
+        name: 'App Sources',
+        component: AppSourcePage,
         requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
     },
     {

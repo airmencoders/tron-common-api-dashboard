@@ -3,150 +3,9 @@ info:
   title: TRON Common API
   version: 0.0.1
 servers:
-- url: http://localhost:8088/api
+- url: http://localhost:8080/api
   description: Generated server url
 paths:
-  /v1/wing/{id}:
-    get:
-      tags:
-      - wing-controller
-      summary: Retrieves a USAF WING organization by ID
-      description: Retrieves a USAF WING organization by ID
-      operationId: getWingById
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found or UUID exists but is not a Wing type
-    put:
-      tags:
-      - wing-controller
-      summary: Updates an existing WING
-      description: Updates an existing WING
-      operationId: updateWing
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: Full OrganizationDto object with updated data in it
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad request - provided unit not a WING
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    delete:
-      tags:
-      - wing-controller
-      summary: Deletes an existing WING
-      description: Deletes an existing WING
-      operationId: deleteWing
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-    patch:
-      tags:
-      - wing-controller
-      summary: Updates an existing WING's attributes
-      description: Updates an existing WING's attributes
-      operationId: patchWing
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-              description: Object with key value pairs of the attributes to update
-        required: true
-      responses:
-        "400":
-          description: A provided person UUID was invalid or org was not a WING
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Organization resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
   /v1/subscriptions/{id}:
     get:
       tags:
@@ -162,18 +21,18 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Subscriber'
         "404":
           description: Record not found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
     put:
       tags:
       - subscriber-controller
@@ -200,24 +59,24 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Subscriber'
-        "404":
-          description: Record not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "409":
           description: Subscription exists with address/event type pair
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "404":
+          description: Record not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
     delete:
       tags:
       - subscriber-controller
@@ -232,159 +91,18 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Subscriber'
         "404":
           description: Record not found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-  /v1/squadron/{id}:
-    get:
-      tags:
-      - squadron-controller
-      summary: Retrieves a USAF SQUADRON organization by ID
-      description: Retrieves a USAF SQUADRON organization by ID
-      operationId: getSquadronById
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found or UUID exists but is not a Squadron type
-    put:
-      tags:
-      - squadron-controller
-      summary: Updates an existing SQUADRON
-      description: Updates an existing SQUADRON
-      operationId: updateSquadron
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: Full OrganizationDto object with updated data in it
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad request - provided unit not a SQUADRON
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    delete:
-      tags:
-      - squadron-controller
-      summary: Deletes an existing SQUADRON
-      description: Deletes an existing SQUADRON
-      operationId: deleteSquadron
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-    patch:
-      tags:
-      - squadron-controller
-      summary: Updates an existing SQUADRON's attributes
-      description: Updates an existing SQUADRON's attributes
-      operationId: patchSquadron
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-              description: Object with key value pairs of the attributes to update
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Organization resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: A provided person UUID was invalid or org was not a SQUADRON
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
+                $ref: '#/components/schemas/Subscriber'
   /v1/scratch/users/{id}:
     put:
       tags:
@@ -407,36 +125,36 @@ paths:
               $ref: '#/components/schemas/ScratchStorageUser'
         required: true
       responses:
-        "200":
-          description: Operation Successful
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageUser'
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
-        "409":
-          description: Scratch User Email Address is already is use
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ResourceAlreadyExistsException'
-        "400":
-          description: Malformed Scratch Storage object or malformed user UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/BadRequestException'
         "404":
           description: User id not found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/RecordNotFoundException'
+        "400":
+          description: Malformed Scratch Storage object or malformed user UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        "409":
+          description: Scratch User Email Address is already is use
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResourceAlreadyExistsException'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Operation Successful
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageUser'
     delete:
       tags:
       - scratch-storage-controller
@@ -452,30 +170,30 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Operation Successful
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageUser'
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
-        "400":
-          description: Malformed user UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/BadRequestException'
         "404":
           description: User id not found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/RecordNotFoundException'
+        "400":
+          description: Malformed user UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Operation Successful
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageUser'
   /v1/scratch/apps/{id}:
     put:
       tags:
@@ -498,6 +216,30 @@ paths:
               $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
         required: true
       responses:
+        "200":
+          description: App Info Changed OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
+        "404":
+          description: Application ID not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordNotFoundException'
+        "409":
+          description: App Name is already is use
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResourceAlreadyExistsException'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
         "400":
           description: Malformed request body / app name already exists or appId is
             malformed
@@ -505,30 +247,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/BadRequestException'
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
-        "404":
-          description: Application ID not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/RecordNotFoundException'
-        "200":
-          description: App Info Changed OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
-        "409":
-          description: App Name is already is use
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ResourceAlreadyExistsException'
     delete:
       tags:
       - scratch-storage-controller
@@ -545,18 +263,6 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: App Removed OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
         "400":
           description: AppId is malformed
           content:
@@ -569,6 +275,18 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/RecordNotFoundException'
+        "200":
+          description: App Removed OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
   /v1/person/{id}:
     get:
       tags:
@@ -721,18 +439,18 @@ paths:
           type: string
           default: ""
       responses:
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "404":
           description: Resource not found
     put:
@@ -763,12 +481,6 @@ paths:
               - $ref: '#/components/schemas/Wing'
         required: true
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
         "404":
           description: Resource not found
           content:
@@ -781,6 +493,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
     delete:
       tags:
       - organization-controller
@@ -829,307 +547,24 @@ paths:
                 null to clear that field)
         required: true
       responses:
-        "200":
-          description: Successful operation
+        "404":
+          description: Organization resource not found
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/OrganizationDto'
+                $ref: '#/components/schemas/ExceptionResponse'
         "400":
           description: A provided person UUID was invalid
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Organization resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/group/{id}:
-    get:
-      tags:
-      - group-controller
-      summary: Retrieves a USAF GROUP organization by ID
-      description: Retrieves a USAF GROUP organization by ID
-      operationId: getGroupById
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found or UUID exists but is not a Group type
-    put:
-      tags:
-      - group-controller
-      summary: Updates an existing GROUP
-      description: Updates an existing GROUP
-      operationId: updateGroup
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: Full OrganizationDto object with updated data in it
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "400":
-          description: Bad request - provided unit not a GROUP
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    delete:
-      tags:
-      - group-controller
-      summary: Deletes an existing GROUP
-      description: Deletes an existing GROUP
-      operationId: deleteGroup
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-    patch:
-      tags:
-      - group-controller
-      summary: Updates an existing GROUP's attributes
-      description: Updates an existing GROUP's attributes
-      operationId: patchGroup
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-              description: Object with key value pairs of the attributes to update
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Organization resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: A provided person UUID was invalid or org was not a GROUP
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/flight/{id}:
-    get:
-      tags:
-      - flight-controller
-      summary: Retrieves a USAF FLIGHT organization by ID
-      description: Retrieves a USAF FLIGHT organization by ID
-      operationId: getFlightById
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found or UUID exists but is not a Flight type
-    put:
-      tags:
-      - flight-controller
-      summary: Updates an existing FLIGHT
-      description: Updates an existing FLIGHT
-      operationId: updateFlight
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: Full OrganizationDto object with updated data in it
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad request - provided unit not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    delete:
-      tags:
-      - flight-controller
-      summary: Deletes an existing FLIGHT
-      description: Deletes an existing FLIGHT
-      operationId: deleteFlight
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-    patch:
-      tags:
-      - flight-controller
-      summary: Updates an existing FLIGHT's attributes
-      description: Updates an existing FLIGHT's attributes.  Non-person/organization
-        fields can be updated using this manner.
-      operationId: patchFlight
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-              description: Object with key value pairs of the attributes to update
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "400":
-          description: A provided person UUID was invalid or org was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: Organization resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
   /v1/dashboard-users/{id}:
     get:
       tags:
@@ -1220,6 +655,122 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponse'
         "204":
           description: Successful operation
+  /v1/app-source/{id}:
+    get:
+      tags:
+      - app-source-controller
+      summary: Returns the details for an App Source
+      operationId: getAppSourceDetails
+      parameters:
+      - name: id
+        in: path
+        description: App Source UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: Requested App Source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppSourceDetailsDto'
+    put:
+      tags:
+      - app-source-controller
+      summary: Returns the details for an App Source
+      operationId: updateAppSourceDetails
+      parameters:
+      - name: id
+        in: path
+        description: App Source id to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppSourceDetailsDto'
+        required: true
+      responses:
+        "404":
+          description: Requested App Source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Malformed Request Body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppSourceDetailsDto'
+    delete:
+      tags:
+      - app-source-controller
+      summary: Deletes the App Source
+      description: Requester has to have DASHBOARD_ADMIN rights
+      operationId: deleteAppSource
+      parameters:
+      - name: id
+        in: path
+        description: App Source UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: App Source Id not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: App Source Removed OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AppSourceDetailsDto'
+        "400":
+          description: Id is malformed
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/app-client/{id}:
     put:
       tags:
@@ -1242,6 +793,12 @@ paths:
               $ref: '#/components/schemas/AppClientUserDto'
         required: true
       responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AppClientUserDto'
         "404":
           description: Resource not found
           content:
@@ -1254,12 +811,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AppClientUserDto'
     delete:
       tags:
       - app-client-controller
@@ -1275,109 +826,14 @@ paths:
           type: string
           format: uuid
       responses:
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/AppClientUserDto'
-  /v1/wing:
-    get:
-      tags:
-      - wing-controller
-      summary: Retrieves all organizations of type USAF FLIGHT
-      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
-        \ use '/organization' endpoint to allow more options."
-      operationId: getAllWingTypes
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-    post:
-      tags:
-      - wing-controller
-      summary: Adds a new USAF WING organization
-      description: Adds a new USAF WING organization
-      operationId: createNewWing
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: OrganizationDto object representing new unit
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Resource already exists with the id provided
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/wing/wings:
-    post:
-      tags:
-      - wing-controller
-      summary: Adds one or more WING entities
-      description: "Adds one or more WING entities - returns that same array of input\
-        \ organizations with their assigned UUIDs. If the request does NOT return\
-        \ 201 (Created) because of an error (see other return codes), then any new\
-        \ organizations up to that organization that caused the failure will have\
-        \ been committed (but none thereafter)The return error message will list the\
-        \ offending UUID or other data that caused the error."
-      operationId: addNewWings
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of the new organization objects to add
-              items:
-                oneOf:
-                - $ref: '#/components/schemas/OrganizationDto'
-                - $ref: '#/components/schemas/Flight'
-                - $ref: '#/components/schemas/Group'
-                - $ref: '#/components/schemas/OtherUsaf'
-                - $ref: '#/components/schemas/Squadron'
-                - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Bad Request / One of the supplied organizations contained a
-            UUID that already exists or other duplicate data / An org was provided
-            that was not a WING
+        "404":
+          description: Resource not found
           content:
             '*/*':
               schema:
@@ -1424,101 +880,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-  /v1/squadron:
-    get:
-      tags:
-      - squadron-controller
-      summary: Retrieves all organizations of type USAF SQUADRON
-      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
-        \ use '/organization' endpoint to allow more options."
-      operationId: getAllSquadronTypes
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-    post:
-      tags:
-      - squadron-controller
-      summary: Adds a new USAF SQUADRON organization
-      description: Adds a new USAF SQUADRON organization
-      operationId: createNewSquadron
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: OrganizationDto object representing new unit
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Resource already exists with the id provided
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/squadron/squadrons:
-    post:
-      tags:
-      - squadron-controller
-      summary: Adds one or more SQUADRON entities
-      description: "Adds one or more SQUADRON entities - returns that same array of\
-        \ input organizations with their assigned UUIDs. If the request does NOT return\
-        \ 201 (Created) because of an error (see other return codes), then any new\
-        \ organizations up to that organization that caused the failure will have\
-        \ been committed (but none thereafter)The return error message will list the\
-        \ offending UUID or other data that caused the error."
-      operationId: addNewSquadrons
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of the new organization objects to add
-              items:
-                oneOf:
-                - $ref: '#/components/schemas/OrganizationDto'
-                - $ref: '#/components/schemas/Flight'
-                - $ref: '#/components/schemas/Group'
-                - $ref: '#/components/schemas/OtherUsaf'
-                - $ref: '#/components/schemas/Squadron'
-                - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "409":
-          description: Bad Request / One of the supplied organizations contained a
-            UUID that already exists or other duplicate data / An org was provided
-            that was not a SQUADRON
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
   /v1/scratch:
     get:
       tags:
@@ -1561,18 +922,18 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/InvalidScratchSpacePermissions'
-        "404":
-          description: Application ID / Key name not valid or found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/RecordNotFoundException'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ScratchStorageEntry'
+        "404":
+          description: Application ID / Key name not valid or found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordNotFoundException'
         "400":
           description: Malformed Request Body
           content:
@@ -1587,12 +948,6 @@ paths:
       description: Requester has to have DASHBOARD_ADMIN rights
       operationId: getAllUsers
       responses:
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
         "200":
           description: Successful operation
           content:
@@ -1601,6 +956,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScratchStorageUser'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
     post:
       tags:
       - scratch-storage-controller
@@ -1614,30 +975,30 @@ paths:
               $ref: '#/components/schemas/ScratchStorageUser'
         required: true
       responses:
-        "400":
-          description: Malformed Scratch Storage object
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/BadRequestException'
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
-        "201":
-          description: New user added operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageUser'
         "409":
           description: Scratch User UUID or email address is already is use
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ResourceAlreadyExistsException'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Malformed Scratch Storage object
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BadRequestException'
+        "201":
+          description: New user added operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageUser'
   /v1/scratch/apps:
     get:
       tags:
@@ -1647,12 +1008,6 @@ paths:
       description: Requester has to have DASHBOARD_ADMIN rights
       operationId: getScratchSpaceApps
       responses:
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
         "200":
           description: Successful operation
           content:
@@ -1661,6 +1016,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScratchStorageAppRegistryDto'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
     post:
       tags:
       - scratch-storage-controller
@@ -1766,14 +1127,14 @@ paths:
               - $ref: '#/components/schemas/Spaceman'
         required: true
       responses:
-        "400":
-          description: Bad request
+        "409":
+          description: Resource already exists with the id provided
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "409":
-          description: Resource already exists with the id provided
+        "400":
+          description: Bad request
           content:
             '*/*':
               schema:
@@ -1949,18 +1310,18 @@ paths:
               - $ref: '#/components/schemas/Wing'
         required: true
       responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
         "409":
           description: Resource already exists with the id provided
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
   /v1/organization/organizations:
     post:
       tags:
@@ -1988,6 +1349,12 @@ paths:
                 - $ref: '#/components/schemas/Wing'
         required: true
       responses:
+        "400":
+          description: Bad data or validation error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "409":
           description: Bad Request / One of the supplied organizations contained a
             UUID that already exists or other duplicate data
@@ -1995,208 +1362,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "201":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/OrganizationDto'
-  /v1/group:
-    get:
-      tags:
-      - group-controller
-      summary: Retrieves all organizations of type USAF GROUP
-      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
-        \ use '/organization' endpoint to allow more options."
-      operationId: getAllGroupTypes
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-    post:
-      tags:
-      - group-controller
-      summary: Adds a new USAF GROUP organization
-      description: Adds a new USAF GROUP organization
-      operationId: createNewGroup
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: OrganizationDto object representing new unit
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Resource already exists with the id provided
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/group/groups:
-    post:
-      tags:
-      - group-controller
-      summary: Adds one or more GROUP entities
-      description: "Adds one or more GROUP entities - returns that same array of input\
-        \ organizations with their assigned UUIDs. If the request does NOT return\
-        \ 201 (Created) because of an error (see other return codes), then any new\
-        \ organizations up to that organization that caused the failure will have\
-        \ been committed (but none thereafter)The return error message will list the\
-        \ offending UUID or other data that caused the error."
-      operationId: addNewGroups
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of the new organization objects to add
-              items:
-                oneOf:
-                - $ref: '#/components/schemas/OrganizationDto'
-                - $ref: '#/components/schemas/Flight'
-                - $ref: '#/components/schemas/Group'
-                - $ref: '#/components/schemas/OtherUsaf'
-                - $ref: '#/components/schemas/Squadron'
-                - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Bad Request / One of the supplied organizations contained a
-            UUID that already exists or other duplicate data / An org was provided
-            that was not a GROUP
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/flight:
-    get:
-      tags:
-      - flight-controller
-      summary: Retrieves all organizations of type USAF WING
-      description: "Retrieves all USAF WING organizations.  No other parameters allowed,\
-        \ use '/organization' endpoint to allow more options."
-      operationId: getAllFlightTypes
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-    post:
-      tags:
-      - flight-controller
-      summary: Adds a new USAF FLIGHT organization
-      description: Adds a new USAF FLIGHT organization
-      operationId: createNewFlight
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: OrganizationDto object representing new unit
-              oneOf:
-              - $ref: '#/components/schemas/OrganizationDto'
-              - $ref: '#/components/schemas/Flight'
-              - $ref: '#/components/schemas/Group'
-              - $ref: '#/components/schemas/OtherUsaf'
-              - $ref: '#/components/schemas/Squadron'
-              - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Resource already exists with the id provided
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-  /v1/flight/flights:
-    post:
-      tags:
-      - flight-controller
-      summary: Adds one or more FLIGHT entities
-      description: "Adds one or more FLIGHT entities - returns that same array of\
-        \ input organizations with their assigned UUIDs. If the request does NOT return\
-        \ 201 (Created) because of an error (see other return codes), then any new\
-        \ organizations up to that organization that caused the failure will have\
-        \ been committed (but none thereafter)The return error message will list the\
-        \ offending UUID or other data that caused the error."
-      operationId: addNewFlights
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of the new organization objects to add
-              items:
-                oneOf:
-                - $ref: '#/components/schemas/OrganizationDto'
-                - $ref: '#/components/schemas/Flight'
-                - $ref: '#/components/schemas/Group'
-                - $ref: '#/components/schemas/OtherUsaf'
-                - $ref: '#/components/schemas/Squadron'
-                - $ref: '#/components/schemas/Wing'
-        required: true
-      responses:
-        "400":
-          description: Bad data or validation error
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrganizationDto'
-        "409":
-          description: Bad Request / One of the supplied organizations contained a
-            UUID that already exists or other duplicate data / An org was provided
-            that was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
   /v1/dashboard-users:
     get:
       tags:
@@ -2244,6 +1415,57 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+  /v1/app-source:
+    get:
+      tags:
+      - app-source-controller
+      summary: Gets all App Sources.
+      operationId: getAppSources
+      responses:
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppSourceDto'
+    post:
+      tags:
+      - app-source-controller
+      summary: Creates an App Source including App Client permissions.
+      operationId: createAppSource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppSourceDetailsDto'
+        required: true
+      responses:
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: Malformed Request Body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "201":
+          description: Successful creation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AppSourceDetailsDto'
   /v1/app-client:
     get:
       tags:
@@ -2273,182 +1495,24 @@ paths:
               $ref: '#/components/schemas/AppClientUserDto'
         required: true
       responses:
-        "409":
-          description: Resource already exists with the name provided
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "201":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/AppClientUserDto'
-  /v1/wing/{id}/members:
-    delete:
-      tags:
-      - wing-controller
-      summary: Deletes a member(s) from the WING
-      description: Deletes a member(s) from the WING
-      operationId: deleteWingMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
         "400":
-          description: Provided person UUID(s) was/were invalid or org was not a WING
+          description: Bad request
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-        "404":
-          description: Provided organization UUID was invalid
+        "409":
+          description: Resource already exists with the name provided
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-    patch:
-      tags:
-      - wing-controller
-      summary: Add member(s) to a WING
-      description: Adds member(s) to a WING
-      operationId: addWingMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a WING
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-  /v1/squadron/{id}/members:
-    delete:
-      tags:
-      - squadron-controller
-      summary: Deletes a member(s) from the SQUADRON
-      description: Deletes a member(s) from the SQUADRON
-      operationId: deleteSquadronMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a SQUADRON
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-        "404":
-          description: Provided organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    patch:
-      tags:
-      - squadron-controller
-      summary: Add member(s) to a SQUADRON
-      description: Adds member(s) to a SQUADRON
-      operationId: addSquadronMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a SQUADRON
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
   /v1/scratch/apps/{id}/user:
     patch:
       tags:
@@ -2472,6 +1536,18 @@ paths:
               $ref: '#/components/schemas/ScratchStorageAppUserPrivDto'
         required: true
       responses:
+        "200":
+          description: App Priv Added OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
+        "404":
+          description: Application ID not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordNotFoundException'
         "400":
           description: Malformed request body / app name already exists or appId is
             malformed
@@ -2479,18 +1555,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/BadRequestException'
-        "404":
-          description: Application ID not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/RecordNotFoundException'
-        "200":
-          description: App Priv Added OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
         "403":
           description: "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges\
             \ for given app id"
@@ -2530,14 +1594,14 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: Host organization UUID was invalid
+        "400":
+          description: Provided org UUID(s) was/were invalid
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Provided org UUID(s) was/were invalid
+        "404":
+          description: Host organization UUID was invalid
           content:
             '*/*':
               schema:
@@ -2569,14 +1633,14 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: Host organization UUID was invalid
+        "400":
+          description: Provided org UUID(s) was/were invalid
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: Provided org UUID(s) was/were invalid
+        "404":
+          description: Host organization UUID was invalid
           content:
             '*/*':
               schema:
@@ -2609,14 +1673,14 @@ paths:
                 format: uuid
         required: true
       responses:
-        "204":
-          description: Successful operation
         "404":
           description: Provided organization UUID was invalid
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "204":
+          description: Successful operation
         "400":
           description: Provided person UUID(s) was/were invalid
           content:
@@ -2662,164 +1726,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-  /v1/group/{id}/members:
-    delete:
-      tags:
-      - group-controller
-      summary: Deletes a member(s) from the GROUP
-      description: Deletes a member(s) from the GROUP
-      operationId: deleteGroupMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a GROUP
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-        "404":
-          description: Provided organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    patch:
-      tags:
-      - group-controller
-      summary: Add member(s) to a GROUP
-      description: Adds member(s) to a GROUP
-      operationId: addGroupMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a GROUP
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-  /v1/flight/{id}/members:
-    delete:
-      tags:
-      - flight-controller
-      summary: Deletes a member(s) from the FLIGHT
-      description: Deletes a member(s) from the FLIGHT
-      operationId: deleteFlightMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
-        "404":
-          description: Provided organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-    patch:
-      tags:
-      - flight-controller
-      summary: Add member(s) to a FLIGHT
-      description: Adds member(s) to a FLIGHT
-      operationId: addFlightMembers
-      parameters:
-      - name: id
-        in: path
-        description: UUID of the host organization record
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: List of UUIDs of persons to remove from the organization
-              items:
-                type: string
-                format: uuid
-        required: true
-      responses:
-        "400":
-          description: Provided person UUID(s) was/were invalid or org was not a FLIGHT
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "404":
-          description: A organization UUID was invalid
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
-        "204":
-          description: Successful operation
   /v1/userinfo:
     get:
       tags:
@@ -2828,18 +1734,18 @@ paths:
       description: Retrieves user information
       operationId: getUserInfo
       responses:
-        "400":
-          description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/subscriptions/events/replay:
     get:
       tags:
@@ -2894,14 +1800,6 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ScratchStorageEntry'
         "404":
           description: Application ID not valid or found
           content:
@@ -2914,6 +1812,14 @@ paths:
             '*/*':
               schema:
                 type: object
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScratchStorageEntry'
     delete:
       tags:
       - scratch-storage-controller
@@ -2936,18 +1842,18 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/InvalidScratchSpacePermissions'
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ScratchStorageEntry'
         "404":
           description: Application ID not valid or found
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/RecordNotFoundException'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageEntry'
         "400":
           description: Malformed Request Body
           content:
@@ -2976,18 +1882,18 @@ paths:
         schema:
           type: string
       responses:
-        "404":
-          description: Application ID / Key name not valid or found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/RecordNotFoundException'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ScratchStorageEntry'
+        "404":
+          description: Application ID / Key name not valid or found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordNotFoundException'
         "400":
           description: Malformed Application UUID
           content:
@@ -3100,14 +2006,14 @@ paths:
         schema:
           type: string
       responses:
-        "404":
-          description: Resource not found
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Rank'
+        "404":
+          description: Resource not found
   /v1/puckboard/extract:
     get:
       tags:
@@ -3178,12 +2084,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
-        "400":
-          description: I/O error involving file
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
@@ -3193,6 +2093,12 @@ paths:
                 format: binary
         "404":
           description: File not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: I/O error involving file
           content:
             '*/*':
               schema:
@@ -3258,18 +2164,18 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/InvalidScratchSpacePermissions'
-        "404":
-          description: Application ID / Key name not valid or found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/RecordNotFoundException'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ScratchStorageEntry'
+        "404":
+          description: Application ID / Key name not valid or found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordNotFoundException'
         "400":
           description: Malformed Request Body
           content:
@@ -3299,12 +2205,12 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: App Priv Removed OK
+        "404":
+          description: Application ID not found
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
+                $ref: '#/components/schemas/RecordNotFoundException'
         "400":
           description: Malformed request body / app name already exists or appId is
             malformed
@@ -3312,12 +2218,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/BadRequestException'
-        "404":
-          description: Application ID not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/RecordNotFoundException'
         "403":
           description: "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges\
             \ for given app id"
@@ -3325,114 +2225,70 @@ paths:
             '*/*':
               schema:
                 type: object
+        "200":
+          description: App Priv Removed OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
+  /v1/organization/{id}/parent:
+    delete:
+      tags:
+      - organization-controller
+      summary: Deletes a parent from a subordinate organization
+      description: Deletes/clears out the parent org with no org
+      operationId: deleteOrgParent
+      parameters:
+      - name: id
+        in: path
+        description: Organization ID to delete the parent from
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Organization not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+  /v1/organization/{id}/leader:
+    delete:
+      tags:
+      - organization-controller
+      summary: Deletes a leader from an organization
+      description: Deletes/clears out the leader position with no one
+      operationId: deleteOrgLeader
+      parameters:
+      - name: id
+        in: path
+        description: Organization ID to delete the leader from
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrganizationDto'
+        "404":
+          description: Organization not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
 components:
   schemas:
-    Flight:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/OrganizationDto'
-      - type: object
-        properties:
-          pas:
-            type: string
-    Group:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/OrganizationDto'
-      - type: object
-        properties:
-          pas:
-            type: string
-    OrganizationDto:
-      title: Organization
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        leader:
-          type: string
-          format: uuid
-        members:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-            format: uuid
-        parentOrganization:
-          type: string
-          format: uuid
-        subordinateOrganizations:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-            format: uuid
-        name:
-          type: string
-        orgType:
-          type: string
-          enum:
-          - SQUADRON
-          - GROUP
-          - FLIGHT
-          - WING
-          - OTHER_USAF
-          - ORGANIZATION
-        branchType:
-          type: string
-          enum:
-          - OTHER
-          - USA
-          - USAF
-          - USMC
-          - USN
-          - USSF
-          - USCG
-      discriminator:
-        propertyName: orgType
-        mapping:
-          FLIGHT: '#/components/schemas/Flight'
-          GROUP: '#/components/schemas/Group'
-          OTHER_USAF: '#/components/schemas/OtherUsaf'
-          SQUADRON: '#/components/schemas/Squadron'
-          WING: '#/components/schemas/Wing'
-          ORGANIZATION: '#/components/schemas/OrganizationDto'
-    OtherUsaf:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/OrganizationDto'
-    Squadron:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/OrganizationDto'
-      - type: object
-        properties:
-          pas:
-            type: string
-    Wing:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/OrganizationDto'
-      - type: object
-        properties:
-          pas:
-            type: string
-    ExceptionResponse:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        status:
-          type: integer
-          format: int32
-        error:
-          type: string
-        message:
-          type: string
-        path:
-          type: string
     Subscriber:
       required:
       - subscribedEvent
@@ -3455,6 +2311,21 @@ components:
           - PERSON_ORG_REMOVE
           - SUB_ORG_ADD
           - SUB_ORG_REMOVE
+    ExceptionResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
     ScratchStorageUser:
       required:
       - email
@@ -3465,7 +2336,7 @@ components:
           format: uuid
         email:
           type: string
-    ResourceAlreadyExistsException:
+    RecordNotFoundException:
       type: object
       properties:
         cause:
@@ -3705,7 +2576,7 @@ components:
                 type: string
         localizedMessage:
           type: string
-    RecordNotFoundException:
+    ResourceAlreadyExistsException:
       type: object
       properties:
         cause:
@@ -3980,6 +2851,97 @@ components:
       type: object
       allOf:
       - $ref: '#/components/schemas/PersonDto'
+    Flight:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrganizationDto'
+      - type: object
+        properties:
+          pas:
+            type: string
+    Group:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrganizationDto'
+      - type: object
+        properties:
+          pas:
+            type: string
+    OrganizationDto:
+      title: Organization
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        leader:
+          type: string
+          format: uuid
+        members:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+        parentOrganization:
+          type: string
+          format: uuid
+        subordinateOrganizations:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+        orgType:
+          type: string
+          enum:
+          - SQUADRON
+          - GROUP
+          - FLIGHT
+          - WING
+          - OTHER_USAF
+          - ORGANIZATION
+        branchType:
+          type: string
+          enum:
+          - OTHER
+          - USA
+          - USAF
+          - USMC
+          - USN
+          - USSF
+          - USCG
+      discriminator:
+        propertyName: orgType
+        mapping:
+          FLIGHT: '#/components/schemas/Flight'
+          GROUP: '#/components/schemas/Group'
+          OTHER_USAF: '#/components/schemas/OtherUsaf'
+          SQUADRON: '#/components/schemas/Squadron'
+          WING: '#/components/schemas/Wing'
+          ORGANIZATION: '#/components/schemas/OrganizationDto'
+    OtherUsaf:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrganizationDto'
+    Squadron:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrganizationDto'
+      - type: object
+        properties:
+          pas:
+            type: string
+    Wing:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrganizationDto'
+      - type: object
+        properties:
+          pas:
+            type: string
     DashboardUserDto:
       type: object
       properties:
@@ -3992,7 +2954,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Privilege'
-    AppClientUserDto:
+    AppClientUserPrivDto:
+      type: object
+      properties:
+        appClientUser:
+          type: string
+          format: uuid
+        privilegeIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+    AppSourceDetailsDto:
+      required:
+      - name
       type: object
       properties:
         id:
@@ -4000,10 +2975,22 @@ components:
           format: uuid
         name:
           type: string
+        appClients:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppClientUserPrivDto'
+    AppClientUserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
         privileges:
           type: array
           items:
             $ref: '#/components/schemas/Privilege'
+        name:
+          type: string
     ScratchStorageEntry:
       required:
       - appId
@@ -4264,3 +3251,14 @@ components:
           type: string
         downloadUri:
           type: string
+    AppSourceDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        clientCount:
+          type: integer
+          format: int32

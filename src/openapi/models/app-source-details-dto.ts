@@ -13,32 +13,32 @@
  */
 
 
-import { Privilege } from './privilege';
+import { AppClientUserPrivDto } from './app-client-user-priv-dto';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface AppSourceDetailsDto
  */
-export interface AppClientUserDto {
+export interface AppSourceDetailsDto {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof AppSourceDetailsDto
      */
     id?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @type {string}
+     * @memberof AppSourceDetailsDto
      */
-    privileges?: Array<Privilege>;
+    name: string;
     /**
      * 
-     * @type {string}
-     * @memberof AppClientUserDto
+     * @type {Array<AppClientUserPrivDto>}
+     * @memberof AppSourceDetailsDto
      */
-    name?: string;
+    appClients?: Array<AppClientUserPrivDto>;
 }
 
 

@@ -13,32 +13,25 @@
  */
 
 
-import { Privilege } from './privilege';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface AppClientUserPrivDto
  */
-export interface AppClientUserDto {
+export interface AppClientUserPrivDto {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof AppClientUserPrivDto
      */
-    id?: string;
+    appClientUser?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @type {Array<number>}
+     * @memberof AppClientUserPrivDto
      */
-    privileges?: Array<Privilege>;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppClientUserDto
-     */
-    name?: string;
+    privilegeIds?: Array<number>;
 }
 
 
