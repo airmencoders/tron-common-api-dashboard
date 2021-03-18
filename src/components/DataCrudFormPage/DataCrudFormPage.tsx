@@ -241,7 +241,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                   />
                   : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
                     <UpdateForm
-                      data={pageState.selected.get()}
+                        data={pageState.selected.attach(Downgraded).get()}
                       formErrors={pageState.formErrors.get()}
                       onSubmit={updateSubmit}
                       onClose={onCloseHandler}

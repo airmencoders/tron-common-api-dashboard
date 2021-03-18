@@ -127,7 +127,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     const privileges = new Set<Privilege>();
 
     if (client.read) {
-      const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.READ);
+      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.READ);
 
       if (privilege) {
         privileges.add(privilege);
@@ -135,7 +135,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     }
 
     if (client.write) {
-      const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.WRITE);
+      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.WRITE);
 
       if (privilege) {
         privileges.add(privilege);

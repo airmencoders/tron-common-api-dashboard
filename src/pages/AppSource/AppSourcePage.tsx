@@ -3,6 +3,8 @@ import GridColumn from '../../components/Grid/GridColumn';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import { AppSourceDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
+import { AppSourceDetailsFlat } from '../../state/app-source/app-source-details-flat';
+import AppSourceForm from './AppSourceForm';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn('id', true, true, 'ID'),
@@ -12,14 +14,14 @@ const columnHeaders: GridColumn[] = [
 
 export function AppSourcePage() {
   return (
-    <DataCrudFormPage<AppSourceDto, AppSourceDto>
+    <DataCrudFormPage<AppSourceDto, AppSourceDetailsFlat>
       columns={columnHeaders}
       dataTypeName="App Source"
       pageTitle="App Sources"
       createForm={() => <></>}
-      updateForm={() => <></>}
+      updateForm={AppSourceForm}
       useDataState={useAppSourceState}
-      allowEdit={false}
+      allowEdit={true}
     />
   )
 }
