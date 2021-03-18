@@ -156,11 +156,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   }
 
   async function updatePatch(...args: any) {
+
+    // make sure service implements this optional method...
     if (!dataState.sendPatch) return;
 
     pageState.set(prevState => ({
       ...prevState,
-      isSubmitting: true
+      isSubmitting: false
     }));
     try {
       await dataState.sendPatch(...args);

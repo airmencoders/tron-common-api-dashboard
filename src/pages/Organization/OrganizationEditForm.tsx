@@ -32,12 +32,15 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const formState = useState(createState({...props.data})); // data from the UI form
 
   const [showChooserDialog, setChooserDialog] = React.useState(false); // whether to show the Chooser Dialog
-  const [chooserDataItems, setChooserDataItem] = React.useState(new Array<PersonDto | OrganizationDto>());  // the data to show in Chooser
-  const [chooserChosenRow, setChooserChosenRow] = React.useState({} as RowClickedEvent | undefined);  // the chosen row from the chooser dialog
+  const [chooserDataItems, setChooserDataItem] = React.useState(new Array<PersonDto | OrganizationDto>());  // the data to show in Chooser dialog
+  const [chooserChosenRow, setChooserChosenRow] = React.useState({} as RowClickedEvent | undefined);  // the chosen row from the Chooser dialog
   const [chooserDataColumns, setChooserDataColumns] = React.useState(new Array<GridColumn>());  // the chosen row from the chooser dialog
   const [orgEditType, setOrgEditType] = React.useState(OrgEditOpType.NONE);  // what part of the org we're adding to
   const [membersGridApi, setMembersGridApi] = React.useState<GridApi | undefined>(undefined); // handle to the Grid API for members
   const [subOrgsGridApi, setSubOrgsGridApi] = React.useState<GridApi | undefined>(undefined); // handle to the Grid API for subordinate orgs
+  const [showConfirmDialog, setShowConfirmDialog] = React.useState(false); // whether to show attribute remove confirmation
+  const [removeAction, setRemoveAction] = React.useState<{ data: any, func: any}>({ data: null, func: null}); // on a remove action that is confirmed, call this function to do the removing
+  const [showPatchResult, setShowPatchResult] = React.useState({ leader: false, parent: false, members: false, suborgs: false});  // state determining where our success/error msg shows up
 
   formState.attach(Validation);
   formState.attach(Initial);
@@ -63,10 +66,11 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     return isChanged;
   }
 
-  // handles patch changes, calls into DataCrudForm component
+  // handles all patch changes, calls into DataCrudForm component, does its work, and then refreshes form
   const submitPatch = async (opType: OrgEditOpType, id: string, data: any) => {
     setOrgEditType(opType);
     props.onPatch && props.onPatch(opType, id, data);
+    formState.set({...props.data})
   }
 
   // handles PUT changes, calls into DataCrudForm component
@@ -76,7 +80,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   }
 
   const isFormDisabled = ():boolean => {
-    return props.successAction?.success || false;
+    return false;
   }
 
   // helper to construct the leader's name 
@@ -164,21 +168,29 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserDialog(true);
   }
 
+  const removeChosenMembers = async (members: PersonDto[]) => {
+    if (members.length > 0) {      
+      setShowPatchResult({ ...showPatchResult, members: true });     
+      submitPatch(OrgEditOpType.MEMBERS_REMOVE, orgState.selectedOrgState?.get()?.id || '', members.map(item => item.id));
+    }
+  }
+
   // invoked from clicking `Remove` button for Org Members
   const onRemoveMemberClick = async () => {
-    const memberRowSel = membersGridApi?.getSelectedRows();
-    if (memberRowSel && memberRowSel.length > 0) {
-      submitPatch(OrgEditOpType.MEMBERS_REMOVE, orgState.selectedOrgState?.get()?.id || '', memberRowSel.map(item => item.id));
-    }
+    if (membersGridApi?.getSelectedRows() && membersGridApi.getSelectedRows().length > 0) {
+      removeActionInitiated((args: any) => { removeChosenMembers(args) }, membersGridApi.getSelectedRows());
+    } 
   }
 
   // invoked from clicking `Remove` on the org's leader entry
   const onClearOrgLeader = async () => {
+    setShowPatchResult({ ...showPatchResult, leader: true });   
     submitPatch(OrgEditOpType.LEADER_REMOVE, orgState.selectedOrgState.get().id || '', null);
   }
 
   // invoked from clicking `Remove` on the org's parent entry
   const onClearParentOrg = async () => {    
+    setShowPatchResult({ ...showPatchResult, parent: true });   
     submitPatch(OrgEditOpType.PARENT_ORG_REMOVE, orgState.selectedOrgState.get().id || '', null);
   }
 
@@ -200,11 +212,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserDialog(true);
   }
 
+  // actually sends request to remove suborgs
+  const removeChosenOrgs = async (orgs: OrganizationDto[]) => {
+    if (orgs.length > 0) {     
+      setShowPatchResult({ ...showPatchResult, suborgs: true });     
+      submitPatch(OrgEditOpType.SUB_ORGS_REMOVE, orgState.selectedOrgState.get().id || '', orgs.map(item => item.id));
+    }
+  }
+
   // invoked from clicking `Remove` button for Subordinate Orgs
   const onRemoveSubOrgClick = async () => {
-    const subOrgRowSel = subOrgsGridApi?.getSelectedRows();
-    if (subOrgRowSel && subOrgRowSel.length > 0) {     
-      submitPatch(OrgEditOpType.SUB_ORGS_REMOVE, orgState.selectedOrgState.get().id || '', subOrgRowSel.map(item => item.id));
+    if (subOrgsGridApi?.getSelectedRows() && subOrgsGridApi.getSelectedRows().length > 0) {
+      removeActionInitiated((args: any) => { removeChosenOrgs(args) }, subOrgsGridApi.getSelectedRows())
     }
   }
 
@@ -213,9 +232,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserChosenRow(event);
   }
 
-  // user cancelled out of the choose dialog
+  // user cancelled out of the choose dialog, close it and clean row state
   const chooserDialogClose = () => {
-    // clear temp state(s) and dismiss dialog
     setChooserChosenRow(undefined);
     setChooserDialog(false);
   }  
@@ -224,18 +242,22 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const chooserDialogConfirmed = async () => {
 
     // validate we have some kind of data to PATCH against the org
-    if (chooserChosenRow !== undefined) {
+    if (chooserChosenRow !== undefined && chooserChosenRow?.data?.id) {
       switch (orgEditType) {
-        case OrgEditOpType.LEADER_EDIT:          
+        case OrgEditOpType.LEADER_EDIT: 
+          setShowPatchResult({ ...showPatchResult, leader: true });         
           submitPatch(OrgEditOpType.LEADER_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);          
           break;
         case OrgEditOpType.MEMBERS_EDIT:
+          setShowPatchResult({ ...showPatchResult, members: true });        
           submitPatch(OrgEditOpType.MEMBERS_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);
           break;
         case OrgEditOpType.SUB_ORGS_EDIT:
+          setShowPatchResult({ ...showPatchResult, suborgs: true });        
           submitPatch(OrgEditOpType.SUB_ORGS_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);
           break;
         case OrgEditOpType.PARENT_ORG_EDIT:
+          setShowPatchResult({ ...showPatchResult, parent: true });        
           submitPatch(OrgEditOpType.PARENT_ORG_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);
           break;
         default:
@@ -244,6 +266,24 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     }
 
     chooserDialogClose();
+  }
+
+  // close remove attribute confirm dialog
+  const confirmDialogClose = () => {
+    setRemoveAction({ data: null, func: () => true});
+    setOrgEditType(OrgEditOpType.NONE);
+    setShowConfirmDialog(false);
+  }
+
+  const confirmDialogAffirmed = () => {
+    removeAction.func(removeAction.data);  // action confirmed, call remove handler
+    confirmDialogClose();
+  }
+
+  // some remove button was pushed... set appropriate states and show confirm dialog
+  const removeActionInitiated = (func: any, arg: any) => {
+    setRemoveAction({ data: arg, func: func });
+    setShowConfirmDialog(true);
   }
   
   return (
@@ -290,7 +330,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               }
             </Select>
             {
-              orgEditType === OrgEditOpType.OTHER ?
+              props.formActionType === FormActionType.ADD && props.successAction?.success ?
             
                 <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                   errorMessage={props.formErrors?.general || ''}
@@ -299,10 +339,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                                   showCloseButton={true}
                                   onCloseClicked={props.onClose} />  
               :
-                null
-            }
-            {
-              props.successAction == null &&
+                
               <SubmitActions formActionType={props.formActionType}
                             onCancel={props.onClose}
                             onSubmit={submitForm}
@@ -327,9 +364,14 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button data-testid='change-org-leader__btn' unstyled type="button" onClick={onEditLeaderClick}>
                       Change
                     </Button>
-                    <Button data-testid='remove-org-leader__btn' unstyled type="button" onClick={onClearOrgLeader}>
+                    <Button data-testid='remove-org-leader__btn' 
+                      unstyled 
+                      type="button" 
+                      onClick={() => { resolveLeaderName() !== '' && removeActionInitiated(() => { onClearOrgLeader() }, null) }}
+                    >
                       Remove
                     </Button>
+                    <input type='hidden' name='chosen-person-row' data-testid='chosen-person-row' value={chooserChosenRow?.data?.firstName || ''} />
                   </div>
 
                   {/* used for testing only */}
@@ -341,13 +383,13 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       />
                   </div>
                   {
-                    orgEditType === OrgEditOpType.LEADER_EDIT || orgEditType === OrgEditOpType.LEADER_REMOVE ?
+                    showPatchResult.leader &&  (orgEditType === OrgEditOpType.LEADER_EDIT || orgEditType === OrgEditOpType.LEADER_REMOVE) ?
                       <div>
                         <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                errorMessage={props.formErrors?.general || ''}
                                showErrorMessage={props.formErrors?.general != null}
-                               showSuccessMessage={props.successAction != null && props.successAction?.success}
-                               showCloseButton={true}
+                               showSuccessMessage={(props.successAction != null && props.successAction?.success)}
+                               showCloseButton={false}
                                onCloseClicked={props.onClose} /> 
                       </div>
                   :
@@ -366,33 +408,30 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button data-testid='change-org-parent__btn' unstyled type="button" onClick={onEditParentOrg}>
                       Change
                     </Button>
-                    <Button data-testid='remove-org-parent__btn' unstyled type="button" onClick={onClearParentOrg}>
+                    <Button 
+                      data-testid='remove-org-parent__btn' 
+                      unstyled 
+                      type="button" 
+                      onClick={ () => { orgState.selectedOrgState.get().parentOrganization?.name && removeActionInitiated(() => { onClearParentOrg() }, null) }}
+                    >
                       Remove
                     </Button>
                   </div>                  
                   {
-                    orgEditType === OrgEditOpType.PARENT_ORG_EDIT || orgEditType === OrgEditOpType.PARENT_ORG_REMOVE ?
+                    showPatchResult.parent && (orgEditType === OrgEditOpType.PARENT_ORG_EDIT || orgEditType === OrgEditOpType.PARENT_ORG_REMOVE) ?
                       <div>
                         <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                errorMessage={props.formErrors?.general || ''}
                                showErrorMessage={props.formErrors?.general != null}
-                               showSuccessMessage={props.successAction != null && props.successAction?.success}
-                               showCloseButton={true}
+                               showSuccessMessage={(props.successAction != null && props.successAction?.success)}
+                               showCloseButton={false}
                                onCloseClicked={props.onClose} /> 
                       </div>
                   :
                      null
                   }
 
-                  {/* used for testing only! */}
-                  <div style={{display: 'none'}}>
-                    <TextInput id="hidden-selected-parent" name='chosen-parent' type="text" data-testid='org-parent-selection'
-                        defaultValue={chooserChosenRow?.data?.name || ''}
-                        value={chooserChosenRow?.data?.name || ''}
-                        disabled={true}
-                      />
-                  </div>
-
+                <input type='hidden' name='chosen-parent-row' data-testid='chosen-parent-row' value={chooserChosenRow?.data?.name || ''} />
                 </FormGroup> 
 
                 {/* Add/Remove Org Members Section */}
@@ -407,18 +446,24 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button style={{marginTop: 0}} data-testid='org-member-deselect-all__btn' unstyled type="button" onClick={() => membersGridApi?.deselectAll()}>
                       {DESELECT_ALL_TEXT}
                     </Button>
-                    <Button style={{marginTop: 0}} data-testid='org-member-remove-selected__btn' unstyled type="button" onClick={onRemoveMemberClick}>
+                    <Button 
+                      style={{marginTop: 0}} 
+                      data-testid='org-member-remove-selected__btn' 
+                      unstyled 
+                      type="button" 
+                      onClick={() => { onRemoveMemberClick() }}
+                    >
                       Remove
                     </Button>
                   </div>
                   {
-                    orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.MEMBERS_REMOVE ?
+                    showPatchResult.members && (orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.MEMBERS_REMOVE) ?
                       <div>
                         <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                errorMessage={props.formErrors?.general || ''}
                                showErrorMessage={props.formErrors?.general != null}
-                               showSuccessMessage={props.successAction != null && props.successAction?.success}
-                               showCloseButton={true}
+                               showSuccessMessage={(props.successAction != null && props.successAction?.success)}
+                               showCloseButton={false}
                                onCloseClicked={props.onClose} /> 
                       </div>
                   :
@@ -450,18 +495,23 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button style={{marginTop: 0}} data-testid='org-suborg-deselect-all__btn' unstyled type="button" onClick={() => subOrgsGridApi?.deselectAll()}>
                       {DESELECT_ALL_TEXT}
                     </Button>
-                    <Button style={{marginTop: 0}} data-testid='org-suborg-remove-selected__btn' unstyled type="button" onClick={onRemoveSubOrgClick}>
+                    <Button 
+                      style={{marginTop: 0}} 
+                      data-testid='org-suborg-remove-selected__btn' 
+                      unstyled type="button" 
+                      onClick={() => { onRemoveSubOrgClick() }}
+                    >
                       Remove
                     </Button>
                   </div>
                   {
-                    orgEditType === OrgEditOpType.SUB_ORGS_EDIT || orgEditType === OrgEditOpType.SUB_ORGS_REMOVE ?
+                    showPatchResult.suborgs && (orgEditType === OrgEditOpType.SUB_ORGS_EDIT || orgEditType === OrgEditOpType.SUB_ORGS_REMOVE) ?
                       <div>
                         <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                errorMessage={props.formErrors?.general || ''}
                                showErrorMessage={props.formErrors?.general != null}
-                               showSuccessMessage={props.successAction != null && props.successAction?.success}
-                               showCloseButton={true}
+                               showSuccessMessage={(props.successAction != null && props.successAction?.success)}
+                               showCloseButton={false}
                                onCloseClicked={props.onClose} /> 
                       </div>
                   :
@@ -484,6 +534,21 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               null
           }           
         </Form>
+        {
+          props.formActionType === FormActionType.UPDATE ?        
+            <div className="submit-actions button-container">
+              <Button
+                  type="submit"
+                  className="button-container__submit"       
+                  onClick={props.onClose}      
+                  style={{marginTop: '10px'}}
+              >            
+                  Close
+              </Button>
+            </div>
+          :
+            null
+        }
         <Modal
           show={showChooserDialog}
           headerComponent={(<h2>Choose Entry</h2>)}
@@ -493,7 +558,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                 Cancel
               </Button>
               <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" secondary onClick={chooserDialogConfirmed}>
-                OK
+                Commit
               </Button>
             </div>
           )}
@@ -506,6 +571,25 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
             columns={chooserDataColumns}
             onRowClicked={chooserRowClicked}
             />
+        </Modal>
+        <Modal
+          show={showConfirmDialog}
+          headerComponent={(<h2>Confirm Remove</h2>)}
+          footerComponent={(
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <Button type="button" data-testid='remove-cancel__btn' className="add-app-client__btn" secondary onClick={confirmDialogClose}>
+                No
+              </Button>
+              <Button type="button" data-testid='remove-confirm-ok__btn' className="add-app-client__btn" secondary onClick={confirmDialogAffirmed}>
+                Yes
+              </Button>
+            </div>
+          )}
+          onHide={() => setShowConfirmDialog(false)}
+          height="500px"
+          width="30%"
+        >
+          This action takes immediate effect. Are you sure you want to remove selected entity?
         </Modal>
       </div>
   );

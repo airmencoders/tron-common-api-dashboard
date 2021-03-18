@@ -283,6 +283,13 @@ it('should allow to remove parent', async () => {
   fireEvent.click(parentBtn);
 
   await waitFor(
+    () => expect(form.getByTestId('remove-confirm-ok__btn')).toBeVisible()
+  );
+
+  const okBtn = form.getByTestId('remove-confirm-ok__btn');
+  fireEvent.click(okBtn);
+
+  await waitFor(
     () => expect(opHappened).toBeTruthy()
   );
 
@@ -343,7 +350,7 @@ it('should allow to chose leader', async () => {
   // wait for the state change to be detected --- which we do via watching
   //  hidden element 'hidden-selected-item'
   await waitFor(
-    () => expect(form.getByDisplayValue('Joey')).toBeInTheDocument()   
+    () => expect(form.getByTestId('chosen-person-row')).toHaveValue('Joey')   
   );
 
   // ack the dialog selection to set the leader
@@ -393,6 +400,20 @@ it('should allow to remove leader', async () => {
   fireEvent.click(leaderBtn);
 
   await waitFor(
+    () => expect(form.getByTestId('remove-confirm-ok__btn')).toBeVisible()
+  );
+
+  // cancel removal confirmation
+  const cancelBtn = form.getByTestId('remove-cancel__btn');
+  fireEvent.click(cancelBtn);
+
+  fireEvent.click(leaderBtn);
+  await waitFor(
+    () => expect(form.getByTestId('remove-confirm-ok__btn')).toBeVisible()
+  );
+  fireEvent.click(form.getByTestId('remove-confirm-ok__btn'));
+
+  await waitFor(
     () => expect(opHappenend).toBeTruthy()
   );
 
@@ -440,7 +461,7 @@ it('should allow to add new member', async () => {
   // wait for the state change to be detected --- which we do via watching
   //  hidden element 'hidden-selected-item'
   await waitFor(
-    () => expect(form.getByDisplayValue('Homer')).toBeInTheDocument()   
+    () => expect(form.getByTestId('chosen-person-row')).toHaveValue('Homer')   
   );
 
   // ack the dialog selection to set the leader
