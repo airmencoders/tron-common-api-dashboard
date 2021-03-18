@@ -29,7 +29,10 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   }
   async sendCreate(toCreate: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
     try {
+      if(await this.appNameExists(toCreate))
+        throw new Error("App name already exists.");
       const scratchStorageResponse = await this.scratchStorageApi.postNewScratchSpaceApp(toCreate as ScratchStorageAppRegistryEntry);
+      this.state[this.state.length].set(Object.assign({}, scratchStorageResponse.data as ScratchStorageAppRegistryDto, { userPrivs: undefined }));
       return Promise.resolve(scratchStorageResponse.data as ScratchStorageAppRegistryDto);
     }
     catch (error) {
@@ -37,10 +40,15 @@ export default class ScratchStorageService implements DataService<ScratchStorage
     }
   }
 
+  async appNameExists(app: ScratchStorageAppRegistryDto): Promise<boolean> {
+      const apps = await this.scratchStorageApi.getScratchSpaceApps();
+      return apps.data.some(x => x.appName === app.appName && x.id !== app.id);
+  }
+
   async sendDelete(toDelete: ScratchStorageAppRegistryDto): Promise<void> {
     try {
       if (toDelete?.id == null) {
-        return Promise.reject('App Client to delete has undefined id.');
+        return Promise.reject('Scratch Storage App to delete has undefined id.');
       }
 
       await this.scratchStorageApi.deleteExistingAppEntry(toDelete.id);
