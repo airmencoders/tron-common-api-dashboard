@@ -6,7 +6,8 @@ import { useAppSourceState } from '../../state/app-source/app-source-state';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn('id', true, true, 'ID'),
-  new GridColumn('name', true, true, 'Name')
+  new GridColumn('name', true, true, 'Name'),
+  new GridColumn('clientCount', true, true, 'Client Count')
 ];
 
 export function AppSourcePage() {
