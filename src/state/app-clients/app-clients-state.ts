@@ -1,5 +1,5 @@
 import { createState, State, useState } from '@hookstate/core';
-import { AppClientFlat } from './interface/app-client-flat';
+import { AppClientFlat } from './app-client-flat';
 import Config from '../../api/configuration';
 import { Configuration } from '../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../openapi/apis/app-client-controller-api';

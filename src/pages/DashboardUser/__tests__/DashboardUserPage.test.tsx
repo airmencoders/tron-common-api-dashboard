@@ -10,7 +10,7 @@ import Config from '../../../api/configuration';
 import { usePrivilegeState } from '../../../state/privilege/privilege-state';
 import PrivilegeService from '../../../state/privilege/privilege-service';
 import { AxiosResponse } from 'axios';
-import { PrivilegeType } from '../../../state/app-clients/interface/privilege-type';
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
 
 jest.mock('../../../state/dashboard-user/dashboard-user-state');
 jest.mock('../../../state/privilege/privilege-state');

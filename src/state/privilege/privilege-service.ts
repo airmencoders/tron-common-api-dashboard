@@ -3,7 +3,7 @@ import { AxiosPromise } from "axios";
 import { PrivilegeControllerApiInterface } from "../../openapi/apis/privilege-controller-api";
 import { Privilege } from "../../openapi/models";
 import { PrivilegeDto } from "../../openapi/models/privilege-dto";
-import { PrivilegeType } from "../app-clients/interface/privilege-type";
+import { PrivilegeType } from "./privilege-type";
 
 export default class PrivilegeService {
   constructor(private state: State<PrivilegeDto[]>, private privilegeApi: PrivilegeControllerApiInterface) { }

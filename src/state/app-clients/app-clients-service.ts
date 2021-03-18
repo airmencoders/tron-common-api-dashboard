@@ -1,7 +1,7 @@
 import { none, State } from "@hookstate/core";
-import { AppClientFlat } from "./interface/app-client-flat";
-import { ClientPrivilege } from "./interface/app-client-privilege";
-import { PrivilegeType } from "./interface/privilege-type";
+import { AppClientFlat } from "./app-client-flat";
+import { AppClientPrivilege } from "./app-client-privilege";
+import { PrivilegeType } from "../privilege/privilege-type";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
 import { AxiosPromise } from "axios";
@@ -99,7 +99,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
     const privilegeArr = Array.from(client.privileges || []);
 
-    const privileges: ClientPrivilege = {
+    const privileges: AppClientPrivilege = {
       read: privilegeArr.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
       write: privilegeArr.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
     };

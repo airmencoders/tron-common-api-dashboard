@@ -1,5 +1,5 @@
 import { DeleteComponentProps } from '../../components/DataCrudFormPage/DeleteComponentProps';
-import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
+import { AppClientFlat } from '../../state/app-clients/app-client-flat';
 import './AppClientDelete.scss';
 
 function AppClientDelete(props: DeleteComponentProps<AppClientFlat>) {

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { PrivilegeType } from '../../../state/app-clients/interface/privilege-type';
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import { DashboardUserDto } from '../../../openapi/models/dashboard-user-dto';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { DashboardUserControllerApi } from '../../../openapi/apis/dashboard-user-controller-api';

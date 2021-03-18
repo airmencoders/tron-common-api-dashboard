@@ -4,7 +4,7 @@ import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboar
 import { AxiosPromise } from 'axios';
 import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
-import { PrivilegeType } from '../app-clients/interface/privilege-type';
+import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
 import { Privilege } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
