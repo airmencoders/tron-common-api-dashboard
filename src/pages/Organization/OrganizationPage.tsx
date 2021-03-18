@@ -2,7 +2,6 @@ import React from 'react';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import { OrganizationDto } from '../../openapi';
-import { useCrudPageState } from '../../state/crud-page/crud-page-state';
 import { useOrganizationState } from '../../state/organization/organization-state';
 import OrganizationDelete from './OrganizationDelete';
 import OrganizationEditForm from './OrganizationEditForm';
@@ -27,7 +26,6 @@ function OrganizationPage() {
         pageTitle="Organizations"
         updateForm={OrganizationEditForm}
         useDataState={useOrganizationState}
-        usePageState={useCrudPageState}
         allowDelete
         deleteComponent={OrganizationDelete}
       />

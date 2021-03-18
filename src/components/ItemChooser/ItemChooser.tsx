@@ -2,7 +2,6 @@ import React from 'react';
 import { ChooserProps } from './ChooserProps';
 import Grid from '../../components/Grid/Grid';
 import TextInput from '../forms/TextInput/TextInput';
-import { useState, createState } from '@hookstate/core';
 
 /**
  * Presents a search box and a customized ag-grid table.  The search
@@ -12,18 +11,18 @@ import { useState, createState } from '@hookstate/core';
  * @returns 
  */
 function ItemChooser(props: ChooserProps) {
-    const filterState = useState(createState(''));
+    const [filterState, setFilterState] = React.useState('');
 
     return (
         <>
             <TextInput id='chooser-filter' name='chooserFilter' type='search'
               data-testid='chooser-filter'
               placeholder='Search'
-              defaultValue={filterState.get()}
-              onChange={(event) => filterState.set(event.target.value)}
+              defaultValue={filterState}
+              onChange={(event) => setFilterState(event.target.value)}
             />
             <Grid
-                quickFilterText={filterState.get()}
+                quickFilterText={filterState}
                 height='300px'
                 data={props.items || []}
                 columns={props.columns}

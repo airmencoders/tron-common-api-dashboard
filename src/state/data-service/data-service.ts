@@ -13,5 +13,6 @@ export interface DataService<T, R> {
   sendUpdate(toUpdate: R): Promise<T>;
   sendCreate(toCreate: R): Promise<T>;
   sendDelete(toDelete: R): Promise<void>;
+  sendPatch?: (...args : any) => Promise<T>;
   convertRowDataToEditableData(rowData: T): Promise<R>;
 }

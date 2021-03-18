@@ -1,8 +1,9 @@
 // test if catch needs to be added to promise chain for fetchAndStore
-import OrganizationService from '../organization-service';
+import OrganizationService, { OrgEditOpType } from '../organization-service';
 import {createState} from '@hookstate/core';
 import {Flight, Group, OrganizationControllerApi, OrganizationDto, OtherUsaf, Squadron, Wing} from '../../../openapi';
 import {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
+import { OrganizationDtoWithDetails } from '../organization-state';
 
 class MockOrgApi extends OrganizationControllerApi {
   getOrganizations(type?: "SQUADRON" | "GROUP" | "FLIGHT" | "WING" | "OTHER_USAF" | "ORGANIZATION",
@@ -36,15 +37,44 @@ class MockOrgApi extends OrganizationControllerApi {
       config: {} as AxiosRequestConfig,
     };
     return Promise.resolve(response);
-  }
+  }  
 
   patchOrganization(id?: string, requestBody?: { [key: string]: string; }, options?: any)
       : Promise<AxiosResponse<OrganizationDto>> {
+
     return this.genericFunctionThatReturnsReponse();
   }
 
   createOrganization(organizationDtoFlightGroupOtherUsafSquadronWing: OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing, options?: any) {
     return this.genericFunctionThatReturnsReponse();
+  }
+
+  deleteOrgLeader(id?: string): Promise<AxiosResponse<OrganizationDto>> {
+    return this.genericFunctionThatReturnsReponse();
+  }
+
+  deleteOrgParent(id?: string): Promise<AxiosResponse<OrganizationDto>> {
+    return this.genericFunctionThatReturnsReponse();
+  }  
+
+  removeSubordinateOrganization(id?: string, requestBody? : string[], options?: any) 
+    : Promise<AxiosResponse<void>>{
+      return {} as Promise<AxiosResponse<void>>;
+  }
+
+  addSubordinateOrganization(id?: string, requestBody? : string[], options?: any) 
+    : Promise<AxiosResponse<void>>{
+      return {} as Promise<AxiosResponse<void>>;
+  }
+
+  deleteOrganizationMember(id?: string, requestBody? : string[], options?: any) 
+  : Promise<AxiosResponse<void>>{
+    return {} as Promise<AxiosResponse<void>>;
+  }
+
+  addOrganizationMember(id?: string, requestBody? : string[], options?: any) 
+  : Promise<AxiosResponse<void>>{
+    return {} as Promise<AxiosResponse<void>>;
   }
 
 }
@@ -53,6 +83,7 @@ describe('Test OrganizationService', () => {
 
   it('get all organizations', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
     const response = await organizationService.fetchAndStoreData();
@@ -61,6 +92,7 @@ describe('Test OrganizationService', () => {
 
   it('get single organization', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+      createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
     const response = await organizationService.getOrgDetails('some id');
@@ -69,6 +101,7 @@ describe('Test OrganizationService', () => {
 
   it('send Create', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
     const response = await organizationService.sendCreate({ id: 'some id'} as OrganizationDto);
@@ -77,6 +110,7 @@ describe('Test OrganizationService', () => {
 
   it('send Update', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
     const response = await organizationService.sendUpdate({ id: 'some id'} as OrganizationDto);
@@ -85,55 +119,80 @@ describe('Test OrganizationService', () => {
 
   it('sets Leader', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
-    const response = await organizationService.updateLeader('some id', 'some id');
+    const response = await organizationService.sendPatch(OrgEditOpType.LEADER_EDIT, 'some id', 'some id');
     expect(response).toBeTruthy();
   });
 
   it('removes Leader', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
-    const response = await organizationService.removeLeader('some id');
+    const response = await organizationService.sendPatch(OrgEditOpType.LEADER_REMOVE, 'some id');
     expect(response).toBeTruthy();
   });
 
   it('adds member', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
-    const response = await organizationService.addMember('some id', 'some id');
+    const response = await organizationService.sendPatch(OrgEditOpType.MEMBERS_EDIT, 'some id', 'some id');
     expect(response).toBeTruthy();
   });
 
 
   it('removes member', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
-    const response = await organizationService.removeMember('some id', ['some id']);
+    const response = await organizationService.sendPatch(OrgEditOpType.MEMBERS_REMOVE, 'some id', ['some id']);
     expect(response).toBeTruthy();
   });
 
   it('adds subordinate org', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
-    const response = await organizationService.addSubOrg('some id', 'some id');
+    const response = await organizationService.sendPatch(OrgEditOpType.SUB_ORGS_EDIT, 'some id', 'some id');
     expect(response).toBeTruthy();
   });
 
   it('removes subordinate org', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
-    const response = await organizationService.removeSubOrg('some id', ['some id']);
+    const response = await organizationService.sendPatch(OrgEditOpType.SUB_ORGS_REMOVE, 'some id', ['some id']);
+    expect(response).toBeTruthy();
+  });
+
+  it('adds parent org', async () => {
+    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
+        new MockOrgApi());
+
+    const response = await organizationService.sendPatch(OrgEditOpType.PARENT_ORG_EDIT, 'some id', 'some id');
+    expect(response).toBeTruthy();
+  });
+
+  it('removes parent org', async () => {
+    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
+        new MockOrgApi());
+
+    const response = await organizationService.sendPatch(OrgEditOpType.PARENT_ORG_REMOVE, 'some id', ['some id']);
     expect(response).toBeTruthy();
   });
 
   it('deletes an org', async () => {
     const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
         new MockOrgApi());
 
     const response = await organizationService.sendDelete({ id: 'some id', name: 'some org' });
