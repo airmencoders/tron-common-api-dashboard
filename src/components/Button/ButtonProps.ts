@@ -11,4 +11,5 @@ export interface ButtonProps {
   onClick?: (event?: any) => void;
   className?: string;
   unstyled?: boolean;
+  style?: object;
 }

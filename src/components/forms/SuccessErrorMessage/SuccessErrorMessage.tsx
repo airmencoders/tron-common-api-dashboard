@@ -14,7 +14,11 @@ function SuccessErrorMessage(props: SuccessErrorMessageProps) {
                 <p className="success-container__successful-operation">
                   {props.successMessage}
                 </p>
-                <Button type="button" onClick={props.onCloseClicked} className="success-container__close">Close</Button>
+                {props.showCloseButton ?
+                  <Button type="button" onClick={props.onCloseClicked} className="success-container__close">Close</Button>
+                :
+                  null
+                }
               </div> :
               <>
                 {
