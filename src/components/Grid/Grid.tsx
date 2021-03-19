@@ -15,7 +15,7 @@ function Grid(props: GridProps) {
   };
 
   useEffect(() => {
-    gridApi?.setRowData(props.data);
+    gridApi?.refreshCells();
   }, [props.data]);
 
   return (
