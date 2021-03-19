@@ -37,7 +37,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
     if (props.allowEdit && !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName)) {
-      const rowData = event.data;
+      let rowData = event.data;
+
+      // Take it out of the proxy so that pageState takes
+      // the raw object instead of the proxy
+      const dataStateItem = dataState.state.find(item => item.id.get() === rowData.id);
+      rowData = dataStateItem?.attach(Downgraded).get() ?? Object.assign({}, rowData);
+
       if (rowData != null) {
         const dtoData = await dataState.convertRowDataToEditableData(rowData);
         pageState.merge({
