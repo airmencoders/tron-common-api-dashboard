@@ -23,13 +23,7 @@ import { AppSourceDetailsDto } from '../models';
 // @ts-ignore
 import { AppSourceDto } from '../models';
 // @ts-ignore
-import { BadRequestException } from '../models';
-// @ts-ignore
 import { ExceptionResponse } from '../models';
-// @ts-ignore
-import { RecordNotFoundException } from '../models';
-// @ts-ignore
-import { ScratchStorageAppRegistryEntry } from '../models';
 /**
  * AppSourceControllerApi - axios parameter creator
  * @export
@@ -297,7 +291,7 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteAppSource(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
+        async deleteAppSource(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
             const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).deleteAppSource(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -372,7 +366,7 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteAppSource(id: string, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
+        deleteAppSource(id: string, options?: any): AxiosPromise<AppSourceDetailsDto> {
             return AppSourceControllerApiFp(configuration).deleteAppSource(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -432,7 +426,7 @@ export interface AppSourceControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppSourceControllerApiInterface
      */
-    deleteAppSource(id: string, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    deleteAppSource(id: string, options?: any): AxiosPromise<AppSourceDetailsDto>;
 
     /**
      * 

@@ -3,7 +3,7 @@ info:
   title: TRON Common API
   version: 0.0.1
 servers:
-- url: http://localhost:8088/api
+- url: http://localhost:8080/api
   description: Generated server url
 paths:
   /v1/subscriptions/{id}:
@@ -53,8 +53,8 @@ paths:
               $ref: '#/components/schemas/Subscriber'
         required: true
       responses:
-        "200":
-          description: Successful operation
+        "400":
+          description: UUID given does not match UUID in Subscriber entity object
           content:
             '*/*':
               schema:
@@ -77,6 +77,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subscriber'
     delete:
       tags:
       - subscriber-controller
@@ -317,6 +323,12 @@ paths:
         schema:
           type: boolean
       responses:
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
         "400":
           description: Bad request
           content:
@@ -762,13 +774,19 @@ paths:
         "400":
           description: Id is malformed
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
               schema:
                 $ref: '#/components/schemas/BadRequestException'
         "200":
           description: App Source Removed OK
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/ScratchStorageAppRegistryEntry'
   /v1/app-client/{id}:
@@ -802,13 +820,13 @@ paths:
         "200":
           description: Successful operation
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/AppClientUserDto'
         "404":
           description: Resource not found
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionResponse'
     delete:
@@ -833,7 +851,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppClientUserDto'
         "404":
-          description: Resource not found
+          description: App Source Id not found
           content:
             '*/*':
               schema:
@@ -1425,7 +1443,7 @@ paths:
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
@@ -1453,7 +1471,7 @@ paths:
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/AppSourceDetailsDto'
         "400":
@@ -1728,6 +1746,12 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponse'
         "204":
           description: Successful operation
+        "400":
+          description: Provided person UUID(s) was/were invalid
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/userinfo:
     get:
       tags:
@@ -1736,18 +1760,18 @@ paths:
       description: Retrieves user information
       operationId: getUserInfo
       responses:
-        "400":
-          description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ExceptionResponse'
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
   /v1/subscriptions/events/replay:
     get:
       tags:
@@ -1802,14 +1826,6 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ScratchStorageEntry'
         "404":
           description: Application ID not valid or found
           content:
@@ -1822,6 +1838,14 @@ paths:
             '*/*':
               schema:
                 type: object
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScratchStorageEntry'
     delete:
       tags:
       - scratch-storage-controller
@@ -1890,6 +1914,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ScratchStorageEntry'
+        "404":
+          description: Application ID / Key name not valid or found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecordNotFoundException'
         "400":
           description: Malformed Application UUID
           content:
@@ -2101,6 +2131,12 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponse'
         "404":
           description: File not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+        "400":
+          description: I/O error involving file
           content:
             '*/*':
               schema:
