@@ -1,10 +1,9 @@
 import { GridApi } from 'ag-grid-community';
 import { GridReadyEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
 import { GridProps } from './GridProps';
-
 
 function Grid(props: GridProps) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -17,8 +16,22 @@ function Grid(props: GridProps) {
     props.onGridReady && props.onGridReady(event.api);
   };
 
+  const rowDataLengthChanged = useRef(false);
+
+  // Only reset grid data when the length has changed
   useEffect(() => {
-    gridApi?.refreshCells();
+    rowDataLengthChanged.current = true;
+
+    gridApi?.setRowData(props.data);
+  }, [props.data.length]);
+
+  // Refresh grid cells only if the length of the dat has not changed
+  useEffect(() => {
+    if (!rowDataLengthChanged.current) {
+      gridApi?.refreshCells();
+    } else {
+      rowDataLengthChanged.current = false;
+    }
   }, [props.data]);
 
   return (
