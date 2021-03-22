@@ -1,6 +1,9 @@
 
 export interface ModalFooterSubmitProps {
-  onCancel: () => void;
+  onCancel?: () => void;
   onSubmit: () => void;
+  showCancel?: boolean;
   disableSubmit?: boolean;
+  submitText?: string;
+  cancelText?: string;
 }

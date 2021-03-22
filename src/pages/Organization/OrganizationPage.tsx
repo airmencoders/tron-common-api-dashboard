@@ -27,6 +27,7 @@ function OrganizationPage() {
         updateForm={OrganizationEditForm}
         useDataState={useOrganizationState}
         allowDelete
+        allowAdd
         deleteComponent={OrganizationDelete}
       />
   );

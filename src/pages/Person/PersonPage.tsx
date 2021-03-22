@@ -27,6 +27,7 @@ function PersonPage() {
           updateForm={PersonEditForm}
           useDataState={usePersonState}
           allowEdit={true}
+          allowAdd
       />
   );
 }

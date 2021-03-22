@@ -28,6 +28,7 @@ export function DashboardUserContent() {
       useDataState={useDashboardUserState}
       allowEdit={true}
       allowDelete
+      allowAdd
       deleteComponent={DashboardUserDelete}
     />
   )

@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Downgraded, useState } from "@hookstate/core";
+import { useHookstate } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
@@ -18,9 +18,18 @@ import GridColumn from '../../components/Grid/GridColumn';
 import { AppSourceDetailsFlat } from '../../state/app-source/app-source-details-flat';
 import { RowClickedEvent } from 'ag-grid-community';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
+import { AppClientUserPrivFlat } from '../../state/app-source/app-client-user-priv-flat';
+import AppSourceClientForm from './AppSourceClientForm';
+import AppSourceClientAdd from './AppSourceClientAdd';
+import Button from '../../components/Button/Button';
+
+interface AppSourceEditorState {
+  isOpen: boolean;
+  data: AppClientUserPrivFlat;
+}
 
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
-  const formState = useState<AppSourceDetailsFlat>({
+  const formState = useHookstate<AppSourceDetailsFlat>({
     id: props.data?.id ?? "",
     name: props.data?.name ?? "",
     appClients: props.data?.appClients ?? []
@@ -29,6 +38,20 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
+
+  const clientEditorState = useHookstate<AppSourceEditorState>({
+    isOpen: false,
+    data: {
+      appClientUser: '',
+      appClientUserName: '',
+      read: false,
+      write: false
+    }
+  });
+
+  const clientAddState = useHookstate({
+    isOpen: false,
+  });
 
   Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
 
@@ -52,7 +75,30 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
   ];
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-    console.log(event.data);
+    clientEditorState.merge({
+      isOpen: true,
+      data: event.data
+    });
+  }
+
+  function clientEditorCloseHandler() {
+    clientEditorState.merge({
+      isOpen: false
+    });
+  }
+
+  function clientEditorSubmitModal() {
+    clientEditorCloseHandler();
+  }
+
+  function clientAddCloseHandler() {
+    clientAddState.merge({
+      isOpen: false
+    });
+  }
+
+  function clientAddSubmitModal() {
+    clientAddCloseHandler();
   }
 
   return (
@@ -93,14 +139,18 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
         </FormGroup>
 
         <FormGroup
-          labelName="permissions"
-          labelText="Permissions"
+          labelName="authorized-clients"
+          labelText="Authorized Clients"
         >
+          <Button type='button' onClick={() => clientAddState.isOpen.set(true)}>
+            Add Client
+          </Button>
           <Grid
             data={formState.appClients.get() || []}
             columns={appClientColumns}
             onRowClicked={onRowClicked}
             rowClass="ag-grid--row-pointer"
+            height="40vh"
           />
         </FormGroup>
 
@@ -125,23 +175,34 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
         }
       </Form>
 
-      {/* <Modal
-        headerComponent={<ModalTitle title="App Client" />}
+      <Modal
+        headerComponent={<ModalTitle title="Client Editor" />}
         footerComponent={<ModalFooterSubmit
-          onCancel={onCloseHandler}
-          onSubmit={deleteSubmit}
-          disableSubmit={pageState.isSubmitting.get() || pageState.successAction.get()?.success}
+          showCancel={false}
+          onSubmit={clientEditorSubmitModal}
+          submitText="Done"
         />}
-        show={pageState.isDeleteConfirmationOpen.get()}
-        onHide={onCloseHandler}
+        show={clientEditorState.isOpen.get()}
+        onHide={clientEditorCloseHandler}
+        width="auto"
       >
-        <DeleteComponent
-          data={pageState.selected.get()}
-          formErrors={pageState.formErrors.get()}
-          successAction={pageState.successAction.get()}
-          isSubmitting={pageState.isSubmitting.get()}
-        />
-      </Modal> */}
+        <AppSourceClientForm data={clientEditorState.data} />
+      </Modal>
+
+      <Modal
+        headerComponent={<ModalTitle title="Add Client" />}
+        footerComponent={<ModalFooterSubmit
+          showCancel={false}
+          onSubmit={clientAddSubmitModal}
+          submitText="Close"
+        />}
+        show={clientAddState.isOpen.get()}
+        onHide={clientAddCloseHandler}
+        width="auto"
+        height="auto"
+      >
+        <AppSourceClientAdd data={formState.appClients} />
+      </Modal>
     </>
   );
 }

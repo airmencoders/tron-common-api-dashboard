@@ -26,6 +26,7 @@ export function AppClientPage() {
       useDataState={useAppClientsState}
       allowEdit={true}
       allowDelete
+      allowAdd
       deleteComponent={AppClientDelete}
     />
   )

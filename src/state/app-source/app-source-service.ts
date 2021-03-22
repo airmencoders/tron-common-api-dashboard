@@ -4,8 +4,10 @@ import { DataService } from '../data-service/data-service';
 import { AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto, AppClientUserPrivDto, PrivilegeDto } from '../../openapi';
 import { AppClientUserPrivFlat } from './app-client-user-priv-flat';
 import { accessPrivilegeState } from '../privilege/privilege-state';
+import { accessAppClientsState } from '../app-clients/app-clients-state';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { AppSourceDetailsFlat } from './app-source-details-flat';
+import { AppClientFlat } from '../app-clients/app-client-flat';
 
 export default class AppSourceService implements DataService<AppSourceDto, AppSourceDetailsFlat> {
   constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) { }
@@ -13,10 +15,12 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   fetchAndStoreData(): Promise<AppSourceDto[]> {
     const response = (): AxiosPromise<AppSourceDto[]> => this.appSourceApi.getAppSources();
     const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
+    const appClientResponse = (): Promise<AppClientFlat[]> => accessAppClientsState().fetchAndStoreData();
 
     const data = new Promise<AppSourceDto[]>(async (resolve, reject) => {
       try {
         await privilegeResponse();
+        await appClientResponse();
         const result = await response();
 
         resolve(result.data);
@@ -103,8 +107,9 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
 
     const flat: AppClientUserPrivFlat = {
       appClientUser: appClientPrivDto.appClientUser ?? '',
+      appClientUserName: appClientPrivDto.appClientUserName ?? '',
       read: privileges.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
-      write: privileges.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
+      write: privileges.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
     };
 
     return flat;
@@ -115,10 +120,10 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     const writeId = accessPrivilegeState().getPrivilegeIdFromType(PrivilegeType.WRITE);
     const privilegeIds = [];
 
-    if (readId)
+    if (flat.read && readId)
       privilegeIds.push(readId);
 
-    if (writeId)
+    if (flat.write && writeId)
       privilegeIds.push(writeId);
 
     const dto: AppClientUserPrivDto = {
@@ -140,10 +145,12 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   }
 
   convertToDto(flat: AppSourceDetailsFlat): AppSourceDetailsDto {
+    const appClientUserPrivDtos = this.convertAppClientUserPrivFlatsToDto(flat.appClients);
+
     const dto: AppSourceDetailsDto = {
       id: flat.id,
       name: flat.name,
-      appClients: this.convertAppClientUserPrivFlatsToDto(flat.appClients)
+      appClients: this.sanitizeAppClients(appClientUserPrivDtos)
     };
 
     return dto;
@@ -157,6 +164,16 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     }
 
     return convertedToFlat;
+  }
+
+  sanitizeAppClients(clientPrivs: AppClientUserPrivDto[]) {
+    const sanitized: AppClientUserPrivDto[] = [];
+    for (const client of clientPrivs) {
+      if (client.privilegeIds.length > 0)
+        sanitized.push(client);
+    }
+
+    return sanitized;
   }
 
   private isStateReady(): boolean {

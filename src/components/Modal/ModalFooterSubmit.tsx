@@ -8,12 +8,14 @@ function ModalFooterSubmit(props: ModalFooterSubmitProps) {
   return (
       <div className="modal-footer-submit">
         <div className="modal-footer-submit__button-container">
-          <Button type="button" inverse outline
+          {props.showCancel &&
+            <Button type="button" inverse outline
                   onClick={props.onCancel}>
-            Cancel
-          </Button>
+              {props.cancelText ?? 'Cancel'}
+            </Button>
+          }
           <Button type="submit" onClick={props.onSubmit} disabled={props.disableSubmit}>
-            Submit
+            {props.submitText ?? 'Submit'}
           </Button>
         </div>
       </div>
