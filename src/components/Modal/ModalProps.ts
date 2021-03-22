@@ -6,4 +6,6 @@ export interface ModalProps {
   footerComponent: React.ReactNode;
   show: boolean;
   onHide: () => void;
+  height?: string | number;
+  width?: string | number;
 }

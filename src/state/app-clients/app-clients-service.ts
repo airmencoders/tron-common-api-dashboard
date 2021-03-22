@@ -85,7 +85,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
-    return Promise.resolve(Object.assign({}, rowData));
+    return Promise.resolve(rowData);
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {

@@ -5,7 +5,7 @@ import TextInput from '../../components/forms/TextInput/TextInput';
 import Select from '../../components/forms/Select/Select';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import {PersonDto, PersonDtoBranchEnum} from '../../openapi/models';
-import {createState, useState} from '@hookstate/core';
+import {useState} from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
@@ -18,7 +18,7 @@ import './PersonEditForm.scss';
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();
-  const formState = useState(createState({...props.data}));
+  const formState = useState({...props.data});
 
   formState.attach(Validation);
   formState.attach(Initial);

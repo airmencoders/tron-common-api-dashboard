@@ -2,7 +2,6 @@ import React from 'react';
 import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
-import {useCrudPageState} from '../../state/crud-page/crud-page-state';
 import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
 import ScratchStorageDelete from './ScratchStorageDelete';
 import ScratchStorageEditForm from './ScratchStorageEditForm';
@@ -22,7 +21,6 @@ function ScratchStoragePage() {
           pageTitle="Scratch Storage Apps"
           updateForm={ScratchStorageEditForm}
           useDataState={useScratchStorageState}
-          usePageState={useCrudPageState}
           allowEdit={true}
           allowDelete
           deleteComponent={ScratchStorageDelete}

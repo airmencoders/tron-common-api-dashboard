@@ -29,16 +29,16 @@ export interface AppClientUserDto {
     id?: string;
     /**
      * 
-     * @type {string}
-     * @memberof AppClientUserDto
-     */
-    name?: string;
-    /**
-     * 
      * @type {Array<Privilege>}
      * @memberof AppClientUserDto
      */
     privileges?: Array<Privilege>;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppClientUserDto
+     */
+    name?: string;
 }
 
 

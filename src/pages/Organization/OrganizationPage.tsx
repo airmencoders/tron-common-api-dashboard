@@ -1,31 +1,33 @@
 import React from 'react';
-import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
+import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
-import {useOrganizationState} from '../../state/organization/organization-state';
-import {useCrudPageState} from '../../state/crud-page/crud-page-state';
+import { OrganizationDto } from '../../openapi';
+import { useOrganizationState } from '../../state/organization/organization-state';
+import OrganizationDelete from './OrganizationDelete';
+import OrganizationEditForm from './OrganizationEditForm';
 
 const columns: GridColumn[] =
     [
       new GridColumn('id', true, true, 'id'),
       new GridColumn('name', true, true, 'Name'),
       new GridColumn('leader', true, true, 'Leader'),
+      new GridColumn('parentOrganization', true, true, 'Parent Org Id'),
       new GridColumn('orgType', true, true, 'Org Type'),
       new GridColumn('branchType', true, true, 'Branch Type'),
     ];
 
 function OrganizationPage() {
   return (
-      <DataCrudFormPage
-       allowEdit={false}
-       columns={columns}
-       // Currently disabled
-       createForm={() => <></>}
-       dataTypeName="Organization"
-       pageTitle="Organizations"
-       // Currently disabled
-       updateForm={() => <></>}
-       useDataState={useOrganizationState}
-       usePageState={useCrudPageState}
+      <DataCrudFormPage<OrganizationDto, OrganizationDto>
+        allowEdit={true}
+        columns={columns}
+        createForm={OrganizationEditForm}
+        dataTypeName="Organization"
+        pageTitle="Organizations"
+        updateForm={OrganizationEditForm}
+        useDataState={useOrganizationState}
+        allowDelete
+        deleteComponent={OrganizationDelete}
       />
   );
 }
