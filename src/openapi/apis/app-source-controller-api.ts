@@ -206,7 +206,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
         },
         /**
          * 
-         * @summary Returns the details for an App Source
+         * @summary Updates the details for an App Source
          * @param {string} id App Source id to update
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
          * @param {*} [options] Override http request option.
@@ -327,7 +327,7 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
         },
         /**
          * 
-         * @summary Returns the details for an App Source
+         * @summary Updates the details for an App Source
          * @param {string} id App Source id to update
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
          * @param {*} [options] Override http request option.
@@ -390,7 +390,7 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
         },
         /**
          * 
-         * @summary Returns the details for an App Source
+         * @summary Updates the details for an App Source
          * @param {string} id App Source id to update
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
          * @param {*} [options] Override http request option.
@@ -449,7 +449,7 @@ export interface AppSourceControllerApiInterface {
 
     /**
      * 
-     * @summary Returns the details for an App Source
+     * @summary Updates the details for an App Source
      * @param {string} id App Source id to update
      * @param {AppSourceDetailsDto} appSourceDetailsDto 
      * @param {*} [options] Override http request option.
@@ -516,7 +516,7 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
 
     /**
      * 
-     * @summary Returns the details for an App Source
+     * @summary Updates the details for an App Source
      * @param {string} id App Source id to update
      * @param {AppSourceDetailsDto} appSourceDetailsDto 
      * @param {*} [options] Override http request option.
