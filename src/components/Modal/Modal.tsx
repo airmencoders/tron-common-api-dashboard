@@ -14,12 +14,17 @@ function Modal(props: ModalProps) {
         <ReactModal isOpen={props.show}
                     style={{
                       overlay: {
-                        backgroundColor: 'rgba(0,0,0,.25)'
+                        backgroundColor: 'rgba(0,0,0,.25)',
+                        zIndex: 10000,
+                        display: 'flex',
                       },
                       content: {
+                        width: props.width || '75%',
+                        margin: 'auto',
+                        height:  props.height || '50%',
                         padding: 0,
                         borderRadius: '6px'
-                      }
+                      },
                     }}
                     className="modal-component__react-modal"
         >

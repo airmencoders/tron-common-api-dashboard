@@ -161,6 +161,42 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }
   }
 
+  async function updatePatch(...args: any) {
+
+    // make sure service implements this optional method...
+    if (!dataState.sendPatch) return;
+
+    pageState.set(prevState => ({
+      ...prevState,
+      isSubmitting: false
+    }));
+    try {
+      await dataState.sendPatch(...args);
+
+      pageState.set( prevState => {
+        return {
+          ...prevState,
+          successAction: {
+            success: true,
+            successMsg: `Successfully updated ${props.dataTypeName}.`,
+          },
+          isSubmitting: false
+        }
+      });
+    }
+    catch (error) {
+      pageState.set(prevState => {
+        return {
+          ... prevState,
+          formErrors: {
+            general: error.message
+          },
+          isSubmitting: false
+        }
+      });
+    }
+  }
+
   async function createSubmit(newDto: R) {
     pageState.set(prevState => ({
       ...prevState,
@@ -250,6 +286,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                         data={pageState.selected.attach(Downgraded).get()}
                       formErrors={pageState.formErrors.get()}
                       onSubmit={updateSubmit}
+                      onPatch={updatePatch}
                       onClose={onCloseHandler}
                       successAction={pageState.successAction.get()}
                       isSubmitting={pageState.isSubmitting.get()}
