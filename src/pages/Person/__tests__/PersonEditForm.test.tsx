@@ -180,6 +180,74 @@ it('should set formState for phone', async () => {
   );
 });
 
+[
+    '1234567980',
+    '223456789',
+    '22345678901',
+    'A23232322',
+    '23 234 4232',
+    '23-3 234 4232',
+    '23 3 234 4232',
+].forEach(input => 
+    it(`should not allow submit when phone input [${input}] is invalid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const phoneInput = await form.getByLabelText('Phone', {selector: 'input'});
+        fireEvent.change(phoneInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button'))
+                .toHaveAttribute('disabled')
+        );
+    })
+);
+
+[
+    '2234567890',
+    '223456-7890',
+    '223456 7890',
+    '223 4567890',
+    '223-4567890',
+    '223 456 7890',
+    '223 456-7890',
+    '223-456 7890',
+    '223-456-7890',
+    '(223)4567890',
+    '(223)456-7890',
+    '(223)456 7890',
+    '(223) 4567890',
+    '(223) 456 7890',
+    '(223) 456-7890',
+].forEach(input => 
+    it(`should allow submit when phone input [${input}] is valid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+    
+        const phoneInput = await form.getByLabelText('Phone', {selector: 'input'});
+        fireEvent.change(phoneInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button'))
+                .not.toHaveAttribute('disabled')
+        );
+    })
+);
+
+
 it('should set formState for dutyPhone', async () => {
   const form = render(
       <PersonEditForm

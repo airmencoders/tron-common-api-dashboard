@@ -54,6 +54,11 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   Validation(formState.lastName).validate(requiredText, requiredError, 'error');
   Validation(formState.rank).validate(requiredText, requiredError, 'error');
 
+  const validPhone = (text: string | undefined): boolean => !text || text.trim().length === 0 || /^(?:\([2-9]\d{2}\) ?|[2-9]\d{2}(?:-?| ?))[2-9]\d{2}[- ]?\d{4}$/.test(text);
+  const validPhoneError = 'Enter a valid phone number'
+  Validation(formState.phone).validate(validPhone, validPhoneError, 'error');
+  Validation(formState.dutyPhone).validate(validPhone, validPhoneError, 'error');
+
   const isFormModified = (): boolean => {
     const stateKeys = formState.keys;
     let isChanged = false;
@@ -154,7 +159,10 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                        disabled={isFormDisabled()}
             />
           </FormGroup>
-          <FormGroup labelName="phone" labelText="Phone">
+          <FormGroup labelName="phone" labelText="Phone"
+                     isError={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
+                     errorMessages={Validation(formState.phone).errors()
+                         .map(validationError =>validationError.message)}>
             <TextInput id="phone" name="phone" type="text"
                        defaultValue={props.data?.phone || ''}
                        error={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
@@ -162,7 +170,10 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                        disabled={isFormDisabled()}
             />
           </FormGroup>
-          <FormGroup labelName="dutyPhone" labelText="Duty Phone">
+          <FormGroup labelName="dutyPhone" labelText="Duty Phone"
+                     isError={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
+                     errorMessages={Validation(formState.dutyPhone).errors()
+                         .map(validationError =>validationError.message)}>
             <TextInput id="dutyPhone" name="dutyPhone" type="text"
                        defaultValue={props.data?.dutyPhone || ''}
                        error={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
