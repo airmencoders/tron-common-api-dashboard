@@ -17,6 +17,7 @@ import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import GridColumn from '../../components/Grid/GridColumn';
 import { AppSourceDetailsFlat } from '../../state/app-source/app-source-details-flat';
 import { RowClickedEvent } from 'ag-grid-community';
+import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
   const formState = useState<AppSourceDetailsFlat>({
@@ -45,9 +46,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
   }
 
   const appClientColumns: GridColumn[] = [
-    new GridColumn('appClientUser', true, true, 'Name'),
-    new GridColumn('read', true, true, 'Read'),
-    new GridColumn('write', true, true, 'Write')
+    new GridColumn('appClientUserName', true, true, 'Name'),
+    new GridColumn('read', true, false, 'Read', 'header-center', PrivilegeCellRenderer),
+    new GridColumn('write', true, false, 'Write', 'header-center', PrivilegeCellRenderer)
   ];
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {

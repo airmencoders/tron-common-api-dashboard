@@ -219,7 +219,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
             :
             <div style={{ height: '100%' }}>
               {
-                props.allowEdit &&
+                props.allowAdd && CreateForm &&
                 <div className="add-data-container">
                   <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
                     Add { props.dataTypeName }
