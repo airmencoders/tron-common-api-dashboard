@@ -6,6 +6,7 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Checkbox from '../../components/forms/Checkbox/Checkbox';
 import { AppClientUserPrivFlat } from '../../state/app-source/app-client-user-priv-flat';
 import Button from '../../components/Button/Button';
+import './AppSourceClientAddForm.scss';
 
 interface AppSourceClientAddFormProps {
   data: State<AppClientUserPrivFlat>;

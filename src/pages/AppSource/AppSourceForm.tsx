@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { useHookstate } from "@hookstate/core";
+import { none, useHookstate } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
@@ -10,7 +10,6 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
-import Grid from '../../components/Grid/Grid';
 import Modal from '../../components/Modal/Modal';
 import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
@@ -22,6 +21,9 @@ import { AppClientUserPrivFlat } from '../../state/app-source/app-client-user-pr
 import AppSourceClientForm from './AppSourceClientForm';
 import AppSourceClientAdd from './AppSourceClientAdd';
 import Button from '../../components/Button/Button';
+import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
+import './AppSourceForm.scss';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
 
 interface AppSourceEditorState {
   isOpen: boolean;
@@ -68,13 +70,23 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
     props.onSubmit(formState.get());
   }
 
+  const deleteBtnName = 'Delete';
   const appClientColumns: GridColumn[] = [
     new GridColumn('appClientUserName', true, true, 'Name'),
     new GridColumn('read', true, false, 'Read', 'header-center', PrivilegeCellRenderer),
-    new GridColumn('write', true, false, 'Write', 'header-center', PrivilegeCellRenderer)
+    new GridColumn('write', true, false, 'Write', 'header-center', PrivilegeCellRenderer),
+    new GridColumn('', false, false, deleteBtnName, 'header-center', DeleteCellRenderer, { onClick: removeClient })
   ];
 
-  async function onRowClicked(event: RowClickedEvent): Promise<void> {
+  function removeClient(data: AppClientUserPrivFlat) {
+    formState.appClients.find(item => item.appClientUser.get() === data.appClientUser)?.set(none);
+  }
+
+  function onRowClicked(event: RowClickedEvent) {
+    // Don't trigger row clicked if delete cell clicked
+    if ((event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName))
+      return;
+
     clientEditorState.merge({
       isOpen: true,
       data: event.data
@@ -142,15 +154,14 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
           labelName="authorized-clients"
           labelText="Authorized Clients"
         >
-          <Button type='button' onClick={() => clientAddState.isOpen.set(true)}>
+          <Button type='button' className="app-source-form__add-client-btn" onClick={() => clientAddState.isOpen.set(true)}>
             Add Client
           </Button>
-          <Grid
-            data={formState.appClients.get() || []}
+
+          <ItemChooser
+            items={formState.appClients.get() || []}
             columns={appClientColumns}
             onRowClicked={onRowClicked}
-            rowClass="ag-grid--row-pointer"
-            height="40vh"
           />
         </FormGroup>
 
@@ -178,28 +189,29 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
       <Modal
         headerComponent={<ModalTitle title="Client Editor" />}
         footerComponent={<ModalFooterSubmit
-          showCancel={false}
+          hideCancel
           onSubmit={clientEditorSubmitModal}
           submitText="Done"
         />}
         show={clientEditorState.isOpen.get()}
         onHide={clientEditorCloseHandler}
         width="auto"
+        height="auto"
       >
         <AppSourceClientForm data={clientEditorState.data} />
       </Modal>
 
       <Modal
-        headerComponent={<ModalTitle title="Add Client" />}
+        headerComponent={<ModalTitle title="Add Client Editor" />}
         footerComponent={<ModalFooterSubmit
-          showCancel={false}
+          hideCancel
           onSubmit={clientAddSubmitModal}
-          submitText="Close"
+          submitText="Done"
         />}
         show={clientAddState.isOpen.get()}
         onHide={clientAddCloseHandler}
         width="auto"
-        height="auto"
+        height="90vh"
       >
         <AppSourceClientAdd data={formState.appClients} />
       </Modal>

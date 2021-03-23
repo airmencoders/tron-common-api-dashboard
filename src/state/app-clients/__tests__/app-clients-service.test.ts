@@ -94,7 +94,7 @@ describe('App Client State Tests', () => {
   };
 
   const axiosDeleteResponse = {
-    data: undefined,
+    data: testClientDto,
     status: 204,
     statusText: 'OK',
     config: {},
@@ -258,7 +258,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendDelete Success', async () => {
     appClientsApi.deleteAppClient = jest.fn(() => {
-      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+      return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosDeleteResponse));
     });
 
     await expect(wrappedState.sendDelete(testClientFlat)).resolves.not.toThrow();
@@ -266,7 +266,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendDelete Fail', async () => {
     appClientsApi.deleteAppClient = jest.fn(() => {
-      return new Promise<AxiosResponse<void>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
     });
 
     await expect(wrappedState.sendDelete(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -274,7 +274,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendDelete Fail - bad id', async () => {
     appClientsApi.deleteAppClient = jest.fn(() => {
-      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+      return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosDeleteResponse));
     });
 
     await expect(wrappedState.sendDelete({ ...testClientFlat, id: undefined })).rejects.toBeDefined();
@@ -282,7 +282,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendDelete Success - delete from state', async () => {
     appClientsApi.deleteAppClient = jest.fn(() => {
-      return new Promise<AxiosResponse<void>>(resolve => resolve(axiosDeleteResponse));
+      return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosDeleteResponse));
     });
 
     wrappedState.state.set([testClientFlat]);
