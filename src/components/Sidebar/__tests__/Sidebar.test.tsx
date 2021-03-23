@@ -4,7 +4,7 @@ import Sidebar from '../Sidebar';
 import { MemoryRouter } from 'react-router-dom';
 import { RouteItem } from '../../../routes';
 import HealthPage from '../../../pages/Health/HealthPage';
-import {PrivilegeType} from '../../../state/app-clients/interface/privilege-type';
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import PersonPage from '../../../pages/Person/PersonPage';
 import {DashboardUserDto} from '../../../openapi/models';
 import {AxiosResponse} from 'axios';

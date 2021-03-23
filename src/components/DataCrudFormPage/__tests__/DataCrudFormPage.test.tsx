@@ -173,7 +173,9 @@ it('should show sidebar if page in add state', async () => {
             updateForm={CreateUpdateTestForm}
             pageTitle="Test Page Title"
             dataTypeName="Test"
-            allowEdit={true} />
+        allowEdit={true}
+        allowAdd
+      />
       </MemoryRouter>
   );
 
@@ -267,7 +269,9 @@ it('should show success message for successful create', async () => {
             updateForm={CreateUpdateTestForm}
             pageTitle="Test Page Title"
             dataTypeName="Test"
-            allowEdit={true} />
+        allowEdit={true}
+        allowAdd
+      />
       </MemoryRouter>
   );
 

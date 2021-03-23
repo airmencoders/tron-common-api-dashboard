@@ -6,7 +6,7 @@ import Config from '../../../api/configuration';
 import PrivilegeService from '../../privilege/privilege-service';
 import DashboardUserService from '../dashboard-user-service';
 import { DashboardUserFlat } from '../dashboard-user-flat';
-import { PrivilegeType } from '../../app-clients/interface/privilege-type';
+import { PrivilegeType } from '../../privilege/privilege-type';
 import { wrapDashboardUserState } from '../dashboard-user-state';
 import { _ } from 'ag-grid-community';
 

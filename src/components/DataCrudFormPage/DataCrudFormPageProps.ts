@@ -47,7 +47,7 @@ export interface DataCrudFormPageProps<T, R> {
   dataTypeName: string;
 
   /**
-   * True allows the edit and create affordances to be active.
+   * True allows the edit to be active.
    */
   allowEdit: boolean;
 
@@ -56,4 +56,10 @@ export interface DataCrudFormPageProps<T, R> {
    * {@link deleteComponent} must be defined if {@link allowDelete} is set to true to perform deletions
    */
   allowDelete?: boolean;
+
+  /**
+   * True allows the creation of asset
+   * {@link createForm} must be defined if {@link allowAdd} is set to true to perform additions
+   */
+  allowAdd?: boolean;
 }

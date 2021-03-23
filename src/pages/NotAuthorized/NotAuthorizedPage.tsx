@@ -1,6 +1,5 @@
 import React from 'react';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import './NotAuthorizedPage.scss';
 
 export function NotAuthorizedPage(props: any) {
   return (

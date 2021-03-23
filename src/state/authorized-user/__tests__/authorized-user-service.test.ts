@@ -1,7 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
 import { DashboardUserDto } from '../../../openapi/models/dashboard-user-dto';
-import { PrivilegeType } from '../../app-clients/interface/privilege-type';
+import { PrivilegeType } from '../../privilege/privilege-type';
 import { DashboardUserControllerApi } from '../../../openapi/apis/dashboard-user-controller-api';
 import AuthorizedUserService from '../authorized-user-service';
 import { wrapAuthorizedUserState } from '../authorized-user-state';

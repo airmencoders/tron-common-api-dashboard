@@ -74,8 +74,8 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * Adds a new subscription.  Duplicates for the same address/event type won\'t be accepted
-         * @summary Adds a new subscription
+         * Adds a new subscription, or updates an existing subscription
+         * @summary Adds/updates a subscription
          * @param {Subscriber} subscriber 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -289,63 +289,6 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * Edits an existing subscription
-         * @summary Edits an existing subscription
-         * @param {string} id 
-         * @param {Subscriber} subscriber 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateSubscription: async (id: string, subscriber: Subscriber, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling updateSubscription.');
-            }
-            // verify required parameter 'subscriber' is not null or undefined
-            if (subscriber === null || subscriber === undefined) {
-                throw new RequiredError('subscriber','Required parameter subscriber was null or undefined when calling updateSubscription.');
-            }
-            const localVarPath = `/v1/subscriptions/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof subscriber !== 'string';
-            const needsSerialization = nonString && configuration && configuration.isJsonMime
-                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
-                : nonString;
-            localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(subscriber !== undefined ? subscriber : {})
-                : (subscriber || "");
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -370,8 +313,8 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
             };
         },
         /**
-         * Adds a new subscription.  Duplicates for the same address/event type won\'t be accepted
-         * @summary Adds a new subscription
+         * Adds a new subscription, or updates an existing subscription
+         * @summary Adds/updates a subscription
          * @param {Subscriber} subscriber 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -437,21 +380,6 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
                 return axios.request(axiosRequestArgs);
             };
         },
-        /**
-         * Edits an existing subscription
-         * @summary Edits an existing subscription
-         * @param {string} id 
-         * @param {Subscriber} subscriber 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateSubscription(id: string, subscriber: Subscriber, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscriber>> {
-            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).updateSubscription(id, subscriber, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
     }
 };
 
@@ -472,8 +400,8 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
             return SubscriberControllerApiFp(configuration).cancelSubscription(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Adds a new subscription.  Duplicates for the same address/event type won\'t be accepted
-         * @summary Adds a new subscription
+         * Adds a new subscription, or updates an existing subscription
+         * @summary Adds/updates a subscription
          * @param {Subscriber} subscriber 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -519,17 +447,6 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
         getSubscription(id: string, options?: any): AxiosPromise<Subscriber> {
             return SubscriberControllerApiFp(configuration).getSubscription(id, options).then((request) => request(axios, basePath));
         },
-        /**
-         * Edits an existing subscription
-         * @summary Edits an existing subscription
-         * @param {string} id 
-         * @param {Subscriber} subscriber 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateSubscription(id: string, subscriber: Subscriber, options?: any): AxiosPromise<Subscriber> {
-            return SubscriberControllerApiFp(configuration).updateSubscription(id, subscriber, options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -550,8 +467,8 @@ export interface SubscriberControllerApiInterface {
     cancelSubscription(id: string, options?: any): AxiosPromise<Subscriber>;
 
     /**
-     * Adds a new subscription.  Duplicates for the same address/event type won\'t be accepted
-     * @summary Adds a new subscription
+     * Adds a new subscription, or updates an existing subscription
+     * @summary Adds/updates a subscription
      * @param {Subscriber} subscriber 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -597,17 +514,6 @@ export interface SubscriberControllerApiInterface {
      */
     getSubscription(id: string, options?: any): AxiosPromise<Subscriber>;
 
-    /**
-     * Edits an existing subscription
-     * @summary Edits an existing subscription
-     * @param {string} id 
-     * @param {Subscriber} subscriber 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SubscriberControllerApiInterface
-     */
-    updateSubscription(id: string, subscriber: Subscriber, options?: any): AxiosPromise<Subscriber>;
-
 }
 
 /**
@@ -630,8 +536,8 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
     }
 
     /**
-     * Adds a new subscription.  Duplicates for the same address/event type won\'t be accepted
-     * @summary Adds a new subscription
+     * Adds a new subscription, or updates an existing subscription
+     * @summary Adds/updates a subscription
      * @param {Subscriber} subscriber 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -685,18 +591,5 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
      */
     public getSubscription(id: string, options?: any) {
         return SubscriberControllerApiFp(this.configuration).getSubscription(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Edits an existing subscription
-     * @summary Edits an existing subscription
-     * @param {string} id 
-     * @param {Subscriber} subscriber 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof SubscriberControllerApi
-     */
-    public updateSubscription(id: string, subscriber: Subscriber, options?: any) {
-        return SubscriberControllerApiFp(this.configuration).updateSubscription(id, subscriber, options).then((request) => request(this.axios, this.basePath));
     }
 }

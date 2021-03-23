@@ -1,0 +1,13 @@
+@import '../../styles/mixins';
+
+.app-source-client-form {
+  width: 30vw;
+
+  @include breakpoint-below(laptop) {
+    width: 50vw;
+  }
+
+  @include breakpoint-below(tablet) {
+    width: 80vw;
+  }
+}

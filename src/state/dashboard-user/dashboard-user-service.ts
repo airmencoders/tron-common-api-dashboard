@@ -4,7 +4,7 @@ import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboar
 import { AxiosPromise } from 'axios';
 import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
-import { PrivilegeType } from '../app-clients/interface/privilege-type';
+import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
 import { Privilege } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
@@ -60,7 +60,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     const privileges = new Set<Privilege>();
 
     if (dashboardUser.hasDashboardAdmin) {
-      const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.DASHBOARD_ADMIN);
+      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.DASHBOARD_ADMIN);
       
       if (privilege) {
         privileges.add(privilege);
@@ -68,7 +68,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     }
 
     if (dashboardUser.hasDashboardUser) {
-      const privilege = accessPrivilegeState().createPrivilege(PrivilegeType.DASHBOARD_USER);
+      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.DASHBOARD_USER);
 
       if (privilege) {
         privileges.add(privilege);
