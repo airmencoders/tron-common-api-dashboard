@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import AppClientForm from '../AppClientForm';
-import { AppClientFlat } from '../../../state/app-clients/interface/app-client-flat';
+import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';

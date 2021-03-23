@@ -4,11 +4,11 @@ import { MemoryRouter } from 'react-router-dom';
 import { AppClientPage } from '../AppClientPage';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AppClientControllerApi, AppClientControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
-import { PrivilegeType } from '../../../state/app-clients/interface/privilege-type';
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import { usePrivilegeState } from '../../../state/privilege/privilege-state';
 import PrivilegeService from '../../../state/privilege/privilege-service';
 import { AxiosResponse } from 'axios';
-import { AppClientFlat } from '../../../state/app-clients/interface/app-client-flat';
+import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
 import { useAppClientsState } from '../../../state/app-clients/app-clients-state';
 import AppClientsService from '../../../state/app-clients/app-clients-service';
 

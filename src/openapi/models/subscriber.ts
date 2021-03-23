@@ -38,6 +38,12 @@ export interface Subscriber {
      * @memberof Subscriber
      */
     subscribedEvent: SubscriberSubscribedEventEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Subscriber
+     */
+    secret?: string;
 }
 
 /**

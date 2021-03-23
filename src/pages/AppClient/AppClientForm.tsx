@@ -6,7 +6,7 @@ import { Touched } from "@hookstate/touched";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Form from "../../components/forms/Form/Form";
 import TextInput from "../../components/forms/TextInput/TextInput";
-import { AppClientFlat } from '../../state/app-clients/interface/app-client-flat';
+import { AppClientFlat } from '../../state/app-clients/app-client-flat';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';

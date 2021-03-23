@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
-import { AppClientFlat } from '../../../state/app-clients/interface/app-client-flat';
+import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
 import AppClientDelete from '../AppClientDelete';
 
 describe('Test App Client Delete Component', () => {

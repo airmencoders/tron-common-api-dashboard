@@ -25,13 +25,19 @@ export interface AppClientUserPrivDto {
      * @type {string}
      * @memberof AppClientUserPrivDto
      */
-    appClientUser?: string;
+    appClientUser: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppClientUserPrivDto
+     */
+    appClientUserName?: string;
     /**
      * 
      * @type {Array<number>}
      * @memberof AppClientUserPrivDto
      */
-    privilegeIds?: Array<number>;
+    privilegeIds: Array<number>;
 }
 
 

@@ -47,7 +47,7 @@ describe('Privilege Service', () => {
 
     await state.fetchAndStorePrivileges();
 
-    expect(state.privileges?.get()).toEqual(privilegeDtos);
+    expect(state.privileges).toEqual(privilegeDtos);
   });
 
   it('Convert Dto to Entity', () => {
@@ -85,10 +85,10 @@ describe('Privilege Service', () => {
     });
 
     const fetch = state.fetchAndStorePrivileges();
-    expect(state.privileges).toBe(undefined);
+    expect(state.privileges).toEqual([]);
 
     await fetch;
-    expect(state.privileges?.get()).toEqual(privilegeDtos);
+    expect(state.privileges).toEqual(privilegeDtos);
   });
 
   it('Test isPromised', async () => {
@@ -101,6 +101,39 @@ describe('Privilege Service', () => {
 
     await fetch;
     expect(state.isPromised).toBeFalsy();
+  });
+
+  it('createPrivilegeFromId', async () => {
+    privilegeApi.getPrivileges = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve(axiosGetResponse));
+    });
+
+    await state.fetchAndStorePrivileges();
+
+    const testPrivilege = privilegeDtos[0];
+    const privilege = state.createPrivilegeFromId(testPrivilege.id ?? -1);
+
+    expect(privilege?.id).toEqual(testPrivilege.id);
+    expect(privilege?.name).toEqual(testPrivilege.name);
+  });
+
+  it('createPrivilegesFromIds', async () => {
+    privilegeApi.getPrivileges = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve(axiosGetResponse));
+    });
+
+    await state.fetchAndStorePrivileges();
+
+    let ids = [0];
+
+    let privileges = state.createPrivilegesFromIds(ids);
+    expect(privileges.length).toEqual(1);
+    expect(privileges[0].name).toEqual(privilegeDtos[0].name);
+
+    // Test ids not exist
+    ids = [3];
+    privileges = state.createPrivilegesFromIds(ids);
+    expect(privileges.length).toEqual(0);
   });
 
 });

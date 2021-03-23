@@ -23,7 +23,8 @@ function Modal(props: ModalProps) {
                         margin: 'auto',
                         height:  props.height || '50%',
                         padding: 0,
-                        borderRadius: '6px'
+                        borderRadius: '6px',
+                        overflow: 'auto'
                       },
                     }}
                     className="modal-component__react-modal"

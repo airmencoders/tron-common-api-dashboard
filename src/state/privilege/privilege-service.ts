@@ -3,7 +3,7 @@ import { AxiosPromise } from "axios";
 import { PrivilegeControllerApiInterface } from "../../openapi/apis/privilege-controller-api";
 import { Privilege } from "../../openapi/models";
 import { PrivilegeDto } from "../../openapi/models/privilege-dto";
-import { PrivilegeType } from "../app-clients/interface/privilege-type";
+import { PrivilegeType } from "./privilege-type";
 
 export default class PrivilegeService {
   constructor(private state: State<PrivilegeDto[]>, private privilegeApi: PrivilegeControllerApiInterface) { }
@@ -23,16 +23,41 @@ export default class PrivilegeService {
     };
   }
 
-  createPrivilege(privilegeType: PrivilegeType): Privilege | undefined {
+  createPrivilegeFromType(privilegeType: PrivilegeType): Privilege | undefined {
     return this.state.find(privilege => privilege.name.value === privilegeType)?.value;
+  }
+
+  createPrivilegeFromId(id: number): Privilege | undefined {
+    return this.state.find(privilege => privilege.id.value === id)?.value;
+  }
+
+  createPrivilegesFromIds(ids: Array<number>): Array<Privilege> {
+    const privileges: Array<Privilege> = [];
+
+    for (const id of ids) {
+      const privilege = this.createPrivilegeFromId(id);
+
+      if (privilege)
+        privileges.push(privilege);
+    }
+
+    return privileges;
+  }
+
+  getPrivilegeIdFromType(privilegeType: PrivilegeType): number | undefined {
+    return this.state.find(privilege => privilege.name.value === privilegeType)?.value.id;
+  }
+
+  private isStateReady(): boolean {
+    return !this.error && !this.isPromised;
   }
 
   get isPromised(): boolean {
     return this.state.promised;
   }
 
-  get privileges(): State<PrivilegeDto[]> | undefined {
-    return this.state.promised ? undefined : this.state;
+  get privileges(): PrivilegeDto[] {
+    return !this.isStateReady() ? new Array<PrivilegeDto>() : this.state.get();
   }
 
   get error(): string | undefined {

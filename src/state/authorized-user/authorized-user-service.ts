@@ -2,7 +2,7 @@ import { State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import { AxiosPromise } from 'axios';
-import { PrivilegeType } from '../app-clients/interface/privilege-type';
+import { PrivilegeType } from '../privilege/privilege-type';
 
 export default class AuthorizedUserService {
   constructor(public state: State<DashboardUserDto | undefined>, private dashboardUserApi: DashboardUserControllerApiInterface) { }

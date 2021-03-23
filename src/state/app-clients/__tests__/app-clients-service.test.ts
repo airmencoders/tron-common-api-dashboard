@@ -1,11 +1,11 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientFlat } from '../interface/app-client-flat';
+import { AppClientFlat } from '../app-client-flat';
 import { wrapState } from '../app-clients-state';
 import AppClientsService from '../app-clients-service';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
-import { PrivilegeType } from '../interface/privilege-type';
+import { PrivilegeType } from '../../privilege/privilege-type';
 import { Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
