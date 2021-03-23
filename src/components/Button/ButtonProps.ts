@@ -1,3 +1,4 @@
+import React from "react";
 
 export interface ButtonProps {
   type: 'button' | 'submit' | 'reset';
@@ -11,5 +12,5 @@ export interface ButtonProps {
   onClick?: (event?: any) => void;
   className?: string;
   unstyled?: boolean;
-  style?: object;
+  style?: React.CSSProperties;
 }
