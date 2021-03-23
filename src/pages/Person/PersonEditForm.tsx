@@ -15,7 +15,7 @@ import {usePersonState} from '../../state/person/person-state';
 import {Initial} from '@hookstate/initial';
 
 import './PersonEditForm.scss';
-import { validPhone } from '../../utils/validation-utils';
+import { validDoDId, validPhone } from '../../utils/validation-utils';
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();
@@ -60,7 +60,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   Validation(formState.dutyPhone).validate(validPhone, validPhoneError, 'error');
 
   Validation(formState.dodid).validate(
-    (text: string | undefined): boolean => !text || /^\d{5,10}$/.test(text), 
+    validDoDId, 
     'Enter a valid DoD Id',
     'error');
 
