@@ -1,12 +1,13 @@
 import React from 'react';
 import { State, useHookstate } from "@hookstate/core";
 import { AppClientUserPrivFlat } from '../../state/app-source/app-client-user-priv-flat';
-import Grid from '../../components/Grid/Grid';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import GridColumn from '../../components/Grid/GridColumn';
 import { RowClickedEvent } from 'ag-grid-community';
 import { AppClientFlat } from '../../state/app-clients/app-client-flat';
 import AppSourceClientAddForm from './AppSourceClientAddForm';
+import './AppSourceClientAdd.scss';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
 
 function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
   const currentAppClients = props.data;
@@ -45,18 +46,16 @@ function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
   }
 
   return (
-    <>
-      <div style={{ height: "30vh" }}>
-        <Grid
-          data={
-            appClientState.appClients.filter(item => {
-              return currentAppClients.get().findIndex(curr => curr.appClientUser === item.id) === -1
-            })
-          }
-          height="100%"
+    <div className="app-source-client-add" data-testid="app-source-client-add">
+      <p>Click an App Client below to add as an authorized client for this App Source.</p>
+
+      <div className="app-source-client-add__grid-container">
+        <ItemChooser
+          items={appClientState.appClients.filter(item => {
+            return currentAppClients.get().findIndex(curr => curr.appClientUser === item.id) === -1
+          })}
           columns={columns}
           onRowClicked={onRowClicked}
-          rowClass="ag-grid--row-pointer"
         />
       </div>
 
@@ -64,7 +63,7 @@ function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
         data={selectedClientState}
         onSubmit={onSubmit}
       />
-    </>
+    </div>
   );
 }
 
