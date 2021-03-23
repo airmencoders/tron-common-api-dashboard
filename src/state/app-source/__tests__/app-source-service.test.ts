@@ -261,7 +261,7 @@ describe('App Source State Tests', () => {
 
     await expect(wrappedState.convertRowDataToEditableData(testAppSourceDto)).resolves.toEqual(testAppSourceDetailsFlat);
 
-    await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: undefined })).rejects;
-    await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: '' })).rejects;
+    await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: undefined })).rejects.toBeDefined();
+    await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: '' })).rejects.toBeDefined();
   });
 });
