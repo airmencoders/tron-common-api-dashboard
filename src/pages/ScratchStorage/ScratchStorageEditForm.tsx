@@ -3,21 +3,50 @@ import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import {ScratchStorageAppRegistryDto} from '../../openapi/models';
-import {useState} from '@hookstate/core';
+import {ScratchStorageAppRegistryDto, UserWithPrivs} from '../../openapi/models';
+import {useHookstate, useState} from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { Initial } from '@hookstate/initial';
+import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scratch-storage-user-with-privs-flat';
+import GridColumn from '../../components/Grid/GridColumn';
+import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
+import Button from '../../components/Button/Button';
+import Grid from '../../components/Grid/Grid';
+import { RowClickedEvent } from 'ag-grid-community';
 
+interface ScratchStorageEditorState {
+  isOpen: boolean;
+  data: ScratchStorageUserWithPrivsFlat;
+}
 function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageAppRegistryDto>) {
 
-  const formState = useState({id: props.data?.id, appName: props.data?.appName ?? '', userPrivs: props.data?.userPrivs});
+  const formState = useHookstate<ScratchStorageAppRegistryDto>({
+    id: props.data?.id ?? "",
+    appName: props.data?.appName ?? "",
+    userPrivs: props.data?.userPrivs ?? []
+  });
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
+
+  const userEditorState = useHookstate<ScratchStorageEditorState>({
+    isOpen: false,
+    data: {
+      userId: '',
+      email: '',
+      read: false,
+      write: false,
+      admin: false
+    }
+  })
+
+  const userAddState = useHookstate({
+    isOpen: false,
+  });
 
   const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0
   const requiredError = 'cannot be empty or blank';
@@ -44,6 +73,20 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageAppRe
     props.onSubmit(formState.get());
   }
 
+  const userColumns: GridColumn[] = [
+    new GridColumn('email', true, true, 'Email'),
+    new GridColumn('read', true, false, 'Read', 'header-center', PrivilegeCellRenderer),
+    new GridColumn('write', true, false, 'Write', 'header-center', PrivilegeCellRenderer),
+    new GridColumn('admin', true, false, 'Admin', 'header-center', PrivilegeCellRenderer)
+  ]
+
+  async function onRowClicked(event: RowClickedEvent): Promise<void> {
+    userEditorState.merge({
+      isOpen: true,
+      data: event.data
+    });
+  }
+
   const isFormDisabled = ():boolean => {
     return props.successAction?.success || false;
   }
@@ -61,6 +104,21 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageAppRe
                        error={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
                        onChange={(event) => formState.appName.set(event.target.value)}
                        disabled={isFormDisabled()}
+            />
+          </FormGroup>
+          <FormGroup
+          labelName="authorized-clients"
+          labelText="Authorized Clients"
+          >
+            <Button type='button' onClick={() => userAddState.isOpen.set(true)}>
+              Add User
+            </Button>
+            <Grid
+              data={formState.userPrivs.get() || []}
+              columns={userColumns}
+              onRowClicked={onRowClicked}
+              rowClass="ag-grid--row-pointer"
+              height="40vh"
             />
           </FormGroup>
           <SuccessErrorMessage successMessage={props.successAction?.successMsg}

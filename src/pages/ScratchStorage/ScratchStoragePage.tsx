@@ -24,6 +24,7 @@ function ScratchStoragePage() {
           allowEdit={true}
           allowDelete
           deleteComponent={ScratchStorageDelete}
+          allowAdd
       />
   );
 }
