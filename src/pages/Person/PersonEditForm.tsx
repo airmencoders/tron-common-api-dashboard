@@ -15,6 +15,7 @@ import {usePersonState} from '../../state/person/person-state';
 import {Initial} from '@hookstate/initial';
 
 import './PersonEditForm.scss';
+import { validPhone } from '../../utils/validation-utils';
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();
@@ -54,7 +55,6 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   Validation(formState.lastName).validate(requiredText, requiredError, 'error');
   Validation(formState.rank).validate(requiredText, requiredError, 'error');
 
-  const validPhone = (text: string | undefined): boolean => !text || /^(?:\([2-9]\d{2}\) ?|[2-9]\d{2}(?:-?| ?))[2-9]\d{2}[- ]?\d{4}$/.test(text);
   const validPhoneError = 'Enter a valid phone number'
   Validation(formState.phone).validate(validPhone, validPhoneError, 'error');
   Validation(formState.dutyPhone).validate(validPhone, validPhoneError, 'error');
