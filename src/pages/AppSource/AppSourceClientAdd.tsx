@@ -11,7 +11,7 @@ import AppSourceClientAddForm from './AppSourceClientAddForm';
 function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
   const currentAppClients = props.data;
   const appClientState = useAppClientsState();
-  const formState = useHookstate<AppClientUserPrivFlat>({
+  const selectedClientState = useHookstate<AppClientUserPrivFlat>({
     appClientUser: '',
     appClientUserName: '',
     read: false,
@@ -25,7 +25,7 @@ function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
   function onRowClicked(event: RowClickedEvent) {
     const data = event.data as AppClientFlat;
 
-    formState.set({
+    selectedClientState.set({
       appClientUser: data.id ?? '',
       appClientUserName: data.name,
       read: false,
@@ -36,7 +36,7 @@ function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
   function onSubmit(toUpdate: AppClientUserPrivFlat) {
     currentAppClients[currentAppClients.length].set(toUpdate);
 
-    formState.set({
+    selectedClientState.set({
       appClientUser: '',
       appClientUserName: '',
       read: false,
@@ -61,7 +61,7 @@ function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
       </div>
 
       <AppSourceClientAddForm
-        data={formState}
+        data={selectedClientState}
         onSubmit={onSubmit}
       />
     </>

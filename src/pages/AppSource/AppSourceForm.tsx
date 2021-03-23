@@ -178,7 +178,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
       <Modal
         headerComponent={<ModalTitle title="Client Editor" />}
         footerComponent={<ModalFooterSubmit
-          showCancel={false}
+          hideCancel
           onSubmit={clientEditorSubmitModal}
           submitText="Done"
         />}
@@ -192,7 +192,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
       <Modal
         headerComponent={<ModalTitle title="Add Client" />}
         footerComponent={<ModalFooterSubmit
-          showCancel={false}
+          hideCancel
           onSubmit={clientAddSubmitModal}
           submitText="Close"
         />}

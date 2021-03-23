@@ -35,18 +35,16 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   }
 
   /**
-   * // TODO: implement as needed
+   * NOT USED
+   * App Source creation handled on server
    */
   async sendCreate(toCreate: AppSourceDetailsFlat): Promise<AppSourceDto> {
-    throw new Error('Not yet implemented');
+    throw new Error('Not implemented');
   }
 
-  /**
-   * // TODO: implement as needed
-   */
   async sendUpdate(toUpdate: AppSourceDetailsFlat): Promise<AppSourceDto> {
     try {
-      if (toUpdate?.id == null) {
+      if (!toUpdate.id) {
         return Promise.reject(new Error('App Source to update has undefined id.'));
       }
       const appSourceDetailsDto = this.convertToDto(toUpdate);
@@ -77,7 +75,7 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
 
   convertRowDataToEditableData(rowData: AppSourceDto): Promise<AppSourceDetailsFlat> {
     if (rowData.id == null || rowData.id.trim().length <= 0) {
-      throw new Error('App Source ID must be defined');
+      return Promise.reject(new Error('App Source ID must be defined'));
     }
 
     const appSourceDetails = this.appSourceApi.getAppSourceDetails(rowData.id);
