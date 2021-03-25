@@ -299,17 +299,17 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
         }
       </PageFormat>
       
-      {props.allowDelete && props.deleteComponent && selectedData &&
+      {props.allowDelete && DeleteComponent && selectedData &&
         <DataCrudDelete
           dataTypeName={props.dataTypeName}
           onCancel={onCloseHandler}
           onSubmit={deleteSubmit}
-          deleteComponent={props.deleteComponent}
+          deleteComponent={DeleteComponent}
           data={selectedData}
           show={pageState.isDeleteConfirmationOpen.get()}
           disableSubmit={pageState.isSubmitting.get() || pageState.successAction.get()?.success || false}
           errors={pageState.formErrors.get()}
-      />
+        />
       }
     </>
   )
