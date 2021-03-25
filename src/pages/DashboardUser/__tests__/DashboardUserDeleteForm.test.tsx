@@ -1,16 +1,12 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-flat';
-import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
-import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
 import DashboardUserDelete from '../DashboardUserDelete';
 
 describe('Test Dashboard Delete User Form', () => {
   let onSubmit = jest.fn();
   let onClose = jest.fn();
-  let successAction: DataCrudSuccessAction | undefined;
   let data: DashboardUserFlat;
-  let formErrors: DataCrudFormErrors;
 
   beforeEach(() => {
     onSubmit = jest.fn().mockImplementation(() => {
@@ -27,30 +23,17 @@ describe('Test Dashboard Delete User Form', () => {
       hasDashboardAdmin: false,
       hasDashboardUser: false
     }
-
-    successAction = {
-      success: false,
-      successMsg: ''
-    };
-
-    formErrors = {
-      validation: undefined,
-      general: undefined
-    }
   });
 
-  it('Delete', async () => {
-    successAction = undefined;
+  it('Renders', () => {
     const pageRender = render(
       <DashboardUserDelete
         data={data}
-        formErrors={formErrors}
-        successAction={successAction}
-        isSubmitting={false}
+        dataTypeName="Dashboard User"
       />
     );
 
-    expect(pageRender.getByTestId('dashboard-user-delete')).toBeInTheDocument();
+    expect(pageRender.getByTestId('data-crud-delete-content')).toBeInTheDocument();
     expect(pageRender.getByText(data.id!)).toBeInTheDocument();
     expect(pageRender.getByText(data.email!)).toBeInTheDocument();
   });

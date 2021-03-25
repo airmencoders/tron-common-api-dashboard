@@ -1,7 +1,8 @@
 import {DataService} from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
-import {CreateUpdateFormProps} from './CreateUpdateFormProps';
-import { DeleteComponentProps } from './DeleteComponentProps';
+import { CreateUpdateFormProps } from './CreateUpdateFormProps';
+import { DataCrudDeleteComponentProps } from './DataCrudDeleteComponentProps';
+import { DataCrudDeleteContentProps } from './DataCrudDeleteContentProps';
 
 /***
  * T Row data type.
@@ -34,7 +35,7 @@ export interface DataCrudFormPageProps<T, R> {
    * React element of the component used to delete the dto.
    * @param props Used by the delete component.
    */
-  deleteComponent?: (props: DeleteComponentProps<R>) => JSX.Element;
+  deleteComponent?: (props: DataCrudDeleteComponentProps<R>) => JSX.Element;
 
   /**
    * Page title

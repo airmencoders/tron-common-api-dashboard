@@ -1,9 +1,0 @@
-@import "../../styles/base";
-
-.dashboard-user-delete-container {
-  &__content-table {
-    tr > * + * {
-      padding-left: $default-panel-padding-x;
-    }
-  }
-}
