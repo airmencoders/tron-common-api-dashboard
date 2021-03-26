@@ -15,3 +15,5 @@ export const wrapState = (state: State<ScratchStorageAppRegistryDto[]>, scratchS
 }
 
 export const useScratchStorageState = () => wrapState(useState(scratchStorageState), scratchStorageApi);
+
+export const accessScratchStorageState = () => wrapState(scratchStorageState, scratchStorageApi);

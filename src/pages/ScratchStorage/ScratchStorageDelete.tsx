@@ -1,8 +1,8 @@
-import { DeleteComponentProps } from '../../components/DataCrudFormPage/DeleteComponentProps';
+import { DataCrudDeleteComponentProps } from '../../components/DataCrudFormPage/DataCrudDeleteComponentProps';
 import { ScratchStorageAppRegistryDto } from '../../openapi';
 import './ScratchStorageDelete.scss';
 
-function ScratchStorageDelete(props: DeleteComponentProps<ScratchStorageAppRegistryDto>) {
+function ScratchStorageDelete(props: DataCrudDeleteComponentProps<ScratchStorageAppRegistryDto>) {
   return (
     <div className="scratch-storage-delete-container" data-testid="scratch-storage-delete">
       <p className="scratch-storage-delete-container__action-description">Delete this Scratch Storage App?</p>

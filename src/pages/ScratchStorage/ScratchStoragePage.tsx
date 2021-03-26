@@ -2,6 +2,7 @@ import React from 'react';
 import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
+import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
 import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
 import ScratchStorageDelete from './ScratchStorageDelete';
 import ScratchStorageEditForm from './ScratchStorageEditForm';
@@ -14,7 +15,7 @@ const columns: GridColumn[] =
 
 function ScratchStoragePage() {
   return (
-      <DataCrudFormPage<ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDto>
+      <DataCrudFormPage<ScratchStorageAppRegistryDto, ScratchStorageFlat>
           columns={columns}
           createForm={ScratchStorageEditForm}
           dataTypeName="Scratch Storage App"

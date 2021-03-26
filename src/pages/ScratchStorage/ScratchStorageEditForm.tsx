@@ -16,14 +16,16 @@ import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/Privil
 import Button from '../../components/Button/Button';
 import Grid from '../../components/Grid/Grid';
 import { RowClickedEvent } from 'ag-grid-community';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
+import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
 
 interface ScratchStorageEditorState {
   isOpen: boolean;
   data: ScratchStorageUserWithPrivsFlat;
 }
-function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageAppRegistryDto>) {
+function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>) {
 
-  const formState = useHookstate<ScratchStorageAppRegistryDto>({
+  const formState = useHookstate<ScratchStorageFlat>({
     id: props.data?.id ?? "",
     appName: props.data?.appName ?? "",
     userPrivs: props.data?.userPrivs ?? []
@@ -107,18 +109,17 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageAppRe
             />
           </FormGroup>
           <FormGroup
-          labelName="authorized-clients"
-          labelText="Authorized Clients"
+          labelName="scratch-storage-users"
+          labelText="Users"
           >
             <Button type='button' onClick={() => userAddState.isOpen.set(true)}>
               Add User
             </Button>
-            <Grid
-              data={formState.userPrivs.get() || []}
+            
+            <ItemChooser
+              items={formState.userPrivs.get() || []}
               columns={userColumns}
               onRowClicked={onRowClicked}
-              rowClass="ag-grid--row-pointer"
-              height="40vh"
             />
           </FormGroup>
           <SuccessErrorMessage successMessage={props.successAction?.successMsg}

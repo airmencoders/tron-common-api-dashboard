@@ -1,27 +1,86 @@
 import {DataService} from '../data-service/data-service';
 import {none, State} from '@hookstate/core';
-import {ScratchStorageAppRegistryDto, ScratchStorageAppRegistryEntry, ScratchStorageControllerApiInterface} from '../../openapi';
+import {Privilege, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryEntry, ScratchStorageControllerApiInterface, UserWithPrivs} from '../../openapi';
+import { ScratchStorageFlat } from './scratch-storage-flat';
+import { ScratchStorageUserWithPrivsFlat } from './scratch-storage-user-with-privs-flat';
+import { PrivilegeType } from '../privilege/privilege-type';
+import { AxiosPromise } from 'axios';
+import { accessPrivilegeState } from '../privilege/privilege-state';
+import { accessScratchStorageState } from './scratch-storage-state';
 
-export default class ScratchStorageService implements DataService<ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDto> {
+export default class ScratchStorageService implements DataService<ScratchStorageAppRegistryDto, ScratchStorageFlat> {
 
   constructor(public state: State<ScratchStorageAppRegistryDto[]>, private scratchStorageApi: ScratchStorageControllerApiInterface) {
   }
 
   async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
-    const scratchStorageResponsePromise = await this.scratchStorageApi.getScratchSpaceApps()
-        .then(resp => {
-          return resp.data;
-        });
-    const mappedData = scratchStorageResponsePromise.map((scratch) => {
-      scratch.userPrivs = undefined;
-      return scratch;
+    const response = (): AxiosPromise<ScratchStorageAppRegistryDto[]> => this.scratchStorageApi.getScratchSpaceApps();
+    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
+    //const scratchStorageResponse = (): Promise<ScratchStorageUserWithPrivsFlat[]> => accessScratchStorageState().fetchAndStoreData();
+
+    const data = new Promise<ScratchStorageAppRegistryDto[]>(async (resolve, reject) => {
+      try {
+        await privilegeResponse();
+        const result = await response();
+
+        resolve(result.data);
+      } catch (err) {
+        reject(err);
+      }
     });
-    this.state.set(mappedData);
-    return scratchStorageResponsePromise;
+
+    this.state.set(data);
+
+    return data;
   }
 
-  convertRowDataToEditableData(rowData: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
-    return Promise.resolve(Object.assign({}, rowData));
+  convertRowDataToEditableData(rowData: ScratchStorageAppRegistryDto): Promise<ScratchStorageFlat> {
+    if (rowData.id == null || rowData.id.trim().length <= 0) {
+      return Promise.reject(new Error('Scratch Storage App ID must be defined'));
+    }
+
+    const scratchStorage = this.scratchStorageApi.getScratchAppById(rowData.id);
+
+    const result = scratchStorage.then(response => {
+      //const mappedData = response.data.userPrivs?.map(x => {return undefined;});
+      const convertedToFlat: ScratchStorageFlat = this.convertToFlat(response.data);
+
+      return convertedToFlat;
+    });
+
+    return result;
+  }
+  convertToFlat(dto: ScratchStorageAppRegistryDto): ScratchStorageFlat {
+    const convertedToFlat: ScratchStorageFlat = {
+      id: dto.id ?? '',
+      appName: dto.appName,
+      userPrivs: this.convertScratchStorageeUserPrivsToFlat(dto.userPrivs ?? [])
+    }
+
+    return convertedToFlat;
+  }
+  convertScratchStorageeUserPrivsToFlat(userPrivs: UserWithPrivs[]): ScratchStorageUserWithPrivsFlat[] {
+    const flats: Array<ScratchStorageUserWithPrivsFlat> = [];
+
+    for (const dto of userPrivs) {
+      const convertedFlat = this.convertAppClientUserPrivToFlat(dto);
+      flats.push(convertedFlat);
+    }
+
+    return flats;
+  }
+  convertAppClientUserPrivToFlat(dto: UserWithPrivs) {
+    const privileges = dto.privs?.map(x => x.priv).filter(y => y != null) as Privilege[] ?? [];
+
+    const flat: ScratchStorageUserWithPrivsFlat = {
+      userId: dto.userId ?? '',
+      email: dto.emailAddress ?? '',
+      read: privileges.find(privilege => privilege.name === PrivilegeType.SCRATCH_READ) ? true : false,
+      write: privileges.find(privilege => privilege.name === PrivilegeType.SCRATCH_WRITE) ? true : false,
+      admin: privileges.find(privilege => privilege.name === PrivilegeType.SCRATCH_ADMIN) ? true : false,
+    };
+
+    return flat;
   }
 
   sendUpdate(toUpdate: ScratchStorageAppRegistryDto): Promise<ScratchStorageAppRegistryDto> {
