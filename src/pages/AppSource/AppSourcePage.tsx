@@ -7,9 +7,24 @@ import { AppSourceDetailsFlat } from '../../state/app-source/app-source-details-
 import AppSourceForm from './AppSourceForm';
 
 const columnHeaders: GridColumn[] = [
-  new GridColumn('id', true, true, 'ID'),
-  new GridColumn('name', true, true, 'Name'),
-  new GridColumn('clientCount', true, true, 'Client Count')
+  new GridColumn({
+    field: 'id',
+    sortable: true,
+    filter: true,
+    headerName: 'ID'
+  }),
+  new GridColumn({
+    field: 'name',
+    sortable: true,
+    filter: true,
+    headerName: 'Name'
+  }),
+  new GridColumn({
+    field: 'clientCount',
+    sortable: true,
+    filter: true,
+    headerName: 'Client Count'
+  })
 ];
 
 export function AppSourcePage() {

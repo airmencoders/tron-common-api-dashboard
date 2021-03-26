@@ -6,10 +6,20 @@ import { useScratchStorageState } from '../../state/scratch-storage/scratch-stor
 import ScratchStorageEditForm from './ScratchStorageEditForm';
 
 const columns: GridColumn[] =
-    [
-      new GridColumn('id', true, true, 'id'),
-      new GridColumn('appName', true, true, 'App Name')
-    ];
+  [
+    new GridColumn({
+      field: 'id',
+      sortable: true,
+      filter: true,
+      headerName: 'id'
+    }),
+    new GridColumn({
+      field: 'appName',
+      sortable: true,
+      filter: true,
+      headerName: 'App Name'
+    })
+  ];
 
 function ScratchStoragePage() {
   return (

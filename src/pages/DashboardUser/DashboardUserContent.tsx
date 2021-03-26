@@ -9,12 +9,34 @@ import DashboardUserDelete from './DashboardUserDelete';
 
 const columns: GridColumn[] =
   [
-    new GridColumn('id', true, true, 'UUID'),
-    new GridColumn('email', true, true, 'Email'),
-    new GridColumn('hasDashboardAdmin', true, true, 'Dashboard Admin', 'header-center',
-      PrivilegeCellRenderer),
-    new GridColumn('hasDashboardUser', true, true, 'Dashboard User', 'header-center',
-      PrivilegeCellRenderer),
+    new GridColumn({
+      field: 'id',
+      sortable: true,
+      filter: true,
+      headerName: 'UUID'
+    }),
+    new GridColumn({
+      field: 'email',
+      sortable: true,
+      filter: true,
+      headerName: 'Email'
+    }),
+    new GridColumn({
+      field: 'hasDashboardAdmin',
+      sortable: true,
+      filter: true,
+      headerName: 'Dashboard Admin',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: 'hasDashboardUser',
+      sortable: true,
+      filter: true,
+      headerName: 'Dashboard User',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
   ];
 
 export function DashboardUserContent() {

@@ -7,14 +7,44 @@ import OrganizationDelete from './OrganizationDelete';
 import OrganizationEditForm from './OrganizationEditForm';
 
 const columns: GridColumn[] =
-    [
-      new GridColumn('id', true, true, 'id'),
-      new GridColumn('name', true, true, 'Name'),
-      new GridColumn('leader', true, true, 'Leader'),
-      new GridColumn('parentOrganization', true, true, 'Parent Org Id'),
-      new GridColumn('orgType', true, true, 'Org Type'),
-      new GridColumn('branchType', true, true, 'Branch Type'),
-    ];
+  [
+    new GridColumn({
+      field: 'id',
+      sortable: true,
+      filter: true,
+      headerName: 'id'
+    }),
+    new GridColumn({
+      field: 'name',
+      sortable: true,
+      filter: true,
+      headerName: 'Name'
+    }),
+    new GridColumn({
+      field: 'leader',
+      sortable: true,
+      filter: true,
+      headerName: 'Leader'
+    }),
+    new GridColumn({
+      field: 'parentOrganization',
+      sortable: true,
+      filter: true,
+      headerName: 'Parent Org Id'
+    }),
+    new GridColumn({
+      field: 'orgType',
+      sortable: true,
+      filter: true,
+      headerName: 'Org Type'
+    }),
+    new GridColumn({
+      field: 'branchType',
+      sortable: true,
+      filter: true,
+      headerName: 'Branch Type'
+    }),
+  ];
 
 function OrganizationPage() {
   return (

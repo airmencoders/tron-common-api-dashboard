@@ -8,11 +8,26 @@ import AppClientForm from './AppClientForm';
 import AppClientDelete from './AppClientDelete';
 
 const columnHeaders: GridColumn[] = [
-  new GridColumn('name', true, true, 'NAME'),
-  new GridColumn('read', true, false, 'READ', 'header-center',
-      PrivilegeCellRenderer),
-  new GridColumn('write', true, false, 'WRITE', 'header-center',
-      PrivilegeCellRenderer),
+  new GridColumn({
+    field: 'name',
+    sortable: true,
+    filter: true,
+    headerName: 'Name'
+  }),
+  new GridColumn({
+    field: 'read',
+    sortable: true,
+    headerName: 'Read',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
+    field: 'write',
+    sortable: true,
+    headerName: 'Write',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
 ];
 
 export function AppClientPage() {

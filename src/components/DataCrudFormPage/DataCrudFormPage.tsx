@@ -236,7 +236,12 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   if (props.allowDelete && DeleteComponent) {
     columns = [
       ...props.columns,
-      new GridColumn('', false, false, deleteBtnName, 'header-center', DeleteCellRenderer, { onClick: deleteConfirmation })
+      new GridColumn({
+        headerName: deleteBtnName,
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: { onClick: deleteConfirmation }
+      })
     ];
   } else {
     columns = props.columns;
