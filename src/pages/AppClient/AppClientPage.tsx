@@ -43,6 +43,8 @@ export function AppClientPage() {
       allowDelete
       allowAdd
       deleteComponent={AppClientDelete}
+      autoResizeColumns
+      autoResizeColummnsMinWidth={700}
     />
   )
 }

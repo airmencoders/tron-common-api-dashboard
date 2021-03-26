@@ -273,6 +273,8 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                 columns={columns}
                 onRowClicked={onRowClicked}
                 rowClass="ag-grid--row-pointer"
+                autoResizeColumns={props.autoResizeColumns}
+                autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
               />
 
               <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>

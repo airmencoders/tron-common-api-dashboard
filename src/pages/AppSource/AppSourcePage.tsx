@@ -37,6 +37,8 @@ export function AppSourcePage() {
       updateForm={AppSourceForm}
       useDataState={useAppSourceState}
       allowEdit={true}
+      autoResizeColumns
+      autoResizeColummnsMinWidth={800}
     />
   )
 }

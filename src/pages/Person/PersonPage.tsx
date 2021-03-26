@@ -68,6 +68,8 @@ function PersonPage() {
           useDataState={usePersonState}
           allowEdit={true}
           allowAdd
+          autoResizeColumns
+          autoResizeColummnsMinWidth={1200}
       />
   );
 }

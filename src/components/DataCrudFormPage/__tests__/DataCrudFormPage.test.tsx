@@ -142,8 +142,14 @@ it('should render', async () => {
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
             columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
             ]}
             createForm={CreateUpdateTestForm}
             updateForm={CreateUpdateTestForm}
@@ -166,8 +172,14 @@ it('should show sidebar if page in add state', async () => {
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
             columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
             ]}
             createForm={CreateUpdateTestForm}
             updateForm={CreateUpdateTestForm}
@@ -191,8 +203,14 @@ it('should open the update panel if row clicked', async () => {
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
             columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
             ]}
             createForm={CreateUpdateTestForm}
             updateForm={CreateUpdateTestForm}
@@ -214,8 +232,14 @@ it('should show error state if request error', async () => {
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedErrorState}
             columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
             ]}
             createForm={CreateUpdateTestForm}
             updateForm={CreateUpdateTestForm}
@@ -235,8 +259,14 @@ it('should show success message for successful update', async () => {
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
             columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
             ]}
             createForm={CreateUpdateTestForm}
             updateForm={CreateUpdateTestForm}
@@ -262,8 +292,14 @@ it('should show success message for successful create', async () => {
         <DataCrudFormPage<TestRow, TestDto>
             useDataState={wrappedState}
             columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
             ]}
             createForm={CreateUpdateTestForm}
             updateForm={CreateUpdateTestForm}

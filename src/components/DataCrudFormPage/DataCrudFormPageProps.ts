@@ -63,4 +63,15 @@ export interface DataCrudFormPageProps<T, R> {
    * {@link createForm} must be defined if {@link allowAdd} is set to true to perform additions
    */
   allowAdd?: boolean;
+
+  /**
+   * Set to true to auto resize columns when window width is resized
+   */
+  autoResizeColumns?: boolean;
+
+  /**
+   * When set, auto resize of columns will only occur when window width greater than this value.
+   * 0 will be used if no value is provided. Size in pixels.
+   */
+  autoResizeColummnsMinWidth?: number;
 }

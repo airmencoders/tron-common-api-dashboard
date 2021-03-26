@@ -59,6 +59,8 @@ function OrganizationPage() {
         allowDelete
         allowAdd
         deleteComponent={OrganizationDelete}
+        autoResizeColumns
+        autoResizeColummnsMinWidth={1200}
       />
   );
 }

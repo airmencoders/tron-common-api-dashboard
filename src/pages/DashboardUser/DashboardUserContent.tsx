@@ -52,6 +52,8 @@ export function DashboardUserContent() {
       allowDelete
       allowAdd
       deleteComponent={DashboardUserDelete}
+      autoResizeColumns
+      autoResizeColummnsMinWidth={1200}
     />
   )
 }
