@@ -15,6 +15,34 @@ const testValidPerson: PersonDto = {
   rank: 'CIV'
 }
 
+const goodPhoneNumbers = [
+    '2234567890', 
+    '223456-7890',
+    '223456 7890',
+    '223 4567890',
+    '223-4567890',
+    '223 456 7890',
+    '223 456-7890',
+    '223-456 7890',
+    '223-456-7890',
+    '(223)4567890',
+    '(223)456-7890',
+    '(223)456 7890',
+    '(223) 4567890',
+    '(223) 456 7890',
+    '(223) 456-7890'
+];
+
+const badPhoneNumbers = [
+    '0234567980',
+    '1234567980',
+    '223456789',
+    '22345678901',
+    'A23232322',
+    '23 234 4232',
+    '23-3 234 4232',
+    '23 3 234 4232'
+]
 
 it('should render', async () => {
 
@@ -162,6 +190,90 @@ it('should set formState for dodid', async () => {
   );
 });
 
+[
+    '1',
+    '12',
+    '123',
+    '1234',
+    '1234a',
+    '12345A',
+    '2134@@',
+    '  123  ',
+    '-1234567',
+    '123 4567',    
+    '1234567890 ',
+    ' 1234567890',
+    ' 1234567890 ',
+].forEach(input => 
+    it(`should not allow submit when dod id input [${input}] is invalid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const dodIdInput = await form.getByLabelText('DoD Id', {selector: 'input'});
+        fireEvent.change(dodIdInput, { target: { value: input}});
+        await waitFor(
+            () => {
+                expect(form.getByText('Add').closest('button')).toHaveAttribute('disabled')
+                expect(form.getByText('* Enter a valid DoD Id')).toBeInTheDocument();
+            }
+        );
+    })  
+);
+
+[
+    '12345',
+    '123456',
+    '1234567',
+    '12345678',
+    '123456789',
+    '1234567890',
+].forEach(input => 
+    it(`should allow submit when dod id input [${input}] is valid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const dodIdInput = await form.getByLabelText('DoD Id', {selector: 'input'});
+        fireEvent.change(dodIdInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button')).not.toHaveAttribute('disabled')
+        );
+    })  
+);
+
+[null, ''].forEach(input => 
+    it(`should allow submit when dod id input is "${input}"`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const dodIdInput = await form.getByLabelText('DoD Id', {selector: 'input'});
+        fireEvent.change(dodIdInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button')?.getAttribute('disabled')).toEqual('')
+        );
+    })
+);
+
 it('should set formState for phone', async () => {
   const form = render(
       <PersonEditForm
@@ -180,6 +292,71 @@ it('should set formState for phone', async () => {
   );
 });
 
+badPhoneNumbers.forEach(input => 
+    it(`should not allow submit when phone input [${input}] is invalid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const phoneInput = await form.getByLabelText('Phone', {selector: 'input'});
+        fireEvent.change(phoneInput, { target: { value: input}});
+        await waitFor(
+            () => {
+                expect(form.getByText('Add').closest('button')).toHaveAttribute('disabled')
+                expect(form.getByText('* Enter a valid phone number')).toBeInTheDocument();
+            }
+        );
+    })
+);
+
+goodPhoneNumbers.forEach(input => 
+    it(`should allow submit when phone input [${input}] is valid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+    
+        const phoneInput = await form.getByLabelText('Phone', {selector: 'input'});
+        fireEvent.change(phoneInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button'))
+                .not.toHaveAttribute('disabled')
+        );
+    })
+);
+
+[null, ''].forEach(input => 
+    it(`should allow submit when phone input is "${input}"`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const phoneInput = await form.getByLabelText('Phone', {selector: 'input'});
+        fireEvent.change(phoneInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button')?.getAttribute('disabled')).toEqual('')
+        );
+    })
+);
+
 it('should set formState for dutyPhone', async () => {
   const form = render(
       <PersonEditForm
@@ -197,6 +374,71 @@ it('should set formState for dutyPhone', async () => {
       () => expect((dutyPhoneInput as HTMLInputElement).value).toBe('5555555555')
   );
 });
+
+badPhoneNumbers.forEach(input => 
+    it(`should not allow submit when duty phone input [${input}] is invalid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const dutyPhoneInput = await form.getByLabelText('Duty Phone', {selector: 'input'});
+        fireEvent.change(dutyPhoneInput, { target: { value: input}});
+        await waitFor(
+            () => {
+                expect(form.getByText('Add').closest('button')).toHaveAttribute('disabled')
+                expect(form.getByText('* Enter a valid phone number')).toBeInTheDocument();
+            }
+        );
+    })
+);
+
+goodPhoneNumbers.forEach(input => 
+    it(`should allow submit when duty phone input [${input}] is valid`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+    
+        const dutyPhoneInput = await form.getByLabelText('Duty Phone', {selector: 'input'});
+        fireEvent.change(dutyPhoneInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button'))
+                .not.toHaveAttribute('disabled')
+        );
+    })
+);
+
+[null, ''].forEach(input => 
+    it(`should allow submit when duty phone input is "${input}"`, async () => {
+        const form = render(
+            <PersonEditForm
+                data={testValidPerson}
+                formErrors={{}}
+                onSubmit={() => {}}
+                onClose={() => {}}
+                isSubmitting={false}
+                formActionType={FormActionType.ADD}
+            />
+        );
+        const dutyPhoneInput = await form.getByLabelText('Duty Phone', {selector: 'input'});
+        fireEvent.change(dutyPhoneInput, { target: { value: input}});
+        await waitFor(
+            () => expect(form.getByText('Add').closest('button')?.getAttribute('disabled')).toEqual('')
+        );
+    })
+);
 
 it('should set formState for dutyTitle', async () => {
   const form = render(

@@ -1,0 +1,21 @@
+@import '../../styles/base';
+
+.data-crud-delete-container {
+  &__action-description {
+    font-weight: 600;
+  }
+
+  &__content-table {
+    tr > * + * {
+      padding-left: $default-panel-padding-x;
+    }
+  }
+}
+
+.data-crud-delete-errors {
+  margin-top: $default-panel-padding-y;
+
+  &__message {
+    color: $error;
+  }
+}

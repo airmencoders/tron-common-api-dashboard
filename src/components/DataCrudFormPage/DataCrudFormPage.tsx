@@ -15,10 +15,8 @@ import {GridRowData} from '../Grid/grid-row-data';
 import './DataCrudFormPage.scss';
 import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
 import GridColumn from '../Grid/GridColumn';
-import Modal from '../Modal/Modal';
-import ModalTitle from '../Modal/ModalTitle';
-import ModalFooterSubmit from '../Modal/ModalFooterSubmit';
 import Spinner from '../Spinner/Spinner';
+import DataCrudDelete from './DataCrudDelete';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -244,6 +242,8 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     columns = props.columns;
   }
 
+  const selectedData = pageState.selected.get();
+
   return (
     <>
       <PageFormat pageTitle={props.pageTitle}>
@@ -298,25 +298,18 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
             </div>
         }
       </PageFormat>
-
-      { props.allowDelete && DeleteComponent && pageState.selected.get() &&
-        <Modal
-          headerComponent={<ModalTitle title="Delete Confirmation" />}
-          footerComponent={<ModalFooterSubmit 
-                              onCancel={onCloseHandler} 
-                              onSubmit={deleteSubmit} 
-                              disableSubmit={pageState.isSubmitting.get() || pageState.successAction.get()?.success} 
-                            />}
+      
+      {props.allowDelete && DeleteComponent && selectedData &&
+        <DataCrudDelete
+          dataTypeName={props.dataTypeName}
+          onCancel={onCloseHandler}
+          onSubmit={deleteSubmit}
+          deleteComponent={DeleteComponent}
+          data={selectedData}
           show={pageState.isDeleteConfirmationOpen.get()}
-          onHide={onCloseHandler}
-        >
-          <DeleteComponent
-            data={pageState.selected.get()}
-            formErrors={pageState.formErrors.get()}
-            successAction={pageState.successAction.get()}
-            isSubmitting={pageState.isSubmitting.get()}
-          />
-        </Modal>
+          disableSubmit={pageState.isSubmitting.get() || pageState.successAction.get()?.success || false}
+          errors={pageState.formErrors.get()}
+        />
       }
     </>
   )
