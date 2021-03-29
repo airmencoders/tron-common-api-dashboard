@@ -178,9 +178,18 @@ const CreateForm = (props: CreateUpdateFormProps<MockDto>) => {
 }
 
 const columns = [
-    new GridColumn('name', false, false, 'Name'),
-    new GridColumn('val1', false, false, 'Val 1'),
-    new GridColumn('val2', false, false, 'Val 2'),
+  new GridColumn({
+    field: 'name',
+    headerName: 'Name'
+  }),
+  new GridColumn({
+    field: 'val1',
+    headerName: 'Val 1'
+  }),
+  new GridColumn({
+    field: 'val2',
+    headerName: 'Val 2'
+  }),
 ];
 
 

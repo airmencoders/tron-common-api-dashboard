@@ -1,3 +1,4 @@
+import { useHookstate } from '@hookstate/core';
 import { GridApi } from 'ag-grid-community';
 import { GridReadyEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
@@ -33,6 +34,27 @@ function Grid(props: GridProps) {
       rowDataLengthChanged.current = false;
     }
   }, [props.data]);
+
+  const windowWidth = useHookstate<number>(window.innerWidth);
+  // Keep track of the size of the window width
+  useEffect(() => {
+    function onResize() {
+      windowWidth.set(window.innerWidth);
+    }
+
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+    }
+  }, []);
+
+  // Resize the grid columns if necessary
+  useEffect(() => {
+    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0))
+      gridApi?.sizeColumnsToFit();
+
+  }, [windowWidth.get()])
 
   return (
       <div className="grid-component"

@@ -20,7 +20,12 @@ function AppSourceClientAdd(props: { data: State<AppClientUserPrivFlat[]> }) {
   });
 
   const columns = [
-    new GridColumn('name', true, true, 'App Clients')
+    new GridColumn({
+      field: 'name',
+      sortable: true,
+      filter: true,
+      headerName: 'App Clients'
+    })
   ];
 
   function onRowClicked(event: RowClickedEvent) {

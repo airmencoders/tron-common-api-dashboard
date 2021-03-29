@@ -236,7 +236,12 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   if (props.allowDelete && DeleteComponent) {
     columns = [
       ...props.columns,
-      new GridColumn('', false, false, deleteBtnName, 'header-center', DeleteCellRenderer, { onClick: deleteConfirmation })
+      new GridColumn({
+        headerName: deleteBtnName,
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: { onClick: deleteConfirmation }
+      })
     ];
   } else {
     columns = props.columns;
@@ -268,6 +273,8 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                 columns={columns}
                 onRowClicked={onRowClicked}
                 rowClass="ag-grid--row-pointer"
+                autoResizeColumns={props.autoResizeColumns}
+                autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
               />
 
               <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>

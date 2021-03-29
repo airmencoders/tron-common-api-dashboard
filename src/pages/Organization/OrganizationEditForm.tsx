@@ -124,9 +124,24 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserDataItem([...personState.state.get()]);
     setOrgEditType(OrgEditOpType.LEADER_EDIT);
     setChooserDataColumns([ 
-      new GridColumn('id', true, true, 'ID'),
-      new GridColumn('firstName', true, true, 'First'),
-      new GridColumn('lastName', true, true, 'Last')
+      new GridColumn({
+        field: 'id',
+        sortable: true,
+        filter: true,
+        headerName: 'ID'
+      }),
+      new GridColumn({
+        field: 'firstName',
+        sortable: true,
+        filter: true,
+        headerName: 'First'
+      }),
+      new GridColumn({
+        field: 'lastName',
+        sortable: true,
+        filter: true,
+        headerName: 'Last'
+      })
     ]);
     setChooserDialog(true);
   }
@@ -143,8 +158,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserDataItem([...orgState.state.get()]);
     setOrgEditType(OrgEditOpType.PARENT_ORG_EDIT);
     setChooserDataColumns([ 
-      new GridColumn('id', true, true, 'ID'),
-      new GridColumn('name', true, true, 'Name')
+      new GridColumn({
+        field: 'id',
+        sortable: true,
+        filter: true,
+        headerName: 'ID'
+      }),
+      new GridColumn({
+        field: 'name',
+        sortable: true,
+        filter: true,
+        headerName: 'Name'
+      })
     ]);
     setChooserDialog(true);
   }
@@ -161,9 +186,24 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserDataItem([...personState.state.get()]);
     setOrgEditType(OrgEditOpType.MEMBERS_EDIT);
     setChooserDataColumns([ 
-      new GridColumn('id', true, true, 'ID'),
-      new GridColumn('firstName', true, true, 'First'),
-      new GridColumn('lastName', true, true, 'Last')
+      new GridColumn({
+        field: 'id',
+        sortable: true,
+        filter: true,
+        headerName: 'ID'
+      }),
+      new GridColumn({
+        field: 'firstName',
+        sortable: true,
+        filter: true,
+        headerName: 'First'
+      }),
+      new GridColumn({
+        field: 'lastName',
+        sortable: true,
+        filter: true,
+        headerName: 'Last'
+      })
     ]);
     setChooserDialog(true);
   }
@@ -206,8 +246,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setChooserDataItem([...orgState.state.get()]);
     setOrgEditType(OrgEditOpType.SUB_ORGS_EDIT);
     setChooserDataColumns([ 
-      new GridColumn('id', true, true, 'ID'),
-      new GridColumn('name', true, true, 'Name')
+      new GridColumn({
+        field: 'id',
+        sortable: true,
+        filter: true,
+        headerName: 'ID'
+      }),
+      new GridColumn({
+        field: 'name',
+        sortable: true,
+        filter: true,
+        headerName: 'Name'
+      })
     ]);
     setChooserDialog(true);
   }
@@ -476,8 +526,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       data-testid="membersList"
                       data={orgState.selectedOrgState.get().members || []}
                       columns={[
-                        new GridColumn('lastName', true, true, 'Last'),
-                        new GridColumn('firstName', true, true, 'First'),
+                        new GridColumn({
+                          field: 'lastName',
+                          sortable: true,
+                          filter: true,
+                          headerName: 'Last'
+                        }),
+                        new GridColumn({
+                          field: 'firstName',
+                          sortable: true,
+                          filter: true,
+                          headerName: 'First'
+                        }),
                       ]}
                       rowClass="ag-grid--row-pointer"
                   />                  
@@ -524,7 +584,12 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       data-testid="subOrgsList"
                       data={orgState.selectedOrgState.get().subordinateOrganizations || []}
                       columns={[
-                        new GridColumn('name', true, true, 'Name'),
+                        new GridColumn({
+                          field: 'name',
+                          sortable: true,
+                          filter: true,
+                          headerName: 'Name'
+                        }),
                       ]}
                       rowClass="ag-grid--row-pointer"
                   />
