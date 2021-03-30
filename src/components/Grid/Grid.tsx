@@ -68,6 +68,7 @@ function Grid(props: GridProps) {
               rowClass={props.rowClass}
               quickFilterText={props.quickFilterText || ''}
               rowSelection={props.rowSelection || 'none'}
+              suppressColumnVirtualisation={props.disabledGridColumnVirtualization}
           >
             {
               props.columns.map(col => (
