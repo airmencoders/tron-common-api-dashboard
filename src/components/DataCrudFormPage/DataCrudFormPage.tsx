@@ -275,6 +275,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                 rowClass="ag-grid--row-pointer"
                 autoResizeColumns={props.autoResizeColumns}
                 autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
+                disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
               />
 
               <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
@@ -290,7 +291,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                   />
                   : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
                     <UpdateForm
-                        data={pageState.selected.attach(Downgraded).get()}
+                      data={pageState.selected.attach(Downgraded).get()}
                       formErrors={pageState.formErrors.get()}
                       onSubmit={updateSubmit}
                       onPatch={updatePatch}

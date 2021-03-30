@@ -20,4 +20,10 @@ export interface GridProps {
    * 0 will be used if no value is provided. Size in pixels.
    */
   autoResizeColummnsMinWidth?: number;
+
+  /**
+   * If set to true, it will disable column virtualization.
+   * Defaults to FALSE (column virtualization enabled)
+   */
+  disabledGridColumnVirtualization?: boolean;
 }
