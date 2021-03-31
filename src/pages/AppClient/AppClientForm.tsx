@@ -40,6 +40,12 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     props.onSubmit(formState.get());
   }
 
+  function nameErrors(): string[] {
+    const formValidation = Validation(formState.name).errors().map(validationError => validationError.message) ?? [];
+    const serverNameValid = props.formErrors?.validation?.name;
+    return serverNameValid ? formValidation.concat([serverNameValid]) : formValidation;
+  }
+
   return (
     <Form className="app-client-form" onSubmit={(event) => submitForm(event)} data-testid="app-client-form">
       {props.formActionType === FormActionType.UPDATE &&
@@ -62,8 +68,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         labelName="name"
         labelText="Name"
         isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
-        errorMessages={Validation(formState.name).errors()
-          .map(validationError => validationError.message)}
+        errorMessages={nameErrors()}
       >
         <TextInput
           id="name"

@@ -17,6 +17,7 @@ import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
 import GridColumn from '../Grid/GridColumn';
 import Spinner from '../Spinner/Spinner';
 import DataCrudDelete from './DataCrudDelete';
+import { DataCrudFormErrors } from './data-crud-form-errors';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -71,6 +72,18 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
+  function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
+    let formErrors: DataCrudFormErrors = {
+      general: error.message ?? 'Unknown error occurred'
+    };
+
+    if (error.general || error.validation) {
+      formErrors = error as DataCrudFormErrors;
+    }
+
+    return formErrors;
+  }
+
   async function deleteConfirmation(deleteItem: T) {
     if (props.allowDelete && deleteItem != null) {
       /**
@@ -119,9 +132,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }
     catch (error) {
       pageState.merge({
-        formErrors: {
-          general: error.message
-        },
+        formErrors: convertErrorToDataCrudFormError(error),
         isSubmitting: false
       });
     }
@@ -150,9 +161,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       pageState.set(prevState => {
         return {
           ... prevState,
-          formErrors: {
-            general: error.message
-          },
+          formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
       });
@@ -186,9 +195,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       pageState.set(prevState => {
         return {
           ... prevState,
-          formErrors: {
-            general: error.message
-          },
+          formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
       });
@@ -218,9 +225,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       pageState.set(prevState => {
         return {
           ... prevState,
-          formErrors: {
-            general: error.message
-          },
+          formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
       });
