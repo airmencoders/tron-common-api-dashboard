@@ -40,10 +40,10 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     props.onSubmit(formState.get());
   }
 
-  function nameErrors(): string[] {
-    const formValidation = Validation(formState.name).errors().map(validationError => validationError.message) ?? [];
+  function createNameErrors(): string[] {
+    const errors: string[] = Validation(formState.name).errors().map(validationError => validationError.message);
     const serverNameValid = props.formErrors?.validation?.name;
-    return serverNameValid ? formValidation.concat([serverNameValid]) : formValidation;
+    return serverNameValid ? errors.concat([serverNameValid]) : errors;
   }
 
   return (
@@ -67,15 +67,15 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       <FormGroup
         labelName="name"
         labelText="Name"
-        isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
-        errorMessages={nameErrors()}
+        isError={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
+        errorMessages={createNameErrors()}
       >
         <TextInput
           id="name"
           name="name"
           type="text"
           defaultValue={formState.name.get()}
-          error={Touched(formState.name).touched() && Validation(formState.name).invalid()}
+          error={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
           onChange={(event) => formState.name.set(event.target.value)}
           disabled={isFormDisabled()}
         />

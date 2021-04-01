@@ -9,6 +9,7 @@ import { DashboardUserFlat } from '../dashboard-user-flat';
 import { PrivilegeType } from '../../privilege/privilege-type';
 import { wrapDashboardUserState } from '../dashboard-user-state';
 import { _ } from 'ag-grid-community';
+import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
 
 jest.mock('../../privilege/privilege-state');
 
@@ -112,7 +113,22 @@ describe('Dashboard User State Test', () => {
     headers: {}
   };
 
-  const rejectMsg = 'failed';
+  const axiosRejectResponse = {
+    response: {
+      data: {
+        message: 'failed'
+      },
+      status: 400,
+      statusText: 'OK',
+      config: {},
+      headers: {}
+    }
+  };
+
+  const rejectMsg = {
+    general: axiosRejectResponse.response.data.message
+  } as DataCrudFormErrors;
+
 
   const privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
   const privilegeApi: PrivilegeControllerApiInterface = new PrivilegeControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
@@ -164,7 +180,7 @@ describe('Dashboard User State Test', () => {
     dashboardUserApi.getAllDashboardUsers = jest.fn(() => {
       return new Promise<AxiosResponse<DashboardUserDto[]>>((resolve, reject) => {
         setTimeout(() => {
-          reject("Rejected")
+          reject(axiosRejectResponse)
         }, 1000)
       });
     });
@@ -172,8 +188,8 @@ describe('Dashboard User State Test', () => {
     const fetch = state.fetchAndStoreData();
     expect(state.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual("Rejected");
-    expect(state.error).toBe("Rejected");
+    await expect(fetch).rejects.toEqual(rejectMsg);
+    expect(state.error).toEqual(rejectMsg);
   });
 
   it('Test sendUpdate Success', async () => {
@@ -189,7 +205,7 @@ describe('Dashboard User State Test', () => {
 
   it('Test sendUpdate Fail', async () => {
     dashboardUserApi.updateDashboardUser = jest.fn(() => {
-      return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
     await expect(state.sendUpdate(testUserFlat)).rejects.toEqual(rejectMsg);
@@ -220,7 +236,7 @@ describe('Dashboard User State Test', () => {
 
   it('Test sendCreate Fail', async () => {
     dashboardUserApi.addDashboardUser = jest.fn(() => {
-      return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
     await expect(state.sendCreate(testUserFlat)).rejects.toEqual(rejectMsg);
@@ -236,7 +252,7 @@ describe('Dashboard User State Test', () => {
 
   it('Test sendDelete Fail', async () => {
     dashboardUserApi.deleteDashboardUser = jest.fn(() => {
-      return new Promise<AxiosResponse<void>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<void>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
     await expect(state.sendDelete(testUserFlat)).rejects.toEqual(rejectMsg);

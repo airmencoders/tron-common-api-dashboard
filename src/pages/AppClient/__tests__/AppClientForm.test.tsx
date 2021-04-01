@@ -84,11 +84,11 @@ describe('Test App Client Form', () => {
   });
 
   it('Server-side Validation', () => {
-    // const nameValidation: string = 'name validation';
+    const nameValidation: string = 'name validation';
     const generalError: string = 'some error';
     const errors: DataCrudFormErrors = {
       validation: {
-        // name: nameValidation
+        name: nameValidation
       },
       general: generalError
     };
@@ -100,8 +100,8 @@ describe('Test App Client Form', () => {
     const elem = pageRender.getByTestId('app-client-form');
     expect(elem).toBeInTheDocument();
 
-    // expect(pageRender.getByText('* ' + nameValidation));
-    expect(pageRender.getByText('* ' + generalError));
+    expect(pageRender.getByText(new RegExp(nameValidation, 'i')));
+    expect(pageRender.getByText(new RegExp(generalError, 'i')));
   });
 
   it('Success message', () => {

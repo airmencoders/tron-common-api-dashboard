@@ -19,7 +19,7 @@ export function prepareDataCrudErrorResponse(err: any): DataCrudFormErrors {
     }
   } else { // Something else happened...
     return {
-      general: err.message
+      general: err.message ?? 'Unknown error occurred.'
     }
   }
 }

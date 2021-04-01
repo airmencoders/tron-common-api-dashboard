@@ -1,6 +1,7 @@
 import React from 'react';
 import {FormGroupProps} from './FormGroupProps';
 import Label from '../Label/Label';
+import './FormGroup.scss';
 
 function FormGroup(props: FormGroupProps) {
   return (
