@@ -1,11 +1,12 @@
-import {render, waitFor, screen, fireEvent} from '@testing-library/react';
+import React from 'react';
+import DataCrudDeleteContent from '../DataCrudDeleteContent';
+import { render, waitFor, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 import {DataCrudFormPage} from '../DataCrudFormPage';
 import {DataService} from '../../../state/data-service/data-service';
-import { createState, none, State, useState } from '@hookstate/core';
+import { createState, none, State, StateMethodsDestroy, useState } from '@hookstate/core';
 import GridColumn from '../../Grid/GridColumn';
 import {MemoryRouter} from 'react-router-dom';
-
-import React from 'react';
+import { DataCrudDeleteComponentProps } from '../../DataCrudFormPage/DataCrudDeleteComponentProps';
 
 interface TestRow {
   id: string;
@@ -16,10 +17,6 @@ interface TestDto {
   id: string;
   val: string;
 }
-
-const testState = createState(new Array<TestRow>());
-
-const useTestState = () => useState(testState);
 
 class TestDataService implements DataService<TestRow, TestDto> {
   isPromised = false;
@@ -59,6 +56,10 @@ class TestDataService implements DataService<TestRow, TestDto> {
     this.state[indexToUpdate].set(none);
 
     return Promise.resolve();
+  }
+
+  sendPatch(params: any): Promise<TestRow> {
+    return Promise.resolve({ id: '0', val: 'val0' });
   }
 
   convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
@@ -121,167 +122,528 @@ class TestDataErrorService implements DataService<TestRow, TestDto> {
   }
 }
 
-const wrappedState = () => new TestDataService(useTestState());
-const wrappedErrorState = () => new TestDataErrorService(useTestState());
+class TestDataRequestErrorService implements DataService<TestRow, TestDto> {
+  isPromised = false;
+  error = undefined;
 
-const CreateUpdateTestForm = ({onSubmit, successAction}: any) => {
+  private errorMsg = 'ERROR';
+
+  constructor(public state: State<TestRow[]>) { }
+
+  fetchAndStoreData(): Promise<TestRow[]> {
+    const initData = [
+      { id: '0', val: 'val0' },
+      { id: '1', val: 'val1' },
+    ];
+    this.state.set(initData);
+    return Promise.resolve(initData);
+  }
+
+  sendUpdate(toUpdate: TestDto): Promise<TestRow> {
+    throw new Error(this.errorMsg);
+  }
+
+  sendCreate(toCreate: TestDto): Promise<TestRow> {
+    throw new Error(this.errorMsg);
+  }
+
+  sendDelete(toDelete: TestDto): Promise<void> {
+    throw new Error(this.errorMsg);
+  }
+
+  sendPatch(params: any): Promise<TestRow> {
+    throw new Error(this.errorMsg);
+  }
+
+  onPatch(params: any): Promise<TestRow> {
+    throw new Error(this.errorMsg);
+  }
+
+  convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
+    const values = this.state.get();
+    const foundData = values.find(row => row.id === rowData.id);
+    if (foundData == null) {
+      return Promise.reject();
+    }
+    return Promise.resolve(foundData);
+  }
+}
+
+const CreateUpdateTestForm = ({ onSubmit, successAction, formErrors, onPatch }: any) => {
   return (
-      <div data-testid="form">
-        <div>Form</div>
-        <div>{successAction?.successMsg ? 'Successfully' : 'Not Submit'}</div>
-        <button onClick={() => onSubmit({id: '0', val: 'val01'})}>Submit</button>
-
-      </div>
+    <div data-testid="form">
+      <div>Form</div>
+      <div>{formErrors?.general ? 'Error' : 'No Error'}</div>
+      <div>{successAction?.successMsg ? 'Successfully' : 'Not Submit'}</div>
+      <button onClick={() => onSubmit({id: '0', val: 'val01'})}>Submit</button>
+      <button onClick={() => onPatch()}>Patch</button>
+    </div>
   )
 }
 
-it('should render', async () => {
+const DeleteComponent = (props: DataCrudDeleteComponentProps<TestRow>) => {
+  return (
+    <DataCrudDeleteContent
+      dataTypeName={props.dataTypeName}
+    />
+  );
+}
 
-  render(
+describe('Test DataCrudFormPage', () => {
+  let testState: State<TestRow[]> & StateMethodsDestroy;
+  let useTestState: () => State<TestRow[]>;
+  let wrappedState: () => TestDataService;
+  let wrappedErrorState: () => TestDataErrorService;
+  let wrappedRequestErrorState: () => TestDataRequestErrorService;
+
+  beforeEach(() => {
+    testState = createState(new Array<TestRow>());
+    useTestState = () => useState(testState);
+    wrappedState = () => new TestDataService(useTestState());
+    wrappedErrorState = () => new TestDataErrorService(useTestState());
+    wrappedRequestErrorState = () => new TestDataRequestErrorService(useTestState());
+  });
+
+  afterEach(() => {
+    testState.destroy();
+  })
+
+  it('should render', async () => {
+    render(
+        <MemoryRouter>
+          <DataCrudFormPage<TestRow, TestDto>
+              useDataState={wrappedState}
+              columns={[
+                new GridColumn({
+                  field: 'id',
+                  headerName: 'id'
+                }),
+                new GridColumn({
+                  field: 'val',
+                  headerName: 'val'
+                }),
+              ]}
+              createForm={CreateUpdateTestForm}
+              updateForm={CreateUpdateTestForm}
+              pageTitle="Test Page Title"
+              dataTypeName="Test"
+              allowEdit={true} />
+        </MemoryRouter>
+    );
+  
+    await waitFor(
+        () => expect(screen.getAllByText('Test Page Title')).toBeTruthy()
+    );
+    const tableVal = await screen.findByText('val0');
+    expect(tableVal).toBeTruthy();
+  });
+  
+  it('should show sidebar if page in add state', async () => {
+    render(
+        <MemoryRouter>
+          <DataCrudFormPage<TestRow, TestDto>
+              useDataState={wrappedState}
+              columns={[
+                new GridColumn({
+                  field: 'id',
+                  headerName: 'id'
+                }),
+                new GridColumn({
+                  field: 'val',
+                  headerName: 'val'
+                }),
+              ]}
+              createForm={CreateUpdateTestForm}
+              updateForm={CreateUpdateTestForm}
+              pageTitle="Test Page Title"
+              dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+        />
+        </MemoryRouter>
+    );
+  
+    await screen.findByText('Add Test');
+    fireEvent.click(screen.getByText('Add Test'));
+    const formLabel = await screen.findByText('Form');
+    expect(formLabel).toBeTruthy();
+  });
+  
+  it('should open the update panel if row clicked', async () => {
+    render(
+        <MemoryRouter>
+          <DataCrudFormPage<TestRow, TestDto>
+              useDataState={wrappedState}
+              columns={[
+                new GridColumn({
+                  field: 'id',
+                  headerName: 'id'
+                }),
+                new GridColumn({
+                  field: 'val',
+                  headerName: 'val'
+                }),
+              ]}
+              createForm={CreateUpdateTestForm}
+              updateForm={CreateUpdateTestForm}
+              pageTitle="Test Page Title"
+              dataTypeName="Test"
+              allowEdit={true} />
+        </MemoryRouter>
+    );
+  
+    await screen.findByText('val0');
+    fireEvent.click(screen.getByText('val0'));
+    const formLabel = await screen.findByText('Form');
+    expect(formLabel).toBeTruthy();
+  });
+  
+  it('should show error state if request error', async () => {
+    render(
+        <MemoryRouter>
+          <DataCrudFormPage<TestRow, TestDto>
+              useDataState={wrappedErrorState}
+              columns={[
+                new GridColumn({
+                  field: 'id',
+                  headerName: 'id'
+                }),
+                new GridColumn({
+                  field: 'val',
+                  headerName: 'val'
+                }),
+              ]}
+              createForm={CreateUpdateTestForm}
+              updateForm={CreateUpdateTestForm}
+              pageTitle="Test Page Title"
+              dataTypeName="Test"
+              allowEdit={true} />
+        </MemoryRouter>
+    );
+  
+    const error = await screen.findByText('error');
+    expect(error).toBeTruthy();
+  });
+  
+  it('should show success message for successful update', async () => {
+    render(
+        <MemoryRouter>
+          <DataCrudFormPage<TestRow, TestDto>
+              useDataState={wrappedState}
+              columns={[
+                new GridColumn({
+                  field: 'id',
+                  headerName: 'id'
+                }),
+                new GridColumn({
+                  field: 'val',
+                  headerName: 'val'
+                }),
+              ]}
+              createForm={CreateUpdateTestForm}
+              updateForm={CreateUpdateTestForm}
+              pageTitle="Test Page Title"
+              dataTypeName="Test"
+              allowEdit={true} />
+        </MemoryRouter>
+    );
+  
+    await screen.findByText('val0');
+    fireEvent.click(screen.getByText('val0'));
+    await screen.findByText('Submit');
+    fireEvent.click(screen.getByText('Submit'));
+  
+    await waitFor(
+        () => expect(screen.getByText('Successfully')).toBeTruthy(),
+    )
+  });
+  
+  it('should show success message for successful create', async () => {
+    render(
+        <MemoryRouter>
+          <DataCrudFormPage<TestRow, TestDto>
+              useDataState={wrappedState}
+              columns={[
+                new GridColumn({
+                  field: 'id',
+                  headerName: 'id'
+                }),
+                new GridColumn({
+                  field: 'val',
+                  headerName: 'val'
+                }),
+              ]}
+              createForm={CreateUpdateTestForm}
+              updateForm={CreateUpdateTestForm}
+              pageTitle="Test Page Title"
+              dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+        />
+        </MemoryRouter>
+    );
+  
+    await screen.findByText('Add Test');
+    fireEvent.click(screen.getByText('Add Test'));
+    await screen.findByText('Submit');
+    fireEvent.click(screen.getByText('Submit'));
+  
+    await waitFor(
+        () => expect(screen.getByText('Successfully')).toBeTruthy(),
+    )
+  });
+
+  it('should show success message for successful patch', async () => {
+    render(
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
-            useDataState={wrappedState}
-            columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
-            ]}
-            createForm={CreateUpdateTestForm}
-            updateForm={CreateUpdateTestForm}
-            pageTitle="Test Page Title"
-            dataTypeName="Test"
-            allowEdit={true} />
+          useDataState={wrappedState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+        />
       </MemoryRouter>
-  );
+    );
 
-  await waitFor(
-      () => expect(screen.getAllByText('Test Page Title')).toBeTruthy()
-  );
-  const tableVal = await screen.findByText('val0');
-  expect(tableVal).toBeTruthy();
-});
+    const rowItem = await screen.findByText('val0');
+    fireEvent.click(rowItem);
+    const patchBtn = await screen.findByText('Patch');
+    fireEvent.click(patchBtn);
 
-it('should show sidebar if page in add state', async () => {
-  render(
+    await expect(screen.findByText('Successfully')).resolves.toBeInTheDocument();
+  });
+
+  it('test delete', async () => {
+    render(
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
-            useDataState={wrappedState}
-            columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
-            ]}
-            createForm={CreateUpdateTestForm}
-            updateForm={CreateUpdateTestForm}
-            pageTitle="Test Page Title"
-            dataTypeName="Test"
-        allowEdit={true}
-        allowAdd
-      />
+          useDataState={wrappedState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={() => <></>}
+          updateForm={() => <></>}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={false}
+          allowDelete
+          deleteComponent={DeleteComponent}
+          disableGridColumnVirtualization={true}
+        />
       </MemoryRouter>
-  );
+    );
 
-  await screen.findByText('Add Test');
-  fireEvent.click(screen.getByText('Add Test'));
-  const formLabel = await screen.findByText('Form');
-  expect(formLabel).toBeTruthy();
-});
+    const removeIcon = (await screen.findByTitle('remove')).closest('button');
+    expect(removeIcon).toBeDefined();
+    if (removeIcon) fireEvent.click(removeIcon);
 
-it('should open the update panel if row clicked', async () => {
-  render(
+    const deleteModal = await screen.findByText(new RegExp('Delete Confirmation', 'i'));
+    expect(deleteModal).toBeDefined();
+
+    const deleteBtnSearch = await screen.findAllByText('Delete');
+    const deleteBtn = deleteBtnSearch.find(x => x.className === 'usa-button');
+
+    if (deleteBtn) fireEvent.click(deleteBtn);
+    await waitForElementToBeRemoved(deleteModal);
+  });
+
+  it('should close sidedrawer when close button clicked', async () => {
+    render(
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
-            useDataState={wrappedState}
-            columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
-            ]}
-            createForm={CreateUpdateTestForm}
-            updateForm={CreateUpdateTestForm}
-            pageTitle="Test Page Title"
-            dataTypeName="Test"
-            allowEdit={true} />
+          useDataState={wrappedState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true} />
       </MemoryRouter>
-  );
+    );
 
-  await screen.findByText('val0');
-  fireEvent.click(screen.getByText('val0'));
-  const formLabel = await screen.findByText('Form');
-  expect(formLabel).toBeTruthy();
-});
+    const rowItem = await screen.findByText('val0');
+    fireEvent.click(rowItem);
 
-it('should show error state if request error', async () => {
-  render(
+    const closeBtn = (await screen.findByTitle('close')).closest('button');
+    expect(closeBtn).toBeDefined();
+    if (closeBtn) fireEvent.click(closeBtn);
+  });
+
+  it('createSubmit error', async () => {
+    render(
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
-            useDataState={wrappedErrorState}
-            columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
-            ]}
-            createForm={CreateUpdateTestForm}
-            updateForm={CreateUpdateTestForm}
-            pageTitle="Test Page Title"
-            dataTypeName="Test"
-            allowEdit={true} />
+          useDataState={wrappedRequestErrorState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          deleteComponent={DeleteComponent}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+          allowDelete
+        />
       </MemoryRouter>
-  );
+    );
 
-  const error = await screen.findByText('error');
-  expect(error).toBeTruthy();
-});
+    const addBtn = await screen.findByText('Add Test');
+    fireEvent.click(addBtn);
+    const submitBtn = await screen.findByText('Submit');
+    fireEvent.click(submitBtn);
 
-it('should show success message for successful update', async () => {
-  render(
+    await expect(screen.findByText('Error')).resolves.toBeInTheDocument();
+  });
+
+  it('updateSubmit error', async () => {
+    render(
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
-            useDataState={wrappedState}
-            columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
-            ]}
-            createForm={CreateUpdateTestForm}
-            updateForm={CreateUpdateTestForm}
-            pageTitle="Test Page Title"
-            dataTypeName="Test"
-            allowEdit={true} />
+          useDataState={wrappedRequestErrorState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          deleteComponent={DeleteComponent}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+          allowDelete
+        />
       </MemoryRouter>
-  );
+    );
 
-  await screen.findByText('val0');
-  fireEvent.click(screen.getByText('val0'));
-  await screen.findByText('Submit');
-  fireEvent.click(screen.getByText('Submit'));
+    const rowItem = await screen.findByText('val0');
+    fireEvent.click(rowItem);
+    const submitBtn = await screen.findByText('Submit');
+    fireEvent.click(submitBtn);
 
-  await waitFor(
-      () => expect(screen.getByText('Successfully')).toBeTruthy(),
-  )
-});
+    await expect(screen.findByText('Error')).resolves.toBeInTheDocument();
+  });
 
-it('should show success message for successful create', async () => {
-  render(
+  it('deleteSubmit error', async () => {
+    render(
       <MemoryRouter>
         <DataCrudFormPage<TestRow, TestDto>
-            useDataState={wrappedState}
-            columns={[
-              new GridColumn('id', false, false, 'id'),
-              new GridColumn('val', false, false, 'val'),
-            ]}
-            createForm={CreateUpdateTestForm}
-            updateForm={CreateUpdateTestForm}
-            pageTitle="Test Page Title"
-            dataTypeName="Test"
-        allowEdit={true}
-        allowAdd
-      />
+          useDataState={wrappedRequestErrorState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          deleteComponent={DeleteComponent}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+          allowDelete
+          disableGridColumnVirtualization={true}
+        />
       </MemoryRouter>
-  );
+    );
 
-  await screen.findByText('Add Test');
-  fireEvent.click(screen.getByText('Add Test'));
-  await screen.findByText('Submit');
-  fireEvent.click(screen.getByText('Submit'));
+    const removeIcon = (await screen.findByTitle('remove')).closest('button');
+    expect(removeIcon).toBeDefined();
+    if (removeIcon) fireEvent.click(removeIcon);
 
-  await waitFor(
-      () => expect(screen.getByText('Successfully')).toBeTruthy(),
-  )
+    const deleteModal = await screen.findByText(new RegExp('Delete Confirmation', 'i'));
+    expect(deleteModal).toBeDefined();
+
+    const deleteBtnSearch = await screen.findAllByText('Delete');
+    const deleteBtn = deleteBtnSearch.find(x => x.className === 'usa-button');
+
+    if (deleteBtn) fireEvent.click(deleteBtn);
+
+    await expect(screen.findByText('Error')).resolves.toBeInTheDocument();
+  });
+
+  it('updatePatch error', async () => {
+    render(
+      <MemoryRouter>
+        <DataCrudFormPage<TestRow, TestDto>
+          useDataState={wrappedRequestErrorState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          deleteComponent={DeleteComponent}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+          allowDelete
+        />
+      </MemoryRouter>
+    );
+
+    const rowItem = await screen.findByText('val0');
+    fireEvent.click(rowItem);
+    const patchBtn = await screen.findByText('Patch');
+    fireEvent.click(patchBtn);
+
+    await expect(screen.findByText('Error')).resolves.toBeInTheDocument();
+  });
 });
 

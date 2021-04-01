@@ -10,8 +10,14 @@ test('grid shows rows', async () => {
   ];
 
   const columns = [
-      new GridColumn('field1', false, false, 'Field 1'),
-      new GridColumn('field2', false, false, 'Field 2'),
+    new GridColumn({
+      field: 'field1',
+      headerName: 'Field 1'
+    }),
+    new GridColumn({
+      field: 'field2',
+      headerName: 'Field 2'
+    }),
   ];
   render(<Grid data={gridData} columns={columns} />);
   await waitFor(

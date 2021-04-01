@@ -19,8 +19,16 @@ const Template: Story<GridProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   columns: [
-     new GridColumn('col1', true, false, 'Column 1'),
-     new GridColumn('col2', false, true, 'Column 2'),
+    new GridColumn({
+      field: 'col1',
+      sortable: true,
+      headerName: 'Column 1'
+    }),
+    new GridColumn({
+      field: 'col2',
+      filter: true,
+      headerName: 'Column 2'
+    }),
   ],
   data: [
     { col1: 'Value 1', col2: 1 },

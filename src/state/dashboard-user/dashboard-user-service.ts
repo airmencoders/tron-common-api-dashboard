@@ -6,16 +6,27 @@ import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
-import { Privilege } from '../../openapi';
+import { Privilege, PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 
 export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserFlat> {
   constructor(public state: State<DashboardUserFlat[]>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
 
   fetchAndStoreData(): Promise<DashboardUserFlat[]> {
+    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
     const response = (): AxiosPromise<DashboardUserDto[]> => this.dashboardUserApi.getAllDashboardUsers();
 
-    const data = new Promise<DashboardUserFlat[]>((resolve) => resolve(response().then(r => this.convertDashboardUsersToFlat(r.data))));
+    const data = new Promise<DashboardUserFlat[]>(async (resolve, reject) => {
+      try {
+        await privilegeResponse();
+        const result = await response();
+
+        resolve(this.convertDashboardUsersToFlat(result.data));
+      } catch (err) {
+        reject(err);
+      }
+    });
+
     this.state.set(data);
 
     return data;

@@ -72,10 +72,33 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsFlat>) {
 
   const deleteBtnName = 'Delete';
   const appClientColumns: GridColumn[] = [
-    new GridColumn('appClientUserName', true, true, 'Name'),
-    new GridColumn('read', true, false, 'Read', 'header-center', PrivilegeCellRenderer),
-    new GridColumn('write', true, false, 'Write', 'header-center', PrivilegeCellRenderer),
-    new GridColumn('', false, false, deleteBtnName, 'header-center', DeleteCellRenderer, { onClick: removeClient })
+    new GridColumn({
+      field: 'appClientUserName',
+      sortable: true,
+      filter: true,
+      headerName: 'Name'
+    }),
+    new GridColumn({
+      field: 'read',
+      sortable: true,
+      headerName: 'Read',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: 'write',
+      sortable: true,
+      headerName: 'Write',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: '',
+      headerName: deleteBtnName,
+      headerClass: 'header-center',
+      cellRenderer: DeleteCellRenderer,
+      cellRendererParams: { onClick: removeClient }
+    })
   ];
 
   function removeClient(data: AppClientUserPrivFlat) {
