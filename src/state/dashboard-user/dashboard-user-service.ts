@@ -8,6 +8,7 @@ import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
 import { Privilege, PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
+import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 
 export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserFlat> {
   constructor(public state: State<DashboardUserFlat[]>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
@@ -23,7 +24,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
         resolve(this.convertDashboardUsersToFlat(result.data));
       } catch (err) {
-        reject(err);
+        reject(prepareDataCrudErrorResponse(err));
       }
     });
 
@@ -100,7 +101,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
       return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 
@@ -119,7 +120,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
       return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 
@@ -137,7 +138,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
       return Promise.resolve();
     } catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 

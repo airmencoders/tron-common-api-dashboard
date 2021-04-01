@@ -8,6 +8,8 @@ import { AxiosPromise } from "axios";
 import { Privilege, PrivilegeDto } from "../../openapi/models";
 import { accessPrivilegeState } from "../privilege/privilege-state";
 import { DataService } from "../data-service/data-service";
+import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
+import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
 
 export default class AppClientsService implements DataService<AppClientFlat, AppClientFlat> {
   constructor(public state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
@@ -23,7 +25,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
         resolve(this.convertAppClientsToFlat(result.data));
       } catch (err) {
-        reject(err);
+        reject(prepareDataCrudErrorResponse(err));
       }
     });
 
@@ -43,7 +45,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       return Promise.resolve(createdAppClientFlat);
     }
     catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 
@@ -62,7 +64,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       return Promise.resolve(updatedAppClientFlat);
     }
     catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 
@@ -80,7 +82,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
       return Promise.resolve();
     } catch (error) {
-      return Promise.reject(error);
+      return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 
@@ -157,7 +159,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     return !this.isStateReady() ? new Array<AppClientFlat>() : this.state.get();
   }
 
-  get error(): string | undefined {
+  get error(): string | DataCrudFormErrors | undefined {
     return this.state.promised ? undefined : this.state.error;
   }
 }
