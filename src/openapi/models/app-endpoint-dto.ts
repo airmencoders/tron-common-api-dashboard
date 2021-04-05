@@ -13,32 +13,31 @@
  */
 
 
-import { Privilege } from './privilege';
 
 /**
- * Admin To Remove Email
+ * 
  * @export
- * @interface DashboardUserDto
+ * @interface AppEndpointDto
  */
-export interface DashboardUserDto {
+export interface AppEndpointDto {
     /**
      * 
      * @type {string}
-     * @memberof DashboardUserDto
+     * @memberof AppEndpointDto
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof DashboardUserDto
+     * @memberof AppEndpointDto
      */
-    email?: string;
+    path: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof DashboardUserDto
+     * @type {string}
+     * @memberof AppEndpointDto
      */
-    privileges?: Array<Privilege>;
+    requestType: string;
 }
 
 

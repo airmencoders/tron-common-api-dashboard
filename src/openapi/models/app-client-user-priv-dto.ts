@@ -34,10 +34,16 @@ export interface AppClientUserPrivDto {
     appClientUserName?: string;
     /**
      * 
-     * @type {Array<number>}
+     * @type {string}
      * @memberof AppClientUserPrivDto
      */
-    privilegeIds: Array<number>;
+    appEndpoint: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppClientUserPrivDto
+     */
+    privilege?: string;
 }
 
 

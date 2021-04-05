@@ -23,6 +23,8 @@ import { AppSourceDetailsDto } from '../models';
 // @ts-ignore
 import { AppSourceDto } from '../models';
 // @ts-ignore
+import { DashboardUserDto } from '../models';
+// @ts-ignore
 import { ExceptionResponse } from '../models';
 /**
  * AppSourceControllerApi - axios parameter creator
@@ -31,7 +33,64 @@ import { ExceptionResponse } from '../models';
 export const AppSourceControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * 
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+         * @summary Adds single app source admin by email address to provided App Source
+         * @param {string} id App Source UUID
+         * @param {DashboardUserDto} dashboardUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addAppSourceAdmin: async (id: string, dashboardUserDto: DashboardUserDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addAppSourceAdmin.');
+            }
+            // verify required parameter 'dashboardUserDto' is not null or undefined
+            if (dashboardUserDto === null || dashboardUserDto === undefined) {
+                throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling addAppSourceAdmin.');
+            }
+            const localVarPath = `/v1/app-source/admins/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof dashboardUserDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(dashboardUserDto !== undefined ? dashboardUserDto : {})
+                : (dashboardUserDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requires DASHBOARD_ADMIN rights
          * @summary Creates an App Source including App Client permissions.
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
          * @param {*} [options] Override http request option.
@@ -125,7 +184,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * 
+         * Requires DASHBOARD_ADMIN or APP_SOURCE_ADMIN rights.
          * @summary Returns the details for an App Source
          * @param {string} id App Source UUID
          * @param {*} [options] Override http request option.
@@ -168,7 +227,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * 
+         * Requires DASHBOARD_ADMIN rights
          * @summary Gets all App Sources.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -205,7 +264,64 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * 
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+         * @summary Deletes a single app source admin by email address from provided App Source
+         * @param {string} id App Source UUID
+         * @param {DashboardUserDto} dashboardUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeAppSourceAdmin: async (id: string, dashboardUserDto: DashboardUserDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removeAppSourceAdmin.');
+            }
+            // verify required parameter 'dashboardUserDto' is not null or undefined
+            if (dashboardUserDto === null || dashboardUserDto === undefined) {
+                throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling removeAppSourceAdmin.');
+            }
+            const localVarPath = `/v1/app-source/admins/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof dashboardUserDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(dashboardUserDto !== undefined ? dashboardUserDto : {})
+                : (dashboardUserDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
          * @summary Updates the details for an App Source
          * @param {string} id App Source id to update
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
@@ -271,7 +387,22 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
 export const AppSourceControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
-         * 
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+         * @summary Adds single app source admin by email address to provided App Source
+         * @param {string} id App Source UUID
+         * @param {DashboardUserDto} dashboardUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).addAppSourceAdmin(id, dashboardUserDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Requires DASHBOARD_ADMIN rights
          * @summary Creates an App Source including App Client permissions.
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
          * @param {*} [options] Override http request option.
@@ -299,7 +430,7 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
-         * 
+         * Requires DASHBOARD_ADMIN or APP_SOURCE_ADMIN rights.
          * @summary Returns the details for an App Source
          * @param {string} id App Source UUID
          * @param {*} [options] Override http request option.
@@ -313,7 +444,7 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
-         * 
+         * Requires DASHBOARD_ADMIN rights
          * @summary Gets all App Sources.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -326,7 +457,22 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
-         * 
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+         * @summary Deletes a single app source admin by email address from provided App Source
+         * @param {string} id App Source UUID
+         * @param {DashboardUserDto} dashboardUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).removeAppSourceAdmin(id, dashboardUserDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
          * @summary Updates the details for an App Source
          * @param {string} id App Source id to update
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
@@ -350,7 +496,18 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
 export const AppSourceControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
-         * 
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+         * @summary Adds single app source admin by email address to provided App Source
+         * @param {string} id App Source UUID
+         * @param {DashboardUserDto} dashboardUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto> {
+            return AppSourceControllerApiFp(configuration).addAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requires DASHBOARD_ADMIN rights
          * @summary Creates an App Source including App Client permissions.
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
          * @param {*} [options] Override http request option.
@@ -370,7 +527,7 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
             return AppSourceControllerApiFp(configuration).deleteAppSource(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Requires DASHBOARD_ADMIN or APP_SOURCE_ADMIN rights.
          * @summary Returns the details for an App Source
          * @param {string} id App Source UUID
          * @param {*} [options] Override http request option.
@@ -380,7 +537,7 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
             return AppSourceControllerApiFp(configuration).getAppSourceDetails(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Requires DASHBOARD_ADMIN rights
          * @summary Gets all App Sources.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -389,7 +546,18 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
             return AppSourceControllerApiFp(configuration).getAppSources(options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+         * @summary Deletes a single app source admin by email address from provided App Source
+         * @param {string} id App Source UUID
+         * @param {DashboardUserDto} dashboardUserDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto> {
+            return AppSourceControllerApiFp(configuration).removeAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
          * @summary Updates the details for an App Source
          * @param {string} id App Source id to update
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
@@ -409,7 +577,18 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
  */
 export interface AppSourceControllerApiInterface {
     /**
-     * 
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+     * @summary Adds single app source admin by email address to provided App Source
+     * @param {string} id App Source UUID
+     * @param {DashboardUserDto} dashboardUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    addAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto>;
+
+    /**
+     * Requires DASHBOARD_ADMIN rights
      * @summary Creates an App Source including App Client permissions.
      * @param {AppSourceDetailsDto} appSourceDetailsDto 
      * @param {*} [options] Override http request option.
@@ -429,7 +608,7 @@ export interface AppSourceControllerApiInterface {
     deleteAppSource(id: string, options?: any): AxiosPromise<AppSourceDetailsDto>;
 
     /**
-     * 
+     * Requires DASHBOARD_ADMIN or APP_SOURCE_ADMIN rights.
      * @summary Returns the details for an App Source
      * @param {string} id App Source UUID
      * @param {*} [options] Override http request option.
@@ -439,7 +618,7 @@ export interface AppSourceControllerApiInterface {
     getAppSourceDetails(id: string, options?: any): AxiosPromise<AppSourceDetailsDto>;
 
     /**
-     * 
+     * Requires DASHBOARD_ADMIN rights
      * @summary Gets all App Sources.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -448,7 +627,18 @@ export interface AppSourceControllerApiInterface {
     getAppSources(options?: any): AxiosPromise<Array<AppSourceDto>>;
 
     /**
-     * 
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+     * @summary Deletes a single app source admin by email address from provided App Source
+     * @param {string} id App Source UUID
+     * @param {DashboardUserDto} dashboardUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto>;
+
+    /**
+     * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
      * @summary Updates the details for an App Source
      * @param {string} id App Source id to update
      * @param {AppSourceDetailsDto} appSourceDetailsDto 
@@ -468,7 +658,20 @@ export interface AppSourceControllerApiInterface {
  */
 export class AppSourceControllerApi extends BaseAPI implements AppSourceControllerApiInterface {
     /**
-     * 
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+     * @summary Adds single app source admin by email address to provided App Source
+     * @param {string} id App Source UUID
+     * @param {DashboardUserDto} dashboardUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public addAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).addAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requires DASHBOARD_ADMIN rights
      * @summary Creates an App Source including App Client permissions.
      * @param {AppSourceDetailsDto} appSourceDetailsDto 
      * @param {*} [options] Override http request option.
@@ -492,7 +695,7 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
     }
 
     /**
-     * 
+     * Requires DASHBOARD_ADMIN or APP_SOURCE_ADMIN rights.
      * @summary Returns the details for an App Source
      * @param {string} id App Source UUID
      * @param {*} [options] Override http request option.
@@ -504,7 +707,7 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
     }
 
     /**
-     * 
+     * Requires DASHBOARD_ADMIN rights
      * @summary Gets all App Sources.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -515,7 +718,20 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
     }
 
     /**
-     * 
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
+     * @summary Deletes a single app source admin by email address from provided App Source
+     * @param {string} id App Source UUID
+     * @param {DashboardUserDto} dashboardUserDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).removeAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
      * @summary Updates the details for an App Source
      * @param {string} id App Source id to update
      * @param {AppSourceDetailsDto} appSourceDetailsDto 

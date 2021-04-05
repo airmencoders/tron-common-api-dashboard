@@ -37,6 +37,12 @@ export interface AppSourceDto {
      * @type {number}
      * @memberof AppSourceDto
      */
+    endpointCount?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AppSourceDto
+     */
     clientCount?: number;
 }
 

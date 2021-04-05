@@ -14,6 +14,7 @@
 
 
 import { AppClientUserPrivDto } from './app-client-user-priv-dto';
+import { AppEndpointDto } from './app-endpoint-dto';
 
 /**
  * 
@@ -35,10 +36,22 @@ export interface AppSourceDetailsDto {
     name: string;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof AppSourceDetailsDto
+     */
+    appSourceAdminUserEmails?: Array<string>;
+    /**
+     * 
      * @type {Array<AppClientUserPrivDto>}
      * @memberof AppSourceDetailsDto
      */
     appClients?: Array<AppClientUserPrivDto>;
+    /**
+     * 
+     * @type {Array<AppEndpointDto>}
+     * @memberof AppSourceDetailsDto
+     */
+    endpoints?: Array<AppEndpointDto>;
 }
 
 

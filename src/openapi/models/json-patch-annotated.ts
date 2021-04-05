@@ -13,32 +13,31 @@
  */
 
 
-import { Privilege } from './privilege';
 
 /**
- * Admin To Remove Email
+ * Patched person
  * @export
- * @interface DashboardUserDto
+ * @interface JsonPatchAnnotated
  */
-export interface DashboardUserDto {
+export interface JsonPatchAnnotated {
     /**
      * 
      * @type {string}
-     * @memberof DashboardUserDto
+     * @memberof JsonPatchAnnotated
      */
-    id?: string;
+    op?: string;
     /**
      * 
      * @type {string}
-     * @memberof DashboardUserDto
+     * @memberof JsonPatchAnnotated
      */
-    email?: string;
+    path?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof DashboardUserDto
+     * @type {Array<string>}
+     * @memberof JsonPatchAnnotated
      */
-    privileges?: Array<Privilege>;
+    value?: Array<string>;
 }
 
 
