@@ -69,51 +69,6 @@ describe('Test App Source Form', () => {
     fireEvent.change(nameInput, { target: { value: 'Test 2' } });
     expect(nameInput).toHaveValue('Test 2');
 
-    /**
-     * Cannot test this because ag grid does not render
-     * all of the columns. So, the delete button cannot
-     * be found.
-     */
-    // // Remove app client
-    // await waitFor(() => {
-    //   expect(screen.getByTitle('remove')).toBeTruthy();
-    // });
-    // const removeAppClient = page.getByTitle('remove');
-    // expect(removeAppClient).toBeInTheDocument();
-    // fireEvent.click(removeAppClient);
-
-    // // Check removed app client no longer in grid
-    // expect(page.queryByText(appSourceDetailsFlat.appClients[0].appClientUserName)).not.toBeInTheDocument();
-
-
-    // Add Client
-    fireEvent.click(page.getByText('Add Client'));
-
-    // Add Client Editor
-    await waitFor(
-      () => {
-        expect(page.getByText('Add Client Editor')).toBeInTheDocument();
-
-        // Close Client Editor
-        fireEvent.click(page.getByText('Done'));
-      }
-    );
-
-    // Try to edit an app client
-    const appClient = page.getByText(appSourceDetailsFlat.appClients[0].appClientUserName);
-    expect(appClient).toBeInTheDocument();
-    fireEvent.click(appClient);
-
-    // Client Editor
-    await waitFor(
-      () => {
-        expect(page.getByLabelText('Name')).toBeInTheDocument();
-
-        // Close Client Editor
-        fireEvent.click(page.getByText('Done'));
-      }
-    );
-
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
