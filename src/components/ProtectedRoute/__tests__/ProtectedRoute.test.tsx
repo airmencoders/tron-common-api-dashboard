@@ -54,14 +54,14 @@ describe('ProtectRoute Test', () => {
 
     let pageRender = render(
       <MemoryRouter>
-        <ProtectedRoute component={TestComponent} requiredPrivilege={PrivilegeType.DASHBOARD_ADMIN} />
+        <ProtectedRoute component={TestComponent} requiredPrivilege={[PrivilegeType.DASHBOARD_ADMIN]} />
       </MemoryRouter>
     );
     expect(pageRender.getByTestId('test-protected-route')).toBeInTheDocument();
 
     pageRender = render(
       <MemoryRouter>
-        <ProtectedRoute component={TestComponent} requiredPrivilege={PrivilegeType.DASHBOARD_USER} />
+        <ProtectedRoute component={TestComponent} requiredPrivilege={[PrivilegeType.DASHBOARD_USER]} />
       </MemoryRouter>
     );
     expect(pageRender.getByText('Not Authorized')).toBeInTheDocument();

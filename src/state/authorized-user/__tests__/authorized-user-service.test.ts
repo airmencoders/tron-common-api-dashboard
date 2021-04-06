@@ -83,10 +83,31 @@ describe('Authorized User Service Test', () => {
     mockGetSelfDashboardUserDelay();
 
     const fetch = state.fetchAndStoreAuthorizedUser();
-    expect(state.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)).toEqual(undefined);
+    expect(state.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)).toEqual(false);
 
     await fetch;
     expect(state.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)).toEqual(true);
+
+  });
+
+  it('Test authorizedUserHasAnyPrivilege', async () => {
+    mockGetSelfDashboardUserDelay();
+
+    const checkPrivs = [
+      PrivilegeType.DASHBOARD_ADMIN,
+      PrivilegeType.READ
+    ];
+
+    const fetch = state.fetchAndStoreAuthorizedUser();
+    expect(state.authorizedUserHasAnyPrivilege(checkPrivs)).toEqual(false);
+
+    await fetch;
+
+    // Test has privilege
+    expect(state.authorizedUserHasAnyPrivilege(checkPrivs)).toEqual(true);
+
+    // Test does not have privilege
+    expect(state.authorizedUserHasAnyPrivilege([PrivilegeType.READ])).toEqual(false);
 
   });
 
