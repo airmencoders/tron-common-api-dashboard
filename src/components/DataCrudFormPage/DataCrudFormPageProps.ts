@@ -23,7 +23,7 @@ export interface DataCrudFormPageProps<T, R> {
    * React element of the form used to create the dto.
    * @param props Used by the create form.
    */
-  createForm: (props: CreateUpdateFormProps<R>) => JSX.Element;
+  createForm?: (props: CreateUpdateFormProps<R>) => JSX.Element;
 
   /**
    * React element of the form used to update the dto.

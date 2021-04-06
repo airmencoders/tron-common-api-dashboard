@@ -285,7 +285,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
               <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
                 {
-                  pageState.formAction.value === FormActionType.ADD ?
+                  pageState.formAction.value === FormActionType.ADD && CreateForm ?
                   <CreateForm
                     onSubmit={createSubmit}
                     formActionType={FormActionType.ADD}
@@ -294,7 +294,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                     successAction={pageState.successAction.get()}
                     isSubmitting={pageState.isSubmitting.get()}
                   />
-                  : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
+                    : pageState.formAction.value === FormActionType.UPDATE && UpdateForm && pageState.selected.get() ?
                     <UpdateForm
                       data={pageState.selected.attach(Downgraded).get()}
                       formErrors={pageState.formErrors.get()}
