@@ -19,6 +19,8 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { AppEndPointPrivDto } from '../models';
+// @ts-ignore
 import { AppSourceDetailsDto } from '../models';
 // @ts-ignore
 import { AppSourceDto } from '../models';
@@ -83,6 +85,57 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             localVarRequestOptions.data =  needsSerialization
                 ? JSON.stringify(dashboardUserDto !== undefined ? dashboardUserDto : {})
                 : (dashboardUserDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Adds an app source\'s endpoint to app client privilege relationship
+         * @param {AppEndPointPrivDto} appEndPointPrivDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addClientToEndpointPriv: async (appEndPointPrivDto: AppEndPointPrivDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appEndPointPrivDto' is not null or undefined
+            if (appEndPointPrivDto === null || appEndPointPrivDto === undefined) {
+                throw new RequiredError('appEndPointPrivDto','Required parameter appEndPointPrivDto was null or undefined when calling addClientToEndpointPriv.');
+            }
+            const localVarPath = `/v1/app-source/app-clients`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof appEndPointPrivDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(appEndPointPrivDto !== undefined ? appEndPointPrivDto : {})
+                : (appEndPointPrivDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -264,6 +317,86 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
+         * 
+         * @summary Gets a list of the available app clients (their names and UUIDs)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAvailableAppClients: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/app-source/app-clients`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
+         * @param {string} id App Source UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeAllAppClientPrivs: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removeAllAppClientPrivs.');
+            }
+            const localVarPath = `/v1/app-source/app-clients/all/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
          * @summary Deletes a single app source admin by email address from provided App Source
          * @param {string} id App Source UUID
@@ -314,6 +447,55 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             localVarRequestOptions.data =  needsSerialization
                 ? JSON.stringify(dashboardUserDto !== undefined ? dashboardUserDto : {})
                 : (dashboardUserDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Deletes an app source\'s endpoint to app client privilege relationship
+         * @param {string} appId App Source UUID
+         * @param {string} privId App Source Endpoint Privilege UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeClientToEndPointPriv: async (appId: string, privId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appId' is not null or undefined
+            if (appId === null || appId === undefined) {
+                throw new RequiredError('appId','Required parameter appId was null or undefined when calling removeClientToEndPointPriv.');
+            }
+            // verify required parameter 'privId' is not null or undefined
+            if (privId === null || privId === undefined) {
+                throw new RequiredError('privId','Required parameter privId was null or undefined when calling removeClientToEndPointPriv.');
+            }
+            const localVarPath = `/v1/app-source/app-clients/{appId}/{privId}`
+                .replace(`{${"appId"}}`, encodeURIComponent(String(appId)))
+                .replace(`{${"privId"}}`, encodeURIComponent(String(privId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -402,6 +584,20 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Adds an app source\'s endpoint to app client privilege relationship
+         * @param {AppEndPointPrivDto} appEndPointPrivDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addClientToEndpointPriv(appEndPointPrivDto: AppEndPointPrivDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).addClientToEndpointPriv(appEndPointPrivDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Requires DASHBOARD_ADMIN rights
          * @summary Creates an App Source including App Client permissions.
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
@@ -457,6 +653,33 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
+         * 
+         * @summary Gets a list of the available app clients (their names and UUIDs)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAvailableAppClients(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getAvailableAppClients(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
+         * @param {string} id App Source UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeAllAppClientPrivs(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).removeAllAppClientPrivs(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
          * @summary Deletes a single app source admin by email address from provided App Source
          * @param {string} id App Source UUID
@@ -466,6 +689,21 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
          */
         async removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
             const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).removeAppSourceAdmin(id, dashboardUserDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Deletes an app source\'s endpoint to app client privilege relationship
+         * @param {string} appId App Source UUID
+         * @param {string} privId App Source Endpoint Privilege UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeClientToEndPointPriv(appId: string, privId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).removeClientToEndPointPriv(appId, privId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -507,6 +745,16 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
             return AppSourceControllerApiFp(configuration).addAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Adds an app source\'s endpoint to app client privilege relationship
+         * @param {AppEndPointPrivDto} appEndPointPrivDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addClientToEndpointPriv(appEndPointPrivDto: AppEndPointPrivDto, options?: any): AxiosPromise<AppSourceDetailsDto> {
+            return AppSourceControllerApiFp(configuration).addClientToEndpointPriv(appEndPointPrivDto, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Requires DASHBOARD_ADMIN rights
          * @summary Creates an App Source including App Client permissions.
          * @param {AppSourceDetailsDto} appSourceDetailsDto 
@@ -546,6 +794,25 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
             return AppSourceControllerApiFp(configuration).getAppSources(options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary Gets a list of the available app clients (their names and UUIDs)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAvailableAppClients(options?: any): AxiosPromise<AppSourceDetailsDto> {
+            return AppSourceControllerApiFp(configuration).getAvailableAppClients(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
+         * @param {string} id App Source UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeAllAppClientPrivs(id: string, options?: any): AxiosPromise<AppSourceDetailsDto> {
+            return AppSourceControllerApiFp(configuration).removeAllAppClientPrivs(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
          * @summary Deletes a single app source admin by email address from provided App Source
          * @param {string} id App Source UUID
@@ -555,6 +822,17 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
          */
         removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto> {
             return AppSourceControllerApiFp(configuration).removeAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+         * @summary Deletes an app source\'s endpoint to app client privilege relationship
+         * @param {string} appId App Source UUID
+         * @param {string} privId App Source Endpoint Privilege UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeClientToEndPointPriv(appId: string, privId: string, options?: any): AxiosPromise<AppSourceDetailsDto> {
+            return AppSourceControllerApiFp(configuration).removeClientToEndPointPriv(appId, privId, options).then((request) => request(axios, basePath));
         },
         /**
          * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
@@ -586,6 +864,16 @@ export interface AppSourceControllerApiInterface {
      * @memberof AppSourceControllerApiInterface
      */
     addAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto>;
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+     * @summary Adds an app source\'s endpoint to app client privilege relationship
+     * @param {AppEndPointPrivDto} appEndPointPrivDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    addClientToEndpointPriv(appEndPointPrivDto: AppEndPointPrivDto, options?: any): AxiosPromise<AppSourceDetailsDto>;
 
     /**
      * Requires DASHBOARD_ADMIN rights
@@ -627,6 +915,25 @@ export interface AppSourceControllerApiInterface {
     getAppSources(options?: any): AxiosPromise<Array<AppSourceDto>>;
 
     /**
+     * 
+     * @summary Gets a list of the available app clients (their names and UUIDs)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    getAvailableAppClients(options?: any): AxiosPromise<AppSourceDetailsDto>;
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+     * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
+     * @param {string} id App Source UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    removeAllAppClientPrivs(id: string, options?: any): AxiosPromise<AppSourceDetailsDto>;
+
+    /**
      * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
      * @summary Deletes a single app source admin by email address from provided App Source
      * @param {string} id App Source UUID
@@ -636,6 +943,17 @@ export interface AppSourceControllerApiInterface {
      * @memberof AppSourceControllerApiInterface
      */
     removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any): AxiosPromise<AppSourceDetailsDto>;
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+     * @summary Deletes an app source\'s endpoint to app client privilege relationship
+     * @param {string} appId App Source UUID
+     * @param {string} privId App Source Endpoint Privilege UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    removeClientToEndPointPriv(appId: string, privId: string, options?: any): AxiosPromise<AppSourceDetailsDto>;
 
     /**
      * Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.
@@ -668,6 +986,18 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
      */
     public addAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any) {
         return AppSourceControllerApiFp(this.configuration).addAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+     * @summary Adds an app source\'s endpoint to app client privilege relationship
+     * @param {AppEndPointPrivDto} appEndPointPrivDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public addClientToEndpointPriv(appEndPointPrivDto: AppEndPointPrivDto, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).addClientToEndpointPriv(appEndPointPrivDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -718,6 +1048,29 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
     }
 
     /**
+     * 
+     * @summary Gets a list of the available app clients (their names and UUIDs)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public getAvailableAppClients(options?: any) {
+        return AppSourceControllerApiFp(this.configuration).getAvailableAppClients(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+     * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
+     * @param {string} id App Source UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public removeAllAppClientPrivs(id: string, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).removeAllAppClientPrivs(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.
      * @summary Deletes a single app source admin by email address from provided App Source
      * @param {string} id App Source UUID
@@ -728,6 +1081,19 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
      */
     public removeAppSourceAdmin(id: string, dashboardUserDto: DashboardUserDto, options?: any) {
         return AppSourceControllerApiFp(this.configuration).removeAppSourceAdmin(id, dashboardUserDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
+     * @summary Deletes an app source\'s endpoint to app client privilege relationship
+     * @param {string} appId App Source UUID
+     * @param {string} privId App Source Endpoint Privilege UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public removeClientToEndPointPriv(appId: string, privId: string, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).removeClientToEndPointPriv(appId, privId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

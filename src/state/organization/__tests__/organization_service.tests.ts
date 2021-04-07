@@ -39,7 +39,7 @@ class MockOrgApi extends OrganizationControllerApi {
     return Promise.resolve(response);
   }  
 
-  patchOrganization(id?: string, requestBody?: { [key: string]: string; }, options?: any)
+  patchOrganization1(id?: string, requestBody?: { [key: string]: string; }, options?: any)
       : Promise<AxiosResponse<OrganizationDto>> {
 
     return this.genericFunctionThatReturnsReponse();

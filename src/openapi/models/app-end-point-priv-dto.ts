@@ -15,41 +15,29 @@
 
 
 /**
- * 
+ * App Source UUID
  * @export
- * @interface AppClientUserPrivDto
+ * @interface AppEndPointPrivDto
  */
-export interface AppClientUserPrivDto {
+export interface AppEndPointPrivDto {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserPrivDto
+     * @memberof AppEndPointPrivDto
      */
-    id?: string;
+    appSourceId?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserPrivDto
+     * @memberof AppEndPointPrivDto
      */
-    appClientUser: string;
+    appEndpointId?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserPrivDto
+     * @memberof AppEndPointPrivDto
      */
-    appClientUserName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppClientUserPrivDto
-     */
-    appEndpoint: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppClientUserPrivDto
-     */
-    privilege?: string;
+    appClientUserId?: string;
 }
 
 

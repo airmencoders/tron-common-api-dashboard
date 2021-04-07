@@ -15,29 +15,43 @@
 
 
 /**
- * Patched person
+ * 
  * @export
- * @interface JsonPatchAnnotated
+ * @interface JsonPatchObjectValue
  */
-export interface JsonPatchAnnotated {
+export interface JsonPatchObjectValue {
     /**
      * 
      * @type {string}
-     * @memberof JsonPatchAnnotated
+     * @memberof JsonPatchObjectValue
      */
-    op?: string;
+    op?: JsonPatchObjectValueOpEnum;
     /**
      * 
      * @type {string}
-     * @memberof JsonPatchAnnotated
+     * @memberof JsonPatchObjectValue
      */
     path?: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof JsonPatchAnnotated
+     * @type {object}
+     * @memberof JsonPatchObjectValue
      */
-    value?: Array<string>;
+    value?: object;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum JsonPatchObjectValueOpEnum {
+    Add = 'add',
+    Remove = 'remove',
+    Replace = 'replace',
+    Copy = 'copy',
+    Move = 'move',
+    Test = 'test'
+}
+
 
 

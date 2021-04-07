@@ -17,39 +17,41 @@
 /**
  * 
  * @export
- * @interface AppClientUserPrivDto
+ * @interface JsonPatchStringValue
  */
-export interface AppClientUserPrivDto {
+export interface JsonPatchStringValue {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserPrivDto
+     * @memberof JsonPatchStringValue
      */
-    id?: string;
+    op?: JsonPatchStringValueOpEnum;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserPrivDto
+     * @memberof JsonPatchStringValue
      */
-    appClientUser: string;
+    path?: string;
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserPrivDto
+     * @memberof JsonPatchStringValue
      */
-    appClientUserName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppClientUserPrivDto
-     */
-    appEndpoint: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppClientUserPrivDto
-     */
-    privilege?: string;
+    value?: string;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum JsonPatchStringValueOpEnum {
+    Add = 'add',
+    Remove = 'remove',
+    Replace = 'replace',
+    Copy = 'copy',
+    Move = 'move',
+    Test = 'test'
+}
+
 
 

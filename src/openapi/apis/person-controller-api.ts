@@ -25,7 +25,13 @@ import { CoastGuardsman } from '../models';
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
-import { JsonPatchAnnotated } from '../models';
+import { JsonPatchObjectArrayValue } from '../models';
+// @ts-ignore
+import { JsonPatchObjectValue } from '../models';
+// @ts-ignore
+import { JsonPatchStringArrayValue } from '../models';
+// @ts-ignore
+import { JsonPatchStringValue } from '../models';
 // @ts-ignore
 import { Marine } from '../models';
 // @ts-ignore
@@ -301,18 +307,18 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * Patches an existing person
          * @summary Patches an existing person
          * @param {string} id Person ID to patch
-         * @param {JsonPatchAnnotated} jsonPatchAnnotated 
+         * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchPerson: async (id: string, jsonPatchAnnotated: JsonPatchAnnotated, options: any = {}): Promise<RequestArgs> => {
+        patchPerson: async (id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling patchPerson.');
             }
-            // verify required parameter 'jsonPatchAnnotated' is not null or undefined
-            if (jsonPatchAnnotated === null || jsonPatchAnnotated === undefined) {
-                throw new RequiredError('jsonPatchAnnotated','Required parameter jsonPatchAnnotated was null or undefined when calling patchPerson.');
+            // verify required parameter 'jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue' is not null or undefined
+            if (jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === null || jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === undefined) {
+                throw new RequiredError('jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue','Required parameter jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue was null or undefined when calling patchPerson.');
             }
             const localVarPath = `/v1/person/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -341,13 +347,13 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof jsonPatchAnnotated !== 'string';
+            const nonString = typeof jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(jsonPatchAnnotated !== undefined ? jsonPatchAnnotated : {})
-                : (jsonPatchAnnotated || "");
+                ? JSON.stringify(jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue !== undefined ? jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue : {})
+                : (jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -499,12 +505,12 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * Patches an existing person
          * @summary Patches an existing person
          * @param {string} id Person ID to patch
-         * @param {JsonPatchAnnotated} jsonPatchAnnotated 
+         * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchPerson(id: string, jsonPatchAnnotated: JsonPatchAnnotated, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).patchPerson(id, jsonPatchAnnotated, options);
+        async patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).patchPerson(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -593,12 +599,12 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          * Patches an existing person
          * @summary Patches an existing person
          * @param {string} id Person ID to patch
-         * @param {JsonPatchAnnotated} jsonPatchAnnotated 
+         * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchPerson(id: string, jsonPatchAnnotated: JsonPatchAnnotated, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).patchPerson(id, jsonPatchAnnotated, options).then((request) => request(axios, basePath));
+        patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).patchPerson(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates an existing person
@@ -679,12 +685,12 @@ export interface PersonControllerApiInterface {
      * Patches an existing person
      * @summary Patches an existing person
      * @param {string} id Person ID to patch
-     * @param {JsonPatchAnnotated} jsonPatchAnnotated 
+     * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    patchPerson(id: string, jsonPatchAnnotated: JsonPatchAnnotated, options?: any): AxiosPromise<PersonDto>;
+    patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Updates an existing person
@@ -775,13 +781,13 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      * Patches an existing person
      * @summary Patches an existing person
      * @param {string} id Person ID to patch
-     * @param {JsonPatchAnnotated} jsonPatchAnnotated 
+     * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public patchPerson(id: string, jsonPatchAnnotated: JsonPatchAnnotated, options?: any) {
-        return PersonControllerApiFp(this.configuration).patchPerson(id, jsonPatchAnnotated, options).then((request) => request(this.axios, this.basePath));
+    public patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any) {
+        return PersonControllerApiFp(this.configuration).patchPerson(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
