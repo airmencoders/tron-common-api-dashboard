@@ -8,6 +8,7 @@ import DashboardUserPage from "./pages/DashboardUser/DashboardUserPage";
 import ScratchStoragePage from "./pages/ScratchStorage/ScratchStoragePage";
 import HomePage from "./pages/Home/Home";
 import { AppSourcePage } from "./pages/AppSource/AppSourcePage";
+import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 
 export interface RouteItem {
     path: string,
@@ -25,7 +26,8 @@ export enum RoutePath {
     LOGFILE = '/logfile',
     DASHBOARD_USER = '/dashboard-user',
     SCRATCH_STORAGE = '/scratch-storage',
-    APP_SOURCE = '/app-source'
+    APP_SOURCE = '/app-source',
+    MY_DIGITIZE_APPS = '/digitize-apps'
 }
 
 export const routes: RouteItem[] = [
@@ -39,6 +41,12 @@ export const routes: RouteItem[] = [
         path: RoutePath.HEALTH,
         name: 'Health',
         component: HealthPage,
+        requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
+    },
+    {
+        path: RoutePath.MY_DIGITIZE_APPS,
+        name: 'My Digitize Apps',
+        component: MyDigitizeAppsPage,
         requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
     },
     {
