@@ -13,9 +13,9 @@
  */
 
 
-import { RecordNotFoundExceptionCause } from './record-not-found-exception-cause';
-import { RecordNotFoundExceptionCauseStackTrace } from './record-not-found-exception-cause-stack-trace';
-import { RecordNotFoundExceptionCauseSuppressed } from './record-not-found-exception-cause-suppressed';
+import { ResourceAlreadyExistsExceptionCause } from './resource-already-exists-exception-cause';
+import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
+import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-already-exists-exception-cause-suppressed';
 
 /**
  * 
@@ -25,16 +25,16 @@ import { RecordNotFoundExceptionCauseSuppressed } from './record-not-found-excep
 export interface InvalidScratchSpacePermissions {
     /**
      * 
-     * @type {RecordNotFoundExceptionCause}
+     * @type {ResourceAlreadyExistsExceptionCause}
      * @memberof InvalidScratchSpacePermissions
      */
-    cause?: RecordNotFoundExceptionCause;
+    cause?: ResourceAlreadyExistsExceptionCause;
     /**
      * 
-     * @type {Array<RecordNotFoundExceptionCauseStackTrace>}
+     * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
      * @memberof InvalidScratchSpacePermissions
      */
-    stackTrace?: Array<RecordNotFoundExceptionCauseStackTrace>;
+    stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
@@ -43,10 +43,10 @@ export interface InvalidScratchSpacePermissions {
     message?: string;
     /**
      * 
-     * @type {Array<RecordNotFoundExceptionCauseSuppressed>}
+     * @type {Array<ResourceAlreadyExistsExceptionCauseSuppressed>}
      * @memberof InvalidScratchSpacePermissions
      */
-    suppressed?: Array<RecordNotFoundExceptionCauseSuppressed>;
+    suppressed?: Array<ResourceAlreadyExistsExceptionCauseSuppressed>;
     /**
      * 
      * @type {string}
