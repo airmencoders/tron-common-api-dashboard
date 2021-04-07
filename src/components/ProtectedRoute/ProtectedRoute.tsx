@@ -9,7 +9,7 @@ function ProtectedRoute({ component: Component, requiredPrivilege, ...rest }: Pr
 
   return (
     <Route {...rest} render={(props) => (
-      useAuthorizedState.authorizedUserHasPrivilege(requiredPrivilege) ?
+      useAuthorizedState.authorizedUserHasAnyPrivilege(requiredPrivilege) ?
         <Component {...props} />
         :
         <NotAuthorizedPage {...props} />

@@ -13,32 +13,45 @@
  */
 
 
-import { Privilege } from './privilege';
 
 /**
- * Admin To Remove Email
+ * 
  * @export
- * @interface DashboardUserDto
+ * @interface JsonPatchObjectValue
  */
-export interface DashboardUserDto {
+export interface JsonPatchObjectValue {
     /**
      * 
      * @type {string}
-     * @memberof DashboardUserDto
+     * @memberof JsonPatchObjectValue
      */
-    id?: string;
+    op?: JsonPatchObjectValueOpEnum;
     /**
      * 
      * @type {string}
-     * @memberof DashboardUserDto
+     * @memberof JsonPatchObjectValue
      */
-    email?: string;
+    path?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof DashboardUserDto
+     * @type {object}
+     * @memberof JsonPatchObjectValue
      */
-    privileges?: Array<Privilege>;
+    value?: object;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum JsonPatchObjectValueOpEnum {
+    Add = 'add',
+    Remove = 'remove',
+    Replace = 'replace',
+    Copy = 'copy',
+    Move = 'move',
+    Test = 'test'
+}
+
 
 

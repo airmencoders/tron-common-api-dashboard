@@ -58,16 +58,16 @@ export interface RecordNotFoundExceptionCauseStackTrace {
     lineNumber?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
-     */
-    nativeMethod?: boolean;
-    /**
-     * 
      * @type {string}
      * @memberof RecordNotFoundExceptionCauseStackTrace
      */
     className?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof RecordNotFoundExceptionCauseStackTrace
+     */
+    nativeMethod?: boolean;
 }
 
 

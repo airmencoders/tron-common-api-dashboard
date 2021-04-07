@@ -85,7 +85,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
       if (toUpdate.orgType) { orgFeatures = {...orgFeatures, orgType: toUpdate.orgType }; }
       if (toUpdate.branchType) { orgFeatures = {...orgFeatures, branchType: toUpdate.branchType }; }
 
-      const orgResponse = await this.orgApi.patchOrganization(toUpdate.id, orgFeatures);
+      const orgResponse = await this.orgApi.patchOrganization1(toUpdate.id, orgFeatures);
 
       const patchedOrg = orgResponse.data;
       patchedOrg.members = undefined;
@@ -166,7 +166,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    */
   async updateLeader(orgId: string, id: string): Promise<OrganizationDto> {
     try {
-      const orgResponse = await this.orgApi.patchOrganization(orgId, { leader: id });
+      const orgResponse = await this.orgApi.patchOrganization1(orgId, { leader: id });
       await this.getOrgDetails(orgId);
       return Promise.resolve(orgResponse.data);     
     }
@@ -183,7 +183,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    */
    async updateParentOrg(orgId: string, id: string): Promise<OrganizationDto> {
     try {
-      const orgResponse = await this.orgApi.patchOrganization(orgId, { parentOrganization: id });
+      const orgResponse = await this.orgApi.patchOrganization1(orgId, { parentOrganization: id });
       await this.getOrgDetails(orgId);
       return Promise.resolve(orgResponse.data);
     }

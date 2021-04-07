@@ -23,6 +23,8 @@ models/airman-all-of.ts
 models/airman.ts
 models/app-client-user-dto.ts
 models/app-client-user-priv-dto.ts
+models/app-end-point-priv-dto.ts
+models/app-endpoint-dto.ts
 models/app-source-details-dto.ts
 models/app-source-dto.ts
 models/bad-request-exception.ts
@@ -34,6 +36,10 @@ models/flight.ts
 models/group.ts
 models/index.ts
 models/invalid-scratch-space-permissions.ts
+models/json-patch-object-array-value.ts
+models/json-patch-object-value.ts
+models/json-patch-string-array-value.ts
+models/json-patch-string-value.ts
 models/logfile-dto.ts
 models/marine.ts
 models/organization-dto.ts

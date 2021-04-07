@@ -23,7 +23,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
       </div>
       <nav className="sidebar__nav">
         {items.map((item) => {
-          if (authorizedUserState.authorizedUserHasPrivilege(item.requiredPrivilege))
+          if (authorizedUserState.authorizedUserHasAnyPrivilege(item.requiredPrivileges))
             return <SidebarItem key={item.name} path={item.path} name={item.name} />
         })}
       </nav>
