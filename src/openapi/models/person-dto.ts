@@ -100,6 +100,12 @@ export interface PersonDto {
     dutyTitle?: string;
     /**
      * 
+     * @type {string}
+     * @memberof PersonDto
+     */
+    primaryOrganizationId?: string;
+    /**
+     * 
      * @type {Set<string>}
      * @memberof PersonDto
      */

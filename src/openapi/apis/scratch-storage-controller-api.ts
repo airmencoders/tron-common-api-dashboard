@@ -771,6 +771,43 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             };
         },
         /**
+         * Each Scratch Storage App returned will only container user privileges for the Authorized User. It will not contain the privileges of other users.
+         * @summary Gets all Scratch Storage apps that the current Authorized User is a user of
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScratchSpaceAppsByAuthorizedUser: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/scratch/apps/self`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
          * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
@@ -1208,6 +1245,19 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
             };
         },
         /**
+         * Each Scratch Storage App returned will only container user privileges for the Authorized User. It will not contain the privileges of other users.
+         * @summary Gets all Scratch Storage apps that the current Authorized User is a user of
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getScratchSpaceAppsByAuthorizedUser(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageAppRegistryDto>>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getScratchSpaceAppsByAuthorizedUser(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
          * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
@@ -1436,6 +1486,15 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
             return ScratchStorageControllerApiFp(configuration).getScratchSpaceApps(options).then((request) => request(axios, basePath));
         },
         /**
+         * Each Scratch Storage App returned will only container user privileges for the Authorized User. It will not contain the privileges of other users.
+         * @summary Gets all Scratch Storage apps that the current Authorized User is a user of
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getScratchSpaceAppsByAuthorizedUser(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>> {
+            return ScratchStorageControllerApiFp(configuration).getScratchSpaceAppsByAuthorizedUser(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
          * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
@@ -1646,6 +1705,15 @@ export interface ScratchStorageControllerApiInterface {
      * @memberof ScratchStorageControllerApiInterface
      */
     getScratchSpaceApps(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>>;
+
+    /**
+     * Each Scratch Storage App returned will only container user privileges for the Authorized User. It will not contain the privileges of other users.
+     * @summary Gets all Scratch Storage apps that the current Authorized User is a user of
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApiInterface
+     */
+    getScratchSpaceAppsByAuthorizedUser(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1889,6 +1957,17 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      */
     public getScratchSpaceApps(options?: any) {
         return ScratchStorageControllerApiFp(this.configuration).getScratchSpaceApps(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Each Scratch Storage App returned will only container user privileges for the Authorized User. It will not contain the privileges of other users.
+     * @summary Gets all Scratch Storage apps that the current Authorized User is a user of
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApi
+     */
+    public getScratchSpaceAppsByAuthorizedUser(options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).getScratchSpaceAppsByAuthorizedUser(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

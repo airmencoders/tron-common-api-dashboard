@@ -94,10 +94,11 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
          * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addOrganizationMember: async (id: string, requestBody: Array<string>, options: any = {}): Promise<RequestArgs> => {
+        addOrganizationMember: async (id: string, requestBody: Array<string>, primary?: boolean, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling addOrganizationMember.');
@@ -118,6 +119,10 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (primary !== undefined) {
+                localVarQueryParameter['primary'] = primary;
+            }
 
 
     
@@ -769,11 +774,12 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
          * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addOrganizationMember(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addOrganizationMember(id, requestBody, options);
+        async addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addOrganizationMember(id, requestBody, primary, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -971,11 +977,12 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
          * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
-            return OrganizationControllerApiFp(configuration).addOrganizationMember(id, requestBody, options).then((request) => request(axios, basePath));
+        addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).addOrganizationMember(id, requestBody, primary, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds subordinate orgs to an organization
@@ -1125,11 +1132,12 @@ export interface OrganizationControllerApiInterface {
      * @summary Add member(s) to an organization
      * @param {string} id UUID of the organization record
      * @param {Array<string>} requestBody 
+     * @param {boolean} [primary] Whether to make the organization the primary organization for the user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    addOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+    addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void>;
 
     /**
      * Adds subordinate orgs to an organization
@@ -1281,12 +1289,13 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @summary Add member(s) to an organization
      * @param {string} id UUID of the organization record
      * @param {Array<string>} requestBody 
+     * @param {boolean} [primary] Whether to make the organization the primary organization for the user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public addOrganizationMember(id: string, requestBody: Array<string>, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).addOrganizationMember(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    public addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addOrganizationMember(id, requestBody, primary, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
