@@ -19,6 +19,8 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { AppClientSummaryDto } from '../models';
+// @ts-ignore
 import { AppEndPointPrivDto } from '../models';
 // @ts-ignore
 import { AppSourceDetailsDto } from '../models';
@@ -658,7 +660,7 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAvailableAppClients(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDetailsDto>> {
+        async getAvailableAppClients(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AppClientSummaryDto>>> {
             const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getAvailableAppClients(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -799,7 +801,7 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableAppClients(options?: any): AxiosPromise<AppSourceDetailsDto> {
+        getAvailableAppClients(options?: any): AxiosPromise<Array<AppClientSummaryDto>> {
             return AppSourceControllerApiFp(configuration).getAvailableAppClients(options).then((request) => request(axios, basePath));
         },
         /**
@@ -921,7 +923,7 @@ export interface AppSourceControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppSourceControllerApiInterface
      */
-    getAvailableAppClients(options?: any): AxiosPromise<AppSourceDetailsDto>;
+    getAvailableAppClients(options?: any): AxiosPromise<Array<AppClientSummaryDto>>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.

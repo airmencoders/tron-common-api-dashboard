@@ -7,3 +7,19 @@
     margin-bottom: units(0.5);
   }
 }
+
+.endpoint-editor-modal {
+  width: 40vw !important;
+
+  @include breakpoint-below(desktop) {
+    width: 55vw !important;
+  }
+
+  @include breakpoint-below(laptop) {
+    width: 70vw !important;
+  }
+
+  @include breakpoint-below(mobile) {
+    width: 100vw !important;
+  }
+}

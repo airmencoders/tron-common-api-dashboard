@@ -21,12 +21,16 @@ git_push.sh
 index.ts
 models/airman-all-of.ts
 models/airman.ts
+models/app-client-summary-dto.ts
 models/app-client-user-dto.ts
 models/app-client-user-priv-dto.ts
 models/app-end-point-priv-dto.ts
 models/app-endpoint-dto.ts
 models/app-source-details-dto.ts
 models/app-source-dto.ts
+models/bad-request-exception-cause-stack-trace.ts
+models/bad-request-exception-cause-suppressed.ts
+models/bad-request-exception-cause.ts
 models/bad-request-exception.ts
 models/coast-guardsman.ts
 models/dashboard-user-dto.ts
@@ -51,9 +55,6 @@ models/privilege.ts
 models/pub-sub-ledger.ts
 models/rank.ts
 models/record-not-found-exception.ts
-models/resource-already-exists-exception-cause-stack-trace.ts
-models/resource-already-exists-exception-cause-suppressed.ts
-models/resource-already-exists-exception-cause.ts
 models/resource-already-exists-exception.ts
 models/sailor.ts
 models/scratch-storage-app-registry-dto.ts

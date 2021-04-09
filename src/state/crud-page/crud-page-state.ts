@@ -10,6 +10,7 @@ export interface CrudPageState<T> {
   successAction?: DataCrudSuccessAction;
   isSubmitting: boolean;
   isDeleteConfirmationOpen: boolean;
+  isLoading: boolean;
 }
 
 export const getInitialCrudPageState = () => ({
@@ -19,5 +20,6 @@ export const getInitialCrudPageState = () => ({
   formErrors: undefined,
   successAction: undefined,
   isSubmitting: false,
-  isDeleteConfirmationOpen: false
+  isDeleteConfirmationOpen: false,
+  isLoading: false
 });
