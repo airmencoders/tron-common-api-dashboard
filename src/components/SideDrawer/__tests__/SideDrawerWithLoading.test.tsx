@@ -1,10 +1,10 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import SideDrawerWithLoading from '../SideDrawerWithLoading';
+import SideDrawer from '../SideDrawer';
 
 test('Loading state shown', async () => {
   const component = render(
-    <SideDrawerWithLoading
+    <SideDrawer
       isLoading={true}
       onCloseHandler={() => { return; }}
       title="Test Sidedrawer"
@@ -13,7 +13,7 @@ test('Loading state shown', async () => {
       <div data-testid="side-drawer-loading-content">
         The Content
       </div>
-    </SideDrawerWithLoading>
+    </SideDrawer>
   );
 
   await expect(component.findByText('Loading...')).resolves.toBeInTheDocument();

@@ -11,7 +11,7 @@ function SideDrawer(props: SideDrawerProps) {
   if (props.isOpen) {
     document.body.classList.add('side-drawer--open');
   } else {
-    document.body.classList.remove('SideDrawer--open');
+    document.body.classList.remove('side-drawer--open');
   }
 
   return (
