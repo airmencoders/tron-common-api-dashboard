@@ -34,4 +34,21 @@ describe('SideDrawer', () => {
     expect(elem).toBeInTheDocument();
     expect(elem).not.toHaveClass('open');
   });
+
+  test('Renders loading', async () => {
+    const component = render(
+      <SideDrawer
+        isLoading={true}
+        onCloseHandler={() => { return; }}
+        title="Test Sidedrawer"
+        isOpen={true}
+      >
+        <div data-testid="side-drawer-loading-content">
+          The Content
+        </div>
+      </SideDrawer>
+    );
+
+    await expect(component.findByText('Loading...')).resolves.toBeInTheDocument();
+  });
 })
