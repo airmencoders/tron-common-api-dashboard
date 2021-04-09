@@ -1,5 +1,6 @@
 export * from './airman';
 export * from './airman-all-of';
+export * from './app-client-summary-dto';
 export * from './app-client-user-dto';
 export * from './app-client-user-priv-dto';
 export * from './app-end-point-priv-dto';

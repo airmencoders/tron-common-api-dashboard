@@ -1,7 +1,7 @@
 import { State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
 import { DataService } from '../data-service/data-service';
-import { AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
+import { AppClientSummaryDto, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
 
 export default class AppSourceService implements DataService<AppSourceDto, AppSourceDetailsDto> {
   constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) { }
@@ -22,6 +22,14 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     this.state.set(data);
 
     return data;
+  }
+
+  fetchAppClients(): Promise<AppClientSummaryDto[]> {
+    const response = (): AxiosPromise<AppClientSummaryDto[]> => this.appSourceApi.getAvailableAppClients();
+
+    const result = response().then(res => res.data);
+
+    return result;
   }
 
   /**
@@ -45,7 +53,7 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
         name: updatedResponse.data.name,
         clientCount: updatedResponse.data.appClients?.length,
         endpointCount: updatedResponse.data.endpoints?.length
-      }
+      };
 
       this.state.find(item => item.id.value === updatedResponse.data.id)?.set(appSourceDto);
 

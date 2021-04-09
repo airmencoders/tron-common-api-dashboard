@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppSourceForm from '../AppSourceForm';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
@@ -33,7 +33,7 @@ describe('Test App Source Form', () => {
         {
           appClientUser: 'App Client User ID',
           appClientUserName: 'App Client Name',
-          appEndpoint: 'test_endpoint',
+          appEndpoint: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
         }
       ],
       appSourceAdminUserEmails: [
@@ -103,6 +103,17 @@ describe('Test App Source Form', () => {
 
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    // Click an endpoint to edit
+    await (expect(page.findByText('endpoint_path'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByText('endpoint_path'));
+
+    await (expect(page.findByText('Endpoint Editor'))).resolves.toBeInTheDocument();
+
+    const closeBtn = (await (screen.findByTitle('close-modal')));
+    expect(closeBtn).toBeInTheDocument();
+    expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
+    fireEvent.click(closeBtn!);
   });
 
   it('Has default values if none given', () => {

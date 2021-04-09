@@ -1,4 +1,6 @@
 import React from 'react';
+import withLoading from '../../hocs/UseLoading/WithLoading';
+import { WithLoadingProps } from '../../hocs/UseLoading/WithLoadingProps';
 import CloseIcon from '../../icons/CloseIcon';
 import BackdropOverlay from '../BackdropOverlay/BackdropOverlay';
 
@@ -6,6 +8,12 @@ import './SideDrawer.scss';
 import { SideDrawerProps } from './SideDrawerProps';
 
 function SideDrawer(props: SideDrawerProps) {
+  if (props.isOpen) {
+    document.body.classList.add('side-drawer--open');
+  } else {
+    document.body.classList.remove('SideDrawer--open');
+  }
+
   return (
     <>
       {props.isOpen ? <BackdropOverlay /> : null}
@@ -17,10 +25,28 @@ function SideDrawer(props: SideDrawerProps) {
           </button>
         </div>
         <div className="side-drawer__content">
-          {props.children}
+          <SideDrawerChildrenWithLoading isLoading={props.isLoading ?? false}>
+            {props.children}
+          </SideDrawerChildrenWithLoading>
         </div>
       </div>
     </>
+  );
+}
+
+function SideDrawerChildren(props: { children: React.ReactNode | React.ReactNode[] }) {
+  return (
+    <>
+      {props.children}
+    </>
+  );
+}
+
+const WithLoadingSideDrawerChildren = withLoading(SideDrawerChildren);
+
+function SideDrawerChildrenWithLoading(props: WithLoadingProps & { children: React.ReactNode | React.ReactNode[] }) {
+  return (
+    <WithLoadingSideDrawerChildren {...props} />
   );
 }
 

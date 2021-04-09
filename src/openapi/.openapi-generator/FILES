@@ -21,6 +21,7 @@ git_push.sh
 index.ts
 models/airman-all-of.ts
 models/airman.ts
+models/app-client-summary-dto.ts
 models/app-client-user-dto.ts
 models/app-client-user-priv-dto.ts
 models/app-end-point-priv-dto.ts

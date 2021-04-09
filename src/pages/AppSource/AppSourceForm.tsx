@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { none, useHookstate } from "@hookstate/core";
+import { none, State, useHookstate } from "@hookstate/core";
 import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
@@ -11,15 +11,25 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import './AppSourceForm.scss';
-import { AppSourceDetailsDto } from '../../openapi';
+import { AppEndpointDto, AppSourceDetailsDto } from '../../openapi';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import GridColumn from '../../components/Grid/GridColumn';
 import Button from '../../components/Button/Button';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import { validateEmail } from '../../utils/validation-utils';
+import { RowClickedEvent } from 'ag-grid-community';
+import Modal from '../../components/Modal/Modal';
+import ModalTitle from '../../components/Modal/ModalTitle';
+import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
+import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 
 interface AdminEmail {
   email: string;
+}
+
+interface EndpointModalState {
+  isOpen: boolean;
+  selected?: State<AppEndpointDto>;
 }
 
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
@@ -35,6 +45,11 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     email: ''
   });
 
+  const endpointModifyState = useHookstate<EndpointModalState>({
+    isOpen: false,
+    selected: undefined
+  });
+
   adminAddState.attach(Validation);
   adminAddState.attach(Initial);
   adminAddState.attach(Touched);
@@ -48,11 +63,14 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
 
   function isFormModified() {
-    return Initial(formState.appSourceAdminUserEmails).modified() || Initial(formState.name).modified();
+    return Initial(formState.appSourceAdminUserEmails).modified() ||
+      Initial(formState.name).modified() ||
+      Initial(formState.endpoints).modified() ||
+      Initial(formState.appClients).modified();
   }
 
   function isFormDisabled() {
-    return props.successAction?.success;
+    return props.successAction?.success || props.isSubmitting;
   }
 
   function submitForm(event: FormEvent<HTMLFormElement>) {
@@ -69,21 +87,85 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     adminAddState.email.set('');
   }
 
-  const deleteBtnName = 'Delete'
+  const deleteBtnName = 'Delete';
   const appSourceAdminColumns: GridColumn[] = [
     new GridColumn({
       field: 'email',
       sortable: true,
       filter: true,
-      headerName: 'Admin'
-    }),
-    new GridColumn({
-      headerName: deleteBtnName,
-      headerClass: 'header-center',
-      cellRenderer: DeleteCellRenderer,
-      cellRendererParams: { onClick: deleteAppSourceAdmin }
+      headerName: 'Admin',
+      showTooltip: true,
+      resizable: true
     })
   ];
+
+  /**
+   * Prevent anymore interactions with the grid
+   * after a successful submit or while the 
+   * current request is pending.
+   * 
+   * Removes "remove" icon and functionality
+   */
+  if (!isFormDisabled()) {
+    appSourceAdminColumns.push(
+      new GridColumn({
+        headerName: deleteBtnName,
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: { onClick: deleteAppSourceAdmin }
+      })
+    );
+  }
+
+  const appSourceEndpointColumns: GridColumn[] = [
+    new GridColumn({
+      field: 'path',
+      sortable: true,
+      filter: true,
+      headerName: 'Path',
+      showTooltip: true,
+      resizable: true
+    }),
+    new GridColumn({
+      field: 'requestType',
+      sortable: true,
+      filter: true,
+      headerName: 'Request Type',
+      showTooltip: true,
+      resizable: true
+    })
+  ];
+
+  function onEndpointRowClicked(event: RowClickedEvent) {
+    /**
+     * Prevent anymore interactions with the grid
+     * after a successful submit.
+     * 
+     * Removes on click interactions.
+     */
+    if (isFormDisabled()) {
+      return;
+    }
+
+    const rowData: AppEndpointDto = event.data;
+
+    const stateData = formState.endpoints?.find(endpoint => endpoint.get().path === rowData.path && endpoint.get().requestType === rowData.requestType);
+
+    endpointModifyState.merge({
+      isOpen: true,
+      selected: stateData
+    });
+  }
+
+  function endpointModalClose() {
+    endpointModifyState.merge({
+      isOpen: false,
+      selected: undefined
+    });
+  }
+
+  const endpointModalOpen = endpointModifyState.isOpen.get();
+  const endpointSelectedData = endpointModifyState.selected.get();
 
   return (
     <>
@@ -145,7 +227,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           type="button"
           className="app-source-form__add-admin-btn"
           onClick={addAppSourceAdmin}
-          disabled={adminAddState.email.get().length === 0 || Touched(adminAddState.email).touched() && Validation(adminAddState.email).invalid()}
+          disabled={adminAddState.email.get().length === 0 || Touched(adminAddState.email).touched() && Validation(adminAddState.email).invalid() || isFormDisabled()}
         >
           Add Admin
         </Button>
@@ -158,6 +240,18 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             } as AdminEmail
           })}
           onRowClicked={() => { return; }}
+        />
+
+        <FormGroup
+          labelName="endpoints"
+          labelText="Endpoints"
+        >
+        </FormGroup>
+
+        <ItemChooser
+          columns={appSourceEndpointColumns}
+          items={formState.endpoints.get()}
+          onRowClicked={onEndpointRowClicked}
         />
 
         <SuccessErrorMessage
@@ -180,6 +274,28 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           />
         }
       </Form>
+
+      <Modal
+        headerComponent={<ModalTitle title="Endpoint Editor" />}
+        footerComponent={<ModalFooterSubmit
+          hideCancel
+          onSubmit={endpointModalClose}
+          submitText="Done"
+        />}
+        show={endpointModalOpen && endpointSelectedData != null}
+        onHide={endpointModalClose}
+        height="auto"
+        width="auto"
+        className={"endpoint-editor-modal"}
+      >
+        {endpointSelectedData &&
+          <AppSourceEndpointEditor
+            appClientPrivileges={formState.appClients}
+            endpoint={endpointSelectedData}
+          />
+        }
+
+      </Modal>
     </>
   );
 }

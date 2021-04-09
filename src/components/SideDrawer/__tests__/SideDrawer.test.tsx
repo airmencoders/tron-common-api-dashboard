@@ -8,7 +8,7 @@ describe('SideDrawer', () => {
     const onCloseHandler = jest.fn();
 
     const pageRender = render(
-      <SideDrawer title="SideDrawer Test" isOpen={true} onCloseHandler={onCloseHandler}>
+      <SideDrawer isLoading={false} title="SideDrawer Test" isOpen={true} onCloseHandler={onCloseHandler}>
         Test Test
       </SideDrawer>
     );
@@ -24,7 +24,7 @@ describe('SideDrawer', () => {
     const onCloseHandler = jest.fn();
 
     const pageRender = render(
-      <SideDrawer title='SideDrawer Test' isOpen={false} onCloseHandler={onCloseHandler}>
+      <SideDrawer isLoading={false} title='SideDrawer Test' isOpen={false} onCloseHandler={onCloseHandler}>
         Test Test
       </SideDrawer>
     );
