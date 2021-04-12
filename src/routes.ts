@@ -35,7 +35,14 @@ export const routes: RouteItem[] = [
         path: RoutePath.HOME,
         name: 'Home',
         component: HomePage,
-        requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
+        requiredPrivileges: [
+            PrivilegeType.DASHBOARD_USER,
+            PrivilegeType.DASHBOARD_ADMIN,
+            PrivilegeType.APP_SOURCE_ADMIN,
+            PrivilegeType.SCRATCH_READ,
+            PrivilegeType.SCRATCH_WRITE,
+            PrivilegeType.SCRATCH_ADMIN
+        ]
     },
     {
         path: RoutePath.HEALTH,
