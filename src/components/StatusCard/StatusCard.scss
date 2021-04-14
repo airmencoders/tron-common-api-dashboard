@@ -17,6 +17,9 @@
     text-align: center;
     margin-top: units(2);
     margin-bottom: units(1);
+    .down {
+      color: $error;
+    }
   }
   &__status {
     text-align: center;
