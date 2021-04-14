@@ -46,9 +46,7 @@ function HealthPageContent(props: { state: HealthService, serviceTitle: string }
   return (
       <Container>
         <div className="health__status-cards">
-          <div className="status-cards__overall">
-            <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
-          </div>
+          <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
           <StatusCard status={getStatusTypeFromHealth(state.components?.db.status)} title="Database" />
           <StatusCard status={getStatusTypeFromHealth(state.components?.rabbit?.status)} title="RabbitMQ" />
         </div>
