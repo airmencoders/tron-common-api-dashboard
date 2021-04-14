@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react';
-import { useHealthState } from '../../state/health/health-state';
+import React, {useEffect} from 'react';
+import {useHealthState} from '../../state/health/health-state';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import StatusCard from '../../components/StatusCard/StatusCard';
 import {StatusType} from '../../components/StatusCard/status-type';
 import withLoading from '../../hocs/UseLoading/WithLoading';
 import HealthService from '../../state/health/interface/health-service';
+
+import './HealthPage.scss';
+import {Container} from 'react-bootstrap';
 
 function HealthPage() {
   const state = useHealthState();
@@ -13,7 +16,7 @@ function HealthPage() {
     state.fetchAndStoreHealthStatus();
   }, []);
 
-  const serviceTitle = "API Serivce";
+  const serviceTitle = 'Overall';
 
   return (
     <PageFormat pageTitle={"Health"}>
@@ -31,14 +34,25 @@ function HealthPageContent(props: { state: HealthService, serviceTitle: string }
   const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
     if (healthStatus === 'UP') {
       return StatusType.GOOD;
+    } else if (healthStatus === 'DOWN') {
+      return StatusType.DOWN;
+    } else {
+      return StatusType.ERROR;
     }
-    return StatusType.ERROR;
   };
 
   const { state, serviceTitle } = props;
 
   return (
-    <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
+      <Container>
+        <div className="health__status-cards">
+          <div className="status-cards__overall">
+            <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
+          </div>
+          <StatusCard status={getStatusTypeFromHealth(state.components?.db.status)} title="Database" />
+          <StatusCard status={getStatusTypeFromHealth(state.components?.rabbit?.status)} title="RabbitMQ" />
+        </div>
+      </Container>
   );
 }
 

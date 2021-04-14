@@ -1,0 +1,14 @@
+
+.health {
+  &__status-cards {
+    display: flex;
+    justify-content: space-between;
+
+    .status-cards__overall {
+
+    }
+    .status-card {
+      width: 250px;
+    }
+  }
+}
