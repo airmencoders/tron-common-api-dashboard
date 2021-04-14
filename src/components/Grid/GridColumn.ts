@@ -10,6 +10,8 @@ export default class GridColumn {
       headerClass = '',
       cellRenderer,
       cellRendererParams,
+      resizable = false,
+      showTooltip = false
     } = params;
 
     this._field = field;
@@ -19,6 +21,8 @@ export default class GridColumn {
     this._headerClass = headerClass;
     this._cellRenderer = cellRenderer;
     this._cellRendererParams = cellRendererParams;
+    this._resizable = resizable;
+    this._showTooltip = showTooltip;
   }
 
   private _field: string;
@@ -28,6 +32,8 @@ export default class GridColumn {
   private _headerClass: string;
   private _cellRenderer?: React.ReactNode;
   private _cellRendererParams?: any;
+  private _resizable: boolean;
+  private _showTooltip: boolean;
 
   get field(): string {
     return this._field;
@@ -55,5 +61,13 @@ export default class GridColumn {
 
   get cellRendererParams(): any {
     return this._cellRendererParams;
+  }
+
+  get resizable(): boolean {
+    return this._resizable;
+  }
+
+  get showTooltip(): boolean {
+    return this._showTooltip;
   }
 }

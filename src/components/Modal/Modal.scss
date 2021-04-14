@@ -47,3 +47,11 @@
     border-top: solid 1px $page-border-color;
   }
 }
+
+.ReactModal__Body--open {
+  overflow: hidden;
+}
+
+.ReactModal__Content {
+  max-height: 100vh;
+}

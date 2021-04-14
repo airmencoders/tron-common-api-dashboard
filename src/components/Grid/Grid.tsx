@@ -69,6 +69,7 @@ function Grid(props: GridProps) {
               quickFilterText={props.quickFilterText || ''}
               rowSelection={props.rowSelection || 'none'}
               suppressColumnVirtualisation={props.disabledGridColumnVirtualization}
+              enableBrowserTooltips
           >
             {
               props.columns.map(col => (
@@ -81,6 +82,8 @@ function Grid(props: GridProps) {
                     headerClass={col.headerClass}
                     cellRendererFramework={col.cellRenderer}
                     cellRendererParams={col.cellRendererParams}
+                    tooltipField={col.showTooltip ? col.field : undefined}
+                    resizable={col.resizable}
                 />
               ))
             }

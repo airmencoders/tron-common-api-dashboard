@@ -1,0 +1,7 @@
+@import '../../styles/mixins';
+
+.endpoint-editor {
+  &__form {
+    min-width: 100%;
+  }
+}

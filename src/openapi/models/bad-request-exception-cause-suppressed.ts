@@ -13,30 +13,30 @@
  */
 
 
-import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
+import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
 
 /**
  * 
  * @export
- * @interface ResourceAlreadyExistsExceptionCauseSuppressed
+ * @interface BadRequestExceptionCauseSuppressed
  */
-export interface ResourceAlreadyExistsExceptionCauseSuppressed {
+export interface BadRequestExceptionCauseSuppressed {
     /**
      * 
-     * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
-     * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
+     * @type {Array<BadRequestExceptionCauseStackTrace>}
+     * @memberof BadRequestExceptionCauseSuppressed
      */
-    stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
+    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
+     * @memberof BadRequestExceptionCauseSuppressed
      */
     message?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
+     * @memberof BadRequestExceptionCauseSuppressed
      */
     localizedMessage?: string;
 }

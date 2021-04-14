@@ -44,14 +44,20 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       rowData = dataStateItem?.attach(Downgraded).get() ?? Object.assign({}, rowData);
 
       if (rowData != null) {
+        // Set loading state
+        pageState.merge({
+          isOpen: true,
+          isLoading: true
+        });
+
         const dtoData = await dataState.convertRowDataToEditableData(rowData);
         pageState.merge({
           formAction: FormActionType.UPDATE,
-          isOpen: true,
           selected: dtoData,
           formErrors: undefined,
           successAction: undefined,
-          isSubmitting: false
+          isSubmitting: false,
+          isLoading: false
         });
       }
     }
@@ -283,7 +289,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                 disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
               />
 
-              <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
+              <SideDrawer isLoading={pageState.isLoading.get()} title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
                 {
                   pageState.formAction.value === FormActionType.ADD && CreateForm ?
                   <CreateForm

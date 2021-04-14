@@ -10,8 +10,6 @@ import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import './LogfilePage.scss';
 import LogfileDownload from './LogfileDownload';
 
-const LogfileDownloadWithLoading = withLoading(LogfileDownload);
-
 function LogfilePage() {
   const serviceTitle = 'Logfile Service';
   const logfileState = useLogfileState();
@@ -77,8 +75,8 @@ function LogfilePage() {
         <div className='logfile-page-container'>
           <div className='logfile-download-container default-panel-padding'>
             <Button className='logfile-download-container__open-btn' type={'button'} onClick={() => sideDrawerState.set(true)}>Show Downloads</Button>
-            <SideDrawer title={'Logs Download'} isOpen={sideDrawerState.get()} onCloseHandler={onCloseHandler}>
-              <LogfileDownloadWithLoading isLoading={pastLogfileState.isPromised} logfileDtos={pastLogfileState.getPastLogs} />
+            <SideDrawer isLoading={pastLogfileState.isPromised} title={'Logs Download'} isOpen={sideDrawerState.get()} onCloseHandler={onCloseHandler}>
+              <LogfileDownload logfileDtos={pastLogfileState.getPastLogs} />
               <Button className='logfile-download-container__close-btn' type={'button'} onClick={onCloseHandler}>Close</Button>
             </SideDrawer>
           </div>
