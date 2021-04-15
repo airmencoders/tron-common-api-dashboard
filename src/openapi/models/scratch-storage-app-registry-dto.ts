@@ -35,6 +35,12 @@ export interface ScratchStorageAppRegistryDto {
     appName: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ScratchStorageAppRegistryDto
+     */
+    appHasImplicitRead?: boolean;
+    /**
+     * 
      * @type {Array<UserWithPrivs>}
      * @memberof ScratchStorageAppRegistryDto
      */

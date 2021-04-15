@@ -35,6 +35,12 @@ export interface AppSourceDetailsDto {
     name: string;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof AppSourceDetailsDto
+     */
+    appSourceAdminUserEmails?: Array<string>;
+    /**
+     * 
      * @type {Array<AppClientUserPrivDto>}
      * @memberof AppSourceDetailsDto
      */

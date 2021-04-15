@@ -1,6 +1,7 @@
 import React from 'react';
 import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
+import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
 import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
 import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
@@ -20,6 +21,13 @@ const columns: GridColumn[] =
       sortable: true,
       filter: true,
       headerName: 'App Name'
+    }),
+    new GridColumn({
+      field: 'appHasImplicitRead',
+      sortable: true,
+      headerName: 'Implicit Read',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
     })
   ];
 

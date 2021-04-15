@@ -18,6 +18,13 @@ import Grid from '../../components/Grid/Grid';
 import { RowClickedEvent } from 'ag-grid-community';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
+import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
+import Checkbox from '../../components/forms/Checkbox/Checkbox';
+import './ScratchStorageEditForm.scss';
+import Modal from '../../components/Modal/Modal';
+import ModalTitle from '../../components/Modal/ModalTitle';
+import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
+import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
 
 interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -28,6 +35,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   const formState = useHookstate<ScratchStorageFlat>({
     id: props.data?.id ?? "",
     appName: props.data?.appName ?? "",
+    appHasImplicitRead: props.data?.appHasImplicitRead ?? false,
     userPrivs: props.data?.userPrivs ?? []
   });
 
@@ -75,18 +83,81 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     props.onSubmit(formState.get());
   }
 
+  function onAddUser(toUpdate: ScratchStorageUserWithPrivsFlat) {
+    formState.userPrivs[formState.userPrivs.length].set(toUpdate);
+  }
+
+  const deleteBtnName = 'Delete';
   const userColumns: GridColumn[] = [
-    new GridColumn('email', true, true, 'Email'),
-    new GridColumn('read', true, false, 'Read', 'header-center', PrivilegeCellRenderer),
-    new GridColumn('write', true, false, 'Write', 'header-center', PrivilegeCellRenderer),
-    new GridColumn('admin', true, false, 'Admin', 'header-center', PrivilegeCellRenderer)
-  ]
+    new GridColumn({
+      field: 'email', 
+      sortable: true,
+      filter: true,
+      headerName: 'Email'
+    }),
+    new GridColumn({
+      field: 'read',
+      sortable: true,
+      headerName: 'Read',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: 'write',
+      sortable: true,
+      headerName: 'Write',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: 'admin',
+      sortable: true,
+      headerName: 'Admin',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: '',
+      headerName: deleteBtnName,
+      headerClass: 'header-center',
+      cellRenderer: DeleteCellRenderer,
+      cellRendererParams: { onClick: removeUser }
+    })
+  ];
+
+  function removeUser(data: ScratchStorageUserWithPrivsFlat) {
+    //formState.appClients.find(item => item.appClientUser.get() === data.appClientUser)?.set(none);
+  }
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
+    // Don't trigger row clicked if delete cell clicked
+    if ((event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName))
+      return;
+
     userEditorState.merge({
       isOpen: true,
       data: event.data
     });
+  }
+
+  function userEditorCloseHandler() {
+    userEditorState.merge({
+      isOpen: false
+    });
+  }
+
+  function userEditorSubmitModal() {
+    userEditorCloseHandler();
+  }
+
+  function userAddCloseHandler() {
+    userAddState.merge({
+      isOpen: false
+    });
+  }
+
+  function userAddSubmitModal() {
+    userAddCloseHandler();
   }
 
   const isFormDisabled = ():boolean => {
@@ -102,17 +173,26 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
                          .map(validationError =>validationError.message)}
           >
             <TextInput id="appName" name="appName" type="text"
+                       className="scratch-storage-edit-form__mb1" 
                        defaultValue={props.data?.appName || ''}
                        error={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
                        onChange={(event) => formState.appName.set(event.target.value)}
                        disabled={isFormDisabled()}
             />
           </FormGroup>
+            <Checkbox
+              id="implicit_read"
+              name="implicit_read"
+              label={<>Implicit Read</>}
+              checked={formState.appHasImplicitRead.get()}
+              onChange={(event) => formState.appHasImplicitRead.set(event.target.checked)}
+              disabled={isFormDisabled()}
+            />
           <FormGroup
           labelName="scratch-storage-users"
           labelText="Users"
           >
-            <Button type='button' onClick={() => userAddState.isOpen.set(true)}>
+            <Button type='button' className="scratch-storage-edit-form__mb1" onClick={() => userAddState.isOpen.set(true)}>
               Add User
             </Button>
             
@@ -139,6 +219,34 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
             />
           }
         </Form>
+        <Modal
+          headerComponent={<ModalTitle title="User Editor" />}
+          footerComponent={<ModalFooterSubmit
+            hideCancel
+            onSubmit={userEditorSubmitModal}
+            submitText="Done"
+          />}
+          show={userEditorState.isOpen.get()}
+          onHide={userEditorCloseHandler}
+          width="auto"
+          height="auto"
+        >
+          {/* <ScratchStorageUserAddForm data={userEditorState.data} /> */}
+        </Modal>
+        <Modal
+          headerComponent={<ModalTitle title="Add User Editor" />}
+          footerComponent={<ModalFooterSubmit
+            hideCancel
+            onSubmit={userAddSubmitModal}
+            submitText="Done"
+          />}
+          show={userAddState.isOpen.get()}
+          onHide={userAddCloseHandler}
+          width="auto"
+          height="auto"
+        >
+          <ScratchStorageUserAddForm onSubmit= {onAddUser} />
+        </Modal>
       </div>
   );
 }

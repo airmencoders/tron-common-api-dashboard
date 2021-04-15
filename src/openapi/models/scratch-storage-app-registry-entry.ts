@@ -35,6 +35,12 @@ export interface ScratchStorageAppRegistryEntry {
     appName: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ScratchStorageAppRegistryEntry
+     */
+    appHasImplicitRead?: boolean;
+    /**
+     * 
      * @type {Set<ScratchStorageAppUserPriv>}
      * @memberof ScratchStorageAppRegistryEntry
      */

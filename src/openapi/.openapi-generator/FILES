@@ -34,6 +34,7 @@ models/flight.ts
 models/group.ts
 models/index.ts
 models/invalid-scratch-space-permissions.ts
+models/json-patch-annotated.ts
 models/logfile-dto.ts
 models/marine.ts
 models/organization-dto.ts
@@ -44,10 +45,10 @@ models/privilege-id-pair.ts
 models/privilege.ts
 models/pub-sub-ledger.ts
 models/rank.ts
-models/record-not-found-exception-cause-stack-trace.ts
-models/record-not-found-exception-cause-suppressed.ts
-models/record-not-found-exception-cause.ts
 models/record-not-found-exception.ts
+models/resource-already-exists-exception-cause-stack-trace.ts
+models/resource-already-exists-exception-cause-suppressed.ts
+models/resource-already-exists-exception-cause.ts
 models/resource-already-exists-exception.ts
 models/sailor.ts
 models/scratch-storage-app-registry-dto.ts

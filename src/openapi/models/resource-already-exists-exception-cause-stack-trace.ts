@@ -17,57 +17,57 @@
 /**
  * 
  * @export
- * @interface RecordNotFoundExceptionCauseStackTrace
+ * @interface ResourceAlreadyExistsExceptionCauseStackTrace
  */
-export interface RecordNotFoundExceptionCauseStackTrace {
+export interface ResourceAlreadyExistsExceptionCauseStackTrace {
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     methodName?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     fileName?: string;
     /**
      * 
      * @type {number}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     lineNumber?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
-     */
-    nativeMethod?: boolean;
-    /**
-     * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
      */
     className?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     */
+    nativeMethod?: boolean;
 }
 
 

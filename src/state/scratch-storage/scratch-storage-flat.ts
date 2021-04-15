@@ -3,5 +3,6 @@ import { ScratchStorageUserWithPrivsFlat } from "./scratch-storage-user-with-pri
 export interface ScratchStorageFlat {
     id: string;
     appName: string;
-    userPrivs?: Array<ScratchStorageUserWithPrivsFlat>;
+    appHasImplicitRead?: boolean;
+    userPrivs: Array<ScratchStorageUserWithPrivsFlat>;
   }
