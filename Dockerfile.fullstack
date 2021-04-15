@@ -5,7 +5,12 @@ USER root
 WORKDIR /app
 COPY . .
 
-ENV REACT_APP_API_BASE_URL="http://localhost:9000/"
+ARG PROXY_PORT
+ENV REACT_APP_API_BASE_URL="http://localhost:${PROXY_PORT}/"
+ARG REACT_APP_VERSION_PREFIX
+ENV REACT_APP_VERSION_PREFIX=${REACT_APP_VERSION_PREFIX}
+ARG REACT_APP_API_PATH_PREFIX
+ENV REACT_APP_API_PATH_PREFIX=${REACT_APP_API_PATH_PREFIX}
 
 # do not install cypress
 RUN npm uninstall cypress
@@ -17,5 +22,5 @@ RUN npm run build
 FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/base-image/harden-nginx-19:1.19.2
 USER appuser
 COPY --from=builder --chown=appuser:appuser /app/build /var/www
-EXPOSE 8080
+EXPOSE 8080 
 CMD [ "nginx", "-g", "daemon off;" ]
