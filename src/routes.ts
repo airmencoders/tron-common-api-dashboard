@@ -8,12 +8,13 @@ import DashboardUserPage from "./pages/DashboardUser/DashboardUserPage";
 import ScratchStoragePage from "./pages/ScratchStorage/ScratchStoragePage";
 import HomePage from "./pages/Home/Home";
 import { AppSourcePage } from "./pages/AppSource/AppSourcePage";
+import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 
 export interface RouteItem {
     path: string,
     name: string,
     component: React.FunctionComponent,
-    requiredPrivilege: PrivilegeType
+    requiredPrivileges: PrivilegeType[]
 }
 
 export enum RoutePath {
@@ -25,7 +26,8 @@ export enum RoutePath {
     LOGFILE = '/logfile',
     DASHBOARD_USER = '/dashboard-user',
     SCRATCH_STORAGE = '/scratch-storage',
-    APP_SOURCE = '/app-source'
+    APP_SOURCE = '/app-source',
+    MY_DIGITIZE_APPS = '/digitize-apps'
 }
 
 export const routes: RouteItem[] = [
@@ -33,54 +35,67 @@ export const routes: RouteItem[] = [
         path: RoutePath.HOME,
         name: 'Home',
         component: HomePage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_USER
+        requiredPrivileges: [
+            PrivilegeType.DASHBOARD_USER,
+            PrivilegeType.DASHBOARD_ADMIN,
+            PrivilegeType.APP_SOURCE_ADMIN,
+            PrivilegeType.SCRATCH_READ,
+            PrivilegeType.SCRATCH_WRITE,
+            PrivilegeType.SCRATCH_ADMIN
+        ]
     },
     {
         path: RoutePath.HEALTH,
         name: 'Health',
         component: HealthPage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_USER
+        requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
+    },
+    {
+        path: RoutePath.MY_DIGITIZE_APPS,
+        name: 'My Digitize Apps',
+        component: MyDigitizeAppsPage,
+        requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
     },
     {
         path: RoutePath.PERSON,
         name: 'People',
         component: PersonPage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     },
     {
         path: RoutePath.ORGANIZATION,
         name: 'Organizations',
         component: OrganizationPage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     },
     {
         path: RoutePath.APP_CLIENT,
         name: 'App Clients',
         component: AppClientPage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     },
     {
         path: RoutePath.SCRATCH_STORAGE,
         name: 'Scratch Storage Apps',
         component: ScratchStoragePage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     },
     {
         path: RoutePath.DASHBOARD_USER,
         name: 'Dashboard Users',
         component: DashboardUserPage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     },
     {
         path: RoutePath.APP_SOURCE,
         name: 'App Sources',
         component: AppSourcePage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_SOURCE_ADMIN]
     },
     {
         path: RoutePath.LOGFILE,
         name: 'Logfile',
         component: LogfilePage,
-        requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     }
 ];

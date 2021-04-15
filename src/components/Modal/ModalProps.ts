@@ -8,4 +8,5 @@ export interface ModalProps {
   onHide: () => void;
   height?: string | number;
   width?: string | number;
+  className?: string;
 }

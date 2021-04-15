@@ -40,6 +40,12 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     props.onSubmit(formState.get());
   }
 
+  function createNameErrors(): string[] {
+    const errors: string[] = Validation(formState.name).errors().map(validationError => validationError.message);
+    const serverNameValid = props.formErrors?.validation?.name;
+    return serverNameValid ? errors.concat([serverNameValid]) : errors;
+  }
+
   return (
     <Form className="app-client-form" onSubmit={(event) => submitForm(event)} data-testid="app-client-form">
       {props.formActionType === FormActionType.UPDATE &&
@@ -61,16 +67,15 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       <FormGroup
         labelName="name"
         labelText="Name"
-        isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
-        errorMessages={Validation(formState.name).errors()
-          .map(validationError => validationError.message)}
+        isError={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
+        errorMessages={createNameErrors()}
       >
         <TextInput
           id="name"
           name="name"
           type="text"
           defaultValue={formState.name.get()}
-          error={Touched(formState.name).touched() && Validation(formState.name).invalid()}
+          error={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
           onChange={(event) => formState.name.set(event.target.value)}
           disabled={isFormDisabled()}
         />

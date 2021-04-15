@@ -6,12 +6,14 @@ import { DashboardUserControllerApi, DashboardUserControllerApiInterface } from 
 import AuthorizedUserService from './authorized-user-service';
 
 const authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
+const authorizedUserApi = new DashboardUserControllerApi(new Configuration({
+  basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
+}));
 
 export const wrapAuthorizedUserState = (state: State<DashboardUserDto | undefined>, dashboardUserApi: DashboardUserControllerApiInterface): AuthorizedUserService => {
   return new AuthorizedUserService(state, dashboardUserApi);
 }
 
-export const useAuthorizedUserState = (): AuthorizedUserService => wrapAuthorizedUserState(useState(authorizedUserState),
-  new DashboardUserControllerApi(new Configuration({
-    basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
-  })));
+export const useAuthorizedUserState = (): AuthorizedUserService => wrapAuthorizedUserState(useState(authorizedUserState), authorizedUserApi);
+
+export const accessAuthorizedUserState = (): AuthorizedUserService => wrapAuthorizedUserState(authorizedUserState, authorizedUserApi);

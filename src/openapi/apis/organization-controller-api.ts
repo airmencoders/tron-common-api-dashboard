@@ -94,10 +94,11 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
          * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addOrganizationMember: async (id: string, requestBody: Array<string>, options: any = {}): Promise<RequestArgs> => {
+        addOrganizationMember: async (id: string, requestBody: Array<string>, primary?: boolean, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling addOrganizationMember.');
@@ -118,6 +119,10 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (primary !== undefined) {
+                localVarQueryParameter['primary'] = primary;
+            }
 
 
     
@@ -571,21 +576,21 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
-         * Updates an existing organization\'s attributes
-         * @summary Updates an existing organization\'s attributes
+         * Patches an existing organization
+         * @summary Patches an existing organization
          * @param {string} id Organization ID to update
          * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchOrganization: async (id: string, requestBody: { [key: string]: string; }, options: any = {}): Promise<RequestArgs> => {
+        patchOrganization1: async (id: string, requestBody: { [key: string]: string; }, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling patchOrganization.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling patchOrganization1.');
             }
             // verify required parameter 'requestBody' is not null or undefined
             if (requestBody === null || requestBody === undefined) {
-                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization.');
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization1.');
             }
             const localVarPath = `/v1/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -769,11 +774,12 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
          * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addOrganizationMember(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addOrganizationMember(id, requestBody, options);
+        async addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addOrganizationMember(id, requestBody, primary, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -903,15 +909,15 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
-         * Updates an existing organization\'s attributes
-         * @summary Updates an existing organization\'s attributes
+         * Patches an existing organization
+         * @summary Patches an existing organization
          * @param {string} id Organization ID to update
          * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchOrganization(id: string, requestBody: { [key: string]: string; }, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchOrganization(id, requestBody, options);
+        async patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchOrganization1(id, requestBody, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -971,11 +977,12 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
          * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
-            return OrganizationControllerApiFp(configuration).addOrganizationMember(id, requestBody, options).then((request) => request(axios, basePath));
+        addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).addOrganizationMember(id, requestBody, primary, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds subordinate orgs to an organization
@@ -1069,15 +1076,15 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options).then((request) => request(axios, basePath));
         },
         /**
-         * Updates an existing organization\'s attributes
-         * @summary Updates an existing organization\'s attributes
+         * Patches an existing organization
+         * @summary Patches an existing organization
          * @param {string} id Organization ID to update
          * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchOrganization(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).patchOrganization(id, requestBody, options).then((request) => request(axios, basePath));
+        patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).patchOrganization1(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * Removes subordinate orgs from an organization
@@ -1125,11 +1132,12 @@ export interface OrganizationControllerApiInterface {
      * @summary Add member(s) to an organization
      * @param {string} id UUID of the organization record
      * @param {Array<string>} requestBody 
+     * @param {boolean} [primary] Whether to make the organization the primary organization for the user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    addOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+    addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void>;
 
     /**
      * Adds subordinate orgs to an organization
@@ -1223,15 +1231,15 @@ export interface OrganizationControllerApiInterface {
     getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): AxiosPromise<Array<OrganizationDto>>;
 
     /**
-     * Updates an existing organization\'s attributes
-     * @summary Updates an existing organization\'s attributes
+     * Patches an existing organization
+     * @summary Patches an existing organization
      * @param {string} id Organization ID to update
      * @param {{ [key: string]: string; }} requestBody 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    patchOrganization(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto>;
+    patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Removes subordinate orgs from an organization
@@ -1281,12 +1289,13 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @summary Add member(s) to an organization
      * @param {string} id UUID of the organization record
      * @param {Array<string>} requestBody 
+     * @param {boolean} [primary] Whether to make the organization the primary organization for the user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public addOrganizationMember(id: string, requestBody: Array<string>, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).addOrganizationMember(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    public addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addOrganizationMember(id, requestBody, primary, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1397,16 +1406,16 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
-     * Updates an existing organization\'s attributes
-     * @summary Updates an existing organization\'s attributes
+     * Patches an existing organization
+     * @summary Patches an existing organization
      * @param {string} id Organization ID to update
      * @param {{ [key: string]: string; }} requestBody 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public patchOrganization(id: string, requestBody: { [key: string]: string; }, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).patchOrganization(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    public patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).patchOrganization1(id, requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -17,6 +17,7 @@ import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
 import GridColumn from '../Grid/GridColumn';
 import Spinner from '../Spinner/Spinner';
 import DataCrudDelete from './DataCrudDelete';
+import { DataCrudFormErrors } from './data-crud-form-errors';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -43,14 +44,20 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       rowData = dataStateItem?.attach(Downgraded).get() ?? Object.assign({}, rowData);
 
       if (rowData != null) {
+        // Set loading state
+        pageState.merge({
+          isOpen: true,
+          isLoading: true
+        });
+
         const dtoData = await dataState.convertRowDataToEditableData(rowData);
         pageState.merge({
           formAction: FormActionType.UPDATE,
-          isOpen: true,
           selected: dtoData,
           formErrors: undefined,
           successAction: undefined,
-          isSubmitting: false
+          isSubmitting: false,
+          isLoading: false
         });
       }
     }
@@ -69,6 +76,18 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
 
   function onCloseHandler() {
     pageState.set(getInitialCrudPageState());
+  }
+
+  function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
+    let formErrors: DataCrudFormErrors = {
+      general: error.message ?? 'Unknown error occurred'
+    };
+
+    if (error.general || error.validation) {
+      formErrors = error as DataCrudFormErrors;
+    }
+
+    return formErrors;
   }
 
   async function deleteConfirmation(deleteItem: T) {
@@ -119,9 +138,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     }
     catch (error) {
       pageState.merge({
-        formErrors: {
-          general: error.message
-        },
+        formErrors: convertErrorToDataCrudFormError(error),
         isSubmitting: false
       });
     }
@@ -150,9 +167,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       pageState.set(prevState => {
         return {
           ... prevState,
-          formErrors: {
-            general: error.message
-          },
+          formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
       });
@@ -186,9 +201,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       pageState.set(prevState => {
         return {
           ... prevState,
-          formErrors: {
-            general: error.message
-          },
+          formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
       });
@@ -218,9 +231,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
       pageState.set(prevState => {
         return {
           ... prevState,
-          formErrors: {
-            general: error.message
-          },
+          formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
       });
@@ -278,9 +289,9 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                 disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
               />
 
-              <SideDrawer title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
+              <SideDrawer isLoading={pageState.isLoading.get()} title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
                 {
-                  pageState.formAction.value === FormActionType.ADD ?
+                  pageState.formAction.value === FormActionType.ADD && CreateForm ?
                   <CreateForm
                     onSubmit={createSubmit}
                     formActionType={FormActionType.ADD}
@@ -289,7 +300,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
                     successAction={pageState.successAction.get()}
                     isSubmitting={pageState.isSubmitting.get()}
                   />
-                  : pageState.formAction.value === FormActionType.UPDATE && pageState.selected.get() ?
+                    : pageState.formAction.value === FormActionType.UPDATE && UpdateForm && pageState.selected.get() ?
                     <UpdateForm
                       data={pageState.selected.attach(Downgraded).get()}
                       formErrors={pageState.formErrors.get()}

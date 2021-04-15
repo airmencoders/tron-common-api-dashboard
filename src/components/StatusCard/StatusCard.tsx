@@ -3,8 +3,9 @@ import {StatusCardProps} from './StatusCardProps';
 import Card from '../Card/Card';
 import {StatusType} from './status-type';
 import StatusGoodIcon from '../../icons/StatusGoodIcon';
-import CloseIcon from '../../icons/CloseIcon';
 import WarningIcon from '../../icons/WarningIcon';
+import CloseIcon from '../../icons/CloseIcon';
+import DownIcon from '../../icons/DownIcon';
 
 import './StatusCard.scss';
 
@@ -17,6 +18,9 @@ function renderIcon(status: StatusType): React.ReactNode {
       break;
     case StatusType.ERROR:
       returnIcon = <CloseIcon size={iconSize} iconTitle="error"/>;
+      break;
+    case StatusType.DOWN:
+      returnIcon = <DownIcon size={iconSize} iconTitle="down" className="down"/>;
       break;
     default:
       // return default div

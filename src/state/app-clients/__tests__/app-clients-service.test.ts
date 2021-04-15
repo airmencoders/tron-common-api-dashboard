@@ -9,6 +9,7 @@ import { PrivilegeType } from '../../privilege/privilege-type';
 import { Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
+import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
 
 jest.mock('../../privilege/privilege-state');
 
@@ -112,7 +113,21 @@ describe('App Client State Tests', () => {
     }
   ];
 
-  const rejectMsg = 'failed';
+  const axiosRejectResponse = {
+    response: {
+      data: {
+        message: 'failed'
+      },
+      status: 400,
+      statusText: 'OK',
+      config: {},
+      headers: {}
+    }
+  };
+
+  const rejectMsg = {
+    general: axiosRejectResponse.response.data.message
+  } as DataCrudFormErrors;
 
   let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
   let privilegeApi: PrivilegeControllerApiInterface;
@@ -145,7 +160,7 @@ describe('App Client State Tests', () => {
   afterEach(() => {
     appClientsState.destroy();
     privilegeState.destroy();
-  })
+  });
 
   it('Test fetch and store', async () => {
     appClientsApi.getAppClientUsers = jest.fn(() => {
@@ -180,7 +195,7 @@ describe('App Client State Tests', () => {
 
   it('Test appClients', async () => {
     appClientsApi.getAppClientUsers = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
+      return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => setTimeout(() => resolve(axiosGetResponse), 200));
     });
 
     const fetch = wrappedState.fetchAndStoreData();
@@ -194,16 +209,16 @@ describe('App Client State Tests', () => {
     appClientsApi.getAppClientUsers = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto[]>>((resolve, reject) => {
         setTimeout(() => {
-          reject("Rejected")
-        }, 1000)
+          reject(axiosRejectResponse)
+        }, 200)
       });
     });
 
     const fetch = wrappedState.fetchAndStoreData();
     expect(wrappedState.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual("Rejected");
-    expect(wrappedState.error).toBe("Rejected");
+    await expect(fetch).rejects.toEqual(rejectMsg);
+    expect(wrappedState.error).toEqual(rejectMsg);
   });
 
   it('Test sendUpdate', async () => {
@@ -219,7 +234,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendUpdate Fail', async () => {
     appClientsApi.updateAppClient = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
     await expect(wrappedState.sendUpdate(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -250,7 +265,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendCreate Fail', async () => {
     appClientsApi.createAppClientUser = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -266,7 +281,7 @@ describe('App Client State Tests', () => {
 
   it('Test sendDelete Fail', async () => {
     appClientsApi.deleteAppClient = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
     await expect(wrappedState.sendDelete(testClientFlat)).rejects.toEqual(rejectMsg);

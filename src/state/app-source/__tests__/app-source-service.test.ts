@@ -7,7 +7,6 @@ import { accessAppClientsState } from '../../app-clients/app-clients-state';
 import PrivilegeService from '../../privilege/privilege-service';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { AppSourceDetailsFlat } from '../app-source-details-flat';
 import AppSourceService from '../app-source-service';
 import { wrapAppSourceState } from '../app-source-state';
 
@@ -36,28 +35,23 @@ describe('App Source State Tests', () => {
   }
 
   const testAppSourceDetailsDto: AppSourceDetailsDto = {
-    id: testAppSourceDto.id,
-    name: testAppSourceDto.name ?? "App Source 1",
+    id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+    name: 'test',
     appClients: [
       {
-        appClientUser: "6e054926-0d6b-41c1-a66e-4e0ab917bf4d",
-        privilegeIds: [
-          1,
-          2
-        ]
+        appClientUser: 'App Client User ID',
+        appClientUserName: 'App Client Name',
+        appEndpoint: 'test_endpoint',
       }
-    ]
-  };
-
-  const testAppSourceDetailsFlat: AppSourceDetailsFlat = {
-    id: testAppSourceDto.id!,
-    name: testAppSourceDto.name ?? "App Source 1",
-    appClients: [
+    ],
+    appSourceAdminUserEmails: [
+      'test@email.com'
+    ],
+    endpoints: [
       {
-        appClientUser: "6e054926-0d6b-41c1-a66e-4e0ab917bf4d",
-        appClientUserName: "",
-        read: true,
-        write: true
+        id: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+        path: 'endpoint_path',
+        requestType: 'GET'
       }
     ]
   };
@@ -221,12 +215,13 @@ describe('App Source State Tests', () => {
     const expectedResponse: AppSourceDto = {
       id: testAppSourceDetailsDto.id,
       name: testAppSourceDetailsDto.name,
-      clientCount: testAppSourceDetailsDto.appClients?.length
+      clientCount: testAppSourceDetailsDto.appClients?.length,
+      endpointCount: testAppSourceDetailsDto.endpoints?.length
     };
 
     appSourceState.set([expectedResponse]);
 
-    await expect(wrappedState.sendUpdate(wrappedState.convertToFlat(testAppSourceDetailsDto))).resolves.toEqual(expectedResponse);
+    await expect(wrappedState.sendUpdate(testAppSourceDetailsDto)).resolves.toEqual(expectedResponse);
     expect(appSourceState.get()).toEqual([expectedResponse]);
   });
 
@@ -235,23 +230,30 @@ describe('App Source State Tests', () => {
       return new Promise<AxiosResponse<AppSourceDetailsDto>>((resolve, reject) => reject(rejectMsg));
     });
 
-    await expect(wrappedState.sendUpdate(wrappedState.convertToFlat(testAppSourceDetailsDto))).rejects.toEqual(rejectMsg);
+    await expect(wrappedState.sendUpdate(testAppSourceDetailsDto)).rejects.toEqual(rejectMsg);
   });
 
   it('Test sendUpdate Fail No ID', async () => {
-    const flat = wrappedState.convertToFlat(testAppSourceDetailsDto);
-    const noIdAppSourceDetailsFlat: AppSourceDetailsFlat = {
-      ...flat,
+    const noIdAppSourceDetailsDto: AppSourceDetailsDto = {
+      ...testAppSourceDetailsDto,
       id: ''
     };
 
     expect.assertions(1);
 
     try {
-      await wrappedState.sendUpdate(noIdAppSourceDetailsFlat);
+      await wrappedState.sendUpdate(noIdAppSourceDetailsDto);
     } catch (err) {
       expect(err).toBeDefined();
     }
+  });
+
+  it('sendCreate should throw -- not implemented', async () => {
+    await expect(wrappedState.sendCreate(testAppSourceDetailsDto)).rejects.toThrow();
+  });
+
+  it('sendDelete should throw -- not implemented', async () => {
+    await expect(wrappedState.sendDelete(testAppSourceDetailsDto)).rejects.toThrow();
   });
 
   it('Test convertRowDataToEditableData', async () => {
@@ -259,7 +261,7 @@ describe('App Source State Tests', () => {
       return new Promise<AxiosResponse<AppSourceDetailsDto>>(resolve => resolve(axiosGetAppSourceDetailsDtoResponse));
     });
 
-    await expect(wrappedState.convertRowDataToEditableData(testAppSourceDto)).resolves.toEqual(testAppSourceDetailsFlat);
+    await expect(wrappedState.convertRowDataToEditableData(testAppSourceDto)).resolves.toEqual(testAppSourceDetailsDto);
 
     await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: undefined })).rejects.toBeDefined();
     await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: '' })).rejects.toBeDefined();

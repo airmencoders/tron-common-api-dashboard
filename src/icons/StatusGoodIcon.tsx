@@ -6,7 +6,7 @@ import {IconProps} from './IconProps';
 
 function StatusGoodIcon(props: IconProps) {
   return (
-      <i className="status-good-icon bi bi-check-circle-fill success-icon-color"
+      <i className={`status-good-icon bi bi-check-circle-fill success-icon-color ${props.className}`}
          style={{fontSize: `${props.size}rem`}}
          title={ props.iconTitle != null ? props.iconTitle : 'good'}
       ></i>

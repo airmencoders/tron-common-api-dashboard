@@ -16,11 +16,34 @@ export default class AuthorizedUserService {
     return data;
   }
 
-  authorizedUserHasPrivilege(privilegeType: PrivilegeType): boolean | undefined {
+  /**
+   * Checks if the user has a specific privilege
+   * 
+   * @param privilegeType the privilege type to check against the authorized user's privileges
+   * @returns true if the user has the privilege, false if authorized user not yet retrieved or user does not have the privilege
+   */
+  authorizedUserHasPrivilege(privilegeType: PrivilegeType): boolean {
     if (this.isStateReady())
       return this.authorizedUser?.privileges?.find(privilege => privilege.name === privilegeType) ? true : false;
-    else
-      return undefined;
+
+    return false;
+  }
+
+  /**
+   * Checks if the user has any privilege
+   * 
+   * @param privilegeTypes the privilege types to check against the authorized user's privileges
+   * @returns true if the user has any of the provided privileges, false if authorized user not yet retrieved or user does not have any privilege
+   */
+  authorizedUserHasAnyPrivilege(privilegeTypes: PrivilegeType[]): boolean {
+    if (this.isStateReady()) {
+      for (const privilegeType of privilegeTypes) {
+        if (this.authorizedUserHasPrivilege(privilegeType))
+          return true;
+      }
+    }
+
+    return false;
   }
 
   private isStateReady(): boolean {

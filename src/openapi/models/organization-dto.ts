@@ -34,10 +34,10 @@ export interface OrganizationDto {
     leader?: string;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Array<string>}
      * @memberof OrganizationDto
      */
-    members?: Set<string>;
+    members?: Array<string>;
     /**
      * 
      * @type {string}

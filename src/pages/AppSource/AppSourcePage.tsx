@@ -1,9 +1,8 @@
 import React from 'react';
 import GridColumn from '../../components/Grid/GridColumn';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
-import { AppSourceDto } from '../../openapi';
+import { AppSourceDetailsDto, AppSourceDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
-import { AppSourceDetailsFlat } from '../../state/app-source/app-source-details-flat';
 import AppSourceForm from './AppSourceForm';
 
 const columnHeaders: GridColumn[] = [
@@ -24,16 +23,21 @@ const columnHeaders: GridColumn[] = [
     sortable: true,
     filter: true,
     headerName: 'Client Count'
+  }),
+  new GridColumn({
+    field: 'endpointCount',
+    sortable: true,
+    filter: true,
+    headerName: 'Endpoint Count'
   })
 ];
 
 export function AppSourcePage() {
   return (
-    <DataCrudFormPage<AppSourceDto, AppSourceDetailsFlat>
+    <DataCrudFormPage<AppSourceDto, AppSourceDetailsDto>
       columns={columnHeaders}
       dataTypeName="App Source"
       pageTitle="App Sources"
-      createForm={() => <></>}
       updateForm={AppSourceForm}
       useDataState={useAppSourceState}
       allowEdit={true}

@@ -1,8 +1,25 @@
 @import '../../styles/base';
 
 .app-source-form {
-  &__add-client-btn {
-    margin-top: 0 !important;
-    margin-bottom: units(1);
+  &__add-admin-btn {
+    width: 100%;
+    margin-top: units(0.5) !important;
+    margin-bottom: units(0.5);
+  }
+}
+
+.endpoint-editor-modal {
+  width: 40vw !important;
+
+  @include breakpoint-below(desktop) {
+    width: 55vw !important;
+  }
+
+  @include breakpoint-below(laptop) {
+    width: 70vw !important;
+  }
+
+  @include breakpoint-below(mobile) {
+    width: 100vw !important;
   }
 }

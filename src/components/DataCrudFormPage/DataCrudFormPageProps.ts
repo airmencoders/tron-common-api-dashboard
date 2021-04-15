@@ -23,13 +23,13 @@ export interface DataCrudFormPageProps<T, R> {
    * React element of the form used to create the dto.
    * @param props Used by the create form.
    */
-  createForm: (props: CreateUpdateFormProps<R>) => JSX.Element;
+  createForm?: (props: CreateUpdateFormProps<R>) => JSX.Element;
 
   /**
    * React element of the form used to update the dto.
    * @param props Used by the update form.
    */
-  updateForm: (props: CreateUpdateFormProps<R>) => JSX.Element;
+  updateForm?: (props: CreateUpdateFormProps<R>) => JSX.Element;
 
   /**
    * React element of the component used to delete the dto.
@@ -50,7 +50,7 @@ export interface DataCrudFormPageProps<T, R> {
   /**
    * True allows the edit to be active.
    */
-  allowEdit: boolean;
+  allowEdit?: boolean;
 
   /**
    * True creates a new column, placed in the last column position.

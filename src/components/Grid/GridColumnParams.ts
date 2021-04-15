@@ -6,4 +6,6 @@ export interface GridColumnParams {
   headerClass: string;
   cellRenderer: React.ReactNode;
   cellRendererParams: any;
+  resizable: boolean;
+  showTooltip: boolean;
 }

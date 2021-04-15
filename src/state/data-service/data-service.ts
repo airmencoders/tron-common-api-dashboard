@@ -1,4 +1,5 @@
 import {State} from '@hookstate/core';
+import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
 
 /***
  * Interface for a service providing tabular data.
@@ -8,7 +9,7 @@ import {State} from '@hookstate/core';
 export interface DataService<T, R> {
   isPromised: boolean;
   state: State<T[]>;
-  error: string | undefined;
+  error: string | DataCrudFormErrors | undefined;
   fetchAndStoreData(): Promise<T[]>;
   sendUpdate(toUpdate: R): Promise<T>;
   sendCreate(toCreate: R): Promise<T>;

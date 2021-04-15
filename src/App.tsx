@@ -30,7 +30,7 @@ function AppContent() {
           exact={route.path === '/' ? true : false}
           path={route.path}
           component={route.component}
-          requiredPrivilege={route.requiredPrivilege}
+          requiredPrivilege={route.requiredPrivileges}
         />
       })}
     </Switch>

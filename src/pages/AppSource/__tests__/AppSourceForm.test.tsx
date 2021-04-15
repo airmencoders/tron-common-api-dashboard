@@ -1,16 +1,16 @@
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppSourceForm from '../AppSourceForm';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
-import { AppSourceDetailsFlat } from '../../../state/app-source/app-source-details-flat';
+import { AppSourceDetailsDto } from '../../../openapi';
 
 describe('Test App Source Form', () => {
   let onSubmit = jest.fn();
   let onClose = jest.fn();
   let successAction: DataCrudSuccessAction | undefined;
-  let appSourceDetailsFlat: AppSourceDetailsFlat;
+  let appSourceDetailsDto: AppSourceDetailsDto;
 
   beforeEach(() => {
     onSubmit = jest.fn().mockImplementation(() => {
@@ -26,15 +26,24 @@ describe('Test App Source Form', () => {
       successMsg: ''
     };
 
-    appSourceDetailsFlat = {
+    appSourceDetailsDto = {
       id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
       name: 'test',
       appClients: [
         {
           appClientUser: 'App Client User ID',
           appClientUserName: 'App Client Name',
-          read: false,
-          write: false
+          appEndpoint: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+        }
+      ],
+      appSourceAdminUserEmails: [
+        'test@email.com'
+      ],
+      endpoints: [
+        {
+          id: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+          path: 'endpoint_path',
+          requestType: 'GET'
         }
       ]
     };
@@ -51,7 +60,7 @@ describe('Test App Source Form', () => {
           formActionType={FormActionType.UPDATE}
           isSubmitting={false}
           successAction={successAction}
-          data={appSourceDetailsFlat}
+          data={appSourceDetailsDto}
         />
       </MemoryRouter>
     );
@@ -59,63 +68,98 @@ describe('Test App Source Form', () => {
     const elem = page.getByTestId('app-source-form');
     expect(elem).toBeInTheDocument();
 
-    const nameInput = page.getByDisplayValue(appSourceDetailsFlat.name);
+    // Test client-side validation on Name
+    const nameInput = page.getByDisplayValue(appSourceDetailsDto.name);
 
-    // Test client-side validation
     fireEvent.change(nameInput, { target: { value: '' } });
     expect(nameInput).toHaveValue('');
-    expect(page.getByText('* cannot be empty or blank.'));
+    expect(page.getByText(/cannot be empty or blank/i));
 
     fireEvent.change(nameInput, { target: { value: 'Test 2' } });
     expect(nameInput).toHaveValue('Test 2');
 
-    /**
-     * Cannot test this because ag grid does not render
-     * all of the columns. So, the delete button cannot
-     * be found.
-     */
-    // // Remove app client
-    // await waitFor(() => {
-    //   expect(screen.getByTitle('remove')).toBeTruthy();
-    // });
-    // const removeAppClient = page.getByTitle('remove');
-    // expect(removeAppClient).toBeInTheDocument();
-    // fireEvent.click(removeAppClient);
+    // Client-side validation on Admin Email
+    const adminEmailInput = page.getByLabelText('Admins');
 
-    // // Check removed app client no longer in grid
-    // expect(page.queryByText(appSourceDetailsFlat.appClients[0].appClientUserName)).not.toBeInTheDocument();
+    fireEvent.change(adminEmailInput, { target: { value: 'bad_email' } });
+    expect(adminEmailInput).toHaveValue('bad_email');
+    expect(page.getByText(/enter valid email/i));
 
+    const adminEmailTest = 'email@test.com';
+    fireEvent.change(adminEmailInput, { target: { value: adminEmailTest } });
+    expect(adminEmailInput).toHaveValue(adminEmailTest);
 
-    // Add Client
-    fireEvent.click(page.getByText('Add Client'));
+    // Add admin email
+    const addAdminBtn = page.getByText('Add Admin');
+    fireEvent.click(addAdminBtn);
 
-    // Add Client Editor
-    await waitFor(
-      () => {
-        expect(page.getByText('Add Client Editor')).toBeInTheDocument();
+    await expect(page.findByText(adminEmailTest)).resolves.toBeInTheDocument();
 
-        // Close Client Editor
-        fireEvent.click(page.getByText('Done'));
-      }
-    );
+    // Remove admin email
+    const removeBtn = await page.findByTitle('remove');
+    fireEvent.click(removeBtn);
 
-    // Try to edit an app client
-    const appClient = page.getByText(appSourceDetailsFlat.appClients[0].appClientUserName);
-    expect(appClient).toBeInTheDocument();
-    fireEvent.click(appClient);
-
-    // Client Editor
-    await waitFor(
-      () => {
-        expect(page.getByLabelText('Name')).toBeInTheDocument();
-
-        // Close Client Editor
-        fireEvent.click(page.getByText('Done'));
-      }
-    );
+    await expect(page.findByText(adminEmailTest)).rejects.toThrow();
 
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
+
+    // Click an endpoint to edit
+    await (expect(page.findByText('endpoint_path'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByText('endpoint_path'));
+
+    await (expect(page.findByText('Endpoint Editor'))).resolves.toBeInTheDocument();
+
+    const closeBtn = (await (screen.findByTitle('close-modal')));
+    expect(closeBtn).toBeInTheDocument();
+    expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
+    fireEvent.click(closeBtn!);
   });
+
+  it('Has default values if none given', () => {
+    successAction = undefined;
+
+    appSourceDetailsDto.id = undefined;
+    appSourceDetailsDto.appClients = undefined;
+    appSourceDetailsDto.appSourceAdminUserEmails = undefined;
+    appSourceDetailsDto.endpoints = undefined;
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    expect(page.getByTestId('app-source-form')).toBeInTheDocument();
+  });
+
+  it('Shows success', () => {
+    successAction = {
+      success: true,
+      successMsg: 'Success'
+    };
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    expect(page.getByText(successAction.successMsg)).toBeInTheDocument();
+  })
 
 });

@@ -379,17 +379,13 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                 })
               }
             </Select>
-            {
-              props.formActionType === FormActionType.ADD && props.successAction?.success ?
-            
-                <SuccessErrorMessage successMessage={props.successAction?.successMsg}
+            <SuccessErrorMessage successMessage={props.successAction?.successMsg}
                                   errorMessage={props.formErrors?.general || ''}
                                   showErrorMessage={props.formErrors?.general != null}
                                   showSuccessMessage={props.successAction != null && props.successAction?.success}
                                   showCloseButton={true}
                                   onCloseClicked={props.onClose} />  
-              :
-                
+            {props.successAction == null && 
               <SubmitActions formActionType={props.formActionType}
                             onCancel={props.onClose}
                             onSubmit={submitForm}

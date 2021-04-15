@@ -18,13 +18,13 @@ const testRoutes: RouteItem[] = [
     path: '/health',
     name: 'Health',
     component: HealthPage,
-    requiredPrivilege: PrivilegeType.DASHBOARD_USER
+    requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
   },
   {
     path: "/person",
     name: "Person",
     component: PersonPage,
-    requiredPrivilege: PrivilegeType.DASHBOARD_ADMIN
+    requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
   }
 ];
 

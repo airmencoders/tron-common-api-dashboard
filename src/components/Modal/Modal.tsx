@@ -27,7 +27,7 @@ function Modal(props: ModalProps) {
                         overflow: 'auto'
                       },
                     }}
-                    className="modal-component__react-modal"
+        className={`modal-component__react-modal ${props.className ?? ''}`}
         >
           <div className="modal-component__container">
             <div className="modal-component__header">
