@@ -1,0 +1,26 @@
+# Used for docker-compose fullstack setup
+
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/nodejs14:14.15.5 AS builder
+USER root
+WORKDIR /app
+COPY . .
+
+ARG PROXY_PORT
+ENV REACT_APP_API_BASE_URL="http://localhost:${PROXY_PORT}/"
+ARG REACT_APP_VERSION_PREFIX
+ENV REACT_APP_VERSION_PREFIX=${REACT_APP_VERSION_PREFIX}
+ARG REACT_APP_API_PATH_PREFIX
+ENV REACT_APP_API_PATH_PREFIX=${REACT_APP_API_PATH_PREFIX}
+
+# do not install cypress
+RUN npm uninstall cypress
+
+RUN npm install
+RUN npm run build
+
+# Stage 2
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/base-image/harden-nginx-19:1.19.2
+USER appuser
+COPY --from=builder --chown=appuser:appuser /app/build /var/www
+EXPOSE 8080 
+CMD [ "nginx", "-g", "daemon off;" ]

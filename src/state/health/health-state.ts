@@ -1,5 +1,5 @@
 import { createState, State, useState } from '@hookstate/core';
-import { AxiosPromise } from 'axios';
+import {AxiosPromise, AxiosResponse} from 'axios';
 import HealthApi from '../../api/health/health-api';
 import Components from '../../api/health/interface/components';
 import Health from '../../api/health/interface/health';
@@ -11,7 +11,11 @@ const healthApi: HealthApi = new HealthApi();
 export const wrapState = (state: State<Partial<Health>>, healthApi: HealthApi): HealthService => {
   return ({
     async fetchAndStoreHealthStatus(): Promise<Health> {
-      const healthRes = (): AxiosPromise<Health> => healthApi.getHealth();
+      const healthRes = (): AxiosPromise<Health> => healthApi.getHealth()
+          .catch(e => {
+            console.log(e);
+            return new Promise<AxiosResponse<Health>>((resolve) => resolve(e.response));
+          });
       const data = new Promise<Health>((resolve) => resolve(healthRes().then(r => r.data)));
 
       state.set(data);

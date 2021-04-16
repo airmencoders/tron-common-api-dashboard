@@ -1,0 +1,11 @@
+
+.health {
+  &__status-cards {
+    display: flex;
+    justify-content: space-between;
+
+    .status-card {
+      width: 250px;
+    }
+  }
+}
