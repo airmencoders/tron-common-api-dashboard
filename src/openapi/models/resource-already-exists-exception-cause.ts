@@ -13,44 +13,37 @@
  */
 
 
-import { ResourceAlreadyExistsExceptionCause } from './resource-already-exists-exception-cause';
 import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
 import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-already-exists-exception-cause-suppressed';
 
 /**
  * 
  * @export
- * @interface RecordNotFoundException
+ * @interface ResourceAlreadyExistsExceptionCause
  */
-export interface RecordNotFoundException {
-    /**
-     * 
-     * @type {ResourceAlreadyExistsExceptionCause}
-     * @memberof RecordNotFoundException
-     */
-    cause?: ResourceAlreadyExistsExceptionCause;
+export interface ResourceAlreadyExistsExceptionCause {
     /**
      * 
      * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
-     * @memberof RecordNotFoundException
+     * @memberof ResourceAlreadyExistsExceptionCause
      */
     stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundException
+     * @memberof ResourceAlreadyExistsExceptionCause
      */
     message?: string;
     /**
      * 
      * @type {Array<ResourceAlreadyExistsExceptionCauseSuppressed>}
-     * @memberof RecordNotFoundException
+     * @memberof ResourceAlreadyExistsExceptionCause
      */
     suppressed?: Array<ResourceAlreadyExistsExceptionCauseSuppressed>;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundException
+     * @memberof ResourceAlreadyExistsExceptionCause
      */
     localizedMessage?: string;
 }

@@ -13,32 +13,43 @@
  */
 
 
-import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
 
 /**
  * 
  * @export
- * @interface BadRequestExceptionCauseSuppressed
+ * @interface MeterValueDto
  */
-export interface BadRequestExceptionCauseSuppressed {
-    /**
-     * 
-     * @type {Array<BadRequestExceptionCauseStackTrace>}
-     * @memberof BadRequestExceptionCauseSuppressed
-     */
-    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
+export interface MeterValueDto {
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @memberof MeterValueDto
      */
-    message?: string;
+    id?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @memberof MeterValueDto
      */
-    localizedMessage?: string;
+    appClient?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MeterValueDto
+     */
+    metricName?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof MeterValueDto
+     */
+    count?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof MeterValueDto
+     */
+    timestamp?: string;
 }
 
 
