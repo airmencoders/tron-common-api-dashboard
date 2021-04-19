@@ -8,20 +8,23 @@ import Button from '../../components/Button/Button';
 import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scratch-storage-user-with-privs-flat';
 import { Validation } from '@hookstate/validation';
 import { Touched } from '@hookstate/touched';
+import { ScratchStorageEditorState } from './ScratchStorageEditForm';
 
 interface ScratchStorageAddFormProps {
-  data?: ScratchStorageUserWithPrivsFlat;
+  data?: State<ScratchStorageUserWithPrivsFlat>;
   onSubmit: (toUpdate: ScratchStorageUserWithPrivsFlat) => void;
+  isUpdate?: boolean;
+  errorMessage: string;
 }
 
 function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
   const formState = useHookstate<ScratchStorageUserWithPrivsFlat>({
-      userId: props.data?.userId ?? '',
-      email: props.data?.email ?? '',
-      read: props.data?.read ?? false,
-      write: props.data?.write ?? false,
-      admin: props.data?.admin ?? false
-    });
+        userId: props.data?.userId.value ?? '',
+        email: props.data?.email.value ?? '',
+        read: props.data?.read.value ?? false,
+        write: props.data?.write.value ?? false,
+        admin: props.data?.admin.value ?? false
+      });
 
   formState.attach(Validation);
   formState.attach(Touched);
@@ -82,8 +85,9 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       </FormGroup>
 
       <Button type="submit" disabled={!(Validation(formState.email).valid() && (formState.read.get() || formState.write.get() || formState.admin.get()))}>
-        Add User
+        { props.isUpdate ? "Update User": "Add User" }
       </Button>
+      <p className="success-container__validation-error">{props.errorMessage}</p>
     </Form>
   );
 }

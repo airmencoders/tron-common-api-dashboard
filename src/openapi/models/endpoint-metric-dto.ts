@@ -13,31 +13,32 @@
  */
 
 
+import { MeterValueDto } from './meter-value-dto';
 
 /**
- * Patched person
+ * 
  * @export
- * @interface JsonPatchAnnotated
+ * @interface EndpointMetricDto
  */
-export interface JsonPatchAnnotated {
+export interface EndpointMetricDto {
     /**
      * 
      * @type {string}
-     * @memberof JsonPatchAnnotated
+     * @memberof EndpointMetricDto
      */
-    op?: string;
+    id?: string;
     /**
      * 
      * @type {string}
-     * @memberof JsonPatchAnnotated
+     * @memberof EndpointMetricDto
      */
     path?: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof JsonPatchAnnotated
+     * @type {Array<MeterValueDto>}
+     * @memberof EndpointMetricDto
      */
-    value?: Array<string>;
+    values?: Array<MeterValueDto>;
 }
 
 

@@ -5,16 +5,9 @@ import Config from '../../api/configuration';
 import ScratchStorageService from './scratch-storage-service';
 import { ScratchStorageFlat } from './scratch-storage-flat';
 
-// export interface ScratchStorageDetailsFlat {
-//   id?: string;
-//   appName: string;
-//   HasImplicitRead: boolean;
-//   userPrivs?: Array<ScratchStorageUserWithPrivsFlat>;
-// }
-
 const scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
 
-// this holds the selected org we're editing/updating
+// this holds the selected app we're editing/updating
 const selectedScratchStorageState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
 
 const scratchStorageApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
@@ -32,5 +25,3 @@ export const useScratchStorageState = () => wrapState(
   useState(scratchStorageState),
   useState(selectedScratchStorageState),
   scratchStorageApi);
-
-// export const accessScratchStorageState = () => wrapState(scratchStorageState, scratchStorageApi);

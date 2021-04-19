@@ -13,16 +13,11 @@
  */
 
 
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-suppressed.ts
 import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
-=======
-import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
->>>>>>> master:src/openapi/models/bad-request-exception-cause-suppressed.ts
 
 /**
  * 
  * @export
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-suppressed.ts
  * @interface ResourceAlreadyExistsExceptionCauseSuppressed
  */
 export interface ResourceAlreadyExistsExceptionCauseSuppressed {
@@ -36,31 +31,12 @@ export interface ResourceAlreadyExistsExceptionCauseSuppressed {
      * 
      * @type {string}
      * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
-=======
- * @interface BadRequestExceptionCauseSuppressed
- */
-export interface BadRequestExceptionCauseSuppressed {
-    /**
-     * 
-     * @type {Array<BadRequestExceptionCauseStackTrace>}
-     * @memberof BadRequestExceptionCauseSuppressed
-     */
-    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
-    /**
-     * 
-     * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
->>>>>>> master:src/openapi/models/bad-request-exception-cause-suppressed.ts
      */
     message?: string;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-suppressed.ts
      * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
-=======
-     * @memberof BadRequestExceptionCauseSuppressed
->>>>>>> master:src/openapi/models/bad-request-exception-cause-suppressed.ts
      */
     localizedMessage?: string;
 }

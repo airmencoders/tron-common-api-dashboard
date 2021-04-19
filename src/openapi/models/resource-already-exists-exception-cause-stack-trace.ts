@@ -17,7 +17,6 @@
 /**
  * 
  * @export
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
  * @interface ResourceAlreadyExistsExceptionCauseStackTrace
  */
 export interface ResourceAlreadyExistsExceptionCauseStackTrace {
@@ -25,85 +24,48 @@ export interface ResourceAlreadyExistsExceptionCauseStackTrace {
      * 
      * @type {string}
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
- * @interface BadRequestExceptionCauseStackTrace
- */
-export interface BadRequestExceptionCauseStackTrace {
-    /**
-     * 
-     * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     methodName?: string;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     fileName?: string;
     /**
      * 
      * @type {number}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     lineNumber?: number;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     className?: string;
     /**
      * 
      * @type {boolean}
-<<<<<<< HEAD:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
-=======
-     * @memberof BadRequestExceptionCauseStackTrace
->>>>>>> master:src/openapi/models/bad-request-exception-cause-stack-trace.ts
      */
     nativeMethod?: boolean;
 }

@@ -3,8 +3,7 @@ import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import {ScratchStorageAppRegistryDto, UserWithPrivs} from '../../openapi/models';
-import {useHookstate, useState} from '@hookstate/core';
+import {none, useHookstate } from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
@@ -14,7 +13,6 @@ import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scr
 import GridColumn from '../../components/Grid/GridColumn';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import Button from '../../components/Button/Button';
-import Grid from '../../components/Grid/Grid';
 import { RowClickedEvent } from 'ag-grid-community';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
@@ -26,10 +24,12 @@ import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
 
-interface ScratchStorageEditorState {
+export interface ScratchStorageEditorState {
   isOpen: boolean;
   data: ScratchStorageUserWithPrivsFlat;
+  errorMessage: string;
 }
+
 function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>) {
 
   const formState = useHookstate<ScratchStorageFlat>({
@@ -51,7 +51,8 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       read: false,
       write: false,
       admin: false
-    }
+    },
+    errorMessage: ''
   })
 
   const userAddState = useHookstate({
@@ -64,18 +65,13 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
 
 
   const isFormModified = (): boolean => {
-    const stateKeys = formState.keys;
-    let isChanged = false;
-    for (let i = 0; i < stateKeys.length; i++) {
-      const key = stateKeys[i];
-      const origValue = props.data?.[key] == null || props.data[key] === '' ? '' : props.data?.[key];
-      const formStateValue = formState[key]?.get() == null || formState[key]?.get() === '' ? '' : formState[key]?.get();
-      if (formStateValue !== origValue) {
-        isChanged = true;
-        break;
-      }
-    }
-    return isChanged
+    return Initial(formState.appName).modified() ||
+      Initial(formState.appHasImplicitRead).modified() ||
+      Initial(formState.userPrivs).modified();
+  }
+
+  const isFormDisabled = ():boolean => {
+    return props.successAction?.success || props.isSubmitting;
   }
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
@@ -83,8 +79,19 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     props.onSubmit(formState.get());
   }
 
+  function onUpdateUser(toUpdate: ScratchStorageUserWithPrivsFlat) {
+    formState.userPrivs.find(item => item.get().email === toUpdate.email)?.set(toUpdate);
+  }  
+  
   function onAddUser(toUpdate: ScratchStorageUserWithPrivsFlat) {
-    formState.userPrivs[formState.userPrivs.length].set(toUpdate);
+    try{
+      if(formState.userPrivs.some(item => item.get().email === toUpdate.email))
+        throw new Error('Email already exists.');
+
+    formState.userPrivs[formState.userPrivs.length].set(Object.assign({}, toUpdate));
+    } catch (error) {
+      userEditorState.errorMessage.set(error.message);
+    }
   }
 
   const deleteBtnName = 'Delete';
@@ -115,23 +122,30 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       headerName: 'Admin',
       headerClass: 'header-center',
       cellRenderer: PrivilegeCellRenderer
-    }),
-    new GridColumn({
-      field: '',
-      headerName: deleteBtnName,
-      headerClass: 'header-center',
-      cellRenderer: DeleteCellRenderer,
-      cellRendererParams: { onClick: removeUser }
     })
   ];
 
+  if(!isFormDisabled()) {
+    userColumns.push(
+      new GridColumn({
+        field: '',
+        headerName: deleteBtnName,
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: { onClick: removeUser }
+      })
+    )
+  }
+
   function removeUser(data: ScratchStorageUserWithPrivsFlat) {
-    //formState.appClients.find(item => item.appClientUser.get() === data.appClientUser)?.set(none);
+    if(!isFormDisabled())
+      formState.userPrivs.find(item => item.get().email === data.email)?.set(none);
   }
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-    // Don't trigger row clicked if delete cell clicked
-    if ((event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName))
+    // Don't trigger row clicked if delete cell clicked or if the form is disabled
+    if ((event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName ||
+      isFormDisabled()))
       return;
 
     userEditorState.merge({
@@ -160,17 +174,13 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     userAddCloseHandler();
   }
 
-  const isFormDisabled = ():boolean => {
-    return props.successAction?.success || false;
-  }
-
   return (
       <div className="scratch-storage-edit-form">
         <Form onSubmit={submitForm}>
           <FormGroup labelName="appName" labelText="App Name"
                      isError={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
                      errorMessages={Validation(formState.appName).errors()
-                         .map(validationError =>validationError.message)}
+                         .map(validationError => validationError.message)}
           >
             <TextInput id="appName" name="appName" type="text"
                        className="scratch-storage-edit-form__mb1" 
@@ -192,7 +202,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           labelName="scratch-storage-users"
           labelText="Users"
           >
-            <Button type='button' className="scratch-storage-edit-form__mb1" onClick={() => userAddState.isOpen.set(true)}>
+            <Button type='button' className="scratch-storage-edit-form__mb1" onClick={() => userAddState.isOpen.set(true)} disabled={isFormDisabled()}>
               Add User
             </Button>
             
@@ -231,7 +241,12 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           width="auto"
           height="auto"
         >
-          {/* <ScratchStorageUserAddForm data={userEditorState.data} /> */}
+        <ScratchStorageUserAddForm 
+          data={userEditorState.data} 
+          onSubmit={onUpdateUser} 
+          isUpdate={true}
+          errorMessage={userEditorState.get().errorMessage}
+        />
         </Modal>
         <Modal
           headerComponent={<ModalTitle title="Add User Editor" />}
@@ -245,7 +260,10 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           width="auto"
           height="auto"
         >
-          <ScratchStorageUserAddForm onSubmit= {onAddUser} />
+          <ScratchStorageUserAddForm
+            onSubmit= {onAddUser} 
+            errorMessage={userEditorState.get().errorMessage}
+          />
         </Modal>
       </div>
   );
