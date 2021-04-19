@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
@@ -34,5 +34,38 @@ describe('Test App Source Page', () => {
     );
 
     expect(page.getByText('Loading...')).toBeDefined();
+  });
+
+  it('should swap to metrics page from data grid', async () => {  
+    appSourceState = createState<AppSourceDto[]>([{
+      id: '123',
+      name: 'source1',
+      endpointCount: 1,
+      clientCount: 1
+    }]);
+    function mockAppSourceState() {
+      (useAppSourceState as jest.Mock).mockReturnValue(new AppSourceService(appSourceState, appSourceApi));
+
+      jest.spyOn(useAppSourceState(), 'isPromised', 'get').mockReturnValue(false);
+    }
+
+    mockAppSourceState();
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourcePage />
+      </MemoryRouter>
+    );
+
+    const metricBtn = (await page.findByTitle('metric')).closest('button');
+    expect(metricBtn).toBeDefined();
+    fireEvent.click(metricBtn!);
+
+    await waitFor(
+      () => expect(metricBtn).not.toBeInTheDocument()
+    );
+
+    expect(page.getByText('Requests By Endpoint in the last 30 days')).toBeDefined();
+    expect(page.getByText('Requests By App Client in the last 30 days')).toBeDefined();
   });
 })
