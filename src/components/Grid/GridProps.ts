@@ -26,4 +26,6 @@ export interface GridProps {
    * Defaults to FALSE (column virtualization enabled)
    */
   disabledGridColumnVirtualization?: boolean;
+
+  className?: string;
 }
