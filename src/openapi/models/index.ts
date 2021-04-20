@@ -48,6 +48,7 @@ export * from './scratch-storage-app-user-priv';
 export * from './scratch-storage-app-user-priv-dto';
 export * from './scratch-storage-entry';
 export * from './scratch-storage-user';
+export * from './scratch-value-patch-json-dto';
 export * from './soldier';
 export * from './spaceman';
 export * from './squadron';

@@ -38,6 +38,8 @@ import { ScratchStorageAppUserPrivDto } from '../models';
 import { ScratchStorageEntry } from '../models';
 // @ts-ignore
 import { ScratchStorageUser } from '../models';
+// @ts-ignore
+import { ScratchValuePatchJsonDto } from '../models';
 /**
  * ScratchStorageControllerApi - axios parameter creator
  * @export
@@ -755,7 +757,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         },
         /**
          * App ID is the UUID of the owning application
-         * @summary Retrieves a singe key-value pair for for a single app
+         * @summary Retrieves a single key-value pair for for a single app
          * @param {string} appId Application UUID
          * @param {string} keyName Key Name to look up
          * @param {*} [options] Override http request option.
@@ -796,6 +798,69 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * App ID is the UUID of the owning application
+         * @summary Treats the key\'s value as JSON and returns the JsonPath query invoked onto that JSON structure. Returns JSON string matching the specified JSON Path
+         * @param {string} appId Application UUID
+         * @param {string} keyName Key Name to look up
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getKeyValueByKeyNameAsJson: async (appId: string, keyName: string, body: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appId' is not null or undefined
+            if (appId === null || appId === undefined) {
+                throw new RequiredError('appId','Required parameter appId was null or undefined when calling getKeyValueByKeyNameAsJson.');
+            }
+            // verify required parameter 'keyName' is not null or undefined
+            if (keyName === null || keyName === undefined) {
+                throw new RequiredError('keyName','Required parameter keyName was null or undefined when calling getKeyValueByKeyNameAsJson.');
+            }
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling getKeyValueByKeyNameAsJson.');
+            }
+            const localVarPath = `/v1/scratch/{appId}/{keyName}/jsonize`
+                .replace(`{${"appId"}}`, encodeURIComponent(String(appId)))
+                .replace(`{${"keyName"}}`, encodeURIComponent(String(keyName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'text/plain;charset=UTF-8';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof body !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(body !== undefined ? body : {})
+                : (body || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -950,6 +1015,69 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * App ID is the UUID of the owning application
+         * @summary Treats the key\'s value as JSON and attempts to update a portion of it from given JSON Patch spec with provided value.  Returns NO_CONTENT response on successful update.
+         * @param {string} appId Application UUID
+         * @param {string} keyName Key Name to look up
+         * @param {ScratchValuePatchJsonDto} scratchValuePatchJsonDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchKeyValuePairAsJson: async (appId: string, keyName: string, scratchValuePatchJsonDto: ScratchValuePatchJsonDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appId' is not null or undefined
+            if (appId === null || appId === undefined) {
+                throw new RequiredError('appId','Required parameter appId was null or undefined when calling patchKeyValuePairAsJson.');
+            }
+            // verify required parameter 'keyName' is not null or undefined
+            if (keyName === null || keyName === undefined) {
+                throw new RequiredError('keyName','Required parameter keyName was null or undefined when calling patchKeyValuePairAsJson.');
+            }
+            // verify required parameter 'scratchValuePatchJsonDto' is not null or undefined
+            if (scratchValuePatchJsonDto === null || scratchValuePatchJsonDto === undefined) {
+                throw new RequiredError('scratchValuePatchJsonDto','Required parameter scratchValuePatchJsonDto was null or undefined when calling patchKeyValuePairAsJson.');
+            }
+            const localVarPath = `/v1/scratch/{appId}/{keyName}/jsonize`
+                .replace(`{${"appId"}}`, encodeURIComponent(String(appId)))
+                .replace(`{${"keyName"}}`, encodeURIComponent(String(keyName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof scratchValuePatchJsonDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(scratchValuePatchJsonDto !== undefined ? scratchValuePatchJsonDto : {})
+                : (scratchValuePatchJsonDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -1485,7 +1613,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         },
         /**
          * App ID is the UUID of the owning application
-         * @summary Retrieves a singe key-value pair for for a single app
+         * @summary Retrieves a single key-value pair for for a single app
          * @param {string} appId Application UUID
          * @param {string} keyName Key Name to look up
          * @param {*} [options] Override http request option.
@@ -1493,6 +1621,22 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          */
         async getKeyValueByKeyName(appId: string, keyName: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getKeyValueByKeyName(appId, keyName, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * App ID is the UUID of the owning application
+         * @summary Treats the key\'s value as JSON and returns the JsonPath query invoked onto that JSON structure. Returns JSON string matching the specified JSON Path
+         * @param {string} appId Application UUID
+         * @param {string} keyName Key Name to look up
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getKeyValueByKeyNameAsJson(appId: string, keyName: string, body: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getKeyValueByKeyNameAsJson(appId, keyName, body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1546,6 +1690,22 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          */
         async getScratchSpaceAppsByAuthorizedUser(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageAppRegistryDto>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getScratchSpaceAppsByAuthorizedUser(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * App ID is the UUID of the owning application
+         * @summary Treats the key\'s value as JSON and attempts to update a portion of it from given JSON Patch spec with provided value.  Returns NO_CONTENT response on successful update.
+         * @param {string} appId Application UUID
+         * @param {string} keyName Key Name to look up
+         * @param {ScratchValuePatchJsonDto} scratchValuePatchJsonDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchKeyValuePairAsJson(appId: string, keyName: string, scratchValuePatchJsonDto: ScratchValuePatchJsonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).patchKeyValuePairAsJson(appId, keyName, scratchValuePatchJsonDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1804,7 +1964,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
         },
         /**
          * App ID is the UUID of the owning application
-         * @summary Retrieves a singe key-value pair for for a single app
+         * @summary Retrieves a single key-value pair for for a single app
          * @param {string} appId Application UUID
          * @param {string} keyName Key Name to look up
          * @param {*} [options] Override http request option.
@@ -1812,6 +1972,18 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          */
         getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntry> {
             return ScratchStorageControllerApiFp(configuration).getKeyValueByKeyName(appId, keyName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * App ID is the UUID of the owning application
+         * @summary Treats the key\'s value as JSON and returns the JsonPath query invoked onto that JSON structure. Returns JSON string matching the specified JSON Path
+         * @param {string} appId Application UUID
+         * @param {string} keyName Key Name to look up
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getKeyValueByKeyNameAsJson(appId: string, keyName: string, body: string, options?: any): AxiosPromise<string> {
+            return ScratchStorageControllerApiFp(configuration).getKeyValueByKeyNameAsJson(appId, keyName, body, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
@@ -1849,6 +2021,18 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          */
         getScratchSpaceAppsByAuthorizedUser(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>> {
             return ScratchStorageControllerApiFp(configuration).getScratchSpaceAppsByAuthorizedUser(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * App ID is the UUID of the owning application
+         * @summary Treats the key\'s value as JSON and attempts to update a portion of it from given JSON Patch spec with provided value.  Returns NO_CONTENT response on successful update.
+         * @param {string} appId Application UUID
+         * @param {string} keyName Key Name to look up
+         * @param {ScratchValuePatchJsonDto} scratchValuePatchJsonDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchKeyValuePairAsJson(appId: string, keyName: string, scratchValuePatchJsonDto: ScratchValuePatchJsonDto, options?: any): AxiosPromise<object> {
+            return ScratchStorageControllerApiFp(configuration).patchKeyValuePairAsJson(appId, keyName, scratchValuePatchJsonDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
@@ -2079,7 +2263,7 @@ export interface ScratchStorageControllerApiInterface {
 
     /**
      * App ID is the UUID of the owning application
-     * @summary Retrieves a singe key-value pair for for a single app
+     * @summary Retrieves a single key-value pair for for a single app
      * @param {string} appId Application UUID
      * @param {string} keyName Key Name to look up
      * @param {*} [options] Override http request option.
@@ -2087,6 +2271,18 @@ export interface ScratchStorageControllerApiInterface {
      * @memberof ScratchStorageControllerApiInterface
      */
     getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntry>;
+
+    /**
+     * App ID is the UUID of the owning application
+     * @summary Treats the key\'s value as JSON and returns the JsonPath query invoked onto that JSON structure. Returns JSON string matching the specified JSON Path
+     * @param {string} appId Application UUID
+     * @param {string} keyName Key Name to look up
+     * @param {string} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApiInterface
+     */
+    getKeyValueByKeyNameAsJson(appId: string, keyName: string, body: string, options?: any): AxiosPromise<string>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.
@@ -2124,6 +2320,18 @@ export interface ScratchStorageControllerApiInterface {
      * @memberof ScratchStorageControllerApiInterface
      */
     getScratchSpaceAppsByAuthorizedUser(options?: any): AxiosPromise<Array<ScratchStorageAppRegistryDto>>;
+
+    /**
+     * App ID is the UUID of the owning application
+     * @summary Treats the key\'s value as JSON and attempts to update a portion of it from given JSON Patch spec with provided value.  Returns NO_CONTENT response on successful update.
+     * @param {string} appId Application UUID
+     * @param {string} keyName Key Name to look up
+     * @param {ScratchValuePatchJsonDto} scratchValuePatchJsonDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApiInterface
+     */
+    patchKeyValuePairAsJson(appId: string, keyName: string, scratchValuePatchJsonDto: ScratchValuePatchJsonDto, options?: any): AxiosPromise<object>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -2384,7 +2592,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
 
     /**
      * App ID is the UUID of the owning application
-     * @summary Retrieves a singe key-value pair for for a single app
+     * @summary Retrieves a single key-value pair for for a single app
      * @param {string} appId Application UUID
      * @param {string} keyName Key Name to look up
      * @param {*} [options] Override http request option.
@@ -2393,6 +2601,20 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      */
     public getKeyValueByKeyName(appId: string, keyName: string, options?: any) {
         return ScratchStorageControllerApiFp(this.configuration).getKeyValueByKeyName(appId, keyName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * App ID is the UUID of the owning application
+     * @summary Treats the key\'s value as JSON and returns the JsonPath query invoked onto that JSON structure. Returns JSON string matching the specified JSON Path
+     * @param {string} appId Application UUID
+     * @param {string} keyName Key Name to look up
+     * @param {string} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApi
+     */
+    public getKeyValueByKeyNameAsJson(appId: string, keyName: string, body: string, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).getKeyValueByKeyNameAsJson(appId, keyName, body, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2438,6 +2660,20 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      */
     public getScratchSpaceAppsByAuthorizedUser(options?: any) {
         return ScratchStorageControllerApiFp(this.configuration).getScratchSpaceAppsByAuthorizedUser(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * App ID is the UUID of the owning application
+     * @summary Treats the key\'s value as JSON and attempts to update a portion of it from given JSON Patch spec with provided value.  Returns NO_CONTENT response on successful update.
+     * @param {string} appId Application UUID
+     * @param {string} keyName Key Name to look up
+     * @param {ScratchValuePatchJsonDto} scratchValuePatchJsonDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApi
+     */
+    public patchKeyValuePairAsJson(appId: string, keyName: string, scratchValuePatchJsonDto: ScratchValuePatchJsonDto, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).patchKeyValuePairAsJson(appId, keyName, scratchValuePatchJsonDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

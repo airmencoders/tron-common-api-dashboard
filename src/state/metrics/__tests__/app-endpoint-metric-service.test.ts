@@ -12,7 +12,7 @@ describe('App Endpoint Metric State', () => {
 
     const endpointMetricDto: EndpointCountMetricDto = {
         id: '1234',
-        name: 'test-name',
+        path: 'test-name',
         appClients: [{
             id: '234323',
             sum: 3,

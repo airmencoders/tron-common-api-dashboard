@@ -5,7 +5,6 @@ import { MemoryRouter } from "react-router";
 import { EndpointCountMetricDto, MetricsControllerApi, MetricsControllerApiInterface } from "../../../../openapi";
 import AppEndpointMetricService from "../../../../state/metrics/app-endpoint-metric-service";
 import { useAppEndpointMetricState } from "../../../../state/metrics/app-endpoint-metric-state";
-import { useAppSourceMetricState } from "../../../../state/metrics/app-source-metric-state";
 import SimpleEndpointMetricChart from "../SimpleEndpointMetricChart";
 
 jest.mock('../../../../state/metrics/app-endpoint-metric-state');
@@ -37,12 +36,10 @@ describe('Test Metric Page', () => {
   let selectedSourceState: State<{appSourceId: string; name: string; type: string}> & StateMethodsDestroy;
   const clickFunction = (config: any) => null;
 
-
-
   beforeEach(() => {
     metricState = createState<EndpointCountMetricDto>({
         id: '1',
-        name: 'source1',
+        path: 'source1',
         appClients: [{
           id: '13132',
           path: 'appclient1',

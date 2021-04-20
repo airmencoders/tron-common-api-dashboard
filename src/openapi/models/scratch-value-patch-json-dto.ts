@@ -13,38 +13,25 @@
  */
 
 
-import { CountMetricDto } from './count-metric-dto';
 
 /**
- * 
+ * Object specifying the json path to execute and the new value
  * @export
- * @interface EndpointCountMetricDto
+ * @interface ScratchValuePatchJsonDto
  */
-export interface EndpointCountMetricDto {
+export interface ScratchValuePatchJsonDto {
     /**
      * 
      * @type {string}
-     * @memberof EndpointCountMetricDto
+     * @memberof ScratchValuePatchJsonDto
      */
-    id?: string;
+    jsonPath: string;
     /**
      * 
      * @type {string}
-     * @memberof EndpointCountMetricDto
+     * @memberof ScratchValuePatchJsonDto
      */
-    path?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EndpointCountMetricDto
-     */
-    appSource?: string;
-    /**
-     * 
-     * @type {Array<CountMetricDto>}
-     * @memberof EndpointCountMetricDto
-     */
-    appClients?: Array<CountMetricDto>;
+    value?: string;
 }
 
 

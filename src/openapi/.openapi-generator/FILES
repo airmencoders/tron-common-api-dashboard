@@ -71,6 +71,7 @@ models/scratch-storage-app-user-priv-dto.ts
 models/scratch-storage-app-user-priv.ts
 models/scratch-storage-entry.ts
 models/scratch-storage-user.ts
+models/scratch-value-patch-json-dto.ts
 models/soldier.ts
 models/spaceman.ts
 models/squadron.ts
