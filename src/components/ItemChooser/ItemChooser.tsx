@@ -29,6 +29,7 @@ function ItemChooser(props: ChooserProps) {
                 rowClass='ag-grid--row-pointer'
                 rowSelection='single'
                 onRowClicked={props.onRowClicked}
+                hardRefresh={props.hardRefresh}
             />
         </>
     )

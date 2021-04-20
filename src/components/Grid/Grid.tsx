@@ -29,7 +29,7 @@ function Grid(props: GridProps) {
   // Refresh grid cells only if the length of the dat has not changed
   useEffect(() => {
     if (!rowDataLengthChanged.current) {
-      gridApi?.refreshCells();
+      props.hardRefresh ? gridApi?.setRowData(props.data) : gridApi?.refreshCells();
     } else {
       rowDataLengthChanged.current = false;
     }

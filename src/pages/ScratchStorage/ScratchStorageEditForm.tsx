@@ -85,8 +85,10 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   
   function onAddUser(toUpdate: ScratchStorageUserWithPrivsFlat) {
     try{
+        userEditorState.errorMessage.set('');
+
       if(formState.userPrivs.some(item => item.get().email === toUpdate.email))
-        throw new Error('Email already exists.');
+        throw new Error('* Email already exists.');
 
     formState.userPrivs[formState.userPrivs.length].set(Object.assign({}, toUpdate));
     } catch (error) {
@@ -156,7 +158,15 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
 
   function userEditorCloseHandler() {
     userEditorState.merge({
-      isOpen: false
+      isOpen: false,
+      data: {
+        userId: '',
+        email: '',
+        read: false,
+        write: false,
+        admin: false
+      },
+      errorMessage: ''
     });
   }
 
@@ -172,6 +182,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
 
   function userAddSubmitModal() {
     userAddCloseHandler();
+    userEditorCloseHandler();
   }
 
   return (
@@ -210,6 +221,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
               items={formState.userPrivs.get() || []}
               columns={userColumns}
               onRowClicked={onRowClicked}
+              hardRefresh={true}
             />
           </FormGroup>
           <SuccessErrorMessage successMessage={props.successAction?.successMsg}
@@ -242,10 +254,9 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           height="auto"
         >
         <ScratchStorageUserAddForm 
-          data={userEditorState.data} 
+          editorState={userEditorState} 
           onSubmit={onUpdateUser} 
           isUpdate={true}
-          errorMessage={userEditorState.get().errorMessage}
         />
         </Modal>
         <Modal
@@ -261,8 +272,8 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           height="auto"
         >
           <ScratchStorageUserAddForm
+            editorState= {userEditorState}
             onSubmit= {onAddUser} 
-            errorMessage={userEditorState.get().errorMessage}
           />
         </Modal>
       </div>
