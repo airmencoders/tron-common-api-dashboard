@@ -3,7 +3,7 @@ info:
   title: TRON Common API
   version: 0.0.1
 servers:
-- url: "http://localhost:8094/api"
+- url: "http://localhost:8080/api"
   description: Generated server url
 paths:
   /v1/scratch/users/{id}:
