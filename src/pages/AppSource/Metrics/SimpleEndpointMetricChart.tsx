@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import Spinner from "../../../components/Spinner/Spinner";
 import { useAppEndpointMetricState } from "../../../state/metrics/app-endpoint-metric-state";
-import { findChartHeight, translateData, translateOptions } from "./SimpleMetricChart";
+import { findChartHeight, translateData, translateOptions } from "./simple-metric-chart-utils";
 
 function SimpleEndpointMetricChart(props: {id: string, name: string, onClick: (config: any) => void}) {
   const metricsService = useAppEndpointMetricState();

@@ -1,6 +1,6 @@
 import { ApexOptions } from "apexcharts";
 import { CountMetricDto } from "../../../../openapi";
-import { findChartHeight, translateData, translateOptions } from "../SimpleMetricChart";
+import { findChartHeight, translateData, translateOptions } from "../simple-metric-chart-utils";
 
 describe('Test for Simple Metric Chart', () => {
     describe('translate data', () => {

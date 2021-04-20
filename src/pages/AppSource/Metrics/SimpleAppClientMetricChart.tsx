@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import Spinner from "../../../components/Spinner/Spinner";
 import { useAppClientMetricState } from "../../../state/metrics/app-client-user-metric-state";
-import { findChartHeight, translateData, translateOptions } from "./SimpleMetricChart";
+import { findChartHeight, translateData, translateOptions } from "./simple-metric-chart-utils";
 
 function SimpleAppClientMetricChart(props: {id: string, name: string, onClick: (config: any) => void}) {
   const metricsService = useAppClientMetricState();

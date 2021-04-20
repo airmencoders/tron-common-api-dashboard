@@ -27,6 +27,7 @@ jest.mock('react-apexcharts', () => {
           }}>
             dataPointSelection - {props.options.title?.text}
           </button>
+          <div>{props.options.title?.text} - data.length = {props.series[0].data.toString()}</div>
         </div>
     },
   }
