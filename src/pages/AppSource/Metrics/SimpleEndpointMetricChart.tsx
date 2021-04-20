@@ -4,7 +4,7 @@ import Spinner from "../../../components/Spinner/Spinner";
 import { useAppEndpointMetricState } from "../../../state/metrics/app-endpoint-metric-state";
 import { findChartHeight, translateData, translateOptions } from "./SimpleMetricChart";
 
-export function SimpleEndpointMetricChart(props: {id: string, name: string, onClick: (config: any) => void}) {
+function SimpleEndpointMetricChart(props: {id: string, name: string, onClick: (config: any) => void}) {
   const metricsService = useAppEndpointMetricState();
       
   useEffect(() => {
@@ -25,3 +25,5 @@ export function SimpleEndpointMetricChart(props: {id: string, name: string, onCl
       />
   );
 }
+
+export default SimpleEndpointMetricChart;

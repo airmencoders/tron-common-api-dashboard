@@ -36,7 +36,7 @@ export const findChartHeight = (options: ApexOptions): string => {
     if(!options || !options.xaxis) {
         return '50%'
     }
-    return (options.xaxis.categories.length * 5) + 25 > 100 ? '100%' : (options.xaxis.categories.length / 5) + 25 + '%'
+    return (options.xaxis.categories.length * 5) + 25 > 100 ? '100%' : (options.xaxis.categories.length * 5) + 25 + '%'
 }
 
 const barChartDefaultOptions: ApexOptions =  {

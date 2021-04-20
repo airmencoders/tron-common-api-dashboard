@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import { useAppSourceMetricState } from "../../../state/metrics/app-source-metric-state";
-import { SimpleAppClientMetricChart } from "./SimpleAppClientMetricChart";
-import { SimpleEndpointMetricChart } from "./SimpleEndpointMetricChart";
+import SimpleAppClientMetricChart from "./SimpleAppClientMetricChart";
+import SimpleEndpointMetricChart from "./SimpleEndpointMetricChart";
 import { findChartHeight, translateData, translateOptions } from "./SimpleMetricChart";
 
 export function MetricPage(props: {id: string, name: string, titleChange: (newTitle: string) => void, linkChange: (newLink?: JSX.Element) => void}) {
