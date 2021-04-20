@@ -57,7 +57,7 @@ function Grid(props: GridProps) {
   }, [windowWidth.get()])
 
   return (
-      <div className="grid-component"
+      <div className={`grid-component ${props.className}`}
            style={{ width: '100%', height: props.height ?? '60vh'}}
       >
         <div className="ag-theme-alpine" style={{ width: '100%', height: '100%'}}>

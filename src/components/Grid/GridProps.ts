@@ -32,4 +32,6 @@ export interface GridProps {
    * refreshed as opposed to the changed cells
    */
   hardRefresh?: boolean;
+
+  className?: string;
 }
