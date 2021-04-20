@@ -5,5 +5,9 @@
     @include at-media("mobile-lg") {
       max-width: 25rem;
     }
+
+    input:disabled {
+      border-color: rgba(118, 118, 118, 0.3);
+    }
   }
 }
