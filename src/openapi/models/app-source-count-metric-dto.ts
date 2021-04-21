@@ -14,6 +14,7 @@
 
 
 import { CountMetricDto } from './count-metric-dto';
+import { EndpointCountMetricDto } from './endpoint-count-metric-dto';
 
 /**
  * 
@@ -35,10 +36,10 @@ export interface AppSourceCountMetricDto {
     name?: string;
     /**
      * 
-     * @type {Array<CountMetricDto>}
+     * @type {Array<EndpointCountMetricDto>}
      * @memberof AppSourceCountMetricDto
      */
-    endpoints?: Array<CountMetricDto>;
+    endpoints?: Array<EndpointCountMetricDto>;
     /**
      * 
      * @type {Array<CountMetricDto>}

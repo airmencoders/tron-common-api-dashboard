@@ -13,37 +13,44 @@
  */
 
 
+import { CountMetricDto } from './count-metric-dto';
 
 /**
  * 
  * @export
- * @interface EndpointCountMetricDto
+ * @interface AppEndpointCountMetricDto
  */
-export interface EndpointCountMetricDto {
+export interface AppEndpointCountMetricDto {
     /**
      * 
      * @type {string}
-     * @memberof EndpointCountMetricDto
+     * @memberof AppEndpointCountMetricDto
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof EndpointCountMetricDto
+     * @memberof AppEndpointCountMetricDto
      */
-    path?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof EndpointCountMetricDto
-     */
-    sum?: number;
+    path: string;
     /**
      * 
      * @type {string}
-     * @memberof EndpointCountMetricDto
+     * @memberof AppEndpointCountMetricDto
      */
-    method?: string;
+    requestType: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppEndpointCountMetricDto
+     */
+    appSource?: string;
+    /**
+     * 
+     * @type {Array<CountMetricDto>}
+     * @memberof AppEndpointCountMetricDto
+     */
+    appClients?: Array<CountMetricDto>;
 }
 
 

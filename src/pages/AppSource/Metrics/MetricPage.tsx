@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link } from "react-router-dom";
 import { useAppSourceMetricState } from "../../../state/metrics/app-source-metric-state";
+import { isRequestMethod, RequestMethod } from "../../../state/metrics/metric-service";
+import { findChartHeight, translateData, translateOptionsForAppClient, translateOptionsForEndpoint } from "./simple-metric-chart-utils";
 import SimpleAppClientMetricChart from "./SimpleAppClientMetricChart";
 import SimpleEndpointMetricChart from "./SimpleEndpointMetricChart";
-import { findChartHeight, translateData, translateOptions } from "./simple-metric-chart-utils";
 
 export function MetricPage(props: {id: string, name: string, titleChange: (newTitle: string) => void, linkChange: (newLink?: JSX.Element) => void}) {
+  const defaultSelectedSource: SelectedSource = {appSourceId: props.id, name: '', type: 'appsource', method: undefined};
   const metricsService = useAppSourceMetricState();
-  const [selectedSource, setSelectedSource] = useState({appSourceId: props.id, name: '', type: 'appsource'});
+  const [selectedSource, setSelectedSource] = useState(defaultSelectedSource);
 
   useEffect(() => {
       metricsService.fetchAndStoreAppSourceData(props.id);
@@ -16,29 +18,31 @@ export function MetricPage(props: {id: string, name: string, titleChange: (newTi
   }, []);
   
   const handleOnClickChartEventAppClient = (config: any) => {
-    handleOnClickChartEvent(config, 'appclient');
+    handleOnClickChartEvent(config, 'appclient', config.w.config.xaxis.categories[config.dataPointIndex]);
   };
 
   const handleOnClickChartEventEndpoint = (config: any) => {
-    handleOnClickChartEvent(config, 'endpoint');
+    const splitCategory = (config.w.config.xaxis.categories[config.dataPointIndex] as string).split(':');
+    const methodIndex = splitCategory.findIndex(item => isRequestMethod(item));
+    const method = splitCategory.splice(methodIndex, 1)[0] as RequestMethod;    
+    const name = splitCategory.join();
+
+    handleOnClickChartEvent(config, 'endpoint', name, method);
   };
 
-  const handleOnClickChartEvent = (config: any, type: string) => {
+  const handleOnClickChartEvent = (config: any, type: string, name: string, method?: RequestMethod | undefined) => {
     setSelectedSource({
       appSourceId: props.id,
-      name: config.w.config.xaxis.categories[config.dataPointIndex],
-      type: type
+      name: name,
+      type: type,
+      method: method
     });    
     props.linkChange(<Link to="/app-source" onClick={resetToDefault}>Go back to <i>{props.name}</i> Overview Metrics</Link>);
-    props.titleChange('App Sources > ' + props.name + ' > ' + config.w.config.xaxis.categories[config.dataPointIndex]);
+    props.titleChange('App Sources > ' + props.name + ' > ' + name);
   }
 
   const resetToDefault = () => {
-    setSelectedSource({
-      appSourceId: props.id,
-      name: '',
-      type: 'appsource'
-    })
+    setSelectedSource(defaultSelectedSource);
     props.linkChange();
     props.titleChange('App Sources > ' + props.name);
   }
@@ -48,18 +52,18 @@ export function MetricPage(props: {id: string, name: string, titleChange: (newTi
       <div style={{"height" : "100%"}}>
         <hr></hr>
         <ReactApexChart 
-          options={translateOptions(metricsService.appSourceMetric.endpoints, 'endpoint', handleOnClickChartEventEndpoint)}
+          options={translateOptionsForEndpoint(metricsService.appSourceMetric.endpoints, handleOnClickChartEventEndpoint)}
           series={translateData(metricsService.appSourceMetric.endpoints)}
           type="bar"
-          height={findChartHeight(translateOptions(metricsService.appSourceMetric.endpoints, 'endpoint', handleOnClickChartEventEndpoint))}
+          height={findChartHeight(translateOptionsForEndpoint(metricsService.appSourceMetric.endpoints, handleOnClickChartEventEndpoint))}
           width="75%"
         />
         <hr></hr>
         <ReactApexChart 
-          options={translateOptions(metricsService.appSourceMetric.appClients, 'appclient', handleOnClickChartEventAppClient)}
+          options={translateOptionsForAppClient(metricsService.appSourceMetric.appClients, handleOnClickChartEventAppClient)}
           series={translateData(metricsService.appSourceMetric.appClients)}
           type="bar"
-          height={findChartHeight(translateOptions(metricsService.appSourceMetric.appClients, 'appclient', handleOnClickChartEventAppClient))}
+          height={findChartHeight(translateOptionsForAppClient(metricsService.appSourceMetric.appClients, handleOnClickChartEventAppClient))}
           width="75%"
         />   
       </div>
@@ -69,6 +73,7 @@ export function MetricPage(props: {id: string, name: string, titleChange: (newTi
     <SimpleEndpointMetricChart
       id={selectedSource.appSourceId}
       name={selectedSource.name}
+      method={selectedSource.method!}
       onClick={handleOnClickChartEventAppClient}
     />
     ) : 
@@ -79,3 +84,5 @@ export function MetricPage(props: {id: string, name: string, titleChange: (newTi
       />
     );
 }
+
+type SelectedSource = { appSourceId: string, name: string, type: string, method?: RequestMethod };

@@ -1,6 +1,6 @@
 import { ApexOptions } from "apexcharts";
-import { CountMetricDto } from "../../../../openapi";
-import { findChartHeight, translateData, translateOptions } from "../simple-metric-chart-utils";
+import { CountMetricDto, EndpointCountMetricDto } from "../../../../openapi";
+import { findChartHeight, translateData, translateOptionsForAppClient, translateOptionsForEndpoint } from "../simple-metric-chart-utils";
 
 describe('Test for Simple Metric Chart', () => {
     describe('translate data', () => {
@@ -71,19 +71,26 @@ describe('Test for Simple Metric Chart', () => {
 
     describe('translate options', () => {
         it('should translate and build apex chart options with categories, events, and title based on input (endpoint)', () => {
-            const dataToTranslate: CountMetricDto[] | undefined = [{
+            const dataToTranslate: EndpointCountMetricDto[] | undefined = [{
                 id: '13123',
                 path: 'path1',
-                sum: 2
+                sum: 2,
+                method: 'GET'
             }, {
                 id: '423423',
                 path: 'path2',
-                sum: 3
+                sum: 3,
+                method: 'GET'
+            }, {
+                id: '23423',
+                path: 'path2',
+                sum: 6,
+                method: 'POST'
             }];
 
-            const result = translateOptions(dataToTranslate, 'endpoint', () => null);
+            const result = translateOptionsForEndpoint(dataToTranslate, () => null);
 
-            expect(result.xaxis?.categories).toEqual(['path1', 'path2']);
+            expect(result.xaxis?.categories).toEqual(['GET:path1', 'GET:path2', 'POST:path2']);
             expect(result.chart?.events?.dataPointSelection).toBeDefined();
             expect(result.title?.text).toEqual('Requests By Endpoint in the last 30 days');
         });
@@ -99,7 +106,7 @@ describe('Test for Simple Metric Chart', () => {
                 sum: 3
             }];
 
-            const result = translateOptions(dataToTranslate, 'appclient', () => null);
+            const result = translateOptionsForAppClient(dataToTranslate, () => null);
 
             expect(result.xaxis?.categories).toEqual(['path1', 'path2']);
             expect(result.chart?.events?.dataPointSelection).toBeDefined();
@@ -107,19 +114,26 @@ describe('Test for Simple Metric Chart', () => {
         });
 
         it('should translate and build apex chart options, and filter out nulls in the data set while doing so', () => {
-            const dataToTranslate: CountMetricDto[] | undefined = [{
+            const dataToTranslate: EndpointCountMetricDto[] | undefined = [{
                 id: '13123',
                 path: 'path1',
-                sum: 2
+                sum: 2,
+                method: 'GET'
             }, {
                 id: '423423',
                 path: undefined,
-                sum: 3
+                sum: 3,
+                method: 'POST'
+            }, {
+                id: '35345345',
+                path: 'path2',
+                sum: 5,
+                method: undefined
             }];
 
-            const result = translateOptions(dataToTranslate, 'endpoint', () => null);
+            const result = translateOptionsForEndpoint(dataToTranslate, () => null);
 
-            expect(result.xaxis?.categories).toEqual(['path1']);
+            expect(result.xaxis?.categories).toEqual(['GET:path1']);
             expect(result.chart?.events?.dataPointSelection).toBeDefined();
             expect(result.title?.text).toEqual('Requests By Endpoint in the last 30 days');
         });
@@ -127,7 +141,7 @@ describe('Test for Simple Metric Chart', () => {
         it('should handle null data set when translating options', () => {
             const dataToTranslate: CountMetricDto[] | undefined = undefined;
 
-            const result = translateOptions(dataToTranslate, 'endpoint', () => null);
+            const result = translateOptionsForEndpoint(dataToTranslate, () => null);
 
             expect(result.xaxis?.categories).toEqual([]);
             expect(result.chart?.events?.dataPointSelection).toBeDefined();
@@ -137,7 +151,7 @@ describe('Test for Simple Metric Chart', () => {
         it('should handle null select function when translating options', () => {
             const dataToTranslate: CountMetricDto[] | undefined = undefined;
 
-            const result = translateOptions(dataToTranslate, 'endpoint', undefined);
+            const result = translateOptionsForEndpoint(dataToTranslate, undefined);
 
             expect(result.xaxis?.categories).toEqual([]);
             expect(result.chart?.events).toBeUndefined();

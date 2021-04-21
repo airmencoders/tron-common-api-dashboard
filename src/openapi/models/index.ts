@@ -5,6 +5,7 @@ export * from './app-client-summary-dto';
 export * from './app-client-user-dto';
 export * from './app-client-user-priv-dto';
 export * from './app-end-point-priv-dto';
+export * from './app-endpoint-count-metric-dto';
 export * from './app-endpoint-dto';
 export * from './app-source-count-metric-dto';
 export * from './app-source-details-dto';

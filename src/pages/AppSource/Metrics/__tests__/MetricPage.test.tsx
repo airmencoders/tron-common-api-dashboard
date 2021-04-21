@@ -55,7 +55,8 @@ describe('Test Metric Page', () => {
         endpoints: [{
           id: '3234234',
           path: '/place',
-          sum: 2
+          sum: 2,
+          method: 'GET'
         }],
         appClients: [{
           id: '13132',
