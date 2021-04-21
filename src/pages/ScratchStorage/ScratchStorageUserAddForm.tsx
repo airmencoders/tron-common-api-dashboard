@@ -11,6 +11,7 @@ import { Touched } from '@hookstate/touched';
 import { ScratchStorageEditorState } from './ScratchStorageEditForm';
 import { Initial } from '@hookstate/initial';
 import './ScratchStorageUserAddForm.scss';
+import { validateEmail } from '../../utils/validation-utils';
 
 interface ScratchStorageAddFormProps {
   editorState: State<ScratchStorageEditorState>;
@@ -31,7 +32,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
   formState.attach(Touched);
   formState.attach(Initial);
   
-  Validation(formState.email).validate(email => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email), 'Enter a valid email', 'error');
+  Validation(formState.email).validate(email => validateEmail(email), 'Enter a valid email', 'error');
 
   const isFormModified = (): boolean => {
     return Initial(formState.email).modified() ||

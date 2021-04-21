@@ -218,10 +218,10 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
             </Button>
             
             <ItemChooser
-              items={formState.userPrivs.get() || []}
+              items={formState.userPrivs.get()}
               columns={userColumns}
               onRowClicked={onRowClicked}
-              hardRefresh={true}
+              // hardRefresh={true}
             />
           </FormGroup>
           <SuccessErrorMessage successMessage={props.successAction?.successMsg}
