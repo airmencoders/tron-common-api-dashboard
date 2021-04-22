@@ -3,7 +3,7 @@ import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import {none, useHookstate } from '@hookstate/core';
+import {Downgraded, none, State, useHookstate } from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
 import {Touched} from '@hookstate/touched';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
@@ -28,6 +28,7 @@ export interface ScratchStorageEditorState {
   isOpen: boolean;
   data: ScratchStorageUserWithPrivsFlat;
   errorMessage: string;
+  original: ScratchStorageUserWithPrivsFlat;
 }
 
 function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>) {
@@ -52,7 +53,14 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       write: false,
       admin: false
     },
-    errorMessage: ''
+    errorMessage: '',
+    original: {
+      userId: '',
+      email: '',
+      read: false,
+      write: false,
+      admin: false
+    }
   })
 
   const userAddState = useHookstate({
@@ -79,18 +87,29 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     props.onSubmit(formState.get());
   }
 
-  function onUpdateUser(toUpdate: ScratchStorageUserWithPrivsFlat) {
-    formState.userPrivs.find(item => item.get().email === toUpdate.email)?.set(toUpdate);
+  function onUpdateUser(toUpdate: State<ScratchStorageUserWithPrivsFlat>) {
+    const downgraded = toUpdate.attach(Downgraded).get();
+    formState.userPrivs.find(item => item.get().email === downgraded.email)?.set(downgraded);
+    userEditorState.merge({
+      original: downgraded
+    });
   }  
   
-  function onAddUser(toUpdate: ScratchStorageUserWithPrivsFlat) {
+  function onAddUser(toUpdate: State<ScratchStorageUserWithPrivsFlat>) {
     try{
-        userEditorState.errorMessage.set('');
+      userEditorState.errorMessage.set('');
 
-      if(formState.userPrivs.some(item => item.get().email === toUpdate.email))
+      if(formState.userPrivs.some(item => item.get().email === toUpdate.email.get()))
         throw new Error('* Email already exists.');
 
-    formState.userPrivs[formState.userPrivs.length].set(Object.assign({}, toUpdate));
+      formState.userPrivs[formState.userPrivs.length].set(Object.assign({}, toUpdate.get()));
+      toUpdate.set({
+        userId: '',
+        email: '',
+        read: false,
+        write: false,
+        admin: false
+      });
     } catch (error) {
       userEditorState.errorMessage.set(error.message);
     }
@@ -152,7 +171,8 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
 
     userEditorState.merge({
       isOpen: true,
-      data: event.data
+      data: event.data,
+      original: event.data
     });
   }
 
@@ -166,7 +186,14 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
         write: false,
         admin: false
       },
-      errorMessage: ''
+      errorMessage: '',
+      original: {
+        userId: '',
+        email: '',
+        read: false,
+        write: false,
+        admin: false
+      },
     });
   }
 
@@ -221,7 +248,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
               items={formState.userPrivs.get()}
               columns={userColumns}
               onRowClicked={onRowClicked}
-              // hardRefresh={true}
+              hardRefresh
             />
           </FormGroup>
           <SuccessErrorMessage successMessage={props.successAction?.successMsg}

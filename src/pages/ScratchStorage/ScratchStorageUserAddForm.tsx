@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Downgraded, State, useHookstate } from "@hookstate/core";
+import { Downgraded, none, State, useHookstate } from "@hookstate/core";
 import Form from "../../components/forms/Form/Form";
 import TextInput from "../../components/forms/TextInput/TextInput";
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
@@ -15,8 +15,9 @@ import { validateEmail } from '../../utils/validation-utils';
 
 interface ScratchStorageAddFormProps {
   editorState: State<ScratchStorageEditorState>;
-  onSubmit: (toUpdate: ScratchStorageUserWithPrivsFlat) => void;
+  onSubmit: (toUpdate: State<ScratchStorageUserWithPrivsFlat>) => void;
   isUpdate?: boolean;
+  original?: ScratchStorageUserWithPrivsFlat;
 }
 
 function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
@@ -29,21 +30,23 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       });
 
   formState.attach(Validation);
-  formState.attach(Touched);
-  formState.attach(Initial);
-  
+
   Validation(formState.email).validate(email => validateEmail(email), 'Enter a valid email', 'error');
 
+  const isEmailModified = (): boolean => {
+    return props.editorState.original.email.get() !== formState.email.get();
+  }
+
   const isFormModified = (): boolean => {
-    return Initial(formState.email).modified() ||
-      Initial(formState.read).modified() ||
-      Initial(formState.write).modified() ||
-      Initial(formState.admin).modified();
+    return props.editorState.original.email.get() !== formState.email.get() ||
+        props.editorState.original.read.get() !== formState.read.get() ||
+        props.editorState.original.write.get() !== formState.write.get() ||
+        props.editorState.original.admin.get() !== formState.admin.get();
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    props.onSubmit(formState.attach(Downgraded).get());
+    props.onSubmit(formState);
   }
 
   return (
@@ -51,7 +54,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       <FormGroup
         labelName="email"
         labelText="Email"
-        isError={Touched(formState.email).touched() && Validation(formState.email).invalid()}
+        isError={isEmailModified() && Validation(formState.email).invalid()}
         errorMessages={Validation(formState.email).errors()
           .map(validationError => validationError.message)}
       >
@@ -59,8 +62,8 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
           id="email"
           name="email"
           type="email"
-          defaultValue={formState.email.get()}
-          error={Touched(formState.email).touched() && Validation(formState.email).invalid()}
+          value={formState.email.get()}
+          error={isEmailModified() && Validation(formState.email).invalid()}
           onChange={(event) => formState.email.set(event.target.value)}
         />
       </FormGroup>
