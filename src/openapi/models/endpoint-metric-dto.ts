@@ -32,7 +32,13 @@ export interface EndpointMetricDto {
      * @type {string}
      * @memberof EndpointMetricDto
      */
-    path?: string;
+    path: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EndpointMetricDto
+     */
+    requestType: string;
     /**
      * 
      * @type {Array<MeterValueDto>}

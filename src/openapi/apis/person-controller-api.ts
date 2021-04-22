@@ -194,6 +194,71 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
+         * Retrieves a person using a single identifying property.
+         * @summary Retrieves a person by email or dodid
+         * @param {'EMAIL' | 'DODID'} findByField The field to search for
+         * @param {string} value The value to search against
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        findPersonBy: async (findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'findByField' is not null or undefined
+            if (findByField === null || findByField === undefined) {
+                throw new RequiredError('findByField','Required parameter findByField was null or undefined when calling findPersonBy.');
+            }
+            // verify required parameter 'value' is not null or undefined
+            if (value === null || value === undefined) {
+                throw new RequiredError('value','Required parameter value was null or undefined when calling findPersonBy.');
+            }
+            const localVarPath = `/v1/person/find`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (memberships !== undefined) {
+                localVarQueryParameter['memberships'] = memberships;
+            }
+
+            if (leaderships !== undefined) {
+                localVarQueryParameter['leaderships'] = leaderships;
+            }
+
+            if (findByField !== undefined) {
+                localVarQueryParameter['findByField'] = findByField;
+            }
+
+            if (value !== undefined) {
+                localVarQueryParameter['value'] = value;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves a person by ID
          * @summary Retrieves a person by ID
          * @param {string} id Person ID to retrieve
@@ -469,6 +534,23 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Retrieves a person using a single identifying property.
+         * @summary Retrieves a person by email or dodid
+         * @param {'EMAIL' | 'DODID'} findByField The field to search for
+         * @param {string} value The value to search against
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).findPersonBy(findByField, value, memberships, leaderships, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves a person by ID
          * @summary Retrieves a person by ID
          * @param {string} id Person ID to retrieve
@@ -571,6 +653,19 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
             return PersonControllerApiFp(configuration).deletePerson(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieves a person using a single identifying property.
+         * @summary Retrieves a person by email or dodid
+         * @param {'EMAIL' | 'DODID'} findByField The field to search for
+         * @param {string} value The value to search against
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).findPersonBy(findByField, value, memberships, leaderships, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves a person by ID
          * @summary Retrieves a person by ID
          * @param {string} id Person ID to retrieve
@@ -655,6 +750,19 @@ export interface PersonControllerApiInterface {
      * @memberof PersonControllerApiInterface
      */
     deletePerson(id: string, options?: any): AxiosPromise<void>;
+
+    /**
+     * Retrieves a person using a single identifying property.
+     * @summary Retrieves a person by email or dodid
+     * @param {'EMAIL' | 'DODID'} findByField The field to search for
+     * @param {string} value The value to search against
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApiInterface
+     */
+    findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Retrieves a person by ID
@@ -746,6 +854,21 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      */
     public deletePerson(id: string, options?: any) {
         return PersonControllerApiFp(this.configuration).deletePerson(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves a person using a single identifying property.
+     * @summary Retrieves a person by email or dodid
+     * @param {'EMAIL' | 'DODID'} findByField The field to search for
+     * @param {string} value The value to search against
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApi
+     */
+    public findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any) {
+        return PersonControllerApiFp(this.configuration).findPersonBy(findByField, value, memberships, leaderships, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

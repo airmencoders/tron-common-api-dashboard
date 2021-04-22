@@ -1,5 +1,5 @@
 import { ApexOptions } from "apexcharts";
-import { CountMetricDto } from "../../../openapi";
+import { CountMetricDto, EndpointCountMetricDto } from "../../../openapi";
 
 export const translateData = (countMetrics: CountMetricDto[] | undefined): {name: string; data: number[]}[] => {
     let data = countMetrics?.map(item => item.sum ?? 0) ?? [];
@@ -12,8 +12,17 @@ export const translateData = (countMetrics: CountMetricDto[] | undefined): {name
     }]
 }
 
-export const translateOptions = (countMetrics: CountMetricDto[] | undefined, type: string, selectFunction?: (config: any) => void): ApexOptions => {
-    const categories = countMetrics?.map(item => item.path).filter(item => item != null) ?? [];
+export const translateOptionsForEndpoint = (countMetrics: EndpointCountMetricDto[] | undefined, selectFunction?: (config: any) => void): ApexOptions => {
+  const categories = countMetrics?.map((item: EndpointCountMetricDto) => item?.method == null || item?.path == null ? '' : item?.method + ':' + item?.path).filter(item => item !== '') ?? [];
+  return translateOptions(categories, 'Requests By Endpoint in the last 30 days', selectFunction);
+}
+
+export const translateOptionsForAppClient = (countMetrics: CountMetricDto[] | undefined, selectFunction?: (config: any) => void): ApexOptions => {
+  const categories = countMetrics?.map((item: CountMetricDto) => item?.path ?? '').filter(item => item !== '') ?? [];
+  return translateOptions(categories,  'Requests By App Client in the last 30 days', selectFunction);
+}
+
+const translateOptions = (categories: string[], titleText: string, selectFunction?: (config: any) => void): ApexOptions => {    
     const opts = JSON.parse(JSON.stringify(barChartDefaultOptions)) as ApexOptions;
     opts.xaxis = {
       categories: categories
@@ -28,7 +37,7 @@ export const translateOptions = (countMetrics: CountMetricDto[] | undefined, typ
             }
         }
     }
-    opts.title!.text = type === 'endpoint' ? 'Requests By Endpoint in the last 30 days' : 'Requests By App Client in the last 30 days';
+    opts.title!.text = titleText;
     return opts;
 }
 

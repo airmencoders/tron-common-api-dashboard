@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 import Spinner from "../../../components/Spinner/Spinner";
 import { useAppEndpointMetricState } from "../../../state/metrics/app-endpoint-metric-state";
-import { findChartHeight, translateData, translateOptions } from "./simple-metric-chart-utils";
+import { RequestMethod } from "../../../state/metrics/metric-service";
+import { findChartHeight, translateData, translateOptionsForAppClient } from "./simple-metric-chart-utils";
 
-function SimpleEndpointMetricChart(props: {id: string, name: string, onClick: (config: any) => void}) {
+function SimpleEndpointMetricChart(props: {id: string, name: string, method: RequestMethod, onClick: (config: any) => void}) {
   const metricsService = useAppEndpointMetricState();
       
   useEffect(() => {
-    metricsService?.fetchAndStoreAppSourceData(props.id, props.name);
+    metricsService?.fetchAndStoreAppSourceData(props.id, props.name, props.method);
   }, []);
 
   if (metricsService.isPromised) {
@@ -17,10 +18,10 @@ function SimpleEndpointMetricChart(props: {id: string, name: string, onClick: (c
 
   return (
       <ReactApexChart 
-        options={translateOptions(metricsService.countMetric.appClients, 'appclient', props.onClick)}
+        options={translateOptionsForAppClient(metricsService.countMetric.appClients, props.onClick)}
         series={translateData(metricsService.countMetric.appClients)}
         type="bar"
-        height={findChartHeight(translateOptions(metricsService.countMetric.appClients, 'appclient', props.onClick))}
+        height={findChartHeight(translateOptionsForAppClient(metricsService.countMetric.appClients, props.onClick))}
         width="75%"
       />
   );

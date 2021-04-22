@@ -27,6 +27,7 @@ models/app-client-summary-dto.ts
 models/app-client-user-dto.ts
 models/app-client-user-priv-dto.ts
 models/app-end-point-priv-dto.ts
+models/app-endpoint-count-metric-dto.ts
 models/app-endpoint-dto.ts
 models/app-source-count-metric-dto.ts
 models/app-source-details-dto.ts
