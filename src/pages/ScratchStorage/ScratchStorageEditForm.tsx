@@ -214,7 +214,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
 
   return (
       <div className="scratch-storage-edit-form">
-        <Form onSubmit={submitForm}>
+        <Form onSubmit={submitForm} data-testid="scratch-storage-form">
           <FormGroup labelName="appName" labelText="App Name"
                      isError={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
                      errorMessages={Validation(formState.appName).errors()
