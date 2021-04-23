@@ -1,13 +1,13 @@
 import React from 'react';
-import { Redirect } from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import { RoutePath } from '../../../routes';
 import { getEnumKeyByEnumValue } from '../../../utils/enum-utils';
 import { decodeUri } from './metric-page-utils';
 import { MetricPage } from './MetricPage';
-import { MetricPageMatchProps } from './MetricPageMatchProps';
 import { MetricType } from './metric-type';
+import { MetricPageProps } from './MetricPageProps';
 
-export function MetricPageProtectedWrapper(props: MetricPageMatchProps) {
+export function MetricPageProtectedWrapper(props: RouteComponentProps<MetricPageProps>) {
   const params = props.match.params;
 
   const metricTypeKey = getEnumKeyByEnumValue(MetricType, params.type);
