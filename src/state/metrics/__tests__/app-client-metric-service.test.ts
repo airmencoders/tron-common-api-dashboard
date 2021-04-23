@@ -6,74 +6,74 @@ import { wrapAppClientMetricState } from "../app-client-user-metric-state";
 
 describe('App Endpoint Metric State', () => {
 
-    let appClientMetricState: State<AppClientCountMetricDto> & StateMethodsDestroy;
-    let metricsApi: MetricsControllerApiInterface;
-    let wrappedState: AppClientUserMetricService;
+  let appClientMetricState: State<AppClientCountMetricDto> & StateMethodsDestroy;
+  let metricsApi: MetricsControllerApiInterface;
+  let wrappedState: AppClientUserMetricService;
 
-    const endpointMetricDto: AppClientCountMetricDto = {
-        id: '1234',
-        name: 'test-name',
-        endpoints: [{
-            id: '234323',
-            sum: 3,
-            path: '/place/{id}'
-        }]
-    };
+  const endpointMetricDto: AppClientCountMetricDto = {
+    id: '1234',
+    name: 'test-name',
+    endpoints: [{
+      id: '234323',
+      sum: 3,
+      path: '/place/{id}'
+    }]
+  };
 
-    const axiosGetAppSourceMetricDtosResponse: AxiosResponse = {
-        data: endpointMetricDto,
-        status: 200,
-        statusText: 'OK',
-        config: {},
-        headers: {}
-      };
+  const axiosGetAppSourceMetricDtosResponse: AxiosResponse = {
+    data: endpointMetricDto,
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
 
-    beforeEach(() => {
-        appClientMetricState = createState<AppClientCountMetricDto>({});
-        metricsApi = new MetricsControllerApi();
-        wrappedState = wrapAppClientMetricState(appClientMetricState, metricsApi);
+  beforeEach(() => {
+    appClientMetricState = createState<AppClientCountMetricDto>({});
+    metricsApi = new MetricsControllerApi();
+    wrappedState = wrapAppClientMetricState(appClientMetricState, metricsApi);
+  });
+
+  afterEach(() => {
+    appClientMetricState.destroy();
+  });
+
+  it('should fetch and store', async () => {
+    metricsApi.getCountOfMetricsForAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientCountMetricDto>>(resolve => resolve(axiosGetAppSourceMetricDtosResponse));
     });
 
-    afterEach(() => {
-        appClientMetricState.destroy();
-      })
+    await wrappedState.fetchAndStoreAppSourceData('1234', 'app client 1');
 
-    it('should fetch and store', async () => {
-        metricsApi.getCountOfMetricsForAppClient = jest.fn(() => {
-            return new Promise<AxiosResponse<AppClientCountMetricDto>>(resolve => resolve(axiosGetAppSourceMetricDtosResponse));
-        });
+    expect(wrappedState.countMetric).toEqual(endpointMetricDto);
+  });
 
-        await wrappedState.fetchAndStoreAppSourceData('1234', 'app client 1');
-
-        expect(wrappedState.countMetric).toEqual(endpointMetricDto);
+  it('Test countMetrica', async () => {
+    metricsApi.getCountOfMetricsForAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientCountMetricDto>>(resolve => setTimeout(() => resolve(axiosGetAppSourceMetricDtosResponse), 200));
     });
 
-    it('Test countMetrica', async () => {
-        metricsApi.getCountOfMetricsForAppClient = jest.fn(() => {
-          return new Promise<AxiosResponse<AppClientCountMetricDto>>(resolve => setTimeout(() => resolve(axiosGetAppSourceMetricDtosResponse), 1000));
-        });
-    
-        const fetch = wrappedState.fetchAndStoreAppSourceData('1234', 'app client 1');
-        expect(wrappedState.countMetric).toEqual({});
-    
-        await fetch;
-        expect(wrappedState.countMetric).toEqual(endpointMetricDto);
+    const fetch = wrappedState.fetchAndStoreAppSourceData('1234', 'app client 1');
+    expect(wrappedState.countMetric).toEqual({});
+
+    await fetch;
+    expect(wrappedState.countMetric).toEqual(endpointMetricDto);
+  });
+
+  it('Test error', async () => {
+    const failMessage = 'failed';
+    metricsApi.getCountOfMetricsForAppClient = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientCountMetricDto>>((resolve, reject) => {
+        setTimeout(() => {
+          reject(failMessage)
+        }, 200)
+      });
     });
 
-    it('Test error', async () => {
-        const failMessage = 'failed';
-        metricsApi.getCountOfMetricsForAppClient = jest.fn(() => {
-            return new Promise<AxiosResponse<AppClientCountMetricDto>>((resolve, reject) => {
-                setTimeout(() => {
-                    reject(failMessage)
-                }, 1000)
-            });
-        });
+    const fetch = wrappedState.fetchAndStoreAppSourceData('1234', 'app client 1');
+    expect(wrappedState.error).toBe(undefined);
 
-        const fetch = wrappedState.fetchAndStoreAppSourceData('1234', 'app client 1');
-        expect(wrappedState.error).toBe(undefined);
-
-        await expect(fetch).rejects.toEqual(failMessage);
-        expect(wrappedState.error).toBe(failMessage);
-    });
+    await expect(fetch).rejects.toEqual(failMessage);
+    expect(wrappedState.error).toBe(failMessage);
+  });
 });

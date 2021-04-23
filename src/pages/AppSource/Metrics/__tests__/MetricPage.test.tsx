@@ -1,12 +1,16 @@
+import React from 'react';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { ApexOptions } from 'apexcharts';
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route } from 'react-router-dom';
 import { AppSourceCountMetricDto, MetricsControllerApi, MetricsControllerApiInterface } from '../../../../openapi';
 import AppSourceMetricService from '../../../../state/metrics/app-source-metric-service';
 import { useAppSourceMetricState } from '../../../../state/metrics/app-source-metric-state';
 import { MetricPage } from '../MetricPage';
+import { MetricType } from '../metric-type';
+import { RoutePath } from '../../../../routes';
+import { generateMetricsLink } from '../metric-page-utils';
+import { RequestMethod } from '../../../../state/metrics/metric-service';
 
 jest.mock('../../../../state/metrics/app-source-metric-state');
 jest.mock('../SimpleEndpointMetricChart', () => () => <div>SimpleEndpointMetricChart</div>);
@@ -36,16 +40,12 @@ jest.mock('react-apexcharts', () => {
 describe('Test Metric Page', () => {
   let metricState: State<AppSourceCountMetricDto> & StateMethodsDestroy;
   let appSourceApi: MetricsControllerApiInterface;
-  let selectedSourceState: State<{appSourceId: string; name: string; type: string}> & StateMethodsDestroy;
-  let title: string;
-  let link: JSX.Element | undefined;
-  const titleChange = (newTitle: string) => title = newTitle;
-  const linkChange = (newElement: JSX.Element | undefined) => link = newElement;
 
-  function mockAppSourceMetricState() {
+  function mockAppSourceMetricState(promised: boolean = false, error: any = undefined) {
     (useAppSourceMetricState as jest.Mock).mockReturnValue(new AppSourceMetricService(metricState, appSourceApi));
 
-    jest.spyOn(useAppSourceMetricState(), 'isPromised', 'get').mockReturnValue(false);
+    jest.spyOn(useAppSourceMetricState(), 'isPromised', 'get').mockReturnValue(promised);
+    jest.spyOn(useAppSourceMetricState(), 'error', 'get').mockReturnValue(error);
   }
 
   beforeEach(() => {
@@ -65,18 +65,22 @@ describe('Test Metric Page', () => {
         }]
     });
     appSourceApi = new MetricsControllerApi();
-    selectedSourceState = createState({appSourceId: '1234', name: '', type: 'appsource'});
   });
 
-  it('should render the page', async () => {
+  afterEach(() => {
+    metricState.destroy();
+  })
+
+  it('should render the App Source Overview chart page', async () => {
     mockAppSourceMetricState();
     const page = render(
       <MemoryRouter>
         <MetricPage
           id="1"
           name="name"
-          titleChange={titleChange}
-          linkChange={linkChange} />
+          type={MetricType.APPSOURCE}
+          method={undefined}
+        />
       </MemoryRouter>
     );
 
@@ -86,7 +90,7 @@ describe('Test Metric Page', () => {
     expect(page.getByText('Requests By App Client in the last 30 days')).toBeInTheDocument();
   });
 
-  it('should change to rendering the endpoint specific chart', async () => {
+  it('should render endpoint specific chart', async () => {
     mockAppSourceMetricState();
 
     const page = render(
@@ -94,15 +98,11 @@ describe('Test Metric Page', () => {
         <MetricPage
           id="1"
           name="name"
-          titleChange={titleChange}
-          linkChange={linkChange} />
+          type={MetricType.ENDPOINT}
+          method="GET"
+        />
       </MemoryRouter>
     );
-
-    // Click the mock button to fire handleOnClickChartEventEndpoint
-    const dataPointSelectionButton = (await page.findByText('dataPointSelection - Requests By Endpoint in the last 30 days')).closest('button');
-    expect(dataPointSelectionButton).not.toBeNull();
-    fireEvent.click(dataPointSelectionButton!);
 
     await waitFor(() => page.getByText('SimpleEndpointMetricChart'));
 
@@ -112,7 +112,7 @@ describe('Test Metric Page', () => {
     expect(page.queryByText('SimpleAppClientMetricChart')).not.toBeInTheDocument();
   });
 
-  it('should change to rendering the app client specific chart', async () => {
+  it('should render app client specific chart', async () => {
     mockAppSourceMetricState();
 
     const page = render(
@@ -120,15 +120,11 @@ describe('Test Metric Page', () => {
         <MetricPage
           id="1"
           name="name"
-          titleChange={titleChange}
-          linkChange={linkChange} />
+          type={MetricType.APPCLIENT}
+          method={undefined}
+        />
       </MemoryRouter>
     );
-
-    // Click the mock button to fire handleOnClickChartEventAppClient
-    const dataPointSelectionButton = (await page.findByText('dataPointSelection - Requests By App Client in the last 30 days')).closest('button');
-    expect(dataPointSelectionButton).not.toBeNull();
-    fireEvent.click(dataPointSelectionButton!);
 
     await waitFor(() => page.getByText('SimpleAppClientMetricChart'));
 
@@ -136,5 +132,105 @@ describe('Test Metric Page', () => {
 
     expect(page.getByText('SimpleAppClientMetricChart')).toBeInTheDocument();
     expect(page.queryByText('SimpleEndpointMetricChart')).not.toBeInTheDocument();
+  });
+
+  it('should redirect to not found on error', () => {
+    mockAppSourceMetricState(false, { message: 'error status' });
+
+    const {
+      getByText
+    } = render(
+      <MemoryRouter>
+        <MetricPage
+          id="1"
+          name="name"
+          type={MetricType.APPCLIENT}
+          method={undefined}
+        />
+        <Route path={RoutePath.NOT_FOUND}>404</Route>
+      </MemoryRouter>
+    );
+
+    expect(getByText('404')).toBeInTheDocument();
+  });
+
+  it('should show spinner when promised', () => {
+    mockAppSourceMetricState(true);
+
+    const page = render(
+      <MemoryRouter>
+        <MetricPage
+          id="1"
+          name="name"
+          type={MetricType.APPCLIENT}
+          method={undefined}
+        />
+      </MemoryRouter>
+    );
+
+    expect(page.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('should render app client chart on click', async () => {
+    mockAppSourceMetricState();
+
+    const appClientChartPage = 'App Client Chart Page';
+    const page = render(
+      <MemoryRouter>
+        <MetricPage
+          id="1"
+          name="name"
+          type={MetricType.APPSOURCE}
+          method={undefined}
+        />
+        <Route path={generateMetricsLink("1", MetricType.APPCLIENT, metricState.get().appClients![0].path, undefined)}>{appClientChartPage}</Route>
+      </MemoryRouter>
+    );
+
+    const { getByText } = page;
+
+    await waitFor(() => getByText('Requests By App Client in the last 30 days'));
+
+    const chartTitle = getByText('Requests By App Client in the last 30 days');
+    expect(chartTitle).toBeInTheDocument();
+
+    const dataPointSelectionButton = getByText('dataPointSelection - Requests By App Client in the last 30 days').closest('button');
+    expect(dataPointSelectionButton).toBeInTheDocument();
+
+    fireEvent.click(dataPointSelectionButton!);
+
+    await expect(page.findByText(appClientChartPage)).resolves.toBeInTheDocument();
+  });
+
+  it('should render endpoint chart on click', async () => {
+    mockAppSourceMetricState();
+
+    const endpointChartPage = 'App Client Chart Page';
+    const endpoint = metricState.get().endpoints![0];
+    const page = render(
+      <MemoryRouter>
+        <MetricPage
+          id="1"
+          name="name"
+          type={MetricType.APPSOURCE}
+          method={undefined}
+        />
+        <Route path={generateMetricsLink("1", MetricType.ENDPOINT, endpoint.path, endpoint.method as RequestMethod)}>{endpointChartPage}</Route>
+      </MemoryRouter>
+    );
+
+    const { getByText } = page;
+
+    await waitFor(() => getByText('Requests By Endpoint in the last 30 days'));
+
+    const chartTitle = getByText('Requests By Endpoint in the last 30 days');
+    expect(chartTitle).toBeInTheDocument();
+
+    const dataPointSelectionButton = getByText('dataPointSelection - Requests By Endpoint in the last 30 days').closest('button');
+    expect(dataPointSelectionButton).toBeInTheDocument();
+
+    fireEvent.click(dataPointSelectionButton!);
+
+    await expect(page.findByText(endpointChartPage)).resolves.toBeInTheDocument();
   });
 })

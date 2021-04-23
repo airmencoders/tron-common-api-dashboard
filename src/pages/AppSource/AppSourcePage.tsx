@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import MetricCellRenderer from '../../components/MetricCellRenderer/MetricCellRenderer';
-import PageFormat from '../../components/PageFormat/PageFormat';
 import { AppSourceDetailsDto, AppSourceDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
 import AppSourceForm from './AppSourceForm';
-import { MetricPage } from './Metrics/MetricPage';
+import { generateMetricsLink } from './Metrics/metric-page-utils';
+import { MetricType } from './Metrics/metric-type';
   
 export function AppSourcePage() {
   const state = useAppSourceState();
@@ -15,27 +15,13 @@ export function AppSourcePage() {
   useEffect(() => {
     state.fetchAndStoreData();
   }, []);
-  const defaultLink = <Link to="/app-source" onClick={() => setRenderComponent('grid')}>Go back to <i>App Sources Table</i></Link>;
-  const [renderComponent, setRenderComponent] = useState('grid'); 
-  const [selectedAppSource, setSelectedAppSource] = useState({id: '', name: ''});
-  const [title, setTitle] = useState('App Sources > ' + selectedAppSource.name);
-  const [link, setLink] = useState(defaultLink);
+
+  const history = useHistory();
 
   const showMetric = async (event: any): Promise<void> => {
-    setRenderComponent('metric');
-    setSelectedAppSource(event);
-  }
+    const path = generateMetricsLink(event.id, MetricType.APPSOURCE, event.name);
 
-  const changeTitle = (newTitle: string): void => {
-    setTitle(newTitle);
-  }
-  
-  const changeLink = (newLink?: JSX.Element): void => {
-    if(newLink == null) {
-      setLink(defaultLink);
-    } else {
-      setLink(newLink);
-    }
+    history.push(path);
   }
 
   const columnHeaders: GridColumn[] = [
@@ -74,8 +60,7 @@ export function AppSourcePage() {
     })
   ];
   
-  return renderComponent === 'grid' ? 
-  (
+  return (
     <DataCrudFormPage<AppSourceDto, AppSourceDetailsDto>
       columns={columnHeaders}
       dataTypeName="App Source"
@@ -86,16 +71,5 @@ export function AppSourcePage() {
       autoResizeColumns
       autoResizeColummnsMinWidth={800}
     />
-  ) : 
-  (
-    <PageFormat pageTitle={title}>
-      {link}
-      <MetricPage 
-        id={selectedAppSource.id}
-        name={selectedAppSource.name}
-        titleChange={changeTitle}
-        linkChange={changeLink}
-      />
-    </PageFormat>
   );
 }
