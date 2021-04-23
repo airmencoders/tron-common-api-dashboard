@@ -1,40 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { useAppSourceMetricState } from '../../../state/metrics/app-source-metric-state';
 import SimpleAppClientMetricChart from './SimpleAppClientMetricChart';
 import SimpleEndpointMetricChart from './SimpleEndpointMetricChart';
-import { findChartHeight, translateData, translateOptionsForAppClient, translateOptionsForEndpoint } from "./simple-metric-chart-utils";
+import { findChartHeight, translateData, translateOptionsForAppClient, translateOptionsForEndpoint } from './simple-metric-chart-utils';
 import PageFormat from '../../../components/PageFormat/PageFormat';
 import Spinner from '../../../components/Spinner/Spinner';
 import { Redirect, useHistory } from 'react-router';
 import { generateMetricsLink } from './metric-page-utils';
-import { MetricType } from './MetricType';
+import { MetricType } from './metric-type';
 import { RoutePath } from '../../../routes';
-import { Link } from 'react-router-dom';
 import './MetricPage.scss';
-import { isRequestMethod, RequestMethod } from "../../../state/metrics/metric-service";
+import { isRequestMethod, RequestMethod } from '../../../state/metrics/metric-service';
+import { MetricPageProps } from './MetricPageProps';
+import { MetricPageBreadcrumb } from './MetricPageBreadcrumb';
 
-type SelectedSource = { appSourceId: string, name: string, type: string, method?: RequestMethod };
-
-export function MetricPage({ id, type, name, method }: { id: string, type: MetricType, name: string, method: RequestMethod | undefined }) {
-  const defaultSelectedSource: SelectedSource = {appSourceId: id, name: '', type, method: undefined};
+export function MetricPage({ id, type, name, method }: MetricPageProps) {
   const metricsService = useAppSourceMetricState();
-  const [selectedSource, setSelectedSource] = useState<SelectedSource>({ appSourceId: id, name, type, method: undefined });
-
   const history = useHistory();
 
   useEffect(() => {
     metricsService.fetchAndStoreAppSourceData(id);
   }, []);
-
-  useEffect(() => {
-    setSelectedSource({
-      appSourceId: id,
-      name,
-      type,
-      method
-    });
-  }, [id, type, name, method])
 
   const handleOnClickChartEventAppClient = (config: any) => {
     handleOnClickChartEvent(MetricType.APPCLIENT, config.w.config.xaxis.categories[config.dataPointIndex]);
@@ -50,13 +37,6 @@ export function MetricPage({ id, type, name, method }: { id: string, type: Metri
   };
 
   const handleOnClickChartEvent = (type: MetricType, name: string, method?: RequestMethod | undefined) => {
-    setSelectedSource({
-      appSourceId: id,
-      name,
-      type,
-      method
-    });
-
     history.push(generateMetricsLink(id, type, name, method));
   }
 
@@ -68,35 +48,12 @@ export function MetricPage({ id, type, name, method }: { id: string, type: Metri
     );
   }
 
-
-  function createBreadcrumbs() {
-    const appSources = <Link to={RoutePath.APP_SOURCE}>App Sources</Link>;
-
-    if (selectedSource.type === MetricType.APPSOURCE) {
-      return (
-        <div className='app-source-metrics__breadcrumbs'>
-          {appSources}
-          {` > ${metricsService.appSourceMetric.name} Overview`}
-        </div>
-      )
-    } else {
-      return (
-        <div className='app-source-metrics__breadcrumbs'>
-          {appSources}
-          {` > `}
-          <Link to={generateMetricsLink(id, MetricType.APPSOURCE)}>{metricsService.appSourceMetric.name} Overview</Link>
-          {` > ${selectedSource.name}`}
-        </div>
-      )
-    }
-  }
-
   return (
     <PageFormat pageTitle='App Source Metrics'>
       {metricsService.isPromised ? <Spinner centered /> :
         <div className="app-source-metrics">
-          {createBreadcrumbs()}
-          {selectedSource.type === MetricType.APPSOURCE ?
+          <MetricPageBreadcrumb id={id} name={name} type={type} method={method} appSourceName={metricsService.appSourceMetric.name ?? ''} />
+          {type === MetricType.APPSOURCE ?
             <>
               <hr></hr>
               <ReactApexChart
@@ -116,17 +73,17 @@ export function MetricPage({ id, type, name, method }: { id: string, type: Metri
               />
             </>
             :
-            selectedSource.type === MetricType.ENDPOINT ?
+            type === MetricType.ENDPOINT ?
               <SimpleEndpointMetricChart
-                id={selectedSource.appSourceId}
-                name={selectedSource.name}
-                method={selectedSource.method!}
+                id={id}
+                name={name}
+                method={method!}
                 onClick={handleOnClickChartEventAppClient}
               />
               :
               <SimpleAppClientMetricChart
-                id={selectedSource.appSourceId}
-                name={selectedSource.name}
+                id={id}
+                name={name}
                 onClick={handleOnClickChartEventEndpoint}
               />
           }

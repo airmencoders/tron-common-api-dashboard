@@ -7,7 +7,7 @@ import { AppSourceDetailsDto, AppSourceDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
 import AppSourceForm from './AppSourceForm';
 import { generateMetricsLink } from './Metrics/metric-page-utils';
-import { MetricType } from './Metrics/MetricType';
+import { MetricType } from './Metrics/metric-type';
   
 export function AppSourcePage() {
   const state = useAppSourceState();

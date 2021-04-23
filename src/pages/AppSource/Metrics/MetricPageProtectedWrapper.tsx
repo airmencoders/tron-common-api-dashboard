@@ -5,7 +5,7 @@ import { getEnumKeyByEnumValue } from '../../../utils/enum-utils';
 import { decodeUri } from './metric-page-utils';
 import { MetricPage } from './MetricPage';
 import { MetricPageMatchProps } from './MetricPageMatchProps';
-import { MetricType } from './MetricType';
+import { MetricType } from './metric-type';
 
 export function MetricPageProtectedWrapper(props: MetricPageMatchProps) {
   const params = props.match.params;
@@ -28,6 +28,7 @@ export function MetricPageProtectedWrapper(props: MetricPageMatchProps) {
       id={params.id}
       name={revertName}
       type={metricType}
+      method={params.method}
     />
   );
 }

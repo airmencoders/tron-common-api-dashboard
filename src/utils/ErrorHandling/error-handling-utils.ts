@@ -1,23 +1,19 @@
-export function prepareRequestError(err: any) {
+import { RequestError } from "./request-error";
+
+export function prepareRequestError(err: any): RequestError {
   if (err.response) { // Server responded with some error (4xx, 5xx)
-    const validation = err.response.data.errors?.reduce((prev: any, current: any) => {
-      const updated = { ...prev };
-      updated[current.field] = current.defaultMessage;
-
-      return updated;
-    }, {});
-
     return {
-      validation,
-      general: err.response.data.message
+      status: err.response.data.status,
+      error: err.response.data.error,
+      message: err.response.data.message
     };
   } else if (err.request) { // Request never left
     return {
-      general: 'Error contacting server. Try again later.'
+      message: 'Error contacting server. Try again later.'
     }
   } else { // Something else happened...
     return {
-      general: err.message ?? 'Unknown error occurred.'
+      message: err.message ?? 'Unknown error occurred.'
     }
   }
 }

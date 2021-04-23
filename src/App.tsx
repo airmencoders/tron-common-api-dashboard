@@ -18,9 +18,6 @@ function App() {
     authorizedUserState.fetchAndStoreAuthorizedUser();
   }, []);
 
-  if (!authorizedUserState.isPromised) {
-    console.log(authorizedUserState.authorizedUserHasAnyPrivilege([PrivilegeType.DASHBOARD_ADMIN]))
-  }
   return (
     <div className="App">
       <AppWithLoading isLoading={authorizedUserState.isPromised} />
@@ -43,7 +40,7 @@ function AppContent() {
 
       <ProtectedRoute
         exact
-        path='/app-source/:id/metrics/:type/:name'
+        path={RoutePath.APP_SOURCE_METRIC}
         component={MetricPageProtectedWrapper}
         requiredPrivilege={[PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_SOURCE_ADMIN]}
       />
