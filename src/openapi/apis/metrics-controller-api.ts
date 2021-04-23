@@ -21,13 +21,15 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { AppClientCountMetricDto } from '../models';
 // @ts-ignore
+import { AppEndpointCountMetricDto } from '../models';
+// @ts-ignore
 import { AppSourceCountMetricDto } from '../models';
 // @ts-ignore
 import { AppSourceMetricDto } from '../models';
 // @ts-ignore
-import { EndpointCountMetricDto } from '../models';
-// @ts-ignore
 import { EndpointMetricDto } from '../models';
+// @ts-ignore
+import { ExceptionResponse } from '../models';
 /**
  * MetricsControllerApi - axios parameter creator
  * @export
@@ -308,12 +310,13 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
          * @summary Retrieves sum of stored metric values for given endpoint path on given app source
          * @param {string} id App Source Id to search with
          * @param {string} path Endpoint Path to search with
+         * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
          * @param {string} startDate Earliest date to include
          * @param {string} endDate Latest date to include
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCountOfMetricsForEndpoint: async (id: string, path: string, startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
+        getCountOfMetricsForEndpoint: async (id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getCountOfMetricsForEndpoint.');
@@ -321,6 +324,10 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             // verify required parameter 'path' is not null or undefined
             if (path === null || path === undefined) {
                 throw new RequiredError('path','Required parameter path was null or undefined when calling getCountOfMetricsForEndpoint.');
+            }
+            // verify required parameter 'method' is not null or undefined
+            if (method === null || method === undefined) {
+                throw new RequiredError('method','Required parameter method was null or undefined when calling getCountOfMetricsForEndpoint.');
             }
             // verify required parameter 'startDate' is not null or undefined
             if (startDate === null || startDate === undefined) {
@@ -345,6 +352,10 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
 
             if (path !== undefined) {
                 localVarQueryParameter['path'] = path;
+            }
+
+            if (method !== undefined) {
+                localVarQueryParameter['method'] = method;
             }
 
             if (startDate !== undefined) {
@@ -456,13 +467,14 @@ export const MetricsControllerApiFp = function(configuration?: Configuration) {
          * @summary Retrieves sum of stored metric values for given endpoint path on given app source
          * @param {string} id App Source Id to search with
          * @param {string} path Endpoint Path to search with
+         * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
          * @param {string} startDate Earliest date to include
          * @param {string} endDate Latest date to include
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCountOfMetricsForEndpoint(id: string, path: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EndpointCountMetricDto>> {
-            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForEndpoint(id, path, startDate, endDate, options);
+        async getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppEndpointCountMetricDto>> {
+            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForEndpoint(id, path, method, startDate, endDate, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -531,13 +543,14 @@ export const MetricsControllerApiFactory = function (configuration?: Configurati
          * @summary Retrieves sum of stored metric values for given endpoint path on given app source
          * @param {string} id App Source Id to search with
          * @param {string} path Endpoint Path to search with
+         * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
          * @param {string} startDate Earliest date to include
          * @param {string} endDate Latest date to include
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCountOfMetricsForEndpoint(id: string, path: string, startDate: string, endDate: string, options?: any): AxiosPromise<EndpointCountMetricDto> {
-            return MetricsControllerApiFp(configuration).getCountOfMetricsForEndpoint(id, path, startDate, endDate, options).then((request) => request(axios, basePath));
+        getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): AxiosPromise<AppEndpointCountMetricDto> {
+            return MetricsControllerApiFp(configuration).getCountOfMetricsForEndpoint(id, path, method, startDate, endDate, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -602,13 +615,14 @@ export interface MetricsControllerApiInterface {
      * @summary Retrieves sum of stored metric values for given endpoint path on given app source
      * @param {string} id App Source Id to search with
      * @param {string} path Endpoint Path to search with
+     * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
      * @param {string} startDate Earliest date to include
      * @param {string} endDate Latest date to include
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsControllerApiInterface
      */
-    getCountOfMetricsForEndpoint(id: string, path: string, startDate: string, endDate: string, options?: any): AxiosPromise<EndpointCountMetricDto>;
+    getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): AxiosPromise<AppEndpointCountMetricDto>;
 
 }
 
@@ -681,13 +695,14 @@ export class MetricsControllerApi extends BaseAPI implements MetricsControllerAp
      * @summary Retrieves sum of stored metric values for given endpoint path on given app source
      * @param {string} id App Source Id to search with
      * @param {string} path Endpoint Path to search with
+     * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
      * @param {string} startDate Earliest date to include
      * @param {string} endDate Latest date to include
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsControllerApi
      */
-    public getCountOfMetricsForEndpoint(id: string, path: string, startDate: string, endDate: string, options?: any) {
-        return MetricsControllerApiFp(this.configuration).getCountOfMetricsForEndpoint(id, path, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    public getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any) {
+        return MetricsControllerApiFp(this.configuration).getCountOfMetricsForEndpoint(id, path, method, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
     }
 }
