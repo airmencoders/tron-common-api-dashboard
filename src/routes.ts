@@ -27,7 +27,9 @@ export enum RoutePath {
     DASHBOARD_USER = '/dashboard-user',
     SCRATCH_STORAGE = '/scratch-storage',
     APP_SOURCE = '/app-source',
-    MY_DIGITIZE_APPS = '/digitize-apps'
+    MY_DIGITIZE_APPS = '/digitize-apps',
+    NOT_FOUND = '/not-found',
+    NOT_AUTHORIZED = '/not-authorized'
 }
 
 export const routes: RouteItem[] = [

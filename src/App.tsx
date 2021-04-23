@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Switch } from 'react-router-dom';
-import { routes } from './routes';
+import { Route, Switch } from 'react-router-dom';
+import { RoutePath, routes } from './routes';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { useAuthorizedUserState } from './state/authorized-user/authorized-user-state';
 import withLoading from './hocs/UseLoading/WithLoading';
+import { PrivilegeType } from './state/privilege/privilege-type';
+import { MetricPageProtectedWrapper } from './pages/AppSource/Metrics/MetricPageProtectedWrapper';
+import { NotFoundPage } from './pages/NotFound/NotFoundPage';
+import { NotAuthorizedPage } from './pages/NotAuthorized/NotAuthorizedPage';
 
 function App() {
   const authorizedUserState = useAuthorizedUserState();
@@ -14,6 +18,9 @@ function App() {
     authorizedUserState.fetchAndStoreAuthorizedUser();
   }, []);
 
+  if (!authorizedUserState.isPromised) {
+    console.log(authorizedUserState.authorizedUserHasAnyPrivilege([PrivilegeType.DASHBOARD_ADMIN]))
+  }
   return (
     <div className="App">
       <AppWithLoading isLoading={authorizedUserState.isPromised} />
@@ -27,12 +34,22 @@ function AppContent() {
       {routes.map((route) => {
         return <ProtectedRoute
           key={route.name}
-          exact={route.path === '/' ? true : false}
+          exact
           path={route.path}
           component={route.component}
           requiredPrivilege={route.requiredPrivileges}
         />
       })}
+
+      <ProtectedRoute
+        exact
+        path='/app-source/:id/metrics/:type/:name'
+        component={MetricPageProtectedWrapper}
+        requiredPrivilege={[PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_SOURCE_ADMIN]}
+      />
+
+      <Route exact component={NotAuthorizedPage} path={RoutePath.NOT_AUTHORIZED} />
+      <Route component={NotFoundPage} />
     </Switch>
   );
 }

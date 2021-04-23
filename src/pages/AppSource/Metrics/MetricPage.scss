@@ -1,0 +1,10 @@
+@import '../../../styles/base';
+
+.app-source-metrics {
+  height: 100%;
+
+  &__breadcrumbs {
+    margin-top: units(0.5);
+    margin-bottom: units(1)
+  }
+}
