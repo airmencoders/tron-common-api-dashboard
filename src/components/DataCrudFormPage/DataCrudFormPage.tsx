@@ -1,5 +1,5 @@
 import { RowClickedEvent } from 'ag-grid-community';
-import React, { useEffect } from 'react';
+import React, { ReactText, useEffect } from 'react';
 import Grid from '../../components/Grid/Grid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
@@ -18,6 +18,8 @@ import GridColumn from '../Grid/GridColumn';
 import Spinner from '../Spinner/Spinner';
 import DataCrudDelete from './DataCrudDelete';
 import { DataCrudFormErrors } from './data-crud-form-errors';
+import { ToastType } from '../Toast/ToastUtils/toast-type';
+import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -25,7 +27,7 @@ import { DataCrudFormErrors } from './data-crud-form-errors';
  * T Row data type
  * R Editable Data type
  */
-export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormPageProps<T, R>) {
+export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPageProps<T, R>): JSX.Element {
   const dataState: DataService<T, R> = props.useDataState();
 
   const pageState: State<CrudPageState<R>> = useState<CrudPageState<R>>(getInitialCrudPageState());
@@ -78,6 +80,18 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     pageState.set(getInitialCrudPageState());
   }
 
+  /**
+   * Resets state to default.
+   * Creates toast with success message.
+   * 
+   * @param message the message to show
+   * @returns the id of the toast
+   */
+  function onActionSuccess(message: string): ReactText {
+    onCloseHandler();
+    return createTextToast(ToastType.SUCCESS, message);
+  }
+
   function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
     let formErrors: DataCrudFormErrors = {
       general: error.message ?? 'Unknown error occurred'
@@ -126,15 +140,7 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     try {
       await dataState.sendDelete(deleteItem);
 
-      pageState.merge({
-        isDeleteConfirmationOpen: false,
-        successAction: {
-          success: true,
-          successMsg: `Successfully deleted ${props.dataTypeName}.`
-        },
-        isSubmitting: false
-      });
-
+      onActionSuccess(`Successfully deleted ${props.dataTypeName}.`);
     }
     catch (error) {
       pageState.merge({
@@ -145,23 +151,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   }
 
   async function updateSubmit(updatedDto: R) {
-    pageState.set(prevState => ({
-      ...prevState,
+    pageState.merge({
       isSubmitting: true
-    }));
+    });
     try {
       await dataState.sendUpdate(updatedDto);
 
-      pageState.set( prevState => {
-        return {
-          ...prevState,
-          successAction: {
-            success: true,
-            successMsg: `Successfully updated ${props.dataTypeName}.`,
-          },
-          isSubmitting: false
-        }
-      });
+      onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
     }
     catch (error) {
       pageState.set(prevState => {
@@ -179,23 +175,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
     // make sure service implements this optional method...
     if (!dataState.sendPatch) return;
 
-    pageState.set(prevState => ({
-      ...prevState,
+    pageState.merge({
       isSubmitting: false
-    }));
+    });
     try {
       await dataState.sendPatch(...args);
 
-      pageState.set( prevState => {
-        return {
-          ...prevState,
-          successAction: {
-            success: true,
-            successMsg: `Successfully updated ${props.dataTypeName}.`,
-          },
-          isSubmitting: false
-        }
-      });
+      onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
     }
     catch (error) {
       pageState.set(prevState => {
@@ -209,23 +195,13 @@ export function DataCrudFormPage<T extends GridRowData, R> (props: DataCrudFormP
   }
 
   async function createSubmit(newDto: R) {
-    pageState.set(prevState => ({
-      ...prevState,
+    pageState.merge({
       isSubmitting: true
-    }));
+    });
     try {
       await dataState.sendCreate(newDto);
 
-      pageState.set( prevState => {
-        return {
-          ...prevState,
-          successAction: {
-            success: true,
-            successMsg: `Successfully created ${props.dataTypeName}.`,
-          },
-          isSubmitting: false
-        }
-      });
+      onActionSuccess(`Successfully created ${props.dataTypeName}.`);
     }
     catch (error) {
       pageState.set(prevState => {

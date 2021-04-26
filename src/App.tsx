@@ -10,6 +10,7 @@ import { PrivilegeType } from './state/privilege/privilege-type';
 import { MetricPageProtectedWrapper } from './pages/AppSource/Metrics/MetricPageProtectedWrapper';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage';
 import { NotAuthorizedPage } from './pages/NotAuthorized/NotAuthorizedPage';
+import { ToastContainer } from './components/Toast/ToastContainer/ToastContainer';
 
 function App() {
   const authorizedUserState = useAuthorizedUserState();
@@ -21,6 +22,14 @@ function App() {
   return (
     <div className="App">
       <AppWithLoading isLoading={authorizedUserState.isPromised} />
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+      />
     </div>
   );
 }
