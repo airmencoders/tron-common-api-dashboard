@@ -94,7 +94,6 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       sortable: true,
       filter: true,
       headerName: 'Admin',
-      showTooltip: true,
       resizable: true
     })
   ];
@@ -123,7 +122,6 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       sortable: true,
       filter: true,
       headerName: 'Path',
-      showTooltip: true,
       resizable: true
     }),
     new GridColumn({
@@ -131,7 +129,6 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       sortable: true,
       filter: true,
       headerName: 'Request Type',
-      showTooltip: true,
       resizable: true
     })
   ];

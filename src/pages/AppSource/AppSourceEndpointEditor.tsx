@@ -44,7 +44,6 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
       sortable: true,
       filter: true,
       headerName: 'App Client Name',
-      showTooltip: true,
       resizable: true
     }),
     new GridColumn({
@@ -61,7 +60,6 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
       sortable: true,
       filter: true,
       headerName: 'App Client Name',
-      showTooltip: true,
       resizable: true
     })
   ];
