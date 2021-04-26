@@ -11,7 +11,7 @@ export default class GridColumn {
       cellRenderer,
       cellRendererParams,
       resizable = false,
-      showTooltip = false
+      showTooltip = true
     } = params;
 
     this._field = field;
