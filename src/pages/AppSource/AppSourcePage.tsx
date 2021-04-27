@@ -10,12 +10,6 @@ import { generateMetricsLink } from './Metrics/metric-page-utils';
 import { MetricType } from './Metrics/metric-type';
   
 export function AppSourcePage() {
-  const state = useAppSourceState();
-  
-  useEffect(() => {
-    state.fetchAndStoreData();
-  }, []);
-
   const history = useHistory();
 
   const showMetric = async (event: any): Promise<void> => {
