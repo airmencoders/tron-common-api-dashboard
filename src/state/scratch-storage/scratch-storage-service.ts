@@ -49,7 +49,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
     const scratchStorage = this.scratchStorageApi.getScratchAppById(rowData.id);
 
     const result = scratchStorage.then(response => {
-      const convertedToFlat: ScratchStorageFlat = this.convertToFlat(response.data);
+      const convertedToFlat: ScratchStorageFlat = this.convertToFlat(response.data ?? {});
       return convertedToFlat;
     });
 
