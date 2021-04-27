@@ -16,6 +16,8 @@ import Grid from '../../components/Grid/Grid';
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import Modal from '../../components/Modal/Modal';
+import ModalTitle from '../../components/Modal/ModalTitle';
+import '../../components/Modal/ModalFooterSubmit.scss';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../openapi/models';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { OrgEditOpType } from '../../state/organization/organization-service';
@@ -612,19 +614,19 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         }
         <Modal
           show={showChooserDialog}
-          headerComponent={(<h2>Choose Entry</h2>)}
+          headerComponent={<ModalTitle title="Choose Entry" />}
           footerComponent={(
-            <div style={{display: 'flex', justifyContent: 'space-between'}}>
-              <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" secondary onClick={chooserDialogClose}>
+            <div className={'modal-footer-submit'}>
+              <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" onClick={chooserDialogClose}>
                 Cancel
               </Button>
-              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" secondary onClick={chooserDialogConfirmed}>
+              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" onClick={chooserDialogConfirmed}>
                 Commit
               </Button>
             </div>
           )}
           onHide={() => setChooserDialog(false)}
-          height="500px"
+          height="auto"
           width="30%"
         >
           <ItemChooser
@@ -635,9 +637,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         </Modal>
         <Modal
           show={showConfirmDialog}
-          headerComponent={(<h2>Confirm Remove</h2>)}
+          headerComponent={<ModalTitle title="Confirm Remove" />}
           footerComponent={(
-            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <div className={'modal-footer-submit'}>
               <Button type="button" data-testid='remove-cancel__btn' className="add-app-client__btn" secondary onClick={confirmDialogClose}>
                 No
               </Button>
@@ -647,8 +649,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
             </div>
           )}
           onHide={() => setShowConfirmDialog(false)}
-          height="500px"
+          height="auto"
           width="30%"
+          className={'org-member-editor-modal'}
         >
           This action takes immediate effect. Are you sure you want to remove selected entity?
         </Modal>
