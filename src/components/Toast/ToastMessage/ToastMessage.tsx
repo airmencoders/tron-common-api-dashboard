@@ -1,4 +1,5 @@
 import { ToastMessageProps } from './ToastMessageProps';
+import './ToastMessage.scss';
 
 export function ToastMessage(props: ToastMessageProps): JSX.Element {
   return (
