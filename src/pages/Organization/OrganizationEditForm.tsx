@@ -617,10 +617,10 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           headerComponent={<ModalTitle title="Choose Entry" />}
           footerComponent={(
             <div className={'modal-footer-submit'}>
-              <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" secondary onClick={chooserDialogClose}>
+              <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" onClick={chooserDialogClose}>
                 Cancel
               </Button>
-              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" secondary onClick={chooserDialogConfirmed}>
+              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" onClick={chooserDialogConfirmed}>
                 Commit
               </Button>
             </div>
