@@ -26,7 +26,13 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
 
   useEffect(() => {
     const filterResults = appSourceService.fetchAppClients()
-      .then(r => r.filter(avail => !props.appClientPrivileges.find(current => current.appClientUser.get() === avail.id)));
+      .then(clients => {
+        // Find all privileges belonging to this endpoint
+        const endpointClientPrivileges = props.appClientPrivileges.get().filter(clientPriv => clientPriv.appEndpoint === props.endpoint.get().id);
+
+        // Filter out all of the clients that already have an existing privilege for this endpoint
+        return clients.filter(client => !endpointClientPrivileges.find(clientPriv => clientPriv.appClientUser === client.id));
+      });
 
     availableAppClients.set(filterResults);
   }, []);
@@ -38,7 +44,6 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
       sortable: true,
       filter: true,
       headerName: 'App Client Name',
-      showTooltip: true,
       resizable: true
     }),
     new GridColumn({
@@ -55,7 +60,6 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
       sortable: true,
       filter: true,
       headerName: 'App Client Name',
-      showTooltip: true,
       resizable: true
     })
   ];

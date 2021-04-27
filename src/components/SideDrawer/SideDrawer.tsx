@@ -16,11 +16,11 @@ function SideDrawer(props: SideDrawerProps) {
 
   return (
     <>
-      {props.isOpen ? <BackdropOverlay /> : null}
+      <BackdropOverlay show={props.isOpen} />
       <div className={props.isOpen ? "side-drawer default-panel-padding open" : "side-drawer"} data-testid="side-drawer">
         <div className="side-drawer__header">
           <h4 className="header__title">{props.title}</h4>
-          <button className="header__close-icon close-btn" onClick={props.onCloseHandler} title="close-sidedrawer">
+          <button disabled={props.isLoading} className="header__close-icon close-btn" onClick={props.onCloseHandler} title="close-sidedrawer">
             <CloseIcon size={1.75} />
           </button>
         </div>
