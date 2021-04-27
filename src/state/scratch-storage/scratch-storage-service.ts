@@ -185,6 +185,6 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   }
 
   get error(): string | undefined {
-    return this.state.error;
+    return this.state.promised ? undefined : this.state.error;
   }
 }

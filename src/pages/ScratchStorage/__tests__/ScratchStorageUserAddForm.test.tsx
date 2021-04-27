@@ -6,7 +6,7 @@ import { ScratchStorageEditorState } from '../ScratchStorageEditForm';
 
 jest.mock('../../../state/app-source/app-source-state');
 
-describe('Test App Source Endpoint Editor', () => {
+describe('Test Scratch Storage User Add Form', () => {
   let onSubmit = jest.fn();
   let addEditorState: State<ScratchStorageEditorState> & StateMethodsDestroy;
   let updateEditorState: State<ScratchStorageEditorState> & StateMethodsDestroy;
