@@ -7,6 +7,7 @@ import { createState, none, State, StateMethodsDestroy, useState } from '@hookst
 import GridColumn from '../../Grid/GridColumn';
 import {MemoryRouter} from 'react-router-dom';
 import { DataCrudDeleteComponentProps } from '../../DataCrudFormPage/DataCrudDeleteComponentProps';
+import { ToastContainer } from '../../Toast/ToastContainer/ToastContainer';
 
 interface TestRow {
   id: string;
@@ -189,6 +190,10 @@ const DeleteComponent = (props: DataCrudDeleteComponentProps<TestRow>) => {
   );
 }
 
+const updateToastMsg = /Successfully updated/i;
+const createToastMsg = /Successfully created/i;
+const deleteToastMsg = /Successfully deleted/i;
+
 describe('Test DataCrudFormPage', () => {
   let testState: State<TestRow[]> & StateMethodsDestroy;
   let useTestState: () => State<TestRow[]>;
@@ -328,6 +333,7 @@ describe('Test DataCrudFormPage', () => {
   it('should show success message for successful update', async () => {
     render(
         <MemoryRouter>
+        <ToastContainer />
           <DataCrudFormPage<TestRow, TestDto>
               useDataState={wrappedState}
               columns={[
@@ -353,33 +359,36 @@ describe('Test DataCrudFormPage', () => {
     await screen.findByText('Submit');
     fireEvent.click(screen.getByText('Submit'));
   
+
+
     await waitFor(
-        () => expect(screen.getByText('Successfully')).toBeTruthy(),
+      () => expect(screen.getByText(updateToastMsg)).toBeTruthy(),
     )
   });
   
   it('should show success message for successful create', async () => {
     render(
         <MemoryRouter>
+        <ToastContainer />
           <DataCrudFormPage<TestRow, TestDto>
-              useDataState={wrappedState}
-              columns={[
-                new GridColumn({
-                  field: 'id',
-                  headerName: 'id'
-                }),
-                new GridColumn({
-                  field: 'val',
-                  headerName: 'val'
-                }),
-              ]}
-              createForm={CreateUpdateTestForm}
-              updateForm={CreateUpdateTestForm}
-              pageTitle="Test Page Title"
-              dataTypeName="Test"
-          allowEdit={true}
-          allowAdd
-        />
+            useDataState={wrappedState}
+            columns={[
+              new GridColumn({
+                field: 'id',
+                headerName: 'id'
+              }),
+              new GridColumn({
+                field: 'val',
+                headerName: 'val'
+              }),
+            ]}
+            createForm={CreateUpdateTestForm}
+            updateForm={CreateUpdateTestForm}
+            pageTitle="Test Page Title"
+            dataTypeName="Test"
+            allowEdit={true}
+            allowAdd
+          />
         </MemoryRouter>
     );
   
@@ -389,13 +398,14 @@ describe('Test DataCrudFormPage', () => {
     fireEvent.click(screen.getByText('Submit'));
   
     await waitFor(
-        () => expect(screen.getByText('Successfully')).toBeTruthy(),
+      () => expect(screen.getByText(createToastMsg)).toBeTruthy(),
     )
   });
 
   it('should show success message for successful patch', async () => {
     render(
       <MemoryRouter>
+        <ToastContainer />
         <DataCrudFormPage<TestRow, TestDto>
           useDataState={wrappedState}
           columns={[
@@ -423,12 +433,13 @@ describe('Test DataCrudFormPage', () => {
     const patchBtn = await screen.findByText('Patch');
     fireEvent.click(patchBtn);
 
-    await expect(screen.findByText('Successfully')).resolves.toBeInTheDocument();
+    await expect(screen.findByText(updateToastMsg)).resolves.toBeInTheDocument();
   });
 
   it('test delete', async () => {
     render(
       <MemoryRouter>
+        <ToastContainer />
         <DataCrudFormPage<TestRow, TestDto>
           useDataState={wrappedState}
           columns={[
@@ -465,6 +476,8 @@ describe('Test DataCrudFormPage', () => {
 
     if (deleteBtn) fireEvent.click(deleteBtn);
     await waitForElementToBeRemoved(deleteModal);
+
+    await expect(screen.findByText(deleteToastMsg)).resolves.toBeInTheDocument();
   });
 
   it('should close sidedrawer when close button clicked', async () => {
