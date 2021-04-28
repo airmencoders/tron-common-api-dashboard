@@ -7,6 +7,7 @@ import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { AppSourceDetailsDto } from '../../../openapi';
 
 describe('Test App Source Form', () => {
+  jest.setTimeout(10000);
   let onSubmit = jest.fn();
   let onClose = jest.fn();
   let successAction: DataCrudSuccessAction | undefined;
@@ -49,6 +50,7 @@ describe('Test App Source Form', () => {
       ]
     };
   });
+
 
   it('Update', async () => {
     successAction = undefined;
