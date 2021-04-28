@@ -1,27 +1,28 @@
-import React, { FormEvent } from 'react';
 import { none, State, useHookstate } from "@hookstate/core";
-import { Validation } from "@hookstate/validation";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
-import Form from "../../components/forms/Form/Form";
-import TextInput from "../../components/forms/TextInput/TextInput";
-import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import { FormActionType } from '../../state/crud-page/form-action-type';
-import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
-import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
-import './AppSourceForm.scss';
-import { AppEndpointDto, AppSourceDetailsDto } from '../../openapi';
-import ItemChooser from '../../components/ItemChooser/ItemChooser';
-import GridColumn from '../../components/Grid/GridColumn';
-import Button from '../../components/Button/Button';
-import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
-import { validateEmail } from '../../utils/validation-utils';
+import { Validation } from "@hookstate/validation";
 import { RowClickedEvent } from 'ag-grid-community';
+import React, { FormEvent } from 'react';
+import Button from '../../components/Button/Button';
+import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
+import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
+import Form from "../../components/forms/Form/Form";
+import FormGroup from '../../components/forms/FormGroup/FormGroup';
+import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
+import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import TextInput from "../../components/forms/TextInput/TextInput";
+import GridColumn from '../../components/Grid/GridColumn';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import Modal from '../../components/Modal/Modal';
-import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
+import ModalTitle from '../../components/Modal/ModalTitle';
+import UnusedEndpointCellRenderer from '../../components/UnusedEndpointCellRenderer/UnusedEndpointCellRenderer';
+import { AppEndpointDto, AppSourceDetailsDto } from '../../openapi';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { validateEmail } from '../../utils/validation-utils';
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
+import './AppSourceForm.scss';
 
 interface AdminEmail {
   email: string;
@@ -30,6 +31,11 @@ interface AdminEmail {
 interface EndpointModalState {
   isOpen: boolean;
   selected?: State<AppEndpointDto>;
+}
+
+interface DeleteEndpointModalState {
+  isOpen: boolean;
+  selected?: AppEndpointDto;
 }
 
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
@@ -46,6 +52,11 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   });
 
   const endpointModifyState = useHookstate<EndpointModalState>({
+    isOpen: false,
+    selected: undefined
+  });
+
+  const deleteEndpointModifyState = useHookstate<DeleteEndpointModalState>({
     isOpen: false,
     selected: undefined
   });
@@ -122,7 +133,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       sortable: true,
       filter: true,
       headerName: 'Path',
-      resizable: true
+      resizable: true,
+      cellRenderer: UnusedEndpointCellRenderer,
+      cellRendererParams: { onClick: onDeleteEndpointClicked }
     }),
     new GridColumn({
       field: 'requestType',
@@ -132,6 +145,23 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       resizable: true
     })
   ];
+  
+  function onDeleteEndpointClicked(endpoint: AppEndpointDto): void {
+    /**
+     * Prevent anymore interactions with the grid
+     * after a successful submit.
+     * 
+     * Removes on click interactions.
+     */
+    if (isFormDisabled()) {
+      return;
+    }
+
+    deleteEndpointModifyState.merge({
+      isOpen: true,
+      selected: endpoint
+    })
+  }
 
   function onEndpointRowClicked(event: RowClickedEvent) {
     /**
@@ -140,7 +170,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
      * 
      * Removes on click interactions.
      */
-    if (isFormDisabled()) {
+    if (isFormDisabled() || deleteEndpointModifyState.isOpen.get()) {
       return;
     }
 
@@ -161,8 +191,26 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     });
   }
 
+  function deleteEndpointModalClose(): void {
+    deleteEndpointModifyState.merge({
+      isOpen: false,
+      selected: undefined
+    });
+  }
+
   const endpointModalOpen = endpointModifyState.isOpen.get();
+  const deleteEndpointModalOpen = deleteEndpointModifyState.isOpen.get();
   const endpointSelectedData = endpointModifyState.selected.get();
+  const deleteEndpointSelectedData = deleteEndpointModifyState.selected.get();
+  
+  function deleteEndpoint(): void {  
+    const toDeleteId = deleteEndpointSelectedData!.id;
+    formState.merge({
+      appClients: formState.appClients.get()?.filter(client => client.appEndpoint !== toDeleteId),
+      endpoints: formState.endpoints.get()?.filter(endpoint => endpoint.id !== toDeleteId)
+    })    
+    deleteEndpointModalClose();
+  }
 
   return (
     <>
@@ -292,6 +340,22 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           />
         }
 
+      </Modal>
+
+      <Modal
+        headerComponent={<ModalTitle title="Delete Confirmation" />}
+        footerComponent={<ModalFooterSubmit
+          onCancel={deleteEndpointModalClose}
+          onSubmit={deleteEndpoint}
+          submitText="Delete"
+        />}
+        show={deleteEndpointModalOpen}
+        onHide={deleteEndpointModalClose}
+        height="auto"
+        width="auto"
+        className={"delete-endpoint-modal"}
+      >
+        Warning: Permanently deleting this endpoint {deleteEndpointSelectedData && ("(" + deleteEndpointSelectedData?.path + ")")} will cause the loss of all metrics associated with it.
       </Modal>
     </>
   );

@@ -42,6 +42,7 @@ describe('Test App Source Form', () => {
       endpoints: [
         {
           id: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+          deleted: false,
           path: 'endpoint_path',
           requestType: 'GET'
         }
@@ -114,6 +115,91 @@ describe('Test App Source Form', () => {
     expect(closeBtn).toBeInTheDocument();
     expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
     fireEvent.click(closeBtn!);
+  });
+
+  it('should delete endpoint and send update to server', async () => {
+    successAction = undefined;
+    appSourceDetailsDto.endpoints![0].deleted = true;
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    const elem = page.getByTestId('app-source-form');
+    expect(elem).toBeInTheDocument();
+
+    // Click the button to delete endpoint
+    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByTestId('unused-true'));
+
+    await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
+    
+    // Close delete confirmation modal
+    const xCloseBtn = (await (screen.findByTitle('close-modal')));
+    expect(xCloseBtn).toBeInTheDocument();
+    expect(xCloseBtn?.classList.contains('close-btn')).toBeTruthy();
+    fireEvent.click(xCloseBtn!);
+
+    // Click the button to delete endpoint
+    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByTestId('unused-true'));
+
+    await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
+    
+    // Click the button to close delete confirmation modal
+    const closeBtn = (await (screen.getAllByText('Cancel'))).find(element => element.getAttribute('type') === 'button');
+    expect(closeBtn).toBeInTheDocument();
+    fireEvent.click(closeBtn!);
+
+    // Click the button to delete endpoint
+    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByTestId('unused-true'));
+
+    await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
+
+    // Click the delete button to confirm deleting endpoint
+    const deleteBtn = (await (screen.getAllByText('Delete'))).find(element => element.getAttribute('type') === 'submit');
+    expect(deleteBtn).toBeInTheDocument();
+    fireEvent.click(deleteBtn!);
+
+    await (expect(page.findByText('Update'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByText('Update'));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not open delete confirmation after saving occurred', async () => {
+    successAction = {successMsg: 'Success', success: true};
+    appSourceDetailsDto.endpoints![0].deleted = true;
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    const elem = page.getByTestId('app-source-form');
+    expect(elem).toBeInTheDocument();
+
+    // Click the button to delete endpoint
+    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    fireEvent.click(page.getByTestId('unused-true'));
+
+    await (expect(page.queryByText('Delete Confirmation'))).toBeNull()
+    
   });
 
   it('Has default values if none given', () => {
