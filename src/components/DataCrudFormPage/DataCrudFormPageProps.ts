@@ -80,4 +80,6 @@ export interface DataCrudFormPageProps<T, R> {
    * Defaults to FALSE (column virtualization enabled)
    */
   disableGridColumnVirtualization?: boolean;
+
+  className?: string;
 }
