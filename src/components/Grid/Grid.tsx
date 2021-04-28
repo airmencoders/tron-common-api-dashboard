@@ -68,7 +68,7 @@ function Grid(props: GridProps) {
               rowClass={props.rowClass}
               quickFilterText={props.quickFilterText || ''}
               rowSelection={props.rowSelection || 'none'}
-              suppressColumnVirtualisation={props.disabledGridColumnVirtualization}
+              suppressColumnVirtualisation={!process.env.NODE_ENV || process.env.NODE_ENV === 'test' || props.disabledGridColumnVirtualization}
               enableBrowserTooltips
           >
             {

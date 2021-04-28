@@ -1,7 +1,6 @@
-@import '../../styles/mixins';
-
 .endpoint-editor {
-  &__form {
+  // force inputs to take full width
+  input {
     min-width: 100%;
   }
 }
