@@ -38,6 +38,12 @@ export interface AppEndpointDto {
      * @memberof AppEndpointDto
      */
     requestType: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AppEndpointDto
+     */
+    deleted?: boolean;
 }
 
 

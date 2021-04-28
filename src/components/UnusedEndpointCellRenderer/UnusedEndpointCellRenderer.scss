@@ -1,0 +1,10 @@
+
+.unused-endpoint-cell-renderer {
+  text-align: left;
+  &__hidden {
+    visibility: hidden;
+  }
+  &__btn {
+    margin: 0 !important;
+  }
+}
