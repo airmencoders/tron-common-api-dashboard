@@ -12,6 +12,7 @@ import Spinner from '../../components/Spinner/Spinner';
 import CheckboxCellRenderer from '../../components/CheckboxCellRenderer/CheckboxCellRenderer';
 import { AppSourceClientPrivilege } from '../../state/app-source/app-source-client-privilege';
 import Form from '../../components/forms/Form/Form';
+import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 
 function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
   const appSourceService = useAppSourceState();
@@ -51,8 +52,10 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
       field: 'authorized',
       headerName: 'Authorized',
       headerClass: 'header-center',
-      cellRenderer: CheckboxCellRenderer,
-      cellRendererParams: { onChange: onChange, idPrefix: 'app-source-client-authorization' }
+      // cellRenderer: CheckboxCellRenderer,
+      // cellRendererParams: { onChange: onChange, idPrefix: 'app-source-client-authorization' }
+      cellRenderer: DeleteCellRenderer,
+      cellRendererParams: { onClick: () => { return; } }
     })
   ];
 
