@@ -95,8 +95,9 @@ describe('Test App Source Endpoint Editor', () => {
       />
     );
 
-    const cellRenderer = await page.findByTestId('checkbox-cell-renderer');
+    await waitFor(() => expect(page.getByTestId('checkbox-cell-renderer')).toBeInTheDocument());
 
+    const cellRenderer = page.getByTestId('checkbox-cell-renderer');
     const withinCellRenderer = within(cellRenderer);
 
     const checkbox = withinCellRenderer.getByRole('checkbox');
