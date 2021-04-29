@@ -100,7 +100,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Adds a person
+         * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
          * @summary Adds a person
          * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
          * @param {*} [options] Override http request option.
@@ -506,7 +506,7 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
-         * Adds a person
+         * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
          * @summary Adds a person
          * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
          * @param {*} [options] Override http request option.
@@ -633,7 +633,7 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
             return PersonControllerApiFp(configuration).addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(axios, basePath));
         },
         /**
-         * Adds a person
+         * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
          * @summary Adds a person
          * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
          * @param {*} [options] Override http request option.
@@ -732,7 +732,7 @@ export interface PersonControllerApiInterface {
     addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): AxiosPromise<PersonDto>;
 
     /**
-     * Adds a person
+     * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
      * @summary Adds a person
      * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
      * @param {*} [options] Override http request option.
@@ -833,7 +833,7 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     }
 
     /**
-     * Adds a person
+     * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
      * @summary Adds a person
      * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
      * @param {*} [options] Override http request option.
