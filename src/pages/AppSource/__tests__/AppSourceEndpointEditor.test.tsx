@@ -95,20 +95,20 @@ describe('Test App Source Endpoint Editor', () => {
       />
     );
 
-    await waitFor(() => expect(page.findByTestId('delete-cell-renderer')).resolves.toBeInTheDocument());
+    await waitFor(() => page.getByTestId('checkbox-cell-renderer'));
 
-    // const cellRenderer = page.getByTestId('checkbox-cell-renderer');
-    // const withinCellRenderer = within(cellRenderer);
+    const cellRenderer = page.getByTestId('checkbox-cell-renderer');
+    const withinCellRenderer = within(cellRenderer);
 
-    // const checkbox = withinCellRenderer.getByRole('checkbox');
-    // expect(checkbox).toBeInTheDocument();
+    const checkbox = withinCellRenderer.getByRole('checkbox');
+    expect(checkbox).toBeInTheDocument();
 
-    // expect(checkbox).toBeChecked();
+    expect(checkbox).toBeChecked();
 
-    // fireEvent.click(checkbox!);
-    // await waitFor(() => expect(checkbox).not.toBeChecked());
+    fireEvent.click(checkbox!);
+    await waitFor(() => expect(checkbox).not.toBeChecked());
 
-    // fireEvent.click(checkbox!);
-    // await waitFor(() => expect(checkbox).toBeChecked());
+    fireEvent.click(checkbox!);
+    await waitFor(() => expect(checkbox).toBeChecked());
   });
 });
