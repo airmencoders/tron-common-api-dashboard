@@ -48,6 +48,10 @@ export default class PrivilegeService {
     return this.state.find(privilege => privilege.name.value === privilegeType)?.value.id;
   }
 
+  getPrivilegeFromType(privilegeType: PrivilegeType): Privilege | undefined {
+    return this.state.find(privilege => privilege.name.value === privilegeType)?.value;
+  }
+
   private isStateReady(): boolean {
     return !this.error && !this.isPromised;
   }

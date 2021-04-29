@@ -27,5 +27,11 @@ export interface GridProps {
    */
   disabledGridColumnVirtualization?: boolean;
 
+  /**
+   * If set to true, it will force the enter grid to be
+   * refreshed as opposed to the changed cells
+   */
+  hardRefresh?: boolean;
+
   className?: string;
 }
