@@ -46,14 +46,18 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       return Promise.reject(new Error('Scratch Storage App ID must be defined'));
     }
 
-    const scratchStorage = this.scratchStorageApi.getScratchAppById(rowData.id);
+    try {
+      const scratchStorage = this.scratchStorageApi.getScratchAppById(rowData.id);
 
-    const result = scratchStorage.then(response => {
-      const convertedToFlat: ScratchStorageFlat = this.convertToFlat(response.data ?? {});
-      return convertedToFlat;
-    });
+      const result = scratchStorage.then(response => {
+        const convertedToFlat: ScratchStorageFlat = this.convertToFlat(response.data ?? {});
+        return convertedToFlat;
+      });
 
-    return result;
+      return result;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
   convertToFlat(dto: ScratchStorageAppRegistryDto): ScratchStorageFlat {
     const convertedToFlat: ScratchStorageFlat = {
