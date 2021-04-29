@@ -1,6 +1,8 @@
 .endpoint-editor {
-  // force inputs to take full width
-  input {
-    min-width: 100%;
+  // force form to take full width
+  .tron-form {
+    .usa-form {
+      max-width: none;
+    }
   }
 }

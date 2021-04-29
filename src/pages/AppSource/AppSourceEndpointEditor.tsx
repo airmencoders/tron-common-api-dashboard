@@ -11,6 +11,7 @@ import TextInput from '../../components/forms/TextInput/TextInput';
 import Spinner from '../../components/Spinner/Spinner';
 import CheckboxCellRenderer from '../../components/CheckboxCellRenderer/CheckboxCellRenderer';
 import { AppSourceClientPrivilege } from '../../state/app-source/app-source-client-privilege';
+import Form from '../../components/forms/Form/Form';
 
 function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
   const appSourceService = useAppSourceState();
@@ -68,7 +69,7 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
 
         props.appClientPrivileges[props.appClientPrivileges.length].set(appClientUserPrivDto);
       } else {
-        props.appClientPrivileges.find(client => client.appClientUser.get() === data.id && client.appEndpoint.get() === appEndpoint)?.set(none)
+        props.appClientPrivileges.find(client => client.appClientUser.get() === data.id && client.appEndpoint.get() === appEndpoint)?.set(none);
       }
     }
 
@@ -81,6 +82,7 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
 
   return (
     <div className="endpoint-editor" data-testid="app-source-endpoint-editor">
+      <Form onSubmit={() => { return; }} className="endpoint-editor__form" >
         <FormGroup
           labelName="endpoint-path"
           labelText="Endpoint Path"
@@ -108,16 +110,17 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
         </FormGroup>
 
         <FormGroup
-        labelName="appClientList"
-        labelText="App Clients"
+          labelName="appClientList"
+          labelText="App Clients"
         >
         </FormGroup>
 
         <ItemChooser
           columns={appClientUserPrivColumns}
-        items={appClients.get()}
+          items={appClients.get()}
           onRowClicked={() => { return; }}
-      />
+        />
+      </Form>
     </div>
   )
 }
