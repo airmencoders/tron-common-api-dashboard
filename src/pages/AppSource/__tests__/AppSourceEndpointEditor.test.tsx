@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { AppClientSummaryDto, AppClientUserPrivDto, AppEndpointDto, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import AppSourceEndpointEditor from '../AppSourceEndpointEditor';
@@ -95,9 +95,9 @@ describe('Test App Source Endpoint Editor', () => {
       />
     );
 
-    await waitFor(() => expect(page.getByTestId('checkbox-cell-renderer')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('checkbox-cell-renderer')).toBeInTheDocument());
 
-    const cellRenderer = page.getByTestId('checkbox-cell-renderer');
+    const cellRenderer = screen.getByTestId('checkbox-cell-renderer');
     const withinCellRenderer = within(cellRenderer);
 
     const checkbox = withinCellRenderer.getByRole('checkbox');
