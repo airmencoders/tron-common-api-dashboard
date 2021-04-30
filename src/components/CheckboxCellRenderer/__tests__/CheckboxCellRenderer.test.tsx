@@ -25,8 +25,6 @@ describe('Checkbox Cell Renderer', () => {
       />
     );
 
-    // console.log(page.debug(undefined, 200000));
-
     const checkbox = page.getByRole('checkbox');
     expect(checkbox).toBeInTheDocument();
     fireEvent.click(checkbox!);
