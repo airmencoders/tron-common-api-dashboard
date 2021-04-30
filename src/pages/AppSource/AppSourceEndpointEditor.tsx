@@ -1,28 +1,21 @@
-import { Downgraded, none, useHookstate } from '@hookstate/core';
-import { useEffect } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
+import { none, useHookstate } from '@hookstate/core';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
-import { AppClientSummaryDto, AppClientUserPrivDto } from '../../openapi';
+import { AppClientUserPrivDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
 import { AppSourceEndpointEditorProps } from './AppSourceEndpointEditorProps';
-import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import GridColumn from '../../components/Grid/GridColumn';
-import { RowClickedEvent } from 'ag-grid-community';
-import Button from '../../components/Button/Button';
-import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import './AppSourceEndpointEditor.scss';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Spinner from '../../components/Spinner/Spinner';
-
-interface AppClient {
-  id: string;
-  name: string;
-}
+import CheckboxCellRenderer from '../../components/CheckboxCellRenderer/CheckboxCellRenderer';
+import { AppSourceClientPrivilege } from '../../state/app-source/app-source-client-privilege';
+import Form from '../../components/forms/Form/Form';
 
 function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
   const appSourceService = useAppSourceState();
-  const availableAppClients = useHookstate<AppClientSummaryDto[]>([]);
-  const selectedAppClient = useHookstate<AppClient | undefined>(undefined);
+  const appClients = useHookstate<AppSourceClientPrivilege[]>([]);
 
   useEffect(() => {
     const filterResults = appSourceService.fetchAppClients()
@@ -30,88 +23,60 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
         // Find all privileges belonging to this endpoint
         const endpointClientPrivileges = props.appClientPrivileges.get().filter(clientPriv => clientPriv.appEndpoint === props.endpoint.get().id);
 
-        // Filter out all of the clients that already have an existing privilege for this endpoint
-        return clients.filter(client => !endpointClientPrivileges.find(clientPriv => clientPriv.appClientUser === client.id));
+        // Convert object to keep track of app clients that are authorized.
+        // Set the already authorized apps
+        const appClientPrivileges = clients.map(client => {
+          return {
+            id: client.id,
+            name: client.name,
+            authorized: endpointClientPrivileges.find(clientPriv => clientPriv.appClientUser === client.id) ? true : false
+          } as AppSourceClientPrivilege;
+        });
+
+        return appClientPrivileges;
       });
 
-    availableAppClients.set(filterResults);
+    appClients.set(filterResults);
   }, []);
 
-  const deleteBtnName = 'Delete';
   const appClientUserPrivColumns: GridColumn[] = [
-    new GridColumn({
-      field: 'appClientUserName',
-      sortable: true,
-      filter: true,
-      headerName: 'App Client Name',
-      resizable: true
-    }),
-    new GridColumn({
-      headerName: deleteBtnName,
-      headerClass: 'header-center',
-      cellRenderer: DeleteCellRenderer,
-      cellRendererParams: { onClick: deleteClientPrivilege }
-    })
-  ];
-
-  const appClientSummaryColumns: GridColumn[] = [
     new GridColumn({
       field: 'name',
       sortable: true,
       filter: true,
       headerName: 'App Client Name',
       resizable: true
+    }),
+    new GridColumn({
+      field: 'authorized',
+      headerName: 'Authorized',
+      headerClass: 'header-center',
+      cellRenderer: CheckboxCellRenderer,
+      cellRendererParams: { onChange: onChange, idPrefix: 'app-source-client-authorization' }
     })
   ];
 
-  function deleteClientPrivilege(deleteItem: AppClientUserPrivDto) {
-    // Add client back to available clients
-    availableAppClients[availableAppClients.length].set({
-      id: deleteItem.appClientUser,
-      name: deleteItem.appClientUserName
-    });
-
-    // Remove from formState
-    props.appClientPrivileges.find(client => client.appClientUser.get() === deleteItem.appClientUser)?.set(none);
-  }
-
-  function onAdd() {
-    const appClientId = selectedAppClient.get()?.id;
-    const appClientName = selectedAppClient.get()?.name;
+  function onChange(data: AppSourceClientPrivilege, event: ChangeEvent<HTMLInputElement>) {
     const appEndpoint = props.endpoint.id.get();
+    if (appEndpoint) {
+      if (event.target.checked) {
 
-    if (appClientId && appEndpoint) {
-      const appClientUserPrivDto: AppClientUserPrivDto = {
-        appClientUser: appClientId,
-        appClientUserName: appClientName,
-        appEndpoint
-      };
+        const appClientUserPrivDto: AppClientUserPrivDto = {
+          appClientUser: data.id,
+          appClientUserName: data.name,
+          appEndpoint
+        };
 
-      // Add the privilege to formState to be added
-      props.appClientPrivileges[props.appClientPrivileges.length].set(appClientUserPrivDto);
-
-      // Remove from available app clients
-      availableAppClients.find(client => client.id.get() === appClientId)?.set(none);
+        props.appClientPrivileges[props.appClientPrivileges.length].set(appClientUserPrivDto);
+      } else {
+        props.appClientPrivileges.find(client => client.appClientUser.get() === data.id && client.appEndpoint.get() === appEndpoint)?.set(none);
+      }
     }
 
-    // reset state
-    selectedAppClient.set(none);
+    appClients.find(client => client.id.get() === data.id)?.authorized.set(event.target.checked);
   }
 
-  function onAvailableAppClientClick(event: RowClickedEvent) {
-    const data: AppClientSummaryDto = event.data;
-
-    selectedAppClient.set({
-      id: data.id ?? '',
-      name: data.name ?? ''
-    });
-  }
-
-  const currentAppClientUserPrivs = props.appClientPrivileges.attach(Downgraded).get().filter(client => {
-    return client.appEndpoint === props.endpoint.get().id;
-  });
-
-  if (availableAppClients.promised) {
+  if (appClients.promised) {
     return <Spinner centered />;
   }
 
@@ -145,38 +110,16 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
         </FormGroup>
 
         <FormGroup
-          labelName="privilegedAppList"
-          labelText="App Clients with Access"
+          labelName="appClientList"
+          labelText="App Clients"
         >
         </FormGroup>
 
         <ItemChooser
           columns={appClientUserPrivColumns}
-          items={currentAppClientUserPrivs}
+          items={appClients.get()}
           onRowClicked={() => { return; }}
         />
-
-        <FormGroup
-          labelName="availableAppList"
-          labelText="Available App Clients"
-        >
-        </FormGroup>
-
-        <ItemChooser
-          items={availableAppClients.promised ? [] : availableAppClients.get()}
-          columns={appClientSummaryColumns}
-          onRowClicked={onAvailableAppClientClick}
-        />
-
-        <Button
-          type="button"
-          className="endpoint-editor__add-client-btn"
-          onClick={onAdd}
-          disabled={selectedAppClient.promised || selectedAppClient.get() == null}
-        >
-          Add Client
-        </Button>
-
       </Form>
     </div>
   )
