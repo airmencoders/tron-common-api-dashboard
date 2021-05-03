@@ -337,6 +337,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           <AppSourceEndpointEditor
             appClientPrivileges={formState.appClients}
             endpoint={endpointSelectedData}
+            appSourceId={formState.id}
           />
         }
 
