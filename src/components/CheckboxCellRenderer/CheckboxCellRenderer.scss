@@ -1,0 +1,12 @@
+.checkbox-cell-renderer {
+  text-align: center;
+
+  &__checkbox {
+    // Allows the checkbox to sit within ag grids container properly
+    .usa-checkbox {
+      &__label {
+        margin: 0;
+      }
+    }
+  }
+}

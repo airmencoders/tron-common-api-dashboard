@@ -29,7 +29,7 @@ function Grid(props: GridProps) {
   // Refresh grid cells only if the length of the dat has not changed
   useEffect(() => {
     if (!rowDataLengthChanged.current) {
-      gridApi?.refreshCells();
+      props.hardRefresh ? gridApi?.setRowData(props.data) : gridApi?.refreshCells();
     } else {
       rowDataLengthChanged.current = false;
     }
@@ -68,7 +68,7 @@ function Grid(props: GridProps) {
               rowClass={props.rowClass}
               quickFilterText={props.quickFilterText || ''}
               rowSelection={props.rowSelection || 'none'}
-              suppressColumnVirtualisation={props.disabledGridColumnVirtualization}
+              suppressColumnVirtualisation={!process.env.NODE_ENV || process.env.NODE_ENV === 'test' || props.disabledGridColumnVirtualization}
               enableBrowserTooltips
           >
             {

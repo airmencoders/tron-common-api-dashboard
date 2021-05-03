@@ -5,4 +5,5 @@ export interface ChooserProps {
   items: Array<any>,
   columns: Array<GridColumn>
   onRowClicked: (event: RowClickedEvent) => void;
+  hardRefresh?: boolean;
 }

@@ -1,7 +1,8 @@
-@import '../../styles/mixins';
-
 .endpoint-editor {
-  &__form {
-    min-width: 100%;
+  // force form to take full width
+  .tron-form {
+    .usa-form {
+      max-width: none;
+    }
   }
 }
