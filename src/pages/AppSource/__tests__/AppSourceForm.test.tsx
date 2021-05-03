@@ -176,35 +176,6 @@ describe('Test App Source Form', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it('should not open delete confirmation after saving occurred', async () => {
-    successAction = {successMsg: 'Success', success: true};
-    appSourceDetailsDto.endpoints![0].deleted = true;
-    const page = render(
-      <MemoryRouter>
-        <AppSourceForm
-          onSubmit={onSubmit}
-          onClose={onClose}
-          formActionType={FormActionType.UPDATE}
-          isSubmitting={false}
-          successAction={successAction}
-          data={appSourceDetailsDto}
-        />
-      </MemoryRouter>
-    );
-
-    const elem = page.getByTestId('app-source-form');
-    expect(elem).toBeInTheDocument();
-
-    // Click the button to delete endpoint
-    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
-    const deleteEndpointBtn = page.getByTestId('unused-true');
-    expect(deleteEndpointBtn).toBeInTheDocument();
-    fireEvent.click(deleteEndpointBtn);
-
-    expect(page.queryByText('Delete Confirmation'));
-    
-  });
-
   it('Has default values if none given', () => {
     successAction = undefined;
 
