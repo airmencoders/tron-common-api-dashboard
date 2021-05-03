@@ -198,7 +198,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           label={<>Read</>}
           checked={formState.read.get()}
           onChange={(event) => formState.read.set(event.target.checked)}
-          disabled={isFormDisabled()}
+          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
         />
 
         <Checkbox
@@ -207,7 +207,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           label={<>Write</>}
           checked={formState.write.get()}
           onChange={(event) => formState.write.set(event.target.checked)}
-          disabled={isFormDisabled()}
+          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
         />
       </FormGroup>
 
