@@ -8,4 +8,7 @@ export interface GridColumnParams {
   cellRendererParams: any;
   resizable: boolean;
   showTooltip: boolean;
+  checkboxSelection: boolean;
+  headerCheckboxSelection: boolean;
+  headerCheckboxSelectionFilteredOnly: boolean;
 }

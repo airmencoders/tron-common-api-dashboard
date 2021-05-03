@@ -8,3 +8,9 @@
     color: color('gray-40');
   }
 }
+
+.usa-button {
+  &--disable-mobile-full-width {
+    width: auto;
+  }
+}

@@ -3,6 +3,6 @@ import { AppClientUserPrivDto, AppEndpointDto, AppSourceDto } from '../../openap
 
 export interface AppSourceEndpointEditorProps {
   appClientPrivileges: State<AppClientUserPrivDto[]>;
-  endpoint: State<AppEndpointDto>;
+  selectedEndpoints: State<AppEndpointDto[]>;
   appSourceId: State<string>
 }
