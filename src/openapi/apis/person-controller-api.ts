@@ -314,14 +314,15 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
         /**
          * Retrieves all persons
          * @summary Retrieves all persons
-         * @param {number} [page] Page of content to retrieve
-         * @param {number} [limit] Size of each page
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPersons: async (page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options: any = {}): Promise<RequestArgs> => {
+        getPersons: async (memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -334,20 +335,24 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (page !== undefined) {
-                localVarQueryParameter['page'] = page;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
             if (memberships !== undefined) {
                 localVarQueryParameter['memberships'] = memberships;
             }
 
             if (leaderships !== undefined) {
                 localVarQueryParameter['leaderships'] = leaderships;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
             }
 
 
@@ -569,15 +574,16 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
         /**
          * Retrieves all persons
          * @summary Retrieves all persons
-         * @param {number} [page] Page of content to retrieve
-         * @param {number} [limit] Size of each page
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonDto>>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPersons(page, limit, memberships, leaderships, options);
+        async getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonDto>>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPersons(memberships, leaderships, page, size, sort, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -680,15 +686,16 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
         /**
          * Retrieves all persons
          * @summary Retrieves all persons
-         * @param {number} [page] Page of content to retrieve
-         * @param {number} [limit] Size of each page
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<Array<PersonDto>> {
-            return PersonControllerApiFp(configuration).getPersons(page, limit, memberships, leaderships, options).then((request) => request(axios, basePath));
+        getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<PersonDto>> {
+            return PersonControllerApiFp(configuration).getPersons(memberships, leaderships, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Patches an existing person
@@ -779,15 +786,16 @@ export interface PersonControllerApiInterface {
     /**
      * Retrieves all persons
      * @summary Retrieves all persons
-     * @param {number} [page] Page of content to retrieve
-     * @param {number} [limit] Size of each page
      * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
      * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<Array<PersonDto>>;
+    getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<PersonDto>>;
 
     /**
      * Patches an existing person
@@ -888,16 +896,17 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     /**
      * Retrieves all persons
      * @summary Retrieves all persons
-     * @param {number} [page] Page of content to retrieve
-     * @param {number} [limit] Size of each page
      * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
      * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public getPersons(page?: number, limit?: number, memberships?: boolean, leaderships?: boolean, options?: any) {
-        return PersonControllerApiFp(this.configuration).getPersons(page, limit, memberships, leaderships, options).then((request) => request(this.axios, this.basePath));
+    public getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return PersonControllerApiFp(this.configuration).getPersons(memberships, leaderships, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

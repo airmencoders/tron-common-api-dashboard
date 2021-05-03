@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import AppClientForm from '../AppClientForm';
 import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
@@ -118,5 +118,45 @@ describe('Test App Client Form', () => {
     expect(elem).toBeInTheDocument();
 
     expect(pageRender.getByText(successAction.successMsg));
+  });
+
+  it('Adds a developer email', async () => {
+    const pageRender = render(
+      <AppClientForm 
+        onClose={onClose} 
+        data={client} 
+        onSubmit={onSubmit} 
+        formActionType={FormActionType.UPDATE} 
+        isSubmitting={false} 
+      />
+    );
+
+    const button = pageRender.getByTestId('app-client-developer__add-btn');
+    expect(button).toBeInTheDocument();
+
+    const field = pageRender.getByTestId('app-client-developer-field');
+    expect(field).toBeInTheDocument();
+    fireEvent.change(field, { target: { value: 'joe@test.com'}});
+    await waitFor(() => { 
+      expect(button).not.toBeDisabled();
+    });
+
+    fireEvent.click(button);
+
+    await waitFor(() => { 
+      expect(field).toHaveValue('');
+    });
+
+    await waitFor(() => {
+      expect(pageRender.getByText('joe@test.com')).toBeInTheDocument();
+    });
+
+    const row = pageRender.getByText('joe@test.com');
+    fireEvent.click(row);
+
+    await waitFor(() => {
+      expect(pageRender.getByText('joe@test.com')).toBeInTheDocument();
+    });
+
   });
 })

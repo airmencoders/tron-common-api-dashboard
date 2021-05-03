@@ -511,12 +511,13 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @param {string} [search] Case insensitive search string for org name
          * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
          * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
-         * @param {number} [page] Page of content to retrieve
-         * @param {number} [limit] Size of each page
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganizations: async (type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options: any = {}): Promise<RequestArgs> => {
+        getOrganizations: async (type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/organization`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -553,8 +554,12 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 localVarQueryParameter['page'] = page;
             }
 
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
             }
 
 
@@ -896,13 +901,14 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @param {string} [search] Case insensitive search string for org name
          * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
          * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
-         * @param {number} [page] Page of content to retrieve
-         * @param {number} [limit] Size of each page
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganizationDto>>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options);
+        async getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganizationDto>>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1067,13 +1073,14 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @param {string} [search] Case insensitive search string for org name
          * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
          * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
-         * @param {number} [page] Page of content to retrieve
-         * @param {number} [limit] Size of each page
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): AxiosPromise<Array<OrganizationDto>> {
-            return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options).then((request) => request(axios, basePath));
+        getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<OrganizationDto>> {
+            return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Patches an existing organization
@@ -1222,13 +1229,14 @@ export interface OrganizationControllerApiInterface {
      * @param {string} [search] Case insensitive search string for org name
      * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
      * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
-     * @param {number} [page] Page of content to retrieve
-     * @param {number} [limit] Size of each page
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any): AxiosPromise<Array<OrganizationDto>>;
+    getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<OrganizationDto>>;
 
     /**
      * Patches an existing organization
@@ -1395,14 +1403,15 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @param {string} [search] Case insensitive search string for org name
      * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
      * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
-     * @param {number} [page] Page of content to retrieve
-     * @param {number} [limit] Size of each page
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, limit?: number, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).getOrganizations(type, branch, search, people, organizations, page, limit, options).then((request) => request(this.axios, this.basePath));
+    public getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

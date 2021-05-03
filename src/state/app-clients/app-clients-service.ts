@@ -1,28 +1,26 @@
 import { none, State } from "@hookstate/core";
+import { AxiosPromise } from "axios";
+import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
+import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
+import { Privilege } from "../../openapi/models";
+import { AppClientUserDetailsDto } from "../../openapi/models/app-client-user-details-dto";
+import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
+import { DataService } from "../data-service/data-service";
+import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
+import { PrivilegeType } from "../privilege/privilege-type";
 import { AppClientFlat } from "./app-client-flat";
 import { AppClientPrivilege } from "./app-client-privilege";
-import { PrivilegeType } from "../privilege/privilege-type";
-import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
-import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
-import { AxiosPromise } from "axios";
-import { Privilege, PrivilegeDto } from "../../openapi/models";
-import { accessPrivilegeState } from "../privilege/privilege-state";
-import { DataService } from "../data-service/data-service";
-import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
-import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
 
 export default class AppClientsService implements DataService<AppClientFlat, AppClientFlat> {
-  constructor(public state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) { }
+  constructor(public state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) {
+
+  }
 
   fetchAndStoreData(): Promise<AppClientFlat[]> {
     const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
-    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
-
     const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
       try {
-        await privilegeResponse();
         const result = await response();
-
         resolve(this.convertAppClientsToFlat(result.data));
       } catch (err) {
         reject(prepareDataCrudErrorResponse(err));
@@ -34,14 +32,16 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     return data;
   }
 
+  async getSelectedClient(id: string): Promise<AppClientUserDetailsDto> {
+    const record = await this.appClientsApi.getAppClientRecord(id);
+    return {...record.data};
+  }
+
   async sendCreate(toCreate: AppClientFlat): Promise<AppClientFlat> {
     try {
-      const appClientDto = this.convertToDto(toCreate);
-      const createdResponse = await this.appClientsApi.createAppClientUser(appClientDto);
+      const createdResponse = await this.appClientsApi.createAppClientUser(await this.convertToDto(toCreate));
       const createdAppClientFlat = this.convertToFlat(createdResponse.data);
-
       this.state[this.state.length].set(createdAppClientFlat);
-
       return Promise.resolve(createdAppClientFlat);
     }
     catch (error) {
@@ -54,10 +54,9 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('App Client to update has undefined id.'));
       }
-      const appClientDto = this.convertToDto(toUpdate);
-      const updatedResponse = await this.appClientsApi.updateAppClient(toUpdate.id, appClientDto);
-      const updatedAppClientFlat = this.convertToFlat(updatedResponse.data);
 
+      const updatedResponse = await this.appClientsApi.updateAppClient(toUpdate.id, await this.convertToDto(toUpdate));
+      const updatedAppClientFlat = this.convertToFlat(updatedResponse.data);
       const index = this.state.get().findIndex(item => item.id === updatedAppClientFlat.id);
       this.state[index].set(updatedAppClientFlat);
 
@@ -75,7 +74,6 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       }
 
       await this.appClientsApi.deleteAppClient(toDelete.id);
-
       const item = this.state.find(item => item.id.get() === toDelete.id);
       if (item)
         item.set(none);
@@ -86,8 +84,15 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     }
   }
 
-  convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
-    return Promise.resolve(rowData);
+  async convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
+    const details = await this.getSelectedClient(rowData.id ?? "");
+    const retVal : AppClientFlat = { 
+      ...rowData, 
+      appClientDeveloperEmails: details.appClientDeveloperEmails, 
+      appEndpointPrivs: details.appEndpointPrivs 
+    };
+
+    return Promise.resolve(Object.assign({}, retVal));
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
@@ -113,32 +118,32 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     };
   }
 
-  convertToDto(client: AppClientFlat): AppClientUserDto {
+  async convertToDto(client: AppClientFlat): Promise<AppClientUserDto> {
     return {
       id: client.id,
       name: client.name,
-      privileges: this.createAppPrivilegesArr(client)
+      privileges: await this.createAppPrivilegesArr(client),
+      appClientDeveloperEmails: client.appClientDeveloperEmails,
     };
   }
 
-  createAppPrivilegesArr(client: AppClientFlat): Array<Privilege> {
-    return Array.from(this.createAppPrivileges(client));
+  async createAppPrivilegesArr(client: AppClientFlat): Promise<Array<Privilege>> {
+    return Array.from(await this.createAppPrivileges(client));
   }
 
-  createAppPrivileges(client: AppClientFlat): Set<Privilege> {
+  async createAppPrivileges(client: AppClientFlat): Promise<Set<Privilege>> {
     const privileges = new Set<Privilege>();
+    const privilegeResponse = await this.appClientsApi.getClientTypePrivs();
 
     if (client.read) {
-      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.READ);
-
+      const privilege = privilegeResponse.data.find(item => item.name === PrivilegeType.READ);
       if (privilege) {
         privileges.add(privilege);
       }
     }
 
-    if (client.write) {
-      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.WRITE);
-
+    if (client.write) {  
+      const privilege = privilegeResponse.data.find(item => item.name === PrivilegeType.WRITE);
       if (privilege) {
         privileges.add(privilege);
       }

@@ -1,17 +1,28 @@
-import React, { FormEvent } from 'react';
-import { useState } from "@hookstate/core";
-import { Validation } from "@hookstate/validation";
+import { useHookstate, useState } from "@hookstate/core";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
+import { Validation } from "@hookstate/validation";
+import React, { FormEvent } from 'react';
+import Button from '../../components/Button/Button';
+import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
+import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Form from "../../components/forms/Form/Form";
-import TextInput from "../../components/forms/TextInput/TextInput";
-import { AppClientFlat } from '../../state/app-clients/app-client-flat';
-import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import { FormActionType } from '../../state/crud-page/form-action-type';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
+import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import TextInput from "../../components/forms/TextInput/TextInput";
+import GridColumn from '../../components/Grid/GridColumn';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
+import { AppClientFlat } from "../../state/app-clients/app-client-flat";
+import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { validateEmail } from '../../utils/validation-utils';
+
+interface DeveloperEmail {
+  email: string;
+}
 
 function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const formState = useState<AppClientFlat>({
@@ -19,16 +30,34 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     name: props.data?.name || "",
     read: props.data?.read || false,
     write: props.data?.write || false,
+    appClientDeveloperEmails: props.data?.appClientDeveloperEmails ?? [],
+    appEndpointPrivs: props.data?.appEndpointPrivs ?? [],
   });
+
+  const currentUser = accessAuthorizedUserState();
+  const developerAddState = useHookstate({
+    email: ''
+  });
+
+  // if the app client record hasn't resolved yet then no point continuing yet
+  if (formState.promised) return <></>;
+
+  developerAddState.attach(Validation);
+  developerAddState.attach(Initial);
+  developerAddState.attach(Touched);
+
+  Validation(developerAddState.email).validate(email => validateEmail(email), 'enter valid email', 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
-  Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
+  Validation(formState.name).validate(name => name !== undefined && name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
 
   function isFormModified() {
-    return Initial(formState.name).modified() || Initial(formState.read).modified() || Initial(formState.write).modified();
+    return Initial(formState.name).modified() 
+            || Initial(formState.read).modified() || Initial(formState.write).modified()
+            || Initial(formState.appClientDeveloperEmails).modified()
   }
 
   function isFormDisabled() {
@@ -40,11 +69,89 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     props.onSubmit(formState.get());
   }
 
+  function deleteAppClientDeveloper(deleteItem: DeveloperEmail) {
+
+    // get rid of the email we wanna delete and update the state
+    const emails = new Array<string>();
+    const entries = formState.appClientDeveloperEmails.get();
+    if (entries !== undefined) {
+      for (const entry of entries) {
+        if (entry !== deleteItem.email) emails.push(entry);
+      }
+
+      formState.appClientDeveloperEmails.set(emails);
+    }
+  }
+
+  function addAppClientDeveloper() {
+
+    // append new email to the list and update state
+    let emails = new Array<string>();
+    const entries = formState.appClientDeveloperEmails.get() ?? [];
+    emails = [...entries];
+    emails.push(developerAddState.email.get());
+    formState.appClientDeveloperEmails.set(emails);
+    developerAddState.email.set('');
+  }
+
   function createNameErrors(): string[] {
     const errors: string[] = Validation(formState.name).errors().map(validationError => validationError.message);
     const serverNameValid = props.formErrors?.validation?.name;
     return serverNameValid ? errors.concat([serverNameValid]) : errors;
   }
+
+  const deleteBtnName = 'Delete';
+  const appClientDeveloperColumns: GridColumn[] = [
+    new GridColumn({
+      field: 'email',
+      sortable: true,
+      filter: true,
+      headerName: 'Admin',
+      resizable: true
+    })
+  ];
+
+  /**
+   * Prevent anymore interactions with the grid
+   * after a successful submit or while the 
+   * current request is pending.
+   * 
+   * Removes "remove" icon and functionality
+   */
+  if (!isFormDisabled()) {
+    appClientDeveloperColumns.push(
+      new GridColumn({
+        headerName: deleteBtnName,
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: { onClick: deleteAppClientDeveloper }
+      })
+    );
+  }
+
+  const appSourceEndpointColumns: GridColumn[] = [
+    new GridColumn({
+      field: 'appSourceName',
+      sortable: true,
+      filter: true,
+      headerName: 'App Source',
+      resizable: true,
+    }),
+    new GridColumn({
+      field: 'path',
+      sortable: true,
+      filter: true,
+      headerName: 'Path',
+      resizable: true,
+    }),
+    new GridColumn({
+      field: 'method',
+      sortable: true,
+      filter: true,
+      headerName: 'Request Type',
+      resizable: true
+    })
+  ];
 
   return (
     <Form className="app-client-form" onSubmit={(event) => submitForm(event)} data-testid="app-client-form">
@@ -77,7 +184,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           defaultValue={formState.name.get()}
           error={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
           onChange={(event) => formState.name.set(event.target.value)}
-          disabled={isFormDisabled()}
+          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
         />
       </FormGroup>
 
@@ -103,6 +210,58 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           disabled={isFormDisabled()}
         />
       </FormGroup>
+
+      <FormGroup
+          labelName="developer"
+          labelText="Manage Developers"
+          isError={Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid() && developerAddState.email.get().trim().length > 0}
+          errorMessages={Validation(developerAddState.email).errors()
+            .map(validationError => validationError.message)}
+        >
+          <TextInput
+            id="developer"
+            name="developer"
+            type="email"
+            data-testid="app-client-developer-field"
+            placeholder={"Developer Email"}
+            value={developerAddState.email.get()}
+            error={Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid() && developerAddState.email.get().trim().length > 0}
+            onChange={(event) => developerAddState.email.set(event.target.value)}
+            disabled={isFormDisabled()}
+          />
+        </FormGroup>
+
+        <Button
+          type="button"
+          className="app-client-form__add-developer-btn"
+          data-testid="app-client-developer__add-btn"
+          onClick={addAppClientDeveloper}
+          disabled={developerAddState.email?.get().length === 0 || ((Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid()) || isFormDisabled())}
+        >
+          Add Developer
+        </Button>
+
+        <ItemChooser
+          columns={appClientDeveloperColumns}
+          items={formState.appClientDeveloperEmails.get()?.map(r => {
+            return {
+              email: r
+            } as DeveloperEmail
+          }) ?? []}
+          onRowClicked={() => { return; }}
+        />
+
+        <FormGroup
+          labelName="endpoints"
+          labelText="Authorized App Source Endpoints"
+        >
+        </FormGroup>
+
+        <ItemChooser
+          columns={appSourceEndpointColumns}
+          items={formState.appEndpointPrivs.get() ?? []}
+          onRowClicked={() => { return; }}
+        />
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}
