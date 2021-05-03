@@ -12,6 +12,7 @@ jest.mock('../../../state/app-source/app-source-state');
 describe('Test App Source Endpoint Editor', () => {
   let appClientPrivileges: State<AppClientUserPrivDto[]> & StateMethodsDestroy;
   let appClientEndpointState: State<AppEndpointDto[]> & StateMethodsDestroy;
+  let appSourceIdState: State<string> & StateMethodsDestroy;
   let allClients: AppClientSummaryDto[];
   let appSourceState: State<AppSourceDto[]> & StateMethodsDestroy;
   let appSourceApi: AppSourceControllerApiInterface;
@@ -34,6 +35,8 @@ describe('Test App Source Endpoint Editor', () => {
         requestType: 'GET'
       }
     ]);
+
+    appSourceIdState = createState<string>('fa63c630-98af-4943-9f55-e8f9d2cb0cba');
 
     allClients = [
       {
@@ -91,6 +94,7 @@ describe('Test App Source Endpoint Editor', () => {
       <AppSourceEndpointEditor
         appClientPrivileges={appClientPrivileges}
         selectedEndpoints={appClientEndpointState}
+        appSourceId={appSourceIdState}
       />
     );
 
@@ -115,6 +119,7 @@ describe('Test App Source Endpoint Editor', () => {
       <AppSourceEndpointEditor
         appClientPrivileges={appClientPrivileges}
         selectedEndpoints={appClientEndpointState}
+        appSourceId={appSourceIdState}
       />
     );
 

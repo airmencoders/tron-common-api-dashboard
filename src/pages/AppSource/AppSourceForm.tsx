@@ -151,7 +151,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       resizable: true
     })
   ];
-  
+
   function onDeleteEndpointClicked(endpoint: AppEndpointDto): void {
     /**
      * Prevent anymore interactions with the grid
@@ -217,13 +217,13 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   const deleteEndpointModalOpen = deleteEndpointModifyState.isOpen.get();
   const endpointSelectedData = endpointModifyState.singleSelected.length > 0 ? endpointModifyState.singleSelected : endpointModifyState.bulkSelected;
   const deleteEndpointSelectedData = deleteEndpointModifyState.selected.get();
-  
-  function deleteEndpoint(): void {  
+
+  function deleteEndpoint(): void {
     const toDeleteId = deleteEndpointSelectedData!.id;
     formState.merge({
       appClients: formState.appClients.get()?.filter(client => client.appEndpoint !== toDeleteId),
       endpoints: formState.endpoints.get()?.filter(endpoint => endpoint.id !== toDeleteId)
-    })    
+    })
     deleteEndpointModalClose();
   }
 
@@ -358,6 +358,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           <AppSourceEndpointEditor
             appClientPrivileges={formState.appClients}
             selectedEndpoints={endpointSelectedData}
+            appSourceId={formState.id}
           />
         }
 
