@@ -43,7 +43,7 @@ describe('Test App Source Form', () => {
       endpoints: [
         {
           id: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
-          deleted: true,
+          deleted: false,
           path: 'endpoint_path',
           requestType: 'GET'
         }
@@ -141,8 +141,9 @@ describe('Test App Source Form', () => {
     const title = 'Endpoint No Longer Available';
 
     // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
+    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    const deleteEndpointBtn = page.getByTestId('unused-true');
+    fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
@@ -153,8 +154,7 @@ describe('Test App Source Form', () => {
     fireEvent.click(xCloseBtn!);
 
     // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
+    fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
@@ -164,8 +164,7 @@ describe('Test App Source Form', () => {
     fireEvent.click(closeBtn!);
 
     // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
+    fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
 
