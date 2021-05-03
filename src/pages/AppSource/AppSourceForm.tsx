@@ -315,7 +315,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           suppressRowClickSelection
           rowSelection={'multiple'}
           showEditBtn
-          disableEditBtn={endpointSelectedData.length === 0}
+          disableEditBtn={endpointModifyState.bulkSelected.length === 0}
           onEditBtnClick={onEndpointEditBtnClicked}
           onRowSelected={onRowSelected}
         />
