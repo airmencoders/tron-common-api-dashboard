@@ -43,7 +43,7 @@ describe('Test App Source Form', () => {
       endpoints: [
         {
           id: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
-          deleted: false,
+          deleted: true,
           path: 'endpoint_path',
           requestType: 'GET'
         }
@@ -159,7 +159,7 @@ describe('Test App Source Form', () => {
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
     // Click the button to close delete confirmation modal
-    const closeBtn = (await (screen.getAllByText('Cancel'))).find(element => element.getAttribute('type') === 'button');
+    const closeBtn = (screen.getAllByText('Cancel')).find(element => element.getAttribute('type') === 'button');
     expect(closeBtn).toBeInTheDocument();
     fireEvent.click(closeBtn!);
 
@@ -170,7 +170,7 @@ describe('Test App Source Form', () => {
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
 
     // Click the delete button to confirm deleting endpoint
-    const deleteBtn = (await (screen.getAllByText('Delete'))).find(element => element.getAttribute('type') === 'submit');
+    const deleteBtn = (screen.getAllByText('Delete')).find(element => element.getAttribute('type') === 'submit');
     expect(deleteBtn).toBeInTheDocument();
     fireEvent.click(deleteBtn!);
 
