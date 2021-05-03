@@ -13,38 +13,45 @@
  */
 
 
+import { AppEndpointClientInfoDto } from './app-endpoint-client-info-dto';
 import { Privilege } from './privilege';
 
 /**
  * 
  * @export
- * @interface AppClientUserDto
+ * @interface AppClientUserDetailsDto
  */
-export interface AppClientUserDto {
+export interface AppClientUserDetailsDto {
     /**
      * 
      * @type {string}
-     * @memberof AppClientUserDto
+     * @memberof AppClientUserDetailsDto
      */
     id?: string;
     /**
      * 
      * @type {Array<Privilege>}
-     * @memberof AppClientUserDto
+     * @memberof AppClientUserDetailsDto
      */
     privileges?: Array<Privilege>;
     /**
      * 
+     * @type {string}
+     * @memberof AppClientUserDetailsDto
+     */
+    name?: string;
+    /**
+     * 
      * @type {Array<string>}
-     * @memberof AppClientUserDto
+     * @memberof AppClientUserDetailsDto
      */
     appClientDeveloperEmails?: Array<string>;
     /**
      * 
-     * @type {string}
-     * @memberof AppClientUserDto
+     * @type {Array<AppEndpointClientInfoDto>}
+     * @memberof AppClientUserDetailsDto
      */
-    name?: string;
+    appEndpointPrivs?: Array<AppEndpointClientInfoDto>;
 }
 
 

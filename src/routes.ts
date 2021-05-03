@@ -44,14 +44,15 @@ export const routes: RouteItem[] = [
             PrivilegeType.APP_SOURCE_ADMIN,
             PrivilegeType.SCRATCH_READ,
             PrivilegeType.SCRATCH_WRITE,
-            PrivilegeType.SCRATCH_ADMIN
+            PrivilegeType.SCRATCH_ADMIN,
+            PrivilegeType.APP_CLIENT_DEVELOPER,
         ]
     },
     {
         path: RoutePath.HEALTH,
         name: 'Health',
         component: HealthPage,
-        requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
+        requiredPrivileges: [PrivilegeType.DASHBOARD_USER, PrivilegeType.APP_CLIENT_DEVELOPER]
     },
     {
         path: RoutePath.MY_DIGITIZE_APPS,
@@ -75,7 +76,7 @@ export const routes: RouteItem[] = [
         path: RoutePath.APP_CLIENT,
         name: 'App Clients',
         component: AppClientPage,
-        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_CLIENT_DEVELOPER]
     },
     {
         path: RoutePath.SCRATCH_STORAGE,

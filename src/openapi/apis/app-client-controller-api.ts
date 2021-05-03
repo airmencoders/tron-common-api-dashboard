@@ -19,9 +19,13 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { AppClientUserDetailsDto } from '../models';
+// @ts-ignore
 import { AppClientUserDto } from '../models';
 // @ts-ignore
 import { ExceptionResponse } from '../models';
+// @ts-ignore
+import { PrivilegeDto } from '../models';
 /**
  * AppClientControllerApi - axios parameter creator
  * @export
@@ -29,8 +33,8 @@ import { ExceptionResponse } from '../models';
 export const AppClientControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Adds a App Client User
-         * @summary Adds a App Client User
+         * Adds a App Client User. Requires DASHBOARD_ADMIN access.
+         * @summary Adds an App Client
          * @param {AppClientUserDto} appClientUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -80,7 +84,7 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Deletes an existing App Client
+         * Deletes an existing App Client. Requires DASHBOARD_ADMIN access.
          * @summary Deletes an App Client
          * @param {string} id App Client ID to delete
          * @param {*} [options] Override http request option.
@@ -123,7 +127,50 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Retrieves application client user information
+         * Get an App Client by its UUID. Requires DASHBOARD_ADMIN or be an App Client Developer of that UUID.
+         * @summary Get an App Client\'s Information
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientRecord: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getAppClientRecord.');
+            }
+            const localVarPath = `/v1/app-client/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves application client user information.  Requires Dashboard Admin access or App Client Developer.
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -160,7 +207,44 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
-         * Updates an existing Application Client
+         * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
+         * @summary Gets all available privileges available for an app-client
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClientTypePrivs: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/app-client/privs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
          * @summary Updates an existing Application Client
          * @param {string} id App Client ID to update
          * @param {AppClientUserDto} appClientUserDto 
@@ -226,8 +310,8 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
 export const AppClientControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
-         * Adds a App Client User
-         * @summary Adds a App Client User
+         * Adds a App Client User. Requires DASHBOARD_ADMIN access.
+         * @summary Adds an App Client
          * @param {AppClientUserDto} appClientUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -240,7 +324,7 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
-         * Deletes an existing App Client
+         * Deletes an existing App Client. Requires DASHBOARD_ADMIN access.
          * @summary Deletes an App Client
          * @param {string} id App Client ID to delete
          * @param {*} [options] Override http request option.
@@ -254,7 +338,21 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
-         * Retrieves application client user information
+         * Get an App Client by its UUID. Requires DASHBOARD_ADMIN or be an App Client Developer of that UUID.
+         * @summary Get an App Client\'s Information
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAppClientRecord(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientUserDetailsDto>> {
+            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getAppClientRecord(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves application client user information.  Requires Dashboard Admin access or App Client Developer.
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -267,7 +365,20 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
-         * Updates an existing Application Client
+         * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
+         * @summary Gets all available privileges available for an app-client
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getClientTypePrivs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
+            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getClientTypePrivs(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
          * @summary Updates an existing Application Client
          * @param {string} id App Client ID to update
          * @param {AppClientUserDto} appClientUserDto 
@@ -291,8 +402,8 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
 export const AppClientControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
-         * Adds a App Client User
-         * @summary Adds a App Client User
+         * Adds a App Client User. Requires DASHBOARD_ADMIN access.
+         * @summary Adds an App Client
          * @param {AppClientUserDto} appClientUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -301,7 +412,7 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
             return AppClientControllerApiFp(configuration).createAppClientUser(appClientUserDto, options).then((request) => request(axios, basePath));
         },
         /**
-         * Deletes an existing App Client
+         * Deletes an existing App Client. Requires DASHBOARD_ADMIN access.
          * @summary Deletes an App Client
          * @param {string} id App Client ID to delete
          * @param {*} [options] Override http request option.
@@ -311,7 +422,17 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
             return AppClientControllerApiFp(configuration).deleteAppClient(id, options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieves application client user information
+         * Get an App Client by its UUID. Requires DASHBOARD_ADMIN or be an App Client Developer of that UUID.
+         * @summary Get an App Client\'s Information
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientRecord(id: string, options?: any): AxiosPromise<AppClientUserDetailsDto> {
+            return AppClientControllerApiFp(configuration).getAppClientRecord(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves application client user information.  Requires Dashboard Admin access or App Client Developer.
          * @summary Retrieves all application client user information
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -320,7 +441,16 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
             return AppClientControllerApiFp(configuration).getAppClientUsers(options).then((request) => request(axios, basePath));
         },
         /**
-         * Updates an existing Application Client
+         * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
+         * @summary Gets all available privileges available for an app-client
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getClientTypePrivs(options?: any): AxiosPromise<Array<PrivilegeDto>> {
+            return AppClientControllerApiFp(configuration).getClientTypePrivs(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
          * @summary Updates an existing Application Client
          * @param {string} id App Client ID to update
          * @param {AppClientUserDto} appClientUserDto 
@@ -340,8 +470,8 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
  */
 export interface AppClientControllerApiInterface {
     /**
-     * Adds a App Client User
-     * @summary Adds a App Client User
+     * Adds a App Client User. Requires DASHBOARD_ADMIN access.
+     * @summary Adds an App Client
      * @param {AppClientUserDto} appClientUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -350,7 +480,7 @@ export interface AppClientControllerApiInterface {
     createAppClientUser(appClientUserDto: AppClientUserDto, options?: any): AxiosPromise<AppClientUserDto>;
 
     /**
-     * Deletes an existing App Client
+     * Deletes an existing App Client. Requires DASHBOARD_ADMIN access.
      * @summary Deletes an App Client
      * @param {string} id App Client ID to delete
      * @param {*} [options] Override http request option.
@@ -360,7 +490,17 @@ export interface AppClientControllerApiInterface {
     deleteAppClient(id: string, options?: any): AxiosPromise<AppClientUserDto>;
 
     /**
-     * Retrieves application client user information
+     * Get an App Client by its UUID. Requires DASHBOARD_ADMIN or be an App Client Developer of that UUID.
+     * @summary Get an App Client\'s Information
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApiInterface
+     */
+    getAppClientRecord(id: string, options?: any): AxiosPromise<AppClientUserDetailsDto>;
+
+    /**
+     * Retrieves application client user information.  Requires Dashboard Admin access or App Client Developer.
      * @summary Retrieves all application client user information
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -369,7 +509,16 @@ export interface AppClientControllerApiInterface {
     getAppClientUsers(options?: any): AxiosPromise<Array<AppClientUserDto>>;
 
     /**
-     * Updates an existing Application Client
+     * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
+     * @summary Gets all available privileges available for an app-client
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApiInterface
+     */
+    getClientTypePrivs(options?: any): AxiosPromise<Array<PrivilegeDto>>;
+
+    /**
+     * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
      * @summary Updates an existing Application Client
      * @param {string} id App Client ID to update
      * @param {AppClientUserDto} appClientUserDto 
@@ -389,8 +538,8 @@ export interface AppClientControllerApiInterface {
  */
 export class AppClientControllerApi extends BaseAPI implements AppClientControllerApiInterface {
     /**
-     * Adds a App Client User
-     * @summary Adds a App Client User
+     * Adds a App Client User. Requires DASHBOARD_ADMIN access.
+     * @summary Adds an App Client
      * @param {AppClientUserDto} appClientUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -401,7 +550,7 @@ export class AppClientControllerApi extends BaseAPI implements AppClientControll
     }
 
     /**
-     * Deletes an existing App Client
+     * Deletes an existing App Client. Requires DASHBOARD_ADMIN access.
      * @summary Deletes an App Client
      * @param {string} id App Client ID to delete
      * @param {*} [options] Override http request option.
@@ -413,7 +562,19 @@ export class AppClientControllerApi extends BaseAPI implements AppClientControll
     }
 
     /**
-     * Retrieves application client user information
+     * Get an App Client by its UUID. Requires DASHBOARD_ADMIN or be an App Client Developer of that UUID.
+     * @summary Get an App Client\'s Information
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApi
+     */
+    public getAppClientRecord(id: string, options?: any) {
+        return AppClientControllerApiFp(this.configuration).getAppClientRecord(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves application client user information.  Requires Dashboard Admin access or App Client Developer.
      * @summary Retrieves all application client user information
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -424,7 +585,18 @@ export class AppClientControllerApi extends BaseAPI implements AppClientControll
     }
 
     /**
-     * Updates an existing Application Client
+     * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
+     * @summary Gets all available privileges available for an app-client
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppClientControllerApi
+     */
+    public getClientTypePrivs(options?: any) {
+        return AppClientControllerApiFp(this.configuration).getClientTypePrivs(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
      * @summary Updates an existing Application Client
      * @param {string} id App Client ID to update
      * @param {AppClientUserDto} appClientUserDto 

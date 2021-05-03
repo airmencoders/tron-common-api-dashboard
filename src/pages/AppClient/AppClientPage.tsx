@@ -6,6 +6,8 @@ import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudForm
 import { AppClientFlat } from '../../state/app-clients/app-client-flat';
 import AppClientForm from './AppClientForm';
 import AppClientDelete from './AppClientDelete';
+import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn({
@@ -30,6 +32,8 @@ const columnHeaders: GridColumn[] = [
   }),
 ];
 
+const currentUser = accessAuthorizedUserState();
+
 export function AppClientPage() {
   return (
     <DataCrudFormPage<AppClientFlat, AppClientFlat>
@@ -40,8 +44,8 @@ export function AppClientPage() {
       updateForm={AppClientForm}
       useDataState={useAppClientsState}
       allowEdit={true}
-      allowDelete
-      allowAdd
+      allowDelete={currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
+      allowAdd={currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
       deleteComponent={AppClientDelete}
       autoResizeColumns
       autoResizeColummnsMinWidth={700}
