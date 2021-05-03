@@ -13,4 +13,5 @@ export interface ButtonProps {
   className?: string;
   unstyled?: boolean;
   style?: React.CSSProperties;
+  disableMobileFullWidth?: boolean;
 }

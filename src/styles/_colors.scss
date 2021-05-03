@@ -28,6 +28,7 @@ $font-color-lighter: color('gray-cool-50');
 
 $success: color($theme-color-success);
 $error: color($theme-color-error);
+$disabled: #c9c9c9;
 
 .success-icon-color {
   color: $success;
@@ -41,6 +42,10 @@ $error: color($theme-color-error);
   color: color('orange-30v');
 }
 
+.edit-icon-color {
+  color: color($theme-color-primary);
+}
 
-
-
+.icon-disabled-color {
+  color: $disabled;
+}

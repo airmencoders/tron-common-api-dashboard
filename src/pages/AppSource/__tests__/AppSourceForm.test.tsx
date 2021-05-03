@@ -51,7 +51,6 @@ describe('Test App Source Form', () => {
     };
   });
 
-
   it('Update', async () => {
     successAction = undefined;
 
@@ -113,6 +112,7 @@ describe('Test App Source Form', () => {
 
     await (expect(page.findByText('Endpoint Editor'))).resolves.toBeInTheDocument();
 
+    // Close endpoint editor
     const closeBtn = (await (screen.findByTitle('close-modal')));
     expect(closeBtn).toBeInTheDocument();
     expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
@@ -138,11 +138,10 @@ describe('Test App Source Form', () => {
     const elem = page.getByTestId('app-source-form');
     expect(elem).toBeInTheDocument();
 
-    const title = 'Endpoint No Longer Available';
-
     // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
+    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    const deleteEndpointBtn = page.getByTestId('unused-true');
+    fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
@@ -153,59 +152,28 @@ describe('Test App Source Form', () => {
     fireEvent.click(xCloseBtn!);
 
     // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
+    fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
     // Click the button to close delete confirmation modal
-    const closeBtn = (await (screen.getAllByText('Cancel'))).find(element => element.getAttribute('type') === 'button');
+    const closeBtn = (screen.getAllByText('Cancel')).find(element => element.getAttribute('type') === 'button');
     expect(closeBtn).toBeInTheDocument();
     fireEvent.click(closeBtn!);
 
     // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
+    fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
 
     // Click the delete button to confirm deleting endpoint
-    const deleteBtn = (await (screen.getAllByText('Delete'))).find(element => element.getAttribute('type') === 'submit');
+    const deleteBtn = (screen.getAllByText('Delete')).find(element => element.getAttribute('type') === 'submit');
     expect(deleteBtn).toBeInTheDocument();
     fireEvent.click(deleteBtn!);
 
     await (expect(page.findByText('Update'))).resolves.toBeInTheDocument();
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not open delete confirmation after saving occurred', async () => {
-    successAction = {successMsg: 'Success', success: true};
-    appSourceDetailsDto.endpoints![0].deleted = true;
-    const page = render(
-      <MemoryRouter>
-        <AppSourceForm
-          onSubmit={onSubmit}
-          onClose={onClose}
-          formActionType={FormActionType.UPDATE}
-          isSubmitting={false}
-          successAction={successAction}
-          data={appSourceDetailsDto}
-        />
-      </MemoryRouter>
-    );
-
-    const elem = page.getByTestId('app-source-form');
-    expect(elem).toBeInTheDocument();
-
-    const title = 'Endpoint No Longer Available';
-
-    // Click the button to delete endpoint
-    await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
-    fireEvent.click(page.getByTitle(title));
-
-    await (expect(page.queryByText('Delete Confirmation'))).toBeNull()
-    
   });
 
   it('Has default values if none given', () => {
