@@ -1,17 +1,17 @@
-import { none, State, useHookstate } from "@hookstate/core";
-import { Initial } from "@hookstate/initial";
-import { Touched } from "@hookstate/touched";
-import { Validation } from "@hookstate/validation";
+import { none, useHookstate } from '@hookstate/core';
+import { Initial } from '@hookstate/initial';
+import { Touched } from '@hookstate/touched';
+import { Validation } from '@hookstate/validation';
 import { RowClickedEvent } from 'ag-grid-community';
 import React, { FormEvent } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
-import Form from "../../components/forms/Form/Form";
+import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
-import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInput from '../../components/forms/TextInput/TextInput';
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import Modal from '../../components/Modal/Modal';
@@ -30,7 +30,9 @@ interface AdminEmail {
 
 interface EndpointModalState {
   isOpen: boolean;
-  selected?: State<AppEndpointDto>;
+  bulkSelected: AppEndpointDto[];
+  // Allows for row click single editing
+  singleSelected: AppEndpointDto[];
 }
 
 interface DeleteEndpointModalState {
@@ -53,7 +55,8 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
   const endpointModifyState = useHookstate<EndpointModalState>({
     isOpen: false,
-    selected: undefined
+    bulkSelected: [],
+    singleSelected: []
   });
 
   const deleteEndpointModifyState = useHookstate<DeleteEndpointModalState>({
@@ -135,7 +138,10 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       headerName: 'Path',
       resizable: true,
       cellRenderer: UnusedEndpointCellRenderer,
-      cellRendererParams: { onClick: onDeleteEndpointClicked }
+      cellRendererParams: { onClick: onDeleteEndpointClicked },
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+      headerCheckboxSelectionFilteredOnly: true
     }),
     new GridColumn({
       field: 'requestType',
@@ -176,18 +182,27 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
     const rowData: AppEndpointDto = event.data;
 
-    const stateData = formState.endpoints?.find(endpoint => endpoint.get().path === rowData.path && endpoint.get().requestType === rowData.requestType);
+    endpointModifyState.singleSelected[endpointModifyState.singleSelected.length].set(rowData);
+    endpointModifyState.isOpen.set(true);
+  }
 
-    endpointModifyState.merge({
-      isOpen: true,
-      selected: stateData
-    });
+  function onEndpointEditBtnClicked() {
+    endpointModifyState.isOpen.set(true);
+  }
+
+  function onRowSelected(data: AppEndpointDto, selectionEvent: 'selected' | 'unselected') {
+    if (selectionEvent === 'selected') {
+      endpointModifyState.bulkSelected[endpointModifyState.bulkSelected.length].set(data);
+    } else {
+      endpointModifyState.bulkSelected.find(endpoint => endpoint.id.get() === data.id)?.set(none);
+    }
   }
 
   function endpointModalClose() {
     endpointModifyState.merge({
       isOpen: false,
-      selected: undefined
+      // Always reset a singly selected item
+      singleSelected: []
     });
   }
 
@@ -200,7 +215,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
   const endpointModalOpen = endpointModifyState.isOpen.get();
   const deleteEndpointModalOpen = deleteEndpointModifyState.isOpen.get();
-  const endpointSelectedData = endpointModifyState.selected.get();
+  const endpointSelectedData = endpointModifyState.singleSelected.length > 0 ? endpointModifyState.singleSelected : endpointModifyState.bulkSelected;
   const deleteEndpointSelectedData = deleteEndpointModifyState.selected.get();
   
   function deleteEndpoint(): void {  
@@ -297,6 +312,12 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           columns={appSourceEndpointColumns}
           items={formState.endpoints.get()}
           onRowClicked={onEndpointRowClicked}
+          suppressRowClickSelection
+          rowSelection={'multiple'}
+          showEditBtn
+          disableEditBtn={endpointSelectedData.length === 0}
+          onEditBtnClick={onEndpointEditBtnClicked}
+          onRowSelected={onRowSelected}
         />
 
         <SuccessErrorMessage
@@ -327,16 +348,16 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           onSubmit={endpointModalClose}
           submitText="Done"
         />}
-        show={endpointModalOpen && endpointSelectedData != null}
+        show={endpointModalOpen && endpointSelectedData.length > 0}
         onHide={endpointModalClose}
         height="auto"
         width="auto"
         className={"endpoint-editor-modal"}
       >
-        {endpointSelectedData &&
+        {endpointSelectedData.length > 0 &&
           <AppSourceEndpointEditor
             appClientPrivileges={formState.appClients}
-            endpoint={endpointSelectedData}
+            selectedEndpoints={endpointSelectedData}
           />
         }
 

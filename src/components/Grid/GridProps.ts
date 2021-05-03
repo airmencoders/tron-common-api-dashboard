@@ -1,4 +1,4 @@
-import { GridApi, RowClickedEvent } from 'ag-grid-community';
+import { GridApi, RowClickedEvent, RowNode, RowSelectedEvent } from 'ag-grid-community';
 import GridColumn from './GridColumn';
 
 export interface GridProps {
@@ -34,4 +34,10 @@ export interface GridProps {
   hardRefresh?: boolean;
 
   className?: string;
+  suppressRowClickSelection?: boolean;
+
+  /**
+   * Returns the data of the row and the event that occurred (selected or unselected)
+   */
+  onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
 }

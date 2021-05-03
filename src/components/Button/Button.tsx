@@ -6,7 +6,7 @@ import './Button.scss';
 
 function Button(props: ButtonProps) {
   return (
-      <UswdsButton {...props} />
+    <UswdsButton {...props} className={`${props.className ?? ''}${props.disableMobileFullWidth ? ' usa-button--disable-mobile-full-width' : ''}`} />
   );
 }
 

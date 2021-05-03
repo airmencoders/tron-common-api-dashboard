@@ -3,5 +3,5 @@ import { AppClientUserPrivDto, AppEndpointDto } from '../../openapi';
 
 export interface AppSourceEndpointEditorProps {
   appClientPrivileges: State<AppClientUserPrivDto[]>;
-  endpoint: State<AppEndpointDto>;
+  selectedEndpoints: State<AppEndpointDto[]>;
 }

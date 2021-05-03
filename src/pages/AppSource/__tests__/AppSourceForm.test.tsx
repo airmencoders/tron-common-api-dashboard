@@ -51,7 +51,6 @@ describe('Test App Source Form', () => {
     };
   });
 
-
   it('Update', async () => {
     successAction = undefined;
 
@@ -113,6 +112,7 @@ describe('Test App Source Form', () => {
 
     await (expect(page.findByText('Endpoint Editor'))).resolves.toBeInTheDocument();
 
+    // Close endpoint editor
     const closeBtn = (await (screen.findByTitle('close-modal')));
     expect(closeBtn).toBeInTheDocument();
     expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
@@ -204,7 +204,7 @@ describe('Test App Source Form', () => {
     await (expect(page.findByTitle(title))).resolves.toBeInTheDocument();
     fireEvent.click(page.getByTitle(title));
 
-    await (expect(page.queryByText('Delete Confirmation'))).toBeNull()
+    expect(page.queryByText('Delete Confirmation'));
     
   });
 

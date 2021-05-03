@@ -4,4 +4,28 @@
   &__grid {
     margin-top: units(0.5);
   }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+
+    .actions {
+      // Remove default button margins
+      &__edit-btn {
+        margin: 0 0 0 units(1);
+      }
+
+      &__edit-btn:disabled {
+        background-color: transparent;
+      }
+    }
+
+    .tron-text-input {
+      flex: 1 1;
+      .usa-input.actions__input {
+        // Remove default input margins
+        margin: 0;
+      }
+    }
+  }
 }

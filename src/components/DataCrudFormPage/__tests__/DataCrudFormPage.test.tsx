@@ -472,7 +472,7 @@ describe('Test DataCrudFormPage', () => {
     expect(deleteModal).toBeDefined();
 
     const deleteBtnSearch = await screen.findAllByText('Delete');
-    const deleteBtn = deleteBtnSearch.find(x => x.className === 'usa-button');
+    const deleteBtn = deleteBtnSearch.find(x => x.className.includes('usa-button'));
 
     if (deleteBtn) fireEvent.click(deleteBtn);
     await waitForElementToBeRemoved(deleteModal);
@@ -617,7 +617,7 @@ describe('Test DataCrudFormPage', () => {
     expect(deleteModal).toBeDefined();
 
     const deleteBtnSearch = await screen.findAllByText('Delete');
-    const deleteBtn = deleteBtnSearch.find(x => x.className === 'usa-button');
+    const deleteBtn = deleteBtnSearch.find(x => x.className.includes('usa-button'));
 
     if (deleteBtn) fireEvent.click(deleteBtn);
 

@@ -11,7 +11,10 @@ export default class GridColumn {
       cellRenderer,
       cellRendererParams,
       resizable = false,
-      showTooltip = true
+      showTooltip = true,
+      checkboxSelection = false,
+      headerCheckboxSelection = false,
+      headerCheckboxSelectionFilteredOnly = false
     } = params;
 
     this._field = field;
@@ -23,6 +26,9 @@ export default class GridColumn {
     this._cellRendererParams = cellRendererParams;
     this._resizable = resizable;
     this._showTooltip = showTooltip;
+    this._checkboxSelection = checkboxSelection;
+    this._headerCheckboxSelection = headerCheckboxSelection;
+    this._headerCheckboxSelectionFilteredOnly = headerCheckboxSelectionFilteredOnly;
   }
 
   private _field: string;
@@ -34,6 +40,9 @@ export default class GridColumn {
   private _cellRendererParams?: any;
   private _resizable: boolean;
   private _showTooltip: boolean;
+  private _checkboxSelection: boolean;
+  private _headerCheckboxSelection: boolean;
+  private _headerCheckboxSelectionFilteredOnly: boolean;
 
   get field(): string {
     return this._field;
@@ -69,5 +78,17 @@ export default class GridColumn {
 
   get showTooltip(): boolean {
     return this._showTooltip;
+  }
+
+  get checkboxSelection(): boolean {
+    return this._checkboxSelection;
+  }
+
+  get headerCheckboxSelection(): boolean {
+    return this._headerCheckboxSelection;
+  }
+
+  get headerCheckboxSelectionFilteredOnly(): boolean {
+    return this._headerCheckboxSelectionFilteredOnly;
   }
 }
