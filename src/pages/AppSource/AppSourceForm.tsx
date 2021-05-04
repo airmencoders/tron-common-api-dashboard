@@ -265,6 +265,20 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
         </FormGroup>
 
         <FormGroup
+          labelName="gateway-path"
+          labelText="Full Path"
+          isError={false}
+        >
+          <TextInput
+            id="gateway-path"
+            name="gateway-path"
+            type="text"
+            defaultValue={props.data?.appSourcePath}
+            disabled={true}
+          />
+        </FormGroup>
+
+        <FormGroup
           labelName="admin"
           labelText="Admins"
           isError={Touched(adminAddState.email).touched() && Validation(adminAddState.email).invalid() && adminAddState.email.get().trim().length > 0}
