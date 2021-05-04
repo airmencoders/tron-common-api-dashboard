@@ -1,0 +1,9 @@
+@import "../../styles/base";
+
+.scratch-storage-delete-container {
+  &__content-table {
+    tr > * + * {
+      padding-left: $default-panel-padding-x;
+    }
+  }
+}

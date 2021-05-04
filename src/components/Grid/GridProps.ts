@@ -1,4 +1,4 @@
-import { GridApi, RowClickedEvent } from 'ag-grid-community';
+import { GridApi, RowClickedEvent, RowNode, RowSelectedEvent } from 'ag-grid-community';
 import GridColumn from './GridColumn';
 
 export interface GridProps {
@@ -27,5 +27,17 @@ export interface GridProps {
    */
   disabledGridColumnVirtualization?: boolean;
 
+  /**
+   * If set to true, it will force the enter grid to be
+   * refreshed as opposed to the changed cells
+   */
+  hardRefresh?: boolean;
+
   className?: string;
+  suppressRowClickSelection?: boolean;
+
+  /**
+   * Returns the data of the row and the event that occurred (selected or unselected)
+   */
+  onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
 }

@@ -35,6 +35,12 @@ export interface AppClientUserDto {
     privileges?: Array<Privilege>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof AppClientUserDto
+     */
+    appClientDeveloperEmails?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof AppClientUserDto
      */

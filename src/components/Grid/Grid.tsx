@@ -1,6 +1,6 @@
 import { useHookstate } from '@hookstate/core';
 import { GridApi } from 'ag-grid-community';
-import { GridReadyEvent } from 'ag-grid-community/dist/lib/events';
+import { GridReadyEvent, RowSelectedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
@@ -29,7 +29,7 @@ function Grid(props: GridProps) {
   // Refresh grid cells only if the length of the dat has not changed
   useEffect(() => {
     if (!rowDataLengthChanged.current) {
-      gridApi?.refreshCells();
+      props.hardRefresh ? gridApi?.setRowData(props.data) : gridApi?.refreshCells();
     } else {
       rowDataLengthChanged.current = false;
     }
@@ -56,6 +56,13 @@ function Grid(props: GridProps) {
 
   }, [windowWidth.get()])
 
+  function onRowSelected(event: RowSelectedEvent) {
+    const data = event.data;
+    const isSelected = event.node.isSelected();
+
+    props.onRowSelected?.(data, isSelected ? 'selected' : 'unselected');
+  }
+
   return (
       <div className={`grid-component ${props.className}`}
            style={{ width: '100%', height: props.height ?? '60vh'}}
@@ -68,8 +75,10 @@ function Grid(props: GridProps) {
               rowClass={props.rowClass}
               quickFilterText={props.quickFilterText || ''}
               rowSelection={props.rowSelection || 'none'}
-              suppressColumnVirtualisation={props.disabledGridColumnVirtualization}
+              suppressColumnVirtualisation={!process.env.NODE_ENV || process.env.NODE_ENV === 'test' || props.disabledGridColumnVirtualization}
               enableBrowserTooltips
+              suppressRowClickSelection={props.suppressRowClickSelection}
+              onRowSelected={onRowSelected}
           >
             {
               props.columns.map(col => (
@@ -84,6 +93,9 @@ function Grid(props: GridProps) {
                     cellRendererParams={col.cellRendererParams}
                     tooltipField={col.showTooltip ? col.field : undefined}
                     resizable={col.resizable}
+                    checkboxSelection={col.checkboxSelection}
+                    headerCheckboxSelection={col.headerCheckboxSelection}
+                    headerCheckboxSelectionFilteredOnly={col.headerCheckboxSelectionFilteredOnly}
                 />
               ))
             }

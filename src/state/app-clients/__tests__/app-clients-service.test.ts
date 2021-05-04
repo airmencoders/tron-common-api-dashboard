@@ -6,7 +6,7 @@ import { AppClientControllerApi, AppClientControllerApiInterface } from '../../.
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { AppClientUserDetailsDto, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
@@ -46,11 +46,11 @@ describe('App Client State Tests', () => {
           "id": 2,
           "name": PrivilegeType.WRITE
         }
-      ]
+      ],
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
-      name: "Test1"
+      name: "Test1",
     }
   ];
 
@@ -71,7 +71,9 @@ describe('App Client State Tests', () => {
       id: 2,
       name: PrivilegeType.WRITE
     }
-  ]
+  ];
+
+  const testClientPrivilegesDto : PrivilegeDto[] = testClientPrivileges as PrivilegeDto[];
 
   const testClientDto: AppClientUserDto = {
     id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
@@ -79,12 +81,30 @@ describe('App Client State Tests', () => {
     privileges: testClientPrivileges
   };
 
+  const testClientDetailsDto: AppClientUserDetailsDto = {
+    id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
+    name: "Test Client",
+    privileges: testClientPrivileges,
+    appClientDeveloperEmails: [],
+    appEndpointPrivs: [],
+  };
+
   const testClientFlat: AppClientFlat = {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
     name: 'Test Client',
     read: true,
-    write: true
+    write: true,
   }
+
+  const testClientFlatWithDetails: AppClientFlat = {
+    id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+    name: 'Test Client',
+    read: true,
+    write: true,
+    appClientDeveloperEmails: [],
+    appEndpointPrivs: [],
+  }
+
 
   const axiosPostPutResponse = {
     data: testClientDto,
@@ -226,6 +246,16 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
     appClientsState.set([testClientFlat]);
 
     await expect(wrappedState.sendUpdate(testClientFlat)).resolves.toEqual(testClientFlat);
@@ -235,6 +265,16 @@ describe('App Client State Tests', () => {
   it('Test sendUpdate Fail', async () => {
     appClientsApi.updateAppClient = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
+    });
+
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
     });
 
     await expect(wrappedState.sendUpdate(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -260,12 +300,32 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
     await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(testClientFlat);
   });
 
   it('Test sendCreate Fail', async () => {
     appClientsApi.createAppClientUser = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
+    });
+
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -306,28 +366,9 @@ describe('App Client State Tests', () => {
   });
 
   it('Test convertRowDataToEditableData', async () => {
-    await expect(wrappedState.convertRowDataToEditableData(testClientFlat)).resolves.toEqual(testClientFlat);
-  });
-
-  it('Test convertAppClientToFlat', () => {
-    const result = wrappedState.convertToFlat(testClientDto);
-    expect(result).toEqual(testClientFlat);
-  });
-
-  it('Test convertToDto', () => {
-    const result = wrappedState.convertToDto(testClientFlat);
-    expect(result).toEqual(testClientDto);
-  });
-
-  it('Test createAppPrivilegesArr', () => {
-    const result = wrappedState.createAppPrivilegesArr(testClientFlat);
-    expect(result).toEqual(testClientPrivileges);
-  });
-
-  it('Test Privilege not exist in state', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: [],
+    appClientsApi.getAppClientRecord = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDetailsDto>>(resolve => resolve({
+        data: testClientDetailsDto,
         status: 200,
         headers: {},
         config: {},
@@ -335,19 +376,76 @@ describe('App Client State Tests', () => {
       }));
     });
 
-    await accessPrivilegeState().fetchAndStorePrivileges();
-
-    const result = wrappedState.createAppPrivileges(testClientFlat);
-    expect(result.size).toEqual(0);
+    await expect(wrappedState.convertRowDataToEditableData(testClientFlat)).resolves.toEqual(testClientFlatWithDetails);
   });
 
-  it('Test No privilege user', () => {
+  it('Test convertAppClientToFlat', () => {
+    const result = wrappedState.convertToFlat(testClientDto);
+    expect(result).toEqual(testClientFlat);
+  });
+
+  it('Test convertToDto', async () => {
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
+    const result = wrappedState.convertToDto(testClientFlat);
+    await expect(result).resolves.toEqual(testClientDto);
+  });
+
+  it('Test createAppPrivilegesArr', async () => {
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
+    const result = await wrappedState.createAppPrivilegesArr(testClientFlat);
+    expect(result).toEqual(testClientPrivileges);
+  });
+
+  it('Test Create App Privileges', async () => {
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });   
+
+    const result = await wrappedState.createAppPrivileges(testClientFlat);
+    expect(result.size).toEqual(2);
+  });
+
+  it('Test No privilege user', async () => {
+    appClientsApi.getClientTypePrivs = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
+        data: testClientPrivilegesDto,
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+
     const noPrivUser = {
       ...testClientFlat,
       read: false,
       write: false
     };
-    const result = wrappedState.createAppPrivileges(noPrivUser);
+    const result = await wrappedState.createAppPrivileges(noPrivUser);
     expect(result.size).toEqual(0);
   });
 });
