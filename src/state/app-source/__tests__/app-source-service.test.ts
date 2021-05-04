@@ -274,7 +274,7 @@ describe('App Source State Tests', () => {
   });
 
   it('should generate full path based on app source path', () => {
-    const fullPath = wrappedState.generateFullPath('test');
+    const fullPath = wrappedState.generateAppSourcePath('test');
 
     expect(fullPath).toEqual('/api/v1/app/test/<app-source-endpoint>');
   });

@@ -130,7 +130,7 @@ describe('Test App Source Endpoint Editor', () => {
     expect(page.getByText(allClients[0].name!)).toBeInTheDocument();
     expect(page.getByText(allClients[1].name!)).toBeInTheDocument();
 
-    const appClientCheckboxParent = page.getAllByTestId('checkbox-cell-renderer');
+    const appClientCheckboxParent = await page.findAllByTestId('checkbox-cell-renderer');
 
     // App Client 1
     const appClient1Checkbox = within(appClientCheckboxParent[0]).getByRole('checkbox');

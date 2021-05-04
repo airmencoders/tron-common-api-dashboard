@@ -266,7 +266,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
         <FormGroup
           labelName="gateway-path"
-          labelText="Full Path"
+          labelText="Path"
           isError={false}
         >
           <TextInput

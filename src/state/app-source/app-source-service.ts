@@ -33,12 +33,12 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     return result;
   }
 
-  generateFullPath(appSourceName?: string): string {
-    if (appSourceName == null) {
+  generateAppSourcePath(appSourcePath?: string): string {
+    if (appSourcePath == null) {
       return '';
     }
 
-    return `${Config.API_URL}app/${appSourceName}/<app-source-endpoint>`;
+    return `${Config.API_URL}app/${appSourcePath}/<app-source-endpoint>`;
   }
 
   /**
@@ -88,7 +88,7 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     const appSourceDetailsDto = (await this.appSourceApi.getAppSourceDetails(rowData.id)).data;
     const appSourceDetails: AppSourceDetailsDto = {
       ...appSourceDetailsDto,
-      appSourcePath: this.generateFullPath(appSourceDetailsDto.appSourcePath)
+      appSourcePath: this.generateAppSourcePath(appSourceDetailsDto.appSourcePath)
     };
 
     return Promise.resolve(appSourceDetails);
