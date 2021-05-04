@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppSourceForm from '../AppSourceForm';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
@@ -96,12 +96,14 @@ describe('Test App Source Form', () => {
     fireEvent.click(addAdminBtn);
 
     await expect(page.findByText(adminEmailTest)).resolves.toBeInTheDocument();
-
+    const adminEmailElement = page.getByText(adminEmailTest);
+    const waitForAdminEmailRemoval = waitForElementToBeRemoved(adminEmailElement);
     // Remove admin email
     const removeBtn = await page.findByTitle('remove');
     fireEvent.click(removeBtn);
 
-    await expect(page.findByText(adminEmailTest)).rejects.toThrow();
+    await waitForAdminEmailRemoval;
+
 
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -146,7 +148,7 @@ describe('Test App Source Form', () => {
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
     // Close delete confirmation modal
-    const xCloseBtn = (await (screen.findByTitle('close-modal')));
+    const xCloseBtn = (await (screen.findByTitle('close-modal', {}, { timeout: 3000 })));
     expect(xCloseBtn).toBeInTheDocument();
     expect(xCloseBtn?.classList.contains('close-btn')).toBeTruthy();
     fireEvent.click(xCloseBtn!);
