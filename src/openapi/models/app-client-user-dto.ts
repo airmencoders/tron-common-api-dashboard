@@ -44,7 +44,7 @@ export interface AppClientUserDto {
      * @type {string}
      * @memberof AppClientUserDto
      */
-    name?: string;
+    name: string;
 }
 
 

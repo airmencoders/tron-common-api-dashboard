@@ -30,28 +30,28 @@ export interface AppClientUserDetailsDto {
     id?: string;
     /**
      * 
-     * @type {Array<Privilege>}
-     * @memberof AppClientUserDetailsDto
-     */
-    privileges?: Array<Privilege>;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppClientUserDetailsDto
-     */
-    name?: string;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof AppClientUserDetailsDto
      */
     appClientDeveloperEmails?: Array<string>;
     /**
      * 
+     * @type {Array<Privilege>}
+     * @memberof AppClientUserDetailsDto
+     */
+    privileges?: Array<Privilege>;
+    /**
+     * 
      * @type {Array<AppEndpointClientInfoDto>}
      * @memberof AppClientUserDetailsDto
      */
     appEndpointPrivs?: Array<AppEndpointClientInfoDto>;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppClientUserDetailsDto
+     */
+    name?: string;
 }
 
 

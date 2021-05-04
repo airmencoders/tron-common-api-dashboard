@@ -2,6 +2,7 @@ import { State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
 import { DataService } from '../data-service/data-service';
 import { AppClientSummaryDto, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
+import Config from '../../api/configuration';
 
 export default class AppSourceService implements DataService<AppSourceDto, AppSourceDetailsDto> {
   constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) { }
@@ -30,6 +31,14 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     const result = response().then(res => res.data);
 
     return result;
+  }
+
+  generateAppSourcePath(appSourcePath?: string): string {
+    if (appSourcePath == null) {
+      return '';
+    }
+
+    return `${Config.API_URL}app/${appSourcePath}/<app-source-endpoint>`;
   }
 
   /**
@@ -76,9 +85,13 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
       return Promise.reject(new Error('App Source ID must be defined'));
     }
 
-    const appSourceDetails = this.appSourceApi.getAppSourceDetails(rowData.id);
+    const appSourceDetailsDto = (await this.appSourceApi.getAppSourceDetails(rowData.id)).data;
+    const appSourceDetails: AppSourceDetailsDto = {
+      ...appSourceDetailsDto,
+      appSourcePath: this.generateAppSourcePath(appSourceDetailsDto.appSourcePath)
+    };
 
-    return Promise.resolve((await appSourceDetails).data);
+    return Promise.resolve(appSourceDetails);
   }
 
   private isStateReady(): boolean {

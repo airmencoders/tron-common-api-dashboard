@@ -53,7 +53,13 @@ describe('App Source State Tests', () => {
         path: 'endpoint_path',
         requestType: 'GET'
       }
-    ]
+    ],
+    appSourcePath: 'test'
+  };
+
+  const testAppSourceDetailsDtoWithFullPath: AppSourceDetailsDto = {
+    ...testAppSourceDetailsDto,
+    appSourcePath: '/api/v1/app/test/<app-source-endpoint>'
   };
 
   const axiosGetAppSourceDtosResponse: AxiosResponse = {
@@ -261,9 +267,15 @@ describe('App Source State Tests', () => {
       return new Promise<AxiosResponse<AppSourceDetailsDto>>(resolve => resolve(axiosGetAppSourceDetailsDtoResponse));
     });
 
-    await expect(wrappedState.convertRowDataToEditableData(testAppSourceDto)).resolves.toEqual(testAppSourceDetailsDto);
+    await expect(wrappedState.convertRowDataToEditableData(testAppSourceDto)).resolves.toEqual(testAppSourceDetailsDtoWithFullPath);
 
     await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: undefined })).rejects.toBeDefined();
     await expect(wrappedState.convertRowDataToEditableData({ ...testAppSourceDto, id: '' })).rejects.toBeDefined();
+  });
+
+  it('should generate full path based on app source path', () => {
+    const fullPath = wrappedState.generateAppSourcePath('test');
+
+    expect(fullPath).toEqual('/api/v1/app/test/<app-source-endpoint>');
   });
 });

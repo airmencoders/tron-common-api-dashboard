@@ -36,6 +36,12 @@ export interface AppSourceDetailsDto {
     name: string;
     /**
      * 
+     * @type {string}
+     * @memberof AppSourceDetailsDto
+     */
+    appSourcePath?: string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof AppSourceDetailsDto
      */

@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppSourceForm from '../AppSourceForm';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
@@ -96,12 +96,14 @@ describe('Test App Source Form', () => {
     fireEvent.click(addAdminBtn);
 
     await expect(page.findByText(adminEmailTest)).resolves.toBeInTheDocument();
-
+    const adminEmailElement = page.getByText(adminEmailTest);
+    const waitForAdminEmailRemoval = waitForElementToBeRemoved(adminEmailElement);
     // Remove admin email
     const removeBtn = await page.findByTitle('remove');
     fireEvent.click(removeBtn);
 
-    await expect(page.findByText(adminEmailTest)).rejects.toThrow();
+    await waitForAdminEmailRemoval;
+
 
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -139,7 +141,7 @@ describe('Test App Source Form', () => {
     expect(elem).toBeInTheDocument();
 
     // Click the button to delete endpoint
-    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    await (expect(page.findByTestId('unused-true', {}, { timeout: 3000 }))).resolves.toBeInTheDocument();
     const deleteEndpointBtn = page.getByTestId('unused-true');
     fireEvent.click(deleteEndpointBtn);
 
