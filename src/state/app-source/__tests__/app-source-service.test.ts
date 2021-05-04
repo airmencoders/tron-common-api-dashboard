@@ -59,7 +59,7 @@ describe('App Source State Tests', () => {
 
   const testAppSourceDetailsDtoWithFullPath: AppSourceDetailsDto = {
     ...testAppSourceDetailsDto,
-    appSourcePath: 'api/v1/app/test/<app-source-endpoint>'
+    appSourcePath: '/api/v1/app/test/<app-source-endpoint>'
   };
 
   const axiosGetAppSourceDtosResponse: AxiosResponse = {
@@ -276,6 +276,6 @@ describe('App Source State Tests', () => {
   it('should generate full path based on app source path', () => {
     const fullPath = wrappedState.generateFullPath('test');
 
-    expect(fullPath).toEqual('api/v1/app/test/<app-source-endpoint>');
+    expect(fullPath).toEqual('/api/v1/app/test/<app-source-endpoint>');
   });
 });
