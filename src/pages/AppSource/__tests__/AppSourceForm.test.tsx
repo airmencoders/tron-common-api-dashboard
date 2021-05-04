@@ -141,14 +141,14 @@ describe('Test App Source Form', () => {
     expect(elem).toBeInTheDocument();
 
     // Click the button to delete endpoint
-    await (expect(page.findByTestId('unused-true'))).resolves.toBeInTheDocument();
+    await (expect(page.findByTestId('unused-true', {}, { timeout: 3000 }))).resolves.toBeInTheDocument();
     const deleteEndpointBtn = page.getByTestId('unused-true');
     fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
     
     // Close delete confirmation modal
-    const xCloseBtn = (await (screen.findByTitle('close-modal', {}, { timeout: 3000 })));
+    const xCloseBtn = (await (screen.findByTitle('close-modal')));
     expect(xCloseBtn).toBeInTheDocument();
     expect(xCloseBtn?.classList.contains('close-btn')).toBeTruthy();
     fireEvent.click(xCloseBtn!);
