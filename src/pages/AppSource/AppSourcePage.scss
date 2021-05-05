@@ -1,0 +1,28 @@
+@import"../../styles/base";
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.app-source-page {
+  .side-drawer {
+    @include breakpoint-above(desktop) {
+      width: 40%;
+    }
+    .tron-form .usa-form {
+      @include breakpoint-above(desktop) {
+        max-width: 100%;
+      }
+    }
+    .tron-text-input {
+      input {
+        max-width: 25em;
+      }
+      .item-choose__input {
+        max-width: none;
+      }
+    }
+    .app-source-form__add-admin-btn {
+      max-width: 9em;
+    }
+
+  }
+}
