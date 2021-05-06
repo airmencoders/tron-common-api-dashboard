@@ -35,9 +35,6 @@ models/app-source-count-metric-dto.ts
 models/app-source-details-dto.ts
 models/app-source-dto.ts
 models/app-source-metric-dto.ts
-models/bad-request-exception-cause-stack-trace.ts
-models/bad-request-exception-cause-suppressed.ts
-models/bad-request-exception-cause.ts
 models/bad-request-exception.ts
 models/coast-guardsman.ts
 models/count-metric-dto.ts
@@ -66,6 +63,9 @@ models/privilege.ts
 models/pub-sub-ledger.ts
 models/rank.ts
 models/record-not-found-exception.ts
+models/resource-already-exists-exception-cause-stack-trace.ts
+models/resource-already-exists-exception-cause-suppressed.ts
+models/resource-already-exists-exception-cause.ts
 models/resource-already-exists-exception.ts
 models/sailor.ts
 models/scratch-storage-app-registry-dto.ts

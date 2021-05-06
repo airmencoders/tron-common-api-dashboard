@@ -60,6 +60,42 @@ export const PuckboardEtlControllerApiAxiosParamCreator = function (configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        testPuckboardComms: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/puckboard/test`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -76,6 +112,18 @@ export const PuckboardEtlControllerApiFp = function(configuration?: Configuratio
          */
         async getPuckboardData(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
             const localVarAxiosArgs = await PuckboardEtlControllerApiAxiosParamCreator(configuration).getPuckboardData(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async testPuckboardComms(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await PuckboardEtlControllerApiAxiosParamCreator(configuration).testPuckboardComms(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -98,6 +146,14 @@ export const PuckboardEtlControllerApiFactory = function (configuration?: Config
         getPuckboardData(options?: any): AxiosPromise<object> {
             return PuckboardEtlControllerApiFp(configuration).getPuckboardData(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        testPuckboardComms(options?: any): AxiosPromise<object> {
+            return PuckboardEtlControllerApiFp(configuration).testPuckboardComms(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -114,6 +170,14 @@ export interface PuckboardEtlControllerApiInterface {
      * @memberof PuckboardEtlControllerApiInterface
      */
     getPuckboardData(options?: any): AxiosPromise<object>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PuckboardEtlControllerApiInterface
+     */
+    testPuckboardComms(options?: any): AxiosPromise<object>;
 
 }
 
@@ -132,5 +196,15 @@ export class PuckboardEtlControllerApi extends BaseAPI implements PuckboardEtlCo
      */
     public getPuckboardData(options?: any) {
         return PuckboardEtlControllerApiFp(this.configuration).getPuckboardData(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PuckboardEtlControllerApi
+     */
+    public testPuckboardComms(options?: any) {
+        return PuckboardEtlControllerApiFp(this.configuration).testPuckboardComms(options).then((request) => request(this.axios, this.basePath));
     }
 }

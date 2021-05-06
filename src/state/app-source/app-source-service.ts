@@ -33,6 +33,22 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     return result;
   }
 
+  fetchAPISpecFile(id: string): Promise<any> {
+    const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFile(id)
+
+    const result = response().then(res => res.data);
+    
+    return result;
+  }
+
+  fetchAPISpecFileByEndpointId(id: string): Promise<any> {
+    const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFileByEndpointPriv(id)
+
+    const result = response().then(res => res.data);
+    
+    return result;
+  }
+
   generateAppSourcePath(appSourcePath?: string): string {
     if (appSourcePath == null) {
       return '';
