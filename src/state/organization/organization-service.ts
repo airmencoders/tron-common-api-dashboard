@@ -47,9 +47,18 @@ export default class OrganizationService implements DataService<OrganizationDto,
   }
 
   async convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
-    // fetch selected org's detailed info 
-    await this.getOrgDetails(rowData?.id || '')
-    return Promise.resolve(Object.assign({}, rowData));
+    const { id } = rowData;
+    if (!id) {
+      return Promise.reject(new Error('Organization ID must be defined'));
+    }
+
+    try {
+      // fetch selected org's detailed info 
+      await this.getOrgDetails(id);
+      return Promise.resolve(Object.assign({}, rowData));
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   async sendCreate(toCreate: OrganizationDto): Promise<OrganizationDto> {

@@ -20,6 +20,7 @@ import DataCrudDelete from './DataCrudDelete';
 import { DataCrudFormErrors } from './data-crud-form-errors';
 import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -52,15 +53,27 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
           isLoading: true
         });
 
-        const dtoData = await dataState.convertRowDataToEditableData(rowData);
-        pageState.merge({
-          formAction: FormActionType.UPDATE,
-          selected: dtoData,
-          formErrors: undefined,
-          successAction: undefined,
-          isSubmitting: false,
-          isLoading: false
-        });
+        try {
+          const dtoData = await dataState.convertRowDataToEditableData(rowData);
+          pageState.merge({
+            formAction: FormActionType.UPDATE,
+            selected: dtoData,
+            formErrors: undefined,
+            successAction: undefined,
+            isSubmitting: false,
+            isLoading: false
+          });
+        } catch (err) {
+          const error = prepareRequestError(err);
+
+          /**
+           * Ensures the sidedrawer does not get put into
+           * an infinite loading state on error when 
+           * requesting data.
+           */
+          pageState.set(getInitialCrudPageState());
+          createTextToast(ToastType.ERROR, error.message);
+        }
       }
     }
   }
