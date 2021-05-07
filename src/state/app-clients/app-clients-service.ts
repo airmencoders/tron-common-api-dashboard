@@ -5,6 +5,7 @@ import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-c
 import { Privilege } from "../../openapi/models";
 import { AppClientUserDetailsDto } from "../../openapi/models/app-client-user-details-dto";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
+import { prepareRequestError } from "../../utils/ErrorHandling/error-handling-utils";
 import { DataService } from "../data-service/data-service";
 import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
 import { PrivilegeType } from "../privilege/privilege-type";
@@ -85,14 +86,24 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
-    const details = await this.getSelectedClient(rowData.id ?? "");
-    const retVal : AppClientFlat = { 
-      ...rowData, 
-      appClientDeveloperEmails: details.appClientDeveloperEmails, 
-      appEndpointPrivs: details.appEndpointPrivs 
-    };
+    const { id } = rowData;
 
-    return Promise.resolve(Object.assign({}, retVal));
+    if (!id) {
+      return Promise.reject(new Error('App Client ID must be defined.'));
+    }
+
+    try {
+      const details = await this.getSelectedClient(id);
+      const retVal: AppClientFlat = {
+        ...rowData,
+        appClientDeveloperEmails: details.appClientDeveloperEmails,
+        appEndpointPrivs: details.appEndpointPrivs
+      };
+
+      return Promise.resolve(Object.assign({}, retVal));
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
