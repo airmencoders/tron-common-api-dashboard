@@ -3,6 +3,7 @@ import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
 import { Validation } from "@hookstate/validation";
 import React, { FormEvent } from 'react';
+import ApiSpecCellRenderer from "../../components/ApiSpecCellRenderer/ApiSpecCellRenderer";
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
@@ -135,7 +136,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       sortable: true,
       filter: true,
       headerName: 'App Source',
-      resizable: true,
+      cellRenderer: ApiSpecCellRenderer,
+      cellRendererParams: { showAsText: true }
     }),
     new GridColumn({
       field: 'path',

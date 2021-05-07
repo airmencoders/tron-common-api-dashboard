@@ -37,7 +37,10 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   }, []);
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-    if (props.allowEdit && !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) && !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics')) {
+    if (props.allowEdit && 
+        !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) && 
+        !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics') &&
+        !(event.api.getFocusedCell()?.column.getColDef().headerName === 'API Spec')) {
       let rowData = event.data;
 
       // Take it out of the proxy so that pageState takes

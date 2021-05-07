@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import ApiSpecCellRenderer from '../../components/ApiSpecCellRenderer/ApiSpecCellRenderer';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import MetricCellRenderer from '../../components/MetricCellRenderer/MetricCellRenderer';
@@ -53,6 +54,14 @@ export function AppSourcePage() {
       headerClass: 'header-center',
       cellRenderer: MetricCellRenderer,
       cellRendererParams: { onClick: showMetric }
+    }),
+    new GridColumn({
+      field: 'apiSpec',
+      sortable: false,
+      filter: false,
+      headerName: 'API Spec',
+      headerClass: 'header-center',
+      cellRenderer: ApiSpecCellRenderer
     })
   ];
 

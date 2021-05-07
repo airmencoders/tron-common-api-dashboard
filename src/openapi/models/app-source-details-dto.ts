@@ -42,18 +42,6 @@ export interface AppSourceDetailsDto {
     appSourcePath?: string;
     /**
      * 
-     * @type {number}
-     * @memberof AppSourceDetailsDto
-     */
-    endpointCount?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AppSourceDetailsDto
-     */
-    clientCount?: number;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof AppSourceDetailsDto
      */
