@@ -1,7 +1,7 @@
 import { ToastType } from "../Toast/ToastUtils/toast-type";
 import { createTextToast } from "../Toast/ToastUtils/ToastUtils";
 
-const DownloadFile = (name: string, byEndpoint: boolean, fetch: Promise<any>): void => {
+const DownloadFile = async (name: string, byEndpoint: boolean, fetch: Promise<any>): Promise<void> => {
     if(name) {
         fetch.then(response => {
                 const url = window.URL.createObjectURL(new Blob([response]));

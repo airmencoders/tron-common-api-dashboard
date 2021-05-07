@@ -1,8 +1,5 @@
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { fireEvent, render } from '@testing-library/react';
-import { AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
+import { render } from '@testing-library/react';
 import ApiSpecCellRenderer from '../ApiSpecCellRenderer';
-import DownloadFile from '../DownloadFile';
 
 jest.mock('axios');
 describe('API Spec Cell Renderer', () => {

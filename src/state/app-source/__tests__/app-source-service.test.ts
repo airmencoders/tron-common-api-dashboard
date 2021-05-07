@@ -70,6 +70,14 @@ describe('App Source State Tests', () => {
     headers: {}
   };
 
+  const axiosGetSpecFileResponse: AxiosResponse = {
+    data: 'spec file data',
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+
   const axiosGetAppSourceDetailsDtoResponse: AxiosResponse = {
     data: testAppSourceDetailsDto,
     status: 200,
@@ -277,5 +285,41 @@ describe('App Source State Tests', () => {
     const fullPath = wrappedState.generateAppSourcePath('test');
 
     expect(fullPath).toEqual('/api/v1/app/test/<app-source-endpoint>');
+  });
+
+  it('should fetch the API spec file', async () => {
+    appSourceApi.getSpecFile = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDto[]>>(resolve => resolve(axiosGetSpecFileResponse));
+    });
+
+    const result = await wrappedState.fetchAPISpecFile('1');
+
+    expect(result).toEqual(axiosGetSpecFileResponse.data);
+  });
+
+  it('should fetch the API spec file via Endpoint Priv Id', async () => {
+    appSourceApi.getSpecFileByEndpointPriv = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDto[]>>(resolve => resolve(axiosGetSpecFileResponse));
+    });
+
+    const result = await wrappedState.fetchAPISpecFileByEndpointId('1');
+
+    expect(result).toEqual(axiosGetSpecFileResponse.data);
+  });
+
+  it('should return an error if fetching API spec failed', async () => {
+    appSourceApi.getSpecFile = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDetailsDto>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(wrappedState.fetchAPISpecFile('1')).rejects.toEqual(rejectMsg);
+  });
+
+  it('should return an error if fetching API spec via Endpoint Priv failed', async () => {
+    appSourceApi.getSpecFileByEndpointPriv = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDetailsDto>>((resolve, reject) => reject(rejectMsg));
+    });
+
+    await expect(wrappedState.fetchAPISpecFileByEndpointId('1')).rejects.toEqual(rejectMsg);
   });
 });
