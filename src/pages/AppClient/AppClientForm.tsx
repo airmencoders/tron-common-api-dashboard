@@ -138,17 +138,17 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       resizable: true,
     }),
     new GridColumn({
+      field: 'basePath',
+      sortable: true,
+      filter: true,
+      headerName: 'Base Path',
+      resizable: true,
+    }),
+    new GridColumn({
       field: 'path',
       sortable: true,
       filter: true,
       headerName: 'Path',
-      resizable: true,
-    }),
-    new GridColumn({
-      field: 'requestPath',
-      sortable: true,
-      filter: true,
-      headerName: 'Request Path',
       resizable: true,
     }),
     new GridColumn({

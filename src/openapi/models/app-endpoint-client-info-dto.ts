@@ -43,7 +43,7 @@ export interface AppEndpointClientInfoDto {
      * @type {string}
      * @memberof AppEndpointClientInfoDto
      */
-    requestPath?: string;
+    basePath?: string;
     /**
      * 
      * @type {string}
