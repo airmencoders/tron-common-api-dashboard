@@ -102,14 +102,14 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
         /**
          * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
          * @summary Adds a person
-         * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+         * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createPerson: async (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman' is not null or undefined
-            if (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman === null || personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman === undefined) {
-                throw new RequiredError('personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman','Required parameter personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman was null or undefined when calling createPerson.');
+        createPerson: async (personDto: PersonDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personDto' is not null or undefined
+            if (personDto === null || personDto === undefined) {
+                throw new RequiredError('personDto','Required parameter personDto was null or undefined when calling createPerson.');
             }
             const localVarPath = `/v1/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -137,13 +137,13 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman !== 'string';
+            const nonString = typeof personDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman !== undefined ? personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman : {})
-                : (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman || "");
+                ? JSON.stringify(personDto !== undefined ? personDto : {})
+                : (personDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -434,18 +434,18 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * Updates an existing person
          * @summary Updates an existing person
          * @param {string} id Person ID to update
-         * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+         * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatePerson: async (id: string, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options: any = {}): Promise<RequestArgs> => {
+        updatePerson: async (id: string, personDto: PersonDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling updatePerson.');
             }
-            // verify required parameter 'personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman' is not null or undefined
-            if (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman === null || personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman === undefined) {
-                throw new RequiredError('personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman','Required parameter personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman was null or undefined when calling updatePerson.');
+            // verify required parameter 'personDto' is not null or undefined
+            if (personDto === null || personDto === undefined) {
+                throw new RequiredError('personDto','Required parameter personDto was null or undefined when calling updatePerson.');
             }
             const localVarPath = `/v1/person/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -474,13 +474,13 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman !== 'string';
+            const nonString = typeof personDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman !== undefined ? personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman : {})
-                : (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman || "");
+                ? JSON.stringify(personDto !== undefined ? personDto : {})
+                : (personDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -513,12 +513,12 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
         /**
          * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
          * @summary Adds a person
-         * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+         * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options);
+        async createPerson(personDto: PersonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).createPerson(personDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -608,12 +608,12 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * Updates an existing person
          * @summary Updates an existing person
          * @param {string} id Person ID to update
-         * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+         * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatePerson(id: string, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).updatePerson(id, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options);
+        async updatePerson(id: string, personDto: PersonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).updatePerson(id, personDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -641,12 +641,12 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
         /**
          * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
          * @summary Adds a person
-         * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+         * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(axios, basePath));
+        createPerson(personDto: PersonDto, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).createPerson(personDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes an existing person
@@ -712,12 +712,12 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          * Updates an existing person
          * @summary Updates an existing person
          * @param {string} id Person ID to update
-         * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+         * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatePerson(id: string, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).updatePerson(id, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(axios, basePath));
+        updatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).updatePerson(id, personDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -741,12 +741,12 @@ export interface PersonControllerApiInterface {
     /**
      * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
      * @summary Adds a person
-     * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+     * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any): AxiosPromise<PersonDto>;
+    createPerson(personDto: PersonDto, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Deletes an existing person
@@ -812,12 +812,12 @@ export interface PersonControllerApiInterface {
      * Updates an existing person
      * @summary Updates an existing person
      * @param {string} id Person ID to update
-     * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+     * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    updatePerson(id: string, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any): AxiosPromise<PersonDto>;
+    updatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto>;
 
 }
 
@@ -843,13 +843,13 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     /**
      * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
      * @summary Adds a person
-     * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+     * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any) {
-        return PersonControllerApiFp(this.configuration).createPerson(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(this.axios, this.basePath));
+    public createPerson(personDto: PersonDto, options?: any) {
+        return PersonControllerApiFp(this.configuration).createPerson(personDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -926,12 +926,12 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      * Updates an existing person
      * @summary Updates an existing person
      * @param {string} id Person ID to update
-     * @param {PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman} personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman 
+     * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public updatePerson(id: string, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman, options?: any) {
-        return PersonControllerApiFp(this.configuration).updatePerson(id, personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(this.axios, this.basePath));
+    public updatePerson(id: string, personDto: PersonDto, options?: any) {
+        return PersonControllerApiFp(this.configuration).updatePerson(id, personDto, options).then((request) => request(this.axios, this.basePath));
     }
 }

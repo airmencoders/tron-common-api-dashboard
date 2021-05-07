@@ -359,7 +359,7 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getLatestCounts(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+        async getLatestCounts(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getLatestCounts(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -434,7 +434,7 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getLatestCounts(options?: any): AxiosPromise<object> {
+        getLatestCounts(options?: any): AxiosPromise<string> {
             return SubscriberControllerApiFp(configuration).getLatestCounts(options).then((request) => request(axios, basePath));
         },
         /**
@@ -502,7 +502,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getLatestCounts(options?: any): AxiosPromise<object>;
+    getLatestCounts(options?: any): AxiosPromise<string>;
 
     /**
      * Retrieve a subscription by its UUID

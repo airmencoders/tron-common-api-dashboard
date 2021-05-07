@@ -21,6 +21,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { BadRequestException } from '../models';
 // @ts-ignore
+import { ExceptionResponse } from '../models';
+// @ts-ignore
 import { InvalidScratchSpacePermissions } from '../models';
 // @ts-ignore
 import { PrivilegeDto } from '../models';
