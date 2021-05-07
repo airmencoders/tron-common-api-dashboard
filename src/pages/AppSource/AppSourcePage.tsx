@@ -9,7 +9,9 @@ import { useAppSourceState } from '../../state/app-source/app-source-state';
 import AppSourceForm from './AppSourceForm';
 import { generateMetricsLink } from './Metrics/metric-page-utils';
 import { MetricType } from './Metrics/metric-type';
-  
+
+import './AppSourcePage.scss';
+
 export function AppSourcePage() {
   const history = useHistory();
 
@@ -62,9 +64,10 @@ export function AppSourcePage() {
       cellRenderer: ApiSpecCellRenderer
     })
   ];
-  
+
   return (
     <DataCrudFormPage<AppSourceDto, AppSourceDetailsDto>
+      className="app-source-page"
       columns={columnHeaders}
       dataTypeName="App Source"
       pageTitle="App Sources"

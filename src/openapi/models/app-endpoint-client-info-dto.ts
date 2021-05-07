@@ -43,6 +43,12 @@ export interface AppEndpointClientInfoDto {
      * @type {string}
      * @memberof AppEndpointClientInfoDto
      */
+    basePath?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppEndpointClientInfoDto
+     */
     method?: AppEndpointClientInfoDtoMethodEnum;
     /**
      * 

@@ -86,7 +86,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   /**
    * Resets state to default.
    * Creates toast with success message.
-   * 
+   *
    * @param message the message to show
    * @returns the id of the toast
    */
@@ -241,10 +241,10 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   return (
     <>
-      <PageFormat pageTitle={props.pageTitle}>
-        {dataState.isPromised ? 
+      <PageFormat pageTitle={props.pageTitle} className={props.className}>
+        {dataState.isPromised ?
           <Spinner centered />
-          : 
+          :
           dataState.error ?
             <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
             :
@@ -268,7 +268,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                 disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
               />
 
-              <SideDrawer isLoading={pageState.isLoading.get()} title={props.dataTypeName} isOpen={pageState.isOpen.get()} onCloseHandler={onCloseHandler}>
+              <SideDrawer isLoading={pageState.isLoading.get()}
+                          title={props.dataTypeName}
+                          isOpen={pageState.isOpen.get()}
+                          onCloseHandler={onCloseHandler}
+              >
                 {
                   pageState.formAction.value === FormActionType.ADD && CreateForm ?
                   <CreateForm
@@ -296,7 +300,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
             </div>
         }
       </PageFormat>
-      
+
       {props.allowDelete && DeleteComponent && selectedData &&
         <DataCrudDelete
           dataTypeName={props.dataTypeName}
