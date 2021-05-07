@@ -13,30 +13,30 @@
  */
 
 
-import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
+import { RecordNotFoundExceptionCauseStackTrace } from './record-not-found-exception-cause-stack-trace';
 
 /**
  * 
  * @export
- * @interface BadRequestExceptionCauseSuppressed
+ * @interface RecordNotFoundExceptionCauseSuppressed
  */
-export interface BadRequestExceptionCauseSuppressed {
+export interface RecordNotFoundExceptionCauseSuppressed {
     /**
      * 
-     * @type {Array<BadRequestExceptionCauseStackTrace>}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @type {Array<RecordNotFoundExceptionCauseStackTrace>}
+     * @memberof RecordNotFoundExceptionCauseSuppressed
      */
-    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
+    stackTrace?: Array<RecordNotFoundExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @memberof RecordNotFoundExceptionCauseSuppressed
      */
     message?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @memberof RecordNotFoundExceptionCauseSuppressed
      */
     localizedMessage?: string;
 }

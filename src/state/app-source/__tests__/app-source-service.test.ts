@@ -54,7 +54,9 @@ describe('App Source State Tests', () => {
         requestType: 'GET'
       }
     ],
-    appSourcePath: 'test'
+    appSourcePath: 'test',
+    endpointCount: 1,
+    clientCount: 1
   };
 
   const testAppSourceDetailsDtoWithFullPath: AppSourceDetailsDto = {

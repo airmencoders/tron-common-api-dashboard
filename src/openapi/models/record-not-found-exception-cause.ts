@@ -13,44 +13,37 @@
  */
 
 
-import { RecordNotFoundExceptionCause } from './record-not-found-exception-cause';
 import { RecordNotFoundExceptionCauseStackTrace } from './record-not-found-exception-cause-stack-trace';
 import { RecordNotFoundExceptionCauseSuppressed } from './record-not-found-exception-cause-suppressed';
 
 /**
  * 
  * @export
- * @interface RecordNotFoundException
+ * @interface RecordNotFoundExceptionCause
  */
-export interface RecordNotFoundException {
-    /**
-     * 
-     * @type {RecordNotFoundExceptionCause}
-     * @memberof RecordNotFoundException
-     */
-    cause?: RecordNotFoundExceptionCause;
+export interface RecordNotFoundExceptionCause {
     /**
      * 
      * @type {Array<RecordNotFoundExceptionCauseStackTrace>}
-     * @memberof RecordNotFoundException
+     * @memberof RecordNotFoundExceptionCause
      */
     stackTrace?: Array<RecordNotFoundExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundException
+     * @memberof RecordNotFoundExceptionCause
      */
     message?: string;
     /**
      * 
      * @type {Array<RecordNotFoundExceptionCauseSuppressed>}
-     * @memberof RecordNotFoundException
+     * @memberof RecordNotFoundExceptionCause
      */
     suppressed?: Array<RecordNotFoundExceptionCauseSuppressed>;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundException
+     * @memberof RecordNotFoundExceptionCause
      */
     localizedMessage?: string;
 }
