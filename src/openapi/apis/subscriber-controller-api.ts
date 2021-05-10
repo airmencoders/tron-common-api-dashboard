@@ -21,9 +21,9 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
-import { PubSubLedger } from '../models';
+import { PubSubLedgerEntryDto } from '../models';
 // @ts-ignore
-import { Subscriber } from '../models';
+import { SubscriberDto } from '../models';
 /**
  * SubscriberControllerApi - axios parameter creator
  * @export
@@ -76,14 +76,14 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
         /**
          * Adds a new subscription, or updates an existing subscription
          * @summary Adds/updates a subscription
-         * @param {Subscriber} subscriber 
+         * @param {SubscriberDto} subscriberDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createSubscription: async (subscriber: Subscriber, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'subscriber' is not null or undefined
-            if (subscriber === null || subscriber === undefined) {
-                throw new RequiredError('subscriber','Required parameter subscriber was null or undefined when calling createSubscription.');
+        createSubscription: async (subscriberDto: SubscriberDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'subscriberDto' is not null or undefined
+            if (subscriberDto === null || subscriberDto === undefined) {
+                throw new RequiredError('subscriberDto','Required parameter subscriberDto was null or undefined when calling createSubscription.');
             }
             const localVarPath = `/v1/subscriptions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -111,13 +111,13 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof subscriber !== 'string';
+            const nonString = typeof subscriberDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(subscriber !== undefined ? subscriber : {})
-                : (subscriber || "");
+                ? JSON.stringify(subscriberDto !== undefined ? subscriberDto : {})
+                : (subscriberDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -305,7 +305,7 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async cancelSubscription(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscriber>> {
+        async cancelSubscription(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubscriberDto>> {
             const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).cancelSubscription(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -315,12 +315,12 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
         /**
          * Adds a new subscription, or updates an existing subscription
          * @summary Adds/updates a subscription
-         * @param {Subscriber} subscriber 
+         * @param {SubscriberDto} subscriberDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createSubscription(subscriber: Subscriber, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscriber>> {
-            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).createSubscription(subscriber, options);
+        async createSubscription(subscriberDto: SubscriberDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubscriberDto>> {
+            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).createSubscription(subscriberDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -332,7 +332,7 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllSubscriptions(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Subscriber>>> {
+        async getAllSubscriptions(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<SubscriberDto>>> {
             const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getAllSubscriptions(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -346,7 +346,7 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEventSinceDate(sinceDateTime: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedger>>> {
+        async getEventSinceDate(sinceDateTime: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedgerEntryDto>>> {
             const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventSinceDate(sinceDateTime, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -373,7 +373,7 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSubscription(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Subscriber>> {
+        async getSubscription(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubscriberDto>> {
             const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getSubscription(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -396,18 +396,18 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        cancelSubscription(id: string, options?: any): AxiosPromise<Subscriber> {
+        cancelSubscription(id: string, options?: any): AxiosPromise<SubscriberDto> {
             return SubscriberControllerApiFp(configuration).cancelSubscription(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds a new subscription, or updates an existing subscription
          * @summary Adds/updates a subscription
-         * @param {Subscriber} subscriber 
+         * @param {SubscriberDto} subscriberDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createSubscription(subscriber: Subscriber, options?: any): AxiosPromise<Subscriber> {
-            return SubscriberControllerApiFp(configuration).createSubscription(subscriber, options).then((request) => request(axios, basePath));
+        createSubscription(subscriberDto: SubscriberDto, options?: any): AxiosPromise<SubscriberDto> {
+            return SubscriberControllerApiFp(configuration).createSubscription(subscriberDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves all subscriptions
@@ -415,7 +415,7 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSubscriptions(options?: any): AxiosPromise<Array<Subscriber>> {
+        getAllSubscriptions(options?: any): AxiosPromise<Array<SubscriberDto>> {
             return SubscriberControllerApiFp(configuration).getAllSubscriptions(options).then((request) => request(axios, basePath));
         },
         /**
@@ -425,7 +425,7 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventSinceDate(sinceDateTime: string, options?: any): AxiosPromise<Array<PubSubLedger>> {
+        getEventSinceDate(sinceDateTime: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>> {
             return SubscriberControllerApiFp(configuration).getEventSinceDate(sinceDateTime, options).then((request) => request(axios, basePath));
         },
         /**
@@ -444,7 +444,7 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSubscription(id: string, options?: any): AxiosPromise<Subscriber> {
+        getSubscription(id: string, options?: any): AxiosPromise<SubscriberDto> {
             return SubscriberControllerApiFp(configuration).getSubscription(id, options).then((request) => request(axios, basePath));
         },
     };
@@ -464,17 +464,17 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    cancelSubscription(id: string, options?: any): AxiosPromise<Subscriber>;
+    cancelSubscription(id: string, options?: any): AxiosPromise<SubscriberDto>;
 
     /**
      * Adds a new subscription, or updates an existing subscription
      * @summary Adds/updates a subscription
-     * @param {Subscriber} subscriber 
+     * @param {SubscriberDto} subscriberDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    createSubscription(subscriber: Subscriber, options?: any): AxiosPromise<Subscriber>;
+    createSubscription(subscriberDto: SubscriberDto, options?: any): AxiosPromise<SubscriberDto>;
 
     /**
      * Retrieves all subscriptions
@@ -483,7 +483,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getAllSubscriptions(options?: any): AxiosPromise<Array<Subscriber>>;
+    getAllSubscriptions(options?: any): AxiosPromise<Array<SubscriberDto>>;
 
     /**
      * Retrieves all ledger entries from specified date/time
@@ -493,7 +493,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getEventSinceDate(sinceDateTime: string, options?: any): AxiosPromise<Array<PubSubLedger>>;
+    getEventSinceDate(sinceDateTime: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>>;
 
     /**
      * Retrieves latest counts for each event type in a key-value pair object
@@ -512,7 +512,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getSubscription(id: string, options?: any): AxiosPromise<Subscriber>;
+    getSubscription(id: string, options?: any): AxiosPromise<SubscriberDto>;
 
 }
 
@@ -538,13 +538,13 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
     /**
      * Adds a new subscription, or updates an existing subscription
      * @summary Adds/updates a subscription
-     * @param {Subscriber} subscriber 
+     * @param {SubscriberDto} subscriberDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SubscriberControllerApi
      */
-    public createSubscription(subscriber: Subscriber, options?: any) {
-        return SubscriberControllerApiFp(this.configuration).createSubscription(subscriber, options).then((request) => request(this.axios, this.basePath));
+    public createSubscription(subscriberDto: SubscriberDto, options?: any) {
+        return SubscriberControllerApiFp(this.configuration).createSubscription(subscriberDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

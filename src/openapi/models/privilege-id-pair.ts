@@ -13,7 +13,7 @@
  */
 
 
-import { Privilege } from './privilege';
+import { PrivilegeDto } from './privilege-dto';
 
 /**
  * 
@@ -29,10 +29,10 @@ export interface PrivilegeIdPair {
     userPrivPairId?: string;
     /**
      * 
-     * @type {Privilege}
+     * @type {PrivilegeDto}
      * @memberof PrivilegeIdPair
      */
-    priv?: Privilege;
+    priv?: PrivilegeDto;
 }
 
 

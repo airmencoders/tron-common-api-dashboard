@@ -14,7 +14,7 @@
 
 
 import { AppEndpointClientInfoDto } from './app-endpoint-client-info-dto';
-import { Privilege } from './privilege';
+import { PrivilegeDto } from './privilege-dto';
 
 /**
  * 
@@ -36,10 +36,10 @@ export interface AppClientUserDetailsDto {
     appClientDeveloperEmails?: Array<string>;
     /**
      * 
-     * @type {Array<Privilege>}
+     * @type {Array<PrivilegeDto>}
      * @memberof AppClientUserDetailsDto
      */
-    privileges?: Array<Privilege>;
+    privileges?: Array<PrivilegeDto>;
     /**
      * 
      * @type {Array<AppEndpointClientInfoDto>}

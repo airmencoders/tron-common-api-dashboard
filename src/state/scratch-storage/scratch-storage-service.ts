@@ -1,11 +1,11 @@
-import {DataService} from '../data-service/data-service';
-import {none, State} from '@hookstate/core';
-import {Privilege, PrivilegeDto, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryEntry, ScratchStorageAppUserPrivDto, ScratchStorageControllerApiInterface, UserWithPrivs} from '../../openapi';
+import { none, State } from '@hookstate/core';
+import { AxiosPromise } from 'axios';
+import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageControllerApiInterface, UserWithPrivs } from '../../openapi';
+import { DataService } from '../data-service/data-service';
+import { accessPrivilegeState } from '../privilege/privilege-state';
+import { PrivilegeType } from '../privilege/privilege-type';
 import { ScratchStorageFlat } from './scratch-storage-flat';
 import { ScratchStorageUserWithPrivsFlat } from './scratch-storage-user-with-privs-flat';
-import { PrivilegeType } from '../privilege/privilege-type';
-import { AxiosPromise } from 'axios';
-import { accessPrivilegeState } from '../privilege/privilege-state';
 
 export default class ScratchStorageService implements DataService<ScratchStorageAppRegistryDto, ScratchStorageFlat> {
 
@@ -80,7 +80,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
     return flats;
   }
   convertUserPrivToFlat(dto: UserWithPrivs) {
-    const privileges = dto.privs?.map(x => x.priv).filter(y => y != null) as Privilege[] ?? [];
+    const privileges = dto.privs?.map(x => x.priv).filter(y => y != null) as PrivilegeDto[] ?? [];
 
     const flat: ScratchStorageUserWithPrivsFlat = {
       userId: dto.userId ?? '',
@@ -100,7 +100,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       }
 
       const scratchStorageDto = this.convertToDto(toUpdate);
-      const updatedResponse = await this.scratchStorageApi.editExistingAppEntry(toUpdate.id, scratchStorageDto as ScratchStorageAppRegistryEntry);
+      const updatedResponse = await this.scratchStorageApi.editExistingAppEntry(toUpdate.id, scratchStorageDto as ScratchStorageAppRegistryDto);
 
       const patchedResponse = updatedResponse.data as ScratchStorageAppRegistryDto;
       patchedResponse.userPrivs = undefined;
@@ -146,7 +146,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       if(await this.appNameExists(toCreate))
         throw new Error("App name already exists.");
 
-      const scratchStorageResponse = await this.scratchStorageApi.postNewScratchSpaceApp({ appName: toCreate.appName, appHasImplicitRead: toCreate.appHasImplicitRead } as ScratchStorageAppRegistryEntry);
+      const scratchStorageResponse = await this.scratchStorageApi.postNewScratchSpaceApp({ appName: toCreate.appName, appHasImplicitRead: toCreate.appHasImplicitRead } as ScratchStorageAppRegistryDto);
       const scratchStorageDto = scratchStorageResponse.data as ScratchStorageAppRegistryDto;
 
       if(scratchStorageDto.id && toCreate.userPrivs)
