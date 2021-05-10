@@ -17,21 +17,27 @@
 /**
  * 
  * @export
- * @interface ScratchStorageUser
+ * @interface ScratchStorageEntryDto
  */
-export interface ScratchStorageUser {
+export interface ScratchStorageEntryDto {
     /**
      * 
      * @type {string}
-     * @memberof ScratchStorageUser
+     * @memberof ScratchStorageEntryDto
      */
-    id?: string;
+    value?: string;
     /**
      * 
      * @type {string}
-     * @memberof ScratchStorageUser
+     * @memberof ScratchStorageEntryDto
      */
-    email: string;
+    key: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScratchStorageEntryDto
+     */
+    appId: string;
 }
 
 

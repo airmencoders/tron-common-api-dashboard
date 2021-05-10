@@ -2,10 +2,9 @@ import { none, State } from "@hookstate/core";
 import { AxiosPromise } from "axios";
 import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
-import { Privilege } from "../../openapi/models";
+import { PrivilegeDto } from "../../openapi/models";
 import { AppClientUserDetailsDto } from "../../openapi/models/app-client-user-details-dto";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
-import { prepareRequestError } from "../../utils/ErrorHandling/error-handling-utils";
 import { DataService } from "../data-service/data-service";
 import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
 import { PrivilegeType } from "../privilege/privilege-type";
@@ -138,12 +137,12 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     };
   }
 
-  async createAppPrivilegesArr(client: AppClientFlat): Promise<Array<Privilege>> {
+  async createAppPrivilegesArr(client: AppClientFlat): Promise<Array<PrivilegeDto>> {
     return Array.from(await this.createAppPrivileges(client));
   }
 
-  async createAppPrivileges(client: AppClientFlat): Promise<Set<Privilege>> {
-    const privileges = new Set<Privilege>();
+  async createAppPrivileges(client: AppClientFlat): Promise<Set<PrivilegeDto>> {
+    const privileges = new Set<PrivilegeDto>();
     const privilegeResponse = await this.appClientsApi.getClientTypePrivs();
 
     if (client.read) {

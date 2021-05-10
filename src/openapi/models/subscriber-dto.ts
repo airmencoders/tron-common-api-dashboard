@@ -17,46 +17,40 @@
 /**
  * 
  * @export
- * @interface PubSubLedger
+ * @interface SubscriberDto
  */
-export interface PubSubLedger {
+export interface SubscriberDto {
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof SubscriberDto
      */
     id?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PubSubLedger
+     * @type {string}
+     * @memberof SubscriberDto
      */
-    countForEventType?: number;
+    secret?: string;
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof SubscriberDto
      */
-    eventType?: PubSubLedgerEventTypeEnum;
+    subscribedEvent: SubscriberDtoSubscribedEventEnum;
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof SubscriberDto
      */
-    data?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PubSubLedger
-     */
-    dateCreated?: string;
+    subscriberAddress: string;
 }
 
 /**
     * @export
     * @enum {string}
     */
-export enum PubSubLedgerEventTypeEnum {
+export enum SubscriberDtoSubscribedEventEnum {
     PersonChange = 'PERSON_CHANGE',
     PersonDelete = 'PERSON_DELETE',
     OrganizationChange = 'ORGANIZATION_CHANGE',
