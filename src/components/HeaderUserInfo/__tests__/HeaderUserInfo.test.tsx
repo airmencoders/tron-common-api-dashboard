@@ -21,7 +21,7 @@ test('click shows userInfo dropdown', async () => {
     familyName: 'User',
     name: 'Test User'
   }
-  debugger;
+
   render(<HeaderUserInfo userInfo={userInfo} />);
   const dropdownToggle = screen.getByText('TU');
   fireEvent.click(dropdownToggle);
