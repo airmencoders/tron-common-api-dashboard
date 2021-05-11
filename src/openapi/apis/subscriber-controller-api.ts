@@ -19,6 +19,10 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { BadRequestException } from '../models';
+// @ts-ignore
+import { EventInfoDto } from '../models';
+// @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
 import { PubSubLedgerEntryDto } from '../models';
@@ -162,17 +166,13 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             };
         },
         /**
-         * Retrieves all ledger entries from specified date/time
-         * @summary Retrieves all legder entries from specified date/time
-         * @param {string} sinceDateTime 
+         * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
+         * @summary Retrieves all ledger entries from specified date/time regardless of event type
+         * @param {string} [sinceDateTime] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventSinceDate: async (sinceDateTime: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'sinceDateTime' is not null or undefined
-            if (sinceDateTime === null || sinceDateTime === undefined) {
-                throw new RequiredError('sinceDateTime','Required parameter sinceDateTime was null or undefined when calling getEventSinceDate.');
-            }
+        getEventSinceDate: async (sinceDateTime?: string, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v1/subscriptions/events/replay`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -186,9 +186,7 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             const localVarQueryParameter = {} as any;
 
             if (sinceDateTime !== undefined) {
-                localVarQueryParameter['sinceDateTime'] = (sinceDateTime as any instanceof Date) ?
-                    (sinceDateTime as any).toISOString() :
-                    sinceDateTime;
+                localVarQueryParameter['sinceDateTime'] = sinceDateTime;
             }
 
 
@@ -203,6 +201,57 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
+         * @summary Retrieves all ledger entries from specified event count(s) and event types(s)
+         * @param {Array<EventInfoDto>} eventInfoDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getEventsSinceCountAndType: async (eventInfoDto: Array<EventInfoDto>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'eventInfoDto' is not null or undefined
+            if (eventInfoDto === null || eventInfoDto === undefined) {
+                throw new RequiredError('eventInfoDto','Required parameter eventInfoDto was null or undefined when calling getEventsSinceCountAndType.');
+            }
+            const localVarPath = `/v1/subscriptions/events/replay-events`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof eventInfoDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(eventInfoDto !== undefined ? eventInfoDto : {})
+                : (eventInfoDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -340,14 +389,28 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
             };
         },
         /**
-         * Retrieves all ledger entries from specified date/time
-         * @summary Retrieves all legder entries from specified date/time
-         * @param {string} sinceDateTime 
+         * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
+         * @summary Retrieves all ledger entries from specified date/time regardless of event type
+         * @param {string} [sinceDateTime] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEventSinceDate(sinceDateTime: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedgerEntryDto>>> {
+        async getEventSinceDate(sinceDateTime?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedgerEntryDto>>> {
             const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventSinceDate(sinceDateTime, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
+         * @summary Retrieves all ledger entries from specified event count(s) and event types(s)
+         * @param {Array<EventInfoDto>} eventInfoDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedgerEntryDto>>> {
+            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventsSinceCountAndType(eventInfoDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -419,14 +482,24 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
             return SubscriberControllerApiFp(configuration).getAllSubscriptions(options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieves all ledger entries from specified date/time
-         * @summary Retrieves all legder entries from specified date/time
-         * @param {string} sinceDateTime 
+         * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
+         * @summary Retrieves all ledger entries from specified date/time regardless of event type
+         * @param {string} [sinceDateTime] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventSinceDate(sinceDateTime: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>> {
+        getEventSinceDate(sinceDateTime?: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>> {
             return SubscriberControllerApiFp(configuration).getEventSinceDate(sinceDateTime, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
+         * @summary Retrieves all ledger entries from specified event count(s) and event types(s)
+         * @param {Array<EventInfoDto>} eventInfoDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>> {
+            return SubscriberControllerApiFp(configuration).getEventsSinceCountAndType(eventInfoDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves latest counts for each event type in a key-value pair object
@@ -486,14 +559,24 @@ export interface SubscriberControllerApiInterface {
     getAllSubscriptions(options?: any): AxiosPromise<Array<SubscriberDto>>;
 
     /**
-     * Retrieves all ledger entries from specified date/time
-     * @summary Retrieves all legder entries from specified date/time
-     * @param {string} sinceDateTime 
+     * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
+     * @summary Retrieves all ledger entries from specified date/time regardless of event type
+     * @param {string} [sinceDateTime] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getEventSinceDate(sinceDateTime: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>>;
+    getEventSinceDate(sinceDateTime?: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>>;
+
+    /**
+     * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
+     * @summary Retrieves all ledger entries from specified event count(s) and event types(s)
+     * @param {Array<EventInfoDto>} eventInfoDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubscriberControllerApiInterface
+     */
+    getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>>;
 
     /**
      * Retrieves latest counts for each event type in a key-value pair object
@@ -559,15 +642,27 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
     }
 
     /**
-     * Retrieves all ledger entries from specified date/time
-     * @summary Retrieves all legder entries from specified date/time
-     * @param {string} sinceDateTime 
+     * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
+     * @summary Retrieves all ledger entries from specified date/time regardless of event type
+     * @param {string} [sinceDateTime] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SubscriberControllerApi
      */
-    public getEventSinceDate(sinceDateTime: string, options?: any) {
+    public getEventSinceDate(sinceDateTime?: string, options?: any) {
         return SubscriberControllerApiFp(this.configuration).getEventSinceDate(sinceDateTime, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
+     * @summary Retrieves all ledger entries from specified event count(s) and event types(s)
+     * @param {Array<EventInfoDto>} eventInfoDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SubscriberControllerApi
+     */
+    public getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any) {
+        return SubscriberControllerApiFp(this.configuration).getEventsSinceCountAndType(eventInfoDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
