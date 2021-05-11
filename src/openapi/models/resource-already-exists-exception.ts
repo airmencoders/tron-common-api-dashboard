@@ -13,15 +13,9 @@
  */
 
 
-<<<<<<< HEAD
-import { ResourceAlreadyExistsExceptionCause } from './resource-already-exists-exception-cause';
-import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
-import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-already-exists-exception-cause-suppressed';
-=======
-import { RecordNotFoundExceptionCause } from './record-not-found-exception-cause';
-import { RecordNotFoundExceptionCauseStackTrace } from './record-not-found-exception-cause-stack-trace';
-import { RecordNotFoundExceptionCauseSuppressed } from './record-not-found-exception-cause-suppressed';
->>>>>>> master
+import { BadRequestExceptionCause } from './bad-request-exception-cause';
+import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
+import { BadRequestExceptionCauseSuppressed } from './bad-request-exception-cause-suppressed';
 
 /**
  * 
@@ -31,29 +25,16 @@ import { RecordNotFoundExceptionCauseSuppressed } from './record-not-found-excep
 export interface ResourceAlreadyExistsException {
     /**
      * 
-<<<<<<< HEAD
-     * @type {ResourceAlreadyExistsExceptionCause}
+     * @type {BadRequestExceptionCause}
      * @memberof ResourceAlreadyExistsException
      */
-    cause?: ResourceAlreadyExistsExceptionCause;
+    cause?: BadRequestExceptionCause;
     /**
      * 
-     * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
+     * @type {Array<BadRequestExceptionCauseStackTrace>}
      * @memberof ResourceAlreadyExistsException
      */
-    stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
-=======
-     * @type {RecordNotFoundExceptionCause}
-     * @memberof ResourceAlreadyExistsException
-     */
-    cause?: RecordNotFoundExceptionCause;
-    /**
-     * 
-     * @type {Array<RecordNotFoundExceptionCauseStackTrace>}
-     * @memberof ResourceAlreadyExistsException
-     */
-    stackTrace?: Array<RecordNotFoundExceptionCauseStackTrace>;
->>>>>>> master
+    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
@@ -62,17 +43,10 @@ export interface ResourceAlreadyExistsException {
     message?: string;
     /**
      * 
-<<<<<<< HEAD
-     * @type {Array<ResourceAlreadyExistsExceptionCauseSuppressed>}
+     * @type {Array<BadRequestExceptionCauseSuppressed>}
      * @memberof ResourceAlreadyExistsException
      */
-    suppressed?: Array<ResourceAlreadyExistsExceptionCauseSuppressed>;
-=======
-     * @type {Array<RecordNotFoundExceptionCauseSuppressed>}
-     * @memberof ResourceAlreadyExistsException
-     */
-    suppressed?: Array<RecordNotFoundExceptionCauseSuppressed>;
->>>>>>> master
+    suppressed?: Array<BadRequestExceptionCauseSuppressed>;
     /**
      * 
      * @type {string}

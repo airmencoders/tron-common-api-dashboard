@@ -13,44 +13,30 @@
  */
 
 
-import { BadRequestExceptionCause } from './bad-request-exception-cause';
 import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
-import { BadRequestExceptionCauseSuppressed } from './bad-request-exception-cause-suppressed';
 
 /**
  * 
  * @export
- * @interface BadRequestException
+ * @interface BadRequestExceptionCauseSuppressed
  */
-export interface BadRequestException {
-    /**
-     * 
-     * @type {BadRequestExceptionCause}
-     * @memberof BadRequestException
-     */
-    cause?: BadRequestExceptionCause;
+export interface BadRequestExceptionCauseSuppressed {
     /**
      * 
      * @type {Array<BadRequestExceptionCauseStackTrace>}
-     * @memberof BadRequestException
+     * @memberof BadRequestExceptionCauseSuppressed
      */
     stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestException
+     * @memberof BadRequestExceptionCauseSuppressed
      */
     message?: string;
     /**
      * 
-     * @type {Array<BadRequestExceptionCauseSuppressed>}
-     * @memberof BadRequestException
-     */
-    suppressed?: Array<BadRequestExceptionCauseSuppressed>;
-    /**
-     * 
      * @type {string}
-     * @memberof BadRequestException
+     * @memberof BadRequestExceptionCauseSuppressed
      */
     localizedMessage?: string;
 }

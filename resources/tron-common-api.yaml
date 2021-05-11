@@ -3,7 +3,7 @@ info:
   title: TRON Common API
   version: 0.0.1
 servers:
-- url: "http://localhost:8088/api"
+- url: "http://localhost:8080/api"
   description: Generated server url
 paths:
   /v1/scratch/users/{id}:
@@ -28,18 +28,18 @@ paths:
               $ref: "#/components/schemas/ScratchStorageUserDto"
         required: true
       responses:
+        "400":
+          description: Malformed Scratch Storage object or malformed user UUID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/BadRequestException"
         "404":
           description: User id not found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
-        "409":
-          description: Scratch User Email Address is already is use
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ResourceAlreadyExistsException"
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
@@ -52,12 +52,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ScratchStorageUserDto"
-        "400":
-          description: Malformed Scratch Storage object or malformed user UUID
+        "409":
+          description: Scratch User Email Address is already is use
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/BadRequestException"
+                $ref: "#/components/schemas/ResourceAlreadyExistsException"
     delete:
       tags:
       - scratch-storage-controller
@@ -85,18 +85,18 @@ paths:
             '*/*':
               schema:
                 type: object
-        "200":
-          description: Operation Successful
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ScratchStorageUserDto"
         "400":
           description: Malformed user UUID
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/BadRequestException"
+        "200":
+          description: Operation Successful
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ScratchStorageUserDto"
   /v1/scratch/apps/{id}:
     put:
       tags:
@@ -131,18 +131,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
-        "409":
-          description: App Name is already is use
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ResourceAlreadyExistsException"
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
             '*/*':
               schema:
                 type: object
+        "409":
+          description: App Name is already is use
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceAlreadyExistsException"
         "400":
           description: Malformed request body / app name already exists or appId is
             malformed
@@ -172,6 +172,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
+        "400":
+          description: AppId is malformed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/BadRequestException"
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
@@ -184,12 +190,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
-        "400":
-          description: AppId is malformed
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/BadRequestException"
   /v1/person/{id}:
     get:
       tags:
@@ -226,14 +226,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PersonDto"
-        "404":
-          description: Resource not found
+        "400":
+          description: Bad request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: Bad request
+        "404":
+          description: Resource not found
           content:
             '*/*':
               schema:
@@ -286,14 +286,14 @@ paths:
           type: string
           format: uuid
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Resource not found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "204":
-          description: Successful operation
     patch:
       tags:
       - person-controller
@@ -379,12 +379,6 @@ paths:
           type: string
           default: ""
       responses:
-        "400":
-          description: Bad Request or malformed UUID
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -393,6 +387,12 @@ paths:
                 $ref: "#/components/schemas/OrganizationDto"
         "404":
           description: Resource not found
+        "400":
+          description: Bad Request or malformed UUID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
     put:
       tags:
       - organization-controller
@@ -414,24 +414,24 @@ paths:
               $ref: "#/components/schemas/OrganizationDto"
         required: true
       responses:
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: Bad request
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/OrganizationDto"
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
     delete:
       tags:
       - organization-controller
@@ -447,14 +447,14 @@ paths:
           type: string
           format: uuid
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Resource not found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "204":
-          description: Successful operation
     patch:
       tags:
       - organization-controller
@@ -489,6 +489,12 @@ paths:
               - $ref: "#/components/schemas/JsonPatchObjectArrayValue"
         required: true
       responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OrganizationDto"
         "404":
           description: Resource not found
           content:
@@ -501,12 +507,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/OrganizationDto"
   /v1/dashboard-users/{id}:
     get:
       tags:
@@ -523,24 +523,24 @@ paths:
           type: string
           format: uuid
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/DashboardUserDto"
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "400":
           description: Bad request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DashboardUserDto"
     put:
       tags:
       - dashboard-user-controller
@@ -562,18 +562,18 @@ paths:
               $ref: "#/components/schemas/DashboardUserDto"
         required: true
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/DashboardUserDto"
         "404":
           description: Resource not found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DashboardUserDto"
     delete:
       tags:
       - dashboard-user-controller
@@ -589,14 +589,14 @@ paths:
           type: string
           format: uuid
       responses:
+        "204":
+          description: Successful operation
         "404":
           description: Resource not found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "204":
-          description: Successful operation
   /v1/app-source/{id}:
     get:
       tags:
@@ -619,14 +619,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AppSourceDetailsDto"
-        "403":
-          description: Insufficient privileges
+        "404":
+          description: Requested App Source not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "404":
-          description: Requested App Source not found
+        "403":
+          description: Insufficient privileges
           content:
             application/json:
               schema:
@@ -658,12 +658,6 @@ paths:
               $ref: "#/components/schemas/AppSourceDetailsDto"
         required: true
       responses:
-        "400":
-          description: Malformed Request Body
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -672,6 +666,12 @@ paths:
                 $ref: "#/components/schemas/AppSourceDetailsDto"
         "404":
           description: Requested App Source not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
+        "400":
+          description: Malformed Request Body
           content:
             application/json:
               schema:
@@ -697,16 +697,16 @@ paths:
           type: string
           format: uuid
       responses:
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "404":
           description: App Source Id not found
           content:
             '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
         "200":
@@ -786,14 +786,14 @@ paths:
               $ref: "#/components/schemas/AppClientUserDto"
         required: true
       responses:
-        "404":
-          description: Resource not found
+        "400":
+          description: Bad request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: Bad request
+        "404":
+          description: Resource not found
           content:
             '*/*':
               schema:
@@ -866,6 +866,47 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SubscriberDto"
+  /v1/subscriptions/events/replay-events:
+    post:
+      tags:
+      - subscriber-controller
+      summary: Retrieves all ledger entries from specified event count(s) and event
+        types(s)
+      description: "Simply provide a list of type EventInfoDto containing the event\
+        \ types and the LAST event count received for that event. The returned list\
+        \ will contain, as its start point, the point in time at which the oldest\
+        \ of those event types(s)/event count(s) occurred at - the remainder of that\
+        \ list will be event entries containing only events specified in the request\
+        \ body. Note the event count(s) provided should be equal to the actual count\
+        \ received from Common.  This endpoint will know to return events from that\
+        \ count + 1."
+      operationId: getEventsSinceCountAndType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of events and counts to rewind to and playback
+              items:
+                $ref: "#/components/schemas/EventInfoDto"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PubSubLedgerEntryDto"
+        "400":
+          description: Bad Request - malformed date/time
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BadRequestException"
   /v1/scratch:
     get:
       tags:
@@ -874,18 +915,18 @@ paths:
       description: Requires request to be under DASHBOARD_ADMIN privileges
       operationId: getAllKeyValuePairs
       responses:
-        "400":
-          description: Malformed request body
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
             '*/*':
               schema:
                 type: object
+        "400":
+          description: Malformed request body
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -963,6 +1004,13 @@ paths:
               description: Jayway JsonPath spec string
         required: true
       responses:
+        "404":
+          description: Application ID / Key name not valid or found / JSON path spec
+            not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecordNotFoundException"
         "400":
           description: Malformed Application UUID / Value cannot be jsonized / Unable
             to serialize response to JSON
@@ -976,13 +1024,6 @@ paths:
             '*/*':
               schema:
                 type: string
-        "404":
-          description: Application ID / Key name not valid or found / JSON path spec
-            not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecordNotFoundException"
     patch:
       tags:
       - scratch-storage-controller
@@ -1039,12 +1080,6 @@ paths:
       description: Requester has to have DASHBOARD_ADMIN rights
       operationId: getAllUsers
       responses:
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
         "200":
           description: Successful operation
           content:
@@ -1053,6 +1088,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScratchStorageUserDto"
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
     post:
       tags:
       - scratch-storage-controller
@@ -1066,6 +1107,18 @@ paths:
               $ref: "#/components/schemas/ScratchStorageUserDto"
         required: true
       responses:
+        "201":
+          description: New user added operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ScratchStorageUserDto"
+        "409":
+          description: Scratch User UUID or email address is already is use
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceAlreadyExistsException"
         "400":
           description: Malformed Scratch Storage object
           content:
@@ -1078,18 +1131,6 @@ paths:
             '*/*':
               schema:
                 type: object
-        "409":
-          description: Scratch User UUID or email address is already is use
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ResourceAlreadyExistsException"
-        "201":
-          description: New user added operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ScratchStorageUserDto"
   /v1/scratch/apps:
     get:
       tags:
@@ -1099,12 +1140,6 @@ paths:
       description: Requester has to have DASHBOARD_ADMIN rights
       operationId: getScratchSpaceApps
       responses:
-        "403":
-          description: No DASHBOARD_ADMIN privileges
-          content:
-            '*/*':
-              schema:
-                type: object
         "200":
           description: Successful operation
           content:
@@ -1113,6 +1148,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
+        "403":
+          description: No DASHBOARD_ADMIN privileges
+          content:
+            '*/*':
+              schema:
+                type: object
     post:
       tags:
       - scratch-storage-controller
@@ -1133,12 +1174,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
-        "409":
-          description: App UUID or App Name is already is use
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ResourceAlreadyExistsException"
         "403":
           description: No DASHBOARD_ADMIN privileges
           content:
@@ -1151,6 +1186,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/BadRequestException"
+        "409":
+          description: App UUID or App Name is already is use
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceAlreadyExistsException"
   /v1/person:
     get:
       tags:
@@ -1222,12 +1263,6 @@ paths:
               $ref: "#/components/schemas/PersonDto"
         required: true
       responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PersonDto"
         "409":
           description: Resource already exists with the id provided
           content:
@@ -1240,6 +1275,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PersonDto"
   /v1/person/persons:
     post:
       tags:
@@ -1275,14 +1316,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PersonDto"
-        "409":
-          description: A person already exists with the id provided
+        "400":
+          description: Bad data or validation error
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: Bad data or validation error
+        "409":
+          description: A person already exists with the id provided
           content:
             '*/*':
               schema:
@@ -1408,18 +1449,18 @@ paths:
               $ref: "#/components/schemas/OrganizationDto"
         required: true
       responses:
-        "409":
-          description: Resource already exists with the id provided
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "201":
           description: Successful operation
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/OrganizationDto"
+        "409":
+          description: Resource already exists with the id provided
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
   /v1/organization/organizations:
     post:
       tags:
@@ -1447,6 +1488,12 @@ paths:
                 - $ref: "#/components/schemas/Wing"
         required: true
       responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OrganizationDto"
         "409":
           description: Bad Request / One of the supplied organizations contained a
             UUID that already exists or other duplicate data
@@ -1454,12 +1501,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/OrganizationDto"
         "400":
           description: Bad data or validation error
           content:
@@ -1495,12 +1536,6 @@ paths:
               $ref: "#/components/schemas/DashboardUserDto"
         required: true
       responses:
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/DashboardUserDto"
         "400":
           description: Bad request
           content:
@@ -1513,6 +1548,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DashboardUserDto"
   /v1/app-source:
     get:
       tags:
@@ -1548,14 +1589,14 @@ paths:
               $ref: "#/components/schemas/AppSourceDetailsDto"
         required: true
       responses:
-        "403":
-          description: No DASHBOARD_ADMIN privileges
+        "400":
+          description: Malformed Request Body
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: Malformed Request Body
+        "403":
+          description: No DASHBOARD_ADMIN privileges
           content:
             application/json:
               schema:
@@ -1573,12 +1614,6 @@ paths:
       summary: Gets a list of the available app clients (their names and UUIDs)
       operationId: getAvailableAppClients
       responses:
-        "403":
-          description: Insufficient privileges
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -1587,6 +1622,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AppClientSummaryDto"
+        "403":
+          description: Insufficient privileges
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
     post:
       tags:
       - app-source-controller
@@ -1601,14 +1642,20 @@ paths:
               $ref: "#/components/schemas/AppEndPointPrivDto"
         required: true
       responses:
+        "404":
+          description: App Source/End Point/App Client not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Record Added/Updated OK
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AppSourceDetailsDto"
-        "404":
-          description: App Source/End Point/App Client not found
+        "400":
+          description: An Id is malformed
           content:
             '*/*':
               schema:
@@ -1617,12 +1664,6 @@ paths:
           description: Insufficient privileges
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: An Id is malformed
-          content:
-            '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
   /v1/app-client:
@@ -1655,6 +1696,12 @@ paths:
               $ref: "#/components/schemas/AppClientUserDto"
         required: true
       responses:
+        "201":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppClientUserDto"
         "400":
           description: Bad request
           content:
@@ -1667,12 +1714,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "201":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AppClientUserDto"
   /v1/scratch/apps/{id}/user:
     patch:
       tags:
@@ -1702,12 +1743,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
-        "409":
-          description: This app/user/priv combo already exists
+        "200":
+          description: App Priv Added OK
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ResourceAlreadyExistsException"
+                $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
         "403":
           description: "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges\
             \ for given app id"
@@ -1715,12 +1756,12 @@ paths:
             '*/*':
               schema:
                 type: object
-        "200":
-          description: App Priv Added OK
+        "409":
+          description: This app/user/priv combo already exists
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
+                $ref: "#/components/schemas/ResourceAlreadyExistsException"
         "400":
           description: Malformed request body / app name already exists or appId is
             malformed
@@ -1764,6 +1805,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/BadRequestException"
+        "200":
+          description: App Modified OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
         "403":
           description: "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges\
             \ for given app id"
@@ -1771,12 +1818,6 @@ paths:
             '*/*':
               schema:
                 type: object
-        "200":
-          description: App Modified OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
   /v1/organization/{id}/subordinates:
     delete:
       tags:
@@ -1882,16 +1923,16 @@ paths:
                 format: uuid
         required: true
       responses:
-        "404":
-          description: Provided organization UUID was invalid
+        "400":
+          description: Provided person UUID(s) was/were invalid
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
         "204":
           description: Successful operation
-        "400":
-          description: Provided person UUID(s) was/were invalid
+        "404":
+          description: Provided organization UUID was invalid
           content:
             '*/*':
               schema:
@@ -1929,6 +1970,12 @@ paths:
                 format: uuid
         required: true
       responses:
+        "400":
+          description: Provided person UUID(s) was/were invalid
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
         "404":
           description: A organization UUID was invalid
           content:
@@ -1937,12 +1984,6 @@ paths:
                 $ref: "#/components/schemas/ExceptionResponse"
         "204":
           description: Successful operation
-        "400":
-          description: Provided person UUID(s) was/were invalid
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
   /v1/app-source/admins/{id}:
     delete:
       tags:
@@ -1968,18 +2009,18 @@ paths:
               $ref: "#/components/schemas/DashboardUserDto"
         required: true
       responses:
-        "404":
-          description: App Source Id not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Admin Removed OK
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AppSourceDetailsDto"
+        "404":
+          description: App Source Id not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
         "400":
           description: Id is malformed
           content:
@@ -2021,24 +2062,39 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "200":
-          description: Admin Added OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AppSourceDetailsDto"
         "400":
           description: Id is malformed
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Admin Added OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppSourceDetailsDto"
         "403":
           description: Insufficient privileges
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+  /v1/version:
+    get:
+      tags:
+      - app-version-controller
+      summary: Retrieves current running application version
+      description: The version is the first 8-characters of the SHA-1 commit hash
+        of the master branch that this version was compiled from
+      operationId: getVersion
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppVersionInfoDto"
   /v1/userinfo:
     get:
       tags:
@@ -2047,18 +2103,18 @@ paths:
       description: Retrieves user information
       operationId: getUserInfo
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserInfoDto"
         "400":
           description: Bad request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserInfoDto"
   /v1/subscriptions/{id}:
     get:
       tags:
@@ -2116,16 +2172,16 @@ paths:
     get:
       tags:
       - subscriber-controller
-      summary: Retrieves all legder entries from specified date/time
-      description: Retrieves all ledger entries from specified date/time
+      summary: Retrieves all ledger entries from specified date/time regardless of
+        event type
+      description: "Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss"
       operationId: getEventSinceDate
       parameters:
       - name: sinceDateTime
         in: query
-        required: true
+        required: false
         schema:
           type: string
-          format: date-time
       responses:
         "200":
           description: Successful operation
@@ -2135,6 +2191,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PubSubLedgerEntryDto"
+        "400":
+          description: Bad Request - malformed date/time
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BadRequestException"
   /v1/subscriptions/events/latest:
     get:
       tags:
@@ -2181,6 +2245,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
+        "400":
+          description: Malformed Application UUID
+          content:
+            '*/*':
+              schema:
+                type: object
         "200":
           description: Successful operation
           content:
@@ -2189,12 +2259,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScratchStorageEntryDto"
-        "400":
-          description: Malformed Application UUID
-          content:
-            '*/*':
-              schema:
-                type: object
     delete:
       tags:
       - scratch-storage-controller
@@ -2217,18 +2281,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ScratchStorageEntryDto"
-        "403":
-          description: Write / Update action forbidden - no WRITE privileges
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/InvalidScratchSpacePermissions"
         "404":
           description: Application ID not valid or found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
+        "403":
+          description: Write / Update action forbidden - no WRITE privileges
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InvalidScratchSpacePermissions"
         "400":
           description: Malformed Request Body
           content:
@@ -2344,6 +2408,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
+        "400":
+          description: Malformed Application UUID
+          content:
+            '*/*':
+              schema:
+                type: object
         "200":
           description: Successful operation
           content:
@@ -2352,12 +2422,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScratchStorageEntryDto"
-        "400":
-          description: Malformed Application UUID
-          content:
-            '*/*':
-              schema:
-                type: object
   /v1/scratch/apps/self:
     get:
       tags:
@@ -2535,14 +2599,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PersonDto"
-        "404":
-          description: Resource not found
+        "400":
+          description: Bad request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
-        "400":
-          description: Bad request
+        "404":
+          description: Resource not found
           content:
             '*/*':
               schema:
@@ -2713,12 +2777,6 @@ paths:
           type: string
           format: date-time
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AppEndpointCountMetricDto"
         "400":
           description: "Bad Rquest (Start date, end date, and path are all required.\
             \ Start date must be before end date)"
@@ -2732,6 +2790,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppEndpointCountMetricDto"
         "403":
           description: Forbidden (Requires DASHBOARD_ADMIN privilege or must be an
             Admin of the App Source)
@@ -2777,18 +2841,6 @@ paths:
           type: string
           format: date-time
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AppClientCountMetricDto"
-        "404":
-          description: Resource not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "400":
           description: "Bad Rquest (Start date, end date, and name are all required.\
             \ Start date must be before end date)"
@@ -2796,6 +2848,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppClientCountMetricDto"
         "403":
           description: Forbidden (Requires DASHBOARD_ADMIN privilege or must be an
             Admin of the App Source)
@@ -2833,12 +2897,6 @@ paths:
           type: string
           format: date-time
       responses:
-        "200":
-          description: Successful operation
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AppSourceMetricDto"
         "404":
           description: Resource not found
           content:
@@ -2852,6 +2910,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
+        "200":
+          description: Successful operation
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AppSourceMetricDto"
         "403":
           description: Forbidden (Requires DASHBOARD_ADMIN privilege or must be an
             Admin of the App Source)
@@ -2867,12 +2931,6 @@ paths:
       description: Retrieves all logfiles available for download
       operationId: getLogfileInfo
       responses:
-        "403":
-          description: Forbidden (Requires DASHBOARD_ADMIN privilege)
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -2881,6 +2939,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/LogfileDto"
+        "403":
+          description: Forbidden (Requires DASHBOARD_ADMIN privilege)
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
   /v1/logfile/{fileName}:
     get:
       tags:
@@ -2967,6 +3031,12 @@ paths:
           type: string
           format: uuid
       responses:
+        "404":
+          description: App Source or API Specification file not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -2976,12 +3046,6 @@ paths:
                 format: binary
         "400":
           description: Id is malformed
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
-        "404":
-          description: App Source or API Specification file not found
           content:
             '*/*':
               schema:
@@ -3008,6 +3072,12 @@ paths:
           type: string
           format: uuid
       responses:
+        "404":
+          description: App Source or API Specification file not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Successful operation
           content:
@@ -3017,12 +3087,6 @@ paths:
                 format: binary
         "400":
           description: Id is malformed
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
-        "404":
-          description: App Source or API Specification file not found
           content:
             '*/*':
               schema:
@@ -3126,12 +3190,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecordNotFoundException"
-        "200":
-          description: App Priv Removed OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
         "403":
           description: "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges\
             \ for given app id"
@@ -3139,6 +3197,12 @@ paths:
             '*/*':
               schema:
                 type: object
+        "200":
+          description: App Priv Removed OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ScratchStorageAppRegistryDto"
         "400":
           description: Malformed request body / app name already exists or appId is
             malformed
@@ -3226,28 +3290,28 @@ paths:
           type: string
           format: uuid
       responses:
-        "404":
-          description: App Source/End Point/App Client not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionResponse"
         "200":
           description: Privilege Removed OK
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AppSourceDetailsDto"
-        "403":
-          description: Insufficient privileges
+        "404":
+          description: App Source/End Point/App Client not found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
         "400":
           description: An Id is malformed
           content:
             '*/*':
+              schema:
+                $ref: "#/components/schemas/ExceptionResponse"
+        "403":
+          description: Insufficient privileges
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ExceptionResponse"
   /v1/app-source/app-clients/all/{id}:
@@ -3304,7 +3368,7 @@ components:
         id:
           type: string
           format: uuid
-    RecordNotFoundException:
+    BadRequestException:
       type: object
       properties:
         cause:
@@ -3328,10 +3392,10 @@ components:
                   lineNumber:
                     type: integer
                     format: int32
-                  nativeMethod:
-                    type: boolean
                   className:
                     type: string
+                  nativeMethod:
+                    type: boolean
             message:
               type: string
             suppressed:
@@ -3357,10 +3421,10 @@ components:
                         lineNumber:
                           type: integer
                           format: int32
-                        nativeMethod:
-                          type: boolean
                         className:
                           type: string
+                        nativeMethod:
+                          type: boolean
                   message:
                     type: string
                   localizedMessage:
@@ -3385,10 +3449,10 @@ components:
               lineNumber:
                 type: integer
                 format: int32
-              nativeMethod:
-                type: boolean
               className:
                 type: string
+              nativeMethod:
+                type: boolean
         message:
           type: string
         suppressed:
@@ -3414,10 +3478,130 @@ components:
                     lineNumber:
                       type: integer
                       format: int32
-                    nativeMethod:
-                      type: boolean
                     className:
                       type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    RecordNotFoundException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classLoaderName:
+                          type: string
+                        moduleName:
+                          type: string
+                        moduleVersion:
+                          type: string
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        className:
+                          type: string
+                        nativeMethod:
+                          type: boolean
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
               message:
                 type: string
               localizedMessage:
@@ -3448,10 +3632,10 @@ components:
                   lineNumber:
                     type: integer
                     format: int32
-                  nativeMethod:
-                    type: boolean
                   className:
                     type: string
+                  nativeMethod:
+                    type: boolean
             message:
               type: string
             suppressed:
@@ -3477,10 +3661,10 @@ components:
                         lineNumber:
                           type: integer
                           format: int32
-                        nativeMethod:
-                          type: boolean
                         className:
                           type: string
+                        nativeMethod:
+                          type: boolean
                   message:
                     type: string
                   localizedMessage:
@@ -3505,10 +3689,10 @@ components:
               lineNumber:
                 type: integer
                 format: int32
-              nativeMethod:
-                type: boolean
               className:
                 type: string
+              nativeMethod:
+                type: boolean
         message:
           type: string
         suppressed:
@@ -3534,130 +3718,10 @@ components:
                     lineNumber:
                       type: integer
                       format: int32
-                    nativeMethod:
-                      type: boolean
                     className:
                       type: string
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
-    BadRequestException:
-      type: object
-      properties:
-        cause:
-          type: object
-          properties:
-            stackTrace:
-              type: array
-              items:
-                type: object
-                properties:
-                  classLoaderName:
-                    type: string
-                  moduleName:
-                    type: string
-                  moduleVersion:
-                    type: string
-                  methodName:
-                    type: string
-                  fileName:
-                    type: string
-                  lineNumber:
-                    type: integer
-                    format: int32
-                  nativeMethod:
-                    type: boolean
-                  className:
-                    type: string
-            message:
-              type: string
-            suppressed:
-              type: array
-              items:
-                type: object
-                properties:
-                  stackTrace:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        classLoaderName:
-                          type: string
-                        moduleName:
-                          type: string
-                        moduleVersion:
-                          type: string
-                        methodName:
-                          type: string
-                        fileName:
-                          type: string
-                        lineNumber:
-                          type: integer
-                          format: int32
-                        nativeMethod:
-                          type: boolean
-                        className:
-                          type: string
-                  message:
-                    type: string
-                  localizedMessage:
-                    type: string
-            localizedMessage:
-              type: string
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              nativeMethod:
-                type: boolean
-              className:
-                type: string
-        message:
-          type: string
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
                     nativeMethod:
                       type: boolean
-                    className:
-                      type: string
               message:
                 type: string
               localizedMessage:
@@ -4059,6 +4123,48 @@ components:
           - SUB_ORG_REMOVE
         subscriberAddress:
           type: string
+    EventInfoDto:
+      type: object
+      properties:
+        eventType:
+          type: string
+          enum:
+          - PERSON_CHANGE
+          - PERSON_DELETE
+          - ORGANIZATION_CHANGE
+          - ORGANIZATION_DELETE
+          - PERSON_ORG_ADD
+          - PERSON_ORG_REMOVE
+          - SUB_ORG_ADD
+          - SUB_ORG_REMOVE
+        eventCount:
+          type: integer
+          format: int64
+    PubSubLedgerEntryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        countForEventType:
+          type: integer
+          format: int64
+        eventType:
+          type: string
+          enum:
+          - PERSON_CHANGE
+          - PERSON_DELETE
+          - ORGANIZATION_CHANGE
+          - ORGANIZATION_DELETE
+          - PERSON_ORG_ADD
+          - PERSON_ORG_REMOVE
+          - SUB_ORG_ADD
+          - SUB_ORG_REMOVE
+        data:
+          type: string
+        dateCreated:
+          type: string
+          format: date-time
     ScratchStorageEntryDto:
       required:
       - appId
@@ -4096,10 +4202,10 @@ components:
                   lineNumber:
                     type: integer
                     format: int32
-                  nativeMethod:
-                    type: boolean
                   className:
                     type: string
+                  nativeMethod:
+                    type: boolean
             message:
               type: string
             suppressed:
@@ -4125,10 +4231,10 @@ components:
                         lineNumber:
                           type: integer
                           format: int32
-                        nativeMethod:
-                          type: boolean
                         className:
                           type: string
+                        nativeMethod:
+                          type: boolean
                   message:
                     type: string
                   localizedMessage:
@@ -4153,10 +4259,10 @@ components:
               lineNumber:
                 type: integer
                 format: int32
-              nativeMethod:
-                type: boolean
               className:
                 type: string
+              nativeMethod:
+                type: boolean
         message:
           type: string
         suppressed:
@@ -4182,10 +4288,10 @@ components:
                     lineNumber:
                       type: integer
                       format: int32
-                    nativeMethod:
-                      type: boolean
                     className:
                       type: string
+                    nativeMethod:
+                      type: boolean
               message:
                 type: string
               localizedMessage:
@@ -4298,6 +4404,11 @@ components:
           type: array
           items:
             type: object
+    AppVersionInfoDto:
+      type: object
+      properties:
+        version:
+          type: string
     UserInfoDto:
       type: object
       properties:
@@ -4315,31 +4426,6 @@ components:
           type: string
         organization:
           type: string
-    PubSubLedgerEntryDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        countForEventType:
-          type: integer
-          format: int64
-        eventType:
-          type: string
-          enum:
-          - PERSON_CHANGE
-          - PERSON_DELETE
-          - ORGANIZATION_CHANGE
-          - ORGANIZATION_DELETE
-          - PERSON_ORG_ADD
-          - PERSON_ORG_REMOVE
-          - SUB_ORG_ADD
-          - SUB_ORG_REMOVE
-        data:
-          type: string
-        dateCreated:
-          type: string
-          format: date-time
     Rank:
       type: object
       properties:
