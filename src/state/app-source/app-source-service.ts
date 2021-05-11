@@ -3,6 +3,7 @@ import { AxiosPromise } from 'axios';
 import { DataService } from '../data-service/data-service';
 import { AppClientSummaryDto, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
 import Config from '../../api/configuration';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 export default class AppSourceService implements DataService<AppSourceDto, AppSourceDetailsDto> {
   constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) { }
@@ -33,6 +34,22 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     return result;
   }
 
+  fetchAPISpecFile(id: string): Promise<any> {
+    const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFile(id)
+
+    const result = response().then(res => res.data);
+    
+    return result;
+  }
+
+  fetchAPISpecFileByEndpointId(id: string): Promise<any> {
+    const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFileByEndpointPriv(id)
+
+    const result = response().then(res => res.data);
+    
+    return result;
+  }
+
   generateAppSourcePath(appSourcePath?: string): string {
     if (appSourcePath == null) {
       return '';
@@ -60,8 +77,8 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
       const appSourceDto: AppSourceDto = {
         id: updatedResponse.data.id,
         name: updatedResponse.data.name,
-        clientCount: updatedResponse.data.appClients?.length,
-        endpointCount: updatedResponse.data.endpoints?.length
+        clientCount: updatedResponse.data.clientCount,
+        endpointCount: updatedResponse.data.endpointCount
       };
 
       this.state.find(item => item.id.value === updatedResponse.data.id)?.set(appSourceDto);
@@ -85,13 +102,18 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
       return Promise.reject(new Error('App Source ID must be defined'));
     }
 
-    const appSourceDetailsDto = (await this.appSourceApi.getAppSourceDetails(rowData.id)).data;
-    const appSourceDetails: AppSourceDetailsDto = {
-      ...appSourceDetailsDto,
-      appSourcePath: this.generateAppSourcePath(appSourceDetailsDto.appSourcePath)
-    };
+    try {
+      const appSourceDetailsDto = (await this.appSourceApi.getAppSourceDetails(rowData.id)).data;
+      const appSourceDetails: AppSourceDetailsDto = {
+        ...appSourceDetailsDto,
+        appSourcePath: this.generateAppSourcePath(appSourceDetailsDto.appSourcePath)
+      };
 
-    return Promise.resolve(appSourceDetails);
+      return Promise.resolve(appSourceDetails);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
   }
 
   private isStateReady(): boolean {

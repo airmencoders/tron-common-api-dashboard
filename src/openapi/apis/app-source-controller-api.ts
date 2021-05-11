@@ -356,6 +356,92 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
+         * 
+         * @summary Gets a copy of the openapispec file for the app source
+         * @param {string} appId App Source UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSpecFile: async (appId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'appId' is not null or undefined
+            if (appId === null || appId === undefined) {
+                throw new RequiredError('appId','Required parameter appId was null or undefined when calling getSpecFile.');
+            }
+            const localVarPath = `/v1/app-source/spec/{appId}`
+                .replace(`{${"appId"}}`, encodeURIComponent(String(appId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Gets a copy of the openapispec file for the app source related to the endpoint
+         * @param {string} endpointPrivId App Endpoint Privilege UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSpecFileByEndpointPriv: async (endpointPrivId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'endpointPrivId' is not null or undefined
+            if (endpointPrivId === null || endpointPrivId === undefined) {
+                throw new RequiredError('endpointPrivId','Required parameter endpointPrivId was null or undefined when calling getSpecFileByEndpointPriv.');
+            }
+            const localVarPath = `/v1/app-source/spec/endpoint-priv/{endpointPrivId}`
+                .replace(`{${"endpointPrivId"}}`, encodeURIComponent(String(endpointPrivId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
          * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
          * @param {string} id App Source UUID
@@ -668,6 +754,34 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
+         * 
+         * @summary Gets a copy of the openapispec file for the app source
+         * @param {string} appId App Source UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSpecFile(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getSpecFile(appId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Gets a copy of the openapispec file for the app source related to the endpoint
+         * @param {string} endpointPrivId App Endpoint Privilege UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSpecFileByEndpointPriv(endpointPrivId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getSpecFileByEndpointPriv(endpointPrivId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
          * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
          * @param {string} id App Source UUID
@@ -805,6 +919,26 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
             return AppSourceControllerApiFp(configuration).getAvailableAppClients(options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary Gets a copy of the openapispec file for the app source
+         * @param {string} appId App Source UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSpecFile(appId: string, options?: any): AxiosPromise<any> {
+            return AppSourceControllerApiFp(configuration).getSpecFile(appId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Gets a copy of the openapispec file for the app source related to the endpoint
+         * @param {string} endpointPrivId App Endpoint Privilege UUID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSpecFileByEndpointPriv(endpointPrivId: string, options?: any): AxiosPromise<any> {
+            return AppSourceControllerApiFp(configuration).getSpecFileByEndpointPriv(endpointPrivId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
          * @summary Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source\'s endpoints.
          * @param {string} id App Source UUID
@@ -924,6 +1058,26 @@ export interface AppSourceControllerApiInterface {
      * @memberof AppSourceControllerApiInterface
      */
     getAvailableAppClients(options?: any): AxiosPromise<Array<AppClientSummaryDto>>;
+
+    /**
+     * 
+     * @summary Gets a copy of the openapispec file for the app source
+     * @param {string} appId App Source UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    getSpecFile(appId: string, options?: any): AxiosPromise<any>;
+
+    /**
+     * 
+     * @summary Gets a copy of the openapispec file for the app source related to the endpoint
+     * @param {string} endpointPrivId App Endpoint Privilege UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApiInterface
+     */
+    getSpecFileByEndpointPriv(endpointPrivId: string, options?: any): AxiosPromise<any>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.
@@ -1058,6 +1212,30 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
      */
     public getAvailableAppClients(options?: any) {
         return AppSourceControllerApiFp(this.configuration).getAvailableAppClients(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Gets a copy of the openapispec file for the app source
+     * @param {string} appId App Source UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public getSpecFile(appId: string, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).getSpecFile(appId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Gets a copy of the openapispec file for the app source related to the endpoint
+     * @param {string} endpointPrivId App Endpoint Privilege UUID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AppSourceControllerApi
+     */
+    public getSpecFileByEndpointPriv(endpointPrivId: string, options?: any) {
+        return AppSourceControllerApiFp(this.configuration).getSpecFileByEndpointPriv(endpointPrivId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

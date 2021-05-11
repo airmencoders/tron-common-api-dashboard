@@ -13,7 +13,7 @@
  */
 
 
-import { Privilege } from './privilege';
+import { PrivilegeDto } from './privilege-dto';
 
 /**
  * Admin To Remove Email
@@ -35,10 +35,10 @@ export interface DashboardUserDto {
     email?: string;
     /**
      * 
-     * @type {Array<Privilege>}
+     * @type {Array<PrivilegeDto>}
      * @memberof DashboardUserDto
      */
-    privileges?: Array<Privilege>;
+    privileges?: Array<PrivilegeDto>;
 }
 
 

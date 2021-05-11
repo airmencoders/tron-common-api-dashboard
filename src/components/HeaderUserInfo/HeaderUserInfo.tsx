@@ -1,4 +1,6 @@
 import React, {useMemo} from 'react';
+import { Dropdown } from 'react-bootstrap';
+import Button from '../Button/Button';
 import './HeaderUserInfo.scss';
 import {HeaderUserInfoProps} from './HeaderUserInfoProps';
 
@@ -13,11 +15,29 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
   }, [userInfo]);
 
   return (
-      <div className="header-user-info">
-        <div className="header-user-info__initials">
+      <Dropdown className="header-user-info">
+        <Dropdown.Toggle className="header-user-info__initials" type="button">
           {userInitials}
-        </div>
-      </div>
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          <Dropdown.Item>
+              <div className="font-italic text-muted header-user-info__label">Name</div>
+              {userInfo?.name}
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <div className="font-italic text-muted header-user-info__label">DoD ID</div>
+            {userInfo?.dodId}
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <div className="font-italic text-muted header-user-info__label">Email</div>
+            {userInfo?.email}
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <div className="font-italic text-muted header-user-info__label">Organization</div>
+            {userInfo?.organization}
+          </Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>
   );
 }
 

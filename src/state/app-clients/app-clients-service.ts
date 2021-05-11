@@ -2,7 +2,7 @@ import { none, State } from "@hookstate/core";
 import { AxiosPromise } from "axios";
 import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
-import { Privilege } from "../../openapi/models";
+import { PrivilegeDto } from "../../openapi/models";
 import { AppClientUserDetailsDto } from "../../openapi/models/app-client-user-details-dto";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
 import { DataService } from "../data-service/data-service";
@@ -85,14 +85,24 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async convertRowDataToEditableData(rowData: AppClientFlat): Promise<AppClientFlat> {
-    const details = await this.getSelectedClient(rowData.id ?? "");
-    const retVal : AppClientFlat = { 
-      ...rowData, 
-      appClientDeveloperEmails: details.appClientDeveloperEmails, 
-      appEndpointPrivs: details.appEndpointPrivs 
-    };
+    const { id } = rowData;
 
-    return Promise.resolve(Object.assign({}, retVal));
+    if (!id) {
+      return Promise.reject(new Error('App Client ID must be defined.'));
+    }
+
+    try {
+      const details = await this.getSelectedClient(id);
+      const retVal: AppClientFlat = {
+        ...rowData,
+        appClientDeveloperEmails: details.appClientDeveloperEmails,
+        appEndpointPrivs: details.appEndpointPrivs
+      };
+
+      return Promise.resolve(Object.assign({}, retVal));
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   convertAppClientsToFlat(clients: AppClientUserDto[]): AppClientFlat[] {
@@ -127,12 +137,12 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     };
   }
 
-  async createAppPrivilegesArr(client: AppClientFlat): Promise<Array<Privilege>> {
+  async createAppPrivilegesArr(client: AppClientFlat): Promise<Array<PrivilegeDto>> {
     return Array.from(await this.createAppPrivileges(client));
   }
 
-  async createAppPrivileges(client: AppClientFlat): Promise<Set<Privilege>> {
-    const privileges = new Set<Privilege>();
+  async createAppPrivileges(client: AppClientFlat): Promise<Set<PrivilegeDto>> {
+    const privileges = new Set<PrivilegeDto>();
     const privilegeResponse = await this.appClientsApi.getClientTypePrivs();
 
     if (client.read) {

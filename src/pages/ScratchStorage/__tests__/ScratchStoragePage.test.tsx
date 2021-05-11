@@ -1,5 +1,7 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import {rest} from 'msw';
+import {setupServer} from 'msw/node';
+import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { ScratchStorageAppRegistryDto, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
@@ -11,10 +13,25 @@ import { ScratchStorageFlat } from '../../../state/scratch-storage/scratch-stora
 
 jest.mock('../../../state/scratch-storage/scratch-storage-state');
 
+const server = setupServer(
+  rest.get('/api/v1/scratch', (req, res, ctx) => {
+    return res(ctx.json([ { id: 'some id', key: 'SOme Org', value: 'value', appId: '79d15bdb-43ff-4a55-a08d-2ea58a9f343a'}]))
+  }),
+  rest.get('/api/v1/userinfo', (req, res, ctx) => {
+    return res(ctx.json({}))
+  }),
+
+  rest.get('*', req => console.log(req.url.href))
+)
+
 describe('Test Scratch Storage Page', () => {
   let scratchStorageState: State<ScratchStorageAppRegistryDto[]> & StateMethodsDestroy;
   let selectedScratchStorageState: State<ScratchStorageFlat> & StateMethodsDestroy;
   let scratchStorageApi: ScratchStorageControllerApiInterface;
+
+  beforeAll(() => server.listen());
+  afterEach(() => server.resetHandlers());
+  afterAll(() => server.close());
 
   beforeEach(() => {
     scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
@@ -37,6 +54,8 @@ describe('Test Scratch Storage Page', () => {
       </MemoryRouter>
     );
 
-    expect(page.getByText('Loading...')).toBeDefined();
+    await waitFor(() =>
+      expect(page.getByText('Loading...')).toBeDefined()
+    );
   });
 })

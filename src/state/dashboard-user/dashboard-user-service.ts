@@ -6,7 +6,7 @@ import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
-import { Privilege, PrivilegeDto } from '../../openapi';
+import { PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 
@@ -64,12 +64,12 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     };
   }
 
-  createPrivilegesArr(dashboardUser: DashboardUserFlat): Array<Privilege> {
+  createPrivilegesArr(dashboardUser: DashboardUserFlat): Array<PrivilegeDto> {
     return Array.from(this.createPrivileges(dashboardUser));
   }
 
-  createPrivileges(dashboardUser: DashboardUserFlat): Set<Privilege> {
-    const privileges = new Set<Privilege>();
+  createPrivileges(dashboardUser: DashboardUserFlat): Set<PrivilegeDto> {
+    const privileges = new Set<PrivilegeDto>();
 
     if (dashboardUser.hasDashboardAdmin) {
       const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.DASHBOARD_ADMIN);

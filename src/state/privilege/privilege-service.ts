@@ -1,7 +1,6 @@
 import { State } from "@hookstate/core";
 import { AxiosPromise } from "axios";
 import { PrivilegeControllerApiInterface } from "../../openapi/apis/privilege-controller-api";
-import { Privilege } from "../../openapi/models";
 import { PrivilegeDto } from "../../openapi/models/privilege-dto";
 import { PrivilegeType } from "./privilege-type";
 
@@ -16,23 +15,23 @@ export default class PrivilegeService {
     return data;
   }
 
-  convertDtoToEntity(privilege: PrivilegeDto): Privilege {
+  convertDtoToEntity(privilege: PrivilegeDto): PrivilegeDto {
     return {
       id: privilege.id,
       name: privilege.name
     };
   }
 
-  createPrivilegeFromType(privilegeType: PrivilegeType): Privilege | undefined {
+  createPrivilegeFromType(privilegeType: PrivilegeType): PrivilegeDto | undefined {
     return this.state.find(privilege => privilege.name.value === privilegeType)?.value;
   }
 
-  createPrivilegeFromId(id: number): Privilege | undefined {
+  createPrivilegeFromId(id: number): PrivilegeDto | undefined {
     return this.state.find(privilege => privilege.id.value === id)?.value;
   }
 
-  createPrivilegesFromIds(ids: Array<number>): Array<Privilege> {
-    const privileges: Array<Privilege> = [];
+  createPrivilegesFromIds(ids: Array<number>): Array<PrivilegeDto> {
+    const privileges: Array<PrivilegeDto> = [];
 
     for (const id of ids) {
       const privilege = this.createPrivilegeFromId(id);
@@ -48,7 +47,7 @@ export default class PrivilegeService {
     return this.state.find(privilege => privilege.name.value === privilegeType)?.value.id;
   }
 
-  getPrivilegeFromType(privilegeType: PrivilegeType): Privilege | undefined {
+  getPrivilegeFromType(privilegeType: PrivilegeType): PrivilegeDto | undefined {
     return this.state.find(privilege => privilege.name.value === privilegeType)?.value;
   }
 

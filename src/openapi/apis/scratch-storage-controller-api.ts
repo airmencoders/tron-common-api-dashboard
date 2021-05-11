@@ -21,6 +21,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { BadRequestException } from '../models';
 // @ts-ignore
+import { ExceptionResponse } from '../models';
+// @ts-ignore
 import { InvalidScratchSpacePermissions } from '../models';
 // @ts-ignore
 import { PrivilegeDto } from '../models';
@@ -31,13 +33,11 @@ import { ResourceAlreadyExistsException } from '../models';
 // @ts-ignore
 import { ScratchStorageAppRegistryDto } from '../models';
 // @ts-ignore
-import { ScratchStorageAppRegistryEntry } from '../models';
-// @ts-ignore
 import { ScratchStorageAppUserPrivDto } from '../models';
 // @ts-ignore
-import { ScratchStorageEntry } from '../models';
+import { ScratchStorageEntryDto } from '../models';
 // @ts-ignore
-import { ScratchStorageUser } from '../models';
+import { ScratchStorageUserDto } from '../models';
 // @ts-ignore
 import { ScratchValuePatchJsonDto } from '../models';
 /**
@@ -49,14 +49,14 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Space user by their P1 email address
-         * @param {ScratchStorageUser} scratchStorageUser 
+         * @param {ScratchStorageUserDto} scratchStorageUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewScratchUser: async (scratchStorageUser: ScratchStorageUser, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'scratchStorageUser' is not null or undefined
-            if (scratchStorageUser === null || scratchStorageUser === undefined) {
-                throw new RequiredError('scratchStorageUser','Required parameter scratchStorageUser was null or undefined when calling addNewScratchUser.');
+        addNewScratchUser: async (scratchStorageUserDto: ScratchStorageUserDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'scratchStorageUserDto' is not null or undefined
+            if (scratchStorageUserDto === null || scratchStorageUserDto === undefined) {
+                throw new RequiredError('scratchStorageUserDto','Required parameter scratchStorageUserDto was null or undefined when calling addNewScratchUser.');
             }
             const localVarPath = `/v1/scratch/users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -84,13 +84,13 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof scratchStorageUser !== 'string';
+            const nonString = typeof scratchStorageUserDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(scratchStorageUser !== undefined ? scratchStorageUser : {})
-                : (scratchStorageUser || "");
+                ? JSON.stringify(scratchStorageUserDto !== undefined ? scratchStorageUserDto : {})
+                : (scratchStorageUserDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -336,18 +336,18 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Edit existing scratch space app information (its name)
          * @param {string} id Application UUID
-         * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+         * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        editExistingAppEntry: async (id: string, scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options: any = {}): Promise<RequestArgs> => {
+        editExistingAppEntry: async (id: string, scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling editExistingAppEntry.');
             }
-            // verify required parameter 'scratchStorageAppRegistryEntry' is not null or undefined
-            if (scratchStorageAppRegistryEntry === null || scratchStorageAppRegistryEntry === undefined) {
-                throw new RequiredError('scratchStorageAppRegistryEntry','Required parameter scratchStorageAppRegistryEntry was null or undefined when calling editExistingAppEntry.');
+            // verify required parameter 'scratchStorageAppRegistryDto' is not null or undefined
+            if (scratchStorageAppRegistryDto === null || scratchStorageAppRegistryDto === undefined) {
+                throw new RequiredError('scratchStorageAppRegistryDto','Required parameter scratchStorageAppRegistryDto was null or undefined when calling editExistingAppEntry.');
             }
             const localVarPath = `/v1/scratch/apps/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -376,13 +376,13 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof scratchStorageAppRegistryEntry !== 'string';
+            const nonString = typeof scratchStorageAppRegistryDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(scratchStorageAppRegistryEntry !== undefined ? scratchStorageAppRegistryEntry : {})
-                : (scratchStorageAppRegistryEntry || "");
+                ? JSON.stringify(scratchStorageAppRegistryDto !== undefined ? scratchStorageAppRegistryDto : {})
+                : (scratchStorageAppRegistryDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -393,18 +393,18 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Edits an existing Scratch Space user information
          * @param {string} id Scratch User Id
-         * @param {ScratchStorageUser} scratchStorageUser 
+         * @param {ScratchStorageUserDto} scratchStorageUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        editScratchUser: async (id: string, scratchStorageUser: ScratchStorageUser, options: any = {}): Promise<RequestArgs> => {
+        editScratchUser: async (id: string, scratchStorageUserDto: ScratchStorageUserDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling editScratchUser.');
             }
-            // verify required parameter 'scratchStorageUser' is not null or undefined
-            if (scratchStorageUser === null || scratchStorageUser === undefined) {
-                throw new RequiredError('scratchStorageUser','Required parameter scratchStorageUser was null or undefined when calling editScratchUser.');
+            // verify required parameter 'scratchStorageUserDto' is not null or undefined
+            if (scratchStorageUserDto === null || scratchStorageUserDto === undefined) {
+                throw new RequiredError('scratchStorageUserDto','Required parameter scratchStorageUserDto was null or undefined when calling editScratchUser.');
             }
             const localVarPath = `/v1/scratch/users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -433,13 +433,13 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof scratchStorageUser !== 'string';
+            const nonString = typeof scratchStorageUserDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(scratchStorageUser !== undefined ? scratchStorageUser : {})
-                : (scratchStorageUser || "");
+                ? JSON.stringify(scratchStorageUserDto !== undefined ? scratchStorageUserDto : {})
+                : (scratchStorageUserDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -938,14 +938,14 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
-         * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+         * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postNewScratchSpaceApp: async (scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'scratchStorageAppRegistryEntry' is not null or undefined
-            if (scratchStorageAppRegistryEntry === null || scratchStorageAppRegistryEntry === undefined) {
-                throw new RequiredError('scratchStorageAppRegistryEntry','Required parameter scratchStorageAppRegistryEntry was null or undefined when calling postNewScratchSpaceApp.');
+        postNewScratchSpaceApp: async (scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'scratchStorageAppRegistryDto' is not null or undefined
+            if (scratchStorageAppRegistryDto === null || scratchStorageAppRegistryDto === undefined) {
+                throw new RequiredError('scratchStorageAppRegistryDto','Required parameter scratchStorageAppRegistryDto was null or undefined when calling postNewScratchSpaceApp.');
             }
             const localVarPath = `/v1/scratch/apps`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -973,13 +973,13 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof scratchStorageAppRegistryEntry !== 'string';
+            const nonString = typeof scratchStorageAppRegistryDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(scratchStorageAppRegistryEntry !== undefined ? scratchStorageAppRegistryEntry : {})
-                : (scratchStorageAppRegistryEntry || "");
+                ? JSON.stringify(scratchStorageAppRegistryDto !== undefined ? scratchStorageAppRegistryDto : {})
+                : (scratchStorageAppRegistryDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -1090,14 +1090,14 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         /**
          * SCRATCH_WRITE privileges are required for the requester for the given App Id
          * @summary Adds or updates a key-value pair for a given App Id
-         * @param {ScratchStorageEntry} scratchStorageEntry 
+         * @param {ScratchStorageEntryDto} scratchStorageEntryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setKeyValuePair: async (scratchStorageEntry: ScratchStorageEntry, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'scratchStorageEntry' is not null or undefined
-            if (scratchStorageEntry === null || scratchStorageEntry === undefined) {
-                throw new RequiredError('scratchStorageEntry','Required parameter scratchStorageEntry was null or undefined when calling setKeyValuePair.');
+        setKeyValuePair: async (scratchStorageEntryDto: ScratchStorageEntryDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'scratchStorageEntryDto' is not null or undefined
+            if (scratchStorageEntryDto === null || scratchStorageEntryDto === undefined) {
+                throw new RequiredError('scratchStorageEntryDto','Required parameter scratchStorageEntryDto was null or undefined when calling setKeyValuePair.');
             }
             const localVarPath = `/v1/scratch`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -1125,13 +1125,13 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof scratchStorageEntry !== 'string';
+            const nonString = typeof scratchStorageEntryDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(scratchStorageEntry !== undefined ? scratchStorageEntry : {})
-                : (scratchStorageEntry || "");
+                ? JSON.stringify(scratchStorageEntryDto !== undefined ? scratchStorageEntryDto : {})
+                : (scratchStorageEntryDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -1150,12 +1150,12 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Space user by their P1 email address
-         * @param {ScratchStorageUser} scratchStorageUser 
+         * @param {ScratchStorageUserDto} scratchStorageUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addNewScratchUser(scratchStorageUser: ScratchStorageUser, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUser>> {
-            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).addNewScratchUser(scratchStorageUser, options);
+        async addNewScratchUser(scratchStorageUserDto: ScratchStorageUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUserDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).addNewScratchUser(scratchStorageUserDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1169,7 +1169,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addUserPriv(id: string, scratchStorageAppUserPrivDto: ScratchStorageAppUserPrivDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
+        async addUserPriv(id: string, scratchStorageAppUserPrivDto: ScratchStorageAppUserPrivDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).addUserPriv(id, scratchStorageAppUserPrivDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1183,7 +1183,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
+        async deleteAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).deleteAllKeyValuePairsForAppId(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1197,7 +1197,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteExistingAppEntry(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
+        async deleteExistingAppEntry(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).deleteExistingAppEntry(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1212,7 +1212,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteKeyValuePair(appId: string, key: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
+        async deleteKeyValuePair(appId: string, key: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).deleteKeyValuePair(appId, key, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1226,7 +1226,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteScratchUser(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUser>> {
+        async deleteScratchUser(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUserDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).deleteScratchUser(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1237,12 +1237,12 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Edit existing scratch space app information (its name)
          * @param {string} id Application UUID
-         * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+         * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async editExistingAppEntry(id: string, scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
-            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).editExistingAppEntry(id, scratchStorageAppRegistryEntry, options);
+        async editExistingAppEntry(id: string, scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).editExistingAppEntry(id, scratchStorageAppRegistryDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1252,12 +1252,12 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Edits an existing Scratch Space user information
          * @param {string} id Scratch User Id
-         * @param {ScratchStorageUser} scratchStorageUser 
+         * @param {ScratchStorageUserDto} scratchStorageUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async editScratchUser(id: string, scratchStorageUser: ScratchStorageUser, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUser>> {
-            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).editScratchUser(id, scratchStorageUser, options);
+        async editScratchUser(id: string, scratchStorageUserDto: ScratchStorageUserDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageUserDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).editScratchUser(id, scratchStorageUserDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1269,7 +1269,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeyValuePairs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntry>>> {
+        async getAllKeyValuePairs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntryDto>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeyValuePairs(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1283,7 +1283,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntry>>> {
+        async getAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntryDto>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeyValuePairsForAppId(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1297,7 +1297,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeysForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntry>>> {
+        async getAllKeysForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntryDto>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeysForAppId(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1310,7 +1310,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageUser>>> {
+        async getAllUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageUserDto>>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllUsers(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1325,7 +1325,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getKeyValueByKeyName(appId: string, keyName: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
+        async getKeyValueByKeyName(appId: string, keyName: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getKeyValueByKeyName(appId, keyName, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1420,12 +1420,12 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
-         * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+         * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postNewScratchSpaceApp(scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
-            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).postNewScratchSpaceApp(scratchStorageAppRegistryEntry, options);
+        async postNewScratchSpaceApp(scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).postNewScratchSpaceApp(scratchStorageAppRegistryDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1439,7 +1439,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async removeUserPriv(id: string, appPrivIdEntry: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
+        async removeUserPriv(id: string, appPrivIdEntry: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).removeUserPriv(id, appPrivIdEntry, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1454,7 +1454,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setImplicitReadSetting(id: string, priv: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryEntry>> {
+        async setImplicitReadSetting(id: string, priv: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).setImplicitReadSetting(id, priv, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1464,12 +1464,12 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         /**
          * SCRATCH_WRITE privileges are required for the requester for the given App Id
          * @summary Adds or updates a key-value pair for a given App Id
-         * @param {ScratchStorageEntry} scratchStorageEntry 
+         * @param {ScratchStorageEntryDto} scratchStorageEntryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setKeyValuePair(scratchStorageEntry: ScratchStorageEntry, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntry>> {
-            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).setKeyValuePair(scratchStorageEntry, options);
+        async setKeyValuePair(scratchStorageEntryDto: ScratchStorageEntryDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntryDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).setKeyValuePair(scratchStorageEntryDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1487,12 +1487,12 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Space user by their P1 email address
-         * @param {ScratchStorageUser} scratchStorageUser 
+         * @param {ScratchStorageUserDto} scratchStorageUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewScratchUser(scratchStorageUser: ScratchStorageUser, options?: any): AxiosPromise<ScratchStorageUser> {
-            return ScratchStorageControllerApiFp(configuration).addNewScratchUser(scratchStorageUser, options).then((request) => request(axios, basePath));
+        addNewScratchUser(scratchStorageUserDto: ScratchStorageUserDto, options?: any): AxiosPromise<ScratchStorageUserDto> {
+            return ScratchStorageControllerApiFp(configuration).addNewScratchUser(scratchStorageUserDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
@@ -1502,7 +1502,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addUserPriv(id: string, scratchStorageAppUserPrivDto: ScratchStorageAppUserPrivDto, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
+        addUserPriv(id: string, scratchStorageAppUserPrivDto: ScratchStorageAppUserPrivDto, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
             return ScratchStorageControllerApiFp(configuration).addUserPriv(id, scratchStorageAppUserPrivDto, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1512,7 +1512,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<ScratchStorageEntry> {
+        deleteAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<ScratchStorageEntryDto> {
             return ScratchStorageControllerApiFp(configuration).deleteAllKeyValuePairsForAppId(appId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1522,7 +1522,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteExistingAppEntry(id: string, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
+        deleteExistingAppEntry(id: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
             return ScratchStorageControllerApiFp(configuration).deleteExistingAppEntry(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1533,7 +1533,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteKeyValuePair(appId: string, key: string, options?: any): AxiosPromise<ScratchStorageEntry> {
+        deleteKeyValuePair(appId: string, key: string, options?: any): AxiosPromise<ScratchStorageEntryDto> {
             return ScratchStorageControllerApiFp(configuration).deleteKeyValuePair(appId, key, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1543,30 +1543,30 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteScratchUser(id: string, options?: any): AxiosPromise<ScratchStorageUser> {
+        deleteScratchUser(id: string, options?: any): AxiosPromise<ScratchStorageUserDto> {
             return ScratchStorageControllerApiFp(configuration).deleteScratchUser(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Edit existing scratch space app information (its name)
          * @param {string} id Application UUID
-         * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+         * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        editExistingAppEntry(id: string, scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
-            return ScratchStorageControllerApiFp(configuration).editExistingAppEntry(id, scratchStorageAppRegistryEntry, options).then((request) => request(axios, basePath));
+        editExistingAppEntry(id: string, scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
+            return ScratchStorageControllerApiFp(configuration).editExistingAppEntry(id, scratchStorageAppRegistryDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Edits an existing Scratch Space user information
          * @param {string} id Scratch User Id
-         * @param {ScratchStorageUser} scratchStorageUser 
+         * @param {ScratchStorageUserDto} scratchStorageUserDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        editScratchUser(id: string, scratchStorageUser: ScratchStorageUser, options?: any): AxiosPromise<ScratchStorageUser> {
-            return ScratchStorageControllerApiFp(configuration).editScratchUser(id, scratchStorageUser, options).then((request) => request(axios, basePath));
+        editScratchUser(id: string, scratchStorageUserDto: ScratchStorageUserDto, options?: any): AxiosPromise<ScratchStorageUserDto> {
+            return ScratchStorageControllerApiFp(configuration).editScratchUser(id, scratchStorageUserDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Requires request to be under DASHBOARD_ADMIN privileges
@@ -1574,7 +1574,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeyValuePairs(options?: any): AxiosPromise<Array<ScratchStorageEntry>> {
+        getAllKeyValuePairs(options?: any): AxiosPromise<Array<ScratchStorageEntryDto>> {
             return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairs(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1584,7 +1584,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntry>> {
+        getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDto>> {
             return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairsForAppId(appId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1594,7 +1594,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeysForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntry>> {
+        getAllKeysForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDto>> {
             return ScratchStorageControllerApiFp(configuration).getAllKeysForAppId(appId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1603,7 +1603,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllUsers(options?: any): AxiosPromise<Array<ScratchStorageUser>> {
+        getAllUsers(options?: any): AxiosPromise<Array<ScratchStorageUserDto>> {
             return ScratchStorageControllerApiFp(configuration).getAllUsers(options).then((request) => request(axios, basePath));
         },
         /**
@@ -1614,7 +1614,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntry> {
+        getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntryDto> {
             return ScratchStorageControllerApiFp(configuration).getKeyValueByKeyName(appId, keyName, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1681,12 +1681,12 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
         /**
          * Requester has to have DASHBOARD_ADMIN rights
          * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
-         * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+         * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postNewScratchSpaceApp(scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
-            return ScratchStorageControllerApiFp(configuration).postNewScratchSpaceApp(scratchStorageAppRegistryEntry, options).then((request) => request(axios, basePath));
+        postNewScratchSpaceApp(scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
+            return ScratchStorageControllerApiFp(configuration).postNewScratchSpaceApp(scratchStorageAppRegistryDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
@@ -1696,7 +1696,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        removeUserPriv(id: string, appPrivIdEntry: string, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
+        removeUserPriv(id: string, appPrivIdEntry: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
             return ScratchStorageControllerApiFp(configuration).removeUserPriv(id, appPrivIdEntry, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1707,18 +1707,18 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setImplicitReadSetting(id: string, priv: boolean, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry> {
+        setImplicitReadSetting(id: string, priv: boolean, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
             return ScratchStorageControllerApiFp(configuration).setImplicitReadSetting(id, priv, options).then((request) => request(axios, basePath));
         },
         /**
          * SCRATCH_WRITE privileges are required for the requester for the given App Id
          * @summary Adds or updates a key-value pair for a given App Id
-         * @param {ScratchStorageEntry} scratchStorageEntry 
+         * @param {ScratchStorageEntryDto} scratchStorageEntryDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setKeyValuePair(scratchStorageEntry: ScratchStorageEntry, options?: any): AxiosPromise<ScratchStorageEntry> {
-            return ScratchStorageControllerApiFp(configuration).setKeyValuePair(scratchStorageEntry, options).then((request) => request(axios, basePath));
+        setKeyValuePair(scratchStorageEntryDto: ScratchStorageEntryDto, options?: any): AxiosPromise<ScratchStorageEntryDto> {
+            return ScratchStorageControllerApiFp(configuration).setKeyValuePair(scratchStorageEntryDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1732,12 +1732,12 @@ export interface ScratchStorageControllerApiInterface {
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Adds a new Scratch Space user by their P1 email address
-     * @param {ScratchStorageUser} scratchStorageUser 
+     * @param {ScratchStorageUserDto} scratchStorageUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    addNewScratchUser(scratchStorageUser: ScratchStorageUser, options?: any): AxiosPromise<ScratchStorageUser>;
+    addNewScratchUser(scratchStorageUserDto: ScratchStorageUserDto, options?: any): AxiosPromise<ScratchStorageUserDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
@@ -1748,7 +1748,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    addUserPriv(id: string, scratchStorageAppUserPrivDto: ScratchStorageAppUserPrivDto, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    addUserPriv(id: string, scratchStorageAppUserPrivDto: ScratchStorageAppUserPrivDto, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * SCRATCH_WRITE privileges are required for the requester for the given App Id
@@ -1758,7 +1758,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    deleteAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<ScratchStorageEntry>;
+    deleteAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<ScratchStorageEntryDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1768,7 +1768,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    deleteExistingAppEntry(id: string, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    deleteExistingAppEntry(id: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * SCRATCH_WRITE privileges are required for the requester for the given App Id
@@ -1779,7 +1779,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    deleteKeyValuePair(appId: string, key: string, options?: any): AxiosPromise<ScratchStorageEntry>;
+    deleteKeyValuePair(appId: string, key: string, options?: any): AxiosPromise<ScratchStorageEntryDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1789,29 +1789,29 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    deleteScratchUser(id: string, options?: any): AxiosPromise<ScratchStorageUser>;
+    deleteScratchUser(id: string, options?: any): AxiosPromise<ScratchStorageUserDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Edit existing scratch space app information (its name)
      * @param {string} id Application UUID
-     * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+     * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    editExistingAppEntry(id: string, scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    editExistingAppEntry(id: string, scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Edits an existing Scratch Space user information
      * @param {string} id Scratch User Id
-     * @param {ScratchStorageUser} scratchStorageUser 
+     * @param {ScratchStorageUserDto} scratchStorageUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    editScratchUser(id: string, scratchStorageUser: ScratchStorageUser, options?: any): AxiosPromise<ScratchStorageUser>;
+    editScratchUser(id: string, scratchStorageUserDto: ScratchStorageUserDto, options?: any): AxiosPromise<ScratchStorageUserDto>;
 
     /**
      * Requires request to be under DASHBOARD_ADMIN privileges
@@ -1820,7 +1820,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeyValuePairs(options?: any): AxiosPromise<Array<ScratchStorageEntry>>;
+    getAllKeyValuePairs(options?: any): AxiosPromise<Array<ScratchStorageEntryDto>>;
 
     /**
      * App ID is the UUID of the owning application
@@ -1830,7 +1830,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntry>>;
+    getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDto>>;
 
     /**
      * App ID is the UUID of the owning application
@@ -1840,7 +1840,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeysForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntry>>;
+    getAllKeysForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDto>>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1849,7 +1849,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllUsers(options?: any): AxiosPromise<Array<ScratchStorageUser>>;
+    getAllUsers(options?: any): AxiosPromise<Array<ScratchStorageUserDto>>;
 
     /**
      * App ID is the UUID of the owning application
@@ -1860,7 +1860,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntry>;
+    getKeyValueByKeyName(appId: string, keyName: string, options?: any): AxiosPromise<ScratchStorageEntryDto>;
 
     /**
      * App ID is the UUID of the owning application
@@ -1926,12 +1926,12 @@ export interface ScratchStorageControllerApiInterface {
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
-     * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+     * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    postNewScratchSpaceApp(scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    postNewScratchSpaceApp(scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -1942,7 +1942,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    removeUserPriv(id: string, appPrivIdEntry: string, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    removeUserPriv(id: string, appPrivIdEntry: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
@@ -1953,17 +1953,17 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    setImplicitReadSetting(id: string, priv: boolean, options?: any): AxiosPromise<ScratchStorageAppRegistryEntry>;
+    setImplicitReadSetting(id: string, priv: boolean, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * SCRATCH_WRITE privileges are required for the requester for the given App Id
      * @summary Adds or updates a key-value pair for a given App Id
-     * @param {ScratchStorageEntry} scratchStorageEntry 
+     * @param {ScratchStorageEntryDto} scratchStorageEntryDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    setKeyValuePair(scratchStorageEntry: ScratchStorageEntry, options?: any): AxiosPromise<ScratchStorageEntry>;
+    setKeyValuePair(scratchStorageEntryDto: ScratchStorageEntryDto, options?: any): AxiosPromise<ScratchStorageEntryDto>;
 
 }
 
@@ -1977,13 +1977,13 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Adds a new Scratch Space user by their P1 email address
-     * @param {ScratchStorageUser} scratchStorageUser 
+     * @param {ScratchStorageUserDto} scratchStorageUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi
      */
-    public addNewScratchUser(scratchStorageUser: ScratchStorageUser, options?: any) {
-        return ScratchStorageControllerApiFp(this.configuration).addNewScratchUser(scratchStorageUser, options).then((request) => request(this.axios, this.basePath));
+    public addNewScratchUser(scratchStorageUserDto: ScratchStorageUserDto, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).addNewScratchUser(scratchStorageUserDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2052,26 +2052,26 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Edit existing scratch space app information (its name)
      * @param {string} id Application UUID
-     * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+     * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi
      */
-    public editExistingAppEntry(id: string, scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any) {
-        return ScratchStorageControllerApiFp(this.configuration).editExistingAppEntry(id, scratchStorageAppRegistryEntry, options).then((request) => request(this.axios, this.basePath));
+    public editExistingAppEntry(id: string, scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).editExistingAppEntry(id, scratchStorageAppRegistryDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Edits an existing Scratch Space user information
      * @param {string} id Scratch User Id
-     * @param {ScratchStorageUser} scratchStorageUser 
+     * @param {ScratchStorageUserDto} scratchStorageUserDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi
      */
-    public editScratchUser(id: string, scratchStorageUser: ScratchStorageUser, options?: any) {
-        return ScratchStorageControllerApiFp(this.configuration).editScratchUser(id, scratchStorageUser, options).then((request) => request(this.axios, this.basePath));
+    public editScratchUser(id: string, scratchStorageUserDto: ScratchStorageUserDto, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).editScratchUser(id, scratchStorageUserDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2209,13 +2209,13 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
     /**
      * Requester has to have DASHBOARD_ADMIN rights
      * @summary Adds a new Scratch Strorage consuming app name to the Common API scratch storage space
-     * @param {ScratchStorageAppRegistryEntry} scratchStorageAppRegistryEntry 
+     * @param {ScratchStorageAppRegistryDto} scratchStorageAppRegistryDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi
      */
-    public postNewScratchSpaceApp(scratchStorageAppRegistryEntry: ScratchStorageAppRegistryEntry, options?: any) {
-        return ScratchStorageControllerApiFp(this.configuration).postNewScratchSpaceApp(scratchStorageAppRegistryEntry, options).then((request) => request(this.axios, this.basePath));
+    public postNewScratchSpaceApp(scratchStorageAppRegistryDto: ScratchStorageAppRegistryDto, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).postNewScratchSpaceApp(scratchStorageAppRegistryDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2247,12 +2247,12 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
     /**
      * SCRATCH_WRITE privileges are required for the requester for the given App Id
      * @summary Adds or updates a key-value pair for a given App Id
-     * @param {ScratchStorageEntry} scratchStorageEntry 
+     * @param {ScratchStorageEntryDto} scratchStorageEntryDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi
      */
-    public setKeyValuePair(scratchStorageEntry: ScratchStorageEntry, options?: any) {
-        return ScratchStorageControllerApiFp(this.configuration).setKeyValuePair(scratchStorageEntry, options).then((request) => request(this.axios, this.basePath));
+    public setKeyValuePair(scratchStorageEntryDto: ScratchStorageEntryDto, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).setKeyValuePair(scratchStorageEntryDto, options).then((request) => request(this.axios, this.basePath));
     }
 }

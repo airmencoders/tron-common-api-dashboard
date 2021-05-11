@@ -13,9 +13,15 @@
  */
 
 
+<<<<<<< HEAD
 import { ResourceAlreadyExistsExceptionCause } from './resource-already-exists-exception-cause';
 import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
 import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-already-exists-exception-cause-suppressed';
+=======
+import { RecordNotFoundExceptionCause } from './record-not-found-exception-cause';
+import { RecordNotFoundExceptionCauseStackTrace } from './record-not-found-exception-cause-stack-trace';
+import { RecordNotFoundExceptionCauseSuppressed } from './record-not-found-exception-cause-suppressed';
+>>>>>>> master
 
 /**
  * 
@@ -25,6 +31,7 @@ import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-alread
 export interface ResourceAlreadyExistsException {
     /**
      * 
+<<<<<<< HEAD
      * @type {ResourceAlreadyExistsExceptionCause}
      * @memberof ResourceAlreadyExistsException
      */
@@ -35,6 +42,18 @@ export interface ResourceAlreadyExistsException {
      * @memberof ResourceAlreadyExistsException
      */
     stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
+=======
+     * @type {RecordNotFoundExceptionCause}
+     * @memberof ResourceAlreadyExistsException
+     */
+    cause?: RecordNotFoundExceptionCause;
+    /**
+     * 
+     * @type {Array<RecordNotFoundExceptionCauseStackTrace>}
+     * @memberof ResourceAlreadyExistsException
+     */
+    stackTrace?: Array<RecordNotFoundExceptionCauseStackTrace>;
+>>>>>>> master
     /**
      * 
      * @type {string}
@@ -43,10 +62,17 @@ export interface ResourceAlreadyExistsException {
     message?: string;
     /**
      * 
+<<<<<<< HEAD
      * @type {Array<ResourceAlreadyExistsExceptionCauseSuppressed>}
      * @memberof ResourceAlreadyExistsException
      */
     suppressed?: Array<ResourceAlreadyExistsExceptionCauseSuppressed>;
+=======
+     * @type {Array<RecordNotFoundExceptionCauseSuppressed>}
+     * @memberof ResourceAlreadyExistsException
+     */
+    suppressed?: Array<RecordNotFoundExceptionCauseSuppressed>;
+>>>>>>> master
     /**
      * 
      * @type {string}
