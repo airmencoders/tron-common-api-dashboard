@@ -8,7 +8,8 @@ import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
 export default class PersonService implements DataService<PersonDto, PersonDto> {
 
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
-              public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
+              public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface,
+              public currentUserState: State<PersonDto>) {
   }
 
   async fetchAndStoreData(): Promise<PersonDto[]> {
@@ -93,5 +94,11 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
             }
           });
     });
+  }
+
+  async getPersonByEmail(email: string): Promise<PersonDto> {
+      const personResponse = await this.personApi.findPersonBy("EMAIL", email);
+      this.currentUserState.set(personResponse.data)
+      return personResponse.data;
   }
 }

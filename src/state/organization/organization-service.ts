@@ -159,7 +159,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
 
       // the extra query params causes this response to match signature of an OrganizationDtoWithDetails
       const orgResponse = await this.orgApi.getOrganization(id, false, "id,firstName,lastName", "id,name");
-      this.selectedOrgState.set(orgResponse.data as OrganizationDtoWithDetails);      
+      this.selectedOrgState.set(orgResponse.data as OrganizationDtoWithDetails);
       return Promise.resolve(orgResponse.data);
     }
     catch (error) {
