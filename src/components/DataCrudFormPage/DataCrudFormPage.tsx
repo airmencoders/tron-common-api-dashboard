@@ -21,6 +21,7 @@ import { DataCrudFormErrors } from './data-crud-form-errors';
 import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -255,63 +256,65 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   return (
     <>
       <PageFormat pageTitle={props.pageTitle} className={props.className}>
-        {dataState.isPromised ?
-          <Spinner centered />
-          :
-          dataState.error ?
-            <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
+        <ErrorBoundary>
+          {dataState.isPromised ?
+            <Spinner centered />
             :
-            <div style={{ height: '100%' }}>
-              {
-                props.allowAdd && CreateForm &&
-                <div className="add-data-container">
-                  <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
-                    Add { props.dataTypeName }
-                  </Button>
-                </div>
-              }
-
-              <Grid
-                data={dataState.state.get()}
-                columns={columns}
-                onRowClicked={onRowClicked}
-                rowClass="ag-grid--row-pointer"
-                autoResizeColumns={props.autoResizeColumns}
-                autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
-                disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
-              />
-
-              <SideDrawer isLoading={pageState.isLoading.get()}
-                          title={props.dataTypeName}
-                          isOpen={pageState.isOpen.get()}
-                          onCloseHandler={onCloseHandler}
-              >
+            dataState.error ?
+              <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
+              :
+              <div style={{ height: '100%' }}>
                 {
-                  pageState.formAction.value === FormActionType.ADD && CreateForm ?
-                  <CreateForm
-                    onSubmit={createSubmit}
-                    formActionType={FormActionType.ADD}
-                    formErrors={pageState.formErrors.get()}
-                    onClose={onCloseHandler}
-                    successAction={pageState.successAction.get()}
-                    isSubmitting={pageState.isSubmitting.get()}
-                  />
-                    : pageState.formAction.value === FormActionType.UPDATE && UpdateForm && pageState.selected.get() ?
-                    <UpdateForm
-                      data={pageState.selected.attach(Downgraded).get()}
-                      formErrors={pageState.formErrors.get()}
-                      onSubmit={updateSubmit}
-                      onPatch={updatePatch}
-                      onClose={onCloseHandler}
-                      successAction={pageState.successAction.get()}
-                      isSubmitting={pageState.isSubmitting.get()}
-                      formActionType={FormActionType.UPDATE}
-                    />
-                    : null
+                  props.allowAdd && CreateForm &&
+                  <div className="add-data-container">
+                    <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
+                      Add {props.dataTypeName}
+                    </Button>
+                  </div>
                 }
-              </SideDrawer>
-            </div>
-        }
+
+                <Grid
+                  data={dataState.state.get()}
+                  columns={columns}
+                  onRowClicked={onRowClicked}
+                  rowClass="ag-grid--row-pointer"
+                  autoResizeColumns={props.autoResizeColumns}
+                  autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
+                  disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
+                />
+
+                <SideDrawer isLoading={pageState.isLoading.get()}
+                  title={props.dataTypeName}
+                  isOpen={pageState.isOpen.get()}
+                  onCloseHandler={onCloseHandler}
+                >
+                  {
+                    pageState.formAction.value === FormActionType.ADD && CreateForm ?
+                      <CreateForm
+                        onSubmit={createSubmit}
+                        formActionType={FormActionType.ADD}
+                        formErrors={pageState.formErrors.get()}
+                        onClose={onCloseHandler}
+                        successAction={pageState.successAction.get()}
+                        isSubmitting={pageState.isSubmitting.get()}
+                      />
+                      : pageState.formAction.value === FormActionType.UPDATE && UpdateForm && pageState.selected.get() ?
+                        <UpdateForm
+                          data={pageState.selected.attach(Downgraded).get()}
+                          formErrors={pageState.formErrors.get()}
+                          onSubmit={updateSubmit}
+                          onPatch={updatePatch}
+                          onClose={onCloseHandler}
+                          successAction={pageState.successAction.get()}
+                          isSubmitting={pageState.isSubmitting.get()}
+                          formActionType={FormActionType.UPDATE}
+                        />
+                        : null
+                  }
+                </SideDrawer>
+              </div>
+          }
+        </ErrorBoundary>
       </PageFormat>
 
       {props.allowDelete && DeleteComponent && selectedData &&
