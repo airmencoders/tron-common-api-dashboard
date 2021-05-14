@@ -1,5 +1,4 @@
 import { useLogfileState, usePastLogfileState } from '../../state/logfile/logfile-state';
-import withLoading from '../../hocs/UseLoading/WithLoading';
 import { useEffect, useRef } from 'react';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import StatusCard from '../../components/StatusCard/StatusCard';
@@ -9,6 +8,7 @@ import Button from '../../components/Button/Button';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import './LogfilePage.scss';
 import LogfileDownload from './LogfileDownload';
+import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
 
 function LogfilePage() {
   const serviceTitle = 'Logfile Service';
@@ -69,34 +69,36 @@ function LogfilePage() {
 
   return (
     <PageFormat pageTitle={'Logfile'}>
-      {hasError() ?
-        <StatusCard status={StatusType.ERROR} title={serviceTitle} />
-        :
-        <div className='logfile-page-container'>
-          <div className='logfile-download-container default-panel-padding'>
-            <Button className='logfile-download-container__open-btn' type={'button'} onClick={() => sideDrawerState.set(true)}>Show Downloads</Button>
-            <SideDrawer isLoading={pastLogfileState.isPromised} title={'Logs Download'} isOpen={sideDrawerState.get()} onCloseHandler={onCloseHandler}>
-              <LogfileDownload logfileDtos={pastLogfileState.getPastLogs} />
-              <Button className='logfile-download-container__close-btn' type={'button'} onClick={onCloseHandler}>Close</Button>
-            </SideDrawer>
-          </div>
-          <div className='logfile-container default-panel-padding'>
-            <div className='logfile-container__header'>
-              <h4 className='header__title'>Current Logfile</h4>
+      <ErrorBoundary>
+        {hasError() ?
+          <StatusCard status={StatusType.ERROR} title={serviceTitle} />
+          :
+          <div className='logfile-page-container'>
+            <div className='logfile-download-container default-panel-padding'>
+              <Button className='logfile-download-container__open-btn' type={'button'} onClick={() => sideDrawerState.set(true)}>Show Downloads</Button>
+              <SideDrawer isLoading={pastLogfileState.isPromised} title={'Logs Download'} isOpen={sideDrawerState.get()} onCloseHandler={onCloseHandler}>
+                <LogfileDownload logfileDtos={pastLogfileState.getPastLogs} />
+                <Button className='logfile-download-container__close-btn' type={'button'} onClick={onCloseHandler}>Close</Button>
+              </SideDrawer>
             </div>
-            <div ref={logsContainer} className='logfile-container__logs'>
-              {logfileState.getCurrentLog.map((item, index) => {
-                return (
-                  <div key={index} className='logs__message'>
-                    {item}
-                  </div>
-                );
-              })}
-              <div className='logs_message--last-item' ref={lastLogElem}></div>
+            <div className='logfile-container default-panel-padding'>
+              <div className='logfile-container__header'>
+                <h4 className='header__title'>Current Logfile</h4>
+              </div>
+              <div ref={logsContainer} className='logfile-container__logs'>
+                {logfileState.getCurrentLog.map((item, index) => {
+                  return (
+                    <div key={index} className='logs__message'>
+                      {item}
+                    </div>
+                  );
+                })}
+                <div className='logs_message--last-item' ref={lastLogElem}></div>
+              </div>
             </div>
           </div>
-        </div>
-      }
+        }
+      </ErrorBoundary>
     </PageFormat>
   )
 }
