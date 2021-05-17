@@ -11,6 +11,7 @@ import { MetricPageProtectedWrapper } from './pages/AppSource/Metrics/MetricPage
 import { NotFoundPage } from './pages/NotFound/NotFoundPage';
 import { NotAuthorizedPage } from './pages/NotAuthorized/NotAuthorizedPage';
 import { ToastContainer } from './components/Toast/ToastContainer/ToastContainer';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
 function App() {
   const authorizedUserState = useAuthorizedUserState();
@@ -36,27 +37,30 @@ function App() {
 
 function AppContent() {
   return (
-    <Switch>
-      {routes.map((route) => {
-        return <ProtectedRoute
-          key={route.name}
+    <ErrorBoundary>
+      <Switch>
+        {routes.map((route) => {
+          return <ProtectedRoute
+            key={route.name}
+            exact
+            path={route.path}
+            component={route.component}
+            requiredPrivilege={route.requiredPrivileges}
+          />
+        })}
+
+        <ProtectedRoute
           exact
-          path={route.path}
-          component={route.component}
-          requiredPrivilege={route.requiredPrivileges}
+          path={RoutePath.APP_SOURCE_METRIC}
+          component={MetricPageProtectedWrapper}
+          requiredPrivilege={[PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_SOURCE_ADMIN]}
         />
-      })}
 
-      <ProtectedRoute
-        exact
-        path={RoutePath.APP_SOURCE_METRIC}
-        component={MetricPageProtectedWrapper}
-        requiredPrivilege={[PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_SOURCE_ADMIN]}
-      />
+        <Route exact component={NotAuthorizedPage} path={RoutePath.NOT_AUTHORIZED} />
+        <Route component={NotFoundPage} />
+      </Switch>
+    </ErrorBoundary>
 
-      <Route exact component={NotAuthorizedPage} path={RoutePath.NOT_AUTHORIZED} />
-      <Route component={NotFoundPage} />
-    </Switch>
   );
 }
 
