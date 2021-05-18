@@ -1,0 +1,38 @@
+@import"../../styles/base";
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+.header-user-editor {
+    .tron-form .usa-form {
+      @include breakpoint-above(desktop) {
+        max-width: 100%;
+      }
+    }
+    .tron-text-input {
+      input {
+        min-width: 220px;
+      }
+      .item-choose__input {
+        min-width: none;
+      }
+    }
+    .user-editor-header {
+        background-color: aliceblue;
+    }
+    .user-editor-email {
+        font-size: medium;
+        font-weight: 600;
+    }
+    .user-editor-dodid {
+        font-size: medium;
+    }
+    .user-editor-content {
+        padding: 1.25rem 1.25rem;
+    }
+    .user-editor-body {
+        padding: 0 1.25rem 1.25rem 1.25rem;
+    }
+    .branch-rank-container {
+        width: 220px;
+    }
+}

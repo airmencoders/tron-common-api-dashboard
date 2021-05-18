@@ -96,8 +96,8 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     });
   }
 
-  async getPersonByEmail(email: string): Promise<PersonDto> {
-      const personResponse = await this.personApi.findPersonBy("EMAIL", email);
+  async getPersonByDodid(dodid: string): Promise<PersonDto> {
+      const personResponse = await this.personApi.findPersonBy("DODID", dodid);
       this.currentUserState.set(personResponse.data)
       return personResponse.data;
   }

@@ -3,7 +3,7 @@ import React, {useEffect, useMemo} from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { PersonDto } from '../../openapi';
 import { usePersonState } from '../../state/person/person-state';
-import Button from '../Button/Button';
+import { RankStateModel } from '../../state/person/rank-state-model';
 import Modal from '../Modal/Modal';
 import ModalFooterSubmit from '../Modal/ModalFooterSubmit';
 import ModalTitle from '../Modal/ModalTitle';
@@ -13,7 +13,7 @@ import {HeaderUserInfoProps} from './HeaderUserInfoProps';
 
 export interface UserEditorState {
   isOpen: boolean;
-  data: State<PersonDto>;
+  currentUserState: State<PersonDto>;
 }
 
 function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
@@ -26,12 +26,12 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
 
   const personState = usePersonState();
   useEffect(() => {
-    personState.getPersonByEmail(userInfo?.email || '');
+    personState.getPersonByDodid(userInfo?.dodId || '');
   }, []);
 
   const userEditorState = useHookstate<UserEditorState>({
     isOpen: false,
-    data: personState.currentUserState
+    currentUserState: personState.currentUserState,
   });
 
   function userEditorSubmitModal() {
@@ -68,15 +68,16 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
         </Dropdown.Menu>
       </Dropdown>
       <Modal
+        className="user-info-modal"
         headerComponent={<ModalTitle title="User Editor" />}
         footerComponent={<ModalFooterSubmit
           onSubmit={userEditorSubmitModal}
           onCancel={userEditorSubmitModal}
-          submitText="Done"
+          submitText="Update"
         />}
         show={userEditorState.isOpen.get()}
         onHide={userEditorSubmitModal}
-        width="auto"
+        width="500px"
         height="auto"
       >
         <HeaderUserEditor
