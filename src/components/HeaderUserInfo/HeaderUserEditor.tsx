@@ -13,10 +13,11 @@ import Select from '../forms/Select/Select';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { usePersonState } from '../../state/person/person-state';
 import { RankStateModel } from '../../state/person/rank-state-model';
+import { validPhone } from '../../utils/validation-utils';
+import { useUserInfoState } from '../../state/user/user-info-state';
 interface UserInfoFormProps {
   editorState: State<UserEditorState>;
-//   modified: boolean;
-//   onSubmit: (toUpdate: State<PersonDto>) => void;
+  userInitials: string;
 }
 
 function ScratchStorageUserAddForm(props: UserInfoFormProps) {
@@ -38,10 +39,20 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
   const isError = (formState: State<string | undefined>) => Touched(formState).touched() && Validation(formState).invalid()
   const errorMessages = (formState: State<string | undefined>) => Validation(formState).errors().map(validationError =>validationError.message)
 
+  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
+
+  const requiredError = 'cannot be empty or blank';
+  Validation(formState.firstName).validate(requiredText, requiredError, 'error');
+  Validation(formState.lastName).validate(requiredText, requiredError, 'error');
+  Validation(formState.rank).validate(requiredText, requiredError, 'error');
+
+  const validPhoneError = 'Enter a valid phone number'
+  Validation(formState.phone).validate(validPhone, validPhoneError, 'error');
+  Validation(formState.dutyPhone).validate(validPhone, validPhoneError, 'error');
+
   const isFormModified = (): boolean => {
     return Initial(formState.address).modified() ||
         Initial(formState.branch).modified() ||
-        Initial(formState.dodid).modified() ||
         Initial(formState.dutyPhone).modified() ||
         Initial(formState.dutyTitle).modified() ||
         Initial(formState.firstName).modified() ||
@@ -52,9 +63,12 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
         Initial(formState.title).modified(); 
   }
 
+  useEffect(() => {
+    props.editorState.disableSubmit.set(Validation(formState).invalid() || !isFormModified());
+  });
+
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // props.onSubmit(formState);
   }
 
   const onBranchChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -72,8 +86,15 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
       <Form className="header-user-editor-form" onSubmit={onSubmit} data-testid="header-user-editor-form">
         <div className="user-editor-header">
           <div className="user-editor-content">
-            <div className="user-editor-email">{formState.email.get()?.toUpperCase()}</div>
-            <div className="user-editor-dodid text-muted">{formState.dodid.get()}</div>
+            <div className="d-flex align-items-center">
+              <div className="header-user-editor__initials">
+                {props.userInitials}
+              </div>  
+              <div>
+                <div className="user-editor-email">{formState.email.get()?.toUpperCase()}</div>
+                <div className="user-editor-dodid text-muted">{formState.dodid.get()}</div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="user-editor-body">
@@ -115,108 +136,111 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
                 />
               </FormGroup>
             </div>
-          <div>
-            <FormGroup labelName="title" labelText="Title">
-            <TextInput id="title" name="title" type="text"
-                        defaultValue={formState?.title.get() || ''}
-                        error={Touched(formState.title).touched() && Validation(formState.title).invalid()}
-                        onChange={(event) => formState.title.set(event.target.value)}
+            <div>
+              <FormGroup labelName="title" labelText="Title">
+              <TextInput id="title" name="title" type="text"
+                          defaultValue={formState?.title.get() || ''}
+                          error={Touched(formState.title).touched() && Validation(formState.title).invalid()}
+                          onChange={(event) => formState.title.set(event.target.value)}
+              />
+              </FormGroup>
+            </div>
+          </div>
+          <div className="d-flex">
+            <div className="flex-grow-1">
+            <FormGroup labelName="address" labelText="Address">
+            <TextInput id="address" name="address" type="text"
+                        className="d-flex flex-grow-1"
+                        defaultValue={formState?.address.get() || ''}
+                        error={Touched(formState.address).touched() && Validation(formState.address).invalid()}
+                        onChange={(event) => formState.address.set(event.target.value)}
             />
             </FormGroup>
+            </div>
           </div>
-        </div>
-        <div className="d-flex">
-          <div className="flex-grow-1">
-          <FormGroup labelName="address" labelText="Address">
-          <TextInput id="address" name="address" type="text"
-                      className="d-flex flex-grow-1"
-                      defaultValue={formState?.address.get() || ''}
-                      error={Touched(formState.address).touched() && Validation(formState.address).invalid()}
-                      onChange={(event) => formState.address.set(event.target.value)}
-          />
-          </FormGroup>
-          </div>
-        </div>
-        <div className="d-flex justify-content-between">
-          <div>
-            <FormGroup labelName="phone" labelText="Phone"
-                        isError={isError(formState.phone)}
-                        errorMessages={errorMessages(formState.phone)}>
-              <TextInput id="phone" name="phone" type="text"
-                          defaultValue={formState?.phone.get() || ''}
-                          error={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
-                          onChange={(event) => formState.phone.set(event.target.value)}
-              />
-            </FormGroup>
-          </div>
-          <div>
-            <FormGroup labelName="dutyPhone" labelText="Duty Phone"
-                        isError={isError(formState.dutyPhone)}
-                        errorMessages={errorMessages(formState.dutyPhone)}>
-              <TextInput id="dutyPhone" name="dutyPhone" type="text"
-                          defaultValue={formState?.dutyPhone.get() || ''}
-                          error={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
-                          onChange={(event) => formState.dutyPhone.set(event.target.value)}
-              />
-            </FormGroup>
-          </div>
-        </div>
-        <div className="d-flex justify-content-between">
-          <div>
-            <FormGroup labelName="dutyTitle" labelText="Duty Title">
-              <TextInput id="dutyTitle" name="dutyTitle" type="text"
-                          defaultValue={formState?.dutyTitle.get() || ''}
-                          error={Touched(formState.dutyTitle).touched() && Validation(formState.dutyTitle).invalid()}
-                          onChange={(event) => formState.dutyTitle.set(event.target.value)}
-              />
-            </FormGroup>
-          </div>
-          <div>
-          <div className="d-flex justify-content-between branch-rank-container">
+          <div className="d-flex justify-content-between">
             <div>
-              <FormGroup labelName="branch" labelText="Branch">
-                <Select id="branch" name="branch"
-                        defaultValue={formState?.branch.get() || ''}
-                        onChange={onBranchChange}
-                >
-                  {
-                    Object.values(PersonDtoBranchEnum).map((branchName) => {
-                        return <option key={branchName} value={branchName}>{branchName}</option>
-                    })
-                  }
-                </Select>
+              <FormGroup labelName="phone" labelText="Phone"
+                          isError={isError(formState.phone)}
+                          errorMessages={errorMessages(formState.phone)}>
+                <TextInput id="phone" name="phone" type="text"
+                            defaultValue={formState?.phone.get() || ''}
+                            error={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
+                            onChange={(event) => formState.phone.set(event.target.value)}
+                />
               </FormGroup>
             </div>
             <div>
-            <FormGroup labelName="rank" labelText="Rank"
-                        isError={Touched(formState.rank).touched() && Validation(formState.rank).invalid()}
-                        errorMessages={Validation(formState.rank).errors()
-                            .map(validationError =>validationError.message)}
-            >
-      {
-          rankState.promised ? 'loading ranks...' :
-              <Select id="rank" name="rank"
-                      onChange={(event) => {
-                      formState.rank.set(event.target.value);
-                      }}
-                      defaultValue={formState?.rank.get() || ''}
-                      value={formState.get().rank}
-              >
-              {
-                  formState.get().branch && rankState.get()[formState.get()?.branch ||
-                      PersonDtoBranchEnum.Other]?.map(rank => (
-                      <option key={rank.abbreviation} value={rank.abbreviation}>{rank.abbreviation}</option>
-                  ))
-              }
-              </Select>
-      }
-      </FormGroup>
+              <FormGroup labelName="dutyPhone" labelText="Duty Phone"
+                          isError={isError(formState.dutyPhone)}
+                          errorMessages={errorMessages(formState.dutyPhone)}>
+                <TextInput id="dutyPhone" name="dutyPhone" type="text"
+                            defaultValue={formState?.dutyPhone.get() || ''}
+                            error={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
+                            onChange={(event) => formState.dutyPhone.set(event.target.value)}
+                />
+              </FormGroup>
             </div>
-      </div>
-      </div>
-      </div>
-      </div>
-    </Form>
+          </div>
+          <div className="d-flex justify-content-between">
+            <div>
+              <FormGroup labelName="dutyTitle" labelText="Duty Title">
+                <TextInput id="dutyTitle" name="dutyTitle" type="text"
+                            defaultValue={formState?.dutyTitle.get() || ''}
+                            error={Touched(formState.dutyTitle).touched() && Validation(formState.dutyTitle).invalid()}
+                            onChange={(event) => formState.dutyTitle.set(event.target.value)}
+                />
+              </FormGroup>
+            </div>
+            <div>
+              <div className="d-flex justify-content-between branch-rank-container">
+                <div>
+                  <FormGroup labelName="branch" labelText="Branch">
+                    <Select id="branch" name="branch"
+                            defaultValue={formState?.branch.get() || ''}
+                            onChange={onBranchChange}
+                    >
+                      {
+                        Object.values(PersonDtoBranchEnum).map((branchName) => {
+                            return <option key={branchName} value={branchName}>{branchName}</option>
+                        })
+                      }
+                    </Select>
+                  </FormGroup>
+                </div>
+                <div>
+                  <FormGroup labelName="rank" labelText="Rank"
+                              isError={Touched(formState.rank).touched() && Validation(formState.rank).invalid()}
+                              errorMessages={Validation(formState.rank).errors()
+                                  .map(validationError =>validationError.message)}
+                  >
+                    {
+                      rankState.promised ? 'loading ranks...' :
+                        <Select id="rank" name="rank"
+                                onChange={(event) => {
+                                formState.rank.set(event.target.value);
+                                }}
+                                defaultValue={formState?.rank.get() || ''}
+                                value={formState.get().rank}
+                        >
+                          {
+                            formState.get().branch && rankState.get()[formState.get()?.branch ||
+                                PersonDtoBranchEnum.Other]?.map(rank => (
+                                <option key={rank.abbreviation} value={rank.abbreviation}>{rank.abbreviation}</option>
+                            ))
+                          }
+                        </Select>
+                    }
+                  </FormGroup>
+                </div>
+              </div>
+            </div>
+          </div>
+            <div className="success-error-message">
+                <p className="success-container__validation-error">{props.editorState.errorMessage.get()}</p>
+            </div>
+        </div>
+      </Form>
     </div>
   );
 }

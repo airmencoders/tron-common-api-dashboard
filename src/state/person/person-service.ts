@@ -53,6 +53,24 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     }
   }
 
+  async sendSelfUpdate(toUpdate: PersonDto): Promise<PersonDto> {
+    try {
+      if (toUpdate?.id == null) {
+        return Promise.reject(new Error('Person to update has undefined id.'));
+      }
+      const personResponse = await this.personApi.updatePerson(toUpdate.id, toUpdate);
+      this.state.set(currentState => {
+        const currentPersonIndex = currentState.findIndex(person => person.id === personResponse.data.id);
+        currentState[currentPersonIndex] = personResponse.data;
+        return [...currentState];
+      });
+      return Promise.resolve(personResponse.data);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   async sendDelete(toDelete: PersonDto): Promise<void> {
     return Promise.resolve();
   }
@@ -96,8 +114,8 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     });
   }
 
-  async getPersonByDodid(dodid: string): Promise<PersonDto> {
-      const personResponse = await this.personApi.findPersonBy("DODID", dodid);
+  async getPersonByEmail(email: string): Promise<PersonDto> {
+      const personResponse = await this.personApi.findPersonBy("EMAIL", email);
       this.currentUserState.set(personResponse.data)
       return personResponse.data;
   }
