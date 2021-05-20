@@ -25,7 +25,7 @@ export interface FlightAllOf {
      * @type {string}
      * @memberof FlightAllOf
      */
-    pas?: string;
+    pas?: string | null;
 }
 
 

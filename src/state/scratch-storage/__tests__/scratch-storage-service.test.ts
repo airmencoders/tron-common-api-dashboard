@@ -1,8 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryEntry, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
+import { PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
 import { ScratchStorageFlat } from '../scratch-storage-flat';
@@ -90,7 +89,7 @@ describe('scratch storage service tests', () => {
     ]
   }
 
-  const entry: ScratchStorageAppRegistryEntry = {
+  const entry: ScratchStorageAppRegistryDto = {
     id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
     appName: 'Test App Name',
     appHasImplicitRead: true
@@ -112,7 +111,7 @@ describe('scratch storage service tests', () => {
   }
 
   const axiosGetResponse: AxiosResponse = {
-    data: dtos,
+    data: { data: dtos },
     status: 200,
     statusText: 'OK',
     config: {},
@@ -127,7 +126,7 @@ describe('scratch storage service tests', () => {
     headers: {}
   };
 
-  const testClientPrivileges: Privilege[] = [
+  const testClientPrivileges: PrivilegeDto[] = [
     {
       id: 1,
       name: PrivilegeType.SCRATCH_READ
@@ -192,9 +191,9 @@ describe('scratch storage service tests', () => {
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},
@@ -223,8 +222,8 @@ describe('scratch storage service tests', () => {
   });
 
   it('Test fetch and store', async () => {
-    scratchStorageApi.getScratchSpaceApps = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto[]>>(resolve => resolve(axiosGetResponse));
+    scratchStorageApi.getScratchSpaceAppsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
     const data = await wrappedState.fetchAndStoreData();
@@ -239,8 +238,8 @@ describe('scratch storage service tests', () => {
   });
 
   it('Test error', async () => {
-    scratchStorageApi.getScratchSpaceApps = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto[]>>((resolve, reject) => {
+    scratchStorageApi.getScratchSpaceAppsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDtoResponseWrapper>>((resolve, reject) => {
         setTimeout(() => {
           reject(rejectMsg)
         }, 1000)
@@ -256,10 +255,10 @@ describe('scratch storage service tests', () => {
 
   it('Test sendUpdate', async () => {
     scratchStorageApi.editExistingAppEntry = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosPostPutResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosPostPutResponse));
     });
     scratchStorageApi.addUserPriv = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosPostPutResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
     await expect(wrappedState.sendUpdate(flat)).resolves.toEqual(Object.assign({}, flat, { userPrivs: [] }));
@@ -267,7 +266,7 @@ describe('scratch storage service tests', () => {
 
   it('Test sendUpdate Fail', async () => {
     scratchStorageApi.editExistingAppEntry = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>((resolve, reject) => reject(rejectMsg));
     });
 
     await expect(wrappedState.sendUpdate(flat)).rejects.toEqual(rejectMsg);
@@ -290,13 +289,13 @@ describe('scratch storage service tests', () => {
 
   it('Test sendCreate', async () => {
     scratchStorageApi.postNewScratchSpaceApp = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosPostPutResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosPostPutResponse));
     });
-    scratchStorageApi.getScratchSpaceApps = jest.fn(() => {
-        return new Promise<AxiosResponse<ScratchStorageAppRegistryDto[]>>(resolve => resolve(axiosGetResponse));
+    scratchStorageApi.getScratchSpaceAppsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
     scratchStorageApi.addUserPriv = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosPostPutResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
     await expect(wrappedState.sendCreate(flat)).resolves.toEqual(Object.assign({}, flat, { userPrivs: [] }));
@@ -304,10 +303,10 @@ describe('scratch storage service tests', () => {
 
   it('Test sendCreate Fail', async () => {
     scratchStorageApi.postNewScratchSpaceApp = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>((resolve, reject) => reject(rejectMsg));
     });
-    scratchStorageApi.getScratchSpaceApps = jest.fn(() => {
-        return new Promise<AxiosResponse<ScratchStorageAppRegistryDto[]>>(resolve => resolve(axiosGetResponse));
+    scratchStorageApi.getScratchSpaceAppsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
     await expect(wrappedState.sendCreate(flat)).rejects.toEqual(rejectMsg);
@@ -315,7 +314,7 @@ describe('scratch storage service tests', () => {
 
   it('Test sendDelete Success', async () => {
     scratchStorageApi.deleteExistingAppEntry = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosDeleteResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosDeleteResponse));
     });
 
     await expect(wrappedState.sendDelete(flat)).resolves.not.toThrow();
@@ -323,7 +322,7 @@ describe('scratch storage service tests', () => {
 
   it('Test sendDelete Fail', async () => {
     scratchStorageApi.deleteExistingAppEntry = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>((resolve, reject) => reject(rejectMsg));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>((resolve, reject) => reject(rejectMsg));
     });
 
     await expect(wrappedState.sendDelete(flat)).rejects.toEqual(rejectMsg);
@@ -331,7 +330,7 @@ describe('scratch storage service tests', () => {
 
   it('Test sendDelete Fail - bad id', async () => {
     scratchStorageApi.deleteExistingAppEntry = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosDeleteResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosDeleteResponse));
     });
 
     await expect(wrappedState.sendDelete({ ...flat, id: undefined })).rejects.toBeDefined();
@@ -339,7 +338,7 @@ describe('scratch storage service tests', () => {
 
   it('Test sendDelete Success - delete from state', async () => {
     scratchStorageApi.deleteExistingAppEntry = jest.fn(() => {
-      return new Promise<AxiosResponse<ScratchStorageAppRegistryEntry>>(resolve => resolve(axiosDeleteResponse));
+      return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosDeleteResponse));
     });
 
     wrappedState.state.set([dto]);

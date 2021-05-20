@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import DashboardUserPage from '../DashboardUserPage';
 import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-flat';
-import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { useDashboardUserState } from '../../../state/dashboard-user/dashboard-user-state';
 import DashboardUserService from '../../../state/dashboard-user/dashboard-user-service';
 import Config from '../../../api/configuration';
@@ -32,9 +32,9 @@ describe('Test Dashboard User Page', () => {
 
   function mockPrivilegesState() {
     (usePrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},

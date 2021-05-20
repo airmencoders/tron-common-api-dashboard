@@ -1,7 +1,7 @@
 import { createState, State, StateMethodsDestroy } from "@hookstate/core";
 import { AxiosResponse } from "axios";
 import Config from "../../../api/configuration";
-import { Configuration, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from "../../../openapi";
+import { Configuration, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from "../../../openapi";
 import PrivilegeService from "../privilege-service";
 
 describe('Privilege Service', () => {
@@ -32,7 +32,7 @@ describe('Privilege Service', () => {
     ];
 
     axiosGetResponse = {
-      data: privilegeDtos,
+      data: { data: privilegeDtos },
       status: 200,
       statusText: 'OK',
       config: {},
@@ -41,8 +41,8 @@ describe('Privilege Service', () => {
   });
 
   it('fetchAndStore', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve(axiosGetResponse));
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
     await state.fetchAndStorePrivileges();
@@ -53,7 +53,7 @@ describe('Privilege Service', () => {
   it('Convert Dto to Entity', () => {
     const privilegeDto: PrivilegeDto = privilegeDtos[0];
 
-    const privilege: Privilege = {
+    const privilege: PrivilegeDto = {
       id: privilegeDto.id,
       name: privilegeDto.name
     };
@@ -64,8 +64,8 @@ describe('Privilege Service', () => {
   });
 
   it('Test error', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>((resolve, reject) => {
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>((resolve, reject) => {
         setTimeout(() => {
           reject("Rejected")
         }, 1000)
@@ -80,8 +80,8 @@ describe('Privilege Service', () => {
   });
 
   it('Test privileges', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
     });
 
     const fetch = state.fetchAndStorePrivileges();
@@ -92,8 +92,8 @@ describe('Privilege Service', () => {
   });
 
   it('Test isPromised', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
     });
 
     const fetch = state.fetchAndStorePrivileges();
@@ -104,8 +104,8 @@ describe('Privilege Service', () => {
   });
 
   it('createPrivilegeFromId', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve(axiosGetResponse));
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
     await state.fetchAndStorePrivileges();
@@ -118,8 +118,8 @@ describe('Privilege Service', () => {
   });
 
   it('createPrivilegesFromIds', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve(axiosGetResponse));
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
     await state.fetchAndStorePrivileges();

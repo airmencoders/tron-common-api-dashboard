@@ -19,13 +19,13 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { AppClientSummaryDto } from '../models';
+import { AppClientSummaryDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { AppEndPointPrivDto } from '../models';
 // @ts-ignore
 import { AppSourceDetailsDto } from '../models';
 // @ts-ignore
-import { AppSourceDto } from '../models';
+import { AppSourceDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { DashboardUserDto } from '../models';
 // @ts-ignore
@@ -53,7 +53,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (dashboardUserDto === null || dashboardUserDto === undefined) {
                 throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling addAppSourceAdmin.');
             }
-            const localVarPath = `/v1/app-source/admins/{id}`
+            const localVarPath = `/v2/app-source/admins/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -105,7 +105,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (appEndPointPrivDto === null || appEndPointPrivDto === undefined) {
                 throw new RequiredError('appEndPointPrivDto','Required parameter appEndPointPrivDto was null or undefined when calling addClientToEndpointPriv.');
             }
-            const localVarPath = `/v1/app-source/app-clients`;
+            const localVarPath = `/v2/app-source/app-clients`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -156,7 +156,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (appSourceDetailsDto === null || appSourceDetailsDto === undefined) {
                 throw new RequiredError('appSourceDetailsDto','Required parameter appSourceDetailsDto was null or undefined when calling createAppSource.');
             }
-            const localVarPath = `/v1/app-source`;
+            const localVarPath = `/v2/app-source`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -207,7 +207,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteAppSource.');
             }
-            const localVarPath = `/v1/app-source/{id}`
+            const localVarPath = `/v2/app-source/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -250,7 +250,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getAppSourceDetails.');
             }
-            const localVarPath = `/v1/app-source/{id}`
+            const localVarPath = `/v2/app-source/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -287,8 +287,8 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAppSources: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/app-source`;
+        getAppSourcesWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/app-source`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -324,8 +324,8 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableAppClients: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/app-source/app-clients`;
+        getAvailableAppClientsWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/app-source/app-clients`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -367,7 +367,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (appId === null || appId === undefined) {
                 throw new RequiredError('appId','Required parameter appId was null or undefined when calling getSpecFile.');
             }
-            const localVarPath = `/v1/app-source/spec/{appId}`
+            const localVarPath = `/v2/app-source/spec/{appId}`
                 .replace(`{${"appId"}}`, encodeURIComponent(String(appId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -410,7 +410,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (endpointPrivId === null || endpointPrivId === undefined) {
                 throw new RequiredError('endpointPrivId','Required parameter endpointPrivId was null or undefined when calling getSpecFileByEndpointPriv.');
             }
-            const localVarPath = `/v1/app-source/spec/endpoint-priv/{endpointPrivId}`
+            const localVarPath = `/v2/app-source/spec/endpoint-priv/{endpointPrivId}`
                 .replace(`{${"endpointPrivId"}}`, encodeURIComponent(String(endpointPrivId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -453,7 +453,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling removeAllAppClientPrivs.');
             }
-            const localVarPath = `/v1/app-source/app-clients/all/{id}`
+            const localVarPath = `/v2/app-source/app-clients/all/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -501,7 +501,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (dashboardUserDto === null || dashboardUserDto === undefined) {
                 throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling removeAppSourceAdmin.');
             }
-            const localVarPath = `/v1/app-source/admins/{id}`
+            const localVarPath = `/v2/app-source/admins/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -558,7 +558,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (privId === null || privId === undefined) {
                 throw new RequiredError('privId','Required parameter privId was null or undefined when calling removeClientToEndPointPriv.');
             }
-            const localVarPath = `/v1/app-source/app-clients/{appId}/{privId}`
+            const localVarPath = `/v2/app-source/app-clients/{appId}/{privId}`
                 .replace(`{${"appId"}}`, encodeURIComponent(String(appId)))
                 .replace(`{${"privId"}}`, encodeURIComponent(String(privId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -607,7 +607,7 @@ export const AppSourceControllerApiAxiosParamCreator = function (configuration?:
             if (appSourceDetailsDto === null || appSourceDetailsDto === undefined) {
                 throw new RequiredError('appSourceDetailsDto','Required parameter appSourceDetailsDto was null or undefined when calling updateAppSourceDetails.');
             }
-            const localVarPath = `/v1/app-source/{id}`
+            const localVarPath = `/v2/app-source/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -733,8 +733,8 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAppSources(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AppSourceDto>>> {
-            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getAppSources(options);
+        async getAppSourcesWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceDtoResponseWrapper>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getAppSourcesWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -746,8 +746,8 @@ export const AppSourceControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAvailableAppClients(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AppClientSummaryDto>>> {
-            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getAvailableAppClients(options);
+        async getAvailableAppClientsWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientSummaryDtoResponseWrapper>> {
+            const localVarAxiosArgs = await AppSourceControllerApiAxiosParamCreator(configuration).getAvailableAppClientsWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -906,8 +906,8 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAppSources(options?: any): AxiosPromise<Array<AppSourceDto>> {
-            return AppSourceControllerApiFp(configuration).getAppSources(options).then((request) => request(axios, basePath));
+        getAppSourcesWrapped(options?: any): AxiosPromise<AppSourceDtoResponseWrapper> {
+            return AppSourceControllerApiFp(configuration).getAppSourcesWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -915,8 +915,8 @@ export const AppSourceControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableAppClients(options?: any): AxiosPromise<Array<AppClientSummaryDto>> {
-            return AppSourceControllerApiFp(configuration).getAvailableAppClients(options).then((request) => request(axios, basePath));
+        getAvailableAppClientsWrapped(options?: any): AxiosPromise<AppClientSummaryDtoResponseWrapper> {
+            return AppSourceControllerApiFp(configuration).getAvailableAppClientsWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1048,7 +1048,7 @@ export interface AppSourceControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppSourceControllerApiInterface
      */
-    getAppSources(options?: any): AxiosPromise<Array<AppSourceDto>>;
+    getAppSourcesWrapped(options?: any): AxiosPromise<AppSourceDtoResponseWrapper>;
 
     /**
      * 
@@ -1057,7 +1057,7 @@ export interface AppSourceControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppSourceControllerApiInterface
      */
-    getAvailableAppClients(options?: any): AxiosPromise<Array<AppClientSummaryDto>>;
+    getAvailableAppClientsWrapped(options?: any): AxiosPromise<AppClientSummaryDtoResponseWrapper>;
 
     /**
      * 
@@ -1199,8 +1199,8 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
      * @throws {RequiredError}
      * @memberof AppSourceControllerApi
      */
-    public getAppSources(options?: any) {
-        return AppSourceControllerApiFp(this.configuration).getAppSources(options).then((request) => request(this.axios, this.basePath));
+    public getAppSourcesWrapped(options?: any) {
+        return AppSourceControllerApiFp(this.configuration).getAppSourcesWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1210,8 +1210,8 @@ export class AppSourceControllerApi extends BaseAPI implements AppSourceControll
      * @throws {RequiredError}
      * @memberof AppSourceControllerApi
      */
-    public getAvailableAppClients(options?: any) {
-        return AppSourceControllerApiFp(this.configuration).getAvailableAppClients(options).then((request) => request(this.axios, this.basePath));
+    public getAvailableAppClientsWrapped(options?: any) {
+        return AppSourceControllerApiFp(this.configuration).getAvailableAppClientsWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

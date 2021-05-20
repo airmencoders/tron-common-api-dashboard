@@ -3,7 +3,7 @@ import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPa
 import {Meta, Story} from '@storybook/react';
 import {DataCrudFormPageProps} from '../../components/DataCrudFormPage/DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
-import {createState, State, useState} from '@hookstate/core';
+import { createState, postpone, State, useState } from '@hookstate/core';
 import GridColumn from '../../components/Grid/GridColumn';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Label from '../../components/forms/Label/Label';
@@ -119,6 +119,16 @@ class MockDataService implements DataService<MockRow, MockDto> {
   convertRowDataToEditableData(rowData: MockRow): Promise<MockDto> {
     const dataIndex = mockData.findIndex((data) => data.id === rowData.id);
     return Promise.resolve(mockData[dataIndex]);
+  }
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+    });
   }
 }
 

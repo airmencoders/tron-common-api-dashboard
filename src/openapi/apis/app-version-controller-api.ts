@@ -33,7 +33,7 @@ export const AppVersionControllerApiAxiosParamCreator = function (configuration?
          * @throws {RequiredError}
          */
         getVersion: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/version`;
+            const localVarPath = `/v2/version`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;

@@ -4,6 +4,7 @@ import GridColumn from '../../components/Grid/GridColumn';
 import PersonEditForm from './PersonEditForm';
 import {PersonDto} from '../../openapi/models';
 import {usePersonState} from '../../state/person/person-state';
+import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 
 const columns: GridColumn[] =
   [
@@ -11,7 +12,8 @@ const columns: GridColumn[] =
       field: 'id',
       sortable: true,
       filter: true,
-      headerName: 'id'
+      headerName: 'id',
+      cellRenderer: LoadingCellRenderer
     }),
     new GridColumn({
       field: 'email',
@@ -59,18 +61,21 @@ const columns: GridColumn[] =
 
 function PersonPage() {
   return (
-      <DataCrudFormPage<PersonDto, PersonDto>
-          columns={columns}
-          createForm={PersonEditForm}
-          dataTypeName="Person"
-          pageTitle="People"
-          updateForm={PersonEditForm}
-          useDataState={usePersonState}
-          allowEdit={true}
-          allowAdd
-          autoResizeColumns
-          autoResizeColummnsMinWidth={1200}
-      />
+    <DataCrudFormPage<PersonDto, PersonDto>
+      columns={columns}
+      createForm={PersonEditForm}
+      dataTypeName="Person"
+      pageTitle="People"
+      updateForm={PersonEditForm}
+      useDataState={usePersonState}
+      allowEdit={true}
+      allowAdd
+      autoResizeColumns
+      autoResizeColummnsMinWidth={1200}
+      infiniteScroll={{
+        enabled: true
+      }}
+    />
   );
 }
 
