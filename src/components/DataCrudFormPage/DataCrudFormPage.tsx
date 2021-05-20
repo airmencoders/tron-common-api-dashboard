@@ -1,4 +1,4 @@
-import { RowClickedEvent } from 'ag-grid-community';
+import { IDatasource, IGetRowsParams, RowClickedEvent } from 'ag-grid-community';
 import React, { ReactText, useEffect } from 'react';
 import Grid from '../../components/Grid/Grid';
 import PageFormat from '../../components/PageFormat/PageFormat';
@@ -22,6 +22,7 @@ import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
+import { generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -34,9 +35,68 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   const pageState: State<CrudPageState<R>> = useState<CrudPageState<R>>(getInitialCrudPageState());
 
+  const { infiniteScroll } = props;
+
+  const updateInfiniteCache = useState<boolean>(false);
+
   useEffect(() => {
-    dataState.fetchAndStoreData();
+    if (!infiniteScroll?.enabled) {
+      dataState.fetchAndStoreData();
+    }
+
+    return function cleanup() {
+      dataState.resetState();
+    }
   }, []);
+
+  function updateInfiniteCacheCallback() {
+    updateInfiniteCache.set(false);
+  }
+
+  function setUpdateInfiniteCache(status: boolean) {
+    updateInfiniteCache.set(status);
+  }
+
+  function createInfiniteScrollDatasource(): IDatasource | undefined {
+    if (!infiniteScroll?.enabled) {
+      throw new Error('Infinite scroll must be enabled to create datasource');
+    }
+
+    const datasource: IDatasource = {
+      getRows: async function (params: IGetRowsParams) {
+        if (dataState.fetchAndStorePaginatedData == null) {
+          throw new Error('fetchAndStorePaginatedData must exist on the service to use infinite scrolling pagination on Grid');
+        }
+
+        try {
+          const limit = generateInfiniteScrollLimit(infiniteScroll);
+          const page = Math.floor(params.startRow / limit);
+          const data = await dataState.fetchAndStorePaginatedData(page, limit, true);
+
+          let lastRow = -1;
+
+          /**
+           * If the request returns data with length of 0, then
+           * there is no more data to be retrieved.
+           * 
+           * If the request returns data with length less than the limit,
+           * then that is the last page.
+           */
+          if (data.length == 0 || data.length < limit)
+            lastRow = dataState.state.length;
+
+          params.successCallback(data, lastRow);
+        } catch (err) {
+          params.failCallback();
+
+          // Force state into error state on request failure
+          dataState.state.set(Promise.reject(err));
+        }
+      }
+    }
+
+    return datasource;
+  }
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
     if (props.allowEdit && 
@@ -44,6 +104,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics') &&
         !(event.api.getFocusedCell()?.column.getColDef().headerName === 'API Spec')) {
       let rowData = event.data;
+
+      // Ensure a blank row was not click before
+      // handling it
+      if (!rowData)
+        return;
 
       // Take it out of the proxy so that pageState takes
       // the raw object instead of the proxy
@@ -59,6 +124,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
         try {
           const dtoData = await dataState.convertRowDataToEditableData(rowData);
+
           pageState.merge({
             formAction: FormActionType.UPDATE,
             selected: dtoData,
@@ -105,6 +171,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
    * @returns the id of the toast
    */
   function onActionSuccess(message: string): ReactText {
+    setUpdateInfiniteCache(true);
     onCloseHandler();
     return createTextToast(ToastType.SUCCESS, message);
   }
@@ -273,15 +340,33 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                   </div>
                 }
 
-                <Grid
-                  data={dataState.state.get()}
-                  columns={columns}
-                  onRowClicked={onRowClicked}
-                  rowClass="ag-grid--row-pointer"
-                  autoResizeColumns={props.autoResizeColumns}
-                  autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
-                  disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
-                />
+                {infiniteScroll?.enabled ?
+                  <Grid
+                    columns={columns}
+                    onRowClicked={onRowClicked}
+                    rowClass="ag-grid--row-pointer"
+                    autoResizeColumns={props.autoResizeColumns}
+                    autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
+                    disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
+                    rowModelType="infinite"
+                    datasource={createInfiniteScrollDatasource()}
+                    cacheBlockSize={generateInfiniteScrollLimit(infiniteScroll)}
+                    maxBlocksInCache={infiniteScroll.maxBlocksInCache}
+                    maxConcurrentDatasourceRequests={infiniteScroll.maxConcurrentDatasourceRequests}
+                    updateInfiniteCache={updateInfiniteCache.get()}
+                    updateInfiniteCacheCallback={updateInfiniteCacheCallback}
+                  />
+                  :
+                  <Grid
+                    data={dataState.state.get()}
+                    columns={columns}
+                    onRowClicked={onRowClicked}
+                    rowClass="ag-grid--row-pointer"
+                    autoResizeColumns={props.autoResizeColumns}
+                    autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
+                    disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
+                  />
+                }
 
                 <SideDrawer isLoading={pageState.isLoading.get()}
                   title={props.dataTypeName}

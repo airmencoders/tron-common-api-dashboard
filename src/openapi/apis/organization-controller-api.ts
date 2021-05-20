@@ -27,6 +27,10 @@ import { Group } from '../models';
 // @ts-ignore
 import { OrganizationDto } from '../models';
 // @ts-ignore
+import { OrganizationDtoPaginationResponseWrapper } from '../models';
+// @ts-ignore
+import { OrganizationDtoResponseWrapper } from '../models';
+// @ts-ignore
 import { OtherUsaf } from '../models';
 // @ts-ignore
 import { Squadron } from '../models';
@@ -45,12 +49,12 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewOrganizations: async (organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options: any = {}): Promise<RequestArgs> => {
+        addNewOrganizationsWrapped: async (organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
             if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
-                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling addNewOrganizations.');
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling addNewOrganizationsWrapped.');
             }
-            const localVarPath = `/v1/organization/organizations`;
+            const localVarPath = `/v2/organization/organizations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -107,7 +111,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (requestBody === null || requestBody === undefined) {
                 throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling addOrganizationMember.');
             }
-            const localVarPath = `/v1/organization/{id}/members`
+            const localVarPath = `/v2/organization/{id}/members`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -168,7 +172,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (requestBody === null || requestBody === undefined) {
                 throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling addSubordinateOrganization.');
             }
-            const localVarPath = `/v1/organization/{id}/subordinates`
+            const localVarPath = `/v2/organization/{id}/subordinates`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -220,7 +224,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (organizationDto === null || organizationDto === undefined) {
                 throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling createOrganization.');
             }
-            const localVarPath = `/v1/organization`;
+            const localVarPath = `/v2/organization`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -271,7 +275,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrgLeader.');
             }
-            const localVarPath = `/v1/organization/{id}/leader`
+            const localVarPath = `/v2/organization/{id}/leader`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -314,7 +318,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrgParent.');
             }
-            const localVarPath = `/v1/organization/{id}/parent`
+            const localVarPath = `/v2/organization/{id}/parent`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -357,7 +361,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrganization.');
             }
-            const localVarPath = `/v1/organization/{id}`
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -405,7 +409,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (requestBody === null || requestBody === undefined) {
                 throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling deleteOrganizationMember.');
             }
-            const localVarPath = `/v1/organization/{id}/members`
+            const localVarPath = `/v2/organization/{id}/members`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -460,7 +464,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getOrganization.');
             }
-            const localVarPath = `/v1/organization/{id}`
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -517,8 +521,8 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganizations: async (type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/organization`;
+        getOrganizationsWrapped: async (type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/organization`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -597,7 +601,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (requestBody === null || requestBody === undefined) {
                 throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization1.');
             }
-            const localVarPath = `/v1/organization/{id}`
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -654,7 +658,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (requestBody === null || requestBody === undefined) {
                 throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling removeSubordinateOrganization.');
             }
-            const localVarPath = `/v1/organization/{id}/subordinates`
+            const localVarPath = `/v2/organization/{id}/subordinates`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -711,7 +715,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             if (organizationDto === null || organizationDto === undefined) {
                 throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling updateOrganization.');
             }
-            const localVarPath = `/v1/organization/{id}`
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -767,8 +771,8 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options);
+        async addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDtoResponseWrapper>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -907,8 +911,8 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganizationDto>>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options);
+        async getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDtoPaginationResponseWrapper>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -975,8 +979,8 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
+        addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDtoResponseWrapper> {
+            return OrganizationControllerApiFp(configuration).addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds member(s) to an organization
@@ -1079,8 +1083,8 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<OrganizationDto>> {
-            return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(axios, basePath));
+        getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper> {
+            return OrganizationControllerApiFp(configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Patches an existing organization
@@ -1132,7 +1136,7 @@ export interface OrganizationControllerApiInterface {
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto>;
+    addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDtoResponseWrapper>;
 
     /**
      * Adds member(s) to an organization
@@ -1236,7 +1240,7 @@ export interface OrganizationControllerApiInterface {
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<OrganizationDto>>;
+    getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper>;
 
     /**
      * Patches an existing organization
@@ -1288,8 +1292,8 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
+    public addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1410,8 +1414,8 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(this.axios, this.basePath));
+    public getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

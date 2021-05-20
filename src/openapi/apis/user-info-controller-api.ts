@@ -35,7 +35,7 @@ export const UserInfoControllerApiAxiosParamCreator = function (configuration?: 
          * @throws {RequiredError}
          */
         getUserInfo: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/userinfo`;
+            const localVarPath = `/v2/userinfo`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;

@@ -23,11 +23,15 @@ import { BadRequestException } from '../models';
 // @ts-ignore
 import { EventInfoDto } from '../models';
 // @ts-ignore
+import { EventInfoDtoResponseWrapper } from '../models';
+// @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
-import { PubSubLedgerEntryDto } from '../models';
+import { PubSubLedgerEntryDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { SubscriberDto } from '../models';
+// @ts-ignore
+import { SubscriberDtoResponseWrapper } from '../models';
 /**
  * SubscriberControllerApi - axios parameter creator
  * @export
@@ -46,7 +50,7 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling cancelSubscription.');
             }
-            const localVarPath = `/v1/subscriptions/{id}`
+            const localVarPath = `/v2/subscriptions/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -89,7 +93,7 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             if (subscriberDto === null || subscriberDto === undefined) {
                 throw new RequiredError('subscriberDto','Required parameter subscriberDto was null or undefined when calling createSubscription.');
             }
-            const localVarPath = `/v1/subscriptions`;
+            const localVarPath = `/v2/subscriptions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -134,8 +138,8 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSubscriptions: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/subscriptions`;
+        getAllSubscriptionsWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/subscriptions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -172,8 +176,8 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventSinceDate: async (sinceDateTime?: string, options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/subscriptions/events/replay`;
+        getEventSinceDateWrapped: async (sinceDateTime?: string, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/subscriptions/events/replay`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -214,12 +218,12 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventsSinceCountAndType: async (eventInfoDto: Array<EventInfoDto>, options: any = {}): Promise<RequestArgs> => {
+        getEventsSinceCountAndTypeWrapped: async (eventInfoDto: Array<EventInfoDto>, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'eventInfoDto' is not null or undefined
             if (eventInfoDto === null || eventInfoDto === undefined) {
-                throw new RequiredError('eventInfoDto','Required parameter eventInfoDto was null or undefined when calling getEventsSinceCountAndType.');
+                throw new RequiredError('eventInfoDto','Required parameter eventInfoDto was null or undefined when calling getEventsSinceCountAndTypeWrapped.');
             }
-            const localVarPath = `/v1/subscriptions/events/replay-events`;
+            const localVarPath = `/v2/subscriptions/events/replay-events`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -264,8 +268,8 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getLatestCounts: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/subscriptions/events/latest`;
+        getLatestCountsWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/subscriptions/events/latest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -307,7 +311,7 @@ export const SubscriberControllerApiAxiosParamCreator = function (configuration?
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getSubscription.');
             }
-            const localVarPath = `/v1/subscriptions/{id}`
+            const localVarPath = `/v2/subscriptions/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -381,8 +385,8 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllSubscriptions(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<SubscriberDto>>> {
-            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getAllSubscriptions(options);
+        async getAllSubscriptionsWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SubscriberDtoResponseWrapper>> {
+            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getAllSubscriptionsWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -395,8 +399,8 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEventSinceDate(sinceDateTime?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedgerEntryDto>>> {
-            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventSinceDate(sinceDateTime, options);
+        async getEventSinceDateWrapped(sinceDateTime?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PubSubLedgerEntryDtoResponseWrapper>> {
+            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventSinceDateWrapped(sinceDateTime, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -409,8 +413,8 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PubSubLedgerEntryDto>>> {
-            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventsSinceCountAndType(eventInfoDto, options);
+        async getEventsSinceCountAndTypeWrapped(eventInfoDto: Array<EventInfoDto>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PubSubLedgerEntryDtoResponseWrapper>> {
+            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getEventsSinceCountAndTypeWrapped(eventInfoDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -422,8 +426,8 @@ export const SubscriberControllerApiFp = function(configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getLatestCounts(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getLatestCounts(options);
+        async getLatestCountsWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EventInfoDtoResponseWrapper>> {
+            const localVarAxiosArgs = await SubscriberControllerApiAxiosParamCreator(configuration).getLatestCountsWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -478,8 +482,8 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSubscriptions(options?: any): AxiosPromise<Array<SubscriberDto>> {
-            return SubscriberControllerApiFp(configuration).getAllSubscriptions(options).then((request) => request(axios, basePath));
+        getAllSubscriptionsWrapped(options?: any): AxiosPromise<SubscriberDtoResponseWrapper> {
+            return SubscriberControllerApiFp(configuration).getAllSubscriptionsWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
@@ -488,8 +492,8 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventSinceDate(sinceDateTime?: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>> {
-            return SubscriberControllerApiFp(configuration).getEventSinceDate(sinceDateTime, options).then((request) => request(axios, basePath));
+        getEventSinceDateWrapped(sinceDateTime?: string, options?: any): AxiosPromise<PubSubLedgerEntryDtoResponseWrapper> {
+            return SubscriberControllerApiFp(configuration).getEventSinceDateWrapped(sinceDateTime, options).then((request) => request(axios, basePath));
         },
         /**
          * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
@@ -498,8 +502,8 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>> {
-            return SubscriberControllerApiFp(configuration).getEventsSinceCountAndType(eventInfoDto, options).then((request) => request(axios, basePath));
+        getEventsSinceCountAndTypeWrapped(eventInfoDto: Array<EventInfoDto>, options?: any): AxiosPromise<PubSubLedgerEntryDtoResponseWrapper> {
+            return SubscriberControllerApiFp(configuration).getEventsSinceCountAndTypeWrapped(eventInfoDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves latest counts for each event type in a key-value pair object
@@ -507,8 +511,8 @@ export const SubscriberControllerApiFactory = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getLatestCounts(options?: any): AxiosPromise<string> {
-            return SubscriberControllerApiFp(configuration).getLatestCounts(options).then((request) => request(axios, basePath));
+        getLatestCountsWrapped(options?: any): AxiosPromise<EventInfoDtoResponseWrapper> {
+            return SubscriberControllerApiFp(configuration).getLatestCountsWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieve a subscription by its UUID
@@ -556,7 +560,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getAllSubscriptions(options?: any): AxiosPromise<Array<SubscriberDto>>;
+    getAllSubscriptionsWrapped(options?: any): AxiosPromise<SubscriberDtoResponseWrapper>;
 
     /**
      * Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss
@@ -566,7 +570,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getEventSinceDate(sinceDateTime?: string, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>>;
+    getEventSinceDateWrapped(sinceDateTime?: string, options?: any): AxiosPromise<PubSubLedgerEntryDtoResponseWrapper>;
 
     /**
      * Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.
@@ -576,7 +580,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any): AxiosPromise<Array<PubSubLedgerEntryDto>>;
+    getEventsSinceCountAndTypeWrapped(eventInfoDto: Array<EventInfoDto>, options?: any): AxiosPromise<PubSubLedgerEntryDtoResponseWrapper>;
 
     /**
      * Retrieves latest counts for each event type in a key-value pair object
@@ -585,7 +589,7 @@ export interface SubscriberControllerApiInterface {
      * @throws {RequiredError}
      * @memberof SubscriberControllerApiInterface
      */
-    getLatestCounts(options?: any): AxiosPromise<string>;
+    getLatestCountsWrapped(options?: any): AxiosPromise<EventInfoDtoResponseWrapper>;
 
     /**
      * Retrieve a subscription by its UUID
@@ -637,8 +641,8 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
      * @throws {RequiredError}
      * @memberof SubscriberControllerApi
      */
-    public getAllSubscriptions(options?: any) {
-        return SubscriberControllerApiFp(this.configuration).getAllSubscriptions(options).then((request) => request(this.axios, this.basePath));
+    public getAllSubscriptionsWrapped(options?: any) {
+        return SubscriberControllerApiFp(this.configuration).getAllSubscriptionsWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -649,8 +653,8 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
      * @throws {RequiredError}
      * @memberof SubscriberControllerApi
      */
-    public getEventSinceDate(sinceDateTime?: string, options?: any) {
-        return SubscriberControllerApiFp(this.configuration).getEventSinceDate(sinceDateTime, options).then((request) => request(this.axios, this.basePath));
+    public getEventSinceDateWrapped(sinceDateTime?: string, options?: any) {
+        return SubscriberControllerApiFp(this.configuration).getEventSinceDateWrapped(sinceDateTime, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -661,8 +665,8 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
      * @throws {RequiredError}
      * @memberof SubscriberControllerApi
      */
-    public getEventsSinceCountAndType(eventInfoDto: Array<EventInfoDto>, options?: any) {
-        return SubscriberControllerApiFp(this.configuration).getEventsSinceCountAndType(eventInfoDto, options).then((request) => request(this.axios, this.basePath));
+    public getEventsSinceCountAndTypeWrapped(eventInfoDto: Array<EventInfoDto>, options?: any) {
+        return SubscriberControllerApiFp(this.configuration).getEventsSinceCountAndTypeWrapped(eventInfoDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -672,8 +676,8 @@ export class SubscriberControllerApi extends BaseAPI implements SubscriberContro
      * @throws {RequiredError}
      * @memberof SubscriberControllerApi
      */
-    public getLatestCounts(options?: any) {
-        return SubscriberControllerApiFp(this.configuration).getLatestCounts(options).then((request) => request(this.axios, this.basePath));
+    public getLatestCountsWrapped(options?: any) {
+        return SubscriberControllerApiFp(this.configuration).getLatestCountsWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

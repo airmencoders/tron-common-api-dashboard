@@ -1,21 +1,18 @@
-import { State } from '@hookstate/core';
+import { postpone, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
 import { DataService } from '../data-service/data-service';
-import { AppClientSummaryDto, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
+import { AppClientSummaryDto, AppClientSummaryDtoResponseWrapper, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
 import Config from '../../api/configuration';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 export default class AppSourceService implements DataService<AppSourceDto, AppSourceDetailsDto> {
   constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) { }
 
   fetchAndStoreData(): Promise<AppSourceDto[]> {
-    const response = (): AxiosPromise<AppSourceDto[]> => this.appSourceApi.getAppSources();
-
     const data = new Promise<AppSourceDto[]>(async (resolve, reject) => {
       try {
-        const result = await response();
+        const result = await this.appSourceApi.getAppSourcesWrapped();
 
-        resolve(result.data);
+        resolve(result.data.data);
       } catch (err) {
         reject(err);
       }
@@ -27,9 +24,9 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   }
 
   fetchAppClients(): Promise<AppClientSummaryDto[]> {
-    const response = (): AxiosPromise<AppClientSummaryDto[]> => this.appSourceApi.getAvailableAppClients();
+    const response = (): AxiosPromise<AppClientSummaryDtoResponseWrapper> => this.appSourceApi.getAvailableAppClientsWrapped();
 
-    const result = response().then(res => res.data);
+    const result = response().then(res => res.data.data);
 
     return result;
   }
@@ -130,5 +127,15 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
 
   get error(): any | undefined {
     return this.state.promised ? undefined : this.state.error;
+  }
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+    });
   }
 }

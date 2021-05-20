@@ -6,7 +6,7 @@ import { AppClientControllerApi, AppClientControllerApiInterface } from '../../.
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { AppClientUserDetailsDto, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { AppClientUserDetailsDto, AppClientUserDtoResponseWrapped, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
@@ -55,14 +55,14 @@ describe('App Client State Tests', () => {
   ];
 
   const axiosGetResponse: AxiosResponse = {
-    data: clients,
+    data: { data: clients },
     status: 200,
     statusText: 'OK',
     config: {},
     headers: {}
   };
 
-  const testClientPrivileges: Privilege[] = [
+  const testClientPrivileges: PrivilegeDto[] = [
     {
       id: 1,
       name: PrivilegeType.READ
@@ -145,6 +145,14 @@ describe('App Client State Tests', () => {
     }
   };
 
+  const getClientTypePrivsWrappedResponse: AxiosResponse = {
+    data: { data: testClientPrivilegesDto },
+    status: 200,
+    headers: {},
+    config: {},
+    statusText: 'OK'
+  };
+
   const rejectMsg = {
     general: axiosRejectResponse.response.data.message
   } as DataCrudFormErrors;
@@ -183,8 +191,8 @@ describe('App Client State Tests', () => {
   });
 
   it('Test fetch and store', async () => {
-    appClientsApi.getAppClientUsers = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => resolve(axiosGetResponse));
+    appClientsApi.getAppClientUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve(axiosGetResponse));
     });
 
     await wrappedState.fetchAndStoreData();
@@ -198,24 +206,9 @@ describe('App Client State Tests', () => {
     expect(converted).toEqual(flatClients);
   });
 
-  it('Test convertToFlat empty name', () => {
-    const test = {
-      ...testClientDto,
-      name: undefined
-    };
-
-    const testFlat = {
-      ...testClientFlat,
-      name: ''
-    };
-
-    const result = wrappedState.convertToFlat(test);
-    expect(result).toEqual(testFlat);
-  });
-
   it('Test appClients', async () => {
-    appClientsApi.getAppClientUsers = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => setTimeout(() => resolve(axiosGetResponse), 200));
+    appClientsApi.getAppClientUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => setTimeout(() => resolve(axiosGetResponse), 200));
     });
 
     const fetch = wrappedState.fetchAndStoreData();
@@ -226,8 +219,8 @@ describe('App Client State Tests', () => {
   });
 
   it('Test error', async () => {
-    appClientsApi.getAppClientUsers = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto[]>>((resolve, reject) => {
+    appClientsApi.getAppClientUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>((resolve, reject) => {
         setTimeout(() => {
           reject(axiosRejectResponse)
         }, 200)
@@ -246,14 +239,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     appClientsState.set([testClientFlat]);
@@ -267,14 +254,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     await expect(wrappedState.sendUpdate(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -300,14 +281,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
     });
 
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(testClientFlat);
@@ -318,14 +293,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
@@ -385,14 +354,8 @@ describe('App Client State Tests', () => {
   });
 
   it('Test convertToDto', async () => {
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     const result = wrappedState.convertToDto(testClientFlat);
@@ -400,14 +363,8 @@ describe('App Client State Tests', () => {
   });
 
   it('Test createAppPrivilegesArr', async () => {
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     const result = await wrappedState.createAppPrivilegesArr(testClientFlat);
@@ -415,14 +372,8 @@ describe('App Client State Tests', () => {
   });
 
   it('Test Create App Privileges', async () => {
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });   
 
     const result = await wrappedState.createAppPrivileges(testClientFlat);
@@ -430,14 +381,8 @@ describe('App Client State Tests', () => {
   });
 
   it('Test No privilege user', async () => {
-    appClientsApi.getClientTypePrivs = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: testClientPrivilegesDto,
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
+    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
     const noPrivUser = {

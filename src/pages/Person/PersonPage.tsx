@@ -59,18 +59,21 @@ const columns: GridColumn[] =
 
 function PersonPage() {
   return (
-      <DataCrudFormPage<PersonDto, PersonDto>
-          columns={columns}
-          createForm={PersonEditForm}
-          dataTypeName="Person"
-          pageTitle="People"
-          updateForm={PersonEditForm}
-          useDataState={usePersonState}
-          allowEdit={true}
-          allowAdd
-          autoResizeColumns
-          autoResizeColummnsMinWidth={1200}
-      />
+    <DataCrudFormPage<PersonDto, PersonDto>
+      columns={columns}
+      createForm={PersonEditForm}
+      dataTypeName="Person"
+      pageTitle="People"
+      updateForm={PersonEditForm}
+      useDataState={usePersonState}
+      allowEdit={true}
+      allowAdd
+      autoResizeColumns
+      autoResizeColummnsMinWidth={1200}
+      infiniteScroll={{
+        enabled: true
+      }}
+    />
   );
 }
 

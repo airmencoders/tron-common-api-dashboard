@@ -33,7 +33,7 @@ export const PrivilegeControllerApiAxiosParamCreator = function (configuration?:
          * @throws {RequiredError}
          */
         getPrivileges: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/privilege`;
+            const localVarPath = `/v2/privilege`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
