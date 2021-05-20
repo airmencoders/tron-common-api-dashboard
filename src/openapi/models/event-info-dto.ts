@@ -17,40 +17,28 @@
 /**
  * 
  * @export
- * @interface Subscriber
+ * @interface EventInfoDto
  */
-export interface Subscriber {
+export interface EventInfoDto {
     /**
      * 
      * @type {string}
-     * @memberof Subscriber
+     * @memberof EventInfoDto
      */
-    id?: string;
+    eventType?: EventInfoDtoEventTypeEnum;
     /**
      * 
-     * @type {string}
-     * @memberof Subscriber
+     * @type {number}
+     * @memberof EventInfoDto
      */
-    subscriberAddress: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Subscriber
-     */
-    subscribedEvent: SubscriberSubscribedEventEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof Subscriber
-     */
-    secret?: string;
+    eventCount?: number;
 }
 
 /**
     * @export
     * @enum {string}
     */
-export enum SubscriberSubscribedEventEnum {
+export enum EventInfoDtoEventTypeEnum {
     PersonChange = 'PERSON_CHANGE',
     PersonDelete = 'PERSON_DELETE',
     OrganizationChange = 'ORGANIZATION_CHANGE',

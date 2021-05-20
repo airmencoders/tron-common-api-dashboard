@@ -17,37 +17,37 @@
 /**
  * 
  * @export
- * @interface PubSubLedger
+ * @interface PubSubLedgerEntryDto
  */
-export interface PubSubLedger {
+export interface PubSubLedgerEntryDto {
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof PubSubLedgerEntryDto
      */
     id?: string;
     /**
      * 
      * @type {number}
-     * @memberof PubSubLedger
+     * @memberof PubSubLedgerEntryDto
      */
     countForEventType?: number;
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof PubSubLedgerEntryDto
      */
-    eventType?: PubSubLedgerEventTypeEnum;
+    eventType?: PubSubLedgerEntryDtoEventTypeEnum;
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof PubSubLedgerEntryDto
      */
     data?: string;
     /**
      * 
      * @type {string}
-     * @memberof PubSubLedger
+     * @memberof PubSubLedgerEntryDto
      */
     dateCreated?: string;
 }
@@ -56,7 +56,7 @@ export interface PubSubLedger {
     * @export
     * @enum {string}
     */
-export enum PubSubLedgerEventTypeEnum {
+export enum PubSubLedgerEntryDtoEventTypeEnum {
     PersonChange = 'PERSON_CHANGE',
     PersonDelete = 'PERSON_DELETE',
     OrganizationChange = 'ORGANIZATION_CHANGE',

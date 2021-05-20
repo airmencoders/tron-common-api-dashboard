@@ -13,7 +13,6 @@ export const wrapState = (state: State<Partial<Health>>, healthApi: HealthApi): 
     async fetchAndStoreHealthStatus(): Promise<Health> {
       const healthRes = (): AxiosPromise<Health> => healthApi.getHealth()
           .catch(e => {
-            console.log(e);
             return new Promise<AxiosResponse<Health>>((resolve) => resolve(e.response));
           });
       const data = new Promise<Health>((resolve) => resolve(healthRes().then(r => r.data)));

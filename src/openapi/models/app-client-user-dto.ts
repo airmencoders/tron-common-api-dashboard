@@ -13,7 +13,7 @@
  */
 
 
-import { Privilege } from './privilege';
+import { PrivilegeDto } from './privilege-dto';
 
 /**
  * 
@@ -29,10 +29,10 @@ export interface AppClientUserDto {
     id?: string;
     /**
      * 
-     * @type {Array<Privilege>}
+     * @type {Array<PrivilegeDto>}
      * @memberof AppClientUserDto
      */
-    privileges?: Array<Privilege>;
+    privileges?: Array<PrivilegeDto>;
     /**
      * 
      * @type {Array<string>}

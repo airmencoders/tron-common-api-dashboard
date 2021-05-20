@@ -17,21 +17,15 @@
 /**
  * 
  * @export
- * @interface ScratchStorageUser
+ * @interface AppVersionInfoDto
  */
-export interface ScratchStorageUser {
+export interface AppVersionInfoDto {
     /**
      * 
      * @type {string}
-     * @memberof ScratchStorageUser
+     * @memberof AppVersionInfoDto
      */
-    id?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ScratchStorageUser
-     */
-    email: string;
+    version?: string;
 }
 
 

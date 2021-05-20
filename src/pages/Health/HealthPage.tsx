@@ -7,7 +7,7 @@ import withLoading from '../../hocs/UseLoading/WithLoading';
 import HealthService from '../../state/health/interface/health-service';
 
 import './HealthPage.scss';
-import {Container} from 'react-bootstrap';
+import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
 
 function HealthPage() {
   const state = useHealthState();
@@ -20,13 +20,14 @@ function HealthPage() {
 
   return (
     <PageFormat pageTitle={"Health"}>
-      {state.error ?
-        <StatusCard status={StatusType.ERROR} title={serviceTitle} />
-        :
-        <ContentWithLoading state={state} serviceTitle={serviceTitle} />
-      }
+      <ErrorBoundary>
+        {state.error ?
+          <StatusCard status={StatusType.ERROR} title={serviceTitle} />
+          :
+          <ContentWithLoading state={state} serviceTitle={serviceTitle} />
+        }
+      </ErrorBoundary>
     </PageFormat>
-
   )
 }
 
@@ -44,13 +45,11 @@ function HealthPageContent(props: { state: HealthService, serviceTitle: string }
   const { state, serviceTitle } = props;
 
   return (
-      <Container>
-        <div className="health__status-cards">
-          <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
-          <StatusCard status={getStatusTypeFromHealth(state.components?.db.status)} title="Database" />
-          <StatusCard status={getStatusTypeFromHealth(state.components?.rabbit?.status)} title="RabbitMQ" />
-        </div>
-      </Container>
+    <div className="health__status-cards">
+      <StatusCard status={getStatusTypeFromHealth(state.systemStatus)} title={serviceTitle} />
+      <StatusCard status={getStatusTypeFromHealth(state.components?.db.status)} title="Database" />
+      <StatusCard status={getStatusTypeFromHealth(state.components?.rabbit?.status)} title="RabbitMQ" />
+    </div>
   );
 }
 
@@ -60,6 +59,5 @@ function ContentWithLoading(props: { state: HealthService, serviceTitle: string 
     <PageContentWithLoading isLoading={props.state.isPromised} {...props} />
   );
 }
-
 
 export default HealthPage;

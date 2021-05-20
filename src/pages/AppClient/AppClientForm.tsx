@@ -107,7 +107,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       field: 'email',
       sortable: true,
       filter: true,
-      headerName: 'Admin',
+      headerName: 'Developer',
       resizable: true
     })
   ];
@@ -138,6 +138,13 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       headerName: 'App Source',
       cellRenderer: ApiSpecCellRenderer,
       cellRendererParams: { showAsText: true }
+    }),
+    new GridColumn({
+      field: 'basePath',
+      sortable: true,
+      filter: true,
+      headerName: 'Base Path',
+      resizable: true,
     }),
     new GridColumn({
       field: 'path',

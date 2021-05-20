@@ -17,21 +17,27 @@
 /**
  * 
  * @export
- * @interface Privilege
+ * @interface ScratchStorageEntryDto
  */
-export interface Privilege {
-    /**
-     * 
-     * @type {number}
-     * @memberof Privilege
-     */
-    id?: number;
+export interface ScratchStorageEntryDto {
     /**
      * 
      * @type {string}
-     * @memberof Privilege
+     * @memberof ScratchStorageEntryDto
      */
-    name?: string;
+    value?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScratchStorageEntryDto
+     */
+    key: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScratchStorageEntryDto
+     */
+    appId: string;
 }
 
 
