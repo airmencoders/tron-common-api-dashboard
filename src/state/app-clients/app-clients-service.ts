@@ -1,15 +1,14 @@
-import { none, State } from "@hookstate/core";
-import { AxiosPromise } from "axios";
-import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
-import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
-import {AppSourceDto, PrivilegeDto} from "../../openapi/models";
-import { AppClientUserDetailsDto } from "../../openapi/models/app-client-user-details-dto";
-import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
-import { DataService } from "../data-service/data-service";
-import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
-import { PrivilegeType } from "../privilege/privilege-type";
-import { AppClientFlat } from "./app-client-flat";
-import { AppClientPrivilege } from "./app-client-privilege";
+import {none, postpone, State} from "@hookstate/core";
+import {DataCrudFormErrors} from "../../components/DataCrudFormPage/data-crud-form-errors";
+import {AppClientControllerApiInterface} from "../../openapi/apis/app-client-controller-api";
+import {PrivilegeDto} from "../../openapi/models";
+import {AppClientUserDetailsDto} from "../../openapi/models/app-client-user-details-dto";
+import {AppClientUserDto} from "../../openapi/models/app-client-user-dto";
+import {DataService} from "../data-service/data-service";
+import {prepareDataCrudErrorResponse} from "../data-service/data-service-utils";
+import {PrivilegeType} from "../privilege/privilege-type";
+import {AppClientFlat} from "./app-client-flat";
+import {AppClientPrivilege} from "./app-client-privilege";
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
@@ -23,11 +22,10 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   fetchAndStoreData(): Promise<AppClientFlat[]> {
-    const response = (): AxiosPromise<AppClientUserDto[]> => this.appClientsApi.getAppClientUsers();
     const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
       try {
-        const result = await response();
-        resolve(this.convertAppClientsToFlat(result.data));
+        const result = await this.appClientsApi.getAppClientUsersWrapped();
+        resolve(this.convertAppClientsToFlat(result.data.data));
       } catch (err) {
         reject(prepareDataCrudErrorResponse(err));
       }
@@ -157,17 +155,18 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
   async createAppPrivileges(client: AppClientFlat): Promise<Set<PrivilegeDto>> {
     const privileges = new Set<PrivilegeDto>();
-    const privilegeResponse = await this.appClientsApi.getClientTypePrivs();
+    const privilegeResponse = await this.appClientsApi.getClientTypePrivsWrapped();
+    const data = privilegeResponse.data.data;
 
     if (client.read) {
-      const privilege = privilegeResponse.data.find(item => item.name === PrivilegeType.READ);
+      const privilege = data.find(item => item.name === PrivilegeType.READ);
       if (privilege) {
         privileges.add(privilege);
       }
     }
 
     if (client.write) {
-      const privilege = privilegeResponse.data.find(item => item.name === PrivilegeType.WRITE);
+      const privilege = data.find(item => item.name === PrivilegeType.WRITE);
       if (privilege) {
         privileges.add(privilege);
       }
@@ -190,5 +189,15 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
   get error(): string | DataCrudFormErrors | undefined {
     return this.state.promised ? undefined : this.state.error;
+  }
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+    });
   }
 }

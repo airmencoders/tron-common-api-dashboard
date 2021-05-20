@@ -5,7 +5,6 @@ import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { ScratchStorageAppRegistryDto, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
-import { useAppSourceState } from '../../../state/app-source/app-source-state';
 import { useScratchStorageState } from '../../../state/scratch-storage/scratch-storage-state';
 import ScratchStoragePage from '../ScratchStoragePage';
 import ScratchStorageService from '../../../state/scratch-storage/scratch-storage-service';
@@ -14,14 +13,17 @@ import { ScratchStorageFlat } from '../../../state/scratch-storage/scratch-stora
 jest.mock('../../../state/scratch-storage/scratch-storage-state');
 
 const server = setupServer(
-  rest.get('/api/v1/scratch', (req, res, ctx) => {
-    return res(ctx.json([ { id: 'some id', key: 'SOme Org', value: 'value', appId: '79d15bdb-43ff-4a55-a08d-2ea58a9f343a'}]))
-  }),
-  rest.get('/api/v1/userinfo', (req, res, ctx) => {
-    return res(ctx.json({}))
-  }),
-
-  rest.get('*', req => console.log(req.url.href))
+  rest.get('/api/v2/scratch/apps', (req, res, ctx) => {
+    return res(ctx.json(
+      {
+        data: [
+          {
+            id: 'some id', key: 'SOme Org', value: 'value', appId: '79d15bdb-43ff-4a55-a08d-2ea58a9f343a'
+          }
+        ]
+      }
+    ))
+  })
 )
 
 describe('Test Scratch Storage Page', () => {

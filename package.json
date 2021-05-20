@@ -56,7 +56,7 @@
     "test:e2e-ci": "npx cypress run --env INTEGRATION_TEST_HOST=https://tron-common-api.staging.dso.mil/ configFile=pipeline",
     "sonar": "sonar-scanner -Dsonar.projectVersion=${version}",
     "clean:generated-api-client": "rimraf src/openapi",
-    "generate-api-client:code": "npm run clean:generated-api-client && openapi-generator-cli generate -g typescript-axios -i resources/tron-common-api.yaml -o src/openapi --additional-properties=withSeparateModelsAndApi=true,apiPackage=apis,modelPackage=models,withInterfaces=true",
+    "generate-api-client:code": "npm run clean:generated-api-client && openapi-generator-cli generate -g typescript-axios -i resources/tron-common-api.json -o src/openapi --additional-properties=withSeparateModelsAndApi=true,apiPackage=apis,modelPackage=models,withInterfaces=true",
     "generate-api-client:guards": "./node_modules/.bin/ts-json-schema-generator --path 'src/openapi/models/**/*.ts' -o src/api/model-types.json -i 'model-types.json'",
     "generate-api-client:post": "node process-json.js",
     "generate-api-client": "npm run generate-api-client:code && npm run generate-api-client:guards && npm run generate-api-client:post",

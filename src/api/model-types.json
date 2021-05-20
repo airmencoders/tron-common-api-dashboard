@@ -6,13 +6,19 @@
       "additionalProperties": false,
       "properties": {
         "address": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "admin": {
           "type": "boolean"
         },
         "afsc": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "approved": {
           "type": "boolean"
@@ -21,52 +27,94 @@
           "$ref": "model-types.json#/definitions/PersonDtoBranchEnum"
         },
         "deros": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dodid": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dor": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dutyPhone": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dutyTitle": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "email": {
           "type": "string"
         },
         "etsDate": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "firstName": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "fltChief": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "go81": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "gp": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "id": {
           "type": "string"
         },
         "imds": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "lastName": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "manNumber": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "middleName": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "organizationLeaderships": {
           "additionalProperties": false,
@@ -93,31 +141,55 @@
           "type": "object"
         },
         "phone": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "primaryOrganizationId": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "ptDate": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "rank": {
           "type": "string"
         },
         "squadron": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "title": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "unit": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "wc": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "wing": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "type": "object"
@@ -129,49 +201,91 @@
           "type": "boolean"
         },
         "afsc": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "approved": {
           "type": "boolean"
         },
         "deros": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dor": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "etsDate": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "fltChief": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "go81": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "gp": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "imds": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "manNumber": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "ptDate": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "squadron": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "unit": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "wc": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "wing": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "type": "object"
@@ -207,6 +321,21 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "AppClientSummaryDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppClientSummaryDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
       "type": "object"
     },
     "AppClientUserDetailsDto": {
@@ -263,6 +392,21 @@
       },
       "required": [
         "name"
+      ],
+      "type": "object"
+    },
+    "AppClientUserDtoResponseWrapped": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppClientUserDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
       ],
       "type": "object"
     },
@@ -478,6 +622,21 @@
       },
       "type": "object"
     },
+    "AppSourceDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppSourceDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "AppSourceMetricDto": {
       "additionalProperties": false,
       "properties": {
@@ -509,7 +668,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -519,85 +678,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "BadRequestExceptionCause": {
-      "additionalProperties": false,
-      "properties": {
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "BadRequestExceptionCauseStackTrace": {
-      "additionalProperties": false,
-      "properties": {
-        "classLoaderName": {
-          "type": "string"
-        },
-        "className": {
-          "type": "string"
-        },
-        "fileName": {
-          "type": "string"
-        },
-        "lineNumber": {
-          "type": "number"
-        },
-        "methodName": {
-          "type": "string"
-        },
-        "moduleName": {
-          "type": "string"
-        },
-        "moduleVersion": {
-          "type": "string"
-        },
-        "nativeMethod": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
-    "BadRequestExceptionCauseSuppressed": {
-      "additionalProperties": false,
-      "properties": {
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -639,6 +726,21 @@
           "type": "array"
         }
       },
+      "type": "object"
+    },
+    "DashboardUserDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DashboardUserDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
       "type": "object"
     },
     "EndpointCountMetricDto": {
@@ -709,6 +811,21 @@
       ],
       "type": "string"
     },
+    "EventInfoDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/EventInfoDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "ExceptionResponse": {
       "additionalProperties": false,
       "properties": {
@@ -740,7 +857,10 @@
           "type": "string"
         },
         "leader": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "members": {
           "items": {
@@ -755,10 +875,16 @@
           "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
         },
         "parentOrganization": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "pas": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "subordinateOrganizations": {
           "additionalProperties": false,
@@ -779,7 +905,10 @@
       "additionalProperties": false,
       "properties": {
         "pas": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "type": "object"
@@ -794,7 +923,10 @@
           "type": "string"
         },
         "leader": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "members": {
           "items": {
@@ -809,10 +941,16 @@
           "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
         },
         "parentOrganization": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "pas": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "subordinateOrganizations": {
           "additionalProperties": false,
@@ -829,11 +967,114 @@
       },
       "type": "object"
     },
+    "HttpLogDtoPaginationResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/HttpLogEntryDto"
+          },
+          "type": "array"
+        },
+        "pagination": {
+          "$ref": "model-types.json#/definitions/Pagination"
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "type": "object"
+    },
+    "HttpLogEntryDetailsDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "queryString": {
+          "type": "string"
+        },
+        "remoteIp": {
+          "type": "string"
+        },
+        "requestBody": {
+          "type": "string"
+        },
+        "requestHost": {
+          "type": "string"
+        },
+        "requestMethod": {
+          "type": "string"
+        },
+        "requestTimestamp": {
+          "type": "string"
+        },
+        "requestedUrl": {
+          "type": "string"
+        },
+        "responseBody": {
+          "type": "string"
+        },
+        "statusCode": {
+          "type": "number"
+        },
+        "timeTakenMs": {
+          "type": "number"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "HttpLogEntryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "queryString": {
+          "type": "string"
+        },
+        "remoteIp": {
+          "type": "string"
+        },
+        "requestHost": {
+          "type": "string"
+        },
+        "requestMethod": {
+          "type": "string"
+        },
+        "requestTimestamp": {
+          "type": "string"
+        },
+        "requestedUrl": {
+          "type": "string"
+        },
+        "statusCode": {
+          "type": "number"
+        },
+        "timeTakenMs": {
+          "type": "number"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "InvalidScratchSpacePermissions": {
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -843,13 +1084,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -1012,7 +1253,10 @@
           "type": "string"
         },
         "leader": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "members": {
           "items": {
@@ -1027,7 +1271,10 @@
           "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
         },
         "parentOrganization": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "subordinateOrganizations": {
           "additionalProperties": false,
@@ -1067,41 +1314,135 @@
       ],
       "type": "string"
     },
+    "OrganizationDtoPaginationResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/OrganizationDto"
+          },
+          "type": "array"
+        },
+        "pagination": {
+          "$ref": "model-types.json#/definitions/Pagination"
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "type": "object"
+    },
+    "OrganizationDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/OrganizationDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "OtherUsaf": {
       "$ref": "model-types.json#/definitions/OrganizationDto"
+    },
+    "Pagination": {
+      "additionalProperties": false,
+      "properties": {
+        "links": {
+          "$ref": "model-types.json#/definitions/PaginationLink"
+        },
+        "page": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        },
+        "totalElements": {
+          "type": "number"
+        },
+        "totalPages": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "PaginationLink": {
+      "additionalProperties": false,
+      "properties": {
+        "first": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        },
+        "next": {
+          "type": "string"
+        },
+        "prev": {
+          "type": "string"
+        }
+      },
+      "type": "object"
     },
     "PersonDto": {
       "additionalProperties": false,
       "properties": {
         "address": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "branch": {
           "$ref": "model-types.json#/definitions/PersonDtoBranchEnum"
         },
         "dodid": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dutyPhone": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "dutyTitle": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "email": {
           "type": "string"
         },
         "firstName": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "id": {
           "type": "string"
         },
         "lastName": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "middleName": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "organizationLeaderships": {
           "additionalProperties": false,
@@ -1128,16 +1469,25 @@
           "type": "object"
         },
         "phone": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "primaryOrganizationId": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "rank": {
           "type": "string"
         },
         "title": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "type": "object"
@@ -1154,6 +1504,64 @@
       ],
       "type": "string"
     },
+    "PersonDtoPaginationResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PersonDto"
+          },
+          "type": "array"
+        },
+        "pagination": {
+          "$ref": "model-types.json#/definitions/Pagination"
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "type": "object"
+    },
+    "PersonDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PersonDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
+    "PersonFindDto": {
+      "additionalProperties": false,
+      "description": "The information to find a person by",
+      "properties": {
+        "findType": {
+          "$ref": "model-types.json#/definitions/PersonFindDtoFindTypeEnum"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "findType",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PersonFindDtoFindTypeEnum": {
+      "enum": [
+        "EMAIL",
+        "DODID"
+      ],
+      "type": "string"
+    },
     "PrivilegeDto": {
       "additionalProperties": false,
       "properties": {
@@ -1166,6 +1574,21 @@
       },
       "required": [
         "name"
+      ],
+      "type": "object"
+    },
+    "PrivilegeDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
       ],
       "type": "object"
     },
@@ -1215,6 +1638,21 @@
       ],
       "type": "string"
     },
+    "PubSubLedgerEntryDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PubSubLedgerEntryDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "Rank": {
       "additionalProperties": false,
       "properties": {
@@ -1249,7 +1687,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1259,13 +1697,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -1276,7 +1714,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1286,13 +1724,85 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ResourceAlreadyExistsExceptionCause": {
+      "additionalProperties": false,
+      "properties": {
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ResourceAlreadyExistsExceptionCauseStackTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "classLoaderName": {
+          "type": "string"
+        },
+        "className": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "lineNumber": {
+          "type": "number"
+        },
+        "methodName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "moduleVersion": {
+          "type": "string"
+        },
+        "nativeMethod": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "ResourceAlreadyExistsExceptionCauseSuppressed": {
+      "additionalProperties": false,
+      "properties": {
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
           },
           "type": "array"
         }
@@ -1323,6 +1833,21 @@
       },
       "required": [
         "appName"
+      ],
+      "type": "object"
+    },
+    "ScratchStorageAppRegistryDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ScratchStorageAppRegistryDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
       ],
       "type": "object"
     },
@@ -1365,6 +1890,21 @@
       ],
       "type": "object"
     },
+    "ScratchStorageEntryDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ScratchStorageEntryDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "ScratchStorageUserDto": {
       "additionalProperties": false,
       "properties": {
@@ -1377,6 +1917,21 @@
       },
       "required": [
         "email"
+      ],
+      "type": "object"
+    },
+    "ScratchStorageUserDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ScratchStorageUserDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
       ],
       "type": "object"
     },
@@ -1412,7 +1967,10 @@
           "type": "string"
         },
         "leader": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "members": {
           "items": {
@@ -1427,10 +1985,16 @@
           "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
         },
         "parentOrganization": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "pas": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "subordinateOrganizations": {
           "additionalProperties": false,
@@ -1466,6 +2030,21 @@
       "required": [
         "subscribedEvent",
         "subscriberAddress"
+      ],
+      "type": "object"
+    },
+    "SubscriberDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/SubscriberDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
       ],
       "type": "object"
     },
@@ -1537,7 +2116,10 @@
           "type": "string"
         },
         "leader": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "members": {
           "items": {
@@ -1552,10 +2134,16 @@
           "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
         },
         "parentOrganization": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "pas": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "subordinateOrganizations": {
           "additionalProperties": false,

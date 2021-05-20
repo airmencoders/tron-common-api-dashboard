@@ -3,7 +3,7 @@ import DataCrudDeleteContent from '../DataCrudDeleteContent';
 import { render, waitFor, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 import {DataCrudFormPage} from '../DataCrudFormPage';
 import {DataService} from '../../../state/data-service/data-service';
-import { createState, none, State, StateMethodsDestroy, useState } from '@hookstate/core';
+import { createState, none, postpone, State, StateMethodsDestroy, useState } from '@hookstate/core';
 import GridColumn from '../../Grid/GridColumn';
 import {MemoryRouter} from 'react-router-dom';
 import { DataCrudDeleteComponentProps } from '../../DataCrudFormPage/DataCrudDeleteComponentProps';
@@ -71,6 +71,10 @@ class TestDataService implements DataService<TestRow, TestDto> {
     }
     return Promise.resolve(foundData);
   }
+
+  resetState(): void {
+    return;
+  }
 }
 
 class TestDataErrorService implements DataService<TestRow, TestDto> {
@@ -121,6 +125,10 @@ class TestDataErrorService implements DataService<TestRow, TestDto> {
     }
     return Promise.resolve(foundData);
   }
+
+  resetState(): void {
+    return;
+  }
 }
 
 class TestDataRequestErrorService implements DataService<TestRow, TestDto> {
@@ -167,6 +175,10 @@ class TestDataRequestErrorService implements DataService<TestRow, TestDto> {
       return Promise.reject();
     }
     return Promise.resolve(foundData);
+  }
+
+  resetState(): void {
+    return;
   }
 }
 
@@ -358,8 +370,6 @@ describe('Test DataCrudFormPage', () => {
     fireEvent.click(screen.getByText('val0'));
     await screen.findByText('Submit');
     fireEvent.click(screen.getByText('Submit'));
-  
-
 
     await waitFor(
       () => expect(screen.getByText(updateToastMsg)).toBeTruthy(),

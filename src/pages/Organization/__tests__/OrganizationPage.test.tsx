@@ -1,20 +1,13 @@
 import {rest} from 'msw';
-import {setupServer} from 'msw/node';
-import {OrganizationControllerApi} from '../../../openapi';
-import axios from 'axios';
+import { setupServer } from 'msw/node';
 import {render, waitFor, screen} from '@testing-library/react';
 import OrganizationPage from '../OrganizationPage';
 import { MemoryRouter } from 'react-router-dom';
 
-
 const server = setupServer(
     rest.get('/api/v1/organization', (req, res, ctx) => {
       return res(ctx.json([ { id: 'some id', name: 'SOme Org'}]))
-    }),
-    rest.get('/api/v1/userinfo', (req, res, ctx) => {
-      return res(ctx.json({}))
-    }),
-    rest.get('*', req => console.log(req.url.href))
+    })
 )
 
 beforeAll(() => server.listen());

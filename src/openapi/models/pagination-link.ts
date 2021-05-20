@@ -13,32 +13,37 @@
  */
 
 
-import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
 
 /**
  * 
  * @export
- * @interface BadRequestExceptionCauseSuppressed
+ * @interface PaginationLink
  */
-export interface BadRequestExceptionCauseSuppressed {
-    /**
-     * 
-     * @type {Array<BadRequestExceptionCauseStackTrace>}
-     * @memberof BadRequestExceptionCauseSuppressed
-     */
-    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
+export interface PaginationLink {
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @memberof PaginationLink
      */
-    message?: string;
+    next?: string;
     /**
      * 
      * @type {string}
-     * @memberof BadRequestExceptionCauseSuppressed
+     * @memberof PaginationLink
      */
-    localizedMessage?: string;
+    last?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginationLink
+     */
+    prev?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginationLink
+     */
+    first?: string;
 }
 
 
