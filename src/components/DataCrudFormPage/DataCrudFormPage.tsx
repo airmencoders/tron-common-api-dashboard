@@ -54,7 +54,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   }
 
   function setUpdateInfiniteCache(status: boolean) {
-    updateInfiniteCache.set(status);
+    // To avoid sending unnecessary changes to the Grid.
+    // Only update infinite cache if infinite scroll is enabled.
+    if (infiniteScroll?.enabled) {
+      updateInfiniteCache.set(status);
+    }
   }
 
   function createInfiniteScrollDatasource(): IDatasource | undefined {
