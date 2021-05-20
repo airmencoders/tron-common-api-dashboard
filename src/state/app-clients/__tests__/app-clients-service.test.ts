@@ -6,7 +6,7 @@ import { AppClientControllerApi, AppClientControllerApiInterface } from '../../.
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { AppClientUserDetailsDto, Privilege, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { AppClientUserDetailsDto, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
@@ -62,7 +62,7 @@ describe('App Client State Tests', () => {
     headers: {}
   };
 
-  const testClientPrivileges: Privilege[] = [
+  const testClientPrivileges: PrivilegeDto[] = [
     {
       id: 1,
       name: PrivilegeType.READ
@@ -202,7 +202,7 @@ describe('App Client State Tests', () => {
     const test = {
       ...testClientDto,
       name: undefined
-    };
+    } as unknown as AppClientUserDto;
 
     const testFlat = {
       ...testClientFlat,
@@ -423,7 +423,7 @@ describe('App Client State Tests', () => {
         config: {},
         statusText: 'OK'
       }));
-    });   
+    });
 
     const result = await wrappedState.createAppPrivileges(testClientFlat);
     expect(result.size).toEqual(2);

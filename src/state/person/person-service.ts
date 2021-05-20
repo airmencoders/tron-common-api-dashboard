@@ -2,13 +2,18 @@ import {DataService} from '../data-service/data-service';
 import {State} from '@hookstate/core';
 import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, RankControllerApiInterface} from '../../openapi';
 import {RankStateModel} from './rank-state-model';
-import {data} from 'msw/lib/types/context';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
+import {ValidateFunction} from 'ajv';
+import TypeValidation from '../../utils/TypeValidation/type-validation';
+import ModelTypes from '../../api/model-types.json';
 
 export default class PersonService implements DataService<PersonDto, PersonDto> {
 
+  private readonly validate: ValidateFunction<PersonDto>;
+
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
               public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
+    this.validate = TypeValidation.validatorFor<PersonDto>(ModelTypes.definitions.PersonDto);
   }
 
   async fetchAndStoreData(): Promise<PersonDto[]> {
@@ -25,6 +30,9 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
   }
 
   async sendCreate(toCreate: PersonDto): Promise<PersonDto> {
+    if(!this.validate(toCreate)) {
+      throw TypeValidation.validationError('PersonDto');
+    }
     try {
       const personResponse = await this.personApi.createPerson(toCreate);
       return Promise.resolve(personResponse.data);
@@ -35,6 +43,9 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
   }
 
   async sendUpdate(toUpdate: PersonDto): Promise<PersonDto> {
+    if(!this.validate(toUpdate)) {
+      throw TypeValidation.validationError('PersonDto');
+    }
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Person to update has undefined id.'));

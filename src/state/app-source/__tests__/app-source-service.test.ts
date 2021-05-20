@@ -268,6 +268,10 @@ describe('App Source State Tests', () => {
     await expect(wrappedState.sendCreate(testAppSourceDetailsDto)).rejects.toThrow();
   });
 
+  it('should reject non conforming object for create', async() => {
+    await expect(wrappedState.sendCreate({badParam: 'bad'} as unknown as AppSourceDetailsDto)).rejects.toThrowError();
+  });
+
   it('sendDelete should throw -- not implemented', async () => {
     await expect(wrappedState.sendDelete(testAppSourceDetailsDto)).rejects.toThrow();
   });

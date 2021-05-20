@@ -1,0 +1,1576 @@
+{
+  "$id": "model-types.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Airman": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "admin": {
+          "type": "boolean"
+        },
+        "afsc": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "branch": {
+          "$ref": "model-types.json#/definitions/PersonDtoBranchEnum"
+        },
+        "deros": {
+          "type": "string"
+        },
+        "dodid": {
+          "type": "string"
+        },
+        "dor": {
+          "type": "string"
+        },
+        "dutyPhone": {
+          "type": "string"
+        },
+        "dutyTitle": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "etsDate": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "fltChief": {
+          "type": "string"
+        },
+        "go81": {
+          "type": "string"
+        },
+        "gp": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "imds": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "manNumber": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        },
+        "organizationLeaderships": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        },
+        "organizationMemberships": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "primaryOrganizationId": {
+          "type": "string"
+        },
+        "ptDate": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "string"
+        },
+        "squadron": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "wc": {
+          "type": "string"
+        },
+        "wing": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AirmanAllOf": {
+      "additionalProperties": false,
+      "properties": {
+        "admin": {
+          "type": "boolean"
+        },
+        "afsc": {
+          "type": "string"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "deros": {
+          "type": "string"
+        },
+        "dor": {
+          "type": "string"
+        },
+        "etsDate": {
+          "type": "string"
+        },
+        "fltChief": {
+          "type": "string"
+        },
+        "go81": {
+          "type": "string"
+        },
+        "gp": {
+          "type": "string"
+        },
+        "imds": {
+          "type": "string"
+        },
+        "manNumber": {
+          "type": "string"
+        },
+        "ptDate": {
+          "type": "string"
+        },
+        "squadron": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "wc": {
+          "type": "string"
+        },
+        "wing": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppClientCountMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appSource": {
+          "type": "string"
+        },
+        "endpoints": {
+          "items": {
+            "$ref": "model-types.json#/definitions/EndpointCountMetricDto"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppClientSummaryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppClientUserDetailsDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientDeveloperEmails": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "appEndpointPrivs": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppEndpointClientInfoDto"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "AppClientUserDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientDeveloperEmails": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "AppClientUserPrivDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientUser": {
+          "type": "string"
+        },
+        "appClientUserName": {
+          "type": "string"
+        },
+        "appEndpoint": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "privilege": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "appClientUser",
+        "appEndpoint"
+      ],
+      "type": "object"
+    },
+    "AppEndPointPrivDto": {
+      "additionalProperties": false,
+      "description": "App Source UUID",
+      "properties": {
+        "appClientUserId": {
+          "type": "string"
+        },
+        "appEndpointId": {
+          "type": "string"
+        },
+        "appSourceId": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppEndpointClientInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appSourceName": {
+          "type": "string"
+        },
+        "basePath": {
+          "type": "string"
+        },
+        "deleted": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "method": {
+          "$ref": "model-types.json#/definitions/AppEndpointClientInfoDtoMethodEnum"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppEndpointClientInfoDtoMethodEnum": {
+      "enum": [
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+        "TRACE"
+      ],
+      "type": "string"
+    },
+    "AppEndpointCountMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClients": {
+          "items": {
+            "$ref": "model-types.json#/definitions/CountMetricDto"
+          },
+          "type": "array"
+        },
+        "appSource": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "requestType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "requestType"
+      ],
+      "type": "object"
+    },
+    "AppEndpointDto": {
+      "additionalProperties": false,
+      "properties": {
+        "deleted": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "requestType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "requestType"
+      ],
+      "type": "object"
+    },
+    "AppSourceCountMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClients": {
+          "items": {
+            "$ref": "model-types.json#/definitions/CountMetricDto"
+          },
+          "type": "array"
+        },
+        "endpoints": {
+          "items": {
+            "$ref": "model-types.json#/definitions/EndpointCountMetricDto"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSourceDetailsDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClients": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppClientUserPrivDto"
+          },
+          "type": "array"
+        },
+        "appSourceAdminUserEmails": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "appSourcePath": {
+          "type": "string"
+        },
+        "clientCount": {
+          "type": "number"
+        },
+        "endpointCount": {
+          "type": "number"
+        },
+        "endpoints": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppEndpointDto"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "AppSourceDto": {
+      "additionalProperties": false,
+      "properties": {
+        "clientCount": {
+          "type": "number"
+        },
+        "endpointCount": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSourceMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "endpoints": {
+          "items": {
+            "$ref": "model-types.json#/definitions/EndpointMetricDto"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppVersionInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestException": {
+      "additionalProperties": false,
+      "properties": {
+        "cause": {
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+        },
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestExceptionCause": {
+      "additionalProperties": false,
+      "properties": {
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestExceptionCauseStackTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "classLoaderName": {
+          "type": "string"
+        },
+        "className": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "lineNumber": {
+          "type": "number"
+        },
+        "methodName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "moduleVersion": {
+          "type": "string"
+        },
+        "nativeMethod": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestExceptionCauseSuppressed": {
+      "additionalProperties": false,
+      "properties": {
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "CoastGuardsman": {
+      "$ref": "model-types.json#/definitions/PersonDto"
+    },
+    "CountMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sum": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "DashboardUserDto": {
+      "additionalProperties": false,
+      "description": "Admin To Remove Email",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "EndpointCountMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "sum": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "EndpointMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "requestType": {
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "$ref": "model-types.json#/definitions/MeterValueDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "path",
+        "requestType"
+      ],
+      "type": "object"
+    },
+    "EventInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "eventCount": {
+          "type": "number"
+        },
+        "eventType": {
+          "$ref": "model-types.json#/definitions/EventInfoDtoEventTypeEnum"
+        }
+      },
+      "type": "object"
+    },
+    "EventInfoDtoEventTypeEnum": {
+      "enum": [
+        "PERSON_CHANGE",
+        "PERSON_DELETE",
+        "ORGANIZATION_CHANGE",
+        "ORGANIZATION_DELETE",
+        "PERSON_ORG_ADD",
+        "PERSON_ORG_REMOVE",
+        "SUB_ORG_ADD",
+        "SUB_ORG_REMOVE"
+      ],
+      "type": "string"
+    },
+    "ExceptionResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "status": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Flight": {
+      "additionalProperties": false,
+      "properties": {
+        "branchType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoBranchTypeEnum"
+        },
+        "id": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "orgType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
+        },
+        "parentOrganization": {
+          "type": "string"
+        },
+        "pas": {
+          "type": "string"
+        },
+        "subordinateOrganizations": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "FlightAllOf": {
+      "additionalProperties": false,
+      "properties": {
+        "pas": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Group": {
+      "additionalProperties": false,
+      "properties": {
+        "branchType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoBranchTypeEnum"
+        },
+        "id": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "orgType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
+        },
+        "parentOrganization": {
+          "type": "string"
+        },
+        "pas": {
+          "type": "string"
+        },
+        "subordinateOrganizations": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "InvalidScratchSpacePermissions": {
+      "additionalProperties": false,
+      "properties": {
+        "cause": {
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+        },
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatchObjectArrayValue": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "$ref": "model-types.json#/definitions/JsonPatchObjectArrayValueOpEnum"
+        },
+        "path": {
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatchObjectArrayValueOpEnum": {
+      "enum": [
+        "add",
+        "remove",
+        "replace",
+        "copy",
+        "move",
+        "test"
+      ],
+      "type": "string"
+    },
+    "JsonPatchObjectValue": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "$ref": "model-types.json#/definitions/JsonPatchObjectValueOpEnum"
+        },
+        "path": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatchObjectValueOpEnum": {
+      "enum": [
+        "add",
+        "remove",
+        "replace",
+        "copy",
+        "move",
+        "test"
+      ],
+      "type": "string"
+    },
+    "JsonPatchStringArrayValue": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "$ref": "model-types.json#/definitions/JsonPatchStringArrayValueOpEnum"
+        },
+        "path": {
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatchStringArrayValueOpEnum": {
+      "enum": [
+        "add",
+        "remove",
+        "replace",
+        "copy",
+        "move",
+        "test"
+      ],
+      "type": "string"
+    },
+    "JsonPatchStringValue": {
+      "additionalProperties": false,
+      "properties": {
+        "op": {
+          "$ref": "model-types.json#/definitions/JsonPatchStringValueOpEnum"
+        },
+        "path": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatchStringValueOpEnum": {
+      "enum": [
+        "add",
+        "remove",
+        "replace",
+        "copy",
+        "move",
+        "test"
+      ],
+      "type": "string"
+    },
+    "LogfileDto": {
+      "additionalProperties": false,
+      "properties": {
+        "downloadUri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Marine": {
+      "$ref": "model-types.json#/definitions/PersonDto"
+    },
+    "MeterValueDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClient": {
+          "type": "string"
+        },
+        "count": {
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        },
+        "metricName": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "OrganizationDto": {
+      "additionalProperties": false,
+      "properties": {
+        "branchType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoBranchTypeEnum"
+        },
+        "id": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "orgType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
+        },
+        "parentOrganization": {
+          "type": "string"
+        },
+        "subordinateOrganizations": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "OrganizationDtoBranchTypeEnum": {
+      "enum": [
+        "OTHER",
+        "USA",
+        "USAF",
+        "USMC",
+        "USN",
+        "USSF",
+        "USCG"
+      ],
+      "type": "string"
+    },
+    "OrganizationDtoOrgTypeEnum": {
+      "enum": [
+        "SQUADRON",
+        "GROUP",
+        "FLIGHT",
+        "WING",
+        "OTHER_USAF",
+        "ORGANIZATION"
+      ],
+      "type": "string"
+    },
+    "OtherUsaf": {
+      "$ref": "model-types.json#/definitions/OrganizationDto"
+    },
+    "PersonDto": {
+      "additionalProperties": false,
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "branch": {
+          "$ref": "model-types.json#/definitions/PersonDtoBranchEnum"
+        },
+        "dodid": {
+          "type": "string"
+        },
+        "dutyPhone": {
+          "type": "string"
+        },
+        "dutyTitle": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        },
+        "organizationLeaderships": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        },
+        "organizationMemberships": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "primaryOrganizationId": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PersonDtoBranchEnum": {
+      "enum": [
+        "OTHER",
+        "USA",
+        "USAF",
+        "USMC",
+        "USN",
+        "USSF",
+        "USCG"
+      ],
+      "type": "string"
+    },
+    "PrivilegeDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "PrivilegeIdPair": {
+      "additionalProperties": false,
+      "properties": {
+        "priv": {
+          "$ref": "model-types.json#/definitions/PrivilegeDto"
+        },
+        "userPrivPairId": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PubSubLedgerEntryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "countForEventType": {
+          "type": "number"
+        },
+        "data": {
+          "type": "string"
+        },
+        "dateCreated": {
+          "type": "string"
+        },
+        "eventType": {
+          "$ref": "model-types.json#/definitions/PubSubLedgerEntryDtoEventTypeEnum"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PubSubLedgerEntryDtoEventTypeEnum": {
+      "enum": [
+        "PERSON_CHANGE",
+        "PERSON_DELETE",
+        "ORGANIZATION_CHANGE",
+        "ORGANIZATION_DELETE",
+        "PERSON_ORG_ADD",
+        "PERSON_ORG_REMOVE",
+        "SUB_ORG_ADD",
+        "SUB_ORG_REMOVE"
+      ],
+      "type": "string"
+    },
+    "Rank": {
+      "additionalProperties": false,
+      "properties": {
+        "abbreviation": {
+          "type": "string"
+        },
+        "branchType": {
+          "$ref": "model-types.json#/definitions/RankBranchTypeEnum"
+        },
+        "name": {
+          "type": "string"
+        },
+        "payGrade": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RankBranchTypeEnum": {
+      "enum": [
+        "OTHER",
+        "USA",
+        "USAF",
+        "USMC",
+        "USN",
+        "USSF",
+        "USCG"
+      ],
+      "type": "string"
+    },
+    "RecordNotFoundException": {
+      "additionalProperties": false,
+      "properties": {
+        "cause": {
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+        },
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ResourceAlreadyExistsException": {
+      "additionalProperties": false,
+      "properties": {
+        "cause": {
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
+        },
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "Sailor": {
+      "$ref": "model-types.json#/definitions/PersonDto"
+    },
+    "ScratchStorageAppRegistryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appHasImplicitRead": {
+          "type": "boolean"
+        },
+        "appName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "userPrivs": {
+          "items": {
+            "$ref": "model-types.json#/definitions/UserWithPrivs"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "appName"
+      ],
+      "type": "object"
+    },
+    "ScratchStorageAppUserPrivDto": {
+      "additionalProperties": false,
+      "description": "Application User-Priv Object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "privilegeId": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "email",
+        "privilegeId"
+      ],
+      "type": "object"
+    },
+    "ScratchStorageEntryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appId": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "appId"
+      ],
+      "type": "object"
+    },
+    "ScratchStorageUserDto": {
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "email"
+      ],
+      "type": "object"
+    },
+    "ScratchValuePatchJsonDto": {
+      "additionalProperties": false,
+      "description": "Object specifying the json path to execute and the new value",
+      "properties": {
+        "jsonPath": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "jsonPath"
+      ],
+      "type": "object"
+    },
+    "Soldier": {
+      "$ref": "model-types.json#/definitions/PersonDto"
+    },
+    "Spaceman": {
+      "$ref": "model-types.json#/definitions/PersonDto"
+    },
+    "Squadron": {
+      "additionalProperties": false,
+      "properties": {
+        "branchType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoBranchTypeEnum"
+        },
+        "id": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "orgType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
+        },
+        "parentOrganization": {
+          "type": "string"
+        },
+        "pas": {
+          "type": "string"
+        },
+        "subordinateOrganizations": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "SubscriberDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
+        },
+        "subscribedEvent": {
+          "$ref": "model-types.json#/definitions/SubscriberDtoSubscribedEventEnum"
+        },
+        "subscriberAddress": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "subscribedEvent",
+        "subscriberAddress"
+      ],
+      "type": "object"
+    },
+    "SubscriberDtoSubscribedEventEnum": {
+      "enum": [
+        "PERSON_CHANGE",
+        "PERSON_DELETE",
+        "ORGANIZATION_CHANGE",
+        "ORGANIZATION_DELETE",
+        "PERSON_ORG_ADD",
+        "PERSON_ORG_REMOVE",
+        "SUB_ORG_ADD",
+        "SUB_ORG_REMOVE"
+      ],
+      "type": "string"
+    },
+    "UserInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "dodId": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "familyName": {
+          "type": "string"
+        },
+        "givenName": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "preferredUsername": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "UserWithPrivs": {
+      "additionalProperties": false,
+      "properties": {
+        "emailAddress": {
+          "type": "string"
+        },
+        "privs": {
+          "items": {
+            "$ref": "model-types.json#/definitions/PrivilegeIdPair"
+          },
+          "type": "array"
+        },
+        "userId": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Wing": {
+      "additionalProperties": false,
+      "properties": {
+        "branchType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoBranchTypeEnum"
+        },
+        "id": {
+          "type": "string"
+        },
+        "leader": {
+          "type": "string"
+        },
+        "members": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "orgType": {
+          "$ref": "model-types.json#/definitions/OrganizationDtoOrgTypeEnum"
+        },
+        "parentOrganization": {
+          "type": "string"
+        },
+        "pas": {
+          "type": "string"
+        },
+        "subordinateOrganizations": {
+          "additionalProperties": false,
+          "properties": {
+            "size": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "size"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  }
+}
