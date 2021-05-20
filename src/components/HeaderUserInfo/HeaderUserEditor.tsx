@@ -36,10 +36,10 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
     }
   }, [formState.branch.get()]);
 
-  const isError = (formState: State<string | undefined>) => Touched(formState).touched() && Validation(formState).invalid()
-  const errorMessages = (formState: State<string | undefined>) => Validation(formState).errors().map(validationError =>validationError.message)
+  const isError = (formState: State<string | null | undefined>) => Touched(formState).touched() && Validation(formState).invalid()
+  const errorMessages = (formState: State<string | null | undefined>) => Validation(formState).errors().map(validationError =>validationError.message)
 
-  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
+  const requiredText = (text: string | null | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
 
   const requiredError = 'cannot be empty or blank';
   Validation(formState.firstName).validate(requiredText, requiredError, 'error');
