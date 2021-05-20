@@ -13,19 +13,20 @@
  */
 
 
+import { ScratchStorageEntryDto } from './scratch-storage-entry-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface ScratchStorageEntryDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface ScratchStorageEntryDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<ScratchStorageEntryDto>}
+     * @memberof ScratchStorageEntryDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<ScratchStorageEntryDto>;
 }
 
 

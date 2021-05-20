@@ -63,6 +63,43 @@ export const PrivilegeControllerApiAxiosParamCreator = function (configuration?:
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Retrieves Privilege information
+         * @summary Retrieves all Privilege information
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrivileges1: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/privilege`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -80,6 +117,19 @@ export const PrivilegeControllerApiFp = function(configuration?: Configuration) 
          */
         async getPrivileges(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
             const localVarAxiosArgs = await PrivilegeControllerApiAxiosParamCreator(configuration).getPrivileges(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves Privilege information
+         * @summary Retrieves all Privilege information
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPrivileges1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
+            const localVarAxiosArgs = await PrivilegeControllerApiAxiosParamCreator(configuration).getPrivileges1(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -103,6 +153,15 @@ export const PrivilegeControllerApiFactory = function (configuration?: Configura
         getPrivileges(options?: any): AxiosPromise<Array<PrivilegeDto>> {
             return PrivilegeControllerApiFp(configuration).getPrivileges(options).then((request) => request(axios, basePath));
         },
+        /**
+         * Retrieves Privilege information
+         * @summary Retrieves all Privilege information
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPrivileges1(options?: any): AxiosPromise<Array<PrivilegeDto>> {
+            return PrivilegeControllerApiFp(configuration).getPrivileges1(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -120,6 +179,15 @@ export interface PrivilegeControllerApiInterface {
      * @memberof PrivilegeControllerApiInterface
      */
     getPrivileges(options?: any): AxiosPromise<Array<PrivilegeDto>>;
+
+    /**
+     * Retrieves Privilege information
+     * @summary Retrieves all Privilege information
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PrivilegeControllerApiInterface
+     */
+    getPrivileges1(options?: any): AxiosPromise<Array<PrivilegeDto>>;
 
 }
 
@@ -139,5 +207,16 @@ export class PrivilegeControllerApi extends BaseAPI implements PrivilegeControll
      */
     public getPrivileges(options?: any) {
         return PrivilegeControllerApiFp(this.configuration).getPrivileges(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves Privilege information
+     * @summary Retrieves all Privilege information
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PrivilegeControllerApi
+     */
+    public getPrivileges1(options?: any) {
+        return PrivilegeControllerApiFp(this.configuration).getPrivileges1(options).then((request) => request(this.axios, this.basePath));
     }
 }

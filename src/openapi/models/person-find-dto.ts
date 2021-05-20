@@ -15,17 +15,33 @@
 
 
 /**
- * 
+ * The information to find a person by
  * @export
- * @interface FlightAllOf
+ * @interface PersonFindDto
  */
-export interface FlightAllOf {
+export interface PersonFindDto {
     /**
      * 
      * @type {string}
-     * @memberof FlightAllOf
+     * @memberof PersonFindDto
      */
-    pas?: string | null;
+    findType: PersonFindDtoFindTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonFindDto
+     */
+    value: string;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum PersonFindDtoFindTypeEnum {
+    Email = 'EMAIL',
+    Dodid = 'DODID'
+}
+
 
 

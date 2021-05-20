@@ -17,15 +17,33 @@
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface PaginationLink
  */
-export interface FlightAllOf {
+export interface PaginationLink {
     /**
      * 
      * @type {string}
-     * @memberof FlightAllOf
+     * @memberof PaginationLink
      */
-    pas?: string | null;
+    next?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginationLink
+     */
+    last?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginationLink
+     */
+    prev?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PaginationLink
+     */
+    first?: string;
 }
 
 

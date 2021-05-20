@@ -13,19 +13,20 @@
  */
 
 
+import { PrivilegeDto } from './privilege-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface PrivilegeDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface PrivilegeDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<PrivilegeDto>}
+     * @memberof PrivilegeDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<PrivilegeDto>;
 }
 
 

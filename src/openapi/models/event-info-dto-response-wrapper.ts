@@ -13,19 +13,20 @@
  */
 
 
+import { EventInfoDto } from './event-info-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface EventInfoDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface EventInfoDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<EventInfoDto>}
+     * @memberof EventInfoDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<EventInfoDto>;
 }
 
 

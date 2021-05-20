@@ -102,6 +102,71 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
+         * Retrieves all stored metric values for given app source
+         * @summary Retrieves all stored metrics values for given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllMetricsForAppSource1: async (id: string, startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getAllMetricsForAppSource1.');
+            }
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getAllMetricsForAppSource1.');
+            }
+            // verify required parameter 'endDate' is not null or undefined
+            if (endDate === null || endDate === undefined) {
+                throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getAllMetricsForAppSource1.');
+            }
+            const localVarPath = `/v2/metrics/appsource/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString() :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString() :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves all stored metric values for given endpoint
          * @summary Retrieves all stored metrics values for given endpoint
          * @param {string} id Endpoint Id to search with
@@ -124,6 +189,71 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
                 throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getAllMetricsForEndpoint.');
             }
             const localVarPath = `/v1/metrics/endpoint/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString() :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString() :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves all stored metric values for given endpoint
+         * @summary Retrieves all stored metrics values for given endpoint
+         * @param {string} id Endpoint Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllMetricsForEndpoint1: async (id: string, startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getAllMetricsForEndpoint1.');
+            }
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getAllMetricsForEndpoint1.');
+            }
+            // verify required parameter 'endDate' is not null or undefined
+            if (endDate === null || endDate === undefined) {
+                throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getAllMetricsForEndpoint1.');
+            }
+            const localVarPath = `/v2/metrics/endpoint/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -241,6 +371,80 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
+         * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
+         * @summary Retrieves sum of stored metric values for given app client name on given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} name App Client Name to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCountOfMetricsForAppClient1: async (id: string, name: string, startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getCountOfMetricsForAppClient1.');
+            }
+            // verify required parameter 'name' is not null or undefined
+            if (name === null || name === undefined) {
+                throw new RequiredError('name','Required parameter name was null or undefined when calling getCountOfMetricsForAppClient1.');
+            }
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getCountOfMetricsForAppClient1.');
+            }
+            // verify required parameter 'endDate' is not null or undefined
+            if (endDate === null || endDate === undefined) {
+                throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getCountOfMetricsForAppClient1.');
+            }
+            const localVarPath = `/v2/metrics/count/{id}/appclient`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString() :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString() :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
          * @summary Retrieves sum of stored metric values for given app source
          * @param {string} id App Source Id to search with
@@ -263,6 +467,71 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
                 throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getCountOfMetricsForAppSource.');
             }
             const localVarPath = `/v1/metrics/count/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString() :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString() :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
+         * @summary Retrieves sum of stored metric values for given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCountOfMetricsForAppSource1: async (id: string, startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getCountOfMetricsForAppSource1.');
+            }
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getCountOfMetricsForAppSource1.');
+            }
+            // verify required parameter 'endDate' is not null or undefined
+            if (endDate === null || endDate === undefined) {
+                throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getCountOfMetricsForAppSource1.');
+            }
+            const localVarPath = `/v2/metrics/count/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -388,6 +657,89 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
+         * @summary Retrieves sum of stored metric values for given endpoint path on given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} path Endpoint Path to search with
+         * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCountOfMetricsForEndpoint1: async (id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getCountOfMetricsForEndpoint1.');
+            }
+            // verify required parameter 'path' is not null or undefined
+            if (path === null || path === undefined) {
+                throw new RequiredError('path','Required parameter path was null or undefined when calling getCountOfMetricsForEndpoint1.');
+            }
+            // verify required parameter 'method' is not null or undefined
+            if (method === null || method === undefined) {
+                throw new RequiredError('method','Required parameter method was null or undefined when calling getCountOfMetricsForEndpoint1.');
+            }
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getCountOfMetricsForEndpoint1.');
+            }
+            // verify required parameter 'endDate' is not null or undefined
+            if (endDate === null || endDate === undefined) {
+                throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getCountOfMetricsForEndpoint1.');
+            }
+            const localVarPath = `/v2/metrics/count/{id}/endpoint`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (path !== undefined) {
+                localVarQueryParameter['path'] = path;
+            }
+
+            if (method !== undefined) {
+                localVarQueryParameter['method'] = method;
+            }
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString() :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString() :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -414,6 +766,22 @@ export const MetricsControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Retrieves all stored metric values for given app source
+         * @summary Retrieves all stored metrics values for given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAllMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceMetricDto>> {
+            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getAllMetricsForAppSource1(id, startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves all stored metric values for given endpoint
          * @summary Retrieves all stored metrics values for given endpoint
          * @param {string} id Endpoint Id to search with
@@ -424,6 +792,22 @@ export const MetricsControllerApiFp = function(configuration?: Configuration) {
          */
         async getAllMetricsForEndpoint(id: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EndpointMetricDto>> {
             const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getAllMetricsForEndpoint(id, startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves all stored metric values for given endpoint
+         * @summary Retrieves all stored metrics values for given endpoint
+         * @param {string} id Endpoint Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAllMetricsForEndpoint1(id: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EndpointMetricDto>> {
+            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getAllMetricsForEndpoint1(id, startDate, endDate, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -447,6 +831,23 @@ export const MetricsControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
+         * @summary Retrieves sum of stored metric values for given app client name on given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} name App Client Name to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCountOfMetricsForAppClient1(id: string, name: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientCountMetricDto>> {
+            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForAppClient1(id, name, startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
          * @summary Retrieves sum of stored metric values for given app source
          * @param {string} id App Source Id to search with
@@ -457,6 +858,22 @@ export const MetricsControllerApiFp = function(configuration?: Configuration) {
          */
         async getCountOfMetricsForAppSource(id: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceCountMetricDto>> {
             const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForAppSource(id, startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
+         * @summary Retrieves sum of stored metric values for given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCountOfMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppSourceCountMetricDto>> {
+            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForAppSource1(id, startDate, endDate, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -475,6 +892,24 @@ export const MetricsControllerApiFp = function(configuration?: Configuration) {
          */
         async getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppEndpointCountMetricDto>> {
             const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForEndpoint(id, path, method, startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
+         * @summary Retrieves sum of stored metric values for given endpoint path on given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} path Endpoint Path to search with
+         * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCountOfMetricsForEndpoint1(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppEndpointCountMetricDto>> {
+            const localVarAxiosArgs = await MetricsControllerApiAxiosParamCreator(configuration).getCountOfMetricsForEndpoint1(id, path, method, startDate, endDate, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -502,6 +937,18 @@ export const MetricsControllerApiFactory = function (configuration?: Configurati
             return MetricsControllerApiFp(configuration).getAllMetricsForAppSource(id, startDate, endDate, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieves all stored metric values for given app source
+         * @summary Retrieves all stored metrics values for given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceMetricDto> {
+            return MetricsControllerApiFp(configuration).getAllMetricsForAppSource1(id, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves all stored metric values for given endpoint
          * @summary Retrieves all stored metrics values for given endpoint
          * @param {string} id Endpoint Id to search with
@@ -512,6 +959,18 @@ export const MetricsControllerApiFactory = function (configuration?: Configurati
          */
         getAllMetricsForEndpoint(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<EndpointMetricDto> {
             return MetricsControllerApiFp(configuration).getAllMetricsForEndpoint(id, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves all stored metric values for given endpoint
+         * @summary Retrieves all stored metrics values for given endpoint
+         * @param {string} id Endpoint Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAllMetricsForEndpoint1(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<EndpointMetricDto> {
+            return MetricsControllerApiFp(configuration).getAllMetricsForEndpoint1(id, startDate, endDate, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
@@ -527,6 +986,19 @@ export const MetricsControllerApiFactory = function (configuration?: Configurati
             return MetricsControllerApiFp(configuration).getCountOfMetricsForAppClient(id, name, startDate, endDate, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
+         * @summary Retrieves sum of stored metric values for given app client name on given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} name App Client Name to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCountOfMetricsForAppClient1(id: string, name: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppClientCountMetricDto> {
+            return MetricsControllerApiFp(configuration).getCountOfMetricsForAppClient1(id, name, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
          * @summary Retrieves sum of stored metric values for given app source
          * @param {string} id App Source Id to search with
@@ -537,6 +1009,18 @@ export const MetricsControllerApiFactory = function (configuration?: Configurati
          */
         getCountOfMetricsForAppSource(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceCountMetricDto> {
             return MetricsControllerApiFp(configuration).getCountOfMetricsForAppSource(id, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
+         * @summary Retrieves sum of stored metric values for given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCountOfMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceCountMetricDto> {
+            return MetricsControllerApiFp(configuration).getCountOfMetricsForAppSource1(id, startDate, endDate, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
@@ -551,6 +1035,20 @@ export const MetricsControllerApiFactory = function (configuration?: Configurati
          */
         getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): AxiosPromise<AppEndpointCountMetricDto> {
             return MetricsControllerApiFp(configuration).getCountOfMetricsForEndpoint(id, path, method, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
+         * @summary Retrieves sum of stored metric values for given endpoint path on given app source
+         * @param {string} id App Source Id to search with
+         * @param {string} path Endpoint Path to search with
+         * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
+         * @param {string} startDate Earliest date to include
+         * @param {string} endDate Latest date to include
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCountOfMetricsForEndpoint1(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): AxiosPromise<AppEndpointCountMetricDto> {
+            return MetricsControllerApiFp(configuration).getCountOfMetricsForEndpoint1(id, path, method, startDate, endDate, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -574,6 +1072,18 @@ export interface MetricsControllerApiInterface {
     getAllMetricsForAppSource(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceMetricDto>;
 
     /**
+     * Retrieves all stored metric values for given app source
+     * @summary Retrieves all stored metrics values for given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApiInterface
+     */
+    getAllMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceMetricDto>;
+
+    /**
      * Retrieves all stored metric values for given endpoint
      * @summary Retrieves all stored metrics values for given endpoint
      * @param {string} id Endpoint Id to search with
@@ -584,6 +1094,18 @@ export interface MetricsControllerApiInterface {
      * @memberof MetricsControllerApiInterface
      */
     getAllMetricsForEndpoint(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<EndpointMetricDto>;
+
+    /**
+     * Retrieves all stored metric values for given endpoint
+     * @summary Retrieves all stored metrics values for given endpoint
+     * @param {string} id Endpoint Id to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApiInterface
+     */
+    getAllMetricsForEndpoint1(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<EndpointMetricDto>;
 
     /**
      * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
@@ -599,6 +1121,19 @@ export interface MetricsControllerApiInterface {
     getCountOfMetricsForAppClient(id: string, name: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppClientCountMetricDto>;
 
     /**
+     * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
+     * @summary Retrieves sum of stored metric values for given app client name on given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} name App Client Name to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApiInterface
+     */
+    getCountOfMetricsForAppClient1(id: string, name: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppClientCountMetricDto>;
+
+    /**
      * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
      * @summary Retrieves sum of stored metric values for given app source
      * @param {string} id App Source Id to search with
@@ -609,6 +1144,18 @@ export interface MetricsControllerApiInterface {
      * @memberof MetricsControllerApiInterface
      */
     getCountOfMetricsForAppSource(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceCountMetricDto>;
+
+    /**
+     * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
+     * @summary Retrieves sum of stored metric values for given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApiInterface
+     */
+    getCountOfMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any): AxiosPromise<AppSourceCountMetricDto>;
 
     /**
      * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
@@ -623,6 +1170,20 @@ export interface MetricsControllerApiInterface {
      * @memberof MetricsControllerApiInterface
      */
     getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): AxiosPromise<AppEndpointCountMetricDto>;
+
+    /**
+     * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
+     * @summary Retrieves sum of stored metric values for given endpoint path on given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} path Endpoint Path to search with
+     * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApiInterface
+     */
+    getCountOfMetricsForEndpoint1(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any): AxiosPromise<AppEndpointCountMetricDto>;
 
 }
 
@@ -648,6 +1209,20 @@ export class MetricsControllerApi extends BaseAPI implements MetricsControllerAp
     }
 
     /**
+     * Retrieves all stored metric values for given app source
+     * @summary Retrieves all stored metrics values for given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApi
+     */
+    public getAllMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any) {
+        return MetricsControllerApiFp(this.configuration).getAllMetricsForAppSource1(id, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Retrieves all stored metric values for given endpoint
      * @summary Retrieves all stored metrics values for given endpoint
      * @param {string} id Endpoint Id to search with
@@ -659,6 +1234,20 @@ export class MetricsControllerApi extends BaseAPI implements MetricsControllerAp
      */
     public getAllMetricsForEndpoint(id: string, startDate: string, endDate: string, options?: any) {
         return MetricsControllerApiFp(this.configuration).getAllMetricsForEndpoint(id, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves all stored metric values for given endpoint
+     * @summary Retrieves all stored metrics values for given endpoint
+     * @param {string} id Endpoint Id to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApi
+     */
+    public getAllMetricsForEndpoint1(id: string, startDate: string, endDate: string, options?: any) {
+        return MetricsControllerApiFp(this.configuration).getAllMetricsForEndpoint1(id, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -677,6 +1266,21 @@ export class MetricsControllerApi extends BaseAPI implements MetricsControllerAp
     }
 
     /**
+     * Retrieves sum of stored metric values for given app client name on given app source for each endpoint
+     * @summary Retrieves sum of stored metric values for given app client name on given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} name App Client Name to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApi
+     */
+    public getCountOfMetricsForAppClient1(id: string, name: string, startDate: string, endDate: string, options?: any) {
+        return MetricsControllerApiFp(this.configuration).getCountOfMetricsForAppClient1(id, name, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
      * @summary Retrieves sum of stored metric values for given app source
      * @param {string} id App Source Id to search with
@@ -688,6 +1292,20 @@ export class MetricsControllerApi extends BaseAPI implements MetricsControllerAp
      */
     public getCountOfMetricsForAppSource(id: string, startDate: string, endDate: string, options?: any) {
         return MetricsControllerApiFp(this.configuration).getCountOfMetricsForAppSource(id, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves sum of stored metric values for given app source for each endppoint and for each app client
+     * @summary Retrieves sum of stored metric values for given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApi
+     */
+    public getCountOfMetricsForAppSource1(id: string, startDate: string, endDate: string, options?: any) {
+        return MetricsControllerApiFp(this.configuration).getCountOfMetricsForAppSource1(id, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -704,5 +1322,21 @@ export class MetricsControllerApi extends BaseAPI implements MetricsControllerAp
      */
     public getCountOfMetricsForEndpoint(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any) {
         return MetricsControllerApiFp(this.configuration).getCountOfMetricsForEndpoint(id, path, method, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves sum of stored metric values for given endpoint path on given app source for each app client
+     * @summary Retrieves sum of stored metric values for given endpoint path on given app source
+     * @param {string} id App Source Id to search with
+     * @param {string} path Endpoint Path to search with
+     * @param {'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE'} method Endpoint Request Method Type
+     * @param {string} startDate Earliest date to include
+     * @param {string} endDate Latest date to include
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsControllerApi
+     */
+    public getCountOfMetricsForEndpoint1(id: string, path: string, method: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'TRACE', startDate: string, endDate: string, options?: any) {
+        return MetricsControllerApiFp(this.configuration).getCountOfMetricsForEndpoint1(id, path, method, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
     }
 }

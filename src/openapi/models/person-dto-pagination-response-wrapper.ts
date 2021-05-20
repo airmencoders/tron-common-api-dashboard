@@ -13,19 +13,27 @@
  */
 
 
+import { Pagination } from './pagination';
+import { PersonDto } from './person-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface PersonDtoPaginationResponseWrapper
  */
-export interface FlightAllOf {
+export interface PersonDtoPaginationResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<PersonDto>}
+     * @memberof PersonDtoPaginationResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<PersonDto>;
+    /**
+     * 
+     * @type {Pagination}
+     * @memberof PersonDtoPaginationResponseWrapper
+     */
+    pagination?: Pagination;
 }
 
 

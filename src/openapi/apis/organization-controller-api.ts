@@ -27,6 +27,10 @@ import { Group } from '../models';
 // @ts-ignore
 import { OrganizationDto } from '../models';
 // @ts-ignore
+import { OrganizationDtoPaginationResponseWrapper } from '../models';
+// @ts-ignore
+import { OrganizationDtoResponseWrapper } from '../models';
+// @ts-ignore
 import { OtherUsaf } from '../models';
 // @ts-ignore
 import { Squadron } from '../models';
@@ -51,6 +55,57 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling addNewOrganizations.');
             }
             const localVarPath = `/v1/organization/organizations`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof organizationDtoFlightGroupOtherUsafSquadronWing !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(organizationDtoFlightGroupOtherUsafSquadronWing !== undefined ? organizationDtoFlightGroupOtherUsafSquadronWing : {})
+                : (organizationDtoFlightGroupOtherUsafSquadronWing || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
+         * @summary Adds one or more organization entities
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addNewOrganizationsWrapped: async (organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationDtoFlightGroupOtherUsafSquadronWing' is not null or undefined
+            if (organizationDtoFlightGroupOtherUsafSquadronWing === null || organizationDtoFlightGroupOtherUsafSquadronWing === undefined) {
+                throw new RequiredError('organizationDtoFlightGroupOtherUsafSquadronWing','Required parameter organizationDtoFlightGroupOtherUsafSquadronWing was null or undefined when calling addNewOrganizationsWrapped.');
+            }
+            const localVarPath = `/v2/organization/organizations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -152,6 +207,68 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Adds member(s) to an organization
+         * @summary Add member(s) to an organization
+         * @param {string} id UUID of the organization record
+         * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addOrganizationMember1: async (id: string, requestBody: Array<string>, primary?: boolean, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addOrganizationMember1.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling addOrganizationMember1.');
+            }
+            const localVarPath = `/v2/organization/{id}/members`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (primary !== undefined) {
+                localVarQueryParameter['primary'] = primary;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Adds subordinate orgs to an organization
          * @summary Add subordinate organizations to an organization
          * @param {string} id UUID of the host organization record
@@ -169,6 +286,63 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling addSubordinateOrganization.');
             }
             const localVarPath = `/v1/organization/{id}/subordinates`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Adds subordinate orgs to an organization
+         * @summary Add subordinate organizations to an organization
+         * @param {string} id UUID of the host organization record
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addSubordinateOrganization1: async (id: string, requestBody: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addSubordinateOrganization1.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling addSubordinateOrganization1.');
+            }
+            const localVarPath = `/v2/organization/{id}/subordinates`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -260,6 +434,57 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Adds an organization
+         * @summary Adds an organization
+         * @param {OrganizationDto} organizationDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createOrganization1: async (organizationDto: OrganizationDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationDto' is not null or undefined
+            if (organizationDto === null || organizationDto === undefined) {
+                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling createOrganization1.');
+            }
+            const localVarPath = `/v2/organization`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof organizationDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
+                : (organizationDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Deletes/clears out the leader position with no one
          * @summary Deletes a leader from an organization
          * @param {string} id Organization ID to delete the leader from
@@ -272,6 +497,49 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrgLeader.');
             }
             const localVarPath = `/v1/organization/{id}/leader`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Deletes/clears out the leader position with no one
+         * @summary Deletes a leader from an organization
+         * @param {string} id Organization ID to delete the leader from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrgLeader1: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrgLeader1.');
+            }
+            const localVarPath = `/v2/organization/{id}/leader`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -346,6 +614,49 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Deletes/clears out the parent org with no org
+         * @summary Deletes a parent from a subordinate organization
+         * @param {string} id Organization ID to delete the parent from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrgParent1: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrgParent1.');
+            }
+            const localVarPath = `/v2/organization/{id}/parent`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Deletes an existing organization
          * @summary Deletes an existing organization
          * @param {string} id Organization ID to delete
@@ -358,6 +669,49 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrganization.');
             }
             const localVarPath = `/v1/organization/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Deletes an existing organization
+         * @summary Deletes an existing organization
+         * @param {string} id Organization ID to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrganization1: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrganization1.');
+            }
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -446,6 +800,63 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Deletes a member(s) from an organization
+         * @summary Deletes a member(s) from the organization
+         * @param {string} id UUID of the organization to modify
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrganizationMember1: async (id: string, requestBody: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteOrganizationMember1.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling deleteOrganizationMember1.');
+            }
+            const localVarPath = `/v2/organization/{id}/members`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves an organization by ID
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
@@ -461,6 +872,64 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getOrganization.');
             }
             const localVarPath = `/v1/organization/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (flatten !== undefined) {
+                localVarQueryParameter['flatten'] = flatten;
+            }
+
+            if (people !== undefined) {
+                localVarQueryParameter['people'] = people;
+            }
+
+            if (organizations !== undefined) {
+                localVarQueryParameter['organizations'] = organizations;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves an organization by ID
+         * @summary Retrieves an organization by ID
+         * @param {string} id Organization ID to retrieve
+         * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+         * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOrganization1: async (id: string, flatten?: boolean, people?: string, organizations?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getOrganization1.');
+            }
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -581,6 +1050,83 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
+         * @summary Retrieves all organizations
+         * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+         * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+         * @param {string} [search] Case insensitive search string for org name
+         * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOrganizationsWrapped: async (type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/organization`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (branch !== undefined) {
+                localVarQueryParameter['branch'] = branch;
+            }
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
+
+            if (people !== undefined) {
+                localVarQueryParameter['people'] = people;
+            }
+
+            if (organizations !== undefined) {
+                localVarQueryParameter['organizations'] = organizations;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Patches an existing organization
          * @summary Patches an existing organization
          * @param {string} id Organization ID to update
@@ -588,14 +1134,71 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchOrganization1: async (id: string, requestBody: { [key: string]: string; }, options: any = {}): Promise<RequestArgs> => {
+        patchOrganization11: async (id: string, requestBody: { [key: string]: string; }, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling patchOrganization1.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling patchOrganization11.');
             }
             // verify required parameter 'requestBody' is not null or undefined
             if (requestBody === null || requestBody === undefined) {
-                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization1.');
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization11.');
+            }
+            const localVarPath = `/v2/organization/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Patches an existing organization
+         * @summary Patches an existing organization
+         * @param {string} id Organization ID to update
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchOrganization2: async (id: string, requestBody: { [key: string]: string; }, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling patchOrganization2.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization2.');
             }
             const localVarPath = `/v1/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -695,6 +1298,63 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Removes subordinate orgs from an organization
+         * @summary Remove subordinate organizations from an organization
+         * @param {string} id UUID of the host organization record
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeSubordinateOrganization1: async (id: string, requestBody: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removeSubordinateOrganization1.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling removeSubordinateOrganization1.');
+            }
+            const localVarPath = `/v2/organization/{id}/subordinates`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Updates an existing organization
          * @summary Updates an existing organization
          * @param {string} id Organization ID to update
@@ -712,6 +1372,63 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
                 throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling updateOrganization.');
             }
             const localVarPath = `/v1/organization/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof organizationDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(organizationDto !== undefined ? organizationDto : {})
+                : (organizationDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates an existing organization
+         * @summary Updates an existing organization
+         * @param {string} id Organization ID to update
+         * @param {OrganizationDto} organizationDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateOrganization1: async (id: string, organizationDto: OrganizationDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling updateOrganization1.');
+            }
+            // verify required parameter 'organizationDto' is not null or undefined
+            if (organizationDto === null || organizationDto === undefined) {
+                throw new RequiredError('organizationDto','Required parameter organizationDto was null or undefined when calling updateOrganization1.');
+            }
+            const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -775,6 +1492,20 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
+         * @summary Adds one or more organization entities
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDtoResponseWrapper>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Adds member(s) to an organization
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
@@ -785,6 +1516,22 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          */
         async addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addOrganizationMember(id, requestBody, primary, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Adds member(s) to an organization
+         * @summary Add member(s) to an organization
+         * @param {string} id UUID of the organization record
+         * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addOrganizationMember1(id: string, requestBody: Array<string>, primary?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addOrganizationMember1(id, requestBody, primary, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -806,6 +1553,21 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Adds subordinate orgs to an organization
+         * @summary Add subordinate organizations to an organization
+         * @param {string} id UUID of the host organization record
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).addSubordinateOrganization1(id, requestBody, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Adds an organization
          * @summary Adds an organization
          * @param {OrganizationDto} organizationDto 
@@ -814,6 +1576,20 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          */
         async createOrganization(organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).createOrganization(organizationDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Adds an organization
+         * @summary Adds an organization
+         * @param {OrganizationDto} organizationDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createOrganization1(organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).createOrganization1(organizationDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -834,6 +1610,20 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Deletes/clears out the leader position with no one
+         * @summary Deletes a leader from an organization
+         * @param {string} id Organization ID to delete the leader from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteOrgLeader1(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrgLeader1(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Deletes/clears out the parent org with no org
          * @summary Deletes a parent from a subordinate organization
          * @param {string} id Organization ID to delete the parent from
@@ -848,6 +1638,20 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Deletes/clears out the parent org with no org
+         * @summary Deletes a parent from a subordinate organization
+         * @param {string} id Organization ID to delete the parent from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteOrgParent1(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrgParent1(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Deletes an existing organization
          * @summary Deletes an existing organization
          * @param {string} id Organization ID to delete
@@ -856,6 +1660,20 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          */
         async deleteOrganization(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrganization(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Deletes an existing organization
+         * @summary Deletes an existing organization
+         * @param {string} id Organization ID to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteOrganization1(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrganization1(id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -877,6 +1695,21 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Deletes a member(s) from an organization
+         * @summary Deletes a member(s) from the organization
+         * @param {string} id UUID of the organization to modify
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteOrganizationMember1(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrganizationMember1(id, requestBody, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves an organization by ID
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
@@ -888,6 +1721,23 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          */
         async getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganization(id, flatten, people, organizations, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves an organization by ID
+         * @summary Retrieves an organization by ID
+         * @param {string} id Organization ID to retrieve
+         * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+         * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getOrganization1(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganization1(id, flatten, people, organizations, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -915,6 +1765,27 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
+         * @summary Retrieves all organizations
+         * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+         * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+         * @param {string} [search] Case insensitive search string for org name
+         * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDtoPaginationResponseWrapper>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Patches an existing organization
          * @summary Patches an existing organization
          * @param {string} id Organization ID to update
@@ -922,8 +1793,23 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchOrganization1(id, requestBody, options);
+        async patchOrganization11(id: string, requestBody: { [key: string]: string; }, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchOrganization11(id, requestBody, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Patches an existing organization
+         * @summary Patches an existing organization
+         * @param {string} id Organization ID to update
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchOrganization2(id: string, requestBody: { [key: string]: string; }, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchOrganization2(id, requestBody, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -945,6 +1831,21 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Removes subordinate orgs from an organization
+         * @summary Remove subordinate organizations from an organization
+         * @param {string} id UUID of the host organization record
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).removeSubordinateOrganization1(id, requestBody, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Updates an existing organization
          * @summary Updates an existing organization
          * @param {string} id Organization ID to update
@@ -954,6 +1855,21 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          */
         async updateOrganization(id: string, organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).updateOrganization(id, organizationDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Updates an existing organization
+         * @summary Updates an existing organization
+         * @param {string} id Organization ID to update
+         * @param {OrganizationDto} organizationDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateOrganization1(id: string, organizationDto: OrganizationDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).updateOrganization1(id, organizationDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -979,6 +1895,16 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
         },
         /**
+         * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
+         * @summary Adds one or more organization entities
+         * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDtoResponseWrapper> {
+            return OrganizationControllerApiFp(configuration).addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Adds member(s) to an organization
          * @summary Add member(s) to an organization
          * @param {string} id UUID of the organization record
@@ -989,6 +1915,18 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          */
         addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void> {
             return OrganizationControllerApiFp(configuration).addOrganizationMember(id, requestBody, primary, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Adds member(s) to an organization
+         * @summary Add member(s) to an organization
+         * @param {string} id UUID of the organization record
+         * @param {Array<string>} requestBody 
+         * @param {boolean} [primary] Whether to make the organization the primary organization for the user
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addOrganizationMember1(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).addOrganizationMember1(id, requestBody, primary, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds subordinate orgs to an organization
@@ -1002,6 +1940,17 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).addSubordinateOrganization(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * Adds subordinate orgs to an organization
+         * @summary Add subordinate organizations to an organization
+         * @param {string} id UUID of the host organization record
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).addSubordinateOrganization1(id, requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Adds an organization
          * @summary Adds an organization
          * @param {OrganizationDto} organizationDto 
@@ -1010,6 +1959,16 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          */
         createOrganization(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
             return OrganizationControllerApiFp(configuration).createOrganization(organizationDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Adds an organization
+         * @summary Adds an organization
+         * @param {OrganizationDto} organizationDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createOrganization1(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).createOrganization1(organizationDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes/clears out the leader position with no one
@@ -1022,6 +1981,16 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).deleteOrgLeader(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * Deletes/clears out the leader position with no one
+         * @summary Deletes a leader from an organization
+         * @param {string} id Organization ID to delete the leader from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrgLeader1(id: string, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).deleteOrgLeader1(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Deletes/clears out the parent org with no org
          * @summary Deletes a parent from a subordinate organization
          * @param {string} id Organization ID to delete the parent from
@@ -1032,6 +2001,16 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).deleteOrgParent(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * Deletes/clears out the parent org with no org
+         * @summary Deletes a parent from a subordinate organization
+         * @param {string} id Organization ID to delete the parent from
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrgParent1(id: string, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).deleteOrgParent1(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Deletes an existing organization
          * @summary Deletes an existing organization
          * @param {string} id Organization ID to delete
@@ -1040,6 +2019,16 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          */
         deleteOrganization(id: string, options?: any): AxiosPromise<void> {
             return OrganizationControllerApiFp(configuration).deleteOrganization(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Deletes an existing organization
+         * @summary Deletes an existing organization
+         * @param {string} id Organization ID to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrganization1(id: string, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).deleteOrganization1(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes a member(s) from an organization
@@ -1053,6 +2042,17 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).deleteOrganizationMember(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * Deletes a member(s) from an organization
+         * @summary Deletes a member(s) from the organization
+         * @param {string} id UUID of the organization to modify
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteOrganizationMember1(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).deleteOrganizationMember1(id, requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves an organization by ID
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
@@ -1064,6 +2064,19 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          */
         getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): AxiosPromise<OrganizationDto> {
             return OrganizationControllerApiFp(configuration).getOrganization(id, flatten, people, organizations, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves an organization by ID
+         * @summary Retrieves an organization by ID
+         * @param {string} id Organization ID to retrieve
+         * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+         * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOrganization1(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).getOrganization1(id, flatten, people, organizations, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
@@ -1083,6 +2096,23 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).getOrganizations(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
+         * @summary Retrieves all organizations
+         * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+         * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+         * @param {string} [search] Case insensitive search string for org name
+         * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+         * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper> {
+            return OrganizationControllerApiFp(configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Patches an existing organization
          * @summary Patches an existing organization
          * @param {string} id Organization ID to update
@@ -1090,8 +2120,19 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).patchOrganization1(id, requestBody, options).then((request) => request(axios, basePath));
+        patchOrganization11(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).patchOrganization11(id, requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Patches an existing organization
+         * @summary Patches an existing organization
+         * @param {string} id Organization ID to update
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchOrganization2(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).patchOrganization2(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * Removes subordinate orgs from an organization
@@ -1105,6 +2146,17 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).removeSubordinateOrganization(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * Removes subordinate orgs from an organization
+         * @summary Remove subordinate organizations from an organization
+         * @param {string} id UUID of the host organization record
+         * @param {Array<string>} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
+            return OrganizationControllerApiFp(configuration).removeSubordinateOrganization1(id, requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Updates an existing organization
          * @summary Updates an existing organization
          * @param {string} id Organization ID to update
@@ -1114,6 +2166,17 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          */
         updateOrganization(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
             return OrganizationControllerApiFp(configuration).updateOrganization(id, organizationDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates an existing organization
+         * @summary Updates an existing organization
+         * @param {string} id Organization ID to update
+         * @param {OrganizationDto} organizationDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateOrganization1(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).updateOrganization1(id, organizationDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1135,6 +2198,16 @@ export interface OrganizationControllerApiInterface {
     addNewOrganizations(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
+     * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
+     * @summary Adds one or more organization entities
+     * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any): AxiosPromise<OrganizationDtoResponseWrapper>;
+
+    /**
      * Adds member(s) to an organization
      * @summary Add member(s) to an organization
      * @param {string} id UUID of the organization record
@@ -1145,6 +2218,18 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void>;
+
+    /**
+     * Adds member(s) to an organization
+     * @summary Add member(s) to an organization
+     * @param {string} id UUID of the organization record
+     * @param {Array<string>} requestBody 
+     * @param {boolean} [primary] Whether to make the organization the primary organization for the user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    addOrganizationMember1(id: string, requestBody: Array<string>, primary?: boolean, options?: any): AxiosPromise<void>;
 
     /**
      * Adds subordinate orgs to an organization
@@ -1158,6 +2243,17 @@ export interface OrganizationControllerApiInterface {
     addSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
 
     /**
+     * Adds subordinate orgs to an organization
+     * @summary Add subordinate organizations to an organization
+     * @param {string} id UUID of the host organization record
+     * @param {Array<string>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    addSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+
+    /**
      * Adds an organization
      * @summary Adds an organization
      * @param {OrganizationDto} organizationDto 
@@ -1166,6 +2262,16 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     createOrganization(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
+     * Adds an organization
+     * @summary Adds an organization
+     * @param {OrganizationDto} organizationDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    createOrganization1(organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Deletes/clears out the leader position with no one
@@ -1178,6 +2284,16 @@ export interface OrganizationControllerApiInterface {
     deleteOrgLeader(id: string, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
+     * Deletes/clears out the leader position with no one
+     * @summary Deletes a leader from an organization
+     * @param {string} id Organization ID to delete the leader from
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    deleteOrgLeader1(id: string, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
      * Deletes/clears out the parent org with no org
      * @summary Deletes a parent from a subordinate organization
      * @param {string} id Organization ID to delete the parent from
@@ -1188,6 +2304,16 @@ export interface OrganizationControllerApiInterface {
     deleteOrgParent(id: string, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
+     * Deletes/clears out the parent org with no org
+     * @summary Deletes a parent from a subordinate organization
+     * @param {string} id Organization ID to delete the parent from
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    deleteOrgParent1(id: string, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
      * Deletes an existing organization
      * @summary Deletes an existing organization
      * @param {string} id Organization ID to delete
@@ -1196,6 +2322,16 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     deleteOrganization(id: string, options?: any): AxiosPromise<void>;
+
+    /**
+     * Deletes an existing organization
+     * @summary Deletes an existing organization
+     * @param {string} id Organization ID to delete
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    deleteOrganization1(id: string, options?: any): AxiosPromise<void>;
 
     /**
      * Deletes a member(s) from an organization
@@ -1209,6 +2345,17 @@ export interface OrganizationControllerApiInterface {
     deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
 
     /**
+     * Deletes a member(s) from an organization
+     * @summary Deletes a member(s) from the organization
+     * @param {string} id UUID of the organization to modify
+     * @param {Array<string>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    deleteOrganizationMember1(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+
+    /**
      * Retrieves an organization by ID
      * @summary Retrieves an organization by ID
      * @param {string} id Organization ID to retrieve
@@ -1220,6 +2367,19 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
+     * Retrieves an organization by ID
+     * @summary Retrieves an organization by ID
+     * @param {string} id Organization ID to retrieve
+     * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+     * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    getOrganization1(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
@@ -1239,6 +2399,23 @@ export interface OrganizationControllerApiInterface {
     getOrganizations(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<OrganizationDto>>;
 
     /**
+     * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
+     * @summary Retrieves all organizations
+     * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+     * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+     * @param {string} [search] Case insensitive search string for org name
+     * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper>;
+
+    /**
      * Patches an existing organization
      * @summary Patches an existing organization
      * @param {string} id Organization ID to update
@@ -1247,7 +2424,18 @@ export interface OrganizationControllerApiInterface {
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto>;
+    patchOrganization11(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
+     * Patches an existing organization
+     * @summary Patches an existing organization
+     * @param {string} id Organization ID to update
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    patchOrganization2(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Removes subordinate orgs from an organization
@@ -1261,6 +2449,17 @@ export interface OrganizationControllerApiInterface {
     removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
 
     /**
+     * Removes subordinate orgs from an organization
+     * @summary Remove subordinate organizations from an organization
+     * @param {string} id UUID of the host organization record
+     * @param {Array<string>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    removeSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+
+    /**
      * Updates an existing organization
      * @summary Updates an existing organization
      * @param {string} id Organization ID to update
@@ -1270,6 +2469,17 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     updateOrganization(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
+
+    /**
+     * Updates an existing organization
+     * @summary Updates an existing organization
+     * @param {string} id Organization ID to update
+     * @param {OrganizationDto} organizationDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    updateOrganization1(id: string, organizationDto: OrganizationDto, options?: any): AxiosPromise<OrganizationDto>;
 
 }
 
@@ -1293,6 +2503,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.
+     * @summary Adds one or more organization entities
+     * @param {Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>} organizationDtoFlightGroupOtherUsafSquadronWing 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing: Array<OrganizationDto | Flight | Group | OtherUsaf | Squadron | Wing>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addNewOrganizationsWrapped(organizationDtoFlightGroupOtherUsafSquadronWing, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Adds member(s) to an organization
      * @summary Add member(s) to an organization
      * @param {string} id UUID of the organization record
@@ -1304,6 +2526,20 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public addOrganizationMember(id: string, requestBody: Array<string>, primary?: boolean, options?: any) {
         return OrganizationControllerApiFp(this.configuration).addOrganizationMember(id, requestBody, primary, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Adds member(s) to an organization
+     * @summary Add member(s) to an organization
+     * @param {string} id UUID of the organization record
+     * @param {Array<string>} requestBody 
+     * @param {boolean} [primary] Whether to make the organization the primary organization for the user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public addOrganizationMember1(id: string, requestBody: Array<string>, primary?: boolean, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addOrganizationMember1(id, requestBody, primary, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1320,6 +2556,19 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Adds subordinate orgs to an organization
+     * @summary Add subordinate organizations to an organization
+     * @param {string} id UUID of the host organization record
+     * @param {Array<string>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public addSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).addSubordinateOrganization1(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Adds an organization
      * @summary Adds an organization
      * @param {OrganizationDto} organizationDto 
@@ -1329,6 +2578,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public createOrganization(organizationDto: OrganizationDto, options?: any) {
         return OrganizationControllerApiFp(this.configuration).createOrganization(organizationDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Adds an organization
+     * @summary Adds an organization
+     * @param {OrganizationDto} organizationDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public createOrganization1(organizationDto: OrganizationDto, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).createOrganization1(organizationDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1344,6 +2605,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Deletes/clears out the leader position with no one
+     * @summary Deletes a leader from an organization
+     * @param {string} id Organization ID to delete the leader from
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public deleteOrgLeader1(id: string, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).deleteOrgLeader1(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Deletes/clears out the parent org with no org
      * @summary Deletes a parent from a subordinate organization
      * @param {string} id Organization ID to delete the parent from
@@ -1356,6 +2629,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Deletes/clears out the parent org with no org
+     * @summary Deletes a parent from a subordinate organization
+     * @param {string} id Organization ID to delete the parent from
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public deleteOrgParent1(id: string, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).deleteOrgParent1(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Deletes an existing organization
      * @summary Deletes an existing organization
      * @param {string} id Organization ID to delete
@@ -1365,6 +2650,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public deleteOrganization(id: string, options?: any) {
         return OrganizationControllerApiFp(this.configuration).deleteOrganization(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Deletes an existing organization
+     * @summary Deletes an existing organization
+     * @param {string} id Organization ID to delete
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public deleteOrganization1(id: string, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).deleteOrganization1(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1381,6 +2678,19 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Deletes a member(s) from an organization
+     * @summary Deletes a member(s) from the organization
+     * @param {string} id UUID of the organization to modify
+     * @param {Array<string>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public deleteOrganizationMember1(id: string, requestBody: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).deleteOrganizationMember1(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Retrieves an organization by ID
      * @summary Retrieves an organization by ID
      * @param {string} id Organization ID to retrieve
@@ -1393,6 +2703,21 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public getOrganization(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any) {
         return OrganizationControllerApiFp(this.configuration).getOrganization(id, flatten, people, organizations, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves an organization by ID
+     * @summary Retrieves an organization by ID
+     * @param {string} id Organization ID to retrieve
+     * @param {boolean} [flatten] Whether to flatten out all attached members and organizations contained therein
+     * @param {string} [people] Comma-separated string list of fields to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list of fields to include in Organizational type sub-fields. Example: organizations&#x3D;id,name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public getOrganization1(id: string, flatten?: boolean, people?: string, organizations?: string, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).getOrganization1(id, flatten, people, organizations, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1415,6 +2740,25 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Retrieves all organizations.  Optionally can provide \'type\' parameter (e.g. \'WING\') to filter by Organization type and/or \'branch\' parameter to filter by branch of service (e.g \'USAF\'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide \'search\' parameter to search on organization names within the result set (case in-sensitive).
+     * @summary Retrieves all organizations
+     * @param {'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION'} [type] Unit type to filter on
+     * @param {'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG'} [branch] Branch type to filter on
+     * @param {string} [search] Case insensitive search string for org name
+     * @param {string} [people] Comma-separated string list to include in Person type sub-fields. Example: people&#x3D;id,firstName,lastName
+     * @param {string} [organizations] Comma-separated string list to include in Organization type sub-fields. Example: organizations&#x3D;id,name
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Patches an existing organization
      * @summary Patches an existing organization
      * @param {string} id Organization ID to update
@@ -1423,8 +2767,21 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).patchOrganization1(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    public patchOrganization11(id: string, requestBody: { [key: string]: string; }, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).patchOrganization11(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Patches an existing organization
+     * @summary Patches an existing organization
+     * @param {string} id Organization ID to update
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public patchOrganization2(id: string, requestBody: { [key: string]: string; }, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).patchOrganization2(id, requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1441,6 +2798,19 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
+     * Removes subordinate orgs from an organization
+     * @summary Remove subordinate organizations from an organization
+     * @param {string} id UUID of the host organization record
+     * @param {Array<string>} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public removeSubordinateOrganization1(id: string, requestBody: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).removeSubordinateOrganization1(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Updates an existing organization
      * @summary Updates an existing organization
      * @param {string} id Organization ID to update
@@ -1451,5 +2821,18 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public updateOrganization(id: string, organizationDto: OrganizationDto, options?: any) {
         return OrganizationControllerApiFp(this.configuration).updateOrganization(id, organizationDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates an existing organization
+     * @summary Updates an existing organization
+     * @param {string} id Organization ID to update
+     * @param {OrganizationDto} organizationDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public updateOrganization1(id: string, organizationDto: OrganizationDto, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).updateOrganization1(id, organizationDto, options).then((request) => request(this.axios, this.basePath));
     }
 }

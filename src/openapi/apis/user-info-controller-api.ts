@@ -65,6 +65,43 @@ export const UserInfoControllerApiAxiosParamCreator = function (configuration?: 
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Retrieves user information
+         * @summary Retrieves the user information from the jwt
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserInfo1: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/userinfo`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -82,6 +119,19 @@ export const UserInfoControllerApiFp = function(configuration?: Configuration) {
          */
         async getUserInfo(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserInfoDto>> {
             const localVarAxiosArgs = await UserInfoControllerApiAxiosParamCreator(configuration).getUserInfo(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves user information
+         * @summary Retrieves the user information from the jwt
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserInfo1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserInfoDto>> {
+            const localVarAxiosArgs = await UserInfoControllerApiAxiosParamCreator(configuration).getUserInfo1(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -105,6 +155,15 @@ export const UserInfoControllerApiFactory = function (configuration?: Configurat
         getUserInfo(options?: any): AxiosPromise<UserInfoDto> {
             return UserInfoControllerApiFp(configuration).getUserInfo(options).then((request) => request(axios, basePath));
         },
+        /**
+         * Retrieves user information
+         * @summary Retrieves the user information from the jwt
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserInfo1(options?: any): AxiosPromise<UserInfoDto> {
+            return UserInfoControllerApiFp(configuration).getUserInfo1(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -122,6 +181,15 @@ export interface UserInfoControllerApiInterface {
      * @memberof UserInfoControllerApiInterface
      */
     getUserInfo(options?: any): AxiosPromise<UserInfoDto>;
+
+    /**
+     * Retrieves user information
+     * @summary Retrieves the user information from the jwt
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserInfoControllerApiInterface
+     */
+    getUserInfo1(options?: any): AxiosPromise<UserInfoDto>;
 
 }
 
@@ -141,5 +209,16 @@ export class UserInfoControllerApi extends BaseAPI implements UserInfoController
      */
     public getUserInfo(options?: any) {
         return UserInfoControllerApiFp(this.configuration).getUserInfo(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves user information
+     * @summary Retrieves the user information from the jwt
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserInfoControllerApi
+     */
+    public getUserInfo1(options?: any) {
+        return UserInfoControllerApiFp(this.configuration).getUserInfo1(options).then((request) => request(this.axios, this.basePath));
     }
 }

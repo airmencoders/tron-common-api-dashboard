@@ -31,25 +31,25 @@ export interface PersonDto {
      * @type {string}
      * @memberof PersonDto
      */
-    firstName?: string;
+    firstName?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    middleName?: string;
+    middleName?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    lastName?: string;
+    lastName?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    title?: string;
+    title?: string | null;
     /**
      * 
      * @type {string}
@@ -61,7 +61,7 @@ export interface PersonDto {
      * @type {string}
      * @memberof PersonDto
      */
-    dodid?: string;
+    dodid?: string | null;
     /**
      * 
      * @type {string}
@@ -79,31 +79,31 @@ export interface PersonDto {
      * @type {string}
      * @memberof PersonDto
      */
-    phone?: string;
+    phone?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    address?: string;
+    address?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    dutyPhone?: string;
+    dutyPhone?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    dutyTitle?: string;
+    dutyTitle?: string | null;
     /**
      * 
      * @type {string}
      * @memberof PersonDto
      */
-    primaryOrganizationId?: string;
+    primaryOrganizationId?: string | null;
     /**
      * 
      * @type {Set<string>}

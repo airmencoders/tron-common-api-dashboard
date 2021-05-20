@@ -13,19 +13,20 @@
  */
 
 
+import { AppClientUserDto } from './app-client-user-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface AppClientUserDtoResponseWrapped
  */
-export interface FlightAllOf {
+export interface AppClientUserDtoResponseWrapped {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<AppClientUserDto>}
+     * @memberof AppClientUserDtoResponseWrapped
      */
-    pas?: string | null;
+    data?: Array<AppClientUserDto>;
 }
 
 

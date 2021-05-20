@@ -13,19 +13,20 @@
  */
 
 
+import { PubSubLedgerEntryDto } from './pub-sub-ledger-entry-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface PubSubLedgerEntryDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface PubSubLedgerEntryDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<PubSubLedgerEntryDto>}
+     * @memberof PubSubLedgerEntryDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<PubSubLedgerEntryDto>;
 }
 
 

@@ -13,19 +13,20 @@
  */
 
 
+import { PersonDto } from './person-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface PersonDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface PersonDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<PersonDto>}
+     * @memberof PersonDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<PersonDto>;
 }
 
 

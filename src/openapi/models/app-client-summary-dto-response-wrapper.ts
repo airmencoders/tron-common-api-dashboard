@@ -13,19 +13,20 @@
  */
 
 
+import { AppClientSummaryDto } from './app-client-summary-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface AppClientSummaryDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface AppClientSummaryDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<AppClientSummaryDto>}
+     * @memberof AppClientSummaryDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<AppClientSummaryDto>;
 }
 
 

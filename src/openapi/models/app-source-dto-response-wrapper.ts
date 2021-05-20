@@ -13,19 +13,20 @@
  */
 
 
+import { AppSourceDto } from './app-source-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface AppSourceDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface AppSourceDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<AppSourceDto>}
+     * @memberof AppSourceDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<AppSourceDto>;
 }
 
 

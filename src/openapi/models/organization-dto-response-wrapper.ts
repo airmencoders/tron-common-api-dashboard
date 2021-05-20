@@ -13,19 +13,20 @@
  */
 
 
+import { OrganizationDto } from './organization-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface OrganizationDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface OrganizationDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<OrganizationDto>}
+     * @memberof OrganizationDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<OrganizationDto>;
 }
 
 

@@ -13,19 +13,20 @@
  */
 
 
+import { SubscriberDto } from './subscriber-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface SubscriberDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface SubscriberDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<SubscriberDto>}
+     * @memberof SubscriberDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<SubscriberDto>;
 }
 
 

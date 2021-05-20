@@ -13,19 +13,20 @@
  */
 
 
+import { DashboardUserDto } from './dashboard-user-dto';
 
 /**
  * 
  * @export
- * @interface FlightAllOf
+ * @interface DashboardUserDtoResponseWrapper
  */
-export interface FlightAllOf {
+export interface DashboardUserDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof FlightAllOf
+     * @type {Array<DashboardUserDto>}
+     * @memberof DashboardUserDtoResponseWrapper
      */
-    pas?: string | null;
+    data?: Array<DashboardUserDto>;
 }
 
 
