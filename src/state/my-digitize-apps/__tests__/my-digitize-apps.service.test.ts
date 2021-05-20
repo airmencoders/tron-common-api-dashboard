@@ -1,21 +1,18 @@
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AxiosResponse } from 'axios';
+import {createState, State, StateMethodsDestroy} from '@hookstate/core';
+import {AxiosResponse} from 'axios';
 import {
   DashboardUserControllerApi,
   DashboardUserDto,
-  OrganizationDto,
   ScratchStorageAppRegistryDto,
   ScratchStorageControllerApi,
   ScratchStorageControllerApiInterface
 } from '../../../openapi';
 import MyDigitizeAppsService from '../my-digitize-apps-service';
-import { ScratchStorageAppFlat } from '../scratch-storage-app-flat';
-import { wrapDigitizeAppsState } from '../my-digitize-apps-state';
-import { PrivilegeType } from '../../privilege/privilege-type';
-import { accessAuthorizedUserState } from '../../authorized-user/authorized-user-state';
+import {ScratchStorageAppFlat} from '../scratch-storage-app-flat';
+import {wrapDigitizeAppsState} from '../my-digitize-apps-state';
+import {PrivilegeType} from '../../privilege/privilege-type';
+import {accessAuthorizedUserState} from '../../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../../authorized-user/authorized-user-service';
-import OrganizationService from '../../organization/organization-service';
-import {OrganizationDtoWithDetails} from '../../organization/organization-state';
 
 jest.mock('../../authorized-user/authorized-user-state');
 
