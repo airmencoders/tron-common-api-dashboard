@@ -51,16 +51,17 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
   Validation(formState.dutyPhone).validate(validPhone, validPhoneError, 'error');
 
   const isFormModified = (): boolean => {
-    return Initial(formState.address).modified() ||
-        Initial(formState.branch).modified() ||
-        Initial(formState.dutyPhone).modified() ||
-        Initial(formState.dutyTitle).modified() ||
-        Initial(formState.firstName).modified() ||
-        Initial(formState.lastName).modified() ||
-        Initial(formState.middleName).modified() ||
-        Initial(formState.phone).modified() ||
-        Initial(formState.rank).modified() ||
-        Initial(formState.title).modified(); 
+    return props.editorState.original && (props.editorState.get().currentUserState.get().address !== props.editorState.get().original?.address
+        || props.editorState.get().currentUserState.get().branch !== props.editorState.get().original?.branch
+        || props.editorState.get().currentUserState.get().dutyPhone !== props.editorState.get().original?.dutyPhone
+        || props.editorState.get().currentUserState.get().dutyTitle !== props.editorState.get().original?.dutyTitle
+        || props.editorState.get().currentUserState.get().firstName !== props.editorState.get().original?.firstName
+        || props.editorState.get().currentUserState.get().lastName !== props.editorState.get().original?.lastName
+        || props.editorState.get().currentUserState.get().middleName !== props.editorState.get().original?.middleName
+        || props.editorState.get().currentUserState.get().phone !== props.editorState.get().original?.phone
+        || props.editorState.get().currentUserState.get().rank !== props.editorState.get().original?.rank
+        || props.editorState.get().currentUserState.get().title !== props.editorState.get().original?.title
+    );
   }
 
   useEffect(() => {

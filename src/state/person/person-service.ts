@@ -58,7 +58,7 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
-      const personResponse = await this.personApi.updatePerson(toUpdate.id, toUpdate);
+      const personResponse = await this.personApi.selfUpdatePerson(toUpdate.id, toUpdate);
       this.state.set(currentState => {
         const currentPersonIndex = currentState.findIndex(person => person.id === personResponse.data.id);
         currentState[currentPersonIndex] = personResponse.data;

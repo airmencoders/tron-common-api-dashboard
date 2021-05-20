@@ -1,4 +1,4 @@
-import { State, useHookstate } from '@hookstate/core';
+import { Downgraded, State, useHookstate } from '@hookstate/core';
 import React, {useEffect, useMemo} from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { PersonDto } from '../../openapi';
@@ -17,6 +17,7 @@ export interface UserEditorState {
   currentUserState: State<PersonDto>;
   errorMessage: string;
   disableSubmit: boolean
+  original?: PersonDto;
 }
 
 function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
@@ -36,7 +37,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
     isOpen: false,
     currentUserState: personState.currentUserState,
     errorMessage: '',
-    disableSubmit: false
+    disableSubmit: false,
   });
 
   async function userEditorSubmitModal() {
@@ -50,13 +51,25 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
   }
 
   function userEditorCloseHandler() {
-    personState.getPersonByEmail(userInfo?.dodId || '')
+    personState.getPersonByEmail(userInfo?.email || '')
     userEditorState.merge({
       isOpen: false,
       currentUserState: personState.currentUserState,
       errorMessage: '',
-      disableSubmit: false
+      disableSubmit: false,
     })
+  }
+
+  function onHeaderClick() {
+    refreshCurrentUser();
+    userEditorState.merge({
+      isOpen: true,
+      original: personState.currentUserState.attach(Downgraded).get()
+    });
+  }
+
+  function refreshCurrentUser() {
+    personState.getPersonByEmail(userInfo?.email || '');
   }
 
   return (
@@ -85,7 +98,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
             { personState.currentUserState.email.get() &&
               <div>
                 <Dropdown.Divider/>
-                <a className="d-flex justify-content-center header-user-info__edit" href="#" onClick={() => userEditorState.isOpen.set(true) }>Edit Person Record</a>
+                <a className="d-flex justify-content-center header-user-info__edit" href="#" onClick={onHeaderClick}>Edit Person Record</a>
               </div>
             }
         </Dropdown.Menu>

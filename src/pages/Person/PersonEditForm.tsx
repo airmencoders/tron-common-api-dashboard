@@ -128,7 +128,12 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
             />
           </FormGroup>
           <FormGroup labelName="middleName" labelText="Middle Name">
-            <TextInput id="middleName" name="middleName" type="text" />
+            <TextInput id="middleName" name="middleName" type="text"
+                       value={formState?.middleName.get() || ''}
+                       error={Touched(formState.middleName).touched() && Validation(formState.middleName).invalid()}
+                       onChange={(event) => formState.middleName.set(event.target.value)}
+                       disabled={isFormDisabled()}
+            />
           </FormGroup>
           <FormGroup labelName="lastName" labelText="Last Name"
                      isError={Touched(formState.lastName).touched() && Validation(formState.lastName).invalid()}
