@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, AppClientUserDtoResponseWrapped, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto, AppSourceDtoResponseWrapper, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, AppClientUserDtoResponseWrapped, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto, AppSourceDtoResponseWrapper, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { AppClientFlat } from '../../app-clients/app-client-flat';
 import AppClientsService from '../../app-clients/app-clients-service';
 import { accessAppClientsState } from '../../app-clients/app-clients-state';
@@ -117,9 +117,9 @@ describe('App Source State Tests', () => {
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},

@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, DashboardUserDto, DashboardUserDtoResponseWrapper, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, DashboardUserDto, DashboardUserDtoResponseWrapper, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import Config from '../../../api/configuration';
 import PrivilegeService from '../../privilege/privilege-service';
@@ -135,9 +135,9 @@ describe('Dashboard User State Test', () => {
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},
@@ -327,9 +327,9 @@ describe('Dashboard User State Test', () => {
   });
 
   it('Test Privilege not exist in state', async () => {
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: [],
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: [] },
         status: 200,
         headers: {},
         config: {},

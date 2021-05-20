@@ -13,9 +13,9 @@
  */
 
 
-import { ResourceAlreadyExistsExceptionCause } from './resource-already-exists-exception-cause';
-import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
-import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-already-exists-exception-cause-suppressed';
+import { BadRequestExceptionCause } from './bad-request-exception-cause';
+import { BadRequestExceptionCauseStackTrace } from './bad-request-exception-cause-stack-trace';
+import { BadRequestExceptionCauseSuppressed } from './bad-request-exception-cause-suppressed';
 
 /**
  * 
@@ -25,16 +25,16 @@ import { ResourceAlreadyExistsExceptionCauseSuppressed } from './resource-alread
 export interface InvalidScratchSpacePermissions {
     /**
      * 
-     * @type {ResourceAlreadyExistsExceptionCause}
+     * @type {BadRequestExceptionCause}
      * @memberof InvalidScratchSpacePermissions
      */
-    cause?: ResourceAlreadyExistsExceptionCause;
+    cause?: BadRequestExceptionCause;
     /**
      * 
-     * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
+     * @type {Array<BadRequestExceptionCauseStackTrace>}
      * @memberof InvalidScratchSpacePermissions
      */
-    stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
+    stackTrace?: Array<BadRequestExceptionCauseStackTrace>;
     /**
      * 
      * @type {string}
@@ -43,10 +43,10 @@ export interface InvalidScratchSpacePermissions {
     message?: string;
     /**
      * 
-     * @type {Array<ResourceAlreadyExistsExceptionCauseSuppressed>}
+     * @type {Array<BadRequestExceptionCauseSuppressed>}
      * @memberof InvalidScratchSpacePermissions
      */
-    suppressed?: Array<ResourceAlreadyExistsExceptionCauseSuppressed>;
+    suppressed?: Array<BadRequestExceptionCauseSuppressed>;
     /**
      * 
      * @type {string}

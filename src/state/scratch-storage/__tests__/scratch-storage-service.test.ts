@@ -1,7 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
+import { PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import PrivilegeService from '../../privilege/privilege-service';
 import { ScratchStorageFlat } from '../scratch-storage-flat';
@@ -191,9 +191,9 @@ describe('scratch storage service tests', () => {
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},

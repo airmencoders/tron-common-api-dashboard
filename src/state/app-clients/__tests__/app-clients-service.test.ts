@@ -162,9 +162,9 @@ describe('App Client State Tests', () => {
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},

@@ -78,6 +78,15 @@ class MockOrgApi extends OrganizationControllerApi {
     return {} as Promise<AxiosResponse<void>>;
   }
 
+  deleteOrganization(id: string, options?: any): Promise<AxiosResponse<void>> {
+    return Promise.resolve({
+      data: undefined,
+      status: 200,
+      statusText: 'OK',
+      config: {},
+      headers: {}
+    });
+  }
 }
 
 describe('Test OrganizationService', () => {
@@ -197,7 +206,7 @@ describe('Test OrganizationService', () => {
         new MockOrgApi());
 
     const response = await organizationService.sendDelete({ id: 'some id', name: 'some org' });
-    expect(response).toBeTruthy();
+    expect(response).toBe(undefined);
   });
 
 });

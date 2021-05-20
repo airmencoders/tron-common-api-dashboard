@@ -19,7 +19,7 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { PrivilegeDto } from '../models';
+import { PrivilegeDtoResponseWrapper } from '../models';
 /**
  * PrivilegeControllerApi - axios parameter creator
  * @export
@@ -32,7 +32,7 @@ export const PrivilegeControllerApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrivileges: async (options: any = {}): Promise<RequestArgs> => {
+        getPrivilegesWrapped: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v2/privilege`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -78,8 +78,8 @@ export const PrivilegeControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPrivileges(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
-            const localVarAxiosArgs = await PrivilegeControllerApiAxiosParamCreator(configuration).getPrivileges(options);
+        async getPrivilegesWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrivilegeDtoResponseWrapper>> {
+            const localVarAxiosArgs = await PrivilegeControllerApiAxiosParamCreator(configuration).getPrivilegesWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -100,8 +100,8 @@ export const PrivilegeControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrivileges(options?: any): AxiosPromise<Array<PrivilegeDto>> {
-            return PrivilegeControllerApiFp(configuration).getPrivileges(options).then((request) => request(axios, basePath));
+        getPrivilegesWrapped(options?: any): AxiosPromise<PrivilegeDtoResponseWrapper> {
+            return PrivilegeControllerApiFp(configuration).getPrivilegesWrapped(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -119,7 +119,7 @@ export interface PrivilegeControllerApiInterface {
      * @throws {RequiredError}
      * @memberof PrivilegeControllerApiInterface
      */
-    getPrivileges(options?: any): AxiosPromise<Array<PrivilegeDto>>;
+    getPrivilegesWrapped(options?: any): AxiosPromise<PrivilegeDtoResponseWrapper>;
 
 }
 
@@ -137,7 +137,7 @@ export class PrivilegeControllerApi extends BaseAPI implements PrivilegeControll
      * @throws {RequiredError}
      * @memberof PrivilegeControllerApi
      */
-    public getPrivileges(options?: any) {
-        return PrivilegeControllerApiFp(this.configuration).getPrivileges(options).then((request) => request(this.axios, this.basePath));
+    public getPrivilegesWrapped(options?: any) {
+        return PrivilegeControllerApiFp(this.configuration).getPrivilegesWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 }
