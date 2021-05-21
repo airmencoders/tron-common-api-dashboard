@@ -24,6 +24,7 @@ import { OrgEditOpType } from '../../state/organization/organization-service';
 import { useOrganizationState } from '../../state/organization/organization-state';
 import { usePersonState } from '../../state/person/person-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
+import { validateRequiredString, validationErrors } from '../../utils/validation-utils';
 
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
@@ -48,9 +49,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   formState.attach(Initial);
   formState.attach(Touched);
 
-  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
-  const requiredError = 'cannot be empty or blank';
-  Validation(formState.name).validate(requiredText, requiredError, 'error');
+  Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
 
   const isFormModified = (): boolean => {
     const stateKeys = formState.keys;

@@ -19,7 +19,7 @@ import { AppClientFlat } from "../../state/app-clients/app-client-flat";
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { validateEmail } from '../../utils/validation-utils';
+import { validateEmail, validateRequiredString, validationErrors } from '../../utils/validation-utils';
 
 interface DeveloperEmail {
   email: string;
@@ -47,13 +47,13 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   developerAddState.attach(Initial);
   developerAddState.attach(Touched);
 
-  Validation(developerAddState.email).validate(email => validateEmail(email), 'enter valid email', 'error');
+  Validation(developerAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
-  Validation(formState.name).validate(name => name !== undefined && name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
+  Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
 
   function isFormModified() {
     return Initial(formState.name).modified() 

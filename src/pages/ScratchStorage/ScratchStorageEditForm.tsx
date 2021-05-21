@@ -23,6 +23,7 @@ import Modal from '../../components/Modal/Modal';
 import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
+import { validateRequiredString, validationErrors } from '../../utils/validation-utils';
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -67,10 +68,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     isOpen: false,
   });
 
-  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0
-  const requiredError = 'cannot be empty or blank';
-  Validation(formState.appName).validate(requiredText, requiredError, 'error');
-
+  Validation(formState.appName).validate(validateRequiredString, validationErrors.requiredText, 'error');
 
   const isFormModified = (): boolean => {
     return Initial(formState.appName).modified() ||

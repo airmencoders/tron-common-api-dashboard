@@ -5,6 +5,7 @@ import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-flat';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import { validationErrors } from '../../../utils/validation-utils';
 
 describe('Test Dashboard User Form', () => {
   let onSubmit = jest.fn();
@@ -114,7 +115,7 @@ describe('Test Dashboard User Form', () => {
     const emailInput = pageRender.getByDisplayValue(data.email);
     fireEvent.change(emailInput, { target: { value: 'test' } });
     expect(emailInput).toHaveValue('test');
-    expect(pageRender.getByText('* Enter a valid email'));
+    expect(pageRender.getByText(new RegExp(validationErrors.invalidEmail)));
 
 
     const adminCheckbox = pageRender.getByLabelText('Dashboard Admin');
@@ -125,7 +126,7 @@ describe('Test Dashboard User Form', () => {
     fireEvent.click(userCheckbox);
     expect(userCheckbox).not.toBeChecked();
 
-    expect(pageRender.getByText('* A permission must be set'));
+    expect(pageRender.getByText(new RegExp(validationErrors.atLeastOnePrivilege)));
   });
 
   it('Success message', () => {

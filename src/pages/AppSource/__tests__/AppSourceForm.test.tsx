@@ -5,6 +5,7 @@ import AppSourceForm from '../AppSourceForm';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { AppSourceDetailsDto } from '../../../openapi';
+import { validationErrors } from '../../../utils/validation-utils';
 
 describe('Test App Source Form', () => {
   jest.setTimeout(10000);
@@ -75,7 +76,7 @@ describe('Test App Source Form', () => {
 
     fireEvent.change(nameInput, { target: { value: '' } });
     expect(nameInput).toHaveValue('');
-    expect(page.getByText(/cannot be empty or blank/i));
+    expect(page.getByText(new RegExp(validationErrors.requiredText)));
 
     fireEvent.change(nameInput, { target: { value: 'Test 2' } });
     expect(nameInput).toHaveValue('Test 2');
@@ -85,7 +86,7 @@ describe('Test App Source Form', () => {
 
     fireEvent.change(adminEmailInput, { target: { value: 'bad_email' } });
     expect(adminEmailInput).toHaveValue('bad_email');
-    expect(page.getByText(/enter valid email/i));
+    expect(page.getByText(new RegExp(validationErrors.invalidEmail)));
 
     const adminEmailTest = 'email@test.com';
     fireEvent.change(adminEmailInput, { target: { value: adminEmailTest } });

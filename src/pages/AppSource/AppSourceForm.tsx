@@ -20,7 +20,7 @@ import ModalTitle from '../../components/Modal/ModalTitle';
 import UnusedEndpointCellRenderer from '../../components/UnusedEndpointCellRenderer/UnusedEndpointCellRenderer';
 import { AppEndpointDto, AppSourceDetailsDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { validateEmail } from '../../utils/validation-utils';
+import { validateEmail, validateRequiredString, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
 
@@ -68,13 +68,13 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   adminAddState.attach(Initial);
   adminAddState.attach(Touched);
 
-  Validation(adminAddState.email).validate(email => validateEmail(email), 'enter valid email', 'error');
+  Validation(adminAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
-  Validation(formState.name).validate(name => name.length > 0 && name.trim().length > 0, 'cannot be empty or blank.', 'error');
+  Validation(formState.name).validate(name => (validateRequiredString(name)), validationErrors.requiredText, 'error');
 
   function isFormModified() {
     return Initial(formState.appSourceAdminUserEmails).modified() ||
