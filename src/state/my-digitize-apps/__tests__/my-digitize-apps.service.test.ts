@@ -1,11 +1,17 @@
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AxiosResponse } from 'axios';
-import { DashboardUserControllerApi, DashboardUserDto, ScratchStorageAppRegistryDto, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
+import {createState, State, StateMethodsDestroy} from '@hookstate/core';
+import {AxiosResponse} from 'axios';
+import {
+  DashboardUserControllerApi,
+  DashboardUserDto,
+  ScratchStorageAppRegistryDto,
+  ScratchStorageControllerApi,
+  ScratchStorageControllerApiInterface
+} from '../../../openapi';
 import MyDigitizeAppsService from '../my-digitize-apps-service';
-import { ScratchStorageAppFlat } from '../scratch-storage-app-flat';
-import { wrapDigitizeAppsState } from '../my-digitize-apps-state';
-import { PrivilegeType } from '../../privilege/privilege-type';
-import { accessAuthorizedUserState } from '../../authorized-user/authorized-user-state';
+import {ScratchStorageAppFlat} from '../scratch-storage-app-flat';
+import {wrapDigitizeAppsState} from '../my-digitize-apps-state';
+import {PrivilegeType} from '../../privilege/privilege-type';
+import {accessAuthorizedUserState} from '../../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../../authorized-user/authorized-user-service';
 
 jest.mock('../../authorized-user/authorized-user-state');
@@ -224,6 +230,12 @@ describe('My Digitize Apps Service Tests', () => {
 
   it('sendCreate should throw -- not implemented', async () => {
     await expect(wrappedState.sendCreate(scratchStorageAppDtos[0])).rejects.toThrow();
+  });
+
+  it('should not allow incorrectly formatted orgs to be sent', async () => {
+    await expect(wrappedState.sendCreate({ badParam: 'some id'} as unknown as ScratchStorageAppRegistryDto))
+        .rejects
+        .toThrowError();
   });
 
   it('sendDelete should throw -- not implemented', async () => {

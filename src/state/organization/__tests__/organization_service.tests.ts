@@ -38,7 +38,7 @@ class MockOrgApi extends OrganizationControllerApi {
       config: {} as AxiosRequestConfig,
     };
     return Promise.resolve(response);
-  }  
+  }
 
   patchOrganization1(id?: string, requestBody?: { [key: string]: string; }, options?: any)
       : Promise<AxiosResponse<OrganizationDto>> {
@@ -56,24 +56,24 @@ class MockOrgApi extends OrganizationControllerApi {
 
   deleteOrgParent(id?: string): Promise<AxiosResponse<OrganizationDto>> {
     return this.genericFunctionThatReturnsReponse();
-  }  
+  }
 
-  removeSubordinateOrganization(id?: string, requestBody? : string[], options?: any) 
+  removeSubordinateOrganization(id?: string, requestBody? : string[], options?: any)
     : Promise<AxiosResponse<void>>{
       return {} as Promise<AxiosResponse<void>>;
   }
 
-  addSubordinateOrganization(id?: string, requestBody? : string[], options?: any) 
+  addSubordinateOrganization(id?: string, requestBody? : string[], options?: any)
     : Promise<AxiosResponse<void>>{
       return {} as Promise<AxiosResponse<void>>;
   }
 
-  deleteOrganizationMember(id?: string, requestBody? : string[], options?: any) 
+  deleteOrganizationMember(id?: string, requestBody? : string[], options?: any)
   : Promise<AxiosResponse<void>>{
     return {} as Promise<AxiosResponse<void>>;
   }
 
-  addOrganizationMember(id?: string, requestBody? : string[], options?: any) 
+  addOrganizationMember(id?: string, requestBody? : string[], options?: any)
   : Promise<AxiosResponse<void>>{
     return {} as Promise<AxiosResponse<void>>;
   }
@@ -116,6 +116,16 @@ describe('Test OrganizationService', () => {
 
     const response = await organizationService.sendCreate({ id: 'some id'} as OrganizationDto);
     expect(response).toBeTruthy();
+  });
+
+  it('should not allow incorrectly formatted orgs to be sent', async () => {
+    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+        createState<OrganizationDtoWithDetails>({}),
+        new MockOrgApi());
+
+    await expect(organizationService.sendCreate({ badParam: 'some id'} as OrganizationDto))
+        .rejects
+        .toThrowError();
   });
 
   it('send Update', async () => {

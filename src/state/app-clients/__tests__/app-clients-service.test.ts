@@ -374,7 +374,7 @@ describe('App Client State Tests', () => {
   it('Test Create App Privileges', async () => {
     appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
-    });   
+    });
 
     const result = await wrappedState.createAppPrivileges(testClientFlat);
     expect(result.size).toEqual(2);
