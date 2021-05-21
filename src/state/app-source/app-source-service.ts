@@ -1,11 +1,25 @@
-import { postpone, State } from '@hookstate/core';
-import { AxiosPromise } from 'axios';
-import { DataService } from '../data-service/data-service';
-import { AppClientSummaryDto, AppClientSummaryDtoResponseWrapper, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto } from '../../openapi';
+import {postpone, State} from '@hookstate/core';
+import {AxiosPromise} from 'axios';
+import {DataService} from '../data-service/data-service';
+import {
+  AppClientSummaryDto,
+  AppClientSummaryDtoResponseWrapper,
+  AppSourceControllerApiInterface,
+  AppSourceDetailsDto,
+  AppSourceDto
+} from '../../openapi';
 import Config from '../../api/configuration';
+import {ValidateFunction} from 'ajv';
+import TypeValidation from '../../utils/TypeValidation/type-validation';
+import ModelTypes from '../../api/model-types.json';
 
 export default class AppSourceService implements DataService<AppSourceDto, AppSourceDetailsDto> {
-  constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) { }
+
+  private readonly validate: ValidateFunction<AppSourceDetailsDto>;
+
+  constructor(public state: State<AppSourceDto[]>, private appSourceApi: AppSourceControllerApiInterface) {
+    this.validate = TypeValidation.validatorFor<AppSourceDetailsDto>(ModelTypes.definitions.AppSourceDetailsDto);
+  }
 
   fetchAndStoreData(): Promise<AppSourceDto[]> {
     const data = new Promise<AppSourceDto[]>(async (resolve, reject) => {
@@ -35,7 +49,7 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFile(id)
 
     const result = response().then(res => res.data);
-    
+
     return result;
   }
 
@@ -43,7 +57,7 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFileByEndpointPriv(id)
 
     const result = response().then(res => res.data);
-    
+
     return result;
   }
 
@@ -64,6 +78,9 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   }
 
   async sendUpdate(toUpdate: AppSourceDetailsDto): Promise<AppSourceDto> {
+    if(!this.validate(toUpdate)) {
+      throw TypeValidation.validationError('AppSourceDetailsDto');
+    }
     try {
       if (!toUpdate.id) {
         return Promise.reject(new Error('App Source to update has undefined id.'));
