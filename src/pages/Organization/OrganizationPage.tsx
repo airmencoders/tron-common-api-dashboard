@@ -1,6 +1,7 @@
 import React from 'react';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
+import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import { OrganizationDto } from '../../openapi';
 import { useOrganizationState } from '../../state/organization/organization-state';
 import OrganizationDelete from './OrganizationDelete';
@@ -12,7 +13,8 @@ const columns: GridColumn[] =
       field: 'id',
       sortable: true,
       filter: true,
-      headerName: 'id'
+      headerName: 'id',
+      cellRenderer: LoadingCellRenderer
     }),
     new GridColumn({
       field: 'name',
@@ -61,6 +63,9 @@ function OrganizationPage() {
         deleteComponent={OrganizationDelete}
         autoResizeColumns
         autoResizeColummnsMinWidth={1200}
+        infiniteScroll={{
+          enabled: true
+        }}
       />
   );
 }

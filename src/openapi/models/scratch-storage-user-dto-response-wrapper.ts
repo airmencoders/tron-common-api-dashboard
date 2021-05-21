@@ -26,7 +26,7 @@ export interface ScratchStorageUserDtoResponseWrapper {
      * @type {Array<ScratchStorageUserDto>}
      * @memberof ScratchStorageUserDtoResponseWrapper
      */
-    data?: Array<ScratchStorageUserDto>;
+    data: Array<ScratchStorageUserDto>;
 }
 
 

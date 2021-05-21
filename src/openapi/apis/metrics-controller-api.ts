@@ -58,7 +58,7 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             if (endDate === null || endDate === undefined) {
                 throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getAllMetricsForAppSource.');
             }
-            const localVarPath = `/v1/metrics/appsource/{id}`
+            const localVarPath = `/v2/metrics/appsource/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -188,7 +188,7 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             if (endDate === null || endDate === undefined) {
                 throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getAllMetricsForEndpoint.');
             }
-            const localVarPath = `/v1/metrics/endpoint/{id}`
+            const localVarPath = `/v2/metrics/endpoint/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -323,7 +323,7 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             if (endDate === null || endDate === undefined) {
                 throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getCountOfMetricsForAppClient.');
             }
-            const localVarPath = `/v1/metrics/count/{id}/appclient`
+            const localVarPath = `/v2/metrics/count/{id}/appclient`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -466,7 +466,7 @@ export const MetricsControllerApiAxiosParamCreator = function (configuration?: C
             if (endDate === null || endDate === undefined) {
                 throw new RequiredError('endDate','Required parameter endDate was null or undefined when calling getCountOfMetricsForAppSource.');
             }
-            const localVarPath = `/v1/metrics/count/{id}`
+            const localVarPath = `/v2/metrics/count/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');

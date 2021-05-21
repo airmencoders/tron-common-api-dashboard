@@ -1,5 +1,5 @@
 import { DataService } from '../data-service/data-service';
-import { State } from '@hookstate/core';
+import { postpone, State } from '@hookstate/core';
 import { ScratchStorageAppRegistryDto, ScratchStorageControllerApiInterface } from '../../openapi';
 import { ScratchStorageAppFlat } from './scratch-storage-app-flat';
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
@@ -115,5 +115,15 @@ export default class MyDigitizeAppsService implements DataService<ScratchStorage
 
   get error(): string | undefined {
     return this.state.promised ? undefined : this.state.error;
+  }
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+    });
   }
 }

@@ -40,7 +40,7 @@ export const LogfileControllerApiAxiosParamCreator = function (configuration?: C
             if (fileName === null || fileName === undefined) {
                 throw new RequiredError('fileName','Required parameter fileName was null or undefined when calling getLogfile.');
             }
-            const localVarPath = `/v1/logfile/{fileName}`
+            const localVarPath = `/v2/logfile/{fileName}`
                 .replace(`{${"fileName"}}`, encodeURIComponent(String(fileName)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -121,7 +121,7 @@ export const LogfileControllerApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         getLogfileInfo: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/logfile`;
+            const localVarPath = `/v2/logfile`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;

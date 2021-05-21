@@ -26,7 +26,7 @@ export interface AppClientUserDtoResponseWrapped {
      * @type {Array<AppClientUserDto>}
      * @memberof AppClientUserDtoResponseWrapped
      */
-    data?: Array<AppClientUserDto>;
+    data: Array<AppClientUserDto>;
 }
 
 

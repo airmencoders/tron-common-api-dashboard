@@ -26,7 +26,7 @@ export interface PrivilegeDtoResponseWrapper {
      * @type {Array<PrivilegeDto>}
      * @memberof PrivilegeDtoResponseWrapper
      */
-    data?: Array<PrivilegeDto>;
+    data: Array<PrivilegeDto>;
 }
 
 

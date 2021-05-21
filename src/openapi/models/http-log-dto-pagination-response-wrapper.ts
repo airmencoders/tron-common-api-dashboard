@@ -27,13 +27,13 @@ export interface HttpLogDtoPaginationResponseWrapper {
      * @type {Array<HttpLogEntryDto>}
      * @memberof HttpLogDtoPaginationResponseWrapper
      */
-    data?: Array<HttpLogEntryDto>;
+    data: Array<HttpLogEntryDto>;
     /**
      * 
      * @type {Pagination}
      * @memberof HttpLogDtoPaginationResponseWrapper
      */
-    pagination?: Pagination;
+    pagination: Pagination;
 }
 
 

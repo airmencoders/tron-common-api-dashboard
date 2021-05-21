@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, within } from '@testing-library/react';
-import { AppClientSummaryDto, AppClientUserPrivDto, AppEndpointDto, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
+import { AppClientSummaryDto, AppClientSummaryDtoResponseWrapper, AppClientUserPrivDto, AppEndpointDto, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import AppSourceEndpointEditor from '../AppSourceEndpointEditor';
 import { AxiosResponse } from 'axios';
@@ -80,9 +80,9 @@ describe('Test App Source Endpoint Editor', () => {
   it('Renders', async () => {
     (useAppSourceState as jest.Mock).mockReturnValue(appSourceService);
 
-    appSourceApi.getAvailableAppClients = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientSummaryDto[]>>(resolve => resolve({
-        data: allClients,
+    appSourceApi.getAvailableAppClientsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientSummaryDtoResponseWrapper>>(resolve => resolve({
+        data: { data: allClients },
         status: 200,
         headers: {},
         config: {},
@@ -105,9 +105,9 @@ describe('Test App Source Endpoint Editor', () => {
   it('it should call checkbox onChange handler', async () => {
     (useAppSourceState as jest.Mock).mockReturnValue(appSourceService);
 
-    appSourceApi.getAvailableAppClients = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientSummaryDto[]>>(resolve => resolve({
-        data: allClients,
+    appSourceApi.getAvailableAppClientsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientSummaryDtoResponseWrapper>>(resolve => resolve({
+        data: { data: allClients },
         status: 200,
         headers: {},
         config: {},

@@ -26,7 +26,7 @@ export interface EventInfoDtoResponseWrapper {
      * @type {Array<EventInfoDto>}
      * @memberof EventInfoDtoResponseWrapper
      */
-    data?: Array<EventInfoDto>;
+    data: Array<EventInfoDto>;
 }
 
 

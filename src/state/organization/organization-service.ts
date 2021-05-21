@@ -1,7 +1,7 @@
 import { none, State } from '@hookstate/core';
 import { OrganizationControllerApiInterface } from '../../openapi';
 import { OrganizationDto } from '../../openapi/models';
-import { DataService } from '../data-service/data-service';
+import { AbstractDataService } from '../data-service/abstract-data-service';
 import { OrganizationDtoWithDetails } from './organization-state';
 
 // complex parts of the org we can edit -- for now...
@@ -18,32 +18,53 @@ export enum OrgEditOpType {
   OTHER = 'OTHER',
 }
 
-export default class OrganizationService implements DataService<OrganizationDto, OrganizationDto> {
-
+export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDto> {
   constructor(
     public state: State<OrganizationDto[]>, 
     public selectedOrgState: State<OrganizationDtoWithDetails>,
     private orgApi: OrganizationControllerApiInterface) {
+    super(state);
   }
 
   async fetchAndStoreData(): Promise<OrganizationDto[]> {
     try {
-      const orgDataResponse = await this.orgApi.getOrganizations();
-      const orgData = orgDataResponse.data;
-      const mappedData = orgData.map((org) => {
-
-        // undef the collection-type fields because of the ag-grid bug
-        //  with hookState and collections (we're not displaying them anyways)
-        org.members = undefined;
-        org.subordinateOrganizations = undefined;
-        return org;
-      });
+      const orgDataResponse = await this.orgApi.getOrganizationsWrapped();
+      const orgData = orgDataResponse.data.data;
+      const mappedData = this.removeUnfriendlyAgGridData(orgData);
       this.state.set(mappedData);      
       return Promise.resolve(orgData);
     }
     catch (error) {
       return Promise.reject(error);
     }
+  }
+
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<OrganizationDto[]> {
+    const orgResponseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit)
+      .then(resp => {
+        return resp.data.data;
+      });
+
+    const orgDataMapped = this.removeUnfriendlyAgGridData(orgResponseData);
+
+    this.mergeDataToState(orgDataMapped, checkDuplicates);
+
+    return orgResponseData;
+  }
+
+  /**
+   * Due to Hookstate and Ag Grid interaction, some fields cause Hookstate to error.
+   * Remove those fields here.
+   * 
+   * @param data the data to remove fields from
+   * @returns the data with fields removed
+   */
+  removeUnfriendlyAgGridData(data: OrganizationDto[]): Array<OrganizationDto> {
+    return data.map(org => {
+      org.members = undefined;
+      org.subordinateOrganizations = undefined;
+      return org;
+    });
   }
 
   async convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
@@ -322,13 +343,4 @@ export default class OrganizationService implements DataService<OrganizationDto,
       return error;
     }
   }
-
-  get isPromised(): boolean {
-    return this.state.promised;
-  }
-
-  get error(): string | undefined {
-    return this.state.promised ? undefined : this.state.error;
-  }
-
 }

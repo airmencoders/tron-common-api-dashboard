@@ -26,7 +26,7 @@ export interface PersonDtoResponseWrapper {
      * @type {Array<PersonDto>}
      * @memberof PersonDtoResponseWrapper
      */
-    data?: Array<PersonDto>;
+    data: Array<PersonDto>;
 }
 
 

@@ -26,7 +26,7 @@ export interface AppClientSummaryDtoResponseWrapper {
      * @type {Array<AppClientSummaryDto>}
      * @memberof AppClientSummaryDtoResponseWrapper
      */
-    data?: Array<AppClientSummaryDto>;
+    data: Array<AppClientSummaryDto>;
 }
 
 

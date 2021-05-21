@@ -27,13 +27,13 @@ export interface OrganizationDtoPaginationResponseWrapper {
      * @type {Array<OrganizationDto>}
      * @memberof OrganizationDtoPaginationResponseWrapper
      */
-    data?: Array<OrganizationDto>;
+    data: Array<OrganizationDto>;
     /**
      * 
      * @type {Pagination}
      * @memberof OrganizationDtoPaginationResponseWrapper
      */
-    pagination?: Pagination;
+    pagination: Pagination;
 }
 
 

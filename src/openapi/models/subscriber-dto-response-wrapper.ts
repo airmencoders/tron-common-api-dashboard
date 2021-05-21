@@ -26,7 +26,7 @@ export interface SubscriberDtoResponseWrapper {
      * @type {Array<SubscriberDto>}
      * @memberof SubscriberDtoResponseWrapper
      */
-    data?: Array<SubscriberDto>;
+    data: Array<SubscriberDto>;
 }
 
 

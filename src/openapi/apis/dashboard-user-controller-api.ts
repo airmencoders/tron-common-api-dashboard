@@ -42,7 +42,7 @@ export const DashboardUserControllerApiAxiosParamCreator = function (configurati
             if (dashboardUserDto === null || dashboardUserDto === undefined) {
                 throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling addDashboardUser.');
             }
-            const localVarPath = `/v1/dashboard-users`;
+            const localVarPath = `/v2/dashboard-users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -144,7 +144,7 @@ export const DashboardUserControllerApiAxiosParamCreator = function (configurati
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteDashboardUser.');
             }
-            const localVarPath = `/v1/dashboard-users/{id}`
+            const localVarPath = `/v2/dashboard-users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -224,8 +224,8 @@ export const DashboardUserControllerApiAxiosParamCreator = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllDashboardUsers: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/dashboard-users`;
+        getAllDashboardUsersWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/dashboard-users`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -304,7 +304,7 @@ export const DashboardUserControllerApiAxiosParamCreator = function (configurati
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getDashboardUser.');
             }
-            const localVarPath = `/v1/dashboard-users/{id}`
+            const localVarPath = `/v2/dashboard-users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -385,7 +385,7 @@ export const DashboardUserControllerApiAxiosParamCreator = function (configurati
          * @throws {RequiredError}
          */
         getSelfDashboardUser: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/dashboard-users/self`;
+            const localVarPath = `/v2/dashboard-users/self`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -469,7 +469,7 @@ export const DashboardUserControllerApiAxiosParamCreator = function (configurati
             if (dashboardUserDto === null || dashboardUserDto === undefined) {
                 throw new RequiredError('dashboardUserDto','Required parameter dashboardUserDto was null or undefined when calling updateDashboardUser.');
             }
-            const localVarPath = `/v1/dashboard-users/{id}`
+            const localVarPath = `/v2/dashboard-users/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -637,8 +637,8 @@ export const DashboardUserControllerApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllDashboardUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DashboardUserDto>>> {
-            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).getAllDashboardUsers(options);
+        async getAllDashboardUsersWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardUserDtoResponseWrapper>> {
+            const localVarAxiosArgs = await DashboardUserControllerApiAxiosParamCreator(configuration).getAllDashboardUsersWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -796,8 +796,8 @@ export const DashboardUserControllerApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllDashboardUsers(options?: any): AxiosPromise<Array<DashboardUserDto>> {
-            return DashboardUserControllerApiFp(configuration).getAllDashboardUsers(options).then((request) => request(axios, basePath));
+        getAllDashboardUsersWrapped(options?: any): AxiosPromise<DashboardUserDtoResponseWrapper> {
+            return DashboardUserControllerApiFp(configuration).getAllDashboardUsersWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves all Dashboard Users
@@ -924,7 +924,7 @@ export interface DashboardUserControllerApiInterface {
      * @throws {RequiredError}
      * @memberof DashboardUserControllerApiInterface
      */
-    getAllDashboardUsers(options?: any): AxiosPromise<Array<DashboardUserDto>>;
+    getAllDashboardUsersWrapped(options?: any): AxiosPromise<DashboardUserDtoResponseWrapper>;
 
     /**
      * Retrieves all Dashboard Users
@@ -1059,8 +1059,8 @@ export class DashboardUserControllerApi extends BaseAPI implements DashboardUser
      * @throws {RequiredError}
      * @memberof DashboardUserControllerApi
      */
-    public getAllDashboardUsers(options?: any) {
-        return DashboardUserControllerApiFp(this.configuration).getAllDashboardUsers(options).then((request) => request(this.axios, this.basePath));
+    public getAllDashboardUsersWrapped(options?: any) {
+        return DashboardUserControllerApiFp(this.configuration).getAllDashboardUsersWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

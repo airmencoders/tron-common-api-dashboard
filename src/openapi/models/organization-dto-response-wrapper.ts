@@ -26,7 +26,7 @@ export interface OrganizationDtoResponseWrapper {
      * @type {Array<OrganizationDto>}
      * @memberof OrganizationDtoResponseWrapper
      */
-    data?: Array<OrganizationDto>;
+    data: Array<OrganizationDto>;
 }
 
 

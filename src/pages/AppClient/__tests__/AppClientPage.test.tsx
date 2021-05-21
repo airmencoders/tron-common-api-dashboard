@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AppClientPage } from '../AppClientPage';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientControllerApi, AppClientControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { AppClientControllerApi, AppClientControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import { usePrivilegeState } from '../../../state/privilege/privilege-state';
 import PrivilegeService from '../../../state/privilege/privilege-service';
@@ -32,9 +32,9 @@ describe('Test App Client Page', () => {
 
   function mockPrivilegesState() {
     (usePrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},

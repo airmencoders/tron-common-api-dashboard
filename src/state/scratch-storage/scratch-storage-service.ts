@@ -1,6 +1,6 @@
-import { none, State } from '@hookstate/core';
+import { none, postpone, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
-import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageControllerApiInterface, UserWithPrivs } from '../../openapi';
+import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, UserWithPrivs } from '../../openapi';
 import { DataService } from '../data-service/data-service';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { PrivilegeType } from '../privilege/privilege-type';
@@ -18,18 +18,18 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   sendPatch?: ((...args: any) => Promise<ScratchStorageAppRegistryDto>) | undefined;
 
   async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
-    const response = (): AxiosPromise<ScratchStorageAppRegistryDto[]> => this.scratchStorageApi.getScratchSpaceApps();
+    const response = (): AxiosPromise<ScratchStorageAppRegistryDtoResponseWrapper> => this.scratchStorageApi.getScratchSpaceAppsWrapped();
     const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
 
     const data = new Promise<ScratchStorageAppRegistryDto[]>(async (resolve, reject) => {
       try {
         await privilegeResponse();
         const result = await response();
-        const mappedData = result.data.map(x => {
+        const mappedData = result.data.data.map(x => {
           x.userPrivs = undefined;
           return x;
         });
-        resolve(result.data);
+        resolve(result.data.data);
         this.state.set(mappedData);
       } catch (err) {
         reject(err);
@@ -162,8 +162,8 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   }
 
   async appNameExists(app: ScratchStorageAppRegistryDto): Promise<boolean> {
-      const apps = await this.scratchStorageApi.getScratchSpaceApps();
-      return apps.data.some(x => x.appName === app.appName && x.id !== app.id);
+    const apps = await this.scratchStorageApi.getScratchSpaceAppsWrapped();
+    return apps.data.data.some(x => x.appName === app.appName && x.id !== app.id);
   }
 
   async sendDelete(toDelete: ScratchStorageAppRegistryDto): Promise<void> {
@@ -190,5 +190,15 @@ export default class ScratchStorageService implements DataService<ScratchStorage
 
   get error(): string | undefined {
     return this.state.promised ? undefined : this.state.error;
+  }
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+    });
   }
 }

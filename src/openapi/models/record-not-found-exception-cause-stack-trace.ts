@@ -17,6 +17,7 @@
 /**
  * 
  * @export
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
  * @interface RecordNotFoundExceptionCauseStackTrace
  */
 export interface RecordNotFoundExceptionCauseStackTrace {
@@ -24,48 +25,85 @@ export interface RecordNotFoundExceptionCauseStackTrace {
      * 
      * @type {string}
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+ * @interface ResourceAlreadyExistsExceptionCauseStackTrace
+ */
+export interface ResourceAlreadyExistsExceptionCauseStackTrace {
+    /**
+     * 
+     * @type {string}
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     methodName?: string;
     /**
      * 
      * @type {string}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     fileName?: string;
     /**
      * 
      * @type {number}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     lineNumber?: number;
     /**
      * 
      * @type {string}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     className?: string;
     /**
      * 
      * @type {boolean}
+<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-stack-trace.ts
      * @memberof RecordNotFoundExceptionCauseStackTrace
+=======
+     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+>>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-stack-trace.ts
      */
     nativeMethod?: boolean;
 }

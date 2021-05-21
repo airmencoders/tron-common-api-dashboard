@@ -26,7 +26,7 @@ export interface AppSourceDtoResponseWrapper {
      * @type {Array<AppSourceDto>}
      * @memberof AppSourceDtoResponseWrapper
      */
-    data?: Array<AppSourceDto>;
+    data: Array<AppSourceDto>;
 }
 
 

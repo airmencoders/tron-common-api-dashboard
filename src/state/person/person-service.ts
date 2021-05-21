@@ -1,24 +1,34 @@
-import {DataService} from '../data-service/data-service';
-import {State} from '@hookstate/core';
+import { State } from '@hookstate/core';
 import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, RankControllerApiInterface} from '../../openapi';
-import {RankStateModel} from './rank-state-model';
-import {data} from 'msw/lib/types/context';
+import { RankStateModel } from './rank-state-model';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
+import { AbstractDataService } from '../data-service/abstract-data-service';
 
-export default class PersonService implements DataService<PersonDto, PersonDto> {
-
+export default class PersonService extends AbstractDataService<PersonDto, PersonDto> {
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
               public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface,
               public currentUserState: State<PersonDto>) {
+    super(state);
   }
 
   async fetchAndStoreData(): Promise<PersonDto[]> {
-    const personResponsePromise = await this.personApi.getPersons()
+    const personResponsePromise = await this.personApi.getPersonsWrapped()
         .then(resp => {
-          return resp.data;
+          return resp.data.data;
         });
     this.state.set(personResponsePromise);
     return personResponsePromise;
+  }
+
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<PersonDto[]> {
+    const personResponseData = await this.personApi.getPersonsWrapped(undefined, undefined, page, limit)
+      .then(resp => {
+        return resp.data.data;
+      });
+
+    this.mergeDataToState(personResponseData, checkDuplicates);
+
+    return personResponseData;
   }
 
   convertRowDataToEditableData(rowData: PersonDto): Promise<PersonDto> {
@@ -75,13 +85,7 @@ export default class PersonService implements DataService<PersonDto, PersonDto> 
     return Promise.resolve();
   }
 
-  get isPromised(): boolean {
-    return this.state.promised;
-  }
-
-  get error(): string | undefined {
-    return this.state.error;
-  }
+  sendPatch: undefined;
 
   fetchRankForBranch(branch: string) {
     // validate that the branch is part of branch enum

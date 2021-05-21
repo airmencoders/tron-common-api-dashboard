@@ -26,7 +26,7 @@ export interface ScratchStorageAppRegistryDtoResponseWrapper {
      * @type {Array<ScratchStorageAppRegistryDto>}
      * @memberof ScratchStorageAppRegistryDtoResponseWrapper
      */
-    data?: Array<ScratchStorageAppRegistryDto>;
+    data: Array<ScratchStorageAppRegistryDto>;
 }
 
 

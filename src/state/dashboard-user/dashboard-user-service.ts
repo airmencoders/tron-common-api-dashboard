@@ -1,4 +1,4 @@
-import { none, State } from '@hookstate/core';
+import { none, postpone, State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import { AxiosPromise } from 'axios';
@@ -6,7 +6,7 @@ import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
-import { PrivilegeDto } from '../../openapi';
+import { DashboardUserDtoResponseWrapper, PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 
@@ -15,14 +15,14 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
   fetchAndStoreData(): Promise<DashboardUserFlat[]> {
     const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
-    const response = (): AxiosPromise<DashboardUserDto[]> => this.dashboardUserApi.getAllDashboardUsers();
+    const response = (): AxiosPromise<DashboardUserDtoResponseWrapper> => this.dashboardUserApi.getAllDashboardUsersWrapped();
 
     const data = new Promise<DashboardUserFlat[]>(async (resolve, reject) => {
       try {
         await privilegeResponse();
         const result = await response();
 
-        resolve(this.convertDashboardUsersToFlat(result.data));
+        resolve(this.convertDashboardUsersToFlat(result.data.data));
       } catch (err) {
         reject(prepareDataCrudErrorResponse(err));
       }
@@ -160,5 +160,15 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
   get error(): any | undefined {
     return this.state.promised ? undefined : this.state.error;
+  }
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+    });
   }
 }

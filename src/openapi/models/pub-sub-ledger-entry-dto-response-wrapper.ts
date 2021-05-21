@@ -26,7 +26,7 @@ export interface PubSubLedgerEntryDtoResponseWrapper {
      * @type {Array<PubSubLedgerEntryDto>}
      * @memberof PubSubLedgerEntryDtoResponseWrapper
      */
-    data?: Array<PubSubLedgerEntryDto>;
+    data: Array<PubSubLedgerEntryDto>;
 }
 
 

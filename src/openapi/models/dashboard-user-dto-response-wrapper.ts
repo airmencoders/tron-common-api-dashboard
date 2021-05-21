@@ -26,7 +26,7 @@ export interface DashboardUserDtoResponseWrapper {
      * @type {Array<DashboardUserDto>}
      * @memberof DashboardUserDtoResponseWrapper
      */
-    data?: Array<DashboardUserDto>;
+    data: Array<DashboardUserDto>;
 }
 
 

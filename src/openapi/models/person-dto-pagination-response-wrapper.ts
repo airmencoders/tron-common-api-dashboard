@@ -27,13 +27,13 @@ export interface PersonDtoPaginationResponseWrapper {
      * @type {Array<PersonDto>}
      * @memberof PersonDtoPaginationResponseWrapper
      */
-    data?: Array<PersonDto>;
+    data: Array<PersonDto>;
     /**
      * 
      * @type {Pagination}
      * @memberof PersonDtoPaginationResponseWrapper
      */
-    pagination?: Pagination;
+    pagination: Pagination;
 }
 
 
