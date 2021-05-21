@@ -13,16 +13,11 @@
  */
 
 
-<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-suppressed.ts
 import { RecordNotFoundExceptionCauseStackTrace } from './record-not-found-exception-cause-stack-trace';
-=======
-import { ResourceAlreadyExistsExceptionCauseStackTrace } from './resource-already-exists-exception-cause-stack-trace';
->>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-suppressed.ts
 
 /**
  * 
  * @export
-<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-suppressed.ts
  * @interface RecordNotFoundExceptionCauseSuppressed
  */
 export interface RecordNotFoundExceptionCauseSuppressed {
@@ -36,31 +31,12 @@ export interface RecordNotFoundExceptionCauseSuppressed {
      * 
      * @type {string}
      * @memberof RecordNotFoundExceptionCauseSuppressed
-=======
- * @interface ResourceAlreadyExistsExceptionCauseSuppressed
- */
-export interface ResourceAlreadyExistsExceptionCauseSuppressed {
-    /**
-     * 
-     * @type {Array<ResourceAlreadyExistsExceptionCauseStackTrace>}
-     * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
-     */
-    stackTrace?: Array<ResourceAlreadyExistsExceptionCauseStackTrace>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
->>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-suppressed.ts
      */
     message?: string;
     /**
      * 
      * @type {string}
-<<<<<<< HEAD:src/openapi/models/record-not-found-exception-cause-suppressed.ts
      * @memberof RecordNotFoundExceptionCauseSuppressed
-=======
-     * @memberof ResourceAlreadyExistsExceptionCauseSuppressed
->>>>>>> master:src/openapi/models/resource-already-exists-exception-cause-suppressed.ts
      */
     localizedMessage?: string;
 }

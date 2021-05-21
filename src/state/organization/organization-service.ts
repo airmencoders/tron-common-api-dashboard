@@ -115,7 +115,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       if (toUpdate.orgType) { orgFeatures = {...orgFeatures, orgType: toUpdate.orgType }; }
       if (toUpdate.branchType) { orgFeatures = {...orgFeatures, branchType: toUpdate.branchType }; }
 
-      const orgResponse = await this.orgApi.patchOrganization11(toUpdate.id, orgFeatures);
+      const orgResponse = await this.orgApi.patchOrganization1(toUpdate.id, orgFeatures);
 
       const patchedOrg = orgResponse.data;
       patchedOrg.members = undefined;
@@ -196,7 +196,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
    */
   async updateLeader(orgId: string, id: string): Promise<OrganizationDto> {
     try {
-      const orgResponse = await this.orgApi.patchOrganization11(orgId, { leader: id });
+      const orgResponse = await this.orgApi.patchOrganization1(orgId, { leader: id });
       await this.getOrgDetails(orgId);
       return Promise.resolve(orgResponse.data);     
     }
@@ -213,7 +213,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
    */
    async updateParentOrg(orgId: string, id: string): Promise<OrganizationDto> {
     try {
-      const orgResponse = await this.orgApi.patchOrganization11(orgId, { parentOrganization: id });
+      const orgResponse = await this.orgApi.patchOrganization1(orgId, { parentOrganization: id });
       await this.getOrgDetails(orgId);
       return Promise.resolve(orgResponse.data);
     }

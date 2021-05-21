@@ -1,5 +1,5 @@
 import { State } from '@hookstate/core';
-import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, RankControllerApiInterface} from '../../openapi';
+import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, PersonFindDtoFindTypeEnum, RankControllerApiInterface} from '../../openapi';
 import { RankStateModel } from './rank-state-model';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
 import { AbstractDataService } from '../data-service/abstract-data-service';
@@ -16,8 +16,8 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         .then(resp => {
           return resp.data.data;
         });
-    this.state.set(personResponsePromise);
-    return personResponsePromise;
+    this.state.set(personResponsePromise ?? []);
+    return personResponsePromise ?? [];
   }
 
   async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<PersonDto[]> {
@@ -26,9 +26,9 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         return resp.data.data;
       });
 
-    this.mergeDataToState(personResponseData, checkDuplicates);
+    this.mergeDataToState(personResponseData ?? [], checkDuplicates);
 
-    return personResponseData;
+    return personResponseData ?? [];
   }
 
   convertRowDataToEditableData(rowData: PersonDto): Promise<PersonDto> {
@@ -119,7 +119,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async getPersonByEmail(email: string): Promise<PersonDto> {
-      const personResponse = await this.personApi.findPersonBy1("EMAIL", email);
+      const personResponse = await this.personApi.findPersonBy({ findType: PersonFindDtoFindTypeEnum.Email, value: email });
       this.currentUserState.set(personResponse.data)
       return personResponse.data;
   }

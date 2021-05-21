@@ -72,92 +72,12 @@ export const LogfileControllerApiAxiosParamCreator = function (configuration?: C
             };
         },
         /**
-         * Retrieves a logfile for download
-         * @summary Retrieves a logfile for download
-         * @param {string} fileName 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getLogfile1: async (fileName: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'fileName' is not null or undefined
-            if (fileName === null || fileName === undefined) {
-                throw new RequiredError('fileName','Required parameter fileName was null or undefined when calling getLogfile1.');
-            }
-            const localVarPath = `/v2/logfile/{fileName}`
-                .replace(`{${"fileName"}}`, encodeURIComponent(String(fileName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Retrieves all logfiles available for download
          * @summary Retrieves all logfiles info
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         getLogfileInfo: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/logfile`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Retrieves all logfiles available for download
-         * @summary Retrieves all logfiles info
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getLogfileInfo1: async (options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v2/logfile`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -212,20 +132,6 @@ export const LogfileControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
-         * Retrieves a logfile for download
-         * @summary Retrieves a logfile for download
-         * @param {string} fileName 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getLogfile1(fileName: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
-            const localVarAxiosArgs = await LogfileControllerApiAxiosParamCreator(configuration).getLogfile1(fileName, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
          * Retrieves all logfiles available for download
          * @summary Retrieves all logfiles info
          * @param {*} [options] Override http request option.
@@ -233,19 +139,6 @@ export const LogfileControllerApiFp = function(configuration?: Configuration) {
          */
         async getLogfileInfo(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<LogfileDto>>> {
             const localVarAxiosArgs = await LogfileControllerApiAxiosParamCreator(configuration).getLogfileInfo(options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * Retrieves all logfiles available for download
-         * @summary Retrieves all logfiles info
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getLogfileInfo1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<LogfileDto>>> {
-            const localVarAxiosArgs = await LogfileControllerApiAxiosParamCreator(configuration).getLogfileInfo1(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -271,16 +164,6 @@ export const LogfileControllerApiFactory = function (configuration?: Configurati
             return LogfileControllerApiFp(configuration).getLogfile(fileName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieves a logfile for download
-         * @summary Retrieves a logfile for download
-         * @param {string} fileName 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getLogfile1(fileName: string, options?: any): AxiosPromise<any> {
-            return LogfileControllerApiFp(configuration).getLogfile1(fileName, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Retrieves all logfiles available for download
          * @summary Retrieves all logfiles info
          * @param {*} [options] Override http request option.
@@ -288,15 +171,6 @@ export const LogfileControllerApiFactory = function (configuration?: Configurati
          */
         getLogfileInfo(options?: any): AxiosPromise<Array<LogfileDto>> {
             return LogfileControllerApiFp(configuration).getLogfileInfo(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Retrieves all logfiles available for download
-         * @summary Retrieves all logfiles info
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getLogfileInfo1(options?: any): AxiosPromise<Array<LogfileDto>> {
-            return LogfileControllerApiFp(configuration).getLogfileInfo1(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -318,16 +192,6 @@ export interface LogfileControllerApiInterface {
     getLogfile(fileName: string, options?: any): AxiosPromise<any>;
 
     /**
-     * Retrieves a logfile for download
-     * @summary Retrieves a logfile for download
-     * @param {string} fileName 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof LogfileControllerApiInterface
-     */
-    getLogfile1(fileName: string, options?: any): AxiosPromise<any>;
-
-    /**
      * Retrieves all logfiles available for download
      * @summary Retrieves all logfiles info
      * @param {*} [options] Override http request option.
@@ -335,15 +199,6 @@ export interface LogfileControllerApiInterface {
      * @memberof LogfileControllerApiInterface
      */
     getLogfileInfo(options?: any): AxiosPromise<Array<LogfileDto>>;
-
-    /**
-     * Retrieves all logfiles available for download
-     * @summary Retrieves all logfiles info
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof LogfileControllerApiInterface
-     */
-    getLogfileInfo1(options?: any): AxiosPromise<Array<LogfileDto>>;
 
 }
 
@@ -367,18 +222,6 @@ export class LogfileControllerApi extends BaseAPI implements LogfileControllerAp
     }
 
     /**
-     * Retrieves a logfile for download
-     * @summary Retrieves a logfile for download
-     * @param {string} fileName 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof LogfileControllerApi
-     */
-    public getLogfile1(fileName: string, options?: any) {
-        return LogfileControllerApiFp(this.configuration).getLogfile1(fileName, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Retrieves all logfiles available for download
      * @summary Retrieves all logfiles info
      * @param {*} [options] Override http request option.
@@ -387,16 +230,5 @@ export class LogfileControllerApi extends BaseAPI implements LogfileControllerAp
      */
     public getLogfileInfo(options?: any) {
         return LogfileControllerApiFp(this.configuration).getLogfileInfo(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Retrieves all logfiles available for download
-     * @summary Retrieves all logfiles info
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof LogfileControllerApi
-     */
-    public getLogfileInfo1(options?: any) {
-        return LogfileControllerApiFp(this.configuration).getLogfileInfo1(options).then((request) => request(this.axios, this.basePath));
     }
 }
