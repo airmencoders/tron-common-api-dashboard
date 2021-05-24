@@ -101,6 +101,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
         <FormGroup labelName="email" labelText="Email"
           isError={isError(formState.email)}
           errorMessages={errorMessages(formState.email)}
+          required
         >
           <TextInput id="email" name="email" type="email"
             defaultValue={props.data?.email || ''}
@@ -113,6 +114,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           isError={Touched(formState.firstName).touched() && Validation(formState.firstName).invalid()}
           errorMessages={Validation(formState.firstName).errors()
             .map(validationError => validationError.message)}
+          required
         >
           <TextInput id="firstName" name="firstName" type="text"
             defaultValue={props.data?.firstName || ''}
@@ -128,6 +130,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           isError={Touched(formState.lastName).touched() && Validation(formState.lastName).invalid()}
           errorMessages={Validation(formState.lastName).errors()
             .map(validationError => validationError.message)}
+          required
         >
           <TextInput id="lastName" name="lastName" type="text"
             defaultValue={props.data?.lastName || ''}
@@ -207,6 +210,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           isError={Touched(formState.rank).touched() && Validation(formState.rank).invalid()}
           errorMessages={Validation(formState.rank).errors()
             .map(validationError => validationError.message)}
+          required
         >
           {
             personState.rankState.promised ? 'loading ranks...' :

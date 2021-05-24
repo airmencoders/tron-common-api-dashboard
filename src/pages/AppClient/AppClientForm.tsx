@@ -185,6 +185,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         labelText="Name"
         isError={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
         errorMessages={createNameErrors()}
+        required
       >
         <TextInput
           id="name"

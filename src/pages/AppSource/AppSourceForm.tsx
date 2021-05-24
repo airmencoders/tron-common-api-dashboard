@@ -252,6 +252,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
           errorMessages={Validation(formState.name).errors()
             .map(validationError => validationError.message)}
+          required
         >
           <TextInput
             id="name"

@@ -89,6 +89,7 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
         isError={Touched(formState.email).touched() && Validation(formState.email).invalid()}
         errorMessages={Validation(formState.email).errors()
           .map(validationError => validationError.message)}
+        required
       >
         <TextInput
           id="email"
@@ -106,6 +107,7 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
         labelText="Permissions"
         isError={isPermissionsError()}
         errorMessages={getPermissionsErrors()}
+        required
       >
         <Checkbox
           id="dashboard_admin"

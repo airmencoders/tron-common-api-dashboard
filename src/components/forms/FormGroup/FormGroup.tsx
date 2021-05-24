@@ -6,7 +6,7 @@ import './FormGroup.scss';
 function FormGroup(props: FormGroupProps) {
   return (
       <>
-        <Label htmlFor={props.labelName}>{props.labelText}</Label>
+        <Label className={props.required ? 'label--required' : ''} htmlFor={props.labelName}>{props.labelText}</Label>
         {props.children}
         {
           props.isError &&

@@ -344,6 +344,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                      isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
                      errorMessages={Validation(formState.name).errors()
                          .map(validationError =>validationError.message)}
+                      required
           >
             <TextInput id="orgName" name="orgName" type="text"
               defaultValue={props.data?.name || ''}
@@ -352,7 +353,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               disabled={isFormDisabled()}
             />
           </FormGroup>         
-          <FormGroup labelName="branch" labelText="Branch">
+          <FormGroup labelName="branch" labelText="Branch" required>
             <Select id="branch" name="branch" data-testid="branchType"
                     defaultValue={props.data?.branchType || ''}
                     onChange={onBranchChange}
@@ -368,6 +369,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           <FormGroup labelName="type" labelText="Type"
                      errorMessages={Validation(formState.orgType).errors()
                          .map(validationError =>validationError.message)}
+                     required
           >
             <Select id="type" name="type" data-testid="orgType"
                     defaultValue={props.data?.orgType || ''}

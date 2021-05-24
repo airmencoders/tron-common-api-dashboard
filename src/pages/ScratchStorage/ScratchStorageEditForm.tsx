@@ -217,6 +217,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
                      isError={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
                      errorMessages={Validation(formState.appName).errors()
                          .map(validationError => validationError.message)}
+                     required
           >
             <TextInput id="appName" name="appName" type="text"
                        className="scratch-storage-edit-form__mb1" 

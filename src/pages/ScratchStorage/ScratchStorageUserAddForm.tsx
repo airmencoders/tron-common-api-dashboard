@@ -57,6 +57,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
         isError={isEmailModified() && Validation(formState.email).invalid()}
         errorMessages={Validation(formState.email).errors()
           .map(validationError => validationError.message)}
+        required
       >
         <TextInput
           id="email"
@@ -71,6 +72,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       <FormGroup
         labelName="permissions"
         labelText="Permissions"
+        required
       >
         <Checkbox
           id="read"

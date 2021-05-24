@@ -1,5 +1,13 @@
 @import '../../../styles/base';
+@import '../../../styles/colors';
 
 .validation-error {
   color: $error;
+}
+
+.label {
+  &--required::after {
+    content: ' *';
+    color: $required-input;
+  }
 }
