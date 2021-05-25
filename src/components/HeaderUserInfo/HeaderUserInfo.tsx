@@ -30,17 +30,9 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
 
   const personState = usePersonState();
   useEffect(() => {
-    async function fetchPerson() {
-      try {
-        if (userInfo?.email) {
-          await personState.getPersonByEmail(userInfo.email);
-        }
-      } catch (err) {
-
-      }
+    if (userInfo?.email) {
+      personState.getPersonByEmail(userInfo.email);
     }
-
-    fetchPerson();
   }, []);
   
   const userEditorState = useHookstate<UserEditorState>({
