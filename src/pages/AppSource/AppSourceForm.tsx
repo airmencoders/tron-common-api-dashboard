@@ -20,7 +20,7 @@ import ModalTitle from '../../components/Modal/ModalTitle';
 import UnusedEndpointCellRenderer from '../../components/UnusedEndpointCellRenderer/UnusedEndpointCellRenderer';
 import { AppEndpointDto, AppSourceDetailsDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { validateEmail, validateRequiredString, validationErrors } from '../../utils/validation-utils';
+import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
 
@@ -69,12 +69,14 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   adminAddState.attach(Touched);
 
   Validation(adminAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
+  Validation(adminAddState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
   Validation(formState.name).validate(name => (validateRequiredString(name)), validationErrors.requiredText, 'error');
+  Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   function isFormModified() {
     return Initial(formState.appSourceAdminUserEmails).modified() ||
@@ -249,9 +251,8 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
         <FormGroup
           labelName="name"
           labelText="Name"
-          isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
-          errorMessages={Validation(formState.name).errors()
-            .map(validationError => validationError.message)}
+          isError={failsHookstateValidation(formState.name)}
+          errorMessages={generateStringErrorMessages(formState.name)}
           required
         >
           <TextInput
@@ -259,7 +260,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             name="name"
             type="text"
             defaultValue={formState.name.get()}
-            error={Touched(formState.name).touched() && Validation(formState.name).invalid()}
+            error={failsHookstateValidation(formState.name)}
             onChange={(event) => formState.name.set(event.target.value)}
             disabled={isFormDisabled()}
           />

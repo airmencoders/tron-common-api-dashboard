@@ -12,7 +12,7 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { validateCheckboxPrivileges, validateEmail, validationErrors } from '../../utils/validation-utils';
+import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 
 function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   const formState = useState<DashboardUserFlat>({
@@ -27,6 +27,9 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   formState.attach(Touched);
 
   Validation(formState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
+  Validation(formState.email).validate(validateRequiredString, validationErrors.requiredText, 'error');
+  Validation(formState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
   Validation(formState.hasDashboardAdmin).validate(
     () => validateCheckboxPrivileges([formState.hasDashboardAdmin.get(), formState.hasDashboardUser.get()]),
     validationErrors.atLeastOnePrivilege,
@@ -86,9 +89,8 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
       <FormGroup
         labelName="email"
         labelText="Email"
-        isError={Touched(formState.email).touched() && Validation(formState.email).invalid()}
-        errorMessages={Validation(formState.email).errors()
-          .map(validationError => validationError.message)}
+        isError={failsHookstateValidation(formState.email)}
+        errorMessages={generateStringErrorMessages(formState.email)}
         required
       >
         <TextInput
@@ -96,7 +98,7 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
           name="email"
           type="email"
           defaultValue={formState.email.get()}
-          error={Touched(formState.email).touched() && Validation(formState.email).invalid()}
+          error={failsHookstateValidation(formState.email)}
           onChange={(event) => formState.email.set(event.target.value)}
           disabled={isFormDisabled()}
         />

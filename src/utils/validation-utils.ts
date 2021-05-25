@@ -1,3 +1,7 @@
+import { State } from '@hookstate/core';
+import { Touched } from '@hookstate/touched';
+import { Validation } from '@hookstate/validation';
+
 /**
  * 
  * @param text the text to test against the regex
@@ -18,19 +22,13 @@ export function validDoDId(text: string | undefined | null): boolean {
 
 const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 /**
- * Tests for a valid email. Null or undefined emails are not valid and will fail validation.
+ * Tests for a valid email.
  * 
  * @param email the email to validate
- * @returns true if validation passed, false otherwise
+ * @returns true if validation passed or {@link email} is null/undefined or {@link email} length === 0, false otherwise
  */
 export function validateEmail(email: string | null | undefined): boolean {
-  if (email == null)
-    return false;
-
-  if (email.trim().length === 0)
-    return false;
-
-  return emailRegex.test(email);
+  return email == null || email.length === 0 || emailRegex.test(email);
 }
 
 /**
@@ -38,14 +36,11 @@ export function validateEmail(email: string | null | undefined): boolean {
  * 
  * The string must not be null or undefined.
  * The string must not be blank or empty.
- * If @param minLength and/or @param maxLength are set, then the string must also conform to that constraint.
  * 
  * @param value the value to validate
- * @param minLength the minimum length of the string (inclusive)
- * @param maxLength the maximum length of the string (inclusive)
  * @returns true if validation passed, false otherwise
  */
-export function validateRequiredString(value: string | null | undefined, minLength?: number, maxLength?: number): boolean {
+export function validateRequiredString(value: string | null | undefined): boolean {
   if (value == null) {
     return false;
   }
@@ -55,11 +50,29 @@ export function validateRequiredString(value: string | null | undefined, minLeng
   if (trimmed.length <= 0)
     return false;
 
-  if (minLength && trimmed.length < minLength)
+  return true;
+}
+
+/**
+ * Validates that a string's length meets length constraints. String will be trimmed when validating length constraints.
+ * 
+ * @param value the string to validate
+ * @param minLength the min length of the string. Defaults to 1 (inclusive)
+ * @param maxLength the max length of the string. Defaults to 255 (inclusive)
+ * @returns true if string is null, undefined, or passes validation, false otherwise
+ */
+export function validateStringLength(value: string | null | undefined, minLength = 1, maxLength = 255) {
+  if (value == null || value.length === 0)
+    return true;
+
+  const trimmed = value.trim();
+
+  if (trimmed.length < minLength)
     return false;
 
-  if (maxLength && trimmed.length > maxLength)
+  if (trimmed.length > maxLength)
     return false;
+
 
   return true;
 }
@@ -74,10 +87,37 @@ export function validateCheckboxPrivileges(values: boolean[]): boolean {
   return values.some(value => value === true);
 }
 
+/**
+ * Generates an array of string error messages from hookstate validation.
+ * Hookstate Validation plugin must be attached to the state otherwise
+ * a Hookstate exception will be thrown.
+ * 
+ * @param state the Hookstate value to generate errors off
+ * @returns array of string errors
+ */
+export function generateStringErrorMessages<T>(state: State<T>): string[] {
+  return Validation(state).errors().map(validationError => validationError.message);
+}
+
+/**
+ * Checks if a Hookstate state fails validation and has been touched.
+ * Uses Hookstate Touched and Validation plugins. Initial, Touched, and Validation plugins
+ * must be attached to the state otherwise a Hookstate exception will be thrown.
+ * 
+ * @param state the Hookstate value to check validation
+ * @returns true if touched and fails validation, false otherwise
+ */
+export function failsHookstateValidation<T>(state: State<T>): boolean {
+  return Touched(state).touched() && Validation(state).invalid();
+}
+
 export const validationErrors = {
   requiredText: 'Cannot be blank or empty.',
   invalidEmail: 'Email is not valid.',
   atLeastOnePrivilege: 'At least one privilege must be set.',
   invalidPhone: 'Phone Number is not valid.',
-  invalidDodid: 'DoD ID is invalid.'
+  invalidDodid: 'DoD ID is invalid.',
+  generateStringLengthError(minLength = 1, maxLength = 255): string {
+    return `Must have ${minLength} to ${maxLength} characters.`
+  }
 } as const;

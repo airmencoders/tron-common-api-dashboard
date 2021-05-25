@@ -19,7 +19,7 @@ import { AppClientFlat } from "../../state/app-clients/app-client-flat";
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { validateEmail, validateRequiredString, validationErrors } from '../../utils/validation-utils';
+import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 
 interface DeveloperEmail {
   email: string;
@@ -48,12 +48,14 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   developerAddState.attach(Touched);
 
   Validation(developerAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
+  Validation(developerAddState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
   Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
+  Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   function isFormModified() {
     return Initial(formState.name).modified() 
@@ -183,7 +185,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       <FormGroup
         labelName="name"
         labelText="Name"
-        isError={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
+        isError={failsHookstateValidation(formState.name) || props.formErrors?.validation?.name != null}
         errorMessages={createNameErrors()}
         required
       >
@@ -192,7 +194,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           name="name"
           type="text"
           defaultValue={formState.name.get()}
-          error={(Touched(formState.name).touched() && Validation(formState.name).invalid()) || props.formErrors?.validation?.name != null}
+          error={failsHookstateValidation(formState.name) || props.formErrors?.validation?.name != null}
           onChange={(event) => formState.name.set(event.target.value)}
           disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
         />
@@ -224,9 +226,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       <FormGroup
           labelName="developer"
           labelText="Manage Developers"
-          isError={Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid() && developerAddState.email.get().trim().length > 0}
-          errorMessages={Validation(developerAddState.email).errors()
-            .map(validationError => validationError.message)}
+          isError={failsHookstateValidation(developerAddState.email)}
+          errorMessages={generateStringErrorMessages(developerAddState.email)}
         >
           <TextInput
             id="developer"
@@ -235,7 +236,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
             data-testid="app-client-developer-field"
             placeholder={"Developer Email"}
             value={developerAddState.email.get()}
-            error={Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid() && developerAddState.email.get().trim().length > 0}
+            error={failsHookstateValidation(developerAddState.email)}
             onChange={(event) => developerAddState.email.set(event.target.value)}
             disabled={isFormDisabled()}
           />
