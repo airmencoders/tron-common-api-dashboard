@@ -30,7 +30,7 @@ export const PuckboardEtlControllerApiAxiosParamCreator = function (configuratio
          * @throws {RequiredError}
          */
         getPuckboardData: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/puckboard/extract`;
+            const localVarPath = `/v2/puckboard/extract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -66,7 +66,7 @@ export const PuckboardEtlControllerApiAxiosParamCreator = function (configuratio
          * @throws {RequiredError}
          */
         testPuckboardComms: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/puckboard/test`;
+            const localVarPath = `/v2/puckboard/test`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;

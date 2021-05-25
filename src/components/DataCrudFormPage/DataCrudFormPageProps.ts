@@ -1,8 +1,8 @@
 import {DataService} from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
+import { InfiniteScroll } from '../Grid/infinite-scroll';
 import { CreateUpdateFormProps } from './CreateUpdateFormProps';
 import { DataCrudDeleteComponentProps } from './DataCrudDeleteComponentProps';
-import { DataCrudDeleteContentProps } from './DataCrudDeleteContentProps';
 
 /***
  * T Row data type.
@@ -82,4 +82,6 @@ export interface DataCrudFormPageProps<T, R> {
   disableGridColumnVirtualization?: boolean;
 
   className?: string;
+
+  infiniteScroll?: InfiniteScroll;
 }

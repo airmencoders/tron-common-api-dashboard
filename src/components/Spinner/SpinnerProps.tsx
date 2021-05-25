@@ -8,4 +8,6 @@ export interface SpinnerProps extends React.HTMLAttributes<HTMLElement> {
    * Flag that centers the spinner
    */
   centered?: boolean;
+
+  small?: boolean;
 }

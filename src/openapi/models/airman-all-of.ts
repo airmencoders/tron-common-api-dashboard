@@ -25,73 +25,73 @@ export interface AirmanAllOf {
      * @type {string}
      * @memberof AirmanAllOf
      */
-    afsc?: string;
+    afsc?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    etsDate?: string;
+    etsDate?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    ptDate?: string;
+    ptDate?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    imds?: string;
+    imds?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    unit?: string;
+    unit?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    wing?: string;
+    wing?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    gp?: string;
+    gp?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    squadron?: string;
+    squadron?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    wc?: string;
+    wc?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    go81?: string;
+    go81?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    dor?: string;
+    dor?: string | null;
     /**
      * 
      * @type {string}
      * @memberof AirmanAllOf
      */
-    deros?: string;
+    deros?: string | null;
     /**
      * 
      * @type {boolean}
@@ -103,7 +103,7 @@ export interface AirmanAllOf {
      * @type {string}
      * @memberof AirmanAllOf
      */
-    fltChief?: string;
+    fltChief?: string | null;
     /**
      * 
      * @type {boolean}
@@ -115,7 +115,7 @@ export interface AirmanAllOf {
      * @type {string}
      * @memberof AirmanAllOf
      */
-    manNumber?: string;
+    manNumber?: string | null;
 }
 
 

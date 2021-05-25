@@ -31,7 +31,7 @@ export interface OrganizationDto {
      * @type {string}
      * @memberof OrganizationDto
      */
-    leader?: string;
+    leader?: string | null;
     /**
      * 
      * @type {Array<string>}
@@ -43,7 +43,7 @@ export interface OrganizationDto {
      * @type {string}
      * @memberof OrganizationDto
      */
-    parentOrganization?: string;
+    parentOrganization?: string | null;
     /**
      * 
      * @type {Set<string>}

@@ -37,6 +37,12 @@ import { Marine } from '../models';
 // @ts-ignore
 import { PersonDto } from '../models';
 // @ts-ignore
+import { PersonDtoPaginationResponseWrapper } from '../models';
+// @ts-ignore
+import { PersonDtoResponseWrapper } from '../models';
+// @ts-ignore
+import { PersonFindDto } from '../models';
+// @ts-ignore
 import { Sailor } from '../models';
 // @ts-ignore
 import { Soldier } from '../models';
@@ -55,12 +61,12 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addPersons: async (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options: any = {}): Promise<RequestArgs> => {
+        addPersonsWrapped: async (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman' is not null or undefined
             if (personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman === null || personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman === undefined) {
-                throw new RequiredError('personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman','Required parameter personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman was null or undefined when calling addPersons.');
+                throw new RequiredError('personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman','Required parameter personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman was null or undefined when calling addPersonsWrapped.');
             }
-            const localVarPath = `/v1/person/persons`;
+            const localVarPath = `/v2/person/persons`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -111,7 +117,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             if (personDto === null || personDto === undefined) {
                 throw new RequiredError('personDto','Required parameter personDto was null or undefined when calling createPerson.');
             }
-            const localVarPath = `/v1/person`;
+            const localVarPath = `/v2/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -162,7 +168,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deletePerson.');
             }
-            const localVarPath = `/v1/person/{id}`
+            const localVarPath = `/v2/person/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -196,23 +202,18 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
         /**
          * Retrieves a person using a single identifying property.
          * @summary Retrieves a person by email or dodid
-         * @param {'EMAIL' | 'DODID'} findByField The field to search for
-         * @param {string} value The value to search against
+         * @param {PersonFindDto} personFindDto 
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        findPersonBy: async (findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'findByField' is not null or undefined
-            if (findByField === null || findByField === undefined) {
-                throw new RequiredError('findByField','Required parameter findByField was null or undefined when calling findPersonBy.');
+        findPersonBy: async (personFindDto: PersonFindDto, memberships?: boolean, leaderships?: boolean, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personFindDto' is not null or undefined
+            if (personFindDto === null || personFindDto === undefined) {
+                throw new RequiredError('personFindDto','Required parameter personFindDto was null or undefined when calling findPersonBy.');
             }
-            // verify required parameter 'value' is not null or undefined
-            if (value === null || value === undefined) {
-                throw new RequiredError('value','Required parameter value was null or undefined when calling findPersonBy.');
-            }
-            const localVarPath = `/v1/person/find`;
+            const localVarPath = `/v2/person/find`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -220,7 +221,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -232,16 +233,10 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
                 localVarQueryParameter['leaderships'] = leaderships;
             }
 
-            if (findByField !== undefined) {
-                localVarQueryParameter['findByField'] = findByField;
-            }
-
-            if (value !== undefined) {
-                localVarQueryParameter['value'] = value;
-            }
-
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             const queryParameters = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
                 queryParameters.set(key, localVarQueryParameter[key]);
@@ -252,6 +247,13 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof personFindDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(personFindDto !== undefined ? personFindDto : {})
+                : (personFindDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -272,7 +274,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getPerson.');
             }
-            const localVarPath = `/v1/person/{id}`
+            const localVarPath = `/v2/person/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -312,7 +314,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Retrieves all persons
+         * Retrieves all persons  with pagination information
          * @summary Retrieves all persons
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
@@ -322,8 +324,8 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPersons: async (memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/person`;
+        getPersonsWrapped: async (memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -390,7 +392,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             if (jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === null || jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === undefined) {
                 throw new RequiredError('jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue','Required parameter jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue was null or undefined when calling patchPerson.');
             }
-            const localVarPath = `/v1/person/{id}`
+            const localVarPath = `/v2/person/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -447,7 +449,7 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             if (personDto === null || personDto === undefined) {
                 throw new RequiredError('personDto','Required parameter personDto was null or undefined when calling updatePerson.');
             }
-            const localVarPath = `/v1/person/{id}`
+            const localVarPath = `/v2/person/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -503,8 +505,8 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options);
+        async addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDtoResponseWrapper>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -541,15 +543,14 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
         /**
          * Retrieves a person using a single identifying property.
          * @summary Retrieves a person by email or dodid
-         * @param {'EMAIL' | 'DODID'} findByField The field to search for
-         * @param {string} value The value to search against
+         * @param {PersonFindDto} personFindDto 
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).findPersonBy(findByField, value, memberships, leaderships, options);
+        async findPersonBy(personFindDto: PersonFindDto, memberships?: boolean, leaderships?: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).findPersonBy(personFindDto, memberships, leaderships, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -572,7 +573,7 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
-         * Retrieves all persons
+         * Retrieves all persons  with pagination information
          * @summary Retrieves all persons
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
@@ -582,8 +583,8 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonDto>>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPersons(memberships, leaderships, page, size, sort, options);
+        async getPersonsWrapped(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDtoPaginationResponseWrapper>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).getPersonsWrapped(memberships, leaderships, page, size, sort, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -635,8 +636,8 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(axios, basePath));
+        addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): AxiosPromise<PersonDtoResponseWrapper> {
+            return PersonControllerApiFp(configuration).addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(axios, basePath));
         },
         /**
          * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
@@ -661,15 +662,14 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
         /**
          * Retrieves a person using a single identifying property.
          * @summary Retrieves a person by email or dodid
-         * @param {'EMAIL' | 'DODID'} findByField The field to search for
-         * @param {string} value The value to search against
+         * @param {PersonFindDto} personFindDto 
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).findPersonBy(findByField, value, memberships, leaderships, options).then((request) => request(axios, basePath));
+        findPersonBy(personFindDto: PersonFindDto, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).findPersonBy(personFindDto, memberships, leaderships, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves a person by ID
@@ -684,7 +684,7 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
             return PersonControllerApiFp(configuration).getPerson(id, memberships, leaderships, options).then((request) => request(axios, basePath));
         },
         /**
-         * Retrieves all persons
+         * Retrieves all persons  with pagination information
          * @summary Retrieves all persons
          * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
          * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
@@ -694,8 +694,8 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<PersonDto>> {
-            return PersonControllerApiFp(configuration).getPersons(memberships, leaderships, page, size, sort, options).then((request) => request(axios, basePath));
+        getPersonsWrapped(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<PersonDtoPaginationResponseWrapper> {
+            return PersonControllerApiFp(configuration).getPersonsWrapped(memberships, leaderships, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Patches an existing person
@@ -736,7 +736,7 @@ export interface PersonControllerApiInterface {
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): AxiosPromise<PersonDto>;
+    addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any): AxiosPromise<PersonDtoResponseWrapper>;
 
     /**
      * Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank \'Unknown\' and branch \'Other\'
@@ -761,15 +761,14 @@ export interface PersonControllerApiInterface {
     /**
      * Retrieves a person using a single identifying property.
      * @summary Retrieves a person by email or dodid
-     * @param {'EMAIL' | 'DODID'} findByField The field to search for
-     * @param {string} value The value to search against
+     * @param {PersonFindDto} personFindDto 
      * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
      * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto>;
+    findPersonBy(personFindDto: PersonFindDto, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Retrieves a person by ID
@@ -784,7 +783,7 @@ export interface PersonControllerApiInterface {
     getPerson(id: string, memberships?: boolean, leaderships?: boolean, options?: any): AxiosPromise<PersonDto>;
 
     /**
-     * Retrieves all persons
+     * Retrieves all persons  with pagination information
      * @summary Retrieves all persons
      * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
      * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
@@ -795,7 +794,7 @@ export interface PersonControllerApiInterface {
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<Array<PersonDto>>;
+    getPersonsWrapped(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<PersonDtoPaginationResponseWrapper>;
 
     /**
      * Patches an existing person
@@ -836,8 +835,8 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any) {
-        return PersonControllerApiFp(this.configuration).addPersons(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(this.axios, this.basePath));
+    public addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman: Array<PersonDto | Airman | CoastGuardsman | Marine | Sailor | Soldier | Spaceman>, options?: any) {
+        return PersonControllerApiFp(this.configuration).addPersonsWrapped(personDtoAirmanCoastGuardsmanMarineSailorSoldierSpaceman, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -867,16 +866,15 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     /**
      * Retrieves a person using a single identifying property.
      * @summary Retrieves a person by email or dodid
-     * @param {'EMAIL' | 'DODID'} findByField The field to search for
-     * @param {string} value The value to search against
+     * @param {PersonFindDto} personFindDto 
      * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
      * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public findPersonBy(findByField: 'EMAIL' | 'DODID', value: string, memberships?: boolean, leaderships?: boolean, options?: any) {
-        return PersonControllerApiFp(this.configuration).findPersonBy(findByField, value, memberships, leaderships, options).then((request) => request(this.axios, this.basePath));
+    public findPersonBy(personFindDto: PersonFindDto, memberships?: boolean, leaderships?: boolean, options?: any) {
+        return PersonControllerApiFp(this.configuration).findPersonBy(personFindDto, memberships, leaderships, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -894,7 +892,7 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     }
 
     /**
-     * Retrieves all persons
+     * Retrieves all persons  with pagination information
      * @summary Retrieves all persons
      * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
      * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
@@ -905,8 +903,8 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public getPersons(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any) {
-        return PersonControllerApiFp(this.configuration).getPersons(memberships, leaderships, page, size, sort, options).then((request) => request(this.axios, this.basePath));
+    public getPersonsWrapped(memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return PersonControllerApiFp(this.configuration).getPersonsWrapped(memberships, leaderships, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

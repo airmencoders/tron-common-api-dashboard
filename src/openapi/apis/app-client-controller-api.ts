@@ -23,9 +23,11 @@ import { AppClientUserDetailsDto } from '../models';
 // @ts-ignore
 import { AppClientUserDto } from '../models';
 // @ts-ignore
+import { AppClientUserDtoResponseWrapped } from '../models';
+// @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
-import { PrivilegeDto } from '../models';
+import { PrivilegeDtoResponseWrapper } from '../models';
 /**
  * AppClientControllerApi - axios parameter creator
  * @export
@@ -44,7 +46,7 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             if (appClientUserDto === null || appClientUserDto === undefined) {
                 throw new RequiredError('appClientUserDto','Required parameter appClientUserDto was null or undefined when calling createAppClientUser.');
             }
-            const localVarPath = `/v1/app-client`;
+            const localVarPath = `/v2/app-client`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -95,7 +97,7 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteAppClient.');
             }
-            const localVarPath = `/v1/app-client/{id}`
+            const localVarPath = `/v2/app-client/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -138,7 +140,7 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling getAppClientRecord.');
             }
-            const localVarPath = `/v1/app-client/{id}`
+            const localVarPath = `/v2/app-client/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -175,8 +177,8 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAppClientUsers: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/app-client`;
+        getAppClientUsersWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/app-client`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -212,8 +214,8 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getClientTypePrivs: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v1/app-client/privs`;
+        getClientTypePrivsWrapped: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/app-client/privs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -260,7 +262,7 @@ export const AppClientControllerApiAxiosParamCreator = function (configuration?:
             if (appClientUserDto === null || appClientUserDto === undefined) {
                 throw new RequiredError('appClientUserDto','Required parameter appClientUserDto was null or undefined when calling updateAppClient.');
             }
-            const localVarPath = `/v1/app-client/{id}`
+            const localVarPath = `/v2/app-client/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -357,8 +359,8 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAppClientUsers(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<AppClientUserDto>>> {
-            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getAppClientUsers(options);
+        async getAppClientUsersWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientUserDtoResponseWrapped>> {
+            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getAppClientUsersWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -370,8 +372,8 @@ export const AppClientControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getClientTypePrivs(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivilegeDto>>> {
-            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getClientTypePrivs(options);
+        async getClientTypePrivsWrapped(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrivilegeDtoResponseWrapper>> {
+            const localVarAxiosArgs = await AppClientControllerApiAxiosParamCreator(configuration).getClientTypePrivsWrapped(options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -437,8 +439,8 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAppClientUsers(options?: any): AxiosPromise<Array<AppClientUserDto>> {
-            return AppClientControllerApiFp(configuration).getAppClientUsers(options).then((request) => request(axios, basePath));
+        getAppClientUsersWrapped(options?: any): AxiosPromise<AppClientUserDtoResponseWrapped> {
+            return AppClientControllerApiFp(configuration).getAppClientUsersWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
@@ -446,8 +448,8 @@ export const AppClientControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getClientTypePrivs(options?: any): AxiosPromise<Array<PrivilegeDto>> {
-            return AppClientControllerApiFp(configuration).getClientTypePrivs(options).then((request) => request(axios, basePath));
+        getClientTypePrivsWrapped(options?: any): AxiosPromise<PrivilegeDtoResponseWrapper> {
+            return AppClientControllerApiFp(configuration).getClientTypePrivsWrapped(options).then((request) => request(axios, basePath));
         },
         /**
          * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
@@ -506,7 +508,7 @@ export interface AppClientControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppClientControllerApiInterface
      */
-    getAppClientUsers(options?: any): AxiosPromise<Array<AppClientUserDto>>;
+    getAppClientUsersWrapped(options?: any): AxiosPromise<AppClientUserDtoResponseWrapped>;
 
     /**
      * Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER
@@ -515,7 +517,7 @@ export interface AppClientControllerApiInterface {
      * @throws {RequiredError}
      * @memberof AppClientControllerApiInterface
      */
-    getClientTypePrivs(options?: any): AxiosPromise<Array<PrivilegeDto>>;
+    getClientTypePrivsWrapped(options?: any): AxiosPromise<PrivilegeDtoResponseWrapper>;
 
     /**
      * Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.
@@ -580,8 +582,8 @@ export class AppClientControllerApi extends BaseAPI implements AppClientControll
      * @throws {RequiredError}
      * @memberof AppClientControllerApi
      */
-    public getAppClientUsers(options?: any) {
-        return AppClientControllerApiFp(this.configuration).getAppClientUsers(options).then((request) => request(this.axios, this.basePath));
+    public getAppClientUsersWrapped(options?: any) {
+        return AppClientControllerApiFp(this.configuration).getAppClientUsersWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -591,8 +593,8 @@ export class AppClientControllerApi extends BaseAPI implements AppClientControll
      * @throws {RequiredError}
      * @memberof AppClientControllerApi
      */
-    public getClientTypePrivs(options?: any) {
-        return AppClientControllerApiFp(this.configuration).getClientTypePrivs(options).then((request) => request(this.axios, this.basePath));
+    public getClientTypePrivsWrapped(options?: any) {
+        return AppClientControllerApiFp(this.configuration).getClientTypePrivsWrapped(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

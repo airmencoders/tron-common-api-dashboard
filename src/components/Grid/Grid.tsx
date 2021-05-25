@@ -3,6 +3,7 @@ import { GridApi } from 'ag-grid-community';
 import { GridReadyEvent, RowSelectedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { agGridDefaults } from './ag-grid-defaults';
 import './Grid.scss';
 import { GridProps } from './GridProps';
 
@@ -21,13 +22,25 @@ function Grid(props: GridProps) {
 
   // Only reset grid data when the length has changed
   useEffect(() => {
+    if (!props.data)
+      return;
+
+    if (props.datasource)
+      return;
+
     rowDataLengthChanged.current = true;
 
     gridApi?.setRowData(props.data);
-  }, [props.data.length]);
+  }, [props.data?.length]);
 
-  // Refresh grid cells only if the length of the dat has not changed
+  // Refresh grid cells only if the length of the data has not changed
   useEffect(() => {
+    if (!props.data)
+      return;
+
+    if (props.datasource)
+      return;
+
     if (!rowDataLengthChanged.current) {
       props.hardRefresh ? gridApi?.setRowData(props.data) : gridApi?.refreshCells();
     } else {
@@ -56,6 +69,14 @@ function Grid(props: GridProps) {
 
   }, [windowWidth.get()])
 
+  // Handles updating infinite scroll cache
+  useEffect(() => {
+    if (props.updateInfiniteCache) {
+      gridApi?.refreshInfiniteCache();
+      props.updateInfiniteCacheCallback?.();
+    }
+  }, [props.updateInfiniteCache]);
+
   function onRowSelected(event: RowSelectedEvent) {
     const data = event.data;
     const isSelected = event.node.isSelected();
@@ -79,6 +100,11 @@ function Grid(props: GridProps) {
               enableBrowserTooltips
               suppressRowClickSelection={props.suppressRowClickSelection}
               onRowSelected={onRowSelected}
+              rowModelType={props.rowModelType}
+              datasource={props.datasource}
+              cacheBlockSize={props.cacheBlockSize ?? agGridDefaults.cacheBlockSize}
+              maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
+              maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
           >
             {
               props.columns.map(col => (

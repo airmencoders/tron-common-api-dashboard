@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto } from '../../../openapi';
+import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, AppClientUserDtoResponseWrapped, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDetailsDto, AppSourceDto, AppSourceDtoResponseWrapper, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { AppClientFlat } from '../../app-clients/app-client-flat';
 import AppClientsService from '../../app-clients/app-clients-service';
 import { accessAppClientsState } from '../../app-clients/app-clients-state';
@@ -65,7 +65,7 @@ describe('App Source State Tests', () => {
   };
 
   const axiosGetAppSourceDtosResponse: AxiosResponse = {
-    data: appSourceDtos,
+    data: { data: appSourceDtos },
     status: 200,
     statusText: 'OK',
     config: {},
@@ -117,9 +117,9 @@ describe('App Source State Tests', () => {
 
   function mockPrivilegesState() {
     (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivileges = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDto[]>>(resolve => resolve({
-        data: privilegDtos,
+    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
+        data: { data: privilegDtos },
         status: 200,
         headers: {},
         config: {},
@@ -150,9 +150,9 @@ describe('App Source State Tests', () => {
 
   function mockAppClientsState() {
     (accessAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
-    appClientsApi.getAppClientUsers = jest.fn(() => {
-      return new Promise<AxiosResponse<AppClientUserDto[]>>(resolve => resolve({
-        data: appClientUserDtos,
+    appClientsApi.getAppClientUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve({
+        data: { data: appClientUserDtos },
         status: 200,
         headers: {},
         config: {},
@@ -186,8 +186,8 @@ describe('App Source State Tests', () => {
   })
 
   it('Test fetch and store', async () => {
-    appSourceApi.getAppSources = jest.fn(() => {
-      return new Promise<AxiosResponse<AppSourceDto[]>>(resolve => resolve(axiosGetAppSourceDtosResponse));
+    appSourceApi.getAppSourcesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDtoResponseWrapper>>(resolve => resolve(axiosGetAppSourceDtosResponse));
     });
 
     await wrappedState.fetchAndStoreData();
@@ -196,8 +196,8 @@ describe('App Source State Tests', () => {
   });
 
   it('Test appSources', async () => {
-    appSourceApi.getAppSources = jest.fn(() => {
-      return new Promise<AxiosResponse<AppSourceDto[]>>(resolve => setTimeout(() => resolve(axiosGetAppSourceDtosResponse), 1000));
+    appSourceApi.getAppSourcesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDtoResponseWrapper>>(resolve => setTimeout(() => resolve(axiosGetAppSourceDtosResponse), 1000));
     });
 
     const fetch = wrappedState.fetchAndStoreData();
@@ -208,8 +208,8 @@ describe('App Source State Tests', () => {
   });
 
   it('Test error', async () => {
-    appSourceApi.getAppSources = jest.fn(() => {
-      return new Promise<AxiosResponse<AppSourceDto[]>>((resolve, reject) => {
+    appSourceApi.getAppSourcesWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppSourceDtoResponseWrapper>>((resolve, reject) => {
         setTimeout(() => {
           reject(rejectMsg)
         }, 1000)
@@ -266,6 +266,10 @@ describe('App Source State Tests', () => {
 
   it('sendCreate should throw -- not implemented', async () => {
     await expect(wrappedState.sendCreate(testAppSourceDetailsDto)).rejects.toThrow();
+  });
+
+  it('should reject non conforming object for create', async() => {
+    await expect(wrappedState.sendCreate({badParam: 'bad'} as unknown as AppSourceDetailsDto)).rejects.toThrowError();
   });
 
   it('sendDelete should throw -- not implemented', async () => {

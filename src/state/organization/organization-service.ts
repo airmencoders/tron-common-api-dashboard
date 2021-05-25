@@ -1,8 +1,11 @@
-import { none, State } from '@hookstate/core';
-import { OrganizationControllerApiInterface } from '../../openapi';
-import { OrganizationDto } from '../../openapi/models';
-import { DataService } from '../data-service/data-service';
-import { OrganizationDtoWithDetails } from './organization-state';
+import {none, State} from '@hookstate/core';
+import {OrganizationControllerApiInterface} from '../../openapi';
+import {OrganizationDto} from '../../openapi/models';
+import {AbstractDataService} from '../data-service/abstract-data-service';
+import {OrganizationDtoWithDetails} from './organization-state';
+import {ValidateFunction} from 'ajv';
+import TypeValidation from '../../utils/TypeValidation/type-validation';
+import ModelTypes from '../../api/model-types.json';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -18,32 +21,57 @@ export enum OrgEditOpType {
   OTHER = 'OTHER',
 }
 
-export default class OrganizationService implements DataService<OrganizationDto, OrganizationDto> {
+export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDto> {
+
+  private readonly validate: ValidateFunction<OrganizationDto>;
 
   constructor(
-    public state: State<OrganizationDto[]>, 
-    public selectedOrgState: State<OrganizationDtoWithDetails>,
-    private orgApi: OrganizationControllerApiInterface) {
+      public state: State<OrganizationDto[]>,
+      public selectedOrgState: State<OrganizationDtoWithDetails>,
+      private orgApi: OrganizationControllerApiInterface) {
+    super(state);
+    this.validate = TypeValidation.validatorFor<OrganizationDto>(ModelTypes.definitions.OrganizationDto);
   }
 
   async fetchAndStoreData(): Promise<OrganizationDto[]> {
     try {
-      const orgDataResponse = await this.orgApi.getOrganizations();
-      const orgData = orgDataResponse.data;
-      const mappedData = orgData.map((org) => {
-
-        // undef the collection-type fields because of the ag-grid bug
-        //  with hookState and collections (we're not displaying them anyways)
-        org.members = undefined;
-        org.subordinateOrganizations = undefined;
-        return org;
-      });
-      this.state.set(mappedData);      
+      const orgDataResponse = await this.orgApi.getOrganizationsWrapped();
+      const orgData = orgDataResponse.data.data;
+      const mappedData = this.removeUnfriendlyAgGridData(orgData);
+      this.state.set(mappedData);
       return Promise.resolve(orgData);
     }
     catch (error) {
       return Promise.reject(error);
     }
+  }
+
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<OrganizationDto[]> {
+    const orgResponseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit)
+      .then(resp => {
+        return resp.data.data;
+      });
+
+    const orgDataMapped = this.removeUnfriendlyAgGridData(orgResponseData);
+
+    this.mergeDataToState(orgDataMapped, checkDuplicates);
+
+    return orgResponseData;
+  }
+
+  /**
+   * Due to Hookstate and Ag Grid interaction, some fields cause Hookstate to error.
+   * Remove those fields here.
+   *
+   * @param data the data to remove fields from
+   * @returns the data with fields removed
+   */
+  removeUnfriendlyAgGridData(data: OrganizationDto[]): Array<OrganizationDto> {
+    return data.map(org => {
+      org.members = undefined;
+      org.subordinateOrganizations = undefined;
+      return org;
+    });
   }
 
   async convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
@@ -53,7 +81,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
     }
 
     try {
-      // fetch selected org's detailed info 
+      // fetch selected org's detailed info
       await this.getOrgDetails(id);
       return Promise.resolve(Object.assign({}, rowData));
     } catch (err) {
@@ -62,6 +90,9 @@ export default class OrganizationService implements DataService<OrganizationDto,
   }
 
   async sendCreate(toCreate: OrganizationDto): Promise<OrganizationDto> {
+    if(!this.validate(toCreate)) {
+      throw TypeValidation.validationError('OrganizationDto');
+    }
     try {
       const orgResponse = await this.orgApi.createOrganization(toCreate);
 
@@ -84,6 +115,9 @@ export default class OrganizationService implements DataService<OrganizationDto,
    * @param toUpdate
    */
   async sendUpdate(toUpdate: OrganizationDto): Promise<OrganizationDto> {
+    if(!this.validate(toUpdate)) {
+      throw TypeValidation.validationError('OrganizationDto');
+    }
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Organization to update has undefined id.'));
@@ -101,7 +135,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
       patchedOrg.subordinateOrganizations = undefined;
       const index = this.state.get().findIndex(item => item.id === patchedOrg.id);
       this.state[index].set(patchedOrg);
-      
+
       return Promise.resolve(orgResponse.data);
     }
     catch (error) {
@@ -114,7 +148,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    * the DataCrudFormPage component with variable arguments.  First argument should be
    * a way to tell what local method to call within this service, and the rest are the arguments
    * for that method.
-   * @param args 
+   * @param args
    */
   async sendPatch(...args: any) : Promise<OrganizationDto> {
 
@@ -136,7 +170,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
           return Promise.resolve(await this.removeMember(args[1], args[2]));
         case OrgEditOpType.LEADER_REMOVE:
           return Promise.resolve(await this.removeLeader(args[1]));
-        default: 
+        default:
           break;
       }
       return Promise.reject(new Error('Invalid Patch Operation'));
@@ -159,7 +193,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
 
       // the extra query params causes this response to match signature of an OrganizationDtoWithDetails
       const orgResponse = await this.orgApi.getOrganization(id, false, "id,firstName,lastName", "id,name");
-      this.selectedOrgState.set(orgResponse.data as OrganizationDtoWithDetails);      
+      this.selectedOrgState.set(orgResponse.data as OrganizationDtoWithDetails);
       return Promise.resolve(orgResponse.data);
     }
     catch (error) {
@@ -177,7 +211,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
     try {
       const orgResponse = await this.orgApi.patchOrganization1(orgId, { leader: id });
       await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);     
+      return Promise.resolve(orgResponse.data);
     }
     catch (error) {
       return Promise.reject(error);
@@ -207,7 +241,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    * @returns transaction response or the error it raised
    */
   async removeLeader(orgId: string): Promise<OrganizationDto> {
-    try {  
+    try {
       const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
       await this.getOrgDetails(orgId);
       return Promise.resolve(orgResponse.data);
@@ -223,7 +257,7 @@ export default class OrganizationService implements DataService<OrganizationDto,
    * @returns transaction response or the error it raised
    */
    async removeParent(orgId: string): Promise<OrganizationDto> {
-    try {  
+    try {
       const orgResponse = await this.orgApi.deleteOrgParent(orgId);
       await this.getOrgDetails(orgId);
       return Promise.resolve(orgResponse.data);
@@ -304,13 +338,10 @@ export default class OrganizationService implements DataService<OrganizationDto,
       return Promise.reject(error);
     }
   }
-  
+
   async sendDelete(toDelete: OrganizationDto): Promise<void> {
     try {
       const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
-      
-      // easiest way to refresh the data table than interfacing with proxy
-      //await this.fetchAndStoreData();
 
       const item = this.state.find(item => item.id.get() === toDelete.id);
       if (item)
@@ -322,13 +353,4 @@ export default class OrganizationService implements DataService<OrganizationDto,
       return error;
     }
   }
-
-  get isPromised(): boolean {
-    return this.state.promised;
-  }
-
-  get error(): string | undefined {
-    return this.state.promised ? undefined : this.state.error;
-  }
-
 }

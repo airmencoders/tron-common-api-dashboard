@@ -58,8 +58,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
 
   Validation(formState.dodid).validate(validDoDId, validationErrors.invalidDodid, 'error');
 
-  const isError = (formState: State<string | undefined>) => Touched(formState).touched() && Validation(formState).invalid()
-  const errorMessages = (formState: State<string | undefined>) => Validation(formState).errors().map(validationError => validationError.message)
+  const errorMessages = (formState: State<string | undefined | null>) => Validation(formState).errors().map(validationError => validationError.message)
 
   const isFormModified = (): boolean => {
     const stateKeys = formState.keys;
@@ -99,8 +98,8 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
     <div className="person-edit-form">
       <Form onSubmit={submitForm}>
         <FormGroup labelName="email" labelText="Email"
-          isError={isError(formState.email)}
-          errorMessages={errorMessages(formState.email)}
+          isError={Touched(formState.email).touched() && Validation(formState.email).invalid()}
+          errorMessages={Validation(formState.email).errors().map(validationError => validationError.message)}
           required
         >
           <TextInput id="email" name="email" type="email"
@@ -148,7 +147,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           />
         </FormGroup>
         <FormGroup labelName="dodid" labelText="DoD Id"
-          isError={isError(formState.dodid)}
+          isError={Touched(formState.dodid).touched() && Validation(formState.dodid).invalid()}
           errorMessages={errorMessages(formState.dodid)}>
           <TextInput id="dodid" name="dodid" type="text"
             defaultValue={props.data?.dodid || ''}
@@ -166,7 +165,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           />
         </FormGroup>
         <FormGroup labelName="phone" labelText="Phone"
-          isError={isError(formState.phone)}
+          isError={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
           errorMessages={errorMessages(formState.phone)}>
           <TextInput id="phone" name="phone" type="text"
             defaultValue={props.data?.phone || ''}
@@ -176,7 +175,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           />
         </FormGroup>
         <FormGroup labelName="dutyPhone" labelText="Duty Phone"
-          isError={isError(formState.dutyPhone)}
+          isError={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
           errorMessages={errorMessages(formState.dutyPhone)}>
           <TextInput id="dutyPhone" name="dutyPhone" type="text"
             defaultValue={props.data?.dutyPhone || ''}
@@ -206,6 +205,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
             }
           </Select>
         </FormGroup>
+
         <FormGroup labelName="rank" labelText="Rank"
           isError={Touched(formState.rank).touched() && Validation(formState.rank).invalid()}
           errorMessages={Validation(formState.rank).errors()
