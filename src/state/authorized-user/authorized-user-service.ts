@@ -4,6 +4,12 @@ import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboar
 import { AxiosPromise } from 'axios';
 import { PrivilegeType } from '../privilege/privilege-type';
 
+/**
+ * PII WARNING:
+ * Models used by this service has the following PII fields
+ * DashboardUserDto
+ *  * email
+ */
 export default class AuthorizedUserService {
   constructor(public state: State<DashboardUserDto | undefined>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
 
@@ -18,7 +24,7 @@ export default class AuthorizedUserService {
 
   /**
    * Checks if the user has a specific privilege
-   * 
+   *
    * @param privilegeType the privilege type to check against the authorized user's privileges
    * @returns true if the user has the privilege, false if authorized user not yet retrieved or user does not have the privilege
    */
@@ -31,7 +37,7 @@ export default class AuthorizedUserService {
 
   /**
    * Checks if the user has any privilege
-   * 
+   *
    * @param privilegeTypes the privilege types to check against the authorized user's privileges
    * @returns true if the user has any of the provided privileges, false if authorized user not yet retrieved or user does not have any privilege
    */

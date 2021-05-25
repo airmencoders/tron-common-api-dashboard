@@ -7,6 +7,18 @@ import {ValidateFunction} from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 
+/**
+ * PII WARNING:
+ * Models used by this service has the following PII fields
+ * PersonDto
+ *  * firstName
+ *  * middleName
+ *  * lastName
+ *  * email
+ *  * dodid
+ *  * phone
+ *  * address
+ */
 export default class PersonService extends AbstractDataService<PersonDto, PersonDto> {
   private readonly validate: ValidateFunction<PersonDto>;
 
