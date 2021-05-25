@@ -131,8 +131,12 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async getPersonByEmail(email: string): Promise<PersonDto> {
+    try {
       const personResponse = await this.personApi.findPersonBy({ findType: PersonFindDtoFindTypeEnum.Email, value: email });
-      this.currentUserState.set(personResponse.data)
+      this.currentUserState.set(personResponse.data);
       return personResponse.data;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 }

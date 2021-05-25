@@ -14,7 +14,7 @@ import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { usePersonState } from '../../state/person/person-state';
 import { RankStateModel } from '../../state/person/rank-state-model';
 import { validPhone } from '../../utils/validation-utils';
-import { useUserInfoState } from '../../state/user/user-info-state';
+
 interface UserInfoFormProps {
   editorState: State<UserEditorState>;
   userInitials: string;
@@ -200,6 +200,7 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
                     <Select id="branch" name="branch"
                             defaultValue={formState?.branch.get() || ''}
                             onChange={onBranchChange}
+                            disabled={rankState.promised}
                     >
                       {
                         Object.values(PersonDtoBranchEnum).map((branchName) => {

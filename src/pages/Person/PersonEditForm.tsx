@@ -204,7 +204,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
             <Select id="branch" name="branch"
                     defaultValue={props.data?.branch || ''}
                     onChange={onBranchChange}
-                    disabled={isFormDisabled()}
+                    disabled={isFormDisabled() || personState.rankState.promised}
             >
               {
                 Object.values(PersonDtoBranchEnum).map((branchName) => {

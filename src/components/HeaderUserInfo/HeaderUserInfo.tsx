@@ -30,7 +30,8 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
 
   const personState = usePersonState();
   useEffect(() => {
-    personState.getPersonByEmail(userInfo?.email || '');
+    if (userInfo?.email)
+      personState.getPersonByEmail(userInfo.email);
   }, []);
   
   const userEditorState = useHookstate<UserEditorState>({
@@ -42,22 +43,24 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
 
   async function userEditorSubmitModal() {
     try {
+      userEditorState.disableSubmit.set(true);
       await personState.sendSelfUpdate(userEditorState.get().currentUserState.get());
       userEditorCloseHandler();
       createTextToast(ToastType.SUCCESS, 'Successfully updated Person Record.');
     } catch (error) {
       userEditorState.errorMessage.set(error.message);
+      userEditorState.disableSubmit.set(false);
     }
   }
 
   function userEditorCloseHandler() {
-    personState.getPersonByEmail(userInfo?.email || '')
+    personState.getPersonByEmail(userInfo?.email || '');
     userEditorState.merge({
       isOpen: false,
       currentUserState: personState.currentUserState,
       errorMessage: '',
       disableSubmit: false,
-    })
+    });
   }
 
   function onHeaderClick() {
@@ -95,12 +98,12 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
             <div className="font-italic text-muted header-user-info__label">Organization</div>
             {userInfo?.organization}
           </Dropdown.Item>
-            { personState.currentUserState.email.get() &&
-              <div>
-                <Dropdown.Divider/>
-                <a className="d-flex justify-content-center header-user-info__edit" href="#" onClick={onHeaderClick}>Edit Person Record</a>
-              </div>
-            }
+          {personState.currentUserState.email.get() &&
+            <div>
+              <Dropdown.Divider />
+              <a className="d-flex justify-content-center header-user-info__edit" href="#" onClick={onHeaderClick}>Edit Person Record</a>
+            </div>
+          }
         </Dropdown.Menu>
       </Dropdown>
       <Modal
