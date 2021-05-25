@@ -16,7 +16,7 @@ export interface UserEditorState {
   isOpen: boolean;
   currentUserState: State<PersonDto>;
   errorMessage: string;
-  disableSubmit: boolean
+  disableSubmit: boolean;
   original?: PersonDto;
 }
 
@@ -30,8 +30,17 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
 
   const personState = usePersonState();
   useEffect(() => {
-    if (userInfo?.email)
-      personState.getPersonByEmail(userInfo.email);
+    async function fetchPerson() {
+      try {
+        if (userInfo?.email) {
+          await personState.getPersonByEmail(userInfo.email);
+        }
+      } catch (err) {
+
+      }
+    }
+
+    fetchPerson();
   }, []);
   
   const userEditorState = useHookstate<UserEditorState>({
