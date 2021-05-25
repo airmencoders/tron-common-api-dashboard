@@ -10,6 +10,14 @@ import { DashboardUserDtoResponseWrapper, PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 
+/**
+ * PII WARNING:
+ * Models used by this service has the following PII fields
+ * DashboardUserFlat
+ *  * email
+ * DashboardUserDto
+ * * email
+ */
 export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserFlat> {
   constructor(public state: State<DashboardUserFlat[]>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
 
@@ -73,7 +81,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
     if (dashboardUser.hasDashboardAdmin) {
       const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.DASHBOARD_ADMIN);
-      
+
       if (privilege) {
         privileges.add(privilege);
       }

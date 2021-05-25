@@ -12,6 +12,7 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
+import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 
 function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   const formState = useState<DashboardUserFlat>({
@@ -25,9 +26,20 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   formState.attach(Initial);
   formState.attach(Touched);
 
-  Validation(formState.email).validate(email => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email), 'Enter a valid email', 'error');
-  Validation(formState.hasDashboardAdmin).validate(() => validatePrivileges(), 'A permission must be set', 'error');
-  Validation(formState.hasDashboardUser).validate(() => validatePrivileges(), 'A permission must be set', 'error');
+  Validation(formState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
+  Validation(formState.email).validate(validateRequiredString, validationErrors.requiredText, 'error');
+  Validation(formState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
+  Validation(formState.hasDashboardAdmin).validate(
+    () => validateCheckboxPrivileges([formState.hasDashboardAdmin.get(), formState.hasDashboardUser.get()]),
+    validationErrors.atLeastOnePrivilege,
+    'error'
+  );
+  Validation(formState.hasDashboardUser).validate(
+    () => validateCheckboxPrivileges([formState.hasDashboardAdmin.get(), formState.hasDashboardUser.get()]),
+    validationErrors.atLeastOnePrivilege,
+    'error'
+  );
 
   function isFormModified() {
     return Initial(formState.email).modified() || Initial(formState.hasDashboardAdmin).modified() || Initial(formState.hasDashboardUser).modified();
@@ -40,10 +52,6 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     props.onSubmit(formState.get());
-  }
-
-  function validatePrivileges(): boolean {
-    return formState.hasDashboardAdmin.get() || formState.hasDashboardUser.get();
   }
 
   function isPermissionsError(): boolean {
@@ -81,16 +89,16 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
       <FormGroup
         labelName="email"
         labelText="Email"
-        isError={Touched(formState.email).touched() && Validation(formState.email).invalid()}
-        errorMessages={Validation(formState.email).errors()
-          .map(validationError => validationError.message)}
+        isError={failsHookstateValidation(formState.email)}
+        errorMessages={generateStringErrorMessages(formState.email)}
+        required
       >
         <TextInput
           id="email"
           name="email"
           type="email"
           defaultValue={formState.email.get()}
-          error={Touched(formState.email).touched() && Validation(formState.email).invalid()}
+          error={failsHookstateValidation(formState.email)}
           onChange={(event) => formState.email.set(event.target.value)}
           disabled={isFormDisabled()}
         />
@@ -101,6 +109,7 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
         labelText="Permissions"
         isError={isPermissionsError()}
         errorMessages={getPermissionsErrors()}
+        required
       >
         <Checkbox
           id="dashboard_admin"

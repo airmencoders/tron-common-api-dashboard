@@ -23,6 +23,7 @@ import Modal from '../../components/Modal/Modal';
 import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
+import { generateStringErrorMessages, failsHookstateValidation, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -67,10 +68,8 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     isOpen: false,
   });
 
-  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0
-  const requiredError = 'cannot be empty or blank';
-  Validation(formState.appName).validate(requiredText, requiredError, 'error');
-
+  Validation(formState.appName).validate(validateRequiredString, validationErrors.requiredText, 'error');
+  Validation(formState.appName).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   const isFormModified = (): boolean => {
     return Initial(formState.appName).modified() ||
@@ -216,14 +215,14 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       <div className="scratch-storage-edit-form">
         <Form onSubmit={submitForm} data-testid="scratch-storage-form">
           <FormGroup labelName="appName" labelText="App Name"
-                     isError={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
-                     errorMessages={Validation(formState.appName).errors()
-                         .map(validationError => validationError.message)}
+                     isError={failsHookstateValidation(formState.appName)}
+                     errorMessages={generateStringErrorMessages(formState.appName)}
+                     required
           >
             <TextInput id="appName" name="appName" type="text"
                        className="scratch-storage-edit-form__mb1" 
                        defaultValue={props.data?.appName || ''}
-                       error={Touched(formState.appName).touched() && Validation(formState.appName).invalid()}
+                       error={failsHookstateValidation(formState.appName)}
                        onChange={(event) => formState.appName.set(event.target.value)}
                        disabled={isFormDisabled()}
             />

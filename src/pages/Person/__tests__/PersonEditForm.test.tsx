@@ -2,6 +2,7 @@ import {render, waitFor, fireEvent} from '@testing-library/react';
 import PersonEditForm from '../PersonEditForm';
 import {PersonDto} from '../../../openapi/models';
 import {FormActionType} from '../../../state/crud-page/form-action-type';
+import { validationErrors } from '../../../utils/validation-utils';
 
 
 
@@ -221,7 +222,7 @@ it('should set formState for dodid', async () => {
         await waitFor(
             () => {
                 expect(form.getByText('Add').closest('button')).toHaveAttribute('disabled')
-                expect(form.getByText('* Enter a valid DoD Id')).toBeInTheDocument();
+                expect(form.getByText(new RegExp(validationErrors.invalidDodid))).toBeInTheDocument();
             }
         );
     })  
@@ -309,7 +310,7 @@ badPhoneNumbers.forEach(input =>
         await waitFor(
             () => {
                 expect(form.getByText('Add').closest('button')).toHaveAttribute('disabled')
-                expect(form.getByText('* Enter a valid phone number')).toBeInTheDocument();
+                expect(form.getByText(new RegExp(validationErrors.invalidPhone))).toBeInTheDocument();
             }
         );
     })
@@ -392,7 +393,7 @@ badPhoneNumbers.forEach(input =>
         await waitFor(
             () => {
                 expect(form.getByText('Add').closest('button')).toHaveAttribute('disabled')
-                expect(form.getByText('* Enter a valid phone number')).toBeInTheDocument();
+                expect(form.getByText(new RegExp(validationErrors.invalidPhone))).toBeInTheDocument();
             }
         );
     })
