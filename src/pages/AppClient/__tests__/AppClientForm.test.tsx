@@ -5,6 +5,7 @@ import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import { validationErrors } from '../../../utils/validation-utils';
 
 describe('Test App Client Form', () => {
   let onSubmit = jest.fn();
@@ -80,7 +81,7 @@ describe('Test App Client Form', () => {
     const nameInput = pageRender.getByDisplayValue(client.name);
     fireEvent.change(nameInput, { target: { value: '' } });
     expect(nameInput).toHaveValue('');
-    expect(pageRender.getByText('* cannot be empty or blank.'));
+    expect(pageRender.getByText(new RegExp(validationErrors.requiredText)));
   });
 
   it('Server-side Validation', () => {
@@ -100,8 +101,8 @@ describe('Test App Client Form', () => {
     const elem = pageRender.getByTestId('app-client-form');
     expect(elem).toBeInTheDocument();
 
-    expect(pageRender.getByText(new RegExp(nameValidation, 'i')));
-    expect(pageRender.getByText(new RegExp(generalError, 'i')));
+    expect(pageRender.getByText(new RegExp(nameValidation)));
+    expect(pageRender.getByText(new RegExp(generalError)));
   });
 
   it('Success message', () => {
