@@ -10,4 +10,4 @@ USER appuser
 COPY --from=builder --chown=appuser:appuser /app/build /var/www
 COPY nginx.conf /data/conf/nginx.conf
 EXPOSE 8080
-CMD [ "nginx", "-g", "daemon off;", "-c", "/data/conf/nginx.conf" ]
+CMD [ "nginx", "-g", "daemon off;"]
