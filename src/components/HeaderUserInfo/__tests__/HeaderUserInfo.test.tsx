@@ -28,6 +28,11 @@ describe('Test HeaderUserInfo', () => {
   beforeEach(() => {
     personState = createState<PersonDto[]>([]);
     personApi = new PersonControllerApi();
+
+    personApi.findPersonBy = jest.fn(() => {
+      return Promise.resolve(personDtoResponse);
+    });
+
     rankState = createState<RankStateModel>({
       OTHER: [
         { abbreviation: "CIV", name: "Civilian", payGrade: "GS", branchType: RankBranchTypeEnum.Other }
@@ -54,6 +59,7 @@ describe('Test HeaderUserInfo', () => {
 
     personDtoResponse = {
       data: {
+        id: 'TEST ID',
         firstName: userInfo.givenName,
         lastName: userInfo.familyName,
         email: userInfo.email,
@@ -91,10 +97,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   test('userInfo dropdown should allow Edit Person Record', async () => {
-    personApi.findPersonBy = jest.fn(() => {
-      return Promise.resolve(personDtoResponse);
-    });
-
     const element = render(<HeaderUserInfo userInfo={userInfo} />);
     const dropdownToggle = screen.getByText('TU');
     fireEvent.click(dropdownToggle);
@@ -107,10 +109,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   test('should show Edit Person Record modal', async () => {
-    personApi.findPersonBy = jest.fn(() => {
-      return Promise.resolve(personDtoResponse);
-    });
-
     const element = render(<HeaderUserInfo userInfo={userInfo} />);
     const dropdownToggle = screen.getByText('TU');
     fireEvent.click(dropdownToggle);
@@ -149,7 +147,6 @@ describe('Test HeaderUserInfo', () => {
     const selfUpdateResponse = {
       ...personDtoResponse
     };
-    selfUpdateResponse.data.id = 'TEST ID';
 
     personApi.selfUpdatePerson = jest.fn(() => {
       return Promise.reject(new Error('failed'));
@@ -182,7 +179,7 @@ describe('Test HeaderUserInfo', () => {
 
   test('userInfo dropdown should not allow Edit Person Record', async () => {
     personApi.findPersonBy = jest.fn(() => {
-      return Promise.resolve(personDtoResponse);
+      return Promise.reject(new Error('failed'));
     });
 
     const element = render(<HeaderUserInfo userInfo={userInfo} />);
@@ -193,6 +190,6 @@ describe('Test HeaderUserInfo', () => {
       expect(screen.getByText('Test User')).toBeTruthy();
     });
 
-    expect(element.findByText('Edit Person Record')).rejects;
+    await expect(element.findByText('Edit Person Record')).rejects.toBeDefined();
   });
 });
