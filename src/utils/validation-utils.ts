@@ -121,3 +121,27 @@ export const validationErrors = {
     return `Must have ${minLength} to ${maxLength} characters.`
   }
 } as const;
+
+/**
+ * Helper function to get a property of a object.
+ */
+export function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
+  return o[propertyName];
+}
+
+/**
+ * Compares the two objects to see if any fields contain values
+ * that do not match.
+ * 
+ * @param original The first object
+ * @param toCheck The second object
+ * @returns true if some property of {@link original} does not match the associated property of {@link toCheck} or if either is null or undefined
+ */
+export function isFormModified<T>(original: T, toCheck: T): boolean {
+  if (original == null || toCheck == null)
+    return true;
+
+  return Object.keys(original).some(key => {
+    return getProperty(original, key as keyof T) !== getProperty(toCheck, key as keyof T);
+  });
+}

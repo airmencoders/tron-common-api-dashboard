@@ -1,6 +1,6 @@
-import {State} from '@hookstate/core';
-import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, RankControllerApiInterface} from '../../openapi';
-import {RankStateModel} from './rank-state-model';
+import { State } from '@hookstate/core';
+import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, PersonFindDtoFindTypeEnum, RankControllerApiInterface} from '../../openapi';
+import { RankStateModel } from './rank-state-model';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
 import {AbstractDataService} from '../data-service/abstract-data-service';
 import {ValidateFunction} from 'ajv';
@@ -23,7 +23,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   private readonly validate: ValidateFunction<PersonDto>;
 
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
-              public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
+    public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<PersonDto>(ModelTypes.definitions.PersonDto);
   }
@@ -33,8 +33,8 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         .then(resp => {
           return resp.data.data;
         });
-    this.state.set(personResponsePromise);
-    return personResponsePromise;
+    this.state.set(personResponsePromise ?? []);
+    return personResponsePromise ?? [];
   }
 
   async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<PersonDto[]> {
@@ -43,9 +43,9 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         return resp.data.data;
       });
 
-    this.mergeDataToState(personResponseData, checkDuplicates);
+    this.mergeDataToState(personResponseData ?? [], checkDuplicates);
 
-    return personResponseData;
+    return personResponseData ?? [];
   }
 
   convertRowDataToEditableData(rowData: PersonDto): Promise<PersonDto> {
@@ -79,6 +79,23 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         currentState[currentPersonIndex] = personResponse.data;
         return [...currentState];
       });
+      return Promise.resolve(personResponse.data);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async sendSelfUpdate(toUpdate: PersonDto): Promise<PersonDto> {
+    try {
+      if (toUpdate?.id == null) {
+        return Promise.reject(new Error('Person to update has undefined id.'));
+      }
+      const personResponse = await this.personApi.selfUpdatePerson(toUpdate.id, toUpdate);
+
+      const personInState = this.state.find(person => person.id.get() === personResponse.data.id);
+      personInState?.set(personResponse.data);
+
       return Promise.resolve(personResponse.data);
     }
     catch (error) {
@@ -121,5 +138,14 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
             }
           });
     });
+  }
+
+  async getPersonByEmail(email: string) {
+    try {
+      const personResponse = await this.personApi.findPersonBy({ findType: PersonFindDtoFindTypeEnum.Email, value: email });
+      return personResponse.data;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 }

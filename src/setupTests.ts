@@ -52,7 +52,15 @@ const server = setupServer(
       ]
     }))
   }),
-  rest.get('*', req => console.log(req.url.href))
+  rest.get('*', req => console.log(req.url.href)),
+  rest.post('/api/v2/person/find', (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+  rest.get('*', req => console.log(`${req.method} - ${req.url.href}`)),
+  rest.post('*', req => console.log(`${req.method} - ${req.url.href}`)),
+  rest.patch('*', req => console.log(`${req.method} - ${req.url.href}`)),
+  rest.put('*', req => console.log(`${req.method} - ${req.url.href}`)),
+  rest.delete('*', req => console.log(`${req.method} - ${req.url.href}`))
 )
 
 beforeAll(() => server.listen());

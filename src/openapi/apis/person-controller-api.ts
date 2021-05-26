@@ -440,6 +440,63 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        selfUpdatePerson: async (id: string, personDto: PersonDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling selfUpdatePerson.');
+            }
+            // verify required parameter 'personDto' is not null or undefined
+            if (personDto === null || personDto === undefined) {
+                throw new RequiredError('personDto','Required parameter personDto was null or undefined when calling selfUpdatePerson.');
+            }
+            const localVarPath = `/v2/person/self/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof personDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(personDto !== undefined ? personDto : {})
+                : (personDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Updates an existing person
+         * @summary Updates an existing person
+         * @param {string} id Person ID to update
+         * @param {PersonDto} personDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         updatePerson: async (id: string, personDto: PersonDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
@@ -613,6 +670,21 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async selfUpdatePerson(id: string, personDto: PersonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).selfUpdatePerson(id, personDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Updates an existing person
+         * @summary Updates an existing person
+         * @param {string} id Person ID to update
+         * @param {PersonDto} personDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async updatePerson(id: string, personDto: PersonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
             const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).updatePerson(id, personDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
@@ -716,6 +788,17 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        selfUpdatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).selfUpdatePerson(id, personDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Updates an existing person
+         * @summary Updates an existing person
+         * @param {string} id Person ID to update
+         * @param {PersonDto} personDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         updatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto> {
             return PersonControllerApiFp(configuration).updatePerson(id, personDto, options).then((request) => request(axios, basePath));
         },
@@ -806,6 +889,17 @@ export interface PersonControllerApiInterface {
      * @memberof PersonControllerApiInterface
      */
     patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<PersonDto>;
+
+    /**
+     * Updates an existing person
+     * @summary Updates an existing person
+     * @param {string} id Person ID to update
+     * @param {PersonDto} personDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApiInterface
+     */
+    selfUpdatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Updates an existing person
@@ -918,6 +1012,19 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      */
     public patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any) {
         return PersonControllerApiFp(this.configuration).patchPerson(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Updates an existing person
+     * @summary Updates an existing person
+     * @param {string} id Person ID to update
+     * @param {PersonDto} personDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApi
+     */
+    public selfUpdatePerson(id: string, personDto: PersonDto, options?: any) {
+        return PersonControllerApiFp(this.configuration).selfUpdatePerson(id, personDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
