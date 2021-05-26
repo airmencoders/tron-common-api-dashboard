@@ -23,8 +23,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   private readonly validate: ValidateFunction<PersonDto>;
 
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
-              public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface,
-              public currentUserState: State<PersonDto>) {
+    public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<PersonDto>(ModelTypes.definitions.PersonDto);
   }
@@ -93,11 +92,10 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
       const personResponse = await this.personApi.selfUpdatePerson(toUpdate.id, toUpdate);
-      this.state.set(currentState => {
-        const currentPersonIndex = currentState.findIndex(person => person.id === personResponse.data.id);
-        currentState[currentPersonIndex] = personResponse.data;
-        return [...currentState];
-      });
+
+      const personInState = this.state.find(person => person.id.get() === personResponse.data.id);
+      personInState?.set(personResponse.data);
+
       return Promise.resolve(personResponse.data);
     }
     catch (error) {
@@ -143,8 +141,11 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async getPersonByEmail(email: string) {
-    const personResponse = await this.personApi.findPersonBy({ findType: PersonFindDtoFindTypeEnum.Email, value: email });
-    this.currentUserState.set(personResponse.data);
-    return personResponse.data;
+    try {
+      const personResponse = await this.personApi.findPersonBy({ findType: PersonFindDtoFindTypeEnum.Email, value: email });
+      return personResponse.data;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 }

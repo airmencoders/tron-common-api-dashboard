@@ -1,12 +1,13 @@
 import React from 'react';
 import HeaderUserInfo from '../HeaderUserInfo';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
-import { PersonDto, RankBranchTypeEnum, UserInfoDto } from '../../../openapi/models';
+import { PersonDto, PersonDtoBranchEnum, RankBranchTypeEnum, UserInfoDto } from '../../../openapi/models';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { PersonControllerApi, PersonControllerApiInterface, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
 import { RankStateModel } from '../../../state/person/rank-state-model';
 import { usePersonState } from '../../../state/person/person-state';
 import PersonService from '../../../state/person/person-service';
+import { AxiosResponse } from 'axios';
 
 jest.mock('../../../state/person/person-state');
 
@@ -16,10 +17,12 @@ describe('Test HeaderUserInfo', () => {
   let personApi: PersonControllerApiInterface;
   let rankState: State<RankStateModel> & StateMethodsDestroy;
   let rankApi: RankControllerApiInterface;
-  let currentUserState: State<PersonDto> & StateMethodsDestroy;
+
+  let userInfo: UserInfoDto;
+  let personDtoResponse: AxiosResponse<PersonDto>;
 
   function mockPersonService() {
-    (usePersonState as jest.Mock).mockReturnValue(new PersonService(personState, personApi, rankState, rankApi, currentUserState));
+    (usePersonState as jest.Mock).mockReturnValue(new PersonService(personState, personApi, rankState, rankApi));
   }
 
   beforeEach(() => {
@@ -39,22 +42,37 @@ describe('Test HeaderUserInfo', () => {
       USCG: [],
     });
     rankApi = new RankControllerApi();
-    currentUserState = createState<PersonDto>({});
 
     mockPersonService();
+
+    userInfo = {
+      givenName: 'Test',
+      familyName: 'User',
+      name: 'Test User',
+      email: 'test@email.com'
+    };
+
+    personDtoResponse = {
+      data: {
+        firstName: userInfo.givenName,
+        lastName: userInfo.familyName,
+        email: userInfo.email,
+        rank: 'CIV',
+        branch: PersonDtoBranchEnum.Other
+      },
+      status: 200,
+      statusText: 'OK',
+      config: {},
+      headers: {}
+    };
   });
 
   afterEach(() => {
     personState.destroy();
     rankState.destroy();
-    currentUserState.destroy();
   });
 
   test('shows the HeaderUserInfo', async () => {
-    const userInfo: UserInfoDto = {
-      givenName: 'Test',
-      familyName: 'User'
-    }
     render(<HeaderUserInfo userInfo={userInfo} />);
 
     await waitFor(() => {
@@ -63,12 +81,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   test('click shows userInfo dropdown', async () => {
-    const userInfo: UserInfoDto = {
-      givenName: 'Test',
-      familyName: 'User',
-      name: 'Test User'
-    }
-
     render(<HeaderUserInfo userInfo={userInfo} />);
     const dropdownToggle = screen.getByText('TU');
     fireEvent.click(dropdownToggle);
@@ -79,16 +91,9 @@ describe('Test HeaderUserInfo', () => {
   });
 
   test('userInfo dropdown should allow Edit Person Record', async () => {
-    currentUserState.set({
-      email: 'test@email.com'
+    personApi.findPersonBy = jest.fn(() => {
+      return Promise.resolve(personDtoResponse);
     });
-
-    const userInfo: UserInfoDto = {
-      givenName: 'Test',
-      familyName: 'User',
-      name: 'Test User',
-      email: 'test@email.com'
-    }
 
     const element = render(<HeaderUserInfo userInfo={userInfo} />);
     const dropdownToggle = screen.getByText('TU');
@@ -102,31 +107,16 @@ describe('Test HeaderUserInfo', () => {
   });
 
   test('should show Edit Person Record modal', async () => {
-    const userEmail = 'test@email.com';
-    const fName = 'Test';
-    const lName = 'User';
-
-    currentUserState.set({
-      id: 'testID',
-      firstName: fName,
-      lastName: lName,
-      email: userEmail
+    personApi.findPersonBy = jest.fn(() => {
+      return Promise.resolve(personDtoResponse);
     });
-
-    const userInfo: UserInfoDto = {
-      givenName: fName,
-      familyName: lName,
-      name: `${fName} ${lName}`,
-      email: userEmail
-    };
 
     const element = render(<HeaderUserInfo userInfo={userInfo} />);
     const dropdownToggle = screen.getByText('TU');
     fireEvent.click(dropdownToggle);
 
     await waitFor(() => {
-      expect(currentUserState.get().email).toBeDefined();
-      expect(screen.getByText('Test User')).toBeTruthy();
+      expect(screen.getByText(userInfo.name!)).toBeTruthy();
     });
 
     // Open the modal
@@ -136,7 +126,7 @@ describe('Test HeaderUserInfo', () => {
 
     // Find the modal by email
     await waitFor(() => {
-      expect(screen.getByText(userEmail)).toBeTruthy();
+      expect(screen.getByText(userInfo.email!)).toBeTruthy();
     });
 
     // Modal update btn should be disabled
@@ -144,21 +134,56 @@ describe('Test HeaderUserInfo', () => {
     expect(updateBtn).toBeInTheDocument();
     expect(updateBtn).toBeDisabled();
 
-    const firstNameInput = screen.getByDisplayValue(fName);
+    // Try to change one input to enable submit btn
+    const firstNameInput = screen.getByDisplayValue(userInfo.givenName!);
     expect(firstNameInput).toBeInTheDocument();
     fireEvent.change(firstNameInput, { target: { value: 'Test1' } });
+    expect(firstNameInput).toHaveValue('Test1');
 
-    const closeBtn = screen.getByText('Cancel');
-    expect(closeBtn).toBeInTheDocument();
-    fireEvent.click(closeBtn);
+    await waitFor(
+      () => expect(updateBtn).not.toBeDisabled()
+    );
+
+    // Submit the modal
+    // Fail first to test
+    const selfUpdateResponse = {
+      ...personDtoResponse
+    };
+    selfUpdateResponse.data.id = 'TEST ID';
+
+    personApi.selfUpdatePerson = jest.fn(() => {
+      return Promise.reject(new Error('failed'));
+    });
+    fireEvent.click(updateBtn);
+    await waitFor(
+      () => expect(screen.getByText(new RegExp('failed'))).toBeInTheDocument()
+    );
+
+    // Send successful
+    selfUpdateResponse.data.firstName = 'Test2';
+    personApi.selfUpdatePerson = jest.fn(() => {
+      return Promise.resolve(selfUpdateResponse);
+    });
+
+    // Change field again to enable submit button
+    fireEvent.change(firstNameInput, { target: { value: 'Test2' } });
+    expect(firstNameInput).toHaveValue('Test2');
+
+    await waitFor(
+      () => expect(updateBtn).not.toBeDisabled()
+    );
+
+    fireEvent.click(updateBtn);
+    expect(personApi.selfUpdatePerson).toHaveBeenCalledTimes(1);
+    await waitFor(
+      () => expect(updateBtn).not.toBeInTheDocument()
+    );
   });
 
   test('userInfo dropdown should not allow Edit Person Record', async () => {
-    const userInfo: UserInfoDto = {
-      givenName: 'Test',
-      familyName: 'User',
-      name: 'Test User'
-    }
+    personApi.findPersonBy = jest.fn(() => {
+      return Promise.resolve(personDtoResponse);
+    });
 
     const element = render(<HeaderUserInfo userInfo={userInfo} />);
     const dropdownToggle = screen.getByText('TU');

@@ -12,7 +12,6 @@ import {RankStateModel} from './rank-state-model';
 
 const personState = createState<PersonDto[]>(new Array<PersonDto>());
 const rankState = createState<RankStateModel>({});
-const currentUserState = createState<PersonDto>({});
 
 const personApi: PersonControllerApiInterface = new PersonControllerApi(
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
@@ -23,8 +22,8 @@ const rankApi: RankControllerApiInterface = new RankControllerApi(
 );
 
 export const wrapState = (state: State<PersonDto[]>, _personApi: PersonControllerApiInterface,
-                          _rankState: State<RankStateModel>, _rankApi: RankControllerApiInterface, _currentUserState: State<PersonDto>) => {
-  return new PersonService(state, _personApi, _rankState, _rankApi, currentUserState);
+                          _rankState: State<RankStateModel>, _rankApi: RankControllerApiInterface) => {
+  return new PersonService(state, _personApi, _rankState, _rankApi);
 }
 
-export const usePersonState = () => wrapState(useState(personState), personApi, useState(rankState), rankApi, useState(currentUserState));
+export const usePersonState = () => wrapState(useState(personState), personApi, useState(rankState), rankApi);

@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, useEffect } from 'react';
 import { State, useHookstate } from "@hookstate/core";
 import { Validation } from '@hookstate/validation';
-import { PersonDto, PersonDtoBranchEnum } from '../../openapi/models';
+import { PersonDtoBranchEnum } from '../../openapi/models';
 import { Initial } from '@hookstate/initial';
 import { UserEditorState } from './HeaderUserInfo';
 import TextInput from '../forms/TextInput/TextInput';
@@ -13,21 +13,42 @@ import Select from '../forms/Select/Select';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { usePersonState } from '../../state/person/person-state';
 import { RankStateModel } from '../../state/person/rank-state-model';
-import { validPhone } from '../../utils/validation-utils';
+import { failsHookstateValidation, generateStringErrorMessages, isFormModified, validateRequiredString, validateStringLength, validationErrors, validPhone } from '../../utils/validation-utils';
+import withLoading from '../../hocs/UseLoading/WithLoading';
 
 interface UserInfoFormProps {
   editorState: State<UserEditorState>;
   userInitials: string;
 }
 
-function ScratchStorageUserAddForm(props: UserInfoFormProps) {
+function HeaderUserEditor(props: UserInfoFormProps) {
   const personState = usePersonState();
   const rankState = useHookstate<RankStateModel>(personState.rankState);
-  const formState = useHookstate<PersonDto>(props.editorState.currentUserState.get());
+  const formState = useHookstate(props.editorState.currentUserState);
   
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
+
+  Validation(formState.firstName).validate(validateRequiredString, validationErrors.requiredText, 'error');
+  Validation(formState.firstName).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
+  Validation(formState.middleName).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
+  Validation(formState.lastName).validate(validateRequiredString, validationErrors.requiredText, 'error');
+  Validation(formState.lastName).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
+  Validation(formState.title).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
+  Validation(formState.rank).validate(validateRequiredString, validationErrors.requiredText, 'error');
+
+  Validation(formState.phone).validate(validPhone, validationErrors.invalidPhone, 'error');
+
+  Validation(formState.address).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+
+  Validation(formState.dutyPhone).validate(validPhone, validationErrors.invalidPhone, 'error');
+
+  Validation(formState.dutyTitle).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   useEffect(() => {
     const branchValue = formState.branch.get();
@@ -36,37 +57,9 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
     }
   }, [formState.branch.get()]);
 
-  const isError = (formState: State<string | null | undefined>) => Touched(formState).touched() && Validation(formState).invalid()
-  const errorMessages = (formState: State<string | null | undefined>) => Validation(formState).errors().map(validationError =>validationError.message)
-
-  const requiredText = (text: string | null | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
-
-  const requiredError = 'cannot be empty or blank';
-  Validation(formState.firstName).validate(requiredText, requiredError, 'error');
-  Validation(formState.lastName).validate(requiredText, requiredError, 'error');
-  Validation(formState.rank).validate(requiredText, requiredError, 'error');
-
-  const validPhoneError = 'Enter a valid phone number'
-  Validation(formState.phone).validate(validPhone, validPhoneError, 'error');
-  Validation(formState.dutyPhone).validate(validPhone, validPhoneError, 'error');
-
-  const isFormModified = (): boolean => {
-    return props.editorState.original && (props.editorState.get().currentUserState.get().address !== props.editorState.get().original?.address
-        || props.editorState.get().currentUserState.get().branch !== props.editorState.get().original?.branch
-        || props.editorState.get().currentUserState.get().dutyPhone !== props.editorState.get().original?.dutyPhone
-        || props.editorState.get().currentUserState.get().dutyTitle !== props.editorState.get().original?.dutyTitle
-        || props.editorState.get().currentUserState.get().firstName !== props.editorState.get().original?.firstName
-        || props.editorState.get().currentUserState.get().lastName !== props.editorState.get().original?.lastName
-        || props.editorState.get().currentUserState.get().middleName !== props.editorState.get().original?.middleName
-        || props.editorState.get().currentUserState.get().phone !== props.editorState.get().original?.phone
-        || props.editorState.get().currentUserState.get().rank !== props.editorState.get().original?.rank
-        || props.editorState.get().currentUserState.get().title !== props.editorState.get().original?.title
-    );
-  }
-
   useEffect(() => {
-    props.editorState.disableSubmit.set(Validation(formState).invalid() || !isFormModified());
-  });
+    props.editorState.disableSubmit.set(Validation(formState).invalid() || !isFormModified(props.editorState.original.ornull?.get(), formState.get()));
+  }, [formState.address.get(), formState.branch.get(), formState.dodid.get(), formState.dutyPhone.get(), formState.dutyTitle.get(), formState.title.get(), formState.firstName.get(), formState.lastName.get(), formState.middleName.get(), formState.phone.get(), formState.title.get()]);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -102,22 +95,25 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
           <div className="d-flex justify-content-between">
             <div>
               <FormGroup labelName="firstName" labelText="First Name"
-                isError={Touched(formState.firstName).touched() && Validation(formState.firstName).invalid()}
-                errorMessages={Validation(formState.firstName).errors()
-                  .map(validationError =>validationError.message)}
+                isError={failsHookstateValidation(formState.firstName)}
+                errorMessages={generateStringErrorMessages(formState.firstName)}
+                required
               >
                 <TextInput id="firstName" name="firstName" type="text"
                             value={formState.firstName.get() || ''}
-                            error={Touched(formState.firstName).touched() && Validation(formState.firstName).invalid()}
+                            error={failsHookstateValidation(formState.firstName)}
                             onChange={(event) => formState.firstName.set(event.target.value)}
                 />
               </FormGroup>
             </div>
             <div>
-              <FormGroup labelName="middleName" labelText="Middle Name">
+              <FormGroup labelName="middleName" labelText="Middle Name"
+                isError={failsHookstateValidation(formState.middleName)}
+                errorMessages={generateStringErrorMessages(formState.middleName)}
+              >
                 <TextInput id="middleName" name="middleName" type="text"
                             value={formState?.middleName.get() || ''}
-                            error={Touched(formState.middleName).touched() && Validation(formState.middleName).invalid()}
+                            error={failsHookstateValidation(formState.middleName)}
                             onChange={(event) => formState.middleName.set(event.target.value)}
                 />
               </FormGroup>
@@ -126,58 +122,66 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
           <div className="d-flex justify-content-between">
             <div>
               <FormGroup labelName="lastName" labelText="Last Name"
-                          isError={Touched(formState.lastName).touched() && Validation(formState.lastName).invalid()}
-                          errorMessages={Validation(formState.lastName).errors()
-                              .map(validationError =>validationError.message)}
+                isError={failsHookstateValidation(formState.lastName)}
+                errorMessages={generateStringErrorMessages(formState.lastName)}
+                required
               >
                 <TextInput id="lastName" name="lastName" type="text"
                             value={formState?.lastName.get() || ''}
-                            error={Touched(formState.lastName).touched() && Validation(formState.lastName).invalid()}
+                            error={failsHookstateValidation(formState.lastName)}
                             onChange={(event) => formState.lastName.set(event.target.value)}
                 />
               </FormGroup>
             </div>
             <div>
-              <FormGroup labelName="title" labelText="Title">
-              <TextInput id="title" name="title" type="text"
-                          defaultValue={formState?.title.get() || ''}
-                          error={Touched(formState.title).touched() && Validation(formState.title).invalid()}
-                          onChange={(event) => formState.title.set(event.target.value)}
-              />
+              <FormGroup labelName="title" labelText="Title"
+                isError={failsHookstateValidation(formState.title)}
+                errorMessages={generateStringErrorMessages(formState.title)}
+              >
+                <TextInput id="title" name="title" type="text"
+                            defaultValue={formState?.title.get() || ''}
+                            error={failsHookstateValidation(formState.title)}
+                            onChange={(event) => formState.title.set(event.target.value)}
+                />
               </FormGroup>
             </div>
           </div>
           <div className="d-flex">
             <div className="flex-grow-1">
-            <FormGroup labelName="address" labelText="Address">
-            <TextInput id="address" name="address" type="text"
-                        className="d-flex flex-grow-1"
-                        defaultValue={formState?.address.get() || ''}
-                        error={Touched(formState.address).touched() && Validation(formState.address).invalid()}
-                        onChange={(event) => formState.address.set(event.target.value)}
-            />
-            </FormGroup>
+              <FormGroup labelName="address" labelText="Address"
+                isError={failsHookstateValidation(formState.address)}
+                errorMessages={generateStringErrorMessages(formState.address)}
+              >
+                <TextInput id="address" name="address" type="text"
+                            className="d-flex flex-grow-1"
+                            defaultValue={formState?.address.get() || ''}
+                            error={failsHookstateValidation(formState.address)}
+                            onChange={(event) => formState.address.set(event.target.value)}
+                />
+              </FormGroup>
             </div>
           </div>
           <div className="d-flex justify-content-between">
             <div>
               <FormGroup labelName="phone" labelText="Phone"
-                          isError={isError(formState.phone)}
-                          errorMessages={errorMessages(formState.phone)}>
+                isError={failsHookstateValidation(formState.phone)}
+                errorMessages={generateStringErrorMessages(formState.phone)}
+              >
                 <TextInput id="phone" name="phone" type="text"
                             defaultValue={formState?.phone.get() || ''}
-                            error={Touched(formState.phone).touched() && Validation(formState.phone).invalid()}
+                            error={failsHookstateValidation(formState.phone)}
                             onChange={(event) => formState.phone.set(event.target.value)}
                 />
               </FormGroup>
             </div>
             <div>
               <FormGroup labelName="dutyPhone" labelText="Duty Phone"
-                          isError={isError(formState.dutyPhone)}
-                          errorMessages={errorMessages(formState.dutyPhone)}>
+                isError={failsHookstateValidation(formState.dutyPhone)}
+                errorMessages={generateStringErrorMessages(formState.dutyPhone)}
+              >
                 <TextInput id="dutyPhone" name="dutyPhone" type="text"
                             defaultValue={formState?.dutyPhone.get() || ''}
-                            error={Touched(formState.dutyPhone).touched() && Validation(formState.dutyPhone).invalid()}
+                            error={failsHookstateValidation(formState.dutyPhone)}
                             onChange={(event) => formState.dutyPhone.set(event.target.value)}
                 />
               </FormGroup>
@@ -185,10 +189,13 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
           </div>
           <div className="d-flex justify-content-between">
             <div>
-              <FormGroup labelName="dutyTitle" labelText="Duty Title">
+              <FormGroup labelName="dutyTitle" labelText="Duty Title"
+                isError={failsHookstateValidation(formState.dutyTitle)}
+                errorMessages={generateStringErrorMessages(formState.dutyTitle)}
+              >
                 <TextInput id="dutyTitle" name="dutyTitle" type="text"
                             defaultValue={formState?.dutyTitle.get() || ''}
-                            error={Touched(formState.dutyTitle).touched() && Validation(formState.dutyTitle).invalid()}
+                            error={failsHookstateValidation(formState.dutyTitle)}
                             onChange={(event) => formState.dutyTitle.set(event.target.value)}
                 />
               </FormGroup>
@@ -212,9 +219,9 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
                 </div>
                 <div>
                   <FormGroup labelName="rank" labelText="Rank"
-                              isError={Touched(formState.rank).touched() && Validation(formState.rank).invalid()}
-                              errorMessages={Validation(formState.rank).errors()
-                                  .map(validationError =>validationError.message)}
+                    isError={failsHookstateValidation(formState.rank)}
+                    errorMessages={generateStringErrorMessages(formState.rank)}
+                    required
                   >
                     {
                       rankState.promised ? 'loading ranks...' :
@@ -222,13 +229,12 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
                                 onChange={(event) => {
                                 formState.rank.set(event.target.value);
                                 }}
-                                defaultValue={formState?.rank.get() || ''}
                                 value={formState.get().rank}
                         >
                           {
                             formState.get().branch && rankState.get()[formState.get()?.branch ||
                                 PersonDtoBranchEnum.Other]?.map(rank => (
-                                <option key={rank.abbreviation} value={rank.abbreviation}>{rank.abbreviation}</option>
+                                  <option key={`${rank.branchType}-${rank.abbreviation}`} value={rank.abbreviation}>{rank.abbreviation}</option>
                             ))
                           }
                         </Select>
@@ -247,4 +253,5 @@ function ScratchStorageUserAddForm(props: UserInfoFormProps) {
   );
 }
 
-export default ScratchStorageUserAddForm;
+export const HeaderUserEditorWithLoading = withLoading<UserInfoFormProps>(HeaderUserEditor);
+export default HeaderUserEditor;

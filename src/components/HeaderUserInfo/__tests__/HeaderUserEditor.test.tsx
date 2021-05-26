@@ -1,7 +1,7 @@
 import React from 'react';
 import HeaderUserInfo, { UserEditorState } from '../HeaderUserInfo';
 import { render, waitFor, screen, fireEvent, act } from '@testing-library/react';
-import { PersonDto, PersonDtoBranchEnum, RankBranchTypeEnum, UserInfoDto } from '../../../openapi/models';
+import { PersonDto, PersonDtoBranchEnum, Rank, RankBranchTypeEnum, UserInfoDto } from '../../../openapi/models';
 import { createState, State, StateMethodsDestroy, useHookstate } from '@hookstate/core';
 import { PersonControllerApi, PersonControllerApiInterface, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
 import { RankStateModel } from '../../../state/person/rank-state-model';
@@ -30,10 +30,11 @@ describe('Test HeaderUserInfo', () => {
   let personApi: PersonControllerApiInterface;
   let rankState: State<RankStateModel> & StateMethodsDestroy;
   let rankApi: RankControllerApiInterface;
-  let currentUserState: State<PersonDto> & StateMethodsDestroy;
+
+  let userEditorState: State<UserEditorState> & StateMethodsDestroy;
 
   function mockPersonService() {
-    (usePersonState as jest.Mock).mockReturnValue(new PersonService(personState, personApi, rankState, rankApi, currentUserState));
+    (usePersonState as jest.Mock).mockReturnValue(new PersonService(personState, personApi, rankState, rankApi));
   }
 
   beforeEach(() => {
@@ -53,29 +54,32 @@ describe('Test HeaderUserInfo', () => {
       USCG: [],
     });
     rankApi = new RankControllerApi();
-    currentUserState = createState<PersonDto>({});
 
     mockPersonService();
+
+    userEditorState = createState<UserEditorState>({
+      isOpen: false,
+      currentUserState: {
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@user.com',
+        rank: 'CIV',
+        branch: PersonDtoBranchEnum.Other
+      },
+      errorMessage: '',
+      disableSubmit: false,
+      isLoading: false,
+      isLoadingInitial: false
+    });
   });
 
   afterEach(() => {
     personState.destroy();
     rankState.destroy();
-    currentUserState.destroy();
+    userEditorState.destroy
   });
 
-  test('renders HeaderUserEditor', async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
+  it('renders HeaderUserEditor', async () => {
     render(<HeaderUserEditor editorState={userEditorState} userInitials="TU" />);
 
     await waitFor(() => {
@@ -84,17 +88,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for First Name`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -110,17 +103,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Middle Name`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -136,17 +118,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Last Name`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -162,17 +133,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Title`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -188,17 +148,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Address`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -214,17 +163,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Phone`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -240,17 +178,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Duty Phone`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -266,17 +193,6 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Duty Title`, async () => {
-    currentUserState.set({
-      ...person
-    });
-
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
-    });
-
     const form = render(
       <HeaderUserEditor
         editorState={userEditorState}
@@ -292,15 +208,27 @@ describe('Test HeaderUserInfo', () => {
   });
 
   it(`should set formState for Branch`, async () => {
-    currentUserState.set({
-      ...person
-    });
+    const ranks: Rank[] = [
+      {
+        abbreviation: 'CIV',
+        name: 'CIV',
+        branchType: RankBranchTypeEnum.Other
+      },
+      {
+        abbreviation: 'CIV',
+        name: 'CIV',
+        branchType: RankBranchTypeEnum.Usaf
+      }
+    ];
 
-    const userEditorState = createState<UserEditorState>({
-      isOpen: false,
-      currentUserState: currentUserState,
-      errorMessage: '',
-      disableSubmit: false,
+    rankApi.getRanks1 = jest.fn(() => {
+      return Promise.resolve({
+        data: ranks,
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {}
+      });
     });
 
     const form = render(
@@ -310,12 +238,24 @@ describe('Test HeaderUserInfo', () => {
       />
     );
 
-    // const input = form.getByLabelText('Branch');
-    // act(() => {
-    //   fireEvent.change(input, { target: { value: 'USAF' } });
-    // });
-    // await waitFor(
-    //   () => expect((input as HTMLInputElement).value).toBe('USAF')
-    // );
+    // Try to change branch
+    const branchInput = form.getByLabelText('Branch');
+    await waitFor(
+      () => expect(branchInput).not.toBeDisabled()
+    );
+
+    fireEvent.change(branchInput, { target: { value: 'USAF' } });
+    await waitFor(
+      () => expect(branchInput).toHaveValue('USAF')
+    );
+
+    // Try to change rank
+    const rankInput = form.getByLabelText('Rank');
+    fireEvent.change(rankInput, { target: { value: 'CIV' } });
+
+    await waitFor(
+      () => expect((rankInput as HTMLInputElement).value).toBe('CIV')
+    );
+
   });
 });
