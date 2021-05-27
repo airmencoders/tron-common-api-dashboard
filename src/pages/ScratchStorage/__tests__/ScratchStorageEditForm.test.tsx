@@ -6,6 +6,7 @@ import { ScratchStorageFlat } from '../../../state/scratch-storage/scratch-stora
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { validationErrors } from '../../../utils/validation-utils';
 
 describe('Test Scratch Storage Edit Form', () => {
 let onSubmit = jest.fn();
@@ -119,8 +120,7 @@ it('Update', async () => {
 
     fireEvent.change(appNameInput, { target: { value: '' } });
     expect(appNameInput).toHaveValue('');
-    expect(page.getByText(/cannot be empty or blank/i));
-
+    expect(page.getByText(new RegExp(validationErrors.requiredText)));
     fireEvent.change(appNameInput, { target: { value: 'Test 2' } });
     expect(appNameInput).toHaveValue('Test 2');
 

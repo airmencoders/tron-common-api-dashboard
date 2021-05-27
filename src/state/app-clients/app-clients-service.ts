@@ -13,6 +13,14 @@ import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
 
+/**
+ * PII WARNING:
+ * Models used by this service has the following PII fields
+ * AppClientDto
+ *  * appClientDeveloperEmails
+ * AppClientFlat
+ *  * appClientDeveloperEmails
+ */
 export default class AppClientsService implements DataService<AppClientFlat, AppClientFlat> {
 
   private readonly validate: ValidateFunction<AppClientUserDto>;

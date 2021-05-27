@@ -5,4 +5,5 @@ export interface FormGroupProps {
   children: React.ReactNode;
   isError?: boolean;
   errorMessages?: string[];
+  required?: boolean;
 }

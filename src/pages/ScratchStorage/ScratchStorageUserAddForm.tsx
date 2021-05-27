@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Downgraded, none, State, useHookstate } from "@hookstate/core";
+import { State, useHookstate } from "@hookstate/core";
 import Form from "../../components/forms/Form/Form";
 import TextInput from "../../components/forms/TextInput/TextInput";
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
@@ -7,11 +7,11 @@ import Checkbox from '../../components/forms/Checkbox/Checkbox';
 import Button from '../../components/Button/Button';
 import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scratch-storage-user-with-privs-flat';
 import { Validation } from '@hookstate/validation';
-import { Touched } from '@hookstate/touched';
 import { ScratchStorageEditorState } from './ScratchStorageEditForm';
-import { Initial } from '@hookstate/initial';
 import './ScratchStorageUserAddForm.scss';
-import { validateEmail } from '../../utils/validation-utils';
+import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import { Initial } from '@hookstate/initial';
+import { Touched } from '@hookstate/touched';
 
 interface ScratchStorageAddFormProps {
   editorState: State<ScratchStorageEditorState>;
@@ -30,8 +30,12 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       });
 
   formState.attach(Validation);
+  formState.attach(Initial);
+  formState.attach(Touched);
 
-  Validation(formState.email).validate(email => validateEmail(email), 'Enter a valid email', 'error');
+  Validation(formState.email).validate(validateEmail, validationErrors.invalidEmail, 'error');
+  Validation(formState.email).validate(validateRequiredString, validationErrors.requiredText, 'error');
+  Validation(formState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   const isEmailModified = (): boolean => {
     return props.editorState.original.email.get() !== formState.email.get();
@@ -54,16 +58,16 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       <FormGroup
         labelName="email"
         labelText="Email"
-        isError={isEmailModified() && Validation(formState.email).invalid()}
-        errorMessages={Validation(formState.email).errors()
-          .map(validationError => validationError.message)}
+        isError={isEmailModified() && failsHookstateValidation(formState.email)}
+        errorMessages={generateStringErrorMessages(formState.email)}
+        required
       >
         <TextInput
           id="email"
           name="email"
           type="email"
           value={formState.email.get()}
-          error={isEmailModified() && Validation(formState.email).invalid()}
+          error={isEmailModified() && failsHookstateValidation(formState.email)}
           onChange={(event) => formState.email.set(event.target.value)}
         />
       </FormGroup>
@@ -71,6 +75,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
       <FormGroup
         labelName="permissions"
         labelText="Permissions"
+        required
       >
         <Checkbox
           id="read"

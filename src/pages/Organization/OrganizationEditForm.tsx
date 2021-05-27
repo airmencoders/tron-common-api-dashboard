@@ -24,6 +24,7 @@ import { OrgEditOpType } from '../../state/organization/organization-service';
 import { useOrganizationState } from '../../state/organization/organization-state';
 import { usePersonState } from '../../state/person/person-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
+import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
@@ -48,9 +49,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   formState.attach(Initial);
   formState.attach(Touched);
 
-  const requiredText = (text: string | undefined): boolean => text != null && text.length > 0 && text.trim().length > 0;
-  const requiredError = 'cannot be empty or blank';
-  Validation(formState.name).validate(requiredText, requiredError, 'error');
+  Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
+  Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   const isFormModified = (): boolean => {
     const stateKeys = formState.keys;
@@ -345,6 +345,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                      isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
                      errorMessages={Validation(formState.name).errors()
                          .map(validationError =>validationError.message)}
+                      required
           >
             <TextInput id="orgName" name="orgName" type="text"
               defaultValue={props.data?.name || ''}
@@ -353,7 +354,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               disabled={isFormDisabled()}
             />
           </FormGroup>         
-          <FormGroup labelName="branch" labelText="Branch">
+          <FormGroup labelName="branch" labelText="Branch" required>
             <Select id="branch" name="branch" data-testid="branchType"
                     defaultValue={props.data?.branchType || ''}
                     onChange={onBranchChange}
@@ -369,6 +370,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           <FormGroup labelName="type" labelText="Type"
                      errorMessages={Validation(formState.orgType).errors()
                          .map(validationError =>validationError.message)}
+                     required
           >
             <Select id="type" name="type" data-testid="orgType"
                     defaultValue={props.data?.orgType || ''}

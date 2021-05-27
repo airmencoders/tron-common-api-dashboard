@@ -6,13 +6,16 @@ import './FormGroup.scss';
 function FormGroup(props: FormGroupProps) {
   return (
       <>
-        <Label htmlFor={props.labelName}>{props.labelText}</Label>
+        <Label className={props.required ? 'label--required' : ''} htmlFor={props.labelName}>{props.labelText}</Label>
         {props.children}
-        {
-          props.isError &&
+        {props.isError &&
+          <ul className="validation">
+            {
               props.errorMessages?.map((error, idx) => (
-                  <p key={idx} className="validation-error">* {error}</p>
-              ))
+                      <li key={idx} className="validation__error">{error}</li>
+                    ))
+            }
+          </ul>
         }
       </>
   );
