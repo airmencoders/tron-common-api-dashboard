@@ -326,7 +326,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   return (
     <>
-      <PageFormat pageTitle={props.pageTitle} className={props.className}>
+      <PageFormat pageTitle={props.pageTitle} className={`${props.className ?? ''}`}>
         <ErrorBoundary>
           {dataState.isPromised ?
             <Spinner centered />
@@ -334,7 +334,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
             dataState.error ?
               <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
               :
-              <div style={{ height: '100%' }}>
+              <div style={{ height: '100%' }} className="data-crud-content">
                 {
                   props.allowAdd && CreateForm &&
                   <div className="add-data-container">
