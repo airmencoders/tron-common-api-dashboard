@@ -25,13 +25,19 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
   Validation(formState.subscriberAddress).validate(validateRequiredString, validationErrors.requiredText, 'error');
   Validation(formState.subscriberAddress).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
-  Validation(formState.subscribedEvent).validate(event => 
-    Object.values(SubscriberDtoSubscribedEventEnum).includes(event as SubscriberDtoSubscribedEventEnum), 
-    'Invalid Value', 
-    'error');
+  if (props.formActionType == FormActionType.ADD) {
+    Validation(formState.secret).validate(validateRequiredString, validationErrors.requiredText, 'error');
+    Validation(formState.secret).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+  }
+
 
   function isFormModified() {
-    return Initial(formState.subscribedEvent).modified() || Initial(formState.subscriberAddress).modified();
+    if (props.formActionType === FormActionType.ADD) {
+      return Initial(formState.subscriberAddress).modified() && Initial(formState.secret).modified();
+    }
+    else {
+      return Initial(formState.subscriberAddress).modified() || Initial(formState.subscribedEvent).modified();
+    }
   }
 
   function isFormDisabled() {
@@ -95,7 +101,7 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
         required
       >
         <Select
-          id="subscriptionEvents"
+          id="events"
           name="events"
           defaultValue={formState?.subscribedEvent.get() || ''}
           onChange={onEventChange}
@@ -108,6 +114,26 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
           }
         </Select>        
       </FormGroup>
+
+      { props.formActionType === FormActionType.ADD &&
+        <FormGroup
+          labelName="secretPhrase"
+          labelText="Secret"
+          isError={failsHookstateValidation(formState.subscriberAddress)}
+          errorMessages={generateStringErrorMessages(formState.subscriberAddress)}
+          required
+        >
+          <TextInput
+            id="secretPhrase"
+            name="secretPhrase"
+            type="text"
+            defaultValue={formState.secret.get()}
+            error={failsHookstateValidation(formState.secret)}
+            onChange={(event) => formState.secret.set(event.target.value)}
+            disabled={isFormDisabled()}
+          />
+        </FormGroup>
+      }
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}
