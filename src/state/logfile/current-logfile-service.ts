@@ -27,21 +27,26 @@ export default class CurrentLogfileService {
     }
 
     if (results) {
-      const range = this.parseContentRangeHeader(results.headers['content-range']);
-      const messages: string[] = Array.from(results.data.match(/.+/g) || []);
+      try {
+        const range = this.parseContentRangeHeader(results.headers['content-range']);
+        const messages: string[] = Array.from(results.data?.match(/.+/g) || []);
 
-      let combinedMessages = this.getCurrentLog.concat(messages);
-      if (combinedMessages.length > this.logfileState.maxLines.get()) {
-        combinedMessages = combinedMessages.slice(combinedMessages.length - this.logfileState.maxLines.get());
-      }
-
-      this.logfileState.set(prev => {
-        return {
-          ...prev,
-          logs: combinedMessages,
-          ...range,
+        let combinedMessages = this.getCurrentLog.concat(messages);
+        if (combinedMessages.length > this.logfileState.maxLines.get()) {
+          combinedMessages = combinedMessages.slice(combinedMessages.length - this.logfileState.maxLines.get());
         }
-      });
+
+        this.logfileState.set(prev => {
+          return {
+            ...prev,
+            logs: combinedMessages,
+            ...range,
+          }
+        });
+      }
+      catch (e) {
+        this.logfileState.errors.set(e.message);
+      }
     }
 
     this.logfileState.loading.set(false);
@@ -70,7 +75,7 @@ export default class CurrentLogfileService {
   }
 
   private parseContentRangeHeader(range: string): any {
-    if (range.includes('*')) {
+    if (range?.includes('*')) {
       const split = range.split('/');
 
       if (split.length !== 2) {
@@ -83,7 +88,7 @@ export default class CurrentLogfileService {
         length: split[1]
       };
     } else {
-      const split = Array.from(range.match(/([0-9])+/g) || []);
+      const split = Array.from(range?.match(/([0-9])+/g) || []);
 
       if (split.length !== 3) {
         throw new Error('Could not parse Content-Range header');

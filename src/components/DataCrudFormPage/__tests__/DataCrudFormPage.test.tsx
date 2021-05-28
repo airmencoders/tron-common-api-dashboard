@@ -247,14 +247,14 @@ describe('Test DataCrudFormPage', () => {
               allowEdit={true} />
         </MemoryRouter>
     );
-  
+
     await waitFor(
         () => expect(screen.getAllByText('Test Page Title')).toBeTruthy()
     );
     const tableVal = await screen.findByText('val0');
     expect(tableVal).toBeTruthy();
   });
-  
+
   it('should show sidebar if page in add state', async () => {
     render(
         <MemoryRouter>
@@ -279,13 +279,13 @@ describe('Test DataCrudFormPage', () => {
         />
         </MemoryRouter>
     );
-  
+
     await screen.findByText('Add Test');
     fireEvent.click(screen.getByText('Add Test'));
     const formLabel = await screen.findByText('Form');
     expect(formLabel).toBeTruthy();
   });
-  
+
   it('should open the update panel if row clicked', async () => {
     render(
         <MemoryRouter>
@@ -308,13 +308,13 @@ describe('Test DataCrudFormPage', () => {
               allowEdit={true} />
         </MemoryRouter>
     );
-  
+
     await screen.findByText('val0');
     fireEvent.click(screen.getByText('val0'));
     const formLabel = await screen.findByText('Form');
     expect(formLabel).toBeTruthy();
   });
-  
+
   it('should show error state if request error', async () => {
     render(
         <MemoryRouter>
@@ -337,11 +337,11 @@ describe('Test DataCrudFormPage', () => {
               allowEdit={true} />
         </MemoryRouter>
     );
-  
+
     const error = await screen.findByText('error');
     expect(error).toBeTruthy();
   });
-  
+
   it('should show success message for successful update', async () => {
     render(
         <MemoryRouter>
@@ -365,7 +365,7 @@ describe('Test DataCrudFormPage', () => {
               allowEdit={true} />
         </MemoryRouter>
     );
-  
+
     await screen.findByText('val0');
     fireEvent.click(screen.getByText('val0'));
     await screen.findByText('Submit');
@@ -375,7 +375,7 @@ describe('Test DataCrudFormPage', () => {
       () => expect(screen.getByText(updateToastMsg)).toBeTruthy(),
     )
   });
-  
+
   it('should show success message for successful create', async () => {
     render(
         <MemoryRouter>
@@ -401,12 +401,12 @@ describe('Test DataCrudFormPage', () => {
           />
         </MemoryRouter>
     );
-  
+
     await screen.findByText('Add Test');
     fireEvent.click(screen.getByText('Add Test'));
     await screen.findByText('Submit');
     fireEvent.click(screen.getByText('Submit'));
-  
+
     await waitFor(
       () => expect(screen.getByText(createToastMsg)).toBeTruthy(),
     )
@@ -482,7 +482,7 @@ describe('Test DataCrudFormPage', () => {
     expect(deleteModal).toBeDefined();
 
     const deleteBtnSearch = await screen.findAllByText('Delete');
-    const deleteBtn = deleteBtnSearch.find(x => x.className.includes('usa-button'));
+    const deleteBtn = deleteBtnSearch.find(x => x?.className?.includes('usa-button'));
 
     if (deleteBtn) fireEvent.click(deleteBtn);
     await waitForElementToBeRemoved(deleteModal);
@@ -627,7 +627,7 @@ describe('Test DataCrudFormPage', () => {
     expect(deleteModal).toBeDefined();
 
     const deleteBtnSearch = await screen.findAllByText('Delete');
-    const deleteBtn = deleteBtnSearch.find(x => x.className.includes('usa-button'));
+    const deleteBtn = deleteBtnSearch.find(x => x?.className?.includes('usa-button'));
 
     if (deleteBtn) fireEvent.click(deleteBtn);
 
