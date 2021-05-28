@@ -10,11 +10,11 @@ import { ScratchStorageUserWithPrivsFlat } from './scratch-storage-user-with-pri
 export default class ScratchStorageService implements DataService<ScratchStorageAppRegistryDto, ScratchStorageFlat> {
 
   constructor(
-    public state: State<ScratchStorageAppRegistryDto[]>, 
+    public state: State<ScratchStorageAppRegistryDto[]>,
     public selectedScratchStorageState: State<ScratchStorageFlat>,
     private scratchStorageApi: ScratchStorageControllerApiInterface) {
   }
-  
+
   sendPatch?: ((...args: any) => Promise<ScratchStorageAppRegistryDto>) | undefined;
 
   async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
@@ -25,11 +25,11 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       try {
         await privilegeResponse();
         const result = await response();
-        const mappedData = result.data.data.map(x => {
+        const mappedData = result.data?.data?.map(x => {
           x.userPrivs = undefined;
           return x;
-        });
-        resolve(result.data.data);
+        }) || [];
+        resolve(result.data?.data);
         this.state.set(mappedData);
       } catch (err) {
         reject(err);
@@ -110,7 +110,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       for(const userPriv of toUpdate.userPrivs){
         await this.addUserPriv(userPriv, toUpdate.id);
       }
-      
+
       return Promise.resolve(this.convertToFlat(patchedResponse));
     }
     catch (error) {
@@ -130,7 +130,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       await this.scratchStorageApi.addUserPriv(appId, { email: userPriv.email, privilegeId: adminId});
 
   }
-  
+
   convertToDto(flat: ScratchStorageFlat): ScratchStorageAppRegistryDto {
     const dto: ScratchStorageAppRegistryDto = {
       id: flat.id,

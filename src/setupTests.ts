@@ -3,8 +3,14 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
-import { rest } from 'msw';
+import {MockedRequest, RequestParams, ResponseComposition, rest, RestContext} from 'msw';
 import { setupServer } from 'msw/node';
+import {DefaultRequestBodyType} from 'msw/lib/types/utils/handlers/requestHandler';
+
+function returnDefaultResponse(req: MockedRequest<DefaultRequestBodyType, RequestParams>,res: ResponseComposition<any>, ctx: RestContext) {
+  console.log(`${req.method} - ${req.url.href}`);
+  return res(ctx.json({}));
+}
 
 const server = setupServer(
   rest.get('/api/v2/userinfo', (req, res, ctx) => {
@@ -52,15 +58,14 @@ const server = setupServer(
       ]
     }))
   }),
-  rest.get('*', req => console.log(req.url.href)),
   rest.post('/api/v2/person/find', (req, res, ctx) => {
     return res(ctx.json({}));
   }),
-  rest.get('*', req => console.log(`${req.method} - ${req.url.href}`)),
-  rest.post('*', req => console.log(`${req.method} - ${req.url.href}`)),
-  rest.patch('*', req => console.log(`${req.method} - ${req.url.href}`)),
-  rest.put('*', req => console.log(`${req.method} - ${req.url.href}`)),
-  rest.delete('*', req => console.log(`${req.method} - ${req.url.href}`))
+  rest.get('*', returnDefaultResponse),
+  rest.post('*', returnDefaultResponse),
+  rest.patch('*', returnDefaultResponse),
+  rest.put('*', returnDefaultResponse),
+  rest.delete('*', returnDefaultResponse)
 )
 
 beforeAll(() => server.listen());
