@@ -9,6 +9,7 @@ import ScratchStoragePage from "./pages/ScratchStorage/ScratchStoragePage";
 import HomePage from "./pages/Home/Home";
 import { AppSourcePage } from "./pages/AppSource/AppSourcePage";
 import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
+import PubSubPage from "./pages/PubSub/PubSubPage";
 
 export interface RouteItem {
     path: string,
@@ -30,6 +31,7 @@ export enum RoutePath {
     MY_DIGITIZE_APPS = '/digitize-apps',
     NOT_FOUND = '/not-found',
     NOT_AUTHORIZED = '/not-authorized',
+    PUB_SUB = '/pubsub',
     APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?'
 }
 
@@ -59,6 +61,12 @@ export const routes: RouteItem[] = [
         name: 'My Digitize Apps',
         component: MyDigitizeAppsPage,
         requiredPrivileges: [PrivilegeType.DASHBOARD_USER]
+    },
+    {
+        path: RoutePath.PUB_SUB,
+        name: 'Subscriptions',
+        component: PubSubPage,
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     },
     {
         path: RoutePath.PERSON,
