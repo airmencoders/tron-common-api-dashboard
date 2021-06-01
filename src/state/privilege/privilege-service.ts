@@ -10,7 +10,13 @@ export default class PrivilegeService {
   fetchAndStorePrivileges(): Promise<PrivilegeDto[]> {
     const response = (): AxiosPromise<PrivilegeDtoResponseWrapper> => this.privilegeApi.getPrivilegesWrapped();
 
-    const data = new Promise<PrivilegeDto[]>((resolve) => resolve(response().then(r => r.data.data)));
+    const data = new Promise<PrivilegeDto[]>((resolve, reject) =>
+        response()
+            .then(r => resolve(r.data?.data))
+            .catch(err =>
+                reject(err)
+            )
+    );
     this.state.set(data);
 
     return data;
