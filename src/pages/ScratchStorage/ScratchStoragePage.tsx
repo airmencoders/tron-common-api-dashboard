@@ -7,6 +7,7 @@ import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-
 import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
 import ScratchStorageDelete from './ScratchStorageDelete';
 import ScratchStorageEditForm from './ScratchStorageEditForm';
+import './ScratchStoragePage.scss'
 
 const columns: GridColumn[] =
   [
@@ -34,6 +35,7 @@ const columns: GridColumn[] =
 function ScratchStoragePage() {
   return (
       <DataCrudFormPage<ScratchStorageAppRegistryDto, ScratchStorageFlat>
+          className="scratch-storage-page"
           columns={columns}
           createForm={ScratchStorageEditForm}
           dataTypeName="Scratch Storage App"
@@ -44,6 +46,8 @@ function ScratchStoragePage() {
           allowDelete
           deleteComponent={ScratchStorageDelete}
           allowAdd
+          autoResizeColumns
+          autoResizeColummnsMinWidth={800}
       />
   );
 }
