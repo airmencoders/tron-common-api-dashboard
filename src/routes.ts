@@ -66,7 +66,7 @@ export const routes: RouteItem[] = [
         path: RoutePath.PUB_SUB,
         name: 'Subscriptions',
         component: PubSubPage,
-        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN,PrivilegeType.APP_CLIENT_DEVELOPER]
     },
     {
         path: RoutePath.PERSON,

@@ -13,15 +13,19 @@ import TextInput from "../../components/forms/TextInput/TextInput";
 import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
-import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
 
 function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
-  const formState = useState({ ...props.data });
+  const formState = useState({ 
+    ...props.data, 
+    subscribedEvent: props.data?.subscribedEvent ?? Object.values(SubscriberDtoSubscribedEventEnum)[0]
+  });
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
+  Validation(formState.subscriberAddress).validate(url => validateSubscriberAddress(url), 'Invalid Subscriber URL Format', 'error');
   Validation(formState.subscriberAddress).validate(validateRequiredString, validationErrors.requiredText, 'error');
   Validation(formState.subscriberAddress).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
@@ -74,9 +78,16 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
             defaultValue={formState.id.get()}
             disabled={true}
           />
+          <br/>
         </FormGroup>
       }
 
+      <p>
+        The Subscriber URL is the endpoint of your application that will be called (via POST) whenever the 
+        selected event occurs in Common API.  The URI must be of an in-cluster, fully-qualified-domain-name (FQDN) format.
+        The format is <em>http://app-name.app-namespace.svc.cluster.local/your-endpoint-path</em>, so an example would be&nbsp;
+        <em>http://coolapp.coolapp.svc.cluster.local/api/v1/new-person</em>.  <br/><br/>The trailing slash is mandatory, and URL must <em>not</em> be https.
+      </p>
       <FormGroup
         labelName="subscriberAddress"
         labelText="Subscriber URL"
@@ -103,7 +114,7 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
         <Select
           id="events"
           name="events"
-          defaultValue={formState?.subscribedEvent.get() || ''}
+          defaultValue={formState?.subscribedEvent.get() || Object.values(SubscriberDtoSubscribedEventEnum)[0] }
           onChange={onEventChange}
           disabled={isFormDisabled()}
         >
@@ -119,8 +130,8 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
         <FormGroup
           labelName="secretPhrase"
           labelText="Secret"
-          isError={failsHookstateValidation(formState.subscriberAddress)}
-          errorMessages={generateStringErrorMessages(formState.subscriberAddress)}
+          isError={failsHookstateValidation(formState.secret)}
+          errorMessages={generateStringErrorMessages(formState.secret)}
           required
         >
           <TextInput
