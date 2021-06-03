@@ -280,7 +280,7 @@ describe('Test OrganizationService', () => {
 
     // Mock an exception
     filterOrganizationsSpy.mockImplementation(() => { throw new Error("Test error") });
-    expect(() => organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort)).rejects.toThrowError();
+    expect(async () => await organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort)).rejects.toThrowError();
   });
 
 });
