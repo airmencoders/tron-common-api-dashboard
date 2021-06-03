@@ -75,7 +75,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         try {
           const limit = generateInfiniteScrollLimit(infiniteScroll);
           const page = Math.floor(params.startRow / limit);
-          const data = await dataState.fetchAndStorePaginatedData(page, limit, true);
+          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, params.filterModel, params.sortModel);
 
           let lastRow = -1;
 
@@ -93,8 +93,13 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         } catch (err) {
           params.failCallback();
 
-          // Force state into error state on request failure
-          dataState.state.set(Promise.reject(err));
+          /**
+           * Don't error out the state here. If the requests fail for some reason, just show nothing.
+           * 
+           * Call the success callback as a hack to prevent
+           * ag grid from showing an infinite loading state on failure.
+           */
+          params.successCallback([], 0);
         }
       }
     }

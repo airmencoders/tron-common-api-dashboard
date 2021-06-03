@@ -1,11 +1,14 @@
 import { State } from '@hookstate/core';
-import {PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, PersonFindDtoFindTypeEnum, RankControllerApiInterface} from '../../openapi';
+import { FilterDto, PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, PersonFindDtoFindTypeEnum, RankControllerApiInterface } from '../../openapi';
 import { RankStateModel } from './rank-state-model';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
 import {AbstractDataService} from '../data-service/abstract-data-service';
 import {ValidateFunction} from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
+import { convertAgGridFilterToFilterDto, convertAgGridSortToQueryParams } from '../../components/Grid/GridUtils/grid-utils';
+import { AgGridSortModel } from '../../components/Grid/grid-sort-model';
+import { createFailedDataFetchToast } from '../../components/Toast/ToastUtils/ToastUtils';
 
 /**
  * PII WARNING:
@@ -37,15 +40,53 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
     return personResponsePromise ?? [];
   }
 
-  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<PersonDto[]> {
-    const personResponseData = await this.personApi.getPersonsWrapped(undefined, undefined, page, limit)
-      .then(resp => {
-        return resp.data.data;
-      });
+  /**
+  * Keeps track of changes to the filter
+  */
+  private filter?: any;
 
-    this.mergeDataToState(personResponseData ?? [], checkDuplicates);
+  /**
+  * Keeps track of changes to the sort
+  */
+  private sort?: AgGridSortModel[] = undefined;
 
-    return personResponseData ?? [];
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: any, sort?: AgGridSortModel[]): Promise<PersonDto[]> {
+    /**
+     * If the filter or sort changes, purge the state to start fresh.
+     * Set filter to the new value
+     */
+    if (this.filter != filter || this.sort != sort) {
+      this.state.set([]);
+      this.filter = filter;
+      this.sort = sort;
+    }
+
+    const hasFilter = filter != null && Object.keys(filter).length > 0;
+
+    let personResponseData: PersonDto[] = [];
+    const convertedSort: string[] | undefined = convertAgGridSortToQueryParams(sort);
+
+    try {
+      if (hasFilter) {
+        const filterDto: FilterDto = convertAgGridFilterToFilterDto(filter);
+
+        personResponseData = await this.personApi.filterPerson(filterDto, undefined, undefined, page, limit, convertedSort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      } else {
+        personResponseData = await this.personApi.getPersonsWrapped(undefined, undefined, page, limit, convertedSort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      }
+    } catch (err) {
+      createFailedDataFetchToast('Person');
+    }
+
+    this.mergeDataToState(personResponseData, checkDuplicates);
+
+    return personResponseData;
   }
 
   convertRowDataToEditableData(rowData: PersonDto): Promise<PersonDto> {

@@ -13,37 +13,20 @@
  */
 
 
+import { FilterCriteria } from './filter-criteria';
 
 /**
- * 
+ * The conditions used to filter
  * @export
- * @interface AppSourceDto
+ * @interface FilterDto
  */
-export interface AppSourceDto {
+export interface FilterDto {
     /**
      * 
-     * @type {string}
-     * @memberof AppSourceDto
+     * @type {Array<FilterCriteria>}
+     * @memberof FilterDto
      */
-    name: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppSourceDto
-     */
-    id?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof AppSourceDto
-     */
-    endpointCount?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof AppSourceDto
-     */
-    clientCount?: number;
+    filterCriteria: Array<FilterCriteria>;
 }
 
 

@@ -1,11 +1,14 @@
 import {none, State} from '@hookstate/core';
 import {OrganizationControllerApiInterface} from '../../openapi';
-import {OrganizationDto} from '../../openapi/models';
+import { FilterDto, OrganizationDto } from '../../openapi/models';
 import {AbstractDataService} from '../data-service/abstract-data-service';
 import {OrganizationDtoWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
+import { AgGridSortModel } from '../../components/Grid/grid-sort-model';
+import { convertAgGridFilterToFilterDto, convertAgGridSortToQueryParams } from '../../components/Grid/GridUtils/grid-utils';
+import { createFailedDataFetchToast } from '../../components/Toast/ToastUtils/ToastUtils';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -46,17 +49,52 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     }
   }
 
-  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<OrganizationDto[]> {
-    const orgResponseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit)
-      .then(resp => {
-        return resp.data.data;
-      });
+  /**
+  * Keeps track of changes to the filter
+  */
+  private filter: any;
 
-    const orgDataMapped = this.removeUnfriendlyAgGridData(orgResponseData);
+  /**
+  * Keeps track of changes to the sort
+  */
+  private sort?: AgGridSortModel[] = undefined;
 
-    this.mergeDataToState(orgDataMapped, checkDuplicates);
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: any, sort?: AgGridSortModel[]): Promise<OrganizationDto[]> {
+    /**
+     * If the filter or sort changes, purge the state to start fresh.
+     * Set filter to the new value
+     */
+    if (this.filter != filter || this.sort != sort) {
+      this.state.set([]);
+      this.filter = filter;
+      this.sort = sort;
+    }
 
-    return orgResponseData;
+    const hasFilter = filter != null && Object.keys(filter).length > 0;
+
+    let responseData: OrganizationDto[] = [];
+    const convertedSort: string[] | undefined = convertAgGridSortToQueryParams(sort);
+
+    try {
+      if (hasFilter) {
+        const filterDto: FilterDto = convertAgGridFilterToFilterDto(filter);
+        responseData = await this.orgApi.filterOrganizations(filterDto, page, limit, convertedSort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      } else {
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, convertedSort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      }
+    } catch (err) {
+      createFailedDataFetchToast('Organization');
+    }
+
+    this.mergeDataToState(responseData, checkDuplicates);
+
+    return responseData;
   }
 
   /**

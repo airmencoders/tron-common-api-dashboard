@@ -1,6 +1,7 @@
 import React from 'react';
 import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
+import { createDefaultGridFilterParamsForType } from '../../components/Grid/GridUtils/grid-utils';
 import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import { OrganizationDto } from '../../openapi';
 import { useOrganizationState } from '../../state/organization/organization-state';
@@ -14,7 +15,8 @@ const columns: GridColumn[] =
       sortable: true,
       filter: true,
       headerName: 'id',
-      cellRenderer: LoadingCellRenderer
+      cellRenderer: LoadingCellRenderer,
+      filterParams: createDefaultGridFilterParamsForType('uuid')
     }),
     new GridColumn({
       field: 'name',
@@ -26,25 +28,29 @@ const columns: GridColumn[] =
       field: 'leader',
       sortable: true,
       filter: true,
-      headerName: 'Leader'
+      headerName: 'Leader',
+      filterParams: createDefaultGridFilterParamsForType('uuid')
     }),
     new GridColumn({
       field: 'parentOrganization',
       sortable: true,
       filter: true,
-      headerName: 'Parent Org Id'
+      headerName: 'Parent Org Id',
+      filterParams: createDefaultGridFilterParamsForType('uuid')
     }),
     new GridColumn({
       field: 'orgType',
       sortable: true,
       filter: true,
-      headerName: 'Org Type'
+      headerName: 'Org Type',
+      filterParams: createDefaultGridFilterParamsForType('enum')
     }),
     new GridColumn({
       field: 'branchType',
       sortable: true,
       filter: true,
-      headerName: 'Branch Type'
+      headerName: 'Branch Type',
+      filterParams: createDefaultGridFilterParamsForType('enum')
     }),
   ];
 

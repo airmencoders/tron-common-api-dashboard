@@ -50,6 +50,9 @@ models/endpoint-metric-dto.ts
 models/event-info-dto-response-wrapper.ts
 models/event-info-dto.ts
 models/exception-response.ts
+models/filter-condition.ts
+models/filter-criteria.ts
+models/filter-dto.ts
 models/flight-all-of.ts
 models/flight.ts
 models/group.ts

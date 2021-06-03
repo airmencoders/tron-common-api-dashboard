@@ -1,7 +1,7 @@
 // test if catch needs to be added to promise chain for fetchAndStore
 import OrganizationService, { OrgEditOpType } from '../organization-service';
 import {createState} from '@hookstate/core';
-import { Flight, Group, OrganizationControllerApi, OrganizationDto, OrganizationDtoPaginationResponseWrapper, OtherUsaf, Squadron, Wing } from '../../../openapi';
+import { FilterDto, Flight, Group, OrganizationControllerApi, OrganizationDto, OrganizationDtoPaginationResponseWrapper, OtherUsaf, Squadron, Wing } from '../../../openapi';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { OrganizationDtoWithDetails } from '../organization-state';
 
@@ -11,17 +11,12 @@ class MockOrgApi extends OrganizationControllerApi {
                    people?: string, organizations?: string, page?: number, limit?: number, options?: any):
     Promise<AxiosResponse<OrganizationDtoPaginationResponseWrapper>> {
 
-    const orgs : OrganizationDto[] = [ {id: '2a27a3a3-22b6-4dcb-9bd7-a9ce16b742d4', name: 'test' } ];
-    const response : AxiosResponse = {
-      data: { data: orgs },
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config: {} as AxiosRequestConfig,
-    };
-    return Promise.resolve(response);
+    return this.genericFunctionThatReturnsWrappedReponse();
   }
 
+  filterOrganizations(filterDto: FilterDto, page?: number, size?: number, sort?: Array<string>, options?: any) {
+    return this.genericFunctionThatReturnsWrappedReponse();
+  }
 
   getOrganization(id?: string, flatten?: boolean, people?: string, organizations?: string, options?: any):
       Promise<AxiosResponse<OrganizationDto>> {
@@ -32,6 +27,38 @@ class MockOrgApi extends OrganizationControllerApi {
     const orgs : OrganizationDto = {id: '2a27a3a3-22b6-4dcb-9bd7-a9ce16b742d4', name: 'test' };
     const response : AxiosResponse = {
       data: orgs,
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config: {} as AxiosRequestConfig,
+    };
+    return Promise.resolve(response);
+  }
+
+  genericFunctionThatReturnsWrappedReponse(): Promise<AxiosResponse<OrganizationDtoPaginationResponseWrapper>> {
+    const orgs: OrganizationDto[] = [
+      {
+        "id": "5a709b2c-39ee-4913-940b-18c7b2766381",
+        "leader": "490475d6-7cda-40cd-9258-586e4d34467c",
+        "members": [
+          "490475d6-7cda-40cd-9258-586e4d34467c"
+        ],
+        "parentOrganization": null,
+        "name": "56789",
+      }
+    ];
+    const data = {
+      "data": orgs,
+      "pagination": {
+        "page": 0,
+        "size": 20,
+        "totalElements": 1,
+        "totalPages": 1,
+        "links": {}
+      }
+    }
+    const response: AxiosResponse = {
+      data,
       status: 200,
       statusText: 'OK',
       headers: {},
@@ -217,6 +244,43 @@ describe('Test OrganizationService', () => {
 
     const response = await organizationService.sendDelete({ id: 'some id', name: 'some org' });
     expect(response).toBe(undefined);
+  });
+
+  it('test fetchAndStorePaginatedData', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
+      createState<OrganizationDtoWithDetails>({}),
+      api);
+
+    const filterOrganizationsSpy = jest.spyOn(api, 'filterOrganizations');
+    const getOrganizationsWrappedSpy = jest.spyOn(api, 'getOrganizationsWrapped');
+
+    const agGridFilterModel = {
+      "firstName": {
+        "filterType": "text",
+        "type": "contains",
+        "filter": "d"
+      }
+    };
+
+    const agGridSort = [
+      {
+        "sort": "asc",
+        "colId": "email"
+      }
+    ];
+
+    // Make sure it calls filter endpoint
+    let response = await organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort);
+    expect(filterOrganizationsSpy).toHaveBeenCalledTimes(1);
+
+    // No filter, calls get all endpoint
+    response = await organizationService.fetchAndStorePaginatedData(0, 20, false, undefined, agGridSort);
+    expect(getOrganizationsWrappedSpy).toHaveBeenCalledTimes(1);
+
+    // Mock an exception
+    filterOrganizationsSpy.mockImplementation(() => { throw new Error("Test error") });
+    expect(() => organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort)).rejects.toThrowError();
   });
 
 });

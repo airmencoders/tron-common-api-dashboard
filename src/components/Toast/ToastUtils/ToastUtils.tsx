@@ -3,6 +3,7 @@ import { toast, ToastOptions } from 'react-toastify';
 import { ToastMessage } from '../ToastMessage/ToastMessage';
 import { ToastType } from './toast-type';
 
+
 /**
  * 
  * Creates most basic toast with just text
@@ -19,4 +20,14 @@ export function createTextToast(type: ToastType, message: string, options?: Toas
   }
 
   return toast(<ToastMessage message={message} />, toastOptions);
+}
+
+/**
+ * Creates generic text toast with message for data fetching errors
+ * 
+ * @param dataType the name of the data type that failed
+ * @returns the id of the toast created
+ */
+export function createFailedDataFetchToast(dataType?: string) {
+  return createTextToast(ToastType.ERROR, `Failed trying to fetch ${dataType ? dataType + ' data!' : 'data!'}`);
 }

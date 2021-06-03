@@ -1,5 +1,6 @@
 import { State } from '@hookstate/core';
 import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
+import { AgGridSortModel } from '../../components/Grid/grid-sort-model';
 
 /***
  * Interface for a service providing tabular data.
@@ -19,7 +20,7 @@ export interface DataService<T, R> {
    * @param {number} page the page number (0 indexed)
    * @param {number} limit the max items to return
    */
-  fetchAndStorePaginatedData?: (page: number, limit: number, checkDuplicates?: boolean) => Promise<T[]>;
+  fetchAndStorePaginatedData?: (page: number, limit: number, checkDuplicates?: boolean, filter?: any, sort?: AgGridSortModel[]) => Promise<T[]>;
   convertRowDataToEditableData(rowData: T): Promise<R>;
   resetState: () => void;
 }

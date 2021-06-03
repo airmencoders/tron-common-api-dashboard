@@ -1,4 +1,4 @@
-import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
+import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
 
 export function prepareDataCrudErrorResponse(err: any): DataCrudFormErrors {
   if (err.response) { // Server responded with some error (4xx, 5xx)
