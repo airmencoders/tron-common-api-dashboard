@@ -37,7 +37,7 @@ export function validateEmail(email: string | null | undefined): boolean {
  * @returns true if validation passed
  */
 export function validateSubscriberAddress(url: string | undefined): boolean {
-  return url != null && /^http:\/\/(?!tron-common-api).+?\.(?!tron-common-api).+?\.svc.cluster.local\//.test(url);
+  return url != null && (url.length ===0 || /^http:\/\/(?!tron-common-api).+?\.(?!tron-common-api).+?\.svc.cluster.local\//.test(url));
 }
 
 /**

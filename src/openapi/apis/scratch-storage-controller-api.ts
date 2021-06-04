@@ -453,7 +453,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             };
         },
         /**
-         * App ID is the UUID of the owning application
+         * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
          * @summary Retrieves all key-value pairs for for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
@@ -533,7 +533,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
             };
         },
         /**
-         * App ID is the UUID of the owning application
+         * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
          * @summary Retrieves all keys for for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
@@ -1043,6 +1043,58 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
+         * @summary Sets or un-sets the app\'s ACL mode setting
+         * @param {string} id Application UUID
+         * @param {boolean} aclMode Value of the ACL Mode setting - true or false
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setAclModeSetting: async (id: string, aclMode: boolean, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling setAclModeSetting.');
+            }
+            // verify required parameter 'aclMode' is not null or undefined
+            if (aclMode === null || aclMode === undefined) {
+                throw new RequiredError('aclMode','Required parameter aclMode was null or undefined when calling setAclModeSetting.');
+            }
+            const localVarPath = `/v2/scratch/apps/{id}/aclMode`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (aclMode !== undefined) {
+                localVarQueryParameter['aclMode'] = aclMode;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
          * @summary Sets or un-sets the app\'s implicit read field
          * @param {string} id Application UUID
          * @param {boolean} priv Application User-Priv Object
@@ -1270,7 +1322,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
             };
         },
         /**
-         * App ID is the UUID of the owning application
+         * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
          * @summary Retrieves all key-value pairs for for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
@@ -1297,7 +1349,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
             };
         },
         /**
-         * App ID is the UUID of the owning application
+         * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
          * @summary Retrieves all keys for for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
@@ -1454,6 +1506,21 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
+         * @summary Sets or un-sets the app\'s ACL mode setting
+         * @param {string} id Application UUID
+         * @param {boolean} aclMode Value of the ACL Mode setting - true or false
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setAclModeSetting(id: string, aclMode: boolean, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageAppRegistryDto>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).setAclModeSetting(id, aclMode, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
          * @summary Sets or un-sets the app\'s implicit read field
          * @param {string} id Application UUID
          * @param {boolean} priv Application User-Priv Object
@@ -1575,7 +1642,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
             return ScratchStorageControllerApiFp(configuration).editScratchUser(id, scratchStorageUserDto, options).then((request) => request(axios, basePath));
         },
         /**
-         * App ID is the UUID of the owning application
+         * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
          * @summary Retrieves all key-value pairs for for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
@@ -1594,7 +1661,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
             return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairsWrapped(options).then((request) => request(axios, basePath));
         },
         /**
-         * App ID is the UUID of the owning application
+         * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
          * @summary Retrieves all keys for for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
@@ -1704,6 +1771,17 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          */
         removeUserPriv(id: string, appPrivIdEntry: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
             return ScratchStorageControllerApiFp(configuration).removeUserPriv(id, appPrivIdEntry, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
+         * @summary Sets or un-sets the app\'s ACL mode setting
+         * @param {string} id Application UUID
+         * @param {boolean} aclMode Value of the ACL Mode setting - true or false
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setAclModeSetting(id: string, aclMode: boolean, options?: any): AxiosPromise<ScratchStorageAppRegistryDto> {
+            return ScratchStorageControllerApiFp(configuration).setAclModeSetting(id, aclMode, options).then((request) => request(axios, basePath));
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
@@ -1820,7 +1898,7 @@ export interface ScratchStorageControllerApiInterface {
     editScratchUser(id: string, scratchStorageUserDto: ScratchStorageUserDto, options?: any): AxiosPromise<ScratchStorageUserDto>;
 
     /**
-     * App ID is the UUID of the owning application
+     * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
      * @summary Retrieves all key-value pairs for for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
@@ -1839,7 +1917,7 @@ export interface ScratchStorageControllerApiInterface {
     getAllKeyValuePairsWrapped(options?: any): AxiosPromise<ScratchStorageEntryDtoResponseWrapper>;
 
     /**
-     * App ID is the UUID of the owning application
+     * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
      * @summary Retrieves all keys for for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
@@ -1949,6 +2027,17 @@ export interface ScratchStorageControllerApiInterface {
      * @memberof ScratchStorageControllerApiInterface
      */
     removeUserPriv(id: string, appPrivIdEntry: string, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
+     * @summary Sets or un-sets the app\'s ACL mode setting
+     * @param {string} id Application UUID
+     * @param {boolean} aclMode Value of the ACL Mode setting - true or false
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApiInterface
+     */
+    setAclModeSetting(id: string, aclMode: boolean, options?: any): AxiosPromise<ScratchStorageAppRegistryDto>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
@@ -2081,7 +2170,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
     }
 
     /**
-     * App ID is the UUID of the owning application
+     * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
      * @summary Retrieves all key-value pairs for for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
@@ -2104,7 +2193,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
     }
 
     /**
-     * App ID is the UUID of the owning application
+     * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
      * @summary Retrieves all keys for for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
@@ -2235,6 +2324,19 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      */
     public removeUserPriv(id: string, appPrivIdEntry: string, options?: any) {
         return ScratchStorageControllerApiFp(this.configuration).removeUserPriv(id, appPrivIdEntry, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID
+     * @summary Sets or un-sets the app\'s ACL mode setting
+     * @param {string} id Application UUID
+     * @param {boolean} aclMode Value of the ACL Mode setting - true or false
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ScratchStorageControllerApi
+     */
+    public setAclModeSetting(id: string, aclMode: boolean, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).setAclModeSetting(id, aclMode, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

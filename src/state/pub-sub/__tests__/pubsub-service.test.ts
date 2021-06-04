@@ -1,35 +1,58 @@
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AxiosResponse } from 'axios';
-import { Configuration, SubscriberControllerApi, SubscriberControllerApiInterface, SubscriberDto, SubscriberDtoResponseWrapper, SubscriberDtoSubscribedEventEnum} from '../../../openapi';
-import { accessPrivilegeState } from '../../privilege/privilege-state';
-import Config from '../../../api/configuration';
+import {createState, State, StateMethodsDestroy} from '@hookstate/core';
+import {AxiosResponse} from 'axios';
+import {
+  AppClientControllerApi,
+  AppClientControllerApiInterface,
+  AppClientUserDtoResponseWrapped,
+  SubscriberControllerApi,
+  SubscriberControllerApiInterface,
+  SubscriberDto,
+  SubscriberDtoResponseWrapper,
+  SubscriberDtoSubscribedEventEnum
+} from '../../../openapi';
 import PubSubService from '../pubsub-service';
-import { wrapState } from '../pubsub-state';
-import { _ } from 'ag-grid-community';
-import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import {wrapState} from '../pubsub-state';
+import {DataCrudFormErrors} from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import AppClientsService from "../../app-clients/app-clients-service";
+import {accessAppClientsState} from "../../app-clients/app-clients-state";
+import {AppClientFlat} from "../../app-clients/app-client-flat";
+
+jest.mock('../../app-clients/app-clients-state');
 
 describe('Subscriber State Test', () => {
   let pubSubUserState: State<SubscriberDto[]> & StateMethodsDestroy;
+  let appClientUserState: State<AppClientFlat[]> & StateMethodsDestroy;
   let pubSubApi: SubscriberControllerApiInterface;
+  let appClientApi: AppClientControllerApiInterface;
   let state: PubSubService;
 
   const subscribers: SubscriberDto[] = [
     {
         id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
+        appClientUser: 'apache',
         subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
-        subscriberAddress: "http://app.app.svc.cluster.local/",
+        subscriberAddress: "/",
         secret: "",
     },
     {
         id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
+        appClientUser: 'blackhawk',
         subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
-        subscriberAddress: "http://app2.app2.svc.cluster.local/",
+        subscriberAddress: "/",
         secret: "",
     }
   ];
   
   const axiosGetResponse: AxiosResponse = {
     data: { data: subscribers },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+
+  const axiosAppClientGetResponse: AxiosResponse = {
+    data: { data: [] },
     status: 200,
     statusText: 'OK',
     config: {},
@@ -70,19 +93,35 @@ describe('Subscriber State Test', () => {
 
   beforeEach(async () => {
     pubSubUserState = createState<SubscriberDto[]>(new Array<SubscriberDto>());
+    appClientUserState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
     pubSubApi = new SubscriberControllerApi();
+    appClientApi = new AppClientControllerApi();
     state = wrapState(pubSubUserState, pubSubApi);
   });
 
   afterEach(() => {
     pubSubUserState.destroy();
-  })
+  });
+
+  function mockAppClientsState() {
+    (accessAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientUserState, appClientApi));
+    appClientApi.getAppClientUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve({
+        data: { data: [] },
+        status: 200,
+        headers: {},
+        config: {},
+        statusText: 'OK'
+      }));
+    });
+  }
 
   it('Test fetch and store', async () => {
     pubSubApi.getAllSubscriptionsWrapped = jest.fn(() => {
       return new Promise<AxiosResponse<SubscriberDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
-
+    mockAppClientsState();
+    
     const fetch = await state.fetchAndStoreData();
     expect(fetch).toEqual(subscribers);
    

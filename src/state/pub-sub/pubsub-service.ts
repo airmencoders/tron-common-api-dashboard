@@ -2,6 +2,8 @@ import { none, postpone, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
 import { SubscriberControllerApiInterface, SubscriberDtoResponseWrapper } from '../../openapi';
 import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi/models/subscriber-dto';
+import AppClientsService from '../app-clients/app-clients-service';
+import { accessAppClientsState } from '../app-clients/app-clients-state';
 import { DataService } from '../data-service/data-service';
 
 export default class PubSubService implements DataService<SubscriberDto, SubscriberDto> {
@@ -12,13 +14,21 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
   }
 
   async fetchAndStoreData(): Promise<SubscriberDto[]> {
-    const response = await this.pubSubApi.getAllSubscriptionsWrapped()
-        .then(resp => {
+    try {
+      await accessAppClientsState().fetchAndStoreData();
+      const response = await this.pubSubApi.getAllSubscriptionsWrapped()
+          .then(resp => {
             return resp.data.data;
-        });
+          })
+          .catch(err => []);
 
-    this.state.set(response ?? []);
-    return response ?? [];
+      this.state.set(response ?? []);
+      return response ?? [];
+    }
+    catch (e) {
+      this.state.set([]);
+      return [];
+    }
   }
 
   convertRowDataToEditableData(rowData: SubscriberDto): Promise<SubscriberDto> {

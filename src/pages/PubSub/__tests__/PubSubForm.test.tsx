@@ -57,7 +57,7 @@ describe('Test Subscriber Form', () => {
     const elem = pageRender.getByTestId('subscriber-form');
     expect(elem).toBeInTheDocument();
 
-    const subscriberAddress = pageRender.getByLabelText('Subscriber URL');
+    const subscriberAddress = pageRender.getByLabelText(/Subscriber Endpoint Relative Path/);
     fireEvent.change(subscriberAddress, { target: { value: 'http://app2.app2.svc.cluster.local/' } });
     expect(subscriberAddress).toHaveValue('http://app2.app2.svc.cluster.local/');
 

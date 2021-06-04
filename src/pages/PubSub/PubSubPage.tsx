@@ -11,7 +11,13 @@ const columns: GridColumn[] = [
     field: 'id',
     sortable: true,
     filter: true,
-    headerName: 'UUID'
+    headerName: 'Subscription UUID'
+  }),
+  new GridColumn({
+    field: 'appClientUser',
+    sortable: true,
+    filter: true,
+    headerName: 'App Client Name'
   }),
   new GridColumn({
     field: 'subscriberAddress',

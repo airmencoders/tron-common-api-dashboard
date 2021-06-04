@@ -9,7 +9,8 @@ const server = setupServer(
     rest.get('/api/v2/subscriptions', (req, res, ctx) => {
         return res(ctx.json({ data: [ { 
             id: 'some id', 
-            subscriberAddress: 'some url',
+            appClientUser: 'blackhawk',
+            subscriberAddress: '/api/organization',
             subscribedEvent: SubscriberDtoSubscribedEventEnum.OrganizationChange,
             secret: '',
         }]})

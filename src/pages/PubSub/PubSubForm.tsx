@@ -11,23 +11,23 @@ import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from "../../components/forms/TextInput/TextInput";
 import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi';
+import { AppClientFlat } from '../../state/app-clients/app-client-flat';
+import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
 
 function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
+  const appClientsAvail = useAppClientsState().appClients;
   const formState = useState({ 
     ...props.data, 
+    appClientUser: props.data?.appClientUser ?? (appClientsAvail[0]?.name ?? ''),
     subscribedEvent: props.data?.subscribedEvent ?? Object.values(SubscriberDtoSubscribedEventEnum)[0]
-  });
+  });  
 
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
-
-  Validation(formState.subscriberAddress).validate(url => validateSubscriberAddress(url), 'Invalid Subscriber URL Format', 'error');
-  Validation(formState.subscriberAddress).validate(validateRequiredString, validationErrors.requiredText, 'error');
-  Validation(formState.subscriberAddress).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   if (props.formActionType == FormActionType.ADD) {
     Validation(formState.secret).validate(validateRequiredString, validationErrors.requiredText, 'error');
@@ -40,7 +40,8 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
       return Initial(formState.subscriberAddress).modified() && Initial(formState.secret).modified();
     }
     else {
-      return Initial(formState.subscriberAddress).modified() || Initial(formState.subscribedEvent).modified();
+      return Initial(formState.subscriberAddress).modified() || Initial(formState.subscribedEvent).modified()
+        || Initial(formState.appClientUser).modified();
     }
   }
 
@@ -63,6 +64,10 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
     formState.subscribedEvent.set(eventEnum);
   }
 
+  const onAppClientChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    formState.appClientUser.set(event.target.value);
+  }
+
   return (
     <Form className="subscriber-form" onSubmit={(event) => submitForm(event)} data-testid="subscriber-form">
       {props.formActionType === FormActionType.UPDATE &&
@@ -82,15 +87,29 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
         </FormGroup>
       }
 
-      <p>
-        The Subscriber URL is the endpoint of your application that will be called (via POST) whenever the 
-        selected event occurs in Common API.  The URI must be of an in-cluster, fully-qualified-domain-name (FQDN) format.
-        The format is <em>http://app-name.app-namespace.svc.cluster.local/your-endpoint-path</em>, so an example would be&nbsp;
-        <em>http://coolapp.coolapp.svc.cluster.local/api/v1/new-person</em>.  <br/><br/>The trailing slash is mandatory, and URL must <em>not</em> be https.
-      </p>
+      <FormGroup
+        labelName="appclients"
+        labelText="Choose App Client"
+        required
+      >
+        <Select
+          id="appclients"
+          name="appclients"
+          defaultValue={formState?.appClientUser.get() || '' }
+          onChange={onAppClientChange}
+          disabled={isFormDisabled()}
+        >
+          {
+            appClientsAvail.map((app) => {
+                return <option key={app.name} value={app.name}>{app.name}</option>
+            })
+          }
+        </Select>        
+      </FormGroup>
+      
       <FormGroup
         labelName="subscriberAddress"
-        labelText="Subscriber URL"
+        labelText="Subscriber Endpoint Relative Path (e.g. /api/event)"
         isError={failsHookstateValidation(formState.subscriberAddress)}
         errorMessages={generateStringErrorMessages(formState.subscriberAddress)}
         required
@@ -137,7 +156,7 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
           <TextInput
             id="secretPhrase"
             name="secretPhrase"
-            type="text"
+            type="password"
             defaultValue={formState.secret.get()}
             error={failsHookstateValidation(formState.secret)}
             onChange={(event) => formState.secret.set(event.target.value)}
