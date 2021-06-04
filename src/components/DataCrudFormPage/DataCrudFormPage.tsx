@@ -19,10 +19,12 @@ import Spinner from '../Spinner/Spinner';
 import DataCrudDelete from './DataCrudDelete';
 import { DataCrudFormErrors } from './data-crud-form-errors';
 import { ToastType } from '../Toast/ToastUtils/toast-type';
-import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
+import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
-import { generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
+import { convertAgGridFilterToFilterDto, convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
+import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
+import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -75,7 +77,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         try {
           const limit = generateInfiniteScrollLimit(infiniteScroll);
           const page = Math.floor(params.startRow / limit);
-          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, params.filterModel, params.sortModel);
+
+          const filter = convertAgGridFilterToFilterDto(params.filterModel);
+          const sort = convertAgGridSortToQueryParams(params.sortModel);
+
+          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, filter, sort);
 
           let lastRow = -1;
 
@@ -100,6 +106,20 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
            * ag grid from showing an infinite loading state on failure.
            */
           params.successCallback([], 0);
+
+          if (err instanceof AgGridFilterConversionError) {
+            createTextToast(ToastType.ERROR, err.message, { autoClose: false });
+            return;
+          }
+
+          const requestErr = prepareRequestError(err);
+          if (requestErr.status === 400) {
+            createTextToast(ToastType.ERROR, `Failed to filter with error: ${requestErr.message}`);
+            return;
+          } else {
+            createFailedDataFetchToast();
+            return;
+          }
         }
       }
     }

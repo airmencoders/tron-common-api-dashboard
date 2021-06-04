@@ -1,7 +1,11 @@
-import { FilterConditionOperatorEnum, FilterDto } from '../../../openapi';
+import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto } from '../../../openapi';
 import { GridFilterParams } from '../grid-filter-params';
+import { GridFilterOperator } from '../grid-filter-operator-type';
 import { AgGridSortModel } from '../grid-sort-model';
 import { InfiniteScroll } from '../infinite-scroll';
+import { GridMultiFilterModel } from '../grid-multi-filter-model';
+import { GridSingleFilterModel } from '../grid-single-filter-model';
+import { AgGridFilterConversionError } from '../../../utils/Exception/AgGridFilterConversionError';
 
 /**
  * Contains all possible Ag Grid filter options
@@ -46,41 +50,41 @@ export function generateInfiniteScrollLimit(infiniteScroll?: InfiniteScroll) {
 }
 
 /**
- * Converts Ag Grid filter types to the appropriate types used in API
- * @param filterType Ag Grid filter type
+ * Converts Ag Grid operator types to the appropriate types used in API
+ * @param operator Ag Grid operator type
  * @returns API compatible operation 
  */
-export function convertAgGridFilterTypeToOperator(filterType: string): FilterConditionOperatorEnum {
-  switch (filterType) {
-    case agGridFilterOptions.contains:
+export function convertAgGridFilterTypeToOperator(operator: GridFilterOperator): FilterConditionOperatorEnum {
+  switch (operator) {
+    case 'contains':
       return FilterConditionOperatorEnum.Like;
 
-    case agGridFilterOptions.notContains:
+    case 'notContains':
       return FilterConditionOperatorEnum.NotLike;
 
-    case agGridFilterOptions.equals:
+    case 'equals':
       return FilterConditionOperatorEnum.Equals;
 
-    case agGridFilterOptions.notEquals:
+    case 'notEqual':
       return FilterConditionOperatorEnum.NotEquals;
 
-    case agGridFilterOptions.startsWith:
+    case 'startsWith':
       return FilterConditionOperatorEnum.StartsWith;
 
-    case agGridFilterOptions.endsWith:
+    case 'endsWith':
       return FilterConditionOperatorEnum.EndsWith;
 
     default:
-      throw new Error(`${filterType} is not supported`);
+      throw new Error(`${operator} is not supported`);
   }
 }
 
 /**
- * Converts Ag Grid filter model to FilterDto
+ * Converts Ag Grid single filter model to FilterDto
  * @param filter Ag Grid filter model
  * @returns FilterDto
  */
-export function convertAgGridFilterToFilterDto(filter: any): FilterDto {
+function convertAgGridSingleFilterToFilterDto(filter: GridSingleFilterModel): FilterDto {
   const filterDto: FilterDto = {
     filterCriteria: []
   };
@@ -88,13 +92,40 @@ export function convertAgGridFilterToFilterDto(filter: any): FilterDto {
   Object.keys(filter).forEach(key => {
     const value = filter[key];
 
+    filterDto.filterCriteria.push({
+      field: key,
+      conditions: [
+        {
+          operator: convertAgGridFilterTypeToOperator(value.type),
+          value: value.filter
+        }
+      ]
+    });
+
+  });
+
+  return filterDto;
+}
+
+/**
+ * Converts Ag Grid multi filter model to FilterDto
+ * @param filter Ag Grid filter model
+ * @returns FilterDto
+ */
+function convertAgGridMultiFilterToFilterDto(filter: GridMultiFilterModel): FilterDto {
+  const filterDto: FilterDto = {
+    filterCriteria: []
+  };
+
+  Object.keys(filter).forEach(key => {
+    const value = filter[key];
     // AG Grid multi condition filter
     if (value['condition1'] != null && value['condition2'] != null) {
       const condition1 = value['condition1'];
       const condition2 = value['condition2'];
 
       filterDto.filterCriteria.push({
-        relationType: value.operator,
+        relationType: value.operator === 'OR' ? FilterCriteriaRelationTypeEnum.Or : FilterCriteriaRelationTypeEnum.And,
         field: key,
         conditions: [
           {
@@ -107,20 +138,76 @@ export function convertAgGridFilterToFilterDto(filter: any): FilterDto {
           },
         ]
       });
-    } else {
-      filterDto.filterCriteria.push({
-        field: key,
-        conditions: [
-          {
-            operator: convertAgGridFilterTypeToOperator(value.type),
-            value: value.filter
-          }
-        ]
-      });
     }
   });
 
   return filterDto;
+}
+
+/**
+ * Converts an Ag Grid filter (single or multi) to FilterDto
+ * 
+ * @param filter the Ag Grid filter to convert
+ * @returns FilterDto
+ * @throws {AgGridFilterConversionError} Will throw an error if the appropriate conversion could not be performed
+ */
+export function convertAgGridFilterToFilterDto(filter: GridMultiFilterModel | GridSingleFilterModel): FilterDto | undefined {
+  if (Object.keys(filter).length === 0) {
+    return;
+  }
+
+  if (isAgGridMultiFilter(filter)) {
+    return convertAgGridMultiFilterToFilterDto(filter);
+  }
+
+  if (isAgGridSingleFilter(filter)) {
+    return convertAgGridSingleFilterToFilterDto(filter);
+  }
+
+  throw new AgGridFilterConversionError();
+}
+
+/**
+ * Tries to determine if given object is an Ag Grid Multi Filter model
+ * 
+ * @param object the filter to check
+ * @returns true if object is Ag Grid Multi Filter Model, false otherwise
+ */
+function isAgGridMultiFilter(object: GridMultiFilterModel | GridSingleFilterModel): object is GridMultiFilterModel {
+  const keys = Object.keys(object);
+
+  if (keys.length > 0) {
+    const key = keys[0];
+    const value = object[key];
+
+    return value.hasOwnProperty('filterType') &&
+      value.hasOwnProperty('operator') &&
+      value.hasOwnProperty('condition1') &&
+      value.hasOwnProperty('condition2');
+  }
+
+  return false;
+}
+
+/**
+ * Tries to determine if given object is an Ag Grid Single Filter model
+ * 
+ * @param object the filter to check
+ * @returns true if object is Ag Grid Single Filter Model, false otherwise
+ */
+function isAgGridSingleFilter(object: GridMultiFilterModel | GridSingleFilterModel): object is GridSingleFilterModel {
+  const keys = Object.keys(object);
+
+  if (keys.length > 0) {
+    const key = keys[0];
+    const value = object[key];
+
+    return value.hasOwnProperty('filterType') &&
+      value.hasOwnProperty('type') &&
+      value.hasOwnProperty('filter');
+  }
+
+  return false;
 }
 
 /**

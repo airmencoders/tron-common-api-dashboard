@@ -1,6 +1,6 @@
 import { postpone, State } from '@hookstate/core';
 import { GridRowData } from '../../components/Grid/grid-row-data';
-import { AgGridSortModel } from '../../components/Grid/grid-sort-model';
+import { FilterDto } from '../../openapi';
 import { DataService } from './data-service';
 
 export abstract class AbstractDataService<T extends GridRowData, R> implements DataService<T, R> {
@@ -9,7 +9,7 @@ export abstract class AbstractDataService<T extends GridRowData, R> implements D
   }
 
   abstract fetchAndStoreData(): Promise<T[]>;
-  abstract fetchAndStorePaginatedData?(page: number, limit: number, checkDuplicates?: boolean, filter?: any, sort?: AgGridSortModel[]): Promise<T[]>;
+  abstract fetchAndStorePaginatedData?(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<T[]>;
   abstract sendUpdate(toUpdate: R): Promise<T>;
   abstract sendCreate(toCreate: R): Promise<T>;
   abstract sendDelete(toDelete: R): Promise<void>;

@@ -6,8 +6,6 @@ import {AbstractDataService} from '../data-service/abstract-data-service';
 import {ValidateFunction} from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
-import { convertAgGridFilterToFilterDto, convertAgGridSortToQueryParams } from '../../components/Grid/GridUtils/grid-utils';
-import { AgGridSortModel } from '../../components/Grid/grid-sort-model';
 import { createFailedDataFetchToast } from '../../components/Toast/ToastUtils/ToastUtils';
 
 /**
@@ -43,14 +41,14 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   /**
   * Keeps track of changes to the filter
   */
-  private filter?: any;
+  private filter?: FilterDto;
 
   /**
   * Keeps track of changes to the sort
   */
-  private sort?: AgGridSortModel[] = undefined;
+  private sort?: string[];
 
-  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: any, sort?: AgGridSortModel[]): Promise<PersonDto[]> {
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[]> {
     /**
      * If the filter or sort changes, purge the state to start fresh.
      * Set filter to the new value
@@ -61,27 +59,22 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
       this.sort = sort;
     }
 
-    const hasFilter = filter != null && Object.keys(filter).length > 0;
-
     let personResponseData: PersonDto[] = [];
-    const convertedSort: string[] | undefined = convertAgGridSortToQueryParams(sort);
 
     try {
-      if (hasFilter) {
-        const filterDto: FilterDto = convertAgGridFilterToFilterDto(filter);
-
-        personResponseData = await this.personApi.filterPerson(filterDto, undefined, undefined, page, limit, convertedSort)
+      if (filter != null && Object.keys(filter).length > 0) {
+        personResponseData = await this.personApi.filterPerson(filter, undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
       } else {
-        personResponseData = await this.personApi.getPersonsWrapped(undefined, undefined, page, limit, convertedSort)
+        personResponseData = await this.personApi.getPersonsWrapped(undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
       }
     } catch (err) {
-      createFailedDataFetchToast('Person');
+      throw err;
     }
 
     this.mergeDataToState(personResponseData, checkDuplicates);

@@ -6,8 +6,6 @@ import {OrganizationDtoWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
-import { AgGridSortModel } from '../../components/Grid/grid-sort-model';
-import { convertAgGridFilterToFilterDto, convertAgGridSortToQueryParams } from '../../components/Grid/GridUtils/grid-utils';
 import { createFailedDataFetchToast } from '../../components/Toast/ToastUtils/ToastUtils';
 
 // complex parts of the org we can edit -- for now...
@@ -52,14 +50,14 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   /**
   * Keeps track of changes to the filter
   */
-  private filter: any;
+  private filter?: FilterDto;
 
   /**
   * Keeps track of changes to the sort
   */
-  private sort?: AgGridSortModel[] = undefined;
+  private sort?: string[];
 
-  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: any, sort?: AgGridSortModel[]): Promise<OrganizationDto[]> {
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<OrganizationDto[]> {
     /**
      * If the filter or sort changes, purge the state to start fresh.
      * Set filter to the new value
@@ -70,26 +68,22 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       this.sort = sort;
     }
 
-    const hasFilter = filter != null && Object.keys(filter).length > 0;
-
     let responseData: OrganizationDto[] = [];
-    const convertedSort: string[] | undefined = convertAgGridSortToQueryParams(sort);
 
     try {
-      if (hasFilter) {
-        const filterDto: FilterDto = convertAgGridFilterToFilterDto(filter);
-        responseData = await this.orgApi.filterOrganizations(filterDto, page, limit, convertedSort)
+      if (filter != null && Object.keys(filter).length > 0) {
+        responseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
       } else {
-        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, convertedSort)
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
       }
     } catch (err) {
-      createFailedDataFetchToast('Organization');
+      throw err;
     }
 
     this.mergeDataToState(responseData, checkDuplicates);

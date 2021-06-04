@@ -1,3 +1,6 @@
+import { AgGridFilterConversionError } from '../../../utils/Exception/AgGridFilterConversionError';
+import { GridMultiFilterModel } from '../grid-multi-filter-model';
+import { GridSingleFilterModel } from '../grid-single-filter-model';
 import { agGridDefaults, agGridFilterOptions, convertAgGridFilterToFilterDto, convertAgGridFilterTypeToOperator, convertAgGridSortToQueryParams, createDefaultGridFilterParamsForType, generateInfiniteScrollLimit } from '../GridUtils/grid-utils';
 import { InfiniteScroll } from '../infinite-scroll';
 
@@ -30,12 +33,12 @@ describe('Grid Utils Test', () => {
     });
   });
 
-  it('Should throw error on bad Ag Grid filter type', () => {
-    expect(() => convertAgGridFilterTypeToOperator('badFilterType')).toThrow();
+  it('Should throw error on non-supported Ag Grid filter type', () => {
+    expect(() => convertAgGridFilterTypeToOperator('greaterThan')).toThrow();
   });
 
   it('Should convert Ag Grid multi-condition filter model to API FilterDto model', () => {
-    const agGridFilterModel = {
+    const agGridFilterModel: GridMultiFilterModel = {
       "firstName": {
         "filterType": "text",
         "operator": "AND",
@@ -75,7 +78,7 @@ describe('Grid Utils Test', () => {
   });
 
   it('Should convert Ag Grid single condition filter model to API FilterDto model', () => {
-    const agGridFilterModel = {
+    const agGridFilterModel: GridSingleFilterModel = {
       "firstName": {
         "filterType": "text",
         "type": "contains",
@@ -98,6 +101,10 @@ describe('Grid Utils Test', () => {
     };
 
     expect(convertAgGridFilterToFilterDto(agGridFilterModel)).toEqual(filterDto);
+  });
+
+  it('Should throw error trying to convert bad Ag Grid Filter to API FilterDto model', () => {
+    expect(() => convertAgGridFilterToFilterDto({ asd: "asd" } as any)).toThrow(AgGridFilterConversionError);
   });
 
   it('Should convert Ag Grid sort to API query params', () => {
