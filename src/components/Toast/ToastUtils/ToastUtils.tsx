@@ -29,5 +29,5 @@ export function createTextToast(type: ToastType, message: string, options?: Toas
  * @returns the id of the toast created
  */
 export function createFailedDataFetchToast(dataType?: string) {
-  return createTextToast(ToastType.ERROR, `Failed trying to fetch ${dataType ? dataType + ' data!' : 'data!'}`);
+  return createTextToast(ToastType.ERROR, `Failed trying to fetch ${dataType ? dataType + ' data!' : 'data!'}`, { autoClose: false });
 }

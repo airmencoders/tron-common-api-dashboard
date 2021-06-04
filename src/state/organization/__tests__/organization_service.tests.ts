@@ -270,6 +270,8 @@ describe('Test OrganizationService', () => {
       }
     ];
 
+    expect.assertions(4);
+
     // Make sure it calls filter endpoint
     let response = await organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort);
     expect(filterOrganizationsSpy).toHaveBeenCalledTimes(1);
@@ -279,8 +281,8 @@ describe('Test OrganizationService', () => {
     expect(getOrganizationsWrappedSpy).toHaveBeenCalledTimes(1);
 
     // Mock an exception
-    filterOrganizationsSpy.mockImplementation(() => { throw new Error("Test error") });
-    expect(async () => await organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort)).rejects.toThrowError();
+    filterOrganizationsSpy.mockImplementation(() => { return Promise.reject(new Error("Test error")) });
+    await expect(organizationService.fetchAndStorePaginatedData(0, 20, false, agGridFilterModel, agGridSort)).resolves.toEqual([]);
+    expect(filterOrganizationsSpy).toHaveBeenCalledTimes(2);
   });
-
 });
