@@ -52,6 +52,12 @@ export interface AppClientUserDetailsDto {
      * @memberof AppClientUserDetailsDto
      */
     name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppClientUserDetailsDto
+     */
+    clusterUrl?: string;
 }
 
 

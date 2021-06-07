@@ -353,6 +353,9 @@
           },
           "type": "array"
         },
+        "clusterUrl": {
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
@@ -376,6 +379,9 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "clusterUrl": {
+          "type": "string"
         },
         "id": {
           "type": "string"
@@ -620,6 +626,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "AppSourceDtoResponseWrapper": {
@@ -668,7 +677,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -678,13 +687,85 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestExceptionCause": {
+      "additionalProperties": false,
+      "properties": {
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestExceptionCauseStackTrace": {
+      "additionalProperties": false,
+      "properties": {
+        "classLoaderName": {
+          "type": "string"
+        },
+        "className": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "lineNumber": {
+          "type": "number"
+        },
+        "methodName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        },
+        "moduleVersion": {
+          "type": "string"
+        },
+        "nativeMethod": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "BadRequestExceptionCauseSuppressed": {
+      "additionalProperties": false,
+      "properties": {
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
           },
           "type": "array"
         }
@@ -1074,7 +1155,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1084,13 +1165,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -1687,7 +1768,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1697,13 +1778,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -1714,7 +1795,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1724,85 +1805,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "ResourceAlreadyExistsExceptionCause": {
-      "additionalProperties": false,
-      "properties": {
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "ResourceAlreadyExistsExceptionCauseStackTrace": {
-      "additionalProperties": false,
-      "properties": {
-        "classLoaderName": {
-          "type": "string"
-        },
-        "className": {
-          "type": "string"
-        },
-        "fileName": {
-          "type": "string"
-        },
-        "lineNumber": {
-          "type": "number"
-        },
-        "methodName": {
-          "type": "string"
-        },
-        "moduleName": {
-          "type": "string"
-        },
-        "moduleVersion": {
-          "type": "string"
-        },
-        "nativeMethod": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
-    "ResourceAlreadyExistsExceptionCauseSuppressed": {
-      "additionalProperties": false,
-      "properties": {
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -1815,6 +1824,9 @@
     "ScratchStorageAppRegistryDto": {
       "additionalProperties": false,
       "properties": {
+        "aclMode": {
+          "type": "boolean"
+        },
         "appHasImplicitRead": {
           "type": "boolean"
         },
@@ -2014,6 +2026,9 @@
     "SubscriberDto": {
       "additionalProperties": false,
       "properties": {
+        "appClientUser": {
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
@@ -2028,8 +2043,8 @@
         }
       },
       "required": [
-        "subscribedEvent",
-        "subscriberAddress"
+        "appClientUser",
+        "subscribedEvent"
       ],
       "type": "object"
     },

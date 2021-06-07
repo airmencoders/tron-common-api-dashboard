@@ -19,7 +19,7 @@ import { AppClientFlat } from "../../state/app-clients/app-client-flat";
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validateSubscriberAddress } from '../../utils/validation-utils';
 
 interface DeveloperEmail {
   email: string;
@@ -29,6 +29,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const formState = useState<AppClientFlat>({
     id: props.data?.id,
     name: props.data?.name || "",
+    clusterUrl: props.data?.clusterUrl || "",
     read: props.data?.read || false,
     write: props.data?.write || false,
     appClientDeveloperEmails: props.data?.appClientDeveloperEmails ?? [],
@@ -54,6 +55,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   formState.attach(Initial);
   formState.attach(Touched);
 
+  Validation(formState.clusterUrl).validate(url => validateSubscriberAddress(url), 'Invalid Client App URL Format', 'error');
   Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
@@ -61,6 +63,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     return Initial(formState.name).modified() 
             || Initial(formState.read).modified() || Initial(formState.write).modified()
             || Initial(formState.appClientDeveloperEmails).modified()
+            || Initial(formState.clusterUrl).modified()
   }
 
   function isFormDisabled() {
@@ -196,6 +199,31 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           defaultValue={formState.name.get()}
           error={failsHookstateValidation(formState.name) || props.formErrors?.validation?.name != null}
           onChange={(event) => formState.name.set(event.target.value)}
+          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+        />
+      </FormGroup>
+
+      <FormGroup
+        labelName="url"
+        labelText="Cluster URL"
+        isError={failsHookstateValidation(formState.clusterUrl)}
+        errorMessages={generateStringErrorMessages(formState.clusterUrl)}
+        required
+      >
+        <br/>
+        <p>
+          The App Client URL is the url of your application in the cluster. The URI must be of an in-cluster, fully-qualified-domain-name (FQDN) format. 
+          The format is <em>http://app-name.app-namespace.svc.cluster.local/</em>, so an example would be&nbsp;
+          <em>http://coolapp.coolapp.svc.cluster.local/</em>.  <br/><br/>The trailing slash is mandatory, and URL must <em>not</em> be https.
+        </p>
+        <TextInput
+          id="url"
+          name="url"
+          type="text"
+          readOnly={!currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
+          defaultValue={formState.clusterUrl.get()}
+          error={failsHookstateValidation(formState.clusterUrl)}
+          onChange={(event) => formState.clusterUrl.set(event.target.value)}
           disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
         />
       </FormGroup>

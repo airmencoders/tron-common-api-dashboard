@@ -132,7 +132,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   convertToFlat(client: AppClientUserDto): AppClientFlat {
-    const { id, name } = client;
+    const { id, name, clusterUrl } = client;
 
     const privilegeArr = Array.from(client.privileges || []);
 
@@ -144,6 +144,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     return {
       id,
       name: name || '',
+      clusterUrl: clusterUrl || '',
       ...privileges
     };
   }
@@ -152,6 +153,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     return {
       id: client.id,
       name: client.name,
+      clusterUrl: client.clusterUrl,
       privileges: await this.createAppPrivilegesArr(client),
       appClientDeveloperEmails: client.appClientDeveloperEmails,
     };

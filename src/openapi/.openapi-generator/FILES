@@ -40,6 +40,9 @@ models/app-source-dto-response-wrapper.ts
 models/app-source-dto.ts
 models/app-source-metric-dto.ts
 models/app-version-info-dto.ts
+models/bad-request-exception-cause-stack-trace.ts
+models/bad-request-exception-cause-suppressed.ts
+models/bad-request-exception-cause.ts
 models/bad-request-exception.ts
 models/coast-guardsman.ts
 models/count-metric-dto.ts
@@ -81,9 +84,6 @@ models/privilege-id-pair.ts
 models/pub-sub-ledger-entry-dto-response-wrapper.ts
 models/pub-sub-ledger-entry-dto.ts
 models/rank.ts
-models/record-not-found-exception-cause-stack-trace.ts
-models/record-not-found-exception-cause-suppressed.ts
-models/record-not-found-exception-cause.ts
 models/record-not-found-exception.ts
 models/resource-already-exists-exception.ts
 models/sailor.ts
