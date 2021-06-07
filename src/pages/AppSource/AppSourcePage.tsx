@@ -1,16 +1,17 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 import ApiSpecCellRenderer from '../../components/ApiSpecCellRenderer/ApiSpecCellRenderer';
-import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
+import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import MetricCellRenderer from '../../components/MetricCellRenderer/MetricCellRenderer';
-import { AppSourceDetailsDto, AppSourceDto } from '../../openapi';
-import { useAppSourceState } from '../../state/app-source/app-source-state';
+import {AppSourceDetailsDto, AppSourceDto} from '../../openapi';
+import {useAppSourceState} from '../../state/app-source/app-source-state';
 import AppSourceForm from './AppSourceForm';
-import { generateMetricsLink } from './Metrics/metric-page-utils';
-import { MetricType } from './Metrics/metric-type';
+import {generateMetricsLink} from './Metrics/metric-page-utils';
+import {MetricType} from './Metrics/metric-type';
 
 import './AppSourcePage.scss';
+import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 
 export function AppSourcePage() {
   const history = useHistory();
@@ -76,6 +77,7 @@ export function AppSourcePage() {
       allowEdit={true}
       autoResizeColumns
       autoResizeColummnsMinWidth={800}
+      sideDrawerSize={SideDrawerSize.WIDE}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { GridColumnParams } from "./GridColumnParams";
+import {GridColumnPinnedOption} from './grid-column-pinned-option';
 
 export default class GridColumn {
   constructor(params: Partial<GridColumnParams>) {
@@ -14,7 +15,9 @@ export default class GridColumn {
       showTooltip = true,
       checkboxSelection = false,
       headerCheckboxSelection = false,
-      headerCheckboxSelectionFilteredOnly = false
+      headerCheckboxSelectionFilteredOnly = false,
+      pinned = undefined,
+      initialWidth = undefined,
     } = params;
 
     this._field = field;
@@ -29,6 +32,8 @@ export default class GridColumn {
     this._checkboxSelection = checkboxSelection;
     this._headerCheckboxSelection = headerCheckboxSelection;
     this._headerCheckboxSelectionFilteredOnly = headerCheckboxSelectionFilteredOnly;
+    this._pinned = pinned;
+    this._initialWidth = initialWidth;
   }
 
   private _field: string;
@@ -43,6 +48,8 @@ export default class GridColumn {
   private _checkboxSelection: boolean;
   private _headerCheckboxSelection: boolean;
   private _headerCheckboxSelectionFilteredOnly: boolean;
+  private _pinned: GridColumnPinnedOption;
+  private _initialWidth: number | undefined;
 
   get field(): string {
     return this._field;
@@ -90,5 +97,13 @@ export default class GridColumn {
 
   get headerCheckboxSelectionFilteredOnly(): boolean {
     return this._headerCheckboxSelectionFilteredOnly;
+  }
+
+  get pinned(): GridColumnPinnedOption {
+    return this._pinned;
+  }
+
+  get intialWidth(): number | undefined {
+    return this._initialWidth;
   }
 }

@@ -9,6 +9,7 @@ import { GridProps } from './GridProps';
 
 function Grid(props: GridProps) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
+  const gridSizeRef = useRef(null);
   const gridReady = (event: GridReadyEvent) => {
     event.api.sizeColumnsToFit();
 
@@ -89,43 +90,50 @@ function Grid(props: GridProps) {
            style={{ width: '100%', height: props.height ?? '60vh'}}
       >
         <div className="ag-theme-alpine" style={{ width: '100%', height: '100%'}}>
-          <AgGridReact              
-              rowData={props.data}
-              onGridReady={gridReady}
-              onRowClicked={props.onRowClicked}
-              rowClass={props.rowClass}
-              quickFilterText={props.quickFilterText || ''}
-              rowSelection={props.rowSelection || 'none'}
-              suppressColumnVirtualisation={!process.env.NODE_ENV || process.env.NODE_ENV === 'test' || props.disabledGridColumnVirtualization}
-              enableBrowserTooltips
-              suppressRowClickSelection={props.suppressRowClickSelection}
-              onRowSelected={onRowSelected}
-              rowModelType={props.rowModelType}
-              datasource={props.datasource}
-              cacheBlockSize={props.cacheBlockSize ?? agGridDefaults.cacheBlockSize}
-              maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
-              maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
+          <div className="grid-size-ref" style={{ width: 'auto', height: '100%'}}
+               ref={gridSizeRef}
           >
-            {
-              props.columns.map(col => (
-                <AgGridColumn
-                    key={col.field}
-                    field={col.field}
-                    headerName={col.headerName}
-                    sortable={col.sortable}
-                    filter={col.filter}
-                    headerClass={col.headerClass}
-                    cellRendererFramework={col.cellRenderer}
-                    cellRendererParams={col.cellRendererParams}
-                    tooltipField={col.showTooltip ? col.field : undefined}
-                    resizable={col.resizable}
-                    checkboxSelection={col.checkboxSelection}
-                    headerCheckboxSelection={col.headerCheckboxSelection}
-                    headerCheckboxSelectionFilteredOnly={col.headerCheckboxSelectionFilteredOnly}
-                />
-              ))
-            }
-          </AgGridReact>
+            <AgGridReact
+                rowData={props.data}
+                onGridReady={gridReady}
+                onRowClicked={props.onRowClicked}
+                rowClass={props.rowClass}
+                quickFilterText={props.quickFilterText || ''}
+                rowSelection={props.rowSelection || 'none'}
+                suppressColumnVirtualisation={!process.env.NODE_ENV || process.env.NODE_ENV === 'test' || props.disabledGridColumnVirtualization}
+                enableBrowserTooltips
+                suppressRowClickSelection={props.suppressRowClickSelection}
+                onRowSelected={onRowSelected}
+                rowModelType={props.rowModelType}
+                datasource={props.datasource}
+                cacheBlockSize={props.cacheBlockSize ?? agGridDefaults.cacheBlockSize}
+                maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
+                maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
+            >
+              {
+                props.columns.map(col => (
+                    <AgGridColumn
+                        key={col.field}
+                        field={col.field}
+                        headerName={col.headerName}
+                        sortable={col.sortable}
+                        filter={col.filter}
+                        headerClass={col.headerClass}
+                        cellRendererFramework={col.cellRenderer}
+                        cellRendererParams={col.cellRendererParams}
+                        tooltipField={col.showTooltip ? col.field : undefined}
+                        resizable={col.resizable}
+                        checkboxSelection={col.checkboxSelection}
+                        headerCheckboxSelection={col.headerCheckboxSelection}
+                        headerCheckboxSelectionFilteredOnly={col.headerCheckboxSelectionFilteredOnly}
+                        pinned={col.pinned}
+                        initialWidth={col.intialWidth}
+                    />
+                ))
+              }
+            </AgGridReact>
+          </div>
+
         </div>
       </div>
   );

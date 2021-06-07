@@ -1,8 +1,7 @@
 import {none, postpone, State} from "@hookstate/core";
 import {DataCrudFormErrors} from "../../components/DataCrudFormPage/data-crud-form-errors";
 import {AppClientControllerApiInterface} from "../../openapi/apis/app-client-controller-api";
-import {PrivilegeDto} from "../../openapi/models";
-import {AppClientUserDetailsDto} from "../../openapi/models/app-client-user-details-dto";
+import {AppClientUserDetailsDto, PrivilegeDto} from "../../openapi/models";
 import {AppClientUserDto} from "../../openapi/models/app-client-user-dto";
 import {DataService} from "../data-service/data-service";
 import {prepareDataCrudErrorResponse} from "../data-service/data-service-utils";
@@ -12,6 +11,7 @@ import {AppClientPrivilege} from "./app-client-privilege";
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
+import {AppSourceDevDetails} from '../app-source/app-source-dev-details';
 
 /**
  * PII WARNING:
@@ -112,11 +112,25 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     }
 
     try {
-      const details = await this.getSelectedClient(id);
+      const details: AppClientUserDetailsDto = await this.getSelectedClient(id);
+      const appSourceMap: Record<string, AppSourceDevDetails> = {};
+      //groupby appSourceId
+      if (details?.appEndpointPrivs != null) {
+        for (const endpoint of details.appEndpointPrivs) {
+          if (endpoint.appSourceId != null) {
+            let existingEndpoints = appSourceMap[endpoint.appSourceId];
+            if (existingEndpoints == null) {
+              existingEndpoints = appSourceMap[endpoint.appSourceId] =
+                  new AppSourceDevDetails(endpoint.appSourceId, endpoint.appSourceName ?? 'Unknown App Source');
+            }
+            existingEndpoints.allowedEndpoints.push(endpoint);
+          }
+        }
+      }
       const retVal: AppClientFlat = {
         ...rowData,
         appClientDeveloperEmails: details.appClientDeveloperEmails,
-        appEndpointPrivs: details.appEndpointPrivs
+        appSourceEndpoints: Object.values(appSourceMap)
       };
 
       return Promise.resolve(Object.assign({}, retVal));

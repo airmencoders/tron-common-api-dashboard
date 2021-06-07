@@ -25,13 +25,13 @@ export interface AppSourceDto {
      * @type {string}
      * @memberof AppSourceDto
      */
-    id?: string;
+    name: string;
     /**
      * 
      * @type {string}
      * @memberof AppSourceDto
      */
-    name?: string;
+    id?: string;
     /**
      * 
      * @type {number}
