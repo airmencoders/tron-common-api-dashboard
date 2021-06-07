@@ -25,14 +25,6 @@ import { Flight } from '../models';
 // @ts-ignore
 import { Group } from '../models';
 // @ts-ignore
-import { JsonPatchObjectArrayValue } from '../models';
-// @ts-ignore
-import { JsonPatchObjectValue } from '../models';
-// @ts-ignore
-import { JsonPatchStringArrayValue } from '../models';
-// @ts-ignore
-import { JsonPatchStringValue } from '../models';
-// @ts-ignore
 import { OrganizationDto } from '../models';
 // @ts-ignore
 import { OrganizationDtoPaginationResponseWrapper } from '../models';
@@ -595,19 +587,19 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
         /**
          * Patches an existing organization
          * @summary Patches an existing organization
-         * @param {string} id Organization ID to patch
-         * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
+         * @param {string} id Organization ID to update
+         * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchPerson1: async (id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options: any = {}): Promise<RequestArgs> => {
+        patchOrganization1: async (id: string, requestBody: { [key: string]: string; }, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling patchPerson1.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling patchOrganization1.');
             }
-            // verify required parameter 'jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue' is not null or undefined
-            if (jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === null || jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === undefined) {
-                throw new RequiredError('jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue','Required parameter jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue was null or undefined when calling patchPerson1.');
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling patchOrganization1.');
             }
             const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -624,7 +616,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
 
 
     
-            localVarHeaderParameter['Content-Type'] = 'application/json-patch+json';
+            localVarHeaderParameter['Content-Type'] = 'application/json';
 
             const queryParameters = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
@@ -636,13 +628,13 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue !== 'string';
+            const nonString = typeof requestBody !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue !== undefined ? jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue : {})
-                : (jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue || "");
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -929,13 +921,13 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
         /**
          * Patches an existing organization
          * @summary Patches an existing organization
-         * @param {string} id Organization ID to patch
-         * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
+         * @param {string} id Organization ID to update
+         * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchPerson1(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
-            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchPerson1(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options);
+        async patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).patchOrganization1(id, requestBody, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1097,13 +1089,13 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
         /**
          * Patches an existing organization
          * @summary Patches an existing organization
-         * @param {string} id Organization ID to patch
-         * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
+         * @param {string} id Organization ID to update
+         * @param {{ [key: string]: string; }} requestBody 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchPerson1(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<OrganizationDto> {
-            return OrganizationControllerApiFp(configuration).patchPerson1(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(axios, basePath));
+        patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto> {
+            return OrganizationControllerApiFp(configuration).patchOrganization1(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
          * Removes subordinate orgs from an organization
@@ -1253,13 +1245,13 @@ export interface OrganizationControllerApiInterface {
     /**
      * Patches an existing organization
      * @summary Patches an existing organization
-     * @param {string} id Organization ID to patch
-     * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
+     * @param {string} id Organization ID to update
+     * @param {{ [key: string]: string; }} requestBody 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    patchPerson1(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<OrganizationDto>;
+    patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Removes subordinate orgs from an organization
@@ -1429,14 +1421,14 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     /**
      * Patches an existing organization
      * @summary Patches an existing organization
-     * @param {string} id Organization ID to patch
-     * @param {JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
+     * @param {string} id Organization ID to update
+     * @param {{ [key: string]: string; }} requestBody 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi
      */
-    public patchPerson1(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any) {
-        return OrganizationControllerApiFp(this.configuration).patchPerson1(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(this.axios, this.basePath));
+    public patchOrganization1(id: string, requestBody: { [key: string]: string; }, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).patchOrganization1(id, requestBody, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
