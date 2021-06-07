@@ -17,57 +17,57 @@
 /**
  * 
  * @export
- * @interface RecordNotFoundExceptionCauseStackTrace
+ * @interface BadRequestExceptionCauseStackTrace
  */
-export interface RecordNotFoundExceptionCauseStackTrace {
+export interface BadRequestExceptionCauseStackTrace {
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     methodName?: string;
     /**
      * 
      * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     fileName?: string;
     /**
      * 
      * @type {number}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     lineNumber?: number;
     /**
      * 
-     * @type {string}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
-     */
-    className?: string;
-    /**
-     * 
      * @type {boolean}
-     * @memberof RecordNotFoundExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     nativeMethod?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof BadRequestExceptionCauseStackTrace
+     */
+    className?: string;
 }
 
 
