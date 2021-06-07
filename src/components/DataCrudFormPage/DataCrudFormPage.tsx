@@ -22,9 +22,9 @@ import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
-import { convertAgGridFilterToFilterDto, convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
+import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
 import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
-import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
+import { GridFilter } from '../Grid/grid-filter';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -78,10 +78,10 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
           const limit = generateInfiniteScrollLimit(infiniteScroll);
           const page = Math.floor(params.startRow / limit);
 
-          const filter = convertAgGridFilterToFilterDto(params.filterModel);
+          const filter = new GridFilter(params.filterModel);
           const sort = convertAgGridSortToQueryParams(params.sortModel);
 
-          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, filter, sort);
+          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, filter.getFilterDto(), sort);
 
           let lastRow = -1;
 
@@ -100,7 +100,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
           params.failCallback();
 
           /**
-           * Don't error out the state here. If the requests fail for some reason, just show nothing.
+           * Don't error out the state here. If the request fails for some reason, just show nothing.
            * 
            * Call the success callback as a hack to prevent
            * ag grid from showing an infinite loading state on failure.
@@ -113,13 +113,29 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
           }
 
           const requestErr = prepareRequestError(err);
-          if (requestErr.status === 400) {
-            createTextToast(ToastType.ERROR, `Failed to filter with error: ${requestErr.message}`);
+
+          /**
+           * A 400 status with a filter model set means that the server
+           * sent back a validation error.
+           */
+          if (requestErr.status === 400 && params.filterModel != null) {
+            createTextToast(ToastType.ERROR, `Failed to filter with error: ${requestErr.message}`, { autoClose: false });
             return;
-          } else {
+          }
+
+          /**
+           * Server responded with some other response
+           */
+          if (requestErr.status != null) {
             createFailedDataFetchToast();
             return;
           }
+
+          /**
+           * Something else went wrong... the request did not leave
+           */
+          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
+          return;
         }
       }
     }

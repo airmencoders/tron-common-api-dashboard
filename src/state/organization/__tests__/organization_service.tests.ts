@@ -4,7 +4,6 @@ import {createState} from '@hookstate/core';
 import { FilterConditionOperatorEnum, FilterDto, Flight, Group, OrganizationControllerApi, OrganizationDto, OrganizationDtoPaginationResponseWrapper, OtherUsaf, Squadron, Wing } from '../../../openapi';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { OrganizationDtoWithDetails } from '../organization-state';
-import { convertAgGridFilterToFilterDto } from '../../../components/Grid/GridUtils/grid-utils';
 
 class MockOrgApi extends OrganizationControllerApi {
   getOrganizationsWrapped(type?: "SQUADRON" | "GROUP" | "FLIGHT" | "WING" | "OTHER_USAF" | "ORGANIZATION",
