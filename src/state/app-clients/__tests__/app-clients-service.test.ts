@@ -21,12 +21,14 @@ describe('App Client State Tests', () => {
   const flatClients: AppClientFlat[] = [
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
+      clusterUrl: "http://app.app.svc.cluster.local/",
       name: "Test",
       read: true,
       write: true
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
+      clusterUrl: "http://app2.app2.svc.cluster.local/",
       name: "Test1",
       read: false,
       write: false
@@ -37,6 +39,7 @@ describe('App Client State Tests', () => {
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       name: "Test",
+      clusterUrl: "http://app.app.svc.cluster.local/",
       privileges: [
         {
           "id": 1,
@@ -50,6 +53,7 @@ describe('App Client State Tests', () => {
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
+      clusterUrl: "http://app2.app2.svc.cluster.local/",
       name: "Test1",
     }
   ];
@@ -78,12 +82,14 @@ describe('App Client State Tests', () => {
   const testClientDto: AppClientUserDto = {
     id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
     name: "Test Client",
+    clusterUrl: "http://app.app.svc.cluster.local/",
     privileges: testClientPrivileges
   };
 
   const testClientDetailsDto: AppClientUserDetailsDto = {
     id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
     name: "Test Client",
+    clusterUrl: "http://app.app.svc.cluster.local/",
     privileges: testClientPrivileges,
     appClientDeveloperEmails: [],
     appEndpointPrivs: [],
@@ -91,6 +97,7 @@ describe('App Client State Tests', () => {
 
   const testClientFlat: AppClientFlat = {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+    clusterUrl: "http://app.app.svc.cluster.local/",
     name: 'Test Client',
     read: true,
     write: true,
@@ -98,6 +105,7 @@ describe('App Client State Tests', () => {
 
   const testClientFlatWithDetails: AppClientFlat = {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
+    clusterUrl: "http://app.app.svc.cluster.local/",
     name: 'Test Client',
     read: true,
     write: true,

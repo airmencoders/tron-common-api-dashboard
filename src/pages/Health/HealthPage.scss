@@ -2,7 +2,7 @@
 .health {
   &__status-cards {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
 
     .status-card {
       width: 250px;
