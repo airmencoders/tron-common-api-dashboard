@@ -1,3 +1,5 @@
+import { GridFilterParams } from './grid-filter-params';
+
 export interface GridColumnParams {
   field: string;
   sortable: boolean;
@@ -11,4 +13,5 @@ export interface GridColumnParams {
   checkboxSelection: boolean;
   headerCheckboxSelection: boolean;
   headerCheckboxSelectionFilteredOnly: boolean;
+  filterParams: GridFilterParams;
 }

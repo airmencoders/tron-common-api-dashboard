@@ -5,6 +5,7 @@ import PersonEditForm from './PersonEditForm';
 import {PersonDto} from '../../openapi/models';
 import {usePersonState} from '../../state/person/person-state';
 import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
+import { createDefaultGridFilterParamsForType } from '../../components/Grid/GridUtils/grid-utils';
 
 const columns: GridColumn[] =
   [
@@ -13,7 +14,8 @@ const columns: GridColumn[] =
       sortable: true,
       filter: true,
       headerName: 'id',
-      cellRenderer: LoadingCellRenderer
+      cellRenderer: LoadingCellRenderer,
+      filterParams: createDefaultGridFilterParamsForType('uuid')
     }),
     new GridColumn({
       field: 'email',
@@ -47,9 +49,10 @@ const columns: GridColumn[] =
     }),
     new GridColumn({
       field: 'branch',
-      sortable: true,
+      sortable: false,
       filter: true,
-      headerName: 'Branch'
+      headerName: 'Branch',
+      filterParams: createDefaultGridFilterParamsForType('enum')
     }),
     new GridColumn({
       field: 'rank',

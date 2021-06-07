@@ -1,3 +1,4 @@
+import { GridFilterParams } from './grid-filter-params';
 import { GridColumnParams } from "./GridColumnParams";
 
 export default class GridColumn {
@@ -14,7 +15,8 @@ export default class GridColumn {
       showTooltip = true,
       checkboxSelection = false,
       headerCheckboxSelection = false,
-      headerCheckboxSelectionFilteredOnly = false
+      headerCheckboxSelectionFilteredOnly = false,
+      filterParams = undefined
     } = params;
 
     this._field = field;
@@ -29,6 +31,7 @@ export default class GridColumn {
     this._checkboxSelection = checkboxSelection;
     this._headerCheckboxSelection = headerCheckboxSelection;
     this._headerCheckboxSelectionFilteredOnly = headerCheckboxSelectionFilteredOnly;
+    this._filterParams = filterParams;
   }
 
   private _field: string;
@@ -43,6 +46,7 @@ export default class GridColumn {
   private _checkboxSelection: boolean;
   private _headerCheckboxSelection: boolean;
   private _headerCheckboxSelectionFilteredOnly: boolean;
+  private _filterParams?: GridFilterParams;
 
   get field(): string {
     return this._field;
@@ -90,5 +94,9 @@ export default class GridColumn {
 
   get headerCheckboxSelectionFilteredOnly(): boolean {
     return this._headerCheckboxSelectionFilteredOnly;
+  }
+
+  get filterParams(): GridFilterParams | undefined {
+    return this._filterParams;
   }
 }
