@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, within } from '@testing-library/react';
+import { waitFor, fireEvent, render, within } from '@testing-library/react';
 import { AppClientSummaryDto, AppClientSummaryDtoResponseWrapper, AppClientUserPrivDto, AppEndpointDto, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import AppSourceEndpointEditor from '../AppSourceEndpointEditor';
@@ -133,33 +133,33 @@ describe('Test App Source Endpoint Editor', () => {
     const appClientCheckboxParent = await page.findAllByTestId('checkbox-cell-renderer', {}, { timeout: 3000 });
 
     // App Client 1
-    const appClient1Checkbox = within(appClientCheckboxParent[0]).getByRole('checkbox');
-    expect(appClient1Checkbox).toBeInTheDocument();
-    expect(appClient1Checkbox).not.toBeChecked();
+    const appClient1Checkbox = page.container.querySelector('#app-source-client-authorization-0');
+    await waitFor(() => expect(appClient1Checkbox).toBeInTheDocument());
+    await waitFor(() => expect(appClient1Checkbox).not.toBeChecked(), { timeout: 3000 });
 
     // check
     fireEvent.click(appClient1Checkbox!);
-    expect(appClientPrivileges.length).toBe(4);
-    expect(appClient1Checkbox).toBeChecked();
+    await waitFor(() => expect(appClientPrivileges.length).toBe(4));
+    await waitFor(() => expect(appClient1Checkbox).toBeChecked());
 
     // Uncheck
     fireEvent.click(appClient1Checkbox!);
-    expect(appClientPrivileges.length).toBe(2);
-    expect(appClient1Checkbox).not.toBeChecked();
+    await waitFor(() => expect(appClientPrivileges.length).toBe(2));
+    await waitFor(() => expect(appClient1Checkbox).not.toBeChecked());
 
     // App Client 2
-    const appClient2Checkbox = within(appClientCheckboxParent[1]).getByRole('checkbox');
-    expect(appClient2Checkbox).toBeInTheDocument();
-    expect(appClient2Checkbox).toBeChecked();
+    const appClient2Checkbox = page.container.querySelector('#app-source-client-authorization-1');
+    await waitFor(() => expect(appClient2Checkbox).toBeInTheDocument());
+    await waitFor(() => expect(appClient2Checkbox).toBeChecked());
 
     // uncheck
     fireEvent.click(appClient2Checkbox!);
-    expect(appClientPrivileges.length).toBe(0);
-    expect(appClient2Checkbox).not.toBeChecked();
+    await waitFor(() => expect(appClientPrivileges.length).toBe(0));
+    await waitFor(() => expect(appClient2Checkbox).not.toBeChecked());
 
     // check
     fireEvent.click(appClient2Checkbox!);
-    expect(appClientPrivileges.length).toBe(2);
-    expect(appClient2Checkbox).toBeChecked();
+    await waitFor(() => expect(appClientPrivileges.length).toBe(2));
+    await waitFor(() => expect(appClient2Checkbox).toBeChecked());
   });
 });
