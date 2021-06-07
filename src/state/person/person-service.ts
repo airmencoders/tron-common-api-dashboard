@@ -22,11 +22,13 @@ import { createFailedDataFetchToast } from '../../components/Toast/ToastUtils/To
  */
 export default class PersonService extends AbstractDataService<PersonDto, PersonDto> {
   private readonly validate: ValidateFunction<PersonDto>;
+  private readonly filterValidate: ValidateFunction<FilterDto>;
 
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
     public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<PersonDto>(ModelTypes.definitions.PersonDto);
+    this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
   }
 
   async fetchAndStoreData(): Promise<PersonDto[]> {
@@ -63,6 +65,10 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
 
     try {
       if (filter != null && Object.keys(filter).length > 0) {
+        if (!this.filterValidate(filter)) {
+          throw TypeValidation.validationError('FilterDto');
+        }
+        
         personResponseData = await this.personApi.filterPerson(filter, undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;

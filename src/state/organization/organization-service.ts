@@ -24,6 +24,7 @@ export enum OrgEditOpType {
 export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDto> {
 
   private readonly validate: ValidateFunction<OrganizationDto>;
+  private readonly filterValidate: ValidateFunction<FilterDto>;
 
   constructor(
       public state: State<OrganizationDto[]>,
@@ -31,6 +32,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       private orgApi: OrganizationControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<OrganizationDto>(ModelTypes.definitions.OrganizationDto);
+    this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
   }
 
   async fetchAndStoreData(): Promise<OrganizationDto[]> {
@@ -57,6 +59,8 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   private sort?: string[];
 
   async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<OrganizationDto[]> {
+
+
     /**
      * If the filter or sort changes, purge the state to start fresh.
      * Set filter to the new value
@@ -71,6 +75,10 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
     try {
       if (filter != null && Object.keys(filter).length > 0) {
+        if (!this.filterValidate(filter)) {
+          throw TypeValidation.validationError('FilterDto');
+        }
+        
         responseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
           .then(resp => {
             return resp.data.data;

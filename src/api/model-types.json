@@ -620,6 +620,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "AppSourceDtoResponseWrapper": {
@@ -668,7 +671,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -678,13 +681,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -845,6 +848,93 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "FilterCondition": {
+      "additionalProperties": false,
+      "description": "The list of conditions that must be fulfilled",
+      "properties": {
+        "operator": {
+          "$ref": "model-types.json#/definitions/FilterConditionOperatorEnum",
+          "description": "The operation to perform for the condition"
+        },
+        "value": {
+          "description": "The value to perform the operation against",
+          "type": "string"
+        },
+        "values": {
+          "description": "The values to perform the operation against (only used when operator set to IN)",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "operator"
+      ],
+      "type": "object"
+    },
+    "FilterConditionOperatorEnum": {
+      "enum": [
+        "EQUALS",
+        "NOT_EQUALS",
+        "GREATER_THAN",
+        "LESS_THAN",
+        "LIKE",
+        "NOT_LIKE",
+        "STARTS_WITH",
+        "ENDS_WITH",
+        "IN"
+      ],
+      "type": "string"
+    },
+    "FilterCriteria": {
+      "additionalProperties": false,
+      "properties": {
+        "conditions": {
+          "description": "The list of conditions that must be fulfilled",
+          "items": {
+            "$ref": "model-types.json#/definitions/FilterCondition"
+          },
+          "type": "array"
+        },
+        "field": {
+          "description": "the name of the field to compare against",
+          "type": "string"
+        },
+        "relationType": {
+          "$ref": "model-types.json#/definitions/FilterCriteriaRelationTypeEnum",
+          "description": "The relationship between the conditions. Will default to use AND if none provided. Has no effect if only one condition is given"
+        }
+      },
+      "required": [
+        "field",
+        "conditions"
+      ],
+      "type": "object"
+    },
+    "FilterCriteriaRelationTypeEnum": {
+      "enum": [
+        "OR",
+        "AND"
+      ],
+      "type": "string"
+    },
+    "FilterDto": {
+      "additionalProperties": false,
+      "description": "The conditions used to filter",
+      "properties": {
+        "filterCriteria": {
+          "items": {
+            "$ref": "model-types.json#/definitions/FilterCriteria"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "filterCriteria"
+      ],
       "type": "object"
     },
     "Flight": {
@@ -1074,7 +1164,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1084,13 +1174,13 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseSuppressed"
           },
           "type": "array"
         }
@@ -1687,7 +1777,7 @@
       "additionalProperties": false,
       "properties": {
         "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
+          "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCause"
         },
         "localizedMessage": {
           "type": "string"
@@ -1697,47 +1787,20 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseSuppressed"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "ResourceAlreadyExistsException": {
-      "additionalProperties": false,
-      "properties": {
-        "cause": {
-          "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCause"
-        },
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "ResourceAlreadyExistsExceptionCause": {
+    "RecordNotFoundExceptionCause": {
       "additionalProperties": false,
       "properties": {
         "localizedMessage": {
@@ -1748,20 +1811,20 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseStackTrace"
           },
           "type": "array"
         },
         "suppressed": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseSuppressed"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseSuppressed"
           },
           "type": "array"
         }
       },
       "type": "object"
     },
-    "ResourceAlreadyExistsExceptionCauseStackTrace": {
+    "RecordNotFoundExceptionCauseStackTrace": {
       "additionalProperties": false,
       "properties": {
         "classLoaderName": {
@@ -1791,7 +1854,7 @@
       },
       "type": "object"
     },
-    "ResourceAlreadyExistsExceptionCauseSuppressed": {
+    "RecordNotFoundExceptionCauseSuppressed": {
       "additionalProperties": false,
       "properties": {
         "localizedMessage": {
@@ -1802,7 +1865,34 @@
         },
         "stackTrace": {
           "items": {
-            "$ref": "model-types.json#/definitions/ResourceAlreadyExistsExceptionCauseStackTrace"
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseStackTrace"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ResourceAlreadyExistsException": {
+      "additionalProperties": false,
+      "properties": {
+        "cause": {
+          "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCause"
+        },
+        "localizedMessage": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "stackTrace": {
+          "items": {
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseStackTrace"
+          },
+          "type": "array"
+        },
+        "suppressed": {
+          "items": {
+            "$ref": "model-types.json#/definitions/RecordNotFoundExceptionCauseSuppressed"
           },
           "type": "array"
         }
