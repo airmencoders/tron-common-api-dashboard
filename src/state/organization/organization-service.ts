@@ -6,6 +6,7 @@ import {OrganizationDtoWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
+import isEqual from 'fast-deep-equal';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -65,7 +66,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
      * If the filter or sort changes, purge the state to start fresh.
      * Set filter to the new value
      */
-    if (this.filter != filter || this.sort != sort) {
+    if (!isEqual(this.filter, filter) || this.sort != sort) {
       this.state.set([]);
       this.filter = filter;
       this.sort = sort;
