@@ -257,7 +257,10 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         >
         </FormGroup>
 
-      <Accordion items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}/>
+      <Accordion
+          className="app-source-access"
+          items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}
+      />
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}

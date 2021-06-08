@@ -16,7 +16,7 @@ function Accordion(props: AccordionProps) {
       };
 
   return (
-      <div className="usa-accordion">
+      <div className={`usa-accordion ${props.className}`}>
         {
           props.items.map((accordionItem) => (<>
             <h4 className="usa-accordion__heading">
