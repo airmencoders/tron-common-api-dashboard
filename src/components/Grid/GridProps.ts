@@ -42,10 +42,4 @@ export interface GridProps {
   onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
 
   rowModelType?: string;
-  datasource?: IDatasource;
-  cacheBlockSize?: number;
-  maxBlocksInCache?: number;
-  maxConcurrentDatasourceRequests?: number;
-  updateInfiniteCache?: boolean;
-  updateInfiniteCacheCallback?: () => void;
 }

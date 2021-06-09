@@ -25,6 +25,7 @@ import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
 import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
 import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
 import { GridFilter } from '../Grid/grid-filter';
+import InfiniteScrollGrid from '../Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -37,7 +38,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   const pageState: State<CrudPageState<R>> = useState<CrudPageState<R>>(getInitialCrudPageState());
 
-  const { infiniteScroll } = props;
+  const { infiniteScrollOptions: infiniteScroll } = props;
 
   const updateInfiniteCache = useState<boolean>(false);
 
@@ -63,7 +64,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     }
   }
 
-  function createInfiniteScrollDatasource(): IDatasource | undefined {
+  function createInfiniteScrollDatasource(): IDatasource {
     if (!infiniteScroll?.enabled) {
       throw new Error('Infinite scroll must be enabled to create datasource');
     }
@@ -386,14 +387,13 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                 }
 
                 {infiniteScroll?.enabled ?
-                  <Grid
+                  <InfiniteScrollGrid
                     columns={columns}
                     onRowClicked={onRowClicked}
                     rowClass="ag-grid--row-pointer"
                     autoResizeColumns={props.autoResizeColumns}
                     autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
                     disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
-                    rowModelType="infinite"
                     datasource={createInfiniteScrollDatasource()}
                     cacheBlockSize={generateInfiniteScrollLimit(infiniteScroll)}
                     maxBlocksInCache={infiniteScroll.maxBlocksInCache}

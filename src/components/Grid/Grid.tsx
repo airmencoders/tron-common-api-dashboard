@@ -6,8 +6,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
 import { GridProps } from './GridProps';
 import { agGridDefaults } from './GridUtils/grid-utils';
+import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGridProps';
 
-function Grid(props: GridProps) {
+function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const gridReady = (event: GridReadyEvent) => {
     event.api.sizeColumnsToFit();

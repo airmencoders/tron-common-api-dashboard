@@ -69,7 +69,7 @@ function OrganizationPage() {
         deleteComponent={OrganizationDelete}
         autoResizeColumns
         autoResizeColummnsMinWidth={1200}
-        infiniteScroll={{
+        infiniteScrollOptions={{
           enabled: true
         }}
       />

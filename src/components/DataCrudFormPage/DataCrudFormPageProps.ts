@@ -1,6 +1,6 @@
 import {DataService} from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
-import { InfiniteScroll } from '../Grid/infinite-scroll';
+import { InfiniteScrollOptions } from './infinite-scroll-options';
 import { CreateUpdateFormProps } from './CreateUpdateFormProps';
 import { DataCrudDeleteComponentProps } from './DataCrudDeleteComponentProps';
 
@@ -83,5 +83,5 @@ export interface DataCrudFormPageProps<T, R> {
 
   className?: string;
 
-  infiniteScroll?: InfiniteScroll;
+  infiniteScrollOptions?: InfiniteScrollOptions;
 }
