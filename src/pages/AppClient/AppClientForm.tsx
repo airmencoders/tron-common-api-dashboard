@@ -19,6 +19,7 @@ import { AppClientFlat } from "../../state/app-clients/app-client-flat";
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validateSubscriberAddress } from '../../utils/validation-utils';
 
 interface DeveloperEmail {
@@ -182,6 +183,9 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
             defaultValue={formState.id.get()}
             disabled={true}
           />
+          <CopyToClipboard text={formState.id.get()}                           >
+            <button>Copy to Clipboard</button>
+          </CopyToClipboard>
         </FormGroup>
       }
 
