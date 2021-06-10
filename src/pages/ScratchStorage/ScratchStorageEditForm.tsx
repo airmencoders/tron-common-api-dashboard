@@ -24,6 +24,7 @@ import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
 import { generateStringErrorMessages, failsHookstateValidation, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -214,6 +215,22 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   return (
       <div className="scratch-storage-edit-form">
         <Form onSubmit={submitForm} data-testid="scratch-storage-form">
+          <FormGroup
+              labelName="uuid"
+              labelText="UUID"
+              isError={false}
+          >
+            <TextInput
+                id="uuid"
+                name="uuid"
+                type="text"
+                defaultValue={formState.id.get()}
+                disabled={true}
+            />
+            <CopyToClipboard text={String(formState.id.get())}>
+              <Button type="button">Copy to Clipboard</Button>
+            </CopyToClipboard>
+          </FormGroup>
           <FormGroup labelName="appName" labelText="App Name"
                      isError={failsHookstateValidation(formState.appName)}
                      errorMessages={generateStringErrorMessages(formState.appName)}

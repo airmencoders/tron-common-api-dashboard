@@ -183,8 +183,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
             defaultValue={formState.id.get()}
             disabled={true}
           />
-          <CopyToClipboard text={formState.id.get()}                           >
-            <button>Copy to Clipboard</button>
+          <CopyToClipboard text={String(formState.id.get())}>
+            <Button type="button">Copy to Clipboard</Button>
           </CopyToClipboard>
         </FormGroup>
       }

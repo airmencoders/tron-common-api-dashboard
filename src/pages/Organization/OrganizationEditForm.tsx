@@ -25,6 +25,7 @@ import { useOrganizationState } from '../../state/organization/organization-stat
 import { usePersonState } from '../../state/person/person-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
@@ -341,6 +342,22 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   return (
       <div className="organization-edit-form">
         <Form onSubmit={submitForm}>
+          <FormGroup
+              labelName="uuid"
+              labelText="UUID"
+              isError={false}
+          >
+            <TextInput
+                id="uuid"
+                name="uuid"
+                type="text"
+                defaultValue={formState.id.get()}
+                disabled={true}
+            />
+            <CopyToClipboard text={String(formState.id.get())}>
+              <Button type="button">Copy to Clipboard</Button>
+            </CopyToClipboard>
+          </FormGroup>
           <FormGroup labelName="orgName" labelText="Organization Name"
                      isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}
                      errorMessages={Validation(formState.name).errors()

@@ -16,6 +16,8 @@ import { Initial } from '@hookstate/initial';
 
 import './PersonEditForm.scss';
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validDoDId, validPhone } from '../../utils/validation-utils';
+import {CopyToClipboard} from "react-copy-to-clipboard";
+import Button from "../../components/Button/Button";
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();
@@ -110,6 +112,22 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   return (
     <div className="person-edit-form">
       <Form onSubmit={submitForm}>
+        <FormGroup
+            labelName="uuid"
+            labelText="UUID"
+            isError={false}
+        >
+          <TextInput
+              id="uuid"
+              name="uuid"
+              type="text"
+              defaultValue={formState.id.get()}
+              disabled={true}
+          />
+          <CopyToClipboard text={String(formState.id.get())}>
+            <Button type="button">Copy to Clipboard</Button>
+          </CopyToClipboard>
+        </FormGroup>
         <FormGroup labelName="email" labelText="Email"
           isError={failsHookstateValidation(formState.email)}
           errorMessages={generateStringErrorMessages(formState.email)}
