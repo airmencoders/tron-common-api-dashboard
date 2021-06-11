@@ -72,8 +72,9 @@ function PersonPage() {
       pageTitle="People"
       updateForm={PersonEditForm}
       useDataState={usePersonState}
-      allowEdit
-      allowDelete
+      allowAdd={true}
+      allowEdit={true}
+      allowDelete={true}
       deleteComponent={PersonDelete}
       autoResizeColumns
       autoResizeColummnsMinWidth={1200}
