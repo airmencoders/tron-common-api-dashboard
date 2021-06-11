@@ -16,6 +16,8 @@ import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
+import Button from "../../components/Button/Button";
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
   const appClientsAvail = useAppClientsState().appClients;
@@ -83,7 +85,9 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
             defaultValue={formState.id.get()}
             disabled={true}
           />
-          <br/>
+          <CopyToClipboard text={String(formState.id.get())}>
+            <Button type="button" >Copy to Clipboard</Button>
+          </CopyToClipboard>
         </FormGroup>
       }
 

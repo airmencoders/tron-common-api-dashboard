@@ -23,6 +23,7 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 interface AdminEmail {
   email: string;
@@ -245,6 +246,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
               defaultValue={formState.id.get()}
               disabled={true}
             />
+            <CopyToClipboard text={String(formState.id.get())}>
+              <Button type="button" >Copy to Clipboard</Button>
+            </CopyToClipboard>
           </FormGroup>
         }
 
