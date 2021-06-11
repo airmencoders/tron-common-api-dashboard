@@ -1,3 +1,4 @@
+import { GridFilterParams } from './grid-filter-params';
 import { GridColumnParams } from "./GridColumnParams";
 import {GridColumnPinnedOption} from './grid-column-pinned-option';
 
@@ -18,6 +19,7 @@ export default class GridColumn {
       headerCheckboxSelectionFilteredOnly = false,
       pinned = undefined,
       initialWidth = undefined,
+      filterParams = undefined
     } = params;
 
     this._field = field;
@@ -32,6 +34,7 @@ export default class GridColumn {
     this._checkboxSelection = checkboxSelection;
     this._headerCheckboxSelection = headerCheckboxSelection;
     this._headerCheckboxSelectionFilteredOnly = headerCheckboxSelectionFilteredOnly;
+    this._filterParams = filterParams;
     this._pinned = pinned;
     this._initialWidth = initialWidth;
   }
@@ -48,6 +51,7 @@ export default class GridColumn {
   private _checkboxSelection: boolean;
   private _headerCheckboxSelection: boolean;
   private _headerCheckboxSelectionFilteredOnly: boolean;
+  private _filterParams?: GridFilterParams;
   private _pinned: GridColumnPinnedOption;
   private _initialWidth: number | undefined;
 
@@ -97,6 +101,10 @@ export default class GridColumn {
 
   get headerCheckboxSelectionFilteredOnly(): boolean {
     return this._headerCheckboxSelectionFilteredOnly;
+  }
+
+  get filterParams(): GridFilterParams | undefined {
+    return this._filterParams;
   }
 
   get pinned(): GridColumnPinnedOption {

@@ -1,11 +1,12 @@
 import {none, State} from '@hookstate/core';
 import {OrganizationControllerApiInterface} from '../../openapi';
-import {OrganizationDto} from '../../openapi/models';
+import { FilterDto, OrganizationDto } from '../../openapi/models';
 import {AbstractDataService} from '../data-service/abstract-data-service';
 import {OrganizationDtoWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
+import isEqual from 'fast-deep-equal';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -24,6 +25,7 @@ export enum OrgEditOpType {
 export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDto> {
 
   private readonly validate: ValidateFunction<OrganizationDto>;
+  private readonly filterValidate: ValidateFunction<FilterDto>;
 
   constructor(
       public state: State<OrganizationDto[]>,
@@ -31,6 +33,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       private orgApi: OrganizationControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<OrganizationDto>(ModelTypes.definitions.OrganizationDto);
+    this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
   }
 
   async fetchAndStoreData(): Promise<OrganizationDto[]> {
@@ -46,17 +49,54 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     }
   }
 
-  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean): Promise<OrganizationDto[]> {
-    const orgResponseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit)
-      .then(resp => {
-        return resp.data.data;
-      });
+  /**
+  * Keeps track of changes to the filter
+  */
+  private filter?: FilterDto;
 
-    const orgDataMapped = this.removeUnfriendlyAgGridData(orgResponseData);
+  /**
+  * Keeps track of changes to the sort
+  */
+  private sort?: string[];
 
-    this.mergeDataToState(orgDataMapped, checkDuplicates);
+  async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<OrganizationDto[]> {
 
-    return orgResponseData;
+
+    /**
+     * If the filter or sort changes, purge the state to start fresh.
+     * Set filter to the new value
+     */
+    if (!isEqual(this.filter, filter) || this.sort != sort) {
+      this.state.set([]);
+      this.filter = filter;
+      this.sort = sort;
+    }
+
+    let responseData: OrganizationDto[] = [];
+
+    try {
+      if (filter != null && Object.keys(filter).length > 0) {
+        if (!this.filterValidate(filter)) {
+          throw TypeValidation.validationError('FilterDto');
+        }
+        
+        responseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      } else {
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    this.mergeDataToState(responseData, checkDuplicates);
+
+    return responseData;
   }
 
   /**

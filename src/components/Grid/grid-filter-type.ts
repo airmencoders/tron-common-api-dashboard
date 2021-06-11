@@ -1,0 +1,1 @@
+export type GridFilterType = 'text' | 'date' | 'number';

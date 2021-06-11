@@ -19,10 +19,12 @@ import Spinner from '../Spinner/Spinner';
 import DataCrudDelete from './DataCrudDelete';
 import { DataCrudFormErrors } from './data-crud-form-errors';
 import { ToastType } from '../Toast/ToastUtils/toast-type';
-import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
+import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
-import { generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
+import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
+import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
+import { GridFilter } from '../Grid/grid-filter';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -75,7 +77,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         try {
           const limit = generateInfiniteScrollLimit(infiniteScroll);
           const page = Math.floor(params.startRow / limit);
-          const data = await dataState.fetchAndStorePaginatedData(page, limit, true);
+
+          const filter = new GridFilter(params.filterModel);
+          const sort = convertAgGridSortToQueryParams(params.sortModel);
+
+          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, filter.getFilterDto(), sort);
 
           let lastRow = -1;
 
@@ -93,8 +99,43 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         } catch (err) {
           params.failCallback();
 
-          // Force state into error state on request failure
-          dataState.state.set(Promise.reject(err));
+          /**
+           * Don't error out the state here. If the request fails for some reason, just show nothing.
+           * 
+           * Call the success callback as a hack to prevent
+           * ag grid from showing an infinite loading state on failure.
+           */
+          params.successCallback([], 0);
+
+          if (err instanceof AgGridFilterConversionError) {
+            createTextToast(ToastType.ERROR, err.message, { autoClose: false });
+            return;
+          }
+
+          const requestErr = prepareRequestError(err);
+
+          /**
+           * A 400 status with a filter model set means that the server
+           * sent back a validation error.
+           */
+          if (requestErr.status === 400 && params.filterModel != null) {
+            createTextToast(ToastType.ERROR, `Failed to filter with error: ${requestErr.message}`, { autoClose: false });
+            return;
+          }
+
+          /**
+           * Server responded with some other response
+           */
+          if (requestErr.status != null) {
+            createFailedDataFetchToast();
+            return;
+          }
+
+          /**
+           * Something else went wrong... the request did not leave
+           */
+          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
+          return;
         }
       }
     }

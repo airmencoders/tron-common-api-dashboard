@@ -32,6 +32,15 @@ export function validateEmail(email: string | null | undefined): boolean {
 }
 
 /**
+ * Tests for a valid pubsub address
+ * @param value pubsub subscriber address
+ * @returns true if validation passed
+ */
+export function validateSubscriberAddress(url: string | undefined): boolean {
+  return url != null && (url.length ===0 || /^http:\/\/(?!tron-common-api).+?\.(?!tron-common-api).+?\.svc.cluster.local\//.test(url));
+}
+
+/**
  * Tests a required string. The string will be trimmed of whitespace.
  * 
  * The string must not be null or undefined.

@@ -18,7 +18,7 @@ function Accordion(props: AccordionProps) {
   return (
       <div className={`usa-accordion ${props.className}`}>
         {
-          props.items.map((accordionItem) => (<div key={accordionItem.id}>
+          props.items.map((accordionItem) => (<div className="accordion__item" key={accordionItem.id}>
             <h4 className="usa-accordion__heading">
               <button className="usa-accordion__button"
                       aria-expanded={accordionItem.id === expandedItem} aria-controls={accordionItem.id}

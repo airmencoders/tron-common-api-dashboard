@@ -3,9 +3,9 @@ import { GridApi } from 'ag-grid-community';
 import { GridReadyEvent, RowSelectedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { agGridDefaults } from './ag-grid-defaults';
 import './Grid.scss';
 import { GridProps } from './GridProps';
+import { agGridDefaults } from './GridUtils/grid-utils';
 
 function Grid(props: GridProps) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -112,28 +112,28 @@ function Grid(props: GridProps) {
             >
               {
                 props.columns.map(col => (
-                    <AgGridColumn
-                        key={col.field}
-                        field={col.field}
-                        headerName={col.headerName}
-                        sortable={col.sortable}
-                        filter={col.filter}
-                        headerClass={col.headerClass}
-                        cellRendererFramework={col.cellRenderer}
-                        cellRendererParams={col.cellRendererParams}
-                        tooltipField={col.showTooltip ? col.field : undefined}
-                        resizable={col.resizable}
-                        checkboxSelection={col.checkboxSelection}
-                        headerCheckboxSelection={col.headerCheckboxSelection}
-                        headerCheckboxSelectionFilteredOnly={col.headerCheckboxSelectionFilteredOnly}
-                        pinned={col.pinned}
-                        initialWidth={col.intialWidth}
-                    />
+                  <AgGridColumn
+                      key={col.field}
+                      field={col.field}
+                      headerName={col.headerName}
+                      sortable={col.sortable}
+                      filter={col.filter}
+                      headerClass={col.headerClass}
+                      cellRendererFramework={col.cellRenderer}
+                      cellRendererParams={col.cellRendererParams}
+                      tooltipField={col.showTooltip ? col.field : undefined}
+                      resizable={col.resizable}
+                      checkboxSelection={col.checkboxSelection}
+                      headerCheckboxSelection={col.headerCheckboxSelection}
+                      headerCheckboxSelectionFilteredOnly={col.headerCheckboxSelectionFilteredOnly}
+                      pinned={col.pinned}
+                      initialWidth={col.intialWidth}
+                      filterParams={col.filterParams}
+                  />
                 ))
               }
             </AgGridReact>
           </div>
-
         </div>
       </div>
   );
