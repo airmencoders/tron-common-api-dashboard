@@ -25,6 +25,8 @@ import { CoastGuardsman } from '../models';
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { FilterDto } from '../models';
+// @ts-ignore
 import { JsonPatchObjectArrayValue } from '../models';
 // @ts-ignore
 import { JsonPatchObjectValue } from '../models';
@@ -42,6 +44,8 @@ import { PersonDtoPaginationResponseWrapper } from '../models';
 import { PersonDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { PersonFindDto } from '../models';
+// @ts-ignore
+import { PlatformJwtDto } from '../models';
 // @ts-ignore
 import { Sailor } from '../models';
 // @ts-ignore
@@ -157,6 +161,57 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
+         * 
+         * @summary Adds a person using info from P1 JWT
+         * @param {PlatformJwtDto} platformJwtDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createPersonFromJwt: async (platformJwtDto: PlatformJwtDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'platformJwtDto' is not null or undefined
+            if (platformJwtDto === null || platformJwtDto === undefined) {
+                throw new RequiredError('platformJwtDto','Required parameter platformJwtDto was null or undefined when calling createPersonFromJwt.');
+            }
+            const localVarPath = `/v2/person/person-jwt`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof platformJwtDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(platformJwtDto !== undefined ? platformJwtDto : {})
+                : (platformJwtDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Deletes an existing person
          * @summary Deletes an existing person
          * @param {string} id Person ID to delete
@@ -193,6 +248,82 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves filtered list of persons
+         * @summary Retrieves persons filtered
+         * @param {FilterDto} filterDto 
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        filterPerson: async (filterDto: FilterDto, memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterDto' is not null or undefined
+            if (filterDto === null || filterDto === undefined) {
+                throw new RequiredError('filterDto','Required parameter filterDto was null or undefined when calling filterPerson.');
+            }
+            const localVarPath = `/v2/person/filter`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (memberships !== undefined) {
+                localVarQueryParameter['memberships'] = memberships;
+            }
+
+            if (leaderships !== undefined) {
+                localVarQueryParameter['leaderships'] = leaderships;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof filterDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(filterDto !== undefined ? filterDto : {})
+                : (filterDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -584,6 +715,20 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
+         * 
+         * @summary Adds a person using info from P1 JWT
+         * @param {PlatformJwtDto} platformJwtDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createPersonFromJwt(platformJwtDto: PlatformJwtDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).createPersonFromJwt(platformJwtDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Deletes an existing person
          * @summary Deletes an existing person
          * @param {string} id Person ID to delete
@@ -592,6 +737,25 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
          */
         async deletePerson(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).deletePerson(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves filtered list of persons
+         * @summary Retrieves persons filtered
+         * @param {FilterDto} filterDto 
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async filterPerson(filterDto: FilterDto, memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDtoPaginationResponseWrapper>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).filterPerson(filterDto, memberships, leaderships, page, size, sort, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -722,6 +886,16 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
             return PersonControllerApiFp(configuration).createPerson(personDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary Adds a person using info from P1 JWT
+         * @param {PlatformJwtDto} platformJwtDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createPersonFromJwt(platformJwtDto: PlatformJwtDto, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).createPersonFromJwt(platformJwtDto, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Deletes an existing person
          * @summary Deletes an existing person
          * @param {string} id Person ID to delete
@@ -730,6 +904,21 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
          */
         deletePerson(id: string, options?: any): AxiosPromise<void> {
             return PersonControllerApiFp(configuration).deletePerson(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves filtered list of persons
+         * @summary Retrieves persons filtered
+         * @param {FilterDto} filterDto 
+         * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+         * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        filterPerson(filterDto: FilterDto, memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<PersonDtoPaginationResponseWrapper> {
+            return PersonControllerApiFp(configuration).filterPerson(filterDto, memberships, leaderships, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieves a person using a single identifying property.
@@ -832,6 +1021,16 @@ export interface PersonControllerApiInterface {
     createPerson(personDto: PersonDto, options?: any): AxiosPromise<PersonDto>;
 
     /**
+     * 
+     * @summary Adds a person using info from P1 JWT
+     * @param {PlatformJwtDto} platformJwtDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApiInterface
+     */
+    createPersonFromJwt(platformJwtDto: PlatformJwtDto, options?: any): AxiosPromise<PersonDto>;
+
+    /**
      * Deletes an existing person
      * @summary Deletes an existing person
      * @param {string} id Person ID to delete
@@ -840,6 +1039,21 @@ export interface PersonControllerApiInterface {
      * @memberof PersonControllerApiInterface
      */
     deletePerson(id: string, options?: any): AxiosPromise<void>;
+
+    /**
+     * Retrieves filtered list of persons
+     * @summary Retrieves persons filtered
+     * @param {FilterDto} filterDto 
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApiInterface
+     */
+    filterPerson(filterDto: FilterDto, memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<PersonDtoPaginationResponseWrapper>;
 
     /**
      * Retrieves a person using a single identifying property.
@@ -946,6 +1160,18 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     }
 
     /**
+     * 
+     * @summary Adds a person using info from P1 JWT
+     * @param {PlatformJwtDto} platformJwtDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApi
+     */
+    public createPersonFromJwt(platformJwtDto: PlatformJwtDto, options?: any) {
+        return PersonControllerApiFp(this.configuration).createPersonFromJwt(platformJwtDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Deletes an existing person
      * @summary Deletes an existing person
      * @param {string} id Person ID to delete
@@ -955,6 +1181,23 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
      */
     public deletePerson(id: string, options?: any) {
         return PersonControllerApiFp(this.configuration).deletePerson(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves filtered list of persons
+     * @summary Retrieves persons filtered
+     * @param {FilterDto} filterDto 
+     * @param {boolean} [memberships] Whether to include this person\&#39;s organization memberships in the response
+     * @param {boolean} [leaderships] Whether to include the organization ids this person is the leader of in the response
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonControllerApi
+     */
+    public filterPerson(filterDto: FilterDto, memberships?: boolean, leaderships?: boolean, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return PersonControllerApiFp(this.configuration).filterPerson(filterDto, memberships, leaderships, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

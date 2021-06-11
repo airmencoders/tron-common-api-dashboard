@@ -21,6 +21,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { FilterDto } from '../models';
+// @ts-ignore
 import { Flight } from '../models';
 // @ts-ignore
 import { Group } from '../models';
@@ -443,6 +445,72 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             localVarRequestOptions.data =  needsSerialization
                 ? JSON.stringify(requestBody !== undefined ? requestBody : {})
                 : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieves filtered list of organizations
+         * @summary Retrieves organizations filtered
+         * @param {FilterDto} filterDto 
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        filterOrganizations: async (filterDto: FilterDto, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'filterDto' is not null or undefined
+            if (filterDto === null || filterDto === undefined) {
+                throw new RequiredError('filterDto','Required parameter filterDto was null or undefined when calling filterOrganizations.');
+            }
+            const localVarPath = `/v2/organization/filter`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof filterDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(filterDto !== undefined ? filterDto : {})
+                : (filterDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -881,6 +949,23 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
+         * Retrieves filtered list of organizations
+         * @summary Retrieves organizations filtered
+         * @param {FilterDto} filterDto 
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async filterOrganizations(filterDto: FilterDto, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDtoPaginationResponseWrapper>> {
+            const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).filterOrganizations(filterDto, page, size, sort, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves an organization by ID
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
@@ -1057,6 +1142,19 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).deleteOrganizationMember(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
+         * Retrieves filtered list of organizations
+         * @summary Retrieves organizations filtered
+         * @param {FilterDto} filterDto 
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        filterOrganizations(filterDto: FilterDto, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper> {
+            return OrganizationControllerApiFp(configuration).filterOrganizations(filterDto, page, size, sort, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves an organization by ID
          * @summary Retrieves an organization by ID
          * @param {string} id Organization ID to retrieve
@@ -1211,6 +1309,19 @@ export interface OrganizationControllerApiInterface {
      * @memberof OrganizationControllerApiInterface
      */
     deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+
+    /**
+     * Retrieves filtered list of organizations
+     * @summary Retrieves organizations filtered
+     * @param {FilterDto} filterDto 
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApiInterface
+     */
+    filterOrganizations(filterDto: FilterDto, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper>;
 
     /**
      * Retrieves an organization by ID
@@ -1382,6 +1493,21 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      */
     public deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any) {
         return OrganizationControllerApiFp(this.configuration).deleteOrganizationMember(id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves filtered list of organizations
+     * @summary Retrieves organizations filtered
+     * @param {FilterDto} filterDto 
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public filterOrganizations(filterDto: FilterDto, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return OrganizationControllerApiFp(this.configuration).filterOrganizations(filterDto, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

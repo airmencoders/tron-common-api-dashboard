@@ -17,55 +17,55 @@
 /**
  * 
  * @export
- * @interface ResourceAlreadyExistsExceptionCauseStackTrace
+ * @interface BadRequestExceptionCauseStackTrace
  */
-export interface ResourceAlreadyExistsExceptionCauseStackTrace {
+export interface BadRequestExceptionCauseStackTrace {
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     classLoaderName?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     moduleName?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     moduleVersion?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     methodName?: string;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     fileName?: string;
     /**
      * 
      * @type {number}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     lineNumber?: number;
     /**
      * 
      * @type {string}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     className?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof ResourceAlreadyExistsExceptionCauseStackTrace
+     * @memberof BadRequestExceptionCauseStackTrace
      */
     nativeMethod?: boolean;
 }

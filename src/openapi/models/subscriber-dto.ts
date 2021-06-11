@@ -31,6 +31,12 @@ export interface SubscriberDto {
      * @type {string}
      * @memberof SubscriberDto
      */
+    appClientUser: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SubscriberDto
+     */
     secret?: string;
     /**
      * 
@@ -43,7 +49,7 @@ export interface SubscriberDto {
      * @type {string}
      * @memberof SubscriberDto
      */
-    subscriberAddress: string;
+    subscriberAddress?: string;
 }
 
 /**
