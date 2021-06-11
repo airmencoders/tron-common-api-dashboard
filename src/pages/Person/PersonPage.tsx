@@ -6,6 +6,7 @@ import {PersonDto} from '../../openapi/models';
 import {usePersonState} from '../../state/person/person-state';
 import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import { createDefaultGridFilterParamsForType } from '../../components/Grid/GridUtils/grid-utils';
+import PersonDelete from "./PersonDelete";
 
 const columns: GridColumn[] =
   [
@@ -71,8 +72,9 @@ function PersonPage() {
       pageTitle="People"
       updateForm={PersonEditForm}
       useDataState={usePersonState}
-      allowEdit={true}
-      allowAdd
+      allowEdit
+      allowDelete
+      deleteComponent={PersonDelete}
       autoResizeColumns
       autoResizeColummnsMinWidth={1200}
       infiniteScroll={{
