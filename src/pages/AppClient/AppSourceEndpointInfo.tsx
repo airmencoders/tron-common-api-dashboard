@@ -13,7 +13,7 @@ import Button from '../../components/Button/Button';
 import DownloadIcon from '../../icons/DownloadIcon';
 import {AppEndpointClientInfoDto} from '../../openapi/models';
 import {useAppSourceState} from '../../state/app-source/app-source-state';
-import DownloadFile from '../../utils/DownloadFile';
+import DownloadFile from '../../utils/download-file-util';
 
 function AppSourceEndpointInfo(props: AppSourceEndpointInfoProps) {
   const appSourceState = useAppSourceState();

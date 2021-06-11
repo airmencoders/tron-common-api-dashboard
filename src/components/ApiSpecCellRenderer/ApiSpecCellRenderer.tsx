@@ -4,7 +4,7 @@ import DownloadIcon from '../../icons/DownloadIcon';
 import { AppEndpointClientInfoDto, AppSourceDetailsDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
 import Button from '../Button/Button';
-import DownloadFile from '../../utils/DownloadFile';
+import DownloadFile from '../../utils/download-file-util';
 import './ApiSpecCellRenderer.scss';
 import { ApiSpecCellRendererProps } from './ApiSpecCellRendererProps';
 

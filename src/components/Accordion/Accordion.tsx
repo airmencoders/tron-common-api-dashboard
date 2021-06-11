@@ -18,20 +18,24 @@ function Accordion(props: AccordionProps) {
   return (
       <div className={`usa-accordion ${props.className}`}>
         {
-          props.items.map((accordionItem) => (<>
+          props.items.map((accordionItem) => (<div key={accordionItem.id}>
             <h4 className="usa-accordion__heading">
               <button className="usa-accordion__button"
                       aria-expanded={accordionItem.id === expandedItem} aria-controls={accordionItem.id}
                       onClick={handleAccordionClick(accordionItem.id)}
+                      data-testid="accordion-heading-button"
               >
                 {accordionItem.title}
               </button>
             </h4>
-            <div id={accordionItem.id} className="usa-accordion__content usa-prose"
-                 hidden={accordionItem.id !== expandedItem}>
+            <div id={accordionItem.id}
+                 className="usa-accordion__content usa-prose"
+                 hidden={accordionItem.id !== expandedItem}
+                 data-testid="accordion-body"
+            >
               {accordionItem.content}
             </div>
-          </>))
+          </div>))
         }
       </div>
   );
