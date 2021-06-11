@@ -4,13 +4,13 @@ import DownloadIcon from '../../icons/DownloadIcon';
 import { AppEndpointClientInfoDto, AppSourceDetailsDto } from '../../openapi';
 import { useAppSourceState } from '../../state/app-source/app-source-state';
 import Button from '../Button/Button';
-import DownloadFile from './DownloadFile';
+import DownloadFile from '../../utils/DownloadFile';
 import './ApiSpecCellRenderer.scss';
 import { ApiSpecCellRendererProps } from './ApiSpecCellRendererProps';
 
 function ApiSpecCellRenderer(props: Partial<ICellRendererParams> & ApiSpecCellRendererProps) {
   const state = useAppSourceState();
-  
+
   const download = (data: AppSourceDetailsDto | AppEndpointClientInfoDto) => {
     let name: string;
     let byEndpoint = false;
@@ -24,12 +24,12 @@ function ApiSpecCellRenderer(props: Partial<ICellRendererParams> & ApiSpecCellRe
   }
 
   const showAsText = props.showAsText && props.value;
-  
+
   return (
     <div className="api-spec-cell-renderer">
         <Button type="button" onClick={() => download(props.data)} unstyled className="api-spec-cell-renderer__btn" disableMobileFullWidth data-testid="api-spec-btn-cell-renderer">
           <DownloadIcon iconTitle={'api-spec-download'} size={showAsText ? 1 : 1.25} />
-        </Button> 
+        </Button>
       {(showAsText) ? <a data-testid="api-spec-link-cell-renderer" onClick={() => download(props.data)}>{" "+ props.value}</a> : ''}
     </div>
   );

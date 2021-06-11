@@ -30,7 +30,8 @@ export enum RoutePath {
     MY_DIGITIZE_APPS = '/digitize-apps',
     NOT_FOUND = '/not-found',
     NOT_AUTHORIZED = '/not-authorized',
-    APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?'
+    APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?',
+    API_TEST = '/app-api/:apiId'
 }
 
 export const routes: RouteItem[] = [
