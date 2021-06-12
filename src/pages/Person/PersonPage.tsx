@@ -79,7 +79,7 @@ function PersonPage() {
       autoResizeColumns
       autoResizeColummnsMinWidth={1200}
       infiniteScroll={{
-        enabled: false
+        enabled: true
       }}
     />
   );
