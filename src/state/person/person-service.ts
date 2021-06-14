@@ -1,4 +1,4 @@
-import { State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { FilterDto, PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, PersonFindDtoFindTypeEnum, RankControllerApiInterface } from '../../openapi';
 import { RankStateModel } from './rank-state-model';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
@@ -144,7 +144,18 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendDelete(toDelete: PersonDto): Promise<void> {
-    return Promise.resolve();
+    try {
+      const response = await this.personApi.deletePerson(toDelete.id || '');
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
+      return Promise.resolve(response.data);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   sendPatch: undefined;
