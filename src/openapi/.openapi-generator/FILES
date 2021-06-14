@@ -63,7 +63,6 @@ models/http-log-dto-pagination-response-wrapper.ts
 models/http-log-entry-details-dto.ts
 models/http-log-entry-dto.ts
 models/index.ts
-models/invalid-scratch-space-permissions.ts
 models/json-patch-object-array-value.ts
 models/json-patch-object-value.ts
 models/json-patch-string-array-value.ts
@@ -87,8 +86,6 @@ models/privilege-id-pair.ts
 models/pub-sub-ledger-entry-dto-response-wrapper.ts
 models/pub-sub-ledger-entry-dto.ts
 models/rank.ts
-models/record-not-found-exception.ts
-models/resource-already-exists-exception.ts
 models/sailor.ts
 models/scratch-storage-app-registry-dto-response-wrapper.ts
 models/scratch-storage-app-registry-dto.ts

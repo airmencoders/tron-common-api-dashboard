@@ -13,12 +13,16 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
       autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
       disabledGridColumnVirtualization={props.disabledGridColumnVirtualization}
       rowModelType="infinite"
+      rowSelection={props.rowSelection ?? "single"}
       datasource={props.datasource}
       cacheBlockSize={props.cacheBlockSize}
       maxBlocksInCache={props.maxBlocksInCache}
       maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests}
       updateInfiniteCache={props.updateInfiniteCache}
       updateInfiniteCacheCallback={props.updateInfiniteCacheCallback}
+      getRowNodeId={props.getRowNodeId}
+      suppressRowClickSelection={props.suppressRowClickSelection}
+      onRowSelected={props.onRowSelected}
     />
   );
 }

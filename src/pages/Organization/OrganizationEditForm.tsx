@@ -1,4 +1,4 @@
-import { createState, useState } from '@hookstate/core';
+import { none, State, useHookstate, useState } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
@@ -14,31 +14,80 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Grid from '../../components/Grid/Grid';
 import GridColumn from '../../components/Grid/GridColumn';
-import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import Modal from '../../components/Modal/Modal';
 import ModalTitle from '../../components/Modal/ModalTitle';
 import '../../components/Modal/ModalFooterSubmit.scss';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../openapi/models';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { OrgEditOpType } from '../../state/organization/organization-service';
-import { useOrganizationState } from '../../state/organization/organization-state';
-import { usePersonState } from '../../state/person/person-state';
+import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails, useOrganizationState } from '../../state/organization/organization-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 
+export interface OrganizationEditState {
+  leader: OrganizationLeaderState;
+  parentOrg: OrganizationParentState;
+  members: OrganizationMemberState;
+  subOrgs: OrganizationSubOrgState;
+}
 
-function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
+interface OrganizationLeaderState {
+  removed: boolean;
+  newLeader?: PersonDto;
+}
+
+interface OrganizationParentState {
+  removed: boolean;
+  newParent?: OrganizationDto;
+}
+
+interface OrganizationMemberState {
+  toRemove: OrganizationDto[];
+  toAdd: OrganizationDto[];
+}
+
+interface OrganizationSubOrgState {
+  toRemove: OrganizationDto[];
+  toAdd: OrganizationDto[];
+}
+
+function getDefaultOrganizationEditState(): OrganizationEditState {
+  return {
+    leader: {
+      removed: false,
+      newLeader: undefined
+    },
+    parentOrg: {
+      removed: false,
+      newParent: undefined
+    },
+    members: {
+      toAdd: [],
+      toRemove: []
+    },
+    subOrgs: {
+      toAdd: [],
+      toRemove: []
+    }
+  };
+}
+
+function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDetails>) {
   const SELECT_ALL_TEXT = "Select All";
   const DESELECT_ALL_TEXT = "Unselect All";
-  const personState = usePersonState();  // handle to the person-service and state
   const orgState = useOrganizationState();  // handle to the org-service and state
-  const formState = useState(createState({...props.data})); // data from the UI form
+  const formState = useState({ ...props.data }); // data from the UI form
+
+  const formStateExtended = useState<OrganizationEditState>(getDefaultOrganizationEditState());
 
   const [showChooserDialog, setChooserDialog] = React.useState(false); // whether to show the Chooser Dialog
-  const [chooserDataItems, setChooserDataItem] = React.useState(new Array<PersonDto | OrganizationDto>());  // the data to show in Chooser dialog
+  const [chooserDataType, setChooserDataType] = React.useState<'person' | 'organization'>('person');  // the data to show in Chooser dialog
   const [chooserChosenRow, setChooserChosenRow] = React.useState({} as RowClickedEvent | undefined);  // the chosen row from the Chooser dialog
   const [chooserDataColumns, setChooserDataColumns] = React.useState(new Array<GridColumn>());  // the chosen row from the chooser dialog
+
   const [orgEditType, setOrgEditType] = React.useState(OrgEditOpType.NONE);  // what part of the org we're adding to
+
   const [membersGridApi, setMembersGridApi] = React.useState<GridApi | undefined>(undefined); // handle to the Grid API for members
   const [subOrgsGridApi, setSubOrgsGridApi] = React.useState<GridApi | undefined>(undefined); // handle to the Grid API for subordinate orgs
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false); // whether to show attribute remove confirmation
@@ -52,33 +101,26 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
-  const isFormModified = (): boolean => {
-    const stateKeys = formState.keys;
-    let isChanged = false;
-    for (let i = 0; i < stateKeys.length; i++) {
-      const key = stateKeys[i];
-      const origValue = props.data?.[key] == null || props.data[key] === '' ? '' : props.data?.[key];
-      const formStateValue = formState[key]?.get() == null || formState[key]?.get() === '' ? '' : formState[key]?.get();
-      if (formStateValue !== origValue) {
-        isChanged = true;
-        break;
-      }
-    }
-
-    return isChanged;
+  function isFormModified(): boolean {
+    return Initial(formState).modified();
   }
 
-  // handles all patch changes, calls into DataCrudForm component, does its work, and then refreshes form
-  const submitPatch = async (opType: OrgEditOpType, id: string, data: any) => {
-    setOrgEditType(opType);
-    props.onPatch && props.onPatch(opType, id, data);
-    formState.set({...props.data})
-  }
-
-  // handles PUT changes, calls into DataCrudForm component
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    props.onSubmit(formState.get());    
+
+    // Handles adding
+    if (props.formActionType === FormActionType.ADD) {
+      props.onSubmit(formState.get());
+      return;
+    }
+
+    // On updates, just send to patch as everything can be handled there
+    if (props.formActionType === FormActionType.UPDATE && props.onPatch) {
+      props.onPatch(props.data, formState.get(), formStateExtended.get());
+      return;
+    }
+
+    return;
   }
 
   const isFormDisabled = ():boolean => {
@@ -87,7 +129,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
 
   // helper to construct the leader's name 
   const resolveLeaderName = () => {
-    return `${orgState.selectedOrgState.get().leader?.firstName || ''} ${orgState.selectedOrgState.get().leader?.lastName || ''}`.trim();
+    return `${formState.leader.get()?.firstName ?? ''} ${formState.leader.get()?.lastName ?? ''}`;
   }
 
   // invoked when branch selection is changed
@@ -115,22 +157,15 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   }
 
   // invoked from clicking `Edit` button by the Org Leader field
-  const onEditLeaderClick = async () => {
-
-    // get list of people, go fetch if person state doesn't exist yet
-    if (personState.state.get() == null || personState.state.get().length === 0) {
-      await personState.fetchAndStoreData();
-    }
-
-    // clone the people list and set to the chooser items
-    setChooserDataItem([...personState.state.get()]);
+  function onEditLeaderClick() {
     setOrgEditType(OrgEditOpType.LEADER_EDIT);
     setChooserDataColumns([ 
       new GridColumn({
         field: 'id',
         sortable: true,
         filter: true,
-        headerName: 'ID'
+        headerName: 'ID',
+        checkboxSelection: true,
       }),
       new GridColumn({
         field: 'firstName',
@@ -145,26 +180,20 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         headerName: 'Last'
       })
     ]);
+    setChooserDataType('person');
     setChooserDialog(true);
   }
 
   // invoked from clicking `Edit` button by the org's parent field
-  const onEditParentOrg = async () => {
-
-    // get list of orgs, go fetch if orgs state doesn't exist yet or is empty
-    if (orgState.state.get() == null || orgState.state.get().length === 0) {
-      await orgState.fetchAndStoreData();
-    }
-
-    // clone the orgs list and set to the chooser items
-    setChooserDataItem([...orgState.state.get()]);
+  function onEditParentOrg() {
     setOrgEditType(OrgEditOpType.PARENT_ORG_EDIT);
     setChooserDataColumns([ 
       new GridColumn({
         field: 'id',
         sortable: true,
         filter: true,
-        headerName: 'ID'
+        headerName: 'ID',
+        checkboxSelection: true,
       }),
       new GridColumn({
         field: 'name',
@@ -173,26 +202,20 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         headerName: 'Name'
       })
     ]);
+    setChooserDataType('organization');
     setChooserDialog(true);
   }
 
   // invoked from clicking `Add` button for Org Members
-  const onAddMemberClick = async () => {
-
-    // get list of people, go fetch if person state doesn't exist yet
-    if (personState.state.get() == null || personState.state.get().length === 0) {
-      await personState.fetchAndStoreData();
-    }
-
-    // clone the people list and set to the chooser items
-    setChooserDataItem([...personState.state.get()]);
+  function onAddMemberClick() {
     setOrgEditType(OrgEditOpType.MEMBERS_EDIT);
     setChooserDataColumns([ 
       new GridColumn({
         field: 'id',
         sortable: true,
         filter: true,
-        headerName: 'ID'
+        headerName: 'ID',
+        checkboxSelection: true,
       }),
       new GridColumn({
         field: 'firstName',
@@ -207,13 +230,14 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         headerName: 'Last'
       })
     ]);
+    setChooserDataType('person');
     setChooserDialog(true);
   }
 
   const removeChosenMembers = async (members: PersonDto[]) => {
     if (members.length > 0) {      
       setShowPatchResult({ ...showPatchResult, members: true });     
-      submitPatch(OrgEditOpType.MEMBERS_REMOVE, orgState.selectedOrgState?.get()?.id || '', members.map(item => item.id));
+      // submitPatch(OrgEditOpType.MEMBERS_REMOVE, orgState.selectedOrgState?.get()?.id || '', members.map(item => item.id));
     }
   }
 
@@ -226,14 +250,16 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
 
   // invoked from clicking `Remove` on the org's leader entry
   const onClearOrgLeader = async () => {
-    setShowPatchResult({ ...showPatchResult, leader: true });   
-    submitPatch(OrgEditOpType.LEADER_REMOVE, orgState.selectedOrgState.get().id || '', null);
+    // setShowPatchResult({ ...showPatchResult, leader: true });   
+    // submitPatch(OrgEditOpType.LEADER_REMOVE, orgState.selectedOrgState.get().id || '', null);
+    removeLeader();
   }
 
   // invoked from clicking `Remove` on the org's parent entry
   const onClearParentOrg = async () => {    
-    setShowPatchResult({ ...showPatchResult, parent: true });   
-    submitPatch(OrgEditOpType.PARENT_ORG_REMOVE, orgState.selectedOrgState.get().id || '', null);
+    // setShowPatchResult({ ...showPatchResult, parent: true });   
+    // submitPatch(OrgEditOpType.PARENT_ORG_REMOVE, orgState.selectedOrgState.get().id || '', null);
+    removeParentOrg();
   }
 
   // invoked from clicking `Add` button for Subordinate Orgs
@@ -245,14 +271,14 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     }
 
     // clone the orgs list and set to the chooser items
-    setChooserDataItem([...orgState.state.get()]);
     setOrgEditType(OrgEditOpType.SUB_ORGS_EDIT);
     setChooserDataColumns([ 
       new GridColumn({
         field: 'id',
         sortable: true,
         filter: true,
-        headerName: 'ID'
+        headerName: 'ID',
+        checkboxSelection: true,
       }),
       new GridColumn({
         field: 'name',
@@ -261,6 +287,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
         headerName: 'Name'
       })
     ]);
+    setChooserDataType('organization');
     setChooserDialog(true);
   }
 
@@ -268,7 +295,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const removeChosenOrgs = async (orgs: OrganizationDto[]) => {
     if (orgs.length > 0) {     
       setShowPatchResult({ ...showPatchResult, suborgs: true });     
-      submitPatch(OrgEditOpType.SUB_ORGS_REMOVE, orgState.selectedOrgState.get().id || '', orgs.map(item => item.id));
+      // submitPatch(OrgEditOpType.SUB_ORGS_REMOVE, orgState.selectedOrgState.get().id || '', orgs.map(item => item.id));
     }
   }
 
@@ -288,33 +315,150 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const chooserDialogClose = () => {
     setChooserChosenRow(undefined);
     setChooserDialog(false);
-  }  
+    selectedChooserRows.set([]);
+  }
+
+  function setNewLeader(): void {
+    if (selectedChooserRows.get().length !== 1) {
+      throw new Error('Error setting new leader state. Length must be 1');
+    }
+
+    const newLeader = {
+      ...selectedChooserRows.get()[0] as PersonWithDetails
+    };
+
+    formState.leader.set(newLeader);
+
+    formStateExtended.leader.set({
+      removed: false,
+      newLeader
+    });
+  }
+
+  function removeLeader(): void {
+    formStateExtended.leader.set({
+      removed: true,
+      newLeader: undefined
+    });
+
+    formState.leader.set(undefined);
+  }
+
+  function setNewParentOrg(): void {
+    if (selectedChooserRows.get().length !== 1) {
+      throw new Error('Error setting new parent org state. Length must be 1');
+    }
+
+    const newParent = {
+      ...selectedChooserRows.get()[0] as OrgWithDetails
+    };
+
+    formState.parentOrganization.set(newParent);
+
+    formStateExtended.parentOrg.set({
+      removed: false,
+      newParent
+    });
+  }
+
+  function removeParentOrg(): void {
+    formStateExtended.parentOrg.set({
+      removed: true,
+      newParent: undefined
+    });
+
+    formState.parentOrganization.set(undefined);
+  }
+
+  function setNewMembers(): void {
+    const newMembers = (selectedChooserRows.get() as PersonWithDetails[]).map(item => {
+      return {
+        ...item
+      };
+    });
+
+    formStateExtended.members.toAdd.merge(newMembers);
+
+    formState.members.merge(newMembers);
+
+    /**
+     * When adding new members, it will reset the checked state
+     * for the members in the grid. As a result, reset the members
+     * for removal state to nothing.
+     */
+    organizationMembersForRemoval.set([]);
+  }
+
+  function removeMembers(): void {
+    const removedMembers = organizationMembersForRemoval.get().map(item => {
+      return {
+        ...item
+      };
+    });
+
+    formStateExtended.members.toRemove.merge(removedMembers);
+
+    // Remove members from formState
+    removedMembers.forEach(removedMember => {
+      formState.members.ornull?.find(member => member.id.get() === removedMember.id)?.set(none);
+    });
+
+    organizationMembersForRemoval.set([]);
+  }
+
+  function setNewSubOrgs(): void {
+    const newSubOrgs = (selectedChooserRows.get() as OrganizationDto[]).map(item => {
+      return {
+        ...item
+      };
+    });
+
+    formStateExtended.subOrgs.toAdd.merge(newSubOrgs);
+
+    formState.subordinateOrganizations.merge(newSubOrgs);
+
+    /**
+     * When adding new sub orgs, it will reset the checked state
+     * for the sub orgs in the grid. As a result, reset the sub orgs
+     * for removal state to nothing.
+     */
+    organizationSubOrgsForRemoval.set([]);
+  }
+
+  function removeSubOrgs(): void {
+    const removedSubOrgs = organizationSubOrgsForRemoval.get().map(item => {
+      return {
+        ...item
+      };
+    });
+
+    formStateExtended.subOrgs.toRemove.merge(removedSubOrgs);
+
+    // Remove items from formState
+    removedSubOrgs.forEach(removedSubOrg => {
+      formState.subordinateOrganizations.ornull?.find(subOrg => subOrg.id.get() === removedSubOrg.id)?.set(none);
+    });
+
+    organizationMembersForRemoval.set([]);
+  }
 
   // user chose OK (confirmed the action) to do, chooser dialog will be implicitly closed
-  const chooserDialogConfirmed = async () => {
-
-    // validate we have some kind of data to PATCH against the org
-    if (chooserChosenRow !== undefined && chooserChosenRow?.data?.id) {
-      switch (orgEditType) {
-        case OrgEditOpType.LEADER_EDIT: 
-          setShowPatchResult({ ...showPatchResult, leader: true });         
-          submitPatch(OrgEditOpType.LEADER_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);          
-          break;
-        case OrgEditOpType.MEMBERS_EDIT:
-          setShowPatchResult({ ...showPatchResult, members: true });        
-          submitPatch(OrgEditOpType.MEMBERS_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);
-          break;
-        case OrgEditOpType.SUB_ORGS_EDIT:
-          setShowPatchResult({ ...showPatchResult, suborgs: true });        
-          submitPatch(OrgEditOpType.SUB_ORGS_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);
-          break;
-        case OrgEditOpType.PARENT_ORG_EDIT:
-          setShowPatchResult({ ...showPatchResult, parent: true });        
-          submitPatch(OrgEditOpType.PARENT_ORG_EDIT, orgState.selectedOrgState.get().id || '', chooserChosenRow.data.id);
-          break;
-        default:
-          break;
-      }
+  function chooserDialogConfirmed() {
+    switch (orgEditType) {
+      case OrgEditOpType.LEADER_EDIT:
+        setNewLeader();
+        break;
+      case OrgEditOpType.MEMBERS_EDIT:
+        setNewMembers();
+        break;
+      case OrgEditOpType.SUB_ORGS_EDIT:
+        setNewSubOrgs();
+        break;
+      case OrgEditOpType.PARENT_ORG_EDIT:
+        setNewParentOrg();
+        break;
+      default:
+        break;
     }
 
     chooserDialogClose();
@@ -337,7 +481,51 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
     setRemoveAction({ data: arg, func: func });
     setShowConfirmDialog(true);
   }
-  
+
+  const selectedChooserRows = useHookstate<PersonDto[] | OrganizationDto[]>([]);
+  function onChooserRowSelected(data: PersonDto | OrganizationDto, selectionEvent: 'selected' | 'unselected'): void {
+    if (orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.LEADER_EDIT) {
+      if (selectionEvent === 'selected') {
+        selectedChooserRows[selectedChooserRows.length].set(data);
+      } else {
+        (selectedChooserRows as State<PersonDto[]>).find(obj => obj.id.get() === data.id)?.set(none);
+      }
+    } else {
+      if (selectionEvent === 'selected') {
+        selectedChooserRows[selectedChooserRows.length].set(data);
+      } else {
+        (selectedChooserRows as State<OrganizationDto[]>).find(obj => obj.id.get() === data.id)?.set(none);
+      }
+    }
+  }
+
+  const organizationMembersForRemoval = useHookstate<PersonDto[]>([]);
+  function onOrganizationMembersRowSelection(data: PersonDto, selectedEvent: 'selected' | 'unselected'): void {
+    if (selectedEvent === 'selected') {
+      organizationMembersForRemoval[organizationMembersForRemoval.length].set(data);
+    } else {
+      organizationMembersForRemoval.find(item => item.id.get() === data.id)?.set(none);
+    }
+  }
+
+  const organizationSubOrgsForRemoval = useHookstate<OrganizationDto[]>([]);
+  function onOrganizationSubOrgsRowSelection(data: OrganizationDto, selectedEvent: 'selected' | 'unselected'): void {
+    if (selectedEvent === 'selected') {
+      organizationSubOrgsForRemoval[organizationSubOrgsForRemoval.length].set(data);
+    } else {
+      organizationSubOrgsForRemoval.find(item => item.id.get() === data.id)?.set(none);
+    }
+  }
+
+  function getIdsToExclude(chooserDataType: 'person' | 'organization'): string[] {
+    if (chooserDataType === 'person') {
+      const ids = formState.members.get()?.map(member => member.id);
+      return ids && ids.length > 0 ? ids as string[] : [];
+    }
+
+    return [];
+  }
+
   return (
       <div className="organization-edit-form">
         <Form onSubmit={submitForm}>
@@ -348,7 +536,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       required
           >
             <TextInput id="orgName" name="orgName" type="text"
-              defaultValue={props.data?.name || ''}
+            value={formState.name.get() ?? ''}
               error={Touched(formState.name).touched() && Validation(formState.name).invalid()}
               onChange={(event) => { setOrgEditType(OrgEditOpType.OTHER); formState.name.set(event.target.value); }}
               disabled={isFormDisabled()}
@@ -356,7 +544,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           </FormGroup>         
           <FormGroup labelName="branch" labelText="Branch" required>
             <Select id="branch" name="branch" data-testid="branchType"
-                    defaultValue={props.data?.branchType || ''}
+            value={formState.branchType.get() ?? ''}
                     onChange={onBranchChange}
                     disabled={isFormDisabled()}
             >
@@ -373,7 +561,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                      required
           >
             <Select id="type" name="type" data-testid="orgType"
-                    defaultValue={props.data?.orgType || ''}
+            value={formState.orgType.get() ?? ''}
                     onChange={onTypeChange}
                     disabled={isFormDisabled()}
             >
@@ -406,8 +594,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                 {/* Edit/Remove Org Leader Section */}
                 <FormGroup labelName="leaderName" labelText="Leader">
                   <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
-                      defaultValue={resolveLeaderName()}
+                  <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
                       value={resolveLeaderName()}
                       disabled={true}
                     />
@@ -417,6 +604,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                     <Button data-testid='remove-org-leader__btn' 
                       unstyled 
                       type="button" 
+                    disabled={formState.leader.get() == null}
                       onClick={() => { resolveLeaderName() !== '' && removeActionInitiated(() => { onClearOrgLeader() }, null) }}
                     >
                       Remove
@@ -426,8 +614,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
 
                   {/* used for testing only */}
                   <div style={{display: 'none'}}>
-                    <TextInput id="hidden-selected-item" name='chosen-row' type="text" data-testid='org-row-selection'
-                        defaultValue={chooserChosenRow?.data?.firstName || ''}
+                  <TextInput id="hidden-selected-item" name='chosen-row' type="text" data-testid='org-row-selection'
                         value={chooserChosenRow?.data?.firstName || ''}
                         disabled={true}
                       />
@@ -450,9 +637,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                 {/* Edit/Remove Parent Org Section */}
                 <FormGroup labelName="parentOrg" labelText="Parent Organization">
                   <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                    <TextInput id="parentOrg" name="parentOrg" type="text" data-testid='org-parent-name'
-                      defaultValue={orgState.selectedOrgState.get().parentOrganization?.name || ''}
-                      value={orgState.selectedOrgState.get().parentOrganization?.name || ''}
+                  <TextInput id="parentOrg" name="parentOrg" type="text" data-testid='org-parent-name'
+                    value={formState.parentOrganization.get()?.name ?? ''}
                       disabled={true}
                     />
                     <Button data-testid='change-org-parent__btn' unstyled type="button" onClick={onEditParentOrg}>
@@ -462,30 +648,30 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       data-testid='remove-org-parent__btn' 
                       unstyled 
                       type="button" 
-                      onClick={ () => { orgState.selectedOrgState.get().parentOrganization?.name && removeActionInitiated(() => { onClearParentOrg() }, null) }}
+                    onClick={() => { formState.parentOrganization.get()?.name && removeActionInitiated(() => { onClearParentOrg() }, null) }}
                     >
                       Remove
                     </Button>
                   </div>                  
                   {
-                    showPatchResult.parent && (orgEditType === OrgEditOpType.PARENT_ORG_EDIT || orgEditType === OrgEditOpType.PARENT_ORG_REMOVE) ?
-                      <div>
-                        <SuccessErrorMessage successMessage={props.successAction?.successMsg}
-                               errorMessage={props.formErrors?.general || ''}
-                               showErrorMessage={props.formErrors?.general != null}
-                               showSuccessMessage={(props.successAction != null && props.successAction?.success)}
-                               showCloseButton={false}
-                               onCloseClicked={props.onClose} /> 
-                      </div>
-                  :
-                     null
+                  showPatchResult.parent && (orgEditType === OrgEditOpType.PARENT_ORG_EDIT || orgEditType === OrgEditOpType.PARENT_ORG_REMOVE) &&
+                  <div>
+                    <SuccessErrorMessage
+                      successMessage={props.successAction?.successMsg}
+                      errorMessage={props.formErrors?.general || ''}
+                      showErrorMessage={props.formErrors?.general != null}
+                      showSuccessMessage={(props.successAction != null && props.successAction?.success)}
+                      showCloseButton={false}
+                      onCloseClicked={props.onClose}
+                    />
+                  </div>
                   }
 
                 <input type='hidden' name='chosen-parent-row' data-testid='chosen-parent-row' value={chooserChosenRow?.data?.name || ''} />
                 </FormGroup> 
 
                 {/* Add/Remove Org Members Section */}
-                <FormGroup labelName="membersList" labelText={`Organization Members (${orgState.selectedOrgState.get().members?.length || 0})`} >
+              <FormGroup labelName="membersList" labelText={`Organization Members (${formState.members.get()?.length || 0})`} >
                   <div style={{display: 'flex', width: '100%', justifyContent: 'space-around', margin: '1rem', paddingRight: '1rem'}}>
                     <Button style={{marginTop: 0}} data-testid='org-add-member__btn' unstyled type="button" onClick={onAddMemberClick}>
                       Add
@@ -501,7 +687,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       data-testid='org-member-remove-selected__btn' 
                       unstyled 
                       type="button" 
-                      onClick={() => { onRemoveMemberClick() }}
+                      onClick={removeMembers}
                     >
                       Remove
                     </Button>
@@ -520,31 +706,35 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                      null
                   }
                   <Grid
-                      onGridReady={(event: GridApi | undefined) => setMembersGridApi(event)}
-                      rowSelection='multiple'
-                      height="300px"
-                      data-testid="membersList"
-                      data={orgState.selectedOrgState.get().members || []}
-                      columns={[
-                        new GridColumn({
-                          field: 'lastName',
-                          sortable: true,
-                          filter: true,
-                          headerName: 'Last'
-                        }),
-                        new GridColumn({
-                          field: 'firstName',
-                          sortable: true,
-                          filter: true,
-                          headerName: 'First'
-                        }),
-                      ]}
-                      rowClass="ag-grid--row-pointer"
+                  onGridReady={(event: GridApi | undefined) => setMembersGridApi(event)}
+                  rowSelection='multiple'
+                  height="300px"
+                  data-testid="membersList"
+                  data={formState.members.get() || []}
+                  columns={[
+                    new GridColumn({
+                      field: 'lastName',
+                      sortable: true,
+                      filter: true,
+                      headerName: 'Last',
+                      checkboxSelection: true,
+                      headerCheckboxSelection: true,
+                    }),
+                    new GridColumn({
+                      field: 'firstName',
+                      sortable: true,
+                      filter: true,
+                      headerName: 'First'
+                    }),
+                  ]}
+                  rowClass="ag-grid--row-pointer"
+                  onRowSelected={onOrganizationMembersRowSelection}
+                  suppressRowClickSelection
                   />                  
                 </FormGroup>
 
                 {/* Add/Remove Org Subordinate Orgs Section */}
-                <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${orgState.selectedOrgState.get().subordinateOrganizations?.length || 0})`}>
+              <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${formState.subordinateOrganizations.get()?.length || 0})`}>
                   <div style={{display: 'flex', width: '100%', justifyContent: 'space-around', margin: '1rem', paddingRight: '1rem'}}>
                     <Button style={{marginTop: 0}} data-testid='org-add-suborg__btn' unstyled type="button" onClick={onAddSubOrgClick}>
                       Add
@@ -559,7 +749,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       style={{marginTop: 0}} 
                       data-testid='org-suborg-remove-selected__btn' 
                       unstyled type="button" 
-                      onClick={() => { onRemoveSubOrgClick() }}
+                      onClick={removeSubOrgs}
                     >
                       Remove
                     </Button>
@@ -582,16 +772,20 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
                       rowSelection='multiple'
                       height="300px"
                       data-testid="subOrgsList"
-                      data={orgState.selectedOrgState.get().subordinateOrganizations || []}
+                      data={formState.subordinateOrganizations.get() || []}
                       columns={[
                         new GridColumn({
                           field: 'name',
                           sortable: true,
                           filter: true,
-                          headerName: 'Name'
+                          headerName: 'Name',
+                          checkboxSelection: true,
+                          headerCheckboxSelection: true,
                         }),
                       ]}
                       rowClass="ag-grid--row-pointer"
+                      suppressRowClickSelection
+                      onRowSelected={onOrganizationSubOrgsRowSelection}
                   />
                 </FormGroup>
               </>
@@ -622,7 +816,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" onClick={chooserDialogClose}>
                 Cancel
               </Button>
-              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" onClick={chooserDialogConfirmed}>
+              <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" onClick={chooserDialogConfirmed} disabled={selectedChooserRows.length === 0}>
                 Commit
               </Button>
             </div>
@@ -631,11 +825,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           height="auto"
           width="30%"
         >
-          <ItemChooser
-            items={chooserDataItems}
-            columns={chooserDataColumns}
-            onRowClicked={chooserRowClicked}
-            />
+        <InfiniteScrollGrid
+          height='300px'
+          columns={chooserDataColumns}
+          rowClass='ag-grid--row-pointer'
+          rowSelection={orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.SUB_ORGS_EDIT ? 'multiple' : 'single'}
+          datasource={orgState.createDatasource(chooserDataType, getIdsToExclude(chooserDataType))}
+          onRowClicked={chooserRowClicked}
+          className='item-chooser__grid'
+          suppressRowClickSelection
+          getRowNodeId={function (item) { return item.id }}
+          onRowSelected={onChooserRowSelected}
+        />
         </Modal>
         <Modal
           show={showConfirmDialog}
@@ -655,7 +856,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
           width="30%"
           className={'org-member-editor-modal'}
         >
-          This action takes immediate effect. Are you sure you want to remove selected entity?
+        Are you sure you want to remove selected entity?
         </Modal>
       </div>
   );

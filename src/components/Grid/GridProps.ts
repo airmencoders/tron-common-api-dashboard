@@ -42,4 +42,6 @@ export interface GridProps {
   onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
 
   rowModelType?: string;
+
+  getRowNodeId?: ((item: any) => string);
 }

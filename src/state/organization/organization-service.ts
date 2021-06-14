@@ -1,12 +1,22 @@
 import {none, State} from '@hookstate/core';
-import {OrganizationControllerApiInterface} from '../../openapi';
-import { FilterDto, OrganizationDto } from '../../openapi/models';
+import { OrganizationControllerApiInterface, PersonControllerApiInterface } from '../../openapi';
+import { FilterCondition, FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum, OrganizationDto, PersonDto } from '../../openapi/models';
 import {AbstractDataService} from '../data-service/abstract-data-service';
 import {OrganizationDtoWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
 import isEqual from 'fast-deep-equal';
+import { createJsonPatchOp, mergeDataToState } from '../data-service/data-service-utils';
+import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
+import { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
+import { GridFilter } from '../../components/Grid/grid-filter';
+import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
+import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { OrganizationEditState } from '../../pages/Organization/OrganizationEditForm';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -22,15 +32,17 @@ export enum OrgEditOpType {
   OTHER = 'OTHER',
 }
 
-export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDto> {
+export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDtoWithDetails> {
 
   private readonly validate: ValidateFunction<OrganizationDto>;
   private readonly filterValidate: ValidateFunction<FilterDto>;
 
   constructor(
       public state: State<OrganizationDto[]>,
-      public selectedOrgState: State<OrganizationDtoWithDetails>,
-      private orgApi: OrganizationControllerApiInterface) {
+    private orgApi: OrganizationControllerApiInterface,
+    public organizationChooserState: State<OrganizationDto[]>,
+    public personChooserState: State<PersonDto[]>,
+    private personApi: PersonControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<OrganizationDto>(ModelTypes.definitions.OrganizationDto);
     this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
@@ -60,8 +72,6 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   private sort?: string[];
 
   async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<OrganizationDto[]> {
-
-
     /**
      * If the filter or sort changes, purge the state to start fresh.
      * Set filter to the new value
@@ -100,6 +110,182 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   }
 
   /**
+    * Keeps track of changes to the filter
+    */
+  private personChooserFilter?: FilterDto;
+  private organizationChooserFilter?: FilterDto;
+
+  /**
+  * Keeps track of changes to the sort
+  */
+  private personChooserSort?: string[];
+  private organizationChooserSort?: string[];
+
+  async fetchAndStoreChooserPaginatedData(type: 'organization' | 'person', page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[] | OrganizationDto[]> {
+    if (type !== 'organization' && type !== 'person') {
+      throw new Error(`${type} is not supported for Chooser data`);
+    }
+
+    if (filter != null && !this.filterValidate(filter)) {
+      throw TypeValidation.validationError('FilterDto');
+    }
+
+    if (type === 'person') {
+      /**
+       * If the filter or sort changes, purge the state to start fresh.
+       * Set filter to the new value
+       */
+      if (!isEqual(this.personChooserFilter, filter) || this.personChooserSort != sort) {
+        this.personChooserState.set([]);
+        this.personChooserFilter = filter;
+        this.personChooserSort = sort;
+      }
+
+      let responseData: PersonDto[] = [];
+      try {
+        if (filter != null) {
+          responseData = await this.personApi.filterPerson(filter, false, false, page, limit, sort)
+            .then(resp => {
+              return resp.data.data;
+            });
+
+        } else {
+          responseData = await this.personApi.getPersonsWrapped(false, false, page, limit, sort)
+            .then(resp => {
+              return resp.data.data;
+            });
+        }
+      } catch (err) {
+        throw err;
+      }
+
+      mergeDataToState(this.personChooserState, responseData, checkDuplicates);
+
+      return responseData;
+    }
+
+    /**
+     * If the filter or sort changes, purge the state to start fresh.
+     * Set filter to the new value
+     */
+    if (!isEqual(this.organizationChooserFilter, filter) || this.organizationChooserSort != sort) {
+      this.organizationChooserState.set([]);
+      this.organizationChooserFilter = filter;
+      this.organizationChooserSort = sort;
+    }
+
+    let responseData: PersonDto[] = [];
+
+    try {
+      if (filter != null) {
+        responseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      } else {
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
+          .then(resp => {
+            return resp.data.data;
+          });
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    mergeDataToState(this.organizationChooserState, this.removeUnfriendlyAgGridData(responseData), checkDuplicates);
+
+    return responseData;
+  }
+
+  createDatasource(type: 'organization' | 'person', idsToExclude?: string[], infiniteScrollOptions?: InfiniteScrollOptions) {
+    const datasource: IDatasource = {
+      getRows: async (params: IGetRowsParams) => {
+        try {
+          const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
+          const page = Math.floor(params.startRow / limit);
+
+          const filter = new GridFilter(params.filterModel);
+
+          // Filter out the items that already exist
+          const filterConditions: FilterCondition[] = [];
+          idsToExclude?.forEach(id => {
+            filterConditions.push({
+              operator: FilterConditionOperatorEnum.NotEquals,
+              value: id
+            });
+          });
+
+          console.log(idsToExclude);
+
+          filter.addMultiFilter('id', FilterCriteriaRelationTypeEnum.And, filterConditions);
+
+          console.log(filter.getFilterDto())
+
+          const sort = convertAgGridSortToQueryParams(params.sortModel);
+
+          const data = await this.fetchAndStoreChooserPaginatedData(type, page, limit, true, filter.getFilterDto(), sort);
+
+          let lastRow = -1;
+
+          /**
+           * If the request returns data with length of 0, then
+           * there is no more data to be retrieved.
+           * 
+           * If the request returns data with length less than the limit,
+           * then that is the last page.
+           */
+          if (data.length == 0 || data.length < limit)
+            lastRow = type === 'person' ? this.personChooserState.length : this.organizationChooserState.length;
+
+          params.successCallback(data, lastRow);
+        } catch (err) {
+          params.failCallback();
+
+          /**
+           * Don't error out the state here. If the request fails for some reason, just show nothing.
+           * 
+           * Call the success callback as a hack to prevent
+           * ag grid from showing an infinite loading state on failure.
+           */
+          params.successCallback([], 0);
+
+          if (err instanceof AgGridFilterConversionError) {
+            createTextToast(ToastType.ERROR, err.message, { autoClose: false });
+            return;
+          }
+
+          const requestErr = prepareRequestError(err);
+
+          /**
+           * A 400 status with a filter model set means that the server
+           * sent back a validation error.
+           */
+          if (requestErr.status === 400 && params.filterModel != null) {
+            createTextToast(ToastType.ERROR, `Failed to filter with error: ${requestErr.message}`, { autoClose: false });
+            return;
+          }
+
+          /**
+           * Server responded with some other response
+           */
+          if (requestErr.status != null) {
+            createFailedDataFetchToast();
+            return;
+          }
+
+          /**
+           * Something else went wrong... the request did not leave
+           */
+          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
+          return;
+        }
+      }
+    }
+
+    return datasource;
+  }
+
+  /**
    * Due to Hookstate and Ag Grid interaction, some fields cause Hookstate to error.
    * Remove those fields here.
    *
@@ -114,7 +300,11 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     });
   }
 
-  async convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDto> {
+  removeUnfriendlyAgGridDataSingle(data: OrganizationDto): OrganizationDto {
+    return this.removeUnfriendlyAgGridData([data])[0];
+  }
+
+  async convertRowDataToEditableData(rowData: OrganizationDto): Promise<OrganizationDtoWithDetails> {
     const { id } = rowData;
     if (!id) {
       return Promise.reject(new Error('Organization ID must be defined'));
@@ -122,14 +312,14 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
     try {
       // fetch selected org's detailed info
-      await this.getOrgDetails(id);
-      return Promise.resolve(Object.assign({}, rowData));
+      const details = await this.getOrgDetails(id);
+      return Promise.resolve(details);
     } catch (err) {
       return Promise.reject(err);
     }
   }
 
-  async sendCreate(toCreate: OrganizationDto): Promise<OrganizationDto> {
+  async sendCreate(toCreate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
     if(!this.validate(toCreate)) {
       throw TypeValidation.validationError('OrganizationDto');
     }
@@ -154,7 +344,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
    * name, branch, and type
    * @param toUpdate
    */
-  async sendUpdate(toUpdate: OrganizationDto): Promise<OrganizationDto> {
+  async sendUpdate(toUpdate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
     if(!this.validate(toUpdate)) {
       throw TypeValidation.validationError('OrganizationDto');
     }
@@ -163,12 +353,12 @@ export default class OrganizationService extends AbstractDataService<Organizatio
         return Promise.reject(new Error('Organization to update has undefined id.'));
       }
 
-      let orgFeatures = {};
-      if (toUpdate.name) { orgFeatures = {...orgFeatures, name: toUpdate.name }; }
-      if (toUpdate.orgType) { orgFeatures = {...orgFeatures, orgType: toUpdate.orgType }; }
-      if (toUpdate.branchType) { orgFeatures = {...orgFeatures, branchType: toUpdate.branchType }; }
+      const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = [];
+      if (toUpdate.name) { jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/name', toUpdate.name)); }
+      if (toUpdate.orgType) { jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/orgType', toUpdate.orgType)); }
+      if (toUpdate.branchType) { jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/branchType', toUpdate.branchType)); }
 
-      const orgResponse = await this.orgApi.patchOrganization1(toUpdate.id, orgFeatures);
+      const orgResponse = await this.orgApi.jsonPatchOrganization(toUpdate.id, jsonPatchOperations);
 
       const patchedOrg = orgResponse.data;
       patchedOrg.members = undefined;
@@ -190,36 +380,60 @@ export default class OrganizationService extends AbstractDataService<Organizatio
    * for that method.
    * @param args
    */
-  async sendPatch(...args: any) : Promise<OrganizationDto> {
+  async sendPatch(original: OrganizationDto, toUpdate: OrganizationDto, toPatch: OrganizationEditState): Promise<OrganizationDto> {
+    if (toUpdate.id == null) {
+      throw new Error("Organization ID cannot be null when sending PATCH update.");
+    }
+
+    const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = [];
+    if (toUpdate.name !== original.name) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/name', toUpdate.name));
+    }
+
+    if (toUpdate.orgType !== original.orgType) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/orgType', toUpdate.orgType));
+    }
+
+    if (toUpdate.branchType !== original.branchType) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/branchType', toUpdate.branchType));
+    }
+
+    if (toPatch.leader.removed) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Remove, '/leader'));
+    } else if (toPatch.leader.newLeader) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/leader', toPatch.leader.newLeader.id));
+    }
+
+    if (toPatch.parentOrg.removed) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Remove, '/parentOrganization'));
+    } else if (toPatch.parentOrg.newParent) {
+      jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/parentOrganization', toPatch.parentOrg.newParent.id));
+    }
 
     try {
-      switch (args[0] as OrgEditOpType) {
-        case OrgEditOpType.LEADER_EDIT:
-          return Promise.resolve(await this.updateLeader(args[1], args[2]));
-        case OrgEditOpType.MEMBERS_EDIT:
-          return Promise.resolve(await this.addMember(args[1], args[2]));
-        case OrgEditOpType.SUB_ORGS_EDIT:
-          return Promise.resolve(await this.addSubOrg(args[1], args[2]));
-        case OrgEditOpType.PARENT_ORG_EDIT:
-          return Promise.resolve(await this.updateParentOrg(args[1], args[2]));
-        case OrgEditOpType.PARENT_ORG_REMOVE:
-          return Promise.resolve(await this.removeParent(args[1]));
-        case OrgEditOpType.SUB_ORGS_REMOVE:
-          return Promise.resolve(await this.removeSubOrg(args[1], args[2]));
-        case OrgEditOpType.MEMBERS_REMOVE:
-          return Promise.resolve(await this.removeMember(args[1], args[2]));
-        case OrgEditOpType.LEADER_REMOVE:
-          return Promise.resolve(await this.removeLeader(args[1]));
-        default:
-          break;
+      const request = await this.orgApi.jsonPatchOrganization(toUpdate.id, jsonPatchOperations);
+
+      const subOrgsToRemove = toPatch.subOrgs.toRemove.flatMap(org => org.id ? org.id : []);
+      if (subOrgsToRemove.length > 0) {
+        await this.orgApi.removeSubordinateOrganization(toUpdate.id, subOrgsToRemove);
       }
-      return Promise.reject(new Error('Invalid Patch Operation'));
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
 
+      const membersToRemove = toPatch.members.toRemove.flatMap(member => member.id ? member.id : []);
+      if (membersToRemove.length > 0) {
+        await this.orgApi.deleteOrganizationMember(toUpdate.id, membersToRemove);
+      }
 
+      const requestData = request.data;
+
+      const sanitizedData = this.removeUnfriendlyAgGridDataSingle(requestData);
+
+      // Update the state
+      this.state.find(item => item.id.get() === sanitizedData.id)?.set(sanitizedData);
+
+      return Promise.resolve(requestData);
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   /**
@@ -228,47 +442,14 @@ export default class OrganizationService extends AbstractDataService<Organizatio
    * @param id org UUID to fetch
    * @returns a JSON structure with requested fields (hence, the <any> return)
    */
-  async getOrgDetails(id: string): Promise<any> {
+  async getOrgDetails(id: string): Promise<OrganizationDtoWithDetails> {
     try {
 
       // the extra query params causes this response to match signature of an OrganizationDtoWithDetails
       const orgResponse = await this.orgApi.getOrganization(id, false, "id,firstName,lastName", "id,name");
-      this.selectedOrgState.set(orgResponse.data as OrganizationDtoWithDetails);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
 
-  /**
-   * Patch updates an org's leader by UUID
-   * @param orgId org UUID to patch
-   * @param id UUID of the person to make the leader
-   * @returns transaction response or the error it raised
-   */
-  async updateLeader(orgId: string, id: string): Promise<OrganizationDto> {
-    try {
-      const orgResponse = await this.orgApi.patchOrganization1(orgId, { leader: id });
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Patch updates an org's parent by UUID
-   * @param orgId org UUID to patch
-   * @param id UUID of the org to make the parent
-   * @returns transaction response or the error it raised
-   */
-   async updateParentOrg(orgId: string, id: string): Promise<OrganizationDto> {
-    try {
-      const orgResponse = await this.orgApi.patchOrganization1(orgId, { parentOrganization: id });
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
+      const data = orgResponse.data as OrganizationDtoWithDetails;
+      return Promise.resolve(data);
     }
     catch (error) {
       return Promise.reject(error);
@@ -379,7 +560,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     }
   }
 
-  async sendDelete(toDelete: OrganizationDto): Promise<void> {
+  async sendDelete(toDelete: OrganizationDtoWithDetails): Promise<void> {
     try {
       const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
 

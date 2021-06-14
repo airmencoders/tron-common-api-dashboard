@@ -106,6 +106,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
               cacheBlockSize={props.cacheBlockSize ?? agGridDefaults.cacheBlockSize}
               maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
               maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
+              getRowNodeId={props.getRowNodeId}
           >
             {
               props.columns.map(col => (
