@@ -110,7 +110,7 @@ describe('App Client State Tests', () => {
     read: true,
     write: true,
     appClientDeveloperEmails: [],
-    appEndpointPrivs: [],
+    appSourceEndpoints: [],
   }
 
 

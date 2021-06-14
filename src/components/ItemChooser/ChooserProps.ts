@@ -1,4 +1,4 @@
-import { RowClickedEvent, RowNode } from 'ag-grid-community';
+import {GridApi, RowClickedEvent, RowNode} from 'ag-grid-community';
 import GridColumn from '../Grid/GridColumn';
 
 export interface ChooserProps {
@@ -12,4 +12,5 @@ export interface ChooserProps {
   disableEditBtn?: boolean;
   onEditBtnClick?: () => void;
   onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
+  onGridReady?: (event: GridApi | undefined) => void;
 }
