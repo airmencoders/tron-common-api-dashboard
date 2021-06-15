@@ -21,6 +21,7 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validateSubscriberAddress } from '../../utils/validation-utils';
+import CopyIcon from "../../icons/CopyIcon";
 
 interface DeveloperEmail {
   email: string;
@@ -176,16 +177,21 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="UUID"
           isError={false}
         >
-          <TextInput
-            id="uuid"
-            name="uuid"
-            type="text"
-            defaultValue={formState.id.get()}
-            disabled={true}
-          />
-          <CopyToClipboard text={String(formState.id.get())}>
-            <Button type="button">Copy to Clipboard</Button>
-          </CopyToClipboard>
+          <div style={{width: '400px', display: "inline-block"}} >
+            <TextInput
+              id="uuid"
+              name="uuid"
+              type="text"
+              defaultValue={formState.id.get()}
+              disabled={true}
+              className={'tron-text-input-inline'}
+            />
+            <CopyToClipboard text={String(formState.id.get())}>
+              <Button type="button" className={'usa-button usa-button--outline usa-button--inverse usa-button--inline'}>
+                <CopyIcon iconTitle={'copyToClipboard'} size={1} />
+              </Button>
+            </CopyToClipboard>
+          </div>
         </FormGroup>
       }
 

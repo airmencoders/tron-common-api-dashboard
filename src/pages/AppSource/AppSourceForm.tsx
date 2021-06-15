@@ -24,6 +24,7 @@ import { failsHookstateValidation, generateStringErrorMessages, validateEmail, v
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import CopyIcon from "../../icons/CopyIcon";
 
 interface AdminEmail {
   email: string;
@@ -247,7 +248,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
               disabled={true}
             />
             <CopyToClipboard text={String(formState.id.get())}>
-              <Button type="button" >Copy to Clipboard</Button>
+              <Button type="button" className={'usa-button usa-button--outline usa-button--inverse'}>
+                <CopyIcon iconTitle={'copyToClipboard'} size={1} />
+              </Button>
             </CopyToClipboard>
           </FormGroup>
         }
