@@ -1,5 +1,7 @@
 import { GridFilterParams } from './grid-filter-params';
 
+import {GridColumnPinnedOption} from './grid-column-pinned-option';
+
 export interface GridColumnParams {
   field: string;
   sortable: boolean;
@@ -13,5 +15,7 @@ export interface GridColumnParams {
   checkboxSelection: boolean;
   headerCheckboxSelection: boolean;
   headerCheckboxSelectionFilteredOnly: boolean;
+  pinned: GridColumnPinnedOption,
+  initialWidth: number | undefined; // in pixels
   filterParams: GridFilterParams;
 }

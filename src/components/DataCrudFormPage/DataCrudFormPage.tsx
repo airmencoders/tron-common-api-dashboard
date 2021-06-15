@@ -93,7 +93,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
           /**
            * If the request returns data with length of 0, then
            * there is no more data to be retrieved.
-           * 
+           *
            * If the request returns data with length less than the limit,
            * then that is the last page.
            */
@@ -149,8 +149,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   }
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
-    if (props.allowEdit && 
-        !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) && 
+    if (props.allowEdit &&
+        !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) &&
         !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics') &&
         !(event.api.getFocusedCell()?.column.getColDef().headerName === 'API Spec')) {
       let rowData = event.data;
@@ -188,7 +188,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
           /**
            * Ensures the sidedrawer does not get put into
-           * an infinite loading state on error when 
+           * an infinite loading state on error when
            * requesting data.
            */
           pageState.set(getInitialCrudPageState());
@@ -431,6 +431,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                   title={props.dataTypeName}
                   isOpen={pageState.isOpen.get()}
                   onCloseHandler={onCloseHandler}
+                  size={props.sideDrawerSize}
                 >
                   {
                     pageState.formAction.value === FormActionType.ADD && CreateForm ?

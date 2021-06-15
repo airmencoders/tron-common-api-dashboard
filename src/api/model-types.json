@@ -460,6 +460,9 @@
     "AppEndpointClientInfoDto": {
       "additionalProperties": false,
       "properties": {
+        "appSourceId": {
+          "type": "string"
+        },
         "appSourceName": {
           "type": "string"
         },

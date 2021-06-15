@@ -1,13 +1,14 @@
 import React from 'react';
 import GridColumn from '../../components/Grid/GridColumn';
-import { useAppClientsState } from '../../state/app-clients/app-clients-state';
+import {useAppClientsState} from '../../state/app-clients/app-clients-state';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
-import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
-import { AppClientFlat } from '../../state/app-clients/app-client-flat';
+import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
+import {AppClientFlat} from '../../state/app-clients/app-client-flat';
 import AppClientForm from './AppClientForm';
 import AppClientDelete from './AppClientDelete';
-import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
+import {accessAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
+import {PrivilegeType} from '../../state/privilege/privilege-type';
+import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn({
@@ -49,6 +50,7 @@ export function AppClientPage() {
       deleteComponent={AppClientDelete}
       autoResizeColumns
       autoResizeColummnsMinWidth={700}
+      sideDrawerSize={SideDrawerSize.WIDE}
     />
   )
 }

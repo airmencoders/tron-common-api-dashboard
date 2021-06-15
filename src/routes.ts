@@ -34,7 +34,8 @@ export enum RoutePath {
     NOT_AUTHORIZED = '/not-authorized',
     PUB_SUB = '/pubsub',
     AUDIT_LOG = '/audit-log',
-    APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?'
+    APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?',
+    API_TEST = '/app-api/:apiId'
 }
 
 export const routes: RouteItem[] = [

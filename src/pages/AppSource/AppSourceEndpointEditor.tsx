@@ -151,7 +151,7 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
               id="endpoint-method"
               name="endpoint-method"
               type="text"
-            value={endpoints[0].requestType}
+              value={endpoints[0].requestType}
               disabled={true}
             />
           </FormGroup>

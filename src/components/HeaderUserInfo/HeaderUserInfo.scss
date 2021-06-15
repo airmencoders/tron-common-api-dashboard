@@ -1,6 +1,8 @@
 @import "../../styles/base";
 
 .header-user-info {
+  position: relative;
+  top: -5px;
   &__initials {
     background: $main-brand-color;
     display: table;
@@ -10,6 +12,10 @@
     font-family: $headings-font-family;
     font-weight: bold;
     min-width: 39px;
+    min-height: 43px;
+    &:after {
+      font-size: calculateRem(10px);
+    }
   }
   &__label {
     font-size: 0.67em;
