@@ -1238,33 +1238,6 @@
       },
       "type": "object"
     },
-    "InvalidScratchSpacePermissions": {
-      "additionalProperties": false,
-      "properties": {
-        "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
-        },
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "JsonPatchObjectArrayValue": {
       "additionalProperties": false,
       "properties": {
@@ -1730,6 +1703,31 @@
       ],
       "type": "string"
     },
+    "PlatformJwtDto": {
+      "additionalProperties": false,
+      "description": "Person to create",
+      "properties": {
+        "affiliation": {
+          "type": "string"
+        },
+        "dod_id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "family_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "rank": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "PrivilegeDto": {
       "additionalProperties": false,
       "properties": {
@@ -1850,60 +1848,6 @@
         "USCG"
       ],
       "type": "string"
-    },
-    "RecordNotFoundException": {
-      "additionalProperties": false,
-      "properties": {
-        "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
-        },
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "ResourceAlreadyExistsException": {
-      "additionalProperties": false,
-      "properties": {
-        "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
-        },
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
     },
     "Sailor": {
       "$ref": "model-types.json#/definitions/PersonDto"
@@ -2166,6 +2110,9 @@
     "UserInfoDto": {
       "additionalProperties": false,
       "properties": {
+        "affiliation": {
+          "type": "string"
+        },
         "dodId": {
           "type": "string"
         },
@@ -2185,6 +2132,9 @@
           "type": "string"
         },
         "preferredUsername": {
+          "type": "string"
+        },
+        "rank": {
           "type": "string"
         }
       },

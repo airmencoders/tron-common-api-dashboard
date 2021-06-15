@@ -61,6 +61,9 @@ const server = setupServer(
   rest.post('/api/v2/person/find', (req, res, ctx) => {
     return res(ctx.json({}));
   }),
+  rest.get(/\/api\/v2\/logs/, (req, res, ctx) => {
+    return res(ctx.json({ data: [{}], pagination: {}}));
+  }),
   rest.get('*', returnDefaultResponse),
   rest.post('*', returnDefaultResponse),
   rest.patch('*', returnDefaultResponse),

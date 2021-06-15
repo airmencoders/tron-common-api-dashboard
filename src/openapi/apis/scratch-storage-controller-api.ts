@@ -19,17 +19,9 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { BadRequestException } from '../models';
-// @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
-import { InvalidScratchSpacePermissions } from '../models';
-// @ts-ignore
 import { PrivilegeDtoResponseWrapper } from '../models';
-// @ts-ignore
-import { RecordNotFoundException } from '../models';
-// @ts-ignore
-import { ResourceAlreadyExistsException } from '../models';
 // @ts-ignore
 import { ScratchStorageAppRegistryDto } from '../models';
 // @ts-ignore

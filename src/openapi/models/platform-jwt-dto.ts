@@ -15,65 +15,47 @@
 
 
 /**
- * 
+ * Person to create
  * @export
- * @interface UserInfoDto
+ * @interface PlatformJwtDto
  */
-export interface UserInfoDto {
+export interface PlatformJwtDto {
     /**
      * 
      * @type {string}
-     * @memberof UserInfoDto
+     * @memberof PlatformJwtDto
      */
-    dodId?: string;
+    affiliation?: string;
     /**
      * 
      * @type {string}
-     * @memberof UserInfoDto
-     */
-    givenName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserInfoDto
-     */
-    familyName?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserInfoDto
-     */
-    name?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserInfoDto
-     */
-    preferredUsername?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserInfoDto
-     */
-    email?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserInfoDto
-     */
-    organization?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserInfoDto
+     * @memberof PlatformJwtDto
      */
     rank?: string;
     /**
      * 
      * @type {string}
-     * @memberof UserInfoDto
+     * @memberof PlatformJwtDto
      */
-    affiliation?: string;
+    email?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PlatformJwtDto
+     */
+    dod_id?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PlatformJwtDto
+     */
+    given_name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PlatformJwtDto
+     */
+    family_name?: string;
 }
 
 
