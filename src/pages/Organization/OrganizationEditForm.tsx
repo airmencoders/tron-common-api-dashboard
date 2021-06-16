@@ -12,6 +12,7 @@ import Select from '../../components/forms/Select/Select';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from '../../components/forms/TextInput/TextInput';
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import Grid from '../../components/Grid/Grid';
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
@@ -26,6 +27,7 @@ import { usePersonState } from '../../state/person/person-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import CopyIcon from "../../icons/CopyIcon";
 
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
@@ -347,15 +349,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
               labelText="UUID"
               isError={false}
           >
-            <TextInput
+            <TextInputInline
                 id="uuid"
                 name="uuid"
                 type="text"
                 defaultValue={formState.id.get()}
                 disabled={true}
+                className={'tron-text-input-inline'}
             />
             <CopyToClipboard text={String(formState.id.get())}>
-              <Button type="button">Copy to Clipboard</Button>
+              <Button type="button" className={'usa-button inline-icon'}>
+                <CopyIcon iconTitle={'copyToClipboard'} size={1} />
+              </Button>
             </CopyToClipboard>
           </FormGroup>
           <FormGroup labelName="orgName" labelText="Organization Name"

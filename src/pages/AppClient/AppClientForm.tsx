@@ -13,6 +13,7 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import { AppClientFlat } from "../../state/app-clients/app-client-flat";
@@ -177,8 +178,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="UUID"
           isError={false}
         >
-          <div style={{width: '400px', display: "inline-block"}} >
-            <TextInput
+          <div className={'tron-text-input'} >
+            <TextInputInline
               id="uuid"
               name="uuid"
               type="text"
@@ -187,7 +188,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
               className={'tron-text-input-inline'}
             />
             <CopyToClipboard text={String(formState.id.get())}>
-              <Button type="button" className={'usa-button usa-button--outline usa-button--inverse usa-button--inline'}>
+              <Button type="button" className={'usa-button inline-icon'}>
                 <CopyIcon iconTitle={'copyToClipboard'} size={1} />
               </Button>
             </CopyToClipboard>

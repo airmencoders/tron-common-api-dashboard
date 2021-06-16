@@ -2,6 +2,7 @@ import React, {FormEvent} from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import {Downgraded, none, State, useHookstate } from '@hookstate/core';
 import {Validation} from '@hookstate/validation';
@@ -25,6 +26,7 @@ import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
 import { generateStringErrorMessages, failsHookstateValidation, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import CopyIcon from "../../icons/CopyIcon";
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -220,15 +222,18 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
               labelText="UUID"
               isError={false}
           >
-            <TextInput
+            <TextInputInline
                 id="uuid"
                 name="uuid"
                 type="text"
                 defaultValue={formState.id.get()}
                 disabled={true}
+                className={'tron-text-input-inline'}
             />
             <CopyToClipboard text={String(formState.id.get())}>
-              <Button type="button">Copy to Clipboard</Button>
+              <Button type="button" className={'usa-button inline-icon'}>
+                <CopyIcon iconTitle={'copyToClipboard'} size={1} />
+              </Button>
             </CopyToClipboard>
           </FormGroup>
           <FormGroup labelName="appName" labelText="App Name"

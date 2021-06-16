@@ -6,6 +6,7 @@ import { Touched } from "@hookstate/touched";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Form from "../../components/forms/Form/Form";
 import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import { DashboardUserFlat } from '../../state/dashboard-user/dashboard-user-flat';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
@@ -15,6 +16,7 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import Button from "../../components/Button/Button";
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import CopyIcon from "../../icons/CopyIcon";
 
 function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   const formState = useState<DashboardUserFlat>({
@@ -78,15 +80,18 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
           labelText="UUID"
           isError={false}
         >
-          <TextInput
+          <TextInputInline
             id="uuid"
             name="uuid"
             type="text"
             defaultValue={formState.id.get()}
             disabled={true}
+            className={'tron-text-input-inline'}
           />
           <CopyToClipboard text={String(formState.id.get())}>
-            <Button type="button">Copy to Clipboard</Button>
+            <Button type="button" className={'usa-button inline-icon'}>
+              <CopyIcon iconTitle={'copyToClipboard'} size={1} />
+            </Button>
           </CopyToClipboard>
         </FormGroup>
       }

@@ -10,6 +10,7 @@ import Select from '../../components/forms/Select/Select';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi';
 import { AppClientFlat } from '../../state/app-clients/app-client-flat';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
@@ -18,6 +19,7 @@ import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
 import Button from "../../components/Button/Button";
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import CopyIcon from "../../icons/CopyIcon";
 
 function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
   const appClientsAvail = useAppClientsState().appClients;
@@ -78,15 +80,18 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
           labelText="UUID"
           isError={false}
         >
-          <TextInput
+          <TextInputInline
             id="uuid"
             name="uuid"
             type="text"
             defaultValue={formState.id.get()}
             disabled={true}
+            className={'tron-text-input-inline'}
           />
           <CopyToClipboard text={String(formState.id.get())}>
-            <Button type="button" >Copy to Clipboard</Button>
+            <Button type="button" className={'usa-button inline-icon'}>
+              <CopyIcon iconTitle={'copyToClipboard'} size={1} />
+            </Button>
           </CopyToClipboard>
         </FormGroup>
       }

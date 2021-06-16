@@ -15,8 +15,9 @@
   }
 }
 
-.usa-button--inline {
-  padding: units(1) units(1);
-  //float:left;
-  width:19%;
+.inline-icon {
+  float: right;
+  padding: units(1.5) units(1.5);
+  margin-top: 0.5rem !important;
+  text-align: center;
 }
