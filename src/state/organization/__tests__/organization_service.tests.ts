@@ -4,9 +4,9 @@ import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { FilterConditionOperatorEnum, FilterDto, Flight, Group, OrganizationControllerApi, OrganizationControllerApiInterface, OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper, OtherUsaf, PersonControllerApi, PersonControllerApiInterface, PersonDto, Squadron, Wing } from '../../../openapi';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails } from '../organization-state';
-import { OrganizationEditState } from '../../../pages/Organization/OrganizationEditForm';
 import { ResponseType } from '../../data-service/response-type';
 import { PatchResponse } from '../../data-service/patch-response';
+import { OrganizationEditState } from '../../../pages/Organization/organization-edit-state';
 
 class MockOrgApi extends OrganizationControllerApi {
   getOrganizationsWrapped(type?: "SQUADRON" | "GROUP" | "FLIGHT" | "WING" | "OTHER_USAF" | "ORGANIZATION",
@@ -155,7 +155,7 @@ describe('Test OrganizationService', () => {
     const organizationService = new OrganizationService(organizationState,
       mockApi, organizationChooserState, personChooserState, personApi);
 
-    let response = await organizationService.convertRowDataToEditableData({
+    const response = await organizationService.convertRowDataToEditableData({
       id: 'some id'
     });
     expect(response).toBeTruthy();

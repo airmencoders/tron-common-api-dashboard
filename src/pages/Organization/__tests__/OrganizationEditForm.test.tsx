@@ -1,14 +1,11 @@
-import { createState, State, StateMethodsDestroy, useState } from '@hookstate/core';
-import { fireEvent, render, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import React from 'react';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { OrganizationControllerApi, OrganizationControllerApiInterface, PersonControllerApi, PersonControllerApiInterface, RankControllerApi } from '../../../openapi';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../openapi/models';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import OrganizationService from '../../../state/organization/organization-service';
 import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails, useOrganizationState } from '../../../state/organization/organization-state';
-import PersonService from '../../../state/person/person-service';
-import { usePersonState } from '../../../state/person/person-state';
-import { RankStateModel } from '../../../state/person/rank-state-model';
 import OrganizationEditForm from '../OrganizationEditForm';
 
 jest.mock('../../../state/person/person-state');
@@ -562,13 +559,19 @@ it('should allow to remove a member', async () => {
   expect(personRow.parentElement).toBeInTheDocument();
   const personRowCheckbox = personRow.parentElement?.querySelector('.ag-checkbox-input');
   expect(personRowCheckbox).toBeInTheDocument();
+
   fireEvent.click(personRowCheckbox!);
   expect(personRowCheckbox).toBeChecked();
 
   const memberBtn = form.getByTestId('org-member-remove-selected__btn');
+  await waitFor(
+    () => expect(memberBtn).not.toBeDisabled()
+  )
   fireEvent.click(memberBtn);
 
-  waitForElementToBeRemoved(personRow);
+  await waitFor(
+    () => expect(form.getByText('Organization Members (0)')).toBeVisible()
+  )
 });
 
 it('should allow to add new sub org', async () => {
@@ -691,7 +694,12 @@ it('should allow to remove a sub org', async () => {
   expect(orgRowCheckbox).toBeChecked();
 
   const memberBtn = form.getByTestId('org-suborg-remove-selected__btn');
+  await waitFor(
+    () => expect(memberBtn).not.toBeDisabled()
+  );
   fireEvent.click(memberBtn);
 
-  waitForElementToBeRemoved(orgRow);
+  await waitFor(
+    () => expect(form.getByText('Organization Members (0)')).toBeVisible()
+  )
 });
