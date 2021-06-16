@@ -1,9 +1,12 @@
 // test if catch needs to be added to promise chain for fetchAndStore
-import OrganizationService, { OrgEditOpType } from '../organization-service';
-import {createState} from '@hookstate/core';
-import { FilterConditionOperatorEnum, FilterDto, Flight, Group, OrganizationControllerApi, OrganizationDto, OrganizationDtoPaginationResponseWrapper, OtherUsaf, Squadron, Wing } from '../../../openapi';
+import OrganizationService from '../organization-service';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
+import { FilterConditionOperatorEnum, FilterDto, Flight, Group, OrganizationControllerApi, OrganizationControllerApiInterface, OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper, OtherUsaf, PersonControllerApi, PersonControllerApiInterface, PersonDto, Squadron, Wing } from '../../../openapi';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { OrganizationDtoWithDetails } from '../organization-state';
+import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails } from '../organization-state';
+import { OrganizationEditState } from '../../../pages/Organization/OrganizationEditForm';
+import { ResponseType } from '../../data-service/response-type';
+import { PatchResponse } from '../../data-service/patch-response';
 
 class MockOrgApi extends OrganizationControllerApi {
   getOrganizationsWrapped(type?: "SQUADRON" | "GROUP" | "FLIGHT" | "WING" | "OTHER_USAF" | "ORGANIZATION",
@@ -115,132 +118,308 @@ class MockOrgApi extends OrganizationControllerApi {
     });
   }
 }
+let organizationApi: OrganizationControllerApiInterface;
+let personApi: PersonControllerApiInterface;
+let organizationState: State<OrganizationDto[]> & StateMethodsDestroy;
+let organizationChooserState: State<OrganizationDto[]> & StateMethodsDestroy;
+let personChooserState: State<PersonDto[]> & StateMethodsDestroy;
+
+beforeEach(() => {
+  organizationApi = new OrganizationControllerApi();
+  personApi = new PersonControllerApi();
+  organizationState = createState<OrganizationDto[]>([
+
+  ]);
+  organizationChooserState = createState<OrganizationDto[]>([]);
+  personChooserState = createState<PersonDto[]>([]);
+});
+
+afterEach(() => {
+  organizationState.destroy();
+  organizationChooserState.destroy();
+  personChooserState.destroy();
+})
 
 describe('Test OrganizationService', () => {
 
   it('get all organizations', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
     const response = await organizationService.fetchAndStoreData();
     expect(response).toHaveLength(1);
   });
 
-  it('get single organization', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-      createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+  it('get convertRowDataToEditableData (get org details)', async () => {
+    const mockApi = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      mockApi, organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.getOrgDetails('some id');
+    let response = await organizationService.convertRowDataToEditableData({
+      id: 'some id'
+    });
     expect(response).toBeTruthy();
+
+    // Test invalid id
+    await expect(organizationService.convertRowDataToEditableData({
+      name: 'some name'
+    })).rejects.toBeTruthy();
   });
 
   it('send Create', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendCreate({ id: 'some id'} as OrganizationDto);
+    const response = await organizationService.sendCreate({ id: 'some id' } as OrganizationDtoWithDetails);
     expect(response).toBeTruthy();
   });
 
   it('should not allow incorrectly formatted orgs to be sent', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
-    await expect(organizationService.sendCreate({ badParam: 'some id'} as OrganizationDto))
+    await expect(organizationService.sendCreate({ badParam: 'some id' } as OrganizationDtoWithDetails))
         .rejects
         .toThrowError();
   });
 
   it('send Update', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendUpdate({ id: 'some id'} as OrganizationDto);
+    const response = await organizationService.sendUpdate({
+      id: 'some id',
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf
+    } as OrganizationDtoWithDetails);
     expect(response).toBeTruthy();
+
+    // fail validation
+    await expect(organizationService.sendUpdate({
+      badParam: 'bad'
+    } as OrganizationDtoWithDetails)).rejects.toBeTruthy();
+
+    // fail due to no id
+    await expect(organizationService.sendUpdate({
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf
+    } as OrganizationDtoWithDetails)).rejects.toBeTruthy();
   });
 
-  it('sets Leader', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+  it('should remove unfriendly ag grid fields', () => {
+    const organizationService = new OrganizationService(organizationState,
+      organizationApi, organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendPatch(OrgEditOpType.LEADER_EDIT, 'some id', 'some id');
-    expect(response).toBeTruthy();
+    const org: OrganizationDto = {
+      id: 'some id',
+      name: 'some name',
+      members: [
+        '1',
+        '2'
+      ],
+      subordinateOrganizations: new Set([
+        '3',
+        '4'
+      ])
+    };
+
+    const removedFieldsOrg = organizationService.removeUnfriendlyAgGridDataSingle(org);
+    expect(removedFieldsOrg).toEqual({
+      ...org,
+      members: undefined,
+      subordinateOrganizations: undefined
+    });
   });
 
-  it('removes Leader', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+  it('should send patch -- success', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendPatch(OrgEditOpType.LEADER_REMOVE, 'some id');
-    expect(response).toBeTruthy();
+    const originalMembers: PersonWithDetails[] = [{ id: '1' }];
+    const originalSubOrgs: OrgWithDetails[] = [{ id: '111' }];
+
+    const original: OrganizationDtoWithDetails = {
+      id: 'some id',
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf,
+      members: originalMembers,
+      subordinateOrganizations: originalSubOrgs
+    };
+
+    const toUpdate: OrganizationDtoWithDetails = {
+      id: 'some id',
+      name: 'some new name',
+      orgType: OrganizationDtoOrgTypeEnum.Flight,
+      branchType: OrganizationDtoBranchTypeEnum.Ussf,
+    };
+
+    const toPatch: OrganizationEditState = {
+      leader: {
+        removed: false,
+        newLeader: {
+          id: 'new leader id'
+        }
+      },
+      parentOrg: {
+        removed: false,
+        newParent: {
+          id: 'new parent id'
+        }
+      },
+      members: {
+        toAdd: [{ id: 'new member 1' }],
+        toRemove: [{ id: originalMembers[0].id }]
+      },
+      subOrgs: {
+        toAdd: [{ id: 'new sub org 1' }
+        ],
+        toRemove: [{ id: originalSubOrgs[0].id }]
+      }
+    };
+
+    const response = await organizationService.sendPatch(original, toUpdate, toPatch);
+
+    expect(response.type).toEqual(ResponseType.SUCCESS);
   });
 
-  it('adds member', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+  it('should send patch -- fail', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendPatch(OrgEditOpType.MEMBERS_EDIT, 'some id', 'some id');
-    expect(response).toBeTruthy();
+    const original: OrganizationDtoWithDetails = {
+      id: 'some id',
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf,
+      leader: {
+        id: 'leader id'
+      },
+      parentOrganization: {
+        id: 'parent org id'
+      }
+    };
+
+    const toUpdate: OrganizationDtoWithDetails = {
+      id: 'some id',
+      name: 'some new name',
+      orgType: OrganizationDtoOrgTypeEnum.Flight,
+      branchType: OrganizationDtoBranchTypeEnum.Ussf,
+    };
+
+    const toPatch: OrganizationEditState = {
+      leader: {
+        removed: true,
+      },
+      parentOrg: {
+        removed: true
+      },
+      members: {
+        toAdd: [{ id: 'new member 1' }],
+        toRemove: []
+      },
+      subOrgs: {
+        toAdd: [{ id: 'new sub org 1' }
+        ],
+        toRemove: []
+      }
+    };
+
+    api.jsonPatchOrganization = jest.fn(() => {
+      return Promise.reject(new Error('patch error'));
+    });
+
+    api.removeSubordinateOrganization = jest.fn(() => {
+      return Promise.reject(new Error('remove sub org error'));
+    });
+
+    api.addSubordinateOrganization = jest.fn(() => {
+      return Promise.reject(new Error('add sub org error'));
+    });
+
+    api.deleteOrganizationMember = jest.fn(() => {
+      return Promise.reject(new Error('delete org mem error'));
+    });
+
+    api.addOrganizationMember = jest.fn(() => {
+      return Promise.reject(new Error('add org mem error'));
+    });
+
+    try {
+      await organizationService.sendPatch(original, toUpdate, toPatch);
+    } catch (err) {
+      const convertErr = err as PatchResponse<OrganizationDto>;
+      // this is expected
+      expect(convertErr.type).toEqual(ResponseType.FAIL);
+    }
   });
 
+  it('should send patch -- partial', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
 
-  it('removes member', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const originalMembers: PersonWithDetails[] = [{ id: '1' }];
+    const originalSubOrgs: OrgWithDetails[] = [{ id: '111' }];
 
-    const response = await organizationService.sendPatch(OrgEditOpType.MEMBERS_REMOVE, 'some id', ['some id']);
-    expect(response).toBeTruthy();
-  });
+    const original: OrganizationDtoWithDetails = {
+      id: 'some id',
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf,
+      members: originalMembers,
+      subordinateOrganizations: originalSubOrgs
+    };
 
-  it('adds subordinate org', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const toUpdate: OrganizationDtoWithDetails = {
+      ...original,
+      members: undefined,
+      subordinateOrganizations: undefined
+    };
 
-    const response = await organizationService.sendPatch(OrgEditOpType.SUB_ORGS_EDIT, 'some id', 'some id');
-    expect(response).toBeTruthy();
-  });
+    const toPatch: OrganizationEditState = {
+      leader: {
+        removed: false,
+        newLeader: {
+          id: 'new leader id'
+        }
+      },
+      parentOrg: {
+        removed: false,
+        newParent: {
+          id: 'new parent id'
+        }
+      },
+      members: {
+        toAdd: [],
+        toRemove: [{ id: originalMembers[0].id }]
+      },
+      subOrgs: {
+        toAdd: [],
+        toRemove: [{ id: originalSubOrgs[0].id }]
+      }
+    };
 
-  it('removes subordinate org', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    api.deleteOrganizationMember = jest.fn(() => {
+      return Promise.reject(new Error('delete org mem error'));
+    });
 
-    const response = await organizationService.sendPatch(OrgEditOpType.SUB_ORGS_REMOVE, 'some id', ['some id']);
-    expect(response).toBeTruthy();
-  });
+    api.removeSubordinateOrganization = jest.fn(() => {
+      return Promise.reject(new Error('remove sub org error'));
+    });
 
-  it('adds parent org', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const response = await organizationService.sendPatch(original, toUpdate, toPatch);
 
-    const response = await organizationService.sendPatch(OrgEditOpType.PARENT_ORG_EDIT, 'some id', 'some id');
-    expect(response).toBeTruthy();
-  });
-
-  it('removes parent org', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
-
-    const response = await organizationService.sendPatch(OrgEditOpType.PARENT_ORG_REMOVE, 'some id', ['some id']);
-    expect(response).toBeTruthy();
+    expect(response.type).toEqual(ResponseType.PARTIAL);
   });
 
   it('deletes an org', async () => {
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-        createState<OrganizationDtoWithDetails>({}),
-        new MockOrgApi());
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
     const response = await organizationService.sendDelete({ id: 'some id', name: 'some org' });
     expect(response).toBe(undefined);
@@ -248,9 +427,8 @@ describe('Test OrganizationService', () => {
 
   it('test fetchAndStorePaginatedData', async () => {
     const api = new MockOrgApi();
-    const organizationService = new OrganizationService(createState<OrganizationDto[]>([]),
-      createState<OrganizationDtoWithDetails>({}),
-      api);
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
 
     const filterOrganizationsSpy = jest.spyOn(api, 'filterOrganizations');
     const getOrganizationsWrappedSpy = jest.spyOn(api, 'getOrganizationsWrapped');
@@ -286,4 +464,166 @@ describe('Test OrganizationService', () => {
     await expect(organizationService.fetchAndStorePaginatedData(0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
     expect(filterOrganizationsSpy).toHaveBeenCalledTimes(2);
   });
+
+  it('test fetchAndStoreChooserPaginatedData -- person', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+
+    const filterPersonSpy = jest.spyOn(personApi, 'filterPerson');
+    const getPersonWrappedSpy = jest.spyOn(personApi, 'getPersonsWrapped');
+
+    const filterDto: FilterDto = {
+      "filterCriteria": [
+        {
+          "field": "firstName",
+          "conditions": [
+            {
+              "operator": FilterConditionOperatorEnum.Like,
+              "value": "d"
+            }
+          ]
+        }
+      ]
+    };
+
+    const person: PersonDto = {
+      id: 'person id',
+      firstName: 'first name',
+      lastName: 'last name',
+      email: 'email'
+    };
+
+    const mockResponse = {
+      data: {
+        data: [
+          person
+        ],
+        pagination: {
+
+        }
+      },
+      status: 200,
+      statusText: 'OK',
+      config: {},
+      headers: {}
+    };
+
+    filterPersonSpy.mockResolvedValue(Promise.resolve(mockResponse));
+    getPersonWrappedSpy.mockResolvedValue(Promise.resolve(mockResponse));
+
+    const agGridSort = ['email,asc'];
+
+    expect.assertions(4);
+
+    // Make sure it calls filter endpoint
+    let response = await organizationService.fetchAndStoreChooserPaginatedData('person', 0, 20, false, filterDto, agGridSort);
+    expect(filterPersonSpy).toHaveBeenCalledTimes(1);
+
+    // No filter, calls get all endpoint
+    response = await organizationService.fetchAndStoreChooserPaginatedData('person', 0, 20, false, undefined, agGridSort);
+    expect(getPersonWrappedSpy).toHaveBeenCalledTimes(1);
+
+    // Mock an exception
+    filterPersonSpy.mockImplementation(() => { return Promise.reject(new Error('Test error')) });
+    await expect(organizationService.fetchAndStoreChooserPaginatedData('person', 0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
+    expect(filterPersonSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('test fetchAndStoreChooserPaginatedData -- organization', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+
+    const filterOrganizationsSpy = jest.spyOn(api, 'filterOrganizations');
+    const getOrganizationsWrappedSpy = jest.spyOn(api, 'getOrganizationsWrapped');
+
+    const filterDto: FilterDto = {
+      "filterCriteria": [
+        {
+          "field": "firstName",
+          "conditions": [
+            {
+              "operator": FilterConditionOperatorEnum.Like,
+              "value": "d"
+            }
+          ]
+        }
+      ]
+    };
+
+    const org: OrganizationDto = {
+      id: 'org id',
+      name: 'org name'
+    };
+
+    const mockResponse = {
+      data: {
+        data: [
+          org
+        ],
+        pagination: {
+
+        }
+      },
+      status: 200,
+      statusText: 'OK',
+      config: {},
+      headers: {}
+    };
+
+    filterOrganizationsSpy.mockResolvedValue(Promise.resolve(mockResponse));
+    getOrganizationsWrappedSpy.mockResolvedValue(Promise.resolve(mockResponse));
+
+    const agGridSort = ['email,asc'];
+
+    expect.assertions(4);
+
+    // Make sure it calls filter endpoint
+    let response = await organizationService.fetchAndStoreChooserPaginatedData('organization', 0, 20, false, filterDto, agGridSort);
+    expect(filterOrganizationsSpy).toHaveBeenCalledTimes(1);
+
+    // No filter, calls get all endpoint
+    response = await organizationService.fetchAndStoreChooserPaginatedData('organization', 0, 20, false, undefined, agGridSort);
+    expect(getOrganizationsWrappedSpy).toHaveBeenCalledTimes(1);
+
+    // Mock an exception
+    filterOrganizationsSpy.mockImplementation(() => { return Promise.reject(new Error('Test error')) });
+    await expect(organizationService.fetchAndStoreChooserPaginatedData('organization', 0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
+    expect(filterOrganizationsSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('should convert Org Details Dto to Org Dto', () => {
+    const organizationService = new OrganizationService(organizationState,
+      organizationApi, organizationChooserState, personChooserState, personApi);
+
+    const orgDetails: OrganizationDtoWithDetails = {
+      id: 'org id',
+      name: 'org name',
+      leader: {
+        id: 'leader id'
+      },
+      members: [{ id: 'member id' }],
+      subordinateOrganizations: [{ id: 'sub org id' }],
+      parentOrganization: { id: 'parent org id' },
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf
+    };
+
+    const orgDto: OrganizationDto = {
+      id: orgDetails.id,
+      name: orgDetails.name,
+      leader: orgDetails.leader?.id,
+      members: [orgDetails.members![0].id!],
+      subordinateOrganizations: new Set([orgDetails.subordinateOrganizations![0].id!]),
+      parentOrganization: orgDetails.parentOrganization?.id,
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf
+    };
+
+    expect(organizationService.convertOrgDetailsToDto(orgDetails)).toEqual(orgDto);
+  });
+
 });

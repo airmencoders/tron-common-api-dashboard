@@ -26,6 +26,9 @@ import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../
 import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
 import { GridFilter } from '../Grid/grid-filter';
 import InfiniteScrollGrid from '../Grid/InfiniteScrollGrid/InfiniteScrollGrid';
+import { ResponseType } from '../../state/data-service/response-type';
+import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
+import { PatchResponse } from '../../state/data-service/patch-response';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -222,6 +225,33 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     return createTextToast(ToastType.SUCCESS, message);
   }
 
+  /**
+   * Creates toast notifying of partial update.
+   * Creates additional error toasts for each error.
+   * 
+   * @param message The message for the toast that is always created
+   * @param errors The error messages for any additional toasts to be created
+   * @returns list of toast ids
+   */
+  function onActionPartialSuccess(message: string, errors?: string[]): ReactText[] {
+    setUpdateInfiniteCache(true);
+
+    const ids: ReactText[] = [];
+    ids.push(createTextToast(ToastType.WARNING, message));
+
+    if (errors != null) {
+      errors.forEach(item => {
+        ids.push(createTextToast(ToastType.ERROR, item));
+      });
+    }
+
+    pageState.merge({
+      isSubmitting: false
+    })
+
+    return ids;
+  }
+
   function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
     let formErrors: DataCrudFormErrors = {
       general: error.message ?? 'Unknown error occurred'
@@ -301,25 +331,46 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   }
 
   async function updatePatch(...args: any) {
-
     // make sure service implements this optional method...
     if (!dataState.sendPatch) return;
 
     pageState.merge({
-      isSubmitting: false
+      isSubmitting: true
     });
-    try {
-      await dataState.sendPatch(...args);
 
-      onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
-    }
-    catch (error) {
-      pageState.set(prevState => {
-        return {
-          ... prevState,
-          formErrors: convertErrorToDataCrudFormError(error),
-          isSubmitting: false
+    try {
+      const response = await dataState.sendPatch(...args);
+
+      switch (response.type) {
+        case ResponseType.SUCCESS: {
+          onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
+          break;
         }
+
+        case ResponseType.PARTIAL: {
+          const errors = response.errors;
+          onActionPartialSuccess(`Partial updated on ${props.dataTypeName} successful.`, errors?.map<string>(error => {
+            const preparedMessage = prepareDataCrudErrorResponse(error);
+
+            return preparedMessage.general ?? error.message;
+          }));
+          break;
+        }
+
+        default:
+          break;
+      }
+    } catch (error) {
+      const response = error as PatchResponse<T>;
+      response.errors?.forEach(err => {
+        createTextToast(ToastType.ERROR, err.message);
+      });
+
+      pageState.merge({
+        formErrors: {
+          general: `Failed to update ${props.dataTypeName}`
+        },
+        isSubmitting: false
       });
     }
   }

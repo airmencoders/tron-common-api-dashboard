@@ -1,11 +1,11 @@
-import { createState, useState } from '@hookstate/core';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { createState, State, StateMethodsDestroy, useState } from '@hookstate/core';
+import { fireEvent, render, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import React from 'react';
-import { OrganizationControllerApi, PersonControllerApi, RankControllerApi } from '../../../openapi';
+import { OrganizationControllerApi, OrganizationControllerApiInterface, PersonControllerApi, PersonControllerApiInterface, RankControllerApi } from '../../../openapi';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../openapi/models';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
-import OrganizationService, { OrgEditOpType } from '../../../state/organization/organization-service';
-import { OrganizationDtoWithDetails, useOrganizationState } from '../../../state/organization/organization-state';
+import OrganizationService from '../../../state/organization/organization-service';
+import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails, useOrganizationState } from '../../../state/organization/organization-state';
 import PersonService from '../../../state/person/person-service';
 import { usePersonState } from '../../../state/person/person-state';
 import { RankStateModel } from '../../../state/person/rank-state-model';
@@ -14,56 +14,68 @@ import OrganizationEditForm from '../OrganizationEditForm';
 jest.mock('../../../state/person/person-state');
 jest.mock('../../../state/organization/organization-state');
 
-class MockPersonService extends PersonService { }
-class MockOrganizationService extends OrganizationService { }
-
 // represents an organization returned from a GET to
 //   .../organization/:id?people="id,firstName,lastName",organizations="id,name"
 let originalLeader = { id: 'some id', firstName: 'Frank', lastName: 'Summers' };
-const existingOrg = {
-    id: '13c23dd4-e0d5-4d05-8237-8b88f582b114',
-    members: [ { id: 'some id', firstName: 'jon', lastName: 'public' }],
-    parentOrganization: { id: 'some id', name: 'Parent' },
-    subordinateOrganizations: [ { id: 'some id', name: 'some org'}],
-    leader: originalLeader,
-    branchType: 'USAF',
-    orgType: 'SQUADRON'
+const existingOrg: OrganizationDto = {
+  id: '13c23dd4-e0d5-4d05-8237-8b88f582b114',
+  name: 'existing',
+  members: ['an id'],
+  parentOrganization: 'parent org',
+  subordinateOrganizations: new Set(['sub org']),
+  leader: originalLeader.id,
+  branchType: OrganizationDtoBranchTypeEnum.Usaf,
+  orgType: OrganizationDtoOrgTypeEnum.Squadron
 };
 
 let mockUseOrganizationState : any = undefined;
-let mockUsePersonState : any = undefined;
+
+let organizationApi: OrganizationControllerApiInterface;
+let personApi: PersonControllerApiInterface;
+let organizationState: State<OrganizationDto[]> & StateMethodsDestroy;
+let organizationChooserState: State<OrganizationDto[]> & StateMethodsDestroy;
+let personChooserState: State<PersonDto[]> & StateMethodsDestroy;
+
+let onPatch = jest.fn();
+let onClose = jest.fn();
 
 beforeEach(() => {
+  jest.resetAllMocks();
+
   jest.useFakeTimers();
-  mockUsePersonState =  (usePersonState as jest.Mock).mockImplementation(() => new MockPersonService(
-    useState(createState<PersonDto[]>([
-      {id: 'some id', firstName: 'Joey', lastName: 'JoJo', email: 'jj@gmail.com'},
-      {id: 'some id', firstName: 'Homer', lastName: 'Simpson', email: 'hs@gmail.com'}
-    ])),
-    new PersonControllerApi(),
-    useState(createState<RankStateModel>({})),
-    new RankControllerApi()
-  ));
+  onPatch = jest.fn().mockImplementation(() => {
 
-  mockUseOrganizationState =  (useOrganizationState as jest.Mock).mockImplementation(() => new MockOrganizationService(
-    useState(createState<OrganizationDto[]>([testValidOrganization, { id: '1', name: 'some2'}])),
-    useState(createState<OrganizationDtoWithDetails>(existingOrg as OrganizationDtoWithDetails)),
-    new OrganizationControllerApi()
-  ));
+  });
 
-})
+  onClose = jest.fn().mockImplementation(() => {
+
+  });
+
+  organizationApi = new OrganizationControllerApi();
+  personApi = new PersonControllerApi();
+  organizationState = createState<OrganizationDto[]>([
+
+  ]);
+  organizationChooserState = createState<OrganizationDto[]>([]);
+  personChooserState = createState<PersonDto[]>([]);
+
+  mockUseOrganizationState = new OrganizationService(organizationState, organizationApi, organizationChooserState, personChooserState, personApi);
+
+  (useOrganizationState as jest.Mock).mockReturnValue(mockUseOrganizationState);
+});
+
 afterEach(() => {
   jest.runOnlyPendingTimers();
   jest.useRealTimers();
 
+  organizationState.destroy();
+  organizationChooserState.destroy();
+  personChooserState.destroy();
 
-  mockUsePersonState.mockRestore();
-  mockUseOrganizationState.mockRestore();
-  existingOrg.leader = originalLeader;
+  existingOrg.leader = originalLeader.id;
 });
 
-const testOrganization: OrganizationDto = {
-};
+const testOrganization: OrganizationDtoWithDetails = {};
 
 const membersSet = new Set<string>();
 membersSet.add('some id');
@@ -71,16 +83,20 @@ membersSet.add('some id');
 const subOrgsSet = new Set<string>();
 subOrgsSet.add('some id');
 
-const testValidOrganization: OrganizationDto = {
+const testValidOrganization: OrganizationDtoWithDetails = {
   id: 'some id',
   name: 'TestOrg',
-  leader: 'some leader id',
+  leader: {
+    id: "some leader id",
+    firstName: "firstName",
+    lastName: "lastName"
+  },
+  parentOrganization: undefined,
   members: undefined,
   subordinateOrganizations: undefined,
   branchType: OrganizationDtoBranchTypeEnum.Usaf,
   orgType: OrganizationDtoOrgTypeEnum.Squadron,
 };
-
 
 it('should render', async () => {
 
@@ -195,91 +211,105 @@ it('should set formState for orgType', async () => {
   );
 });
 
-it('should allow to chose parent', async () => { 
-  
-
-  let opHappened = false;
+it('should allow to choose parent', async () => {
   const form = render(
     <OrganizationEditForm
-        data={testValidOrganization}
-        formErrors={{}}
-        onSubmit={() => {}}
-        onPatch={(...args : any)=> {
-          if (args[0] === OrgEditOpType.PARENT_ORG_EDIT) {
-            opHappened = true;
-          }
-        }}
-        onClose={() => {}}
-        isSubmitting={false}
-        formActionType={FormActionType.UPDATE}
+      data={testValidOrganization}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
     />
   );
 
-  await waitFor(
-      () => {
-        expect(form
-          .getByDisplayValue(`${existingOrg.parentOrganization.name}`))
-          .toBeInTheDocument();        
-      }
-  );
+  jest.spyOn(organizationApi, 'filterOrganizations').mockImplementation(() => {
+    return Promise.resolve({
+      data: {
+        data: [
+          existingOrg
+        ],
+        pagination: {
 
-  const parentBtn = await form.getByTestId('change-org-parent__btn');
+        }
+      },
+      status: 200,
+      headers: {},
+      config: {},
+      statusText: 'OK'
+    });
+  });
+
+  const parentBtn = form.getByTestId('change-org-parent__btn');
   fireEvent.click(parentBtn);
 
   await waitFor(
-      () => {
-          expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
-      }
-  );
-
-  const orgRow = await form.getByText('some2');
-  fireEvent.click(orgRow);
-
-  // wait for the state change to be detected --- which we do via watching
-  //  hidden element 'hidden-selected-item'
-  await waitFor(
-    () => expect(form.getByDisplayValue('some2')).toBeInTheDocument()   
-  );
-
-  // ack the dialog selection to set the parent
-  const okBtn = await form.getByTestId('chooser-ok__btn');
-  fireEvent.click(okBtn);
-
-  await waitFor(
     () => {
-      expect(form
-        .getByDisplayValue('TestOrg'))
-        .toBeInTheDocument();
-
-        expect(opHappened).toBeTruthy();
+      expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
     }
   );
 
+  // Find checkbox
+  const orgRow = await form.findByText(new RegExp(existingOrg.name!, 'i'));
+  expect(orgRow.parentElement).toBeInTheDocument();
+  const orgRowCheckbox = orgRow.parentElement?.querySelector('.ag-checkbox-input');
+  expect(orgRowCheckbox).toBeInTheDocument();
+
+  // Check it
+  fireEvent.click(orgRowCheckbox!);
+  expect(orgRowCheckbox).toBeChecked();
+
+  // ack the dialog selection to set the parent
+  const okBtn = form.getByTestId('chooser-ok__btn');
+  await waitFor(
+    () => {
+      expect(okBtn).not.toBeDisabled();
+    }
+  );
+  expect(okBtn).not.toBeDisabled();
+  fireEvent.click(okBtn);
+
+  expect(form.getByDisplayValue(existingOrg.name!)).toBeInTheDocument();
+
+  const updateBtn = form.getByText('Update');
+  expect(updateBtn).toBeInTheDocument();
+  await waitFor(
+    () => {
+      expect(updateBtn).not.toBeDisabled();
+    }
+  );
+  fireEvent.click(updateBtn);
+  expect(onPatch).toHaveBeenCalledTimes(1);
 });
 
 
 it('should allow to remove parent', async () => {  
-  let opHappened = false;
+  const orgWithParent: OrganizationDtoWithDetails = {
+    ...testValidOrganization,
+    parentOrganization: {
+      id: 'parent org id',
+      name: 'parent org name'
+    }
+  };
+
   const form = render(
-      <OrganizationEditForm
-          data={testValidOrganization}
-          formErrors={{}}
-          onSubmit={() => {}}
-          onPatch={(...args:any) => {
-            if (args[0] === OrgEditOpType.PARENT_ORG_REMOVE) opHappened = true;
-          }}
-          onClose={() => {}}
-          isSubmitting={false}
-          formActionType={FormActionType.UPDATE}
-      />
+    <OrganizationEditForm
+      data={orgWithParent}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
+    />
   );
+
   await waitFor(
-      () => expect(form
-          .getByDisplayValue(`${existingOrg.parentOrganization.name}`))
-          .toBeInTheDocument()
+    () => expect(form.getByDisplayValue(`${orgWithParent.parentOrganization!.name}`)).toBeInTheDocument()
   )
 
-  const parentBtn = await form.getByTestId('remove-org-parent__btn');
+  const parentBtn = form.getByTestId('remove-org-parent__btn');
   fireEvent.click(parentBtn);
 
   await waitFor(
@@ -289,41 +319,53 @@ it('should allow to remove parent', async () => {
   const okBtn = form.getByTestId('remove-confirm-ok__btn');
   fireEvent.click(okBtn);
 
-  await waitFor(
-    () => expect(opHappened).toBeTruthy()
-  );
-
+  await expect(form.findByDisplayValue(orgWithParent.parentOrganization!.name!)).rejects.toThrow();
 });
 
+it('should allow to choose leader', async () => {
+  const testPerson: PersonDto = {
+    id: 'test person id',
+    email: 'test person email',
+    firstName: 'first name',
+    lastName: 'last name'
+  };
 
-it('should allow to chose leader', async () => {
-  
-  let opHappened = false
+  jest.spyOn(personApi, 'getPersonsWrapped').mockImplementation(() => {
+    return Promise.resolve({
+      data: {
+        data: [
+          testPerson
+        ],
+        pagination: {
+
+        }
+      },
+      status: 200,
+      headers: {},
+      config: {},
+      statusText: 'OK'
+    });
+  });
+
   const form = render(
     <OrganizationEditForm
-        data={testOrganization}
-        formErrors={{}}
-        onSubmit={() => {}}
-        onPatch={(...args : any) => {
-          if (args[0] === OrgEditOpType.LEADER_EDIT) {
-            existingOrg.leader.firstName = 'Joey';
-            existingOrg.leader.lastName = 'JoJo';
-            opHappened = true;
-          }
-        }}
-        onClose={() => {}}
-        isSubmitting={false}
-        formActionType={FormActionType.UPDATE}
+      data={testValidOrganization}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
     />
   );
 
   await waitFor(
     () => expect(form
-        .getByDisplayValue(`${existingOrg.leader.firstName} ${existingOrg.leader.lastName}`))
+      .getByDisplayValue(`${testValidOrganization.leader?.firstName} ${testValidOrganization.leader?.lastName}`))
         .toBeInTheDocument()
   );
 
-  const leaderBtn = await form.getByTestId('change-org-leader__btn');
+  const leaderBtn = form.getByTestId('change-org-leader__btn');
   fireEvent.click(leaderBtn);
 
   await waitFor(
@@ -333,7 +375,7 @@ it('should allow to chose leader', async () => {
   );
 
   // close dialog
-  const closeCloseBtn = await form.getByTestId('chooser-cancel__btn');
+  const closeCloseBtn = form.getByTestId('chooser-cancel__btn');
   fireEvent.click(closeCloseBtn); 
 
   fireEvent.click(leaderBtn);
@@ -344,59 +386,49 @@ it('should allow to chose leader', async () => {
       expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
   });
 
-  const personRow = await form.getByText('Joey');
-  fireEvent.click(personRow);
+  // find checkbox
+  const personRow = await form.findByText(testPerson.firstName!);
+  expect(personRow.parentElement).toBeInTheDocument();
+  const personRowCheckbox = personRow.parentElement?.querySelector('.ag-checkbox-input');
+  expect(personRowCheckbox).toBeInTheDocument();
 
-  // wait for the state change to be detected --- which we do via watching
-  //  hidden element 'hidden-selected-item'
+  // Check it
+  fireEvent.click(personRowCheckbox!);
+  expect(personRowCheckbox).toBeChecked();
+
+  const okBtn = form.getByTestId('chooser-ok__btn');
+
   await waitFor(
-    () => expect(form.getByTestId('chosen-person-row')).toHaveValue('Joey')   
+    () => expect(okBtn).not.toBeDisabled()
   );
 
   // ack the dialog selection to set the leader
-  const okBtn = await form.getByTestId('chooser-ok__btn');
   fireEvent.click(okBtn);
 
-  await waitFor(
-    () => {
-        expect(form
-          .getByDisplayValue('Joey JoJo'))
-          .toBeInTheDocument();
-
-        expect(opHappened).toBeTruthy();
-      }
-  );
-
+  expect(form.getByDisplayValue(`${testPerson.firstName} ${testPerson.lastName}`)).toBeInTheDocument();
 });
 
 
 it('should allow to remove leader', async () => {
-
-  let opHappenend = false;
   const form = render(
-      <OrganizationEditForm
-          data={testOrganization}
-          formErrors={{}}
-          onSubmit={() => {}}
-          onPatch={(...args:any) => {
-            if (args[0] === OrgEditOpType.LEADER_REMOVE) {
-              existingOrg.leader = {id: '', firstName: '', lastName: ''};
-              opHappenend = true;
-            }
-          }}
-          onClose={() => {}}
-          isSubmitting={false}
-          formActionType={FormActionType.UPDATE}
-      />
+    <OrganizationEditForm
+      data={testValidOrganization}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
+    />
   );
 
   await waitFor(
       () => expect(form
-          .getByDisplayValue(`${existingOrg.leader.firstName} ${existingOrg.leader.lastName}`))
+        .getByDisplayValue(`${testValidOrganization.leader!.firstName} ${testValidOrganization.leader!.lastName}`))
           .toBeInTheDocument()
   )
 
-  const leaderBtn = await form.getByTestId('remove-org-leader__btn');
+  const leaderBtn = form.getByTestId('remove-org-leader__btn');
   fireEvent.click(leaderBtn);
 
   await waitFor(
@@ -413,40 +445,57 @@ it('should allow to remove leader', async () => {
   );
   fireEvent.click(form.getByTestId('remove-confirm-ok__btn'));
 
-  await waitFor(
-    () => expect(opHappenend).toBeTruthy()
-  );
-
+  await expect(form.findByDisplayValue(testValidOrganization.leader!.firstName!)).rejects.toThrow();
 });
 
 it('should allow to add new member', async () => {
-  let opHappened = false;
+  const testPerson: PersonDto = {
+    id: 'test person id',
+    email: 'test person email',
+    firstName: 'first name',
+    lastName: 'last name'
+  };
+
+  jest.spyOn(personApi, 'getPersonsWrapped').mockImplementation(() => {
+    return Promise.resolve({
+      data: {
+        data: [
+          testPerson
+        ],
+        pagination: {
+
+        }
+      },
+      status: 200,
+      headers: {},
+      config: {},
+      statusText: 'OK'
+    });
+  });
+
   const form = render(
     <OrganizationEditForm
-        data={testValidOrganization}
-        formErrors={{}}
-        onSubmit={() => {}}
-        onPatch={(...args : any) => {
-            if (args[0] === OrgEditOpType.MEMBERS_EDIT) opHappened = true;
-          }
-        }
-        onClose={() => {}}
-        isSubmitting={false}
-        formActionType={FormActionType.UPDATE}
+      data={testValidOrganization}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
     />
   );
 
   await waitFor(
       () => expect(form
-          .getByDisplayValue(`${existingOrg.leader.firstName} ${existingOrg.leader.lastName}`))
+        .getByDisplayValue(`${testValidOrganization.leader!.firstName} ${testValidOrganization.leader!.lastName}`))
           .toBeInTheDocument()
   )
 
   await waitFor(
-      () => expect(form.getByText('Organization Members (1)')).toBeVisible()
+    () => expect(form.getByText('Organization Members (0)')).toBeVisible()
   )
   
-  const memberBtn = await form.getByTestId('org-add-member__btn');
+  const memberBtn = form.getByTestId('org-add-member__btn');
   fireEvent.click(memberBtn);
 
   await waitFor(
@@ -455,88 +504,114 @@ it('should allow to add new member', async () => {
       }
   );
 
-  const personRow = await form.getByText('Homer');
-  fireEvent.click(personRow);
+  const personRow = await form.findByText(testPerson.firstName!);
+  expect(personRow.parentElement).toBeInTheDocument();
+  const personRowCheckbox = personRow.parentElement?.querySelector('.ag-checkbox-input');
+  expect(personRowCheckbox).toBeInTheDocument();
+  fireEvent.click(personRowCheckbox!);
+  expect(personRowCheckbox).toBeChecked();
 
-  // wait for the state change to be detected --- which we do via watching
-  //  hidden element 'hidden-selected-item'
+  const okBtn = form.getByTestId('chooser-ok__btn');
   await waitFor(
-    () => expect(form.getByTestId('chosen-person-row')).toHaveValue('Homer')   
+    () => expect(okBtn).not.toBeDisabled()
   );
-
-  // ack the dialog selection to set the leader
-  const okBtn = await form.getByTestId('chooser-ok__btn');
   fireEvent.click(okBtn);
 
-  await waitFor( 
-    () => expect(opHappened).toBeTruthy()
-  );
-
+  await expect(form.findByText(testPerson.firstName!)).resolves.toBeInTheDocument();
 });
 
 it('should allow to remove a member', async () => {
-  let opHappened = false;
+  const testPerson: PersonWithDetails = {
+    id: 'test person id',
+    firstName: 'first name',
+    lastName: 'last name'
+  };
+
+  const validOrg: OrganizationDtoWithDetails = {
+    ...testValidOrganization,
+    members: [
+      testPerson
+    ]
+  };
+
   const form = render(
     <OrganizationEditForm
-        data={testOrganization}
-        formErrors={{}}
-        onSubmit={() => {}}
-        onPatch={(...args : any) => { opHappened = true}}
-        onClose={() => {}}
-        isSubmitting={false}
-        formActionType={FormActionType.UPDATE}
+      data={validOrg}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
     />
   );
 
   await waitFor(
     () => expect(form
-        .getByDisplayValue(`${existingOrg.leader.firstName} ${existingOrg.leader.lastName}`))
-        .toBeInTheDocument()
+      .getByDisplayValue(`${validOrg.leader!.firstName} ${validOrg.leader!.lastName}`))
+      .toBeInTheDocument()
   )
 
   await waitFor(
     () => expect(form.getByText('Organization Members (1)')).toBeVisible()
   )
 
-  const selectAllMembersBtn = form.getByTestId('org-member-select-all__btn');
-  fireEvent.click(selectAllMembersBtn);
+  await expect(form.findByText(testPerson.lastName!)).resolves.toBeInTheDocument();
+
+  const personRow = await form.findByText(testPerson.lastName!);
+  expect(personRow.parentElement).toBeInTheDocument();
+  const personRowCheckbox = personRow.parentElement?.querySelector('.ag-checkbox-input');
+  expect(personRowCheckbox).toBeInTheDocument();
+  fireEvent.click(personRowCheckbox!);
+  expect(personRowCheckbox).toBeChecked();
 
   const memberBtn = form.getByTestId('org-member-remove-selected__btn');
   fireEvent.click(memberBtn);
 
-  await waitFor(
-    () => expect(opHappened).toBeFalsy()
-  )
+  waitForElementToBeRemoved(personRow);
 });
 
 it('should allow to add new sub org', async () => {
-  let opHappened = false;
+  jest.spyOn(organizationApi, 'filterOrganizations').mockImplementation(() => {
+    return Promise.resolve({
+      data: {
+        data: [
+          existingOrg
+        ],
+        pagination: {
+
+        }
+      },
+      status: 200,
+      headers: {},
+      config: {},
+      statusText: 'OK'
+    });
+  });
+
   const form = render(
     <OrganizationEditForm
-        data={testValidOrganization}
-        formErrors={{}}
-        onSubmit={() => {}}
-        onPatch={(...args : any) => {
-          if (args[0] === OrgEditOpType.SUB_ORGS_EDIT) opHappened = true;
-        }
-        }
-        onClose={() => {}}
-        isSubmitting={false}
-        formActionType={FormActionType.UPDATE}
+      data={testValidOrganization}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
     />
   );
 
   await waitFor(
       () => expect(form
-          .getByDisplayValue(`${existingOrg.leader.firstName} ${existingOrg.leader.lastName}`))
+        .getByDisplayValue(`${testValidOrganization.leader!.firstName} ${testValidOrganization.leader!.lastName}`))
           .toBeInTheDocument()
   )
 
   await waitFor(
-      () => expect(form.getByText('Subordinate Organizations (1)')).toBeVisible()
+    () => expect(form.getByText('Subordinate Organizations (0)')).toBeVisible()
   )
 
-  const subBtn = await form.getByTestId('org-add-suborg__btn');
+  const subBtn = form.getByTestId('org-add-suborg__btn');
   fireEvent.click(subBtn);
 
   await waitFor(
@@ -544,59 +619,79 @@ it('should allow to add new sub org', async () => {
           expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
       }
   );
-  const personRow = await form.getByText('some2');
-  fireEvent.click(personRow);
 
-  // wait for the state change to be detected --- which we do via watching
-  //  hidden element 'hidden-selected-item'
+  const orgRow = await form.findByText(existingOrg.id!);
+  expect(orgRow.parentElement).toBeInTheDocument();
+  const orgRowCheckbox = orgRow.parentElement?.querySelector('.ag-checkbox-input');
+  expect(orgRowCheckbox).toBeInTheDocument();
+  fireEvent.click(orgRowCheckbox!);
+  expect(orgRowCheckbox).toBeChecked();
+
+  const okBtn = form.getByTestId('chooser-ok__btn');
   await waitFor(
-    () => expect(form.getByDisplayValue('some2')).toBeInTheDocument()   
+    () => expect(okBtn).not.toBeDisabled()
   );
-
-  // ack the dialog selection to set the leader
-  const okBtn = await form.getByTestId('chooser-ok__btn');
   fireEvent.click(okBtn);
 
-  await waitFor( 
-    () => expect(opHappened).toBeTruthy()
-  );
-
+  await expect(form.findByText(existingOrg.name!)).resolves.toBeInTheDocument();
 });
 
 it('should allow to remove a sub org', async () => {
-  let counter = 0
+  const subOrg: OrgWithDetails = {
+    id: 'sub org id',
+    name: 'sub org name'
+  };
+
+  const testOrg: OrganizationDtoWithDetails = {
+    ...testValidOrganization,
+    subordinateOrganizations: [
+      subOrg
+    ]
+  };
   const form = render(
     <OrganizationEditForm
-        data={testValidOrganization}
-        formErrors={{}}
-        onSubmit={() => {}}
-        onPatch={(...args:any) => { counter++; }}
-        onClose={() => {}}
-        isSubmitting={false}
-        formActionType={FormActionType.UPDATE}
+      data={testOrg}
+      formErrors={{}}
+      onSubmit={() => { }}
+      onPatch={onPatch}
+      onClose={() => { }}
+      isSubmitting={false}
+      formActionType={FormActionType.UPDATE}
     />
   );
 
   await waitFor(
     () => expect(form
-        .getByDisplayValue(`${existingOrg.leader.firstName} ${existingOrg.leader.lastName}`))
-        .toBeInTheDocument()
+      .getByDisplayValue(`${testOrg.leader!.firstName} ${testOrg.leader!.lastName}`))
+      .toBeInTheDocument()
   )
 
   await waitFor(
     () => expect(form.getByText('Subordinate Organizations (1)')).toBeVisible()
   );
 
-  const selectAllMembersBtn = await form.getByTestId('org-suborg-select-all__btn');
-  fireEvent.click(selectAllMembersBtn);
+  await expect(form.findByText(subOrg.name!)).resolves.toBeInTheDocument();
 
-  const memberBtn = await form.getByTestId('org-suborg-remove-selected__btn');
+  // Find the checkbox
+  const orgRow = await form.findByText(subOrg.name!);
+  expect(orgRow.parentElement).toBeInTheDocument();
+  const orgRowCheckbox = orgRow.parentElement?.querySelector('.ag-checkbox-input');
+  expect(orgRowCheckbox).toBeInTheDocument();
+
+  // Try to check it
+  fireEvent.click(orgRowCheckbox!);
+  expect(orgRowCheckbox).toBeChecked();
+
+  // uncheck it
+  fireEvent.click(orgRowCheckbox!);
+  expect(orgRowCheckbox).not.toBeChecked();
+
+  // Check it
+  fireEvent.click(orgRowCheckbox!);
+  expect(orgRowCheckbox).toBeChecked();
+
+  const memberBtn = form.getByTestId('org-suborg-remove-selected__btn');
   fireEvent.click(memberBtn);
 
-  await waitFor(
-    () => expect(counter).toEqual(0)
- );
-
-
-
+  waitForElementToBeRemoved(orgRow);
 });

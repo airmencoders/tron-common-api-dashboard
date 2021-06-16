@@ -7,7 +7,7 @@ import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
 import isEqual from 'fast-deep-equal';
-import { createJsonPatchOp, mergeDataToState } from '../data-service/data-service-utils';
+import { createJsonPatchOp, getDataItemDuplicates, getDataItemNonDuplicates, mapDataItemsToStringIds, mergeDataToState } from '../data-service/data-service-utils';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -16,7 +16,10 @@ import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterC
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { OrganizationEditState } from '../../pages/Organization/OrganizationEditForm';
+import { PatchResponse } from '../data-service/patch-response';
+import { OrganizationPatchRequestType } from './organization-patch-request-type';
+import { ResponseType } from '../data-service/response-type';
+import { OrganizationEditState } from '../../pages/Organization/organization-edit-state';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -39,10 +42,10 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
   constructor(
       public state: State<OrganizationDto[]>,
-    private orgApi: OrganizationControllerApiInterface,
-    public organizationChooserState: State<OrganizationDto[]>,
-    public personChooserState: State<PersonDto[]>,
-    private personApi: PersonControllerApiInterface) {
+      private orgApi: OrganizationControllerApiInterface,
+      public organizationChooserState: State<OrganizationDto[]>,
+      public personChooserState: State<PersonDto[]>,
+      private personApi: PersonControllerApiInterface) {
     super(state);
     this.validate = TypeValidation.validatorFor<OrganizationDto>(ModelTypes.definitions.OrganizationDto);
     this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
@@ -206,7 +209,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
           const filter = new GridFilter(params.filterModel);
 
-          // Filter out the items that already exist
+          // Generate extra filters that excludes items that already exist
           const filterConditions: FilterCondition[] = [];
           idsToExclude?.forEach(id => {
             filterConditions.push({
@@ -215,11 +218,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
             });
           });
 
-          console.log(idsToExclude);
-
           filter.addMultiFilter('id', FilterCriteriaRelationTypeEnum.And, filterConditions);
-
-          console.log(filter.getFilterDto())
 
           const sort = convertAgGridSortToQueryParams(params.sortModel);
 
@@ -311,9 +310,10 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     }
 
     try {
-      // fetch selected org's detailed info
-      const details = await this.getOrgDetails(id);
-      return Promise.resolve(details);
+      // fetch selected org's detailed info through use of query params
+      // this causes the response to match OrganizationDtoWithDetails
+      const details = await this.orgApi.getOrganization(id, false, "id,firstName,lastName", "id,name");
+      return Promise.resolve(details.data as OrganizationDtoWithDetails);
     } catch (err) {
       return Promise.reject(err);
     }
@@ -348,11 +348,12 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     if(!this.validate(toUpdate)) {
       throw TypeValidation.validationError('OrganizationDto');
     }
-    try {
-      if (toUpdate?.id == null) {
-        return Promise.reject(new Error('Organization to update has undefined id.'));
-      }
 
+    if (toUpdate?.id == null) {
+      return Promise.reject(new Error('Organization to update has undefined id.'));
+    }
+
+    try {
       const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = [];
       if (toUpdate.name) { jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/name', toUpdate.name)); }
       if (toUpdate.orgType) { jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/orgType', toUpdate.orgType)); }
@@ -374,17 +375,13 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   }
 
   /**
-   * Allows a call to a custom API method (normally a PATCH).  This is called from
-   * the DataCrudFormPage component with variable arguments.  First argument should be
-   * a way to tell what local method to call within this service, and the rest are the arguments
-   * for that method.
-   * @param args
+   * Compares the original object to the updated object to generate the necessary json patch operations.
+   * @param original the original object
+   * @param toUpdate the updated object
+   * @param toPatch extra fields to compare
+   * @returns list of json patch operations
    */
-  async sendPatch(original: OrganizationDto, toUpdate: OrganizationDto, toPatch: OrganizationEditState): Promise<OrganizationDto> {
-    if (toUpdate.id == null) {
-      throw new Error("Organization ID cannot be null when sending PATCH update.");
-    }
-
+  private createJsonPatch(original: OrganizationDtoWithDetails, toUpdate: OrganizationDtoWithDetails, toPatch: OrganizationEditState): Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> {
     const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = [];
     if (toUpdate.name !== original.name) {
       jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/name', toUpdate.name));
@@ -410,154 +407,171 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       jsonPatchOperations.push(createJsonPatchOp(JsonPatchStringValueOpEnum.Replace, '/parentOrganization', toPatch.parentOrg.newParent.id));
     }
 
-    try {
-      const request = await this.orgApi.jsonPatchOrganization(toUpdate.id, jsonPatchOperations);
+    return jsonPatchOperations;
+  }
 
-      const subOrgsToRemove = toPatch.subOrgs.toRemove.flatMap(org => org.id ? org.id : []);
-      if (subOrgsToRemove.length > 0) {
-        await this.orgApi.removeSubordinateOrganization(toUpdate.id, subOrgsToRemove);
+  /**
+   * Creates the appropriate json patch request. Also sends requests for subordinate organization and member changes.
+   * Depending on the changes, multiple requests may be made.
+   * 
+   * @param original the original object
+   * @param toUpdate the object containing updates
+   * @param toPatch extra fields to check
+   * @returns response containing status of the requests
+   */
+  async sendPatch(original: OrganizationDtoWithDetails, toUpdate: OrganizationDtoWithDetails, toPatch: OrganizationEditState): Promise<PatchResponse<OrganizationDto>> {
+    if (toUpdate.id == null) {
+      return Promise.reject(new Error('Organization to update has undefined id.'));
+    }
+
+    const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = this.createJsonPatch(original, toUpdate, toPatch);
+
+    /**
+     * Check to find only removals that exist in the original. If it does not exist
+     * in the original, then there's no need to add it to the request for removal.
+     */
+    let subOrgsToRemove: string[] = [];
+    if (original.subordinateOrganizations != null) {
+      subOrgsToRemove = getDataItemDuplicates(original.subordinateOrganizations, toPatch.subOrgs.toRemove);
+    }
+
+    let membersToRemove: string[] = [];
+    if (original.members != null) {
+      membersToRemove = getDataItemDuplicates(original.members, toPatch.members.toRemove);
+    }
+
+    /**
+     * Check to find only additions that does not exist in the original. If they already
+     * exist in the original, they do not need to be included in the request for addition.
+     */
+    let subOrgsToAdd: string[] = [];
+    if (original.subordinateOrganizations != null) {
+      subOrgsToAdd = getDataItemNonDuplicates(original.subordinateOrganizations, toPatch.subOrgs.toAdd);
+    } else {
+      subOrgsToAdd = mapDataItemsToStringIds(toPatch.subOrgs.toAdd);
+    }
+
+    let membersToAdd: string[] = [];
+    if (original.members != null) {
+      membersToAdd = getDataItemNonDuplicates(original.members, toPatch.members.toAdd);
+    } else {
+      membersToAdd = mapDataItemsToStringIds(toPatch.members.toAdd);
+    }
+
+    const requests: Promise<any>[] = [];
+
+    /**
+     * Keep track of the indexes for the requests that are made
+     * to help differentiate the messages on failure of any request.
+     * Ensures that only the requests that must be made are actually sent.
+     */
+    const requestMap: Map<number, OrganizationPatchRequestType> = new Map();
+    if (jsonPatchOperations.length > 0) {
+      requests.push(this.orgApi.jsonPatchOrganization(toUpdate.id, jsonPatchOperations));
+      requestMap.set(requests.length - 1, OrganizationPatchRequestType.JSON_PATCH);
+    }
+
+    if (subOrgsToRemove.length > 0) {
+      requests.push(this.orgApi.removeSubordinateOrganization(toUpdate.id, subOrgsToRemove));
+      requestMap.set(requests.length - 1, OrganizationPatchRequestType.SUB_ORG_REMOVE);
+    }
+
+    if (subOrgsToAdd.length > 0) {
+      requests.push(this.orgApi.addSubordinateOrganization(toUpdate.id, subOrgsToAdd));
+      requestMap.set(requests.length - 1, OrganizationPatchRequestType.SUB_ORG_ADD);
+    }
+
+    if (membersToRemove.length > 0) {
+      requests.push(this.orgApi.deleteOrganizationMember(toUpdate.id, membersToRemove));
+      requestMap.set(requests.length - 1, OrganizationPatchRequestType.MEMBERS_REMOVE);
+    }
+
+    if (membersToAdd.length > 0) {
+      requests.push(this.orgApi.addOrganizationMember(toUpdate.id, membersToAdd));
+      requestMap.set(requests.length - 1, OrganizationPatchRequestType.MEMBERS_ADD);
+    }
+
+    const data = await Promise.allSettled(requests);
+    const failures = data.some(request => request.status === 'rejected');
+    const errors: Error[] = [];
+    data.forEach((value, idx) => {
+      if (value.status === 'fulfilled')
+        return;
+
+      const requestType = requestMap.get(idx);
+      switch (requestType) {
+        case OrganizationPatchRequestType.JSON_PATCH: {
+          errors.push(value.reason);
+          break;
+        }
+
+        case OrganizationPatchRequestType.MEMBERS_ADD: {
+          errors.push(value.reason);
+          break;
+        }
+
+        case OrganizationPatchRequestType.MEMBERS_REMOVE: {
+          errors.push(value.reason);
+          break;
+        }
+
+        case OrganizationPatchRequestType.SUB_ORG_ADD: {
+          errors.push(value.reason);
+          break;
+        }
+
+        case OrganizationPatchRequestType.SUB_ORG_REMOVE: {
+          errors.push(value.reason);
+          break;
+        }
+
+        default:
+          break;
+      }
+    });
+
+    if (failures) {
+      // Complete failure
+      if (data.every(request => request.status === 'rejected')) {
+        const response: PatchResponse<OrganizationDto> = {
+          type: ResponseType.FAIL,
+          errors
+        }
+        return Promise.reject(response);
       }
 
-      const membersToRemove = toPatch.members.toRemove.flatMap(member => member.id ? member.id : []);
-      if (membersToRemove.length > 0) {
-        await this.orgApi.deleteOrganizationMember(toUpdate.id, membersToRemove);
-      }
-
-      const requestData = request.data;
-
-      const sanitizedData = this.removeUnfriendlyAgGridDataSingle(requestData);
-
-      // Update the state
-      this.state.find(item => item.id.get() === sanitizedData.id)?.set(sanitizedData);
-
-      return Promise.resolve(requestData);
-    } catch (err) {
-      return Promise.reject(err);
+      // Partial failure
+      return Promise.resolve({
+        type: ResponseType.PARTIAL,
+        errors,
+        data: this.convertOrgDetailsToDto(toUpdate)
+      });
     }
+
+    // Success
+    return Promise.resolve({
+      type: ResponseType.SUCCESS,
+      data: this.convertOrgDetailsToDto(toUpdate)
+    });
   }
 
   /**
-   * Gets organization by id and requests that the people/org type fields be further
-   * resolved to readable information via the query parameters.  Populates the selectedOrgState
-   * @param id org UUID to fetch
-   * @returns a JSON structure with requested fields (hence, the <any> return)
+   * Converts an organization dto with details to OrganizationDto
+   * 
+   * @param withDetails organization dto with details
+   * @returns {OrganizationDto} object converted to OrganizationDto
    */
-  async getOrgDetails(id: string): Promise<OrganizationDtoWithDetails> {
-    try {
-
-      // the extra query params causes this response to match signature of an OrganizationDtoWithDetails
-      const orgResponse = await this.orgApi.getOrganization(id, false, "id,firstName,lastName", "id,name");
-
-      const data = orgResponse.data as OrganizationDtoWithDetails;
-      return Promise.resolve(data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Removes organization leader to no one
-   * @param orgId org id to update
-   * @returns transaction response or the error it raised
-   */
-  async removeLeader(orgId: string): Promise<OrganizationDto> {
-    try {
-      const orgResponse = await this.orgApi.deleteOrgLeader(orgId);
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Removes organization parent to no one
-   * @param orgId org id to update
-   * @returns transaction response or the error it raised
-   */
-   async removeParent(orgId: string): Promise<OrganizationDto> {
-    try {
-      const orgResponse = await this.orgApi.deleteOrgParent(orgId);
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Patch updates an org's members with an additional person
-   * @param orgId org UUID to patch
-   * @param id UUID of the person to add
-   * @returns transaction response or the error it raised
-   */
-   async addMember(orgId: string, id: string): Promise<any> {
-    try {
-      await this.orgApi.addOrganizationMember(orgId, [id]);
-      const orgResponse = await this.orgApi.getOrganization(orgId);
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Patch updates an org's members with an additional subordinate organization
-   * @param orgId org UUID to patch
-   * @param id UUID of the org to add
-   * @returns transaction response or the error it raised
-   */
-   async addSubOrg(orgId: string, id: string): Promise<any> {
-    try {
-      await this.orgApi.addSubordinateOrganization(orgId, [id]);
-      const orgResponse = await this.orgApi.getOrganization(orgId);
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Remove an org's member(s)
-   * @param orgId org UUID to patch
-   * @param id UUID of the person(s) to remove
-   * @returns transaction response or the error it raised
-   */
-   async removeMember(orgId: string, ids: string[]): Promise<OrganizationDto> {
-    try {
-      await this.orgApi.deleteOrganizationMember(orgId, ids);
-      const orgResponse = await this.orgApi.getOrganization(orgId);
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Remove an org's subordinate organization(s)
-   * @param orgId org UUID to patch
-   * @param id UUID of the orgs(s) to remove
-   * @returns transaction response or the error it raised
-   */
-   async removeSubOrg(orgId: string, ids: string[]): Promise<OrganizationDto> {
-    try {
-      await this.orgApi.removeSubordinateOrganization(orgId, ids);
-      const orgResponse = await this.orgApi.getOrganization(orgId);
-      await this.getOrgDetails(orgId);
-      return Promise.resolve(orgResponse.data);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
+  convertOrgDetailsToDto(withDetails: OrganizationDtoWithDetails): OrganizationDto {
+    return {
+      id: withDetails.id,
+      leader: withDetails.leader?.id,
+      members: withDetails.members?.flatMap(member => member.id != null ? member.id : []),
+      parentOrganization: withDetails.parentOrganization?.id,
+      subordinateOrganizations: new Set(withDetails.subordinateOrganizations?.flatMap(org => org.id != null ? org.id : [])),
+      name: withDetails.name,
+      orgType: withDetails.orgType,
+      branchType: withDetails.branchType
+    };
   }
 
   async sendDelete(toDelete: OrganizationDtoWithDetails): Promise<void> {

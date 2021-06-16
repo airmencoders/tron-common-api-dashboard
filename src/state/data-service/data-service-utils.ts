@@ -74,3 +74,68 @@ export function createJsonPatchOp(op: JsonPatchStringValueOpEnum, path: string, 
     value
   }
 }
+
+/**
+ * Converts a list of Data items (contains id field) to a list of strings contains the ids of each item.
+ * It also removes duplicate values.
+ * 
+ * @param items Data items
+ * @returns array of string ids
+ */
+export function mapDataItemsToStringIds<T extends GridRowData>(items: T[]): string[] {
+  const ids = items.reduce<string[]>((result, item) => {
+    if (item.id != null) {
+      result.push(String(item.id));
+    }
+
+    return result;
+  }, []);
+
+  const uniqueIds = new Set(ids);
+
+  return Array.from(uniqueIds);
+}
+
+/**
+ * Finds all items from toCheck that exist in original
+ * 
+ * @param original the original
+ * @param toCheck the items to check against the original
+ * @returns list of id strings of values in toCheck that exist in original
+ */
+export function getDataItemDuplicates<T extends GridRowData, R extends GridRowData>(original: T[], toCheck: R[]) {
+  const originalIdSet = new Set(mapDataItemsToStringIds(original));
+  const toCheckIdArr = mapDataItemsToStringIds(toCheck)
+
+  const itemDups = toCheckIdArr.reduce<string[]>((result, id) => {
+    if (id != null && originalIdSet.has(String(id))) {
+      result.push(String(id));
+    }
+
+    return result;
+  }, []);
+
+  return itemDups;
+}
+
+/**
+ * Finds all items from toCheck that do not exist in original
+ * 
+ * @param original the original
+ * @param toCheck the items to check against the original
+ * @returns list of id strings of values in toCheck that do not exist in original
+ */
+export function getDataItemNonDuplicates<T extends GridRowData, R extends GridRowData>(original: T[], toCheck: R[]) {
+  const originalSet = new Set(mapDataItemsToStringIds(original));
+  const toCheckIdArr = mapDataItemsToStringIds(toCheck)
+
+  const itemDups = toCheckIdArr.reduce<string[]>((result, id) => {
+    if (id != null && !originalSet.has(String(id))) {
+      result.push(String(id));
+    }
+
+    return result;
+  }, []);
+
+  return itemDups;
+}

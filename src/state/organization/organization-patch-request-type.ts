@@ -1,0 +1,7 @@
+export enum OrganizationPatchRequestType {
+  JSON_PATCH = 'JSON_PATCH',
+  MEMBERS_ADD = 'MEMBERS_ADD',
+  MEMBERS_REMOVE = 'MEMBERS_REMOVE',
+  SUB_ORG_ADD = 'SUB_ORG_ADD',
+  SUB_ORG_REMOVE = 'SUB_ORG_REMOVE'
+}
