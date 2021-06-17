@@ -1,8 +1,9 @@
-import {DataService} from '../../state/data-service/data-service';
+import { DataService } from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
 import { InfiniteScrollOptions } from './infinite-scroll-options';
 import { CreateUpdateFormProps } from './CreateUpdateFormProps';
 import { DataCrudDeleteComponentProps } from './DataCrudDeleteComponentProps';
+import { SideDrawerSize } from '../SideDrawer/side-drawer-size';
 
 /***
  * T Row data type.
@@ -84,4 +85,6 @@ export interface DataCrudFormPageProps<T, R> {
   className?: string;
 
   infiniteScrollOptions?: InfiniteScrollOptions;
+
+  sideDrawerSize?: SideDrawerSize;
 }

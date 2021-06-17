@@ -10,8 +10,8 @@ import EditIcon from '../../icons/EditIcon';
  * Presents a search box and a customized ag-grid table.  The search
  * box feeds the ag-grids quickFilterText properties to quickly search
  * the ag-grid contents
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 function ItemChooser(props: ChooserProps) {
   const [filterState, setFilterState] = React.useState('');
@@ -29,7 +29,7 @@ function ItemChooser(props: ChooserProps) {
 
         {props.showEditBtn &&
           <Button className='actions__edit-btn' disableMobileFullWidth type={'button'} onClick={props.onEditBtnClick} disabled={props.disableEditBtn} unstyled>
-            <EditIcon disabled={props.disableEditBtn} size={1.75} />
+            <EditIcon disabled={props.disableEditBtn} size={1.25} />
           </Button>
         }
       </div>
@@ -46,6 +46,7 @@ function ItemChooser(props: ChooserProps) {
         className='item-chooser__grid'
         suppressRowClickSelection={props.suppressRowClickSelection}
         onRowSelected={props.onRowSelected}
+        onGridReady={props.onGridReady}
       />
     </div>
   )

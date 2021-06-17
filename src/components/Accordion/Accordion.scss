@@ -1,0 +1,8 @@
+@import "../../styles/base";
+@import "~uswds/dist/scss/components/accordions";
+
+.accordion {
+  &__item {
+    margin-bottom: 1rem;
+  }
+}

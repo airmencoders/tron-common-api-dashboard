@@ -1,5 +1,5 @@
-import { ToastType } from "../Toast/ToastUtils/toast-type";
-import { createTextToast } from "../Toast/ToastUtils/ToastUtils";
+import { ToastType } from "../components/Toast/ToastUtils/toast-type";
+import { createTextToast } from "../components/Toast/ToastUtils/ToastUtils";
 
 const DownloadFile = async (name: string, byEndpoint: boolean, fetch: Promise<any>): Promise<void> => {
     if(name) {

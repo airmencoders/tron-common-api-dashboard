@@ -80,6 +80,7 @@ models/person-dto-pagination-response-wrapper.ts
 models/person-dto-response-wrapper.ts
 models/person-dto.ts
 models/person-find-dto.ts
+models/platform-jwt-dto.ts
 models/privilege-dto-response-wrapper.ts
 models/privilege-dto.ts
 models/privilege-id-pair.ts

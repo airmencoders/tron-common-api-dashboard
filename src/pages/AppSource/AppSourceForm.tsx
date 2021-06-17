@@ -116,9 +116,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
   /**
    * Prevent anymore interactions with the grid
-   * after a successful submit or while the 
+   * after a successful submit or while the
    * current request is pending.
-   * 
+   *
    * Removes "remove" icon and functionality
    */
   if (!isFormDisabled()) {
@@ -151,14 +151,23 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       filter: true,
       headerName: 'Request Type',
       resizable: true
-    })
+    }),
+    // new GridColumn({
+    //   field: 'action',
+    //   sortable: false,
+    //   filter: false,
+    //   headerName: '',
+    //   resizable: false,
+    //   pinned: 'right',
+    //   initialWidth: 45
+    // })
   ];
 
   function onDeleteEndpointClicked(endpoint: AppEndpointDto): void {
     /**
      * Prevent anymore interactions with the grid
      * after a successful submit.
-     * 
+     *
      * Removes on click interactions.
      */
     if (isFormDisabled()) {
@@ -175,7 +184,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     /**
      * Prevent anymore interactions with the grid
      * after a successful submit.
-     * 
+     *
      * Removes on click interactions.
      */
     if (isFormDisabled() || deleteEndpointModifyState.isOpen.get()) {

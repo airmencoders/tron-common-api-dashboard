@@ -56,6 +56,7 @@ export * from './person-dto';
 export * from './person-dto-pagination-response-wrapper';
 export * from './person-dto-response-wrapper';
 export * from './person-find-dto';
+export * from './platform-jwt-dto';
 export * from './privilege-dto';
 export * from './privilege-dto-response-wrapper';
 export * from './privilege-id-pair';

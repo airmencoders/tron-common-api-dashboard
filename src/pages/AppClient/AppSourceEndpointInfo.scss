@@ -1,0 +1,28 @@
+@import"../../styles/base";
+
+.app-source-endpoint-info {
+  &__section {
+    display: flex;
+    .section__value {
+      margin-left: .5rem;
+    }
+  }
+  &__label {
+    label {
+      margin-top: 0;
+    }
+  }
+  &__path {
+    margin-bottom: .75rem;
+  }
+  &__value {
+    .value__link {
+      font-size: 1rem;
+      text-decoration: none;
+      margin-left: 1rem;
+      margin-top: 0;
+      font-family: $body-font-family;
+      @include font-smoothing(none);
+    }
+  }
+}
