@@ -53,7 +53,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   function updateInfiniteCacheCallback() {
     updateInfiniteCache.set(false);
-    if (props.refreshStateCallback) props.refreshStateCallback();
+    props.refreshStateCallback?.();
+  }
+
+  function scrollToTopCallback() {
+    scrollToTopCallback?.();
   }
 
   function setUpdateInfiniteCache(status: boolean) {
@@ -390,7 +394,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
             dataState.error ?
               <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
               :
-              <div style={{ height: '100%' }} className="data-crud-content">
+              <div className="data-crud-content">
                 {
                   props.allowAdd && CreateForm &&
                   <div className="add-data-container">
@@ -412,6 +416,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                     cacheBlockSize={generateInfiniteScrollLimit(infiniteScroll)}
                     maxBlocksInCache={infiniteScroll.maxBlocksInCache}
                     maxConcurrentDatasourceRequests={infiniteScroll.maxConcurrentDatasourceRequests}
+                    scrollToTop={props.scrollToTop}
+                    scrollToTopCallback={props.scrollToTopCallback}
                     updateInfiniteCache={props.refreshState || updateInfiniteCache.get()}
                     updateInfiniteCacheCallback={updateInfiniteCacheCallback}
                   />
@@ -424,6 +430,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                     autoResizeColumns={props.autoResizeColumns}
                     autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
                     disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
+                    scrollToTop={props.scrollToTop}
+                    scrollToTopCallback={props.scrollToTopCallback}
                   />
                 }
 

@@ -14,28 +14,59 @@ const columns: GridColumn[] =
   [
     new GridColumn({
       field: 'requestTimestamp',
-      headerName: 'Timestamp',
+      headerName: 'Timestamp (UTC)',
       resizable: true,
+      initialWidth: 100,
     }),
     new GridColumn({
       field: 'requestMethod',
       headerName: 'Method',
       resizable: true,
+      initialWidth: 30,
     }),
     new GridColumn({
       field: 'requestedUrl',
       headerName: 'Requested Url',
+      initialWidth: 100,
+      showTooltip: true,
       resizable: true,
     }),
     new GridColumn({
       field: 'statusCode',
       headerName: 'Status',
       resizable: true,
+      initialWidth: 30,
+    }),
+    new GridColumn({
+      field: 'userAgent',
+      headerName: 'User Agent',
+      showTooltip: true,
+      resizable: true,
+      initialWidth: 50,
+    }),
+    new GridColumn({
+      field: 'requestHost',
+      headerName: 'Host',
+      resizable: true,
+      initialWidth: 50,
+    }),
+    new GridColumn({
+      field: 'remoteIp',
+      headerName: 'Remote IP',
+      resizable: true,
+      initialWidth: 50,
+    }),
+    new GridColumn({
+      field: 'userName',
+      headerName: 'User / App',
+      resizable: true,
+      initialWidth: 50,
     }),
     new GridColumn({
       field: 'timeTakenMs',
       headerName: 'Time Taken (ms)',
       resizable: true,
+      initialWidth: 30,
     }),
   ];
 
@@ -55,6 +86,7 @@ function AuditLogPage() {
   const [dateError, setDateError ] = React.useState(false);  // malformed date indicator
   const [searchState, setSearchState] = React.useState<SearchLogParams>(initState);  // local form state
   const [refreshGrid, setRefreshGrid] = React.useState(false);
+  const [scrollToTop, setScrollToTop] = React.useState(false);
   const httpLogsState = useAuditLogState();
 
   const setNewFromDate = (event: ChangeEvent<HTMLInputElement>) => {
@@ -68,19 +100,20 @@ function AuditLogPage() {
   }
 
   const resetSearch = () => {
-    // go back to initial paramters
     setSearchState(initState);
-    // force refresh of the data source
-    refreshSearch();
+    httpLogsState.searchParamsState.merge(initState);
+    updateGrid();
   }
 
   const refreshSearch = () => {
-
-    // transfer the state over to the service
     httpLogsState.searchParamsState.merge(searchState);
-    // force refresh of the data source
-    setRefreshGrid(true);
+    updateGrid();
   }  
+
+  const updateGrid = () => {
+    setRefreshGrid(true);
+    setScrollToTop(true);
+  }
 
   // helper to build out the search form
   const searchForm = () => {
@@ -162,14 +195,6 @@ function AuditLogPage() {
               />           
           </FormGroup>    
         </div>
-        </div>
-        <div id='search-form-container' style={{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          alignContent: 'flex-start',
-          alignItems: 'flex-start',
-        }}>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-requestHost"
             labelText="Host Contains" 
@@ -178,7 +203,7 @@ function AuditLogPage() {
                 id="search-form-requestHost" 
                 name="audit-log-requestHost" 
                 value={searchState.hostContains}
-                type="text" 
+                type="search" 
                 onChange={(event) => setSearchState({...searchState, hostContains: event.target.value})}
               />           
           </FormGroup>    
@@ -191,7 +216,7 @@ function AuditLogPage() {
                 id="search-form-userAgent" 
                 name="audit-log-userAgent" 
                 value={searchState.userAgentContains}
-                type="text" 
+                type="search" 
                 onChange={(event) => setSearchState({...searchState, userAgentContains: event.target.value})}
               />           
           </FormGroup>    
@@ -204,7 +229,7 @@ function AuditLogPage() {
                 id="search-form-queryString" 
                 name="audit-log-queryString" 
                 value={searchState.queryStringContains}
-                type="text" 
+                type="search" 
                 onChange={(event) => setSearchState({...searchState, queryStringContains: event.target.value})}
               />           
           </FormGroup>    
@@ -217,7 +242,7 @@ function AuditLogPage() {
                 id="search-form-requester" 
                 name="audit-log-requester" 
                 value={searchState.userNameContains}
-                type="text" 
+                type="search" 
                 onChange={(event) => setSearchState({...searchState, userNameContains: event.target.value})}
               />           
           </FormGroup>    
@@ -261,6 +286,8 @@ function AuditLogPage() {
       infiniteScroll={{enabled: true}}
       refreshState={refreshGrid}
       refreshStateCallback={() => setRefreshGrid(false)}
+      scrollToTop={scrollToTop}
+      scrollToTopCallback={() => setScrollToTop(false)}
     />
     </>
   );

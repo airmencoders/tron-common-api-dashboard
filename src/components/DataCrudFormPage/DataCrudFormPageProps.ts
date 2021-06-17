@@ -100,5 +100,16 @@ export interface DataCrudFormPageProps<T, R> {
    * Optional callback that happens after a infinite scroll datasource updates on the ag-grid
    */
   refreshStateCallback?: () => void;
+  
+  /**
+   * Optional boolean to say to scroll to top or not
+   */
+  scrollToTop?: boolean;
+
+  /**
+   * Optional callback to say when we've scrolled to top
+   */
+  scrollToTopCallback?: () => void;
+
   sideDrawerSize?: SideDrawerSize;
 }
