@@ -1,4 +1,4 @@
-import {DataService} from '../../state/data-service/data-service';
+import { DataService } from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
 import { InfiniteScroll } from '../Grid/infinite-scroll';
 import { CreateUpdateFormProps } from './CreateUpdateFormProps';
@@ -85,6 +85,31 @@ export interface DataCrudFormPageProps<T, R> {
   className?: string;
 
   infiniteScroll?: InfiniteScroll;
+
+  /**
+   * Any JSX elements we want to render above the ag-grid (optional)
+   */
+  beforeChildren?: any;
+
+  /**
+   * An additional state object to monitor so we can control updates on the outside if needed
+   */
+  refreshState?: boolean;
+
+  /**
+   * Optional callback that happens after a infinite scroll datasource updates on the ag-grid
+   */
+  refreshStateCallback?: () => void;
+  
+  /**
+   * Optional boolean to say to scroll to top or not
+   */
+  scrollToTop?: boolean;
+
+  /**
+   * Optional callback to say when we've scrolled to top
+   */
+  scrollToTopCallback?: () => void;
 
   sideDrawerSize?: SideDrawerSize;
 }

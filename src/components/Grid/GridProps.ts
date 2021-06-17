@@ -48,4 +48,7 @@ export interface GridProps {
   maxConcurrentDatasourceRequests?: number;
   updateInfiniteCache?: boolean;
   updateInfiniteCacheCallback?: () => void;
+
+  scrollToTop?: boolean;
+  scrollToTopCallback?: () => void;
 }
