@@ -485,178 +485,177 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
         </FormGroup>
         {props.formActionType === FormActionType.UPDATE &&
           <>
-          <hr />
-          {/* Edit/Remove Org Leader Section */}
-          <FormGroup labelName="leaderName" labelText="Leader">
-            <div className="organization-edit-form__input-actions">
-              <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
-                value={resolveLeaderName()}
-                disabled={true}
+            {/* Edit/Remove Org Leader Section */}
+            <FormGroup labelName="leaderName" labelText="Leader">
+              <div className="organization-edit-form__input-actions">
+                <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
+                  value={resolveLeaderName()}
+                  disabled={true}
+                />
+                <Button
+                  data-testid='change-org-leader__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  onClick={onEditLeaderClick}
+                  unstyled
+                  className="input-actions__icon-btn"
+                >
+                  <EditIcon iconTitle="Change Leader" size={1.75} />
+                </Button>
+
+                <Button
+                  data-testid='remove-org-leader__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  disabled={formState.leader.get() == null}
+                  onClick={() => { resolveLeaderName() !== '' && removeActionInitiated(() => { removeLeader() }, null) }}
+                  unstyled
+                  transparentOnDisabled
+                  className="input-actions__icon-btn"
+                >
+                  <RemoveIcon iconTitle="Remove Leader" disabled={formState.leader.get() == null} size={1.75} />
+                </Button>
+              </div>
+            </FormGroup>
+
+            {/* Edit/Remove Parent Org Section */}
+            <FormGroup labelName="parentOrg" labelText="Parent Organization">
+              <div className="organization-edit-form__input-actions">
+                <TextInput id="parentOrg" name="parentOrg" type="text" data-testid='org-parent-name'
+                  value={formState.parentOrganization.get()?.name ?? ''}
+                  disabled={true}
+                />
+
+                <Button
+                  data-testid='change-org-parent__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  onClick={onEditParentOrg}
+                  unstyled
+                  className="input-actions__icon-btn"
+                >
+                  <EditIcon iconTitle="Change Parent Organization" size={1.75} />
+                </Button>
+
+                <Button
+                  data-testid='remove-org-parent__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  disabled={formState.parentOrganization.get() == null}
+                  onClick={() => { formState.parentOrganization.get()?.name && removeActionInitiated(() => { removeParentOrg() }, null) }}
+                  unstyled
+                  transparentOnDisabled
+                  className="input-actions__icon-btn"
+                >
+                  <RemoveIcon iconTitle="Remove Parent Organization" disabled={formState.parentOrganization.get() == null} size={1.75} />
+                </Button>
+              </div>
+            </FormGroup>
+
+            {/* Add/Remove Org Members Section */}
+            <FormGroup labelName="membersList" labelText={`Organization Members (${formState.members.get()?.length || 0})`} >
+              <div className="organization-edit-form__input-actions--grid">
+                <Button
+                  data-testid='org-add-member__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  onClick={onAddMemberClick}
+                  unstyled
+                  className="input-actions__icon-btn"
+                >
+                  <PlusIcon iconTitle="Add Members" size={2} />
+                </Button>
+
+                <Button
+                  data-testid='org-member-remove-selected__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  disabled={organizationMembersForRemoval.get().length === 0}
+                  onClick={removeMembers}
+                  unstyled
+                  transparentOnDisabled
+                  className="input-actions__icon-btn"
+                >
+                  <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={1.75} />
+                </Button>
+              </div>
+
+              <Grid
+                rowSelection='multiple'
+                height="300px"
+                data-testid="membersList"
+                data={formState.members.attach(Downgraded).get() || []}
+                columns={[
+                  new GridColumn({
+                    field: 'lastName',
+                    sortable: true,
+                    filter: true,
+                    headerName: 'Last',
+                    checkboxSelection: true,
+                    headerCheckboxSelection: true,
+                  }),
+                  new GridColumn({
+                    field: 'firstName',
+                    sortable: true,
+                    filter: true,
+                    headerName: 'First'
+                  }),
+                ]}
+                rowClass="ag-grid--row-pointer"
+                onRowSelected={onOrganizationMembersRowSelection}
+                suppressRowClickSelection
               />
-              <Button
-                data-testid='change-org-leader__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onEditLeaderClick}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <EditIcon iconTitle="Change Leader" size={1.75} />
-              </Button>
+            </FormGroup>
 
-              <Button
-                data-testid='remove-org-leader__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={formState.leader.get() == null}
-                onClick={() => { resolveLeaderName() !== '' && removeActionInitiated(() => { removeLeader() }, null) }}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Leader" disabled={formState.leader.get() == null} size={1.75} />
-              </Button>
-            </div>
-          </FormGroup>
+            {/* Add/Remove Org Subordinate Orgs Section */}
+            <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${formState.subordinateOrganizations.get()?.length || 0})`}>
+              <div className="organization-edit-form__input-actions--grid">
+                <Button
+                  data-testid='org-add-suborg__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  onClick={onAddSubOrgClick}
+                  unstyled
+                  className="input-actions__icon-btn"
+                >
+                  <PlusIcon iconTitle="Add Sub Orgs" size={2} />
+                </Button>
 
-          {/* Edit/Remove Parent Org Section */}
-          <FormGroup labelName="parentOrg" labelText="Parent Organization">
-            <div className="organization-edit-form__input-actions">
-              <TextInput id="parentOrg" name="parentOrg" type="text" data-testid='org-parent-name'
-                value={formState.parentOrganization.get()?.name ?? ''}
-                disabled={true}
+                <Button
+                  data-testid='org-suborg-remove-selected__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  disabled={organizationSubOrgsForRemoval.get().length === 0}
+                  onClick={removeSubOrgs}
+                  unstyled
+                  transparentOnDisabled
+                  className="input-actions__icon-btn"
+                >
+                  <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={1.75} />
+                </Button>
+              </div>
+
+              <Grid
+                rowSelection='multiple'
+                height="300px"
+                data-testid="subOrgsList"
+                data={formState.subordinateOrganizations.attach(Downgraded).get() || []}
+                columns={[
+                  new GridColumn({
+                    field: 'name',
+                    sortable: true,
+                    filter: true,
+                    headerName: 'Name',
+                    checkboxSelection: true,
+                    headerCheckboxSelection: true,
+                  }),
+                ]}
+                rowClass="ag-grid--row-pointer"
+                suppressRowClickSelection
+                onRowSelected={onOrganizationSubOrgsRowSelection}
               />
-
-              <Button
-                data-testid='change-org-parent__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onEditParentOrg}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <EditIcon iconTitle="Change Parent Organization" size={1.75} />
-              </Button>
-
-              <Button
-                data-testid='remove-org-parent__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={formState.parentOrganization.get() == null}
-                onClick={() => { formState.parentOrganization.get()?.name && removeActionInitiated(() => { removeParentOrg() }, null) }}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Parent Organization" disabled={formState.parentOrganization.get() == null} size={1.75} />
-              </Button>
-            </div>
-          </FormGroup>
-
-          {/* Add/Remove Org Members Section */}
-          <FormGroup labelName="membersList" labelText={`Organization Members (${formState.members.get()?.length || 0})`} >
-            <div className="organization-edit-form__input-actions--grid">
-              <Button
-                data-testid='org-add-member__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onAddMemberClick}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <PlusIcon iconTitle="Add Members" size={2} />
-              </Button>
-
-              <Button
-                data-testid='org-member-remove-selected__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={organizationMembersForRemoval.get().length === 0}
-                onClick={removeMembers}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={1.75} />
-              </Button>
-            </div>
-
-            <Grid
-              rowSelection='multiple'
-              height="300px"
-              data-testid="membersList"
-              data={formState.members.attach(Downgraded).get() || []}
-              columns={[
-                new GridColumn({
-                  field: 'lastName',
-                  sortable: true,
-                  filter: true,
-                  headerName: 'Last',
-                  checkboxSelection: true,
-                  headerCheckboxSelection: true,
-                }),
-                new GridColumn({
-                  field: 'firstName',
-                  sortable: true,
-                  filter: true,
-                  headerName: 'First'
-                }),
-              ]}
-              rowClass="ag-grid--row-pointer"
-              onRowSelected={onOrganizationMembersRowSelection}
-              suppressRowClickSelection
-            />
-          </FormGroup>
-
-          {/* Add/Remove Org Subordinate Orgs Section */}
-          <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${formState.subordinateOrganizations.get()?.length || 0})`}>
-            <div className="organization-edit-form__input-actions--grid">
-              <Button
-                data-testid='org-add-suborg__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onAddSubOrgClick}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <PlusIcon iconTitle="Add Sub Orgs" size={2} />
-              </Button>
-
-              <Button
-                data-testid='org-suborg-remove-selected__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={organizationSubOrgsForRemoval.get().length === 0}
-                onClick={removeSubOrgs}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={1.75} />
-              </Button>
-            </div>
-
-            <Grid
-              rowSelection='multiple'
-              height="300px"
-              data-testid="subOrgsList"
-              data={formState.subordinateOrganizations.attach(Downgraded).get() || []}
-              columns={[
-                new GridColumn({
-                  field: 'name',
-                  sortable: true,
-                  filter: true,
-                  headerName: 'Name',
-                  checkboxSelection: true,
-                  headerCheckboxSelection: true,
-                }),
-              ]}
-              rowClass="ag-grid--row-pointer"
-              suppressRowClickSelection
-              onRowSelected={onOrganizationSubOrgsRowSelection}
-            />
-          </FormGroup>
-        </>
+            </FormGroup>
+          </>
         }
 
         <SuccessErrorMessage

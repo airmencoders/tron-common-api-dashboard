@@ -664,18 +664,18 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
          * Patches an existing organization
          * @summary Patches an existing organization
          * @param {string} id Organization ID to patch
-         * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue
+         * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         jsonPatchOrganization: async (id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
-                throw new RequiredError('id', 'Required parameter id was null or undefined when calling jsonPatchOrganization.');
+                throw new RequiredError('id','Required parameter id was null or undefined when calling jsonPatchOrganization.');
             }
             // verify required parameter 'jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue' is not null or undefined
             if (jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === null || jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue === undefined) {
-                throw new RequiredError('jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue', 'Required parameter jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue was null or undefined when calling jsonPatchOrganization.');
+                throw new RequiredError('jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue','Required parameter jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue was null or undefined when calling jsonPatchOrganization.');
             }
             const localVarPath = `/v2/organization/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -1015,7 +1015,7 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * Patches an existing organization
          * @summary Patches an existing organization
          * @param {string} id Organization ID to patch
-         * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue
+         * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1196,7 +1196,7 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * Patches an existing organization
          * @summary Patches an existing organization
          * @param {string} id Organization ID to patch
-         * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue
+         * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1365,7 +1365,7 @@ export interface OrganizationControllerApiInterface {
      * Patches an existing organization
      * @summary Patches an existing organization
      * @param {string} id Organization ID to patch
-     * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue
+     * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
@@ -1556,7 +1556,7 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
      * Patches an existing organization
      * @summary Patches an existing organization
      * @param {string} id Organization ID to patch
-     * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue
+     * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganizationControllerApi

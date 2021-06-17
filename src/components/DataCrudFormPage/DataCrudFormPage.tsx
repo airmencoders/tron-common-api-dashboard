@@ -363,7 +363,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     } catch (error) {
       const response = error as PatchResponse<T>;
       response.errors?.forEach(err => {
-        createTextToast(ToastType.ERROR, err.message);
+        const preparedMessage = prepareDataCrudErrorResponse(err);
+        createTextToast(ToastType.ERROR, preparedMessage.general ?? err.message);
       });
 
       pageState.merge({
