@@ -56,6 +56,12 @@ export interface AppEndpointClientInfoDto {
      * @memberof AppEndpointClientInfoDto
      */
     deleted?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppEndpointClientInfoDto
+     */
+    appSourceId?: string;
 }
 
 /**

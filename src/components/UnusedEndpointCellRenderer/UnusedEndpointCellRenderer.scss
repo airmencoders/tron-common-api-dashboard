@@ -1,10 +1,17 @@
 
 .unused-endpoint-cell-renderer {
   text-align: left;
+  position: relative;
+  top: -1px;
   &__hidden {
     visibility: hidden;
   }
   &__btn {
-    margin: 0 !important;
+    padding-left: .5rem;
+    position: relative;
+    top: 1px;
+  }
+  .usa-button {
+    margin: 0;
   }
 }

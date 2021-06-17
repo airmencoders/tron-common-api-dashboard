@@ -3,11 +3,12 @@ import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPa
 import GridColumn from '../../components/Grid/GridColumn';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
-import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
-import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
+import {ScratchStorageFlat} from '../../state/scratch-storage/scratch-storage-flat';
+import {useScratchStorageState} from '../../state/scratch-storage/scratch-storage-state';
 import ScratchStorageDelete from './ScratchStorageDelete';
 import ScratchStorageEditForm from './ScratchStorageEditForm';
 import './ScratchStoragePage.scss'
+import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 
 const columns: GridColumn[] =
   [
@@ -48,6 +49,7 @@ function ScratchStoragePage() {
           allowAdd
           autoResizeColumns
           autoResizeColummnsMinWidth={800}
+          sideDrawerSize={SideDrawerSize.WIDE}
       />
   );
 }

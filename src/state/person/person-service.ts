@@ -1,4 +1,4 @@
-import { State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { FilterDto, PersonControllerApiInterface, PersonDto, PersonDtoBranchEnum, PersonFindDtoFindTypeEnum, RankControllerApiInterface } from '../../openapi';
 import { RankStateModel } from './rank-state-model';
 import {getEnumKeyByEnumValue} from '../../utils/enum-utils';
@@ -6,7 +6,7 @@ import {AbstractDataService} from '../data-service/abstract-data-service';
 import {ValidateFunction} from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
-import { createFailedDataFetchToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import isEqual from 'fast-deep-equal';
 
 /**
  * PII WARNING:
@@ -55,7 +55,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
      * If the filter or sort changes, purge the state to start fresh.
      * Set filter to the new value
      */
-    if (this.filter != filter || this.sort != sort) {
+    if (!isEqual(this.filter, filter) || this.sort != sort) {
       this.state.set([]);
       this.filter = filter;
       this.sort = sort;
@@ -144,7 +144,18 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendDelete(toDelete: PersonDto): Promise<void> {
-    return Promise.resolve();
+    try {
+      const response = await this.personApi.deletePerson(toDelete.id || '');
+
+      const item = this.state.find(item => item.id.get() === toDelete.id);
+      if (item)
+        item.set(none);
+
+      return Promise.resolve(response.data);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   sendPatch: undefined;

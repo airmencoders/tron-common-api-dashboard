@@ -1,5 +1,5 @@
-import { AppEndpointClientInfoDto } from "../../openapi";
+import {AppSourceDevDetails} from '../app-source/app-source-dev-details';
 
 export interface AppClientDetails {
-    appEndpointPrivs?: Array<AppEndpointClientInfoDto>,
+    appSourceEndpoints?: Array<AppSourceDevDetails>,
   }

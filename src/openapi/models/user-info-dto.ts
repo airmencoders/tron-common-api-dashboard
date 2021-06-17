@@ -62,6 +62,18 @@ export interface UserInfoDto {
      * @memberof UserInfoDto
      */
     organization?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserInfoDto
+     */
+    rank?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserInfoDto
+     */
+    affiliation?: string;
 }
 
 

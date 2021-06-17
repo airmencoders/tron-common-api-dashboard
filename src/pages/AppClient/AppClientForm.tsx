@@ -2,8 +2,7 @@ import { useHookstate, useState } from "@hookstate/core";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
 import { Validation } from "@hookstate/validation";
-import React, { FormEvent } from 'react';
-import ApiSpecCellRenderer from "../../components/ApiSpecCellRenderer/ApiSpecCellRenderer";
+import React, {FormEvent, useMemo} from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
@@ -23,6 +22,9 @@ import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validateSubscriberAddress } from '../../utils/validation-utils';
 import CopyIcon from "../../icons/CopyIcon";
+import Accordion from '../../components/Accordion/Accordion';
+import {AccordionItem} from '../../components/Accordion/AccordionItem';
+import AppSourceEndpointInfo from './AppSourceEndpointInfo';
 
 interface DeveloperEmail {
   email: string;
@@ -36,13 +38,25 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     read: props.data?.read || false,
     write: props.data?.write || false,
     appClientDeveloperEmails: props.data?.appClientDeveloperEmails ?? [],
-    appEndpointPrivs: props.data?.appEndpointPrivs ?? [],
+    appSourceEndpoints: props.data?.appSourceEndpoints ?? [],
   });
+  const expandedAppSource = useState<string | null>(null);
 
   const currentUser = accessAuthorizedUserState();
   const developerAddState = useHookstate({
     email: ''
   });
+
+  const appSourceAccordionItems: Array<AccordionItem> = useMemo(() => {
+    return formState.appSourceEndpoints?.get()?.map((appSourceDevDetails) => ({
+      title: `${appSourceDevDetails.name}`,
+      content: <AppSourceEndpointInfo
+          appSourceDevDetails={appSourceDevDetails}
+          isOpened={expandedAppSource.get() === appSourceDevDetails.appSourceId}
+      />,
+      id: appSourceDevDetails.appSourceId
+    })) || [];
+  },[formState.appSourceEndpoints, expandedAppSource.get()]);
 
   // if the app client record hasn't resolved yet then no point continuing yet
   if (formState.promised) return <></>;
@@ -63,7 +77,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
   function isFormModified() {
-    return Initial(formState.name).modified() 
+    return Initial(formState.name).modified()
             || Initial(formState.read).modified() || Initial(formState.write).modified()
             || Initial(formState.appClientDeveloperEmails).modified()
             || Initial(formState.clusterUrl).modified()
@@ -109,6 +123,10 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     return serverNameValid ? errors.concat([serverNameValid]) : errors;
   }
 
+  function handleAccordionExpanded(itemId: string | null) {
+    expandedAppSource.set(itemId);
+  }
+
   const deleteBtnName = 'Delete';
   const appClientDeveloperColumns: GridColumn[] = [
     new GridColumn({
@@ -122,9 +140,9 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   /**
    * Prevent anymore interactions with the grid
-   * after a successful submit or while the 
+   * after a successful submit or while the
    * current request is pending.
-   * 
+   *
    * Removes "remove" icon and functionality
    */
   if (!isFormDisabled()) {
@@ -138,37 +156,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     );
   }
 
-  const appSourceEndpointColumns: GridColumn[] = [
-    new GridColumn({
-      field: 'appSourceName',
-      sortable: true,
-      filter: true,
-      headerName: 'App Source',
-      cellRenderer: ApiSpecCellRenderer,
-      cellRendererParams: { showAsText: true }
-    }),
-    new GridColumn({
-      field: 'basePath',
-      sortable: true,
-      filter: true,
-      headerName: 'Base Path',
-      resizable: true,
-    }),
-    new GridColumn({
-      field: 'path',
-      sortable: true,
-      filter: true,
-      headerName: 'Path',
-      resizable: true,
-    }),
-    new GridColumn({
-      field: 'method',
-      sortable: true,
-      filter: true,
-      headerName: 'Request Type',
-      resizable: true
-    })
-  ];
+
 
   return (
     <Form className="app-client-form" onSubmit={(event) => submitForm(event)} data-testid="app-client-form">
@@ -223,7 +211,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       >
         <br/>
         <p>
-          The App Client URL is the url of your application in the cluster. The URI must be of an in-cluster, fully-qualified-domain-name (FQDN) format. 
+          The App Client URL is the url of your application in the cluster. The URI must be of an in-cluster, fully-qualified-domain-name (FQDN) format.
           The format is <em>http://app-name.app-namespace.svc.cluster.local/</em>, so an example would be&nbsp;
           <em>http://coolapp.coolapp.svc.cluster.local/</em>.  <br/><br/>The trailing slash is mandatory, and URL must <em>not</em> be https.
         </p>
@@ -307,11 +295,10 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         >
         </FormGroup>
 
-        <ItemChooser
-          columns={appSourceEndpointColumns}
-          items={formState.appEndpointPrivs.get() ?? []}
-          onRowClicked={() => { return; }}
-        />
+      <Accordion
+          className="app-source-access"
+          items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}
+      />
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}
