@@ -29,6 +29,7 @@ import RemoveIcon from '../../icons/RemoveIcon';
 import './OrganizationEditForm.scss';
 import PlusIcon from '../../icons/PlusIcon';
 import { getDefaultOrganizationEditState, OrganizationEditState } from './organization-edit-state';
+import { OrganizationChooserDataType } from '../../state/organization/organization-chooser-data-type';
 
 const personColumns = [ 
   new GridColumn({
@@ -52,6 +53,23 @@ const personColumns = [
   })
 ];
 
+const membersListColumns = [
+  new GridColumn({
+    field: 'lastName',
+    sortable: true,
+    filter: true,
+    headerName: 'Last',
+    checkboxSelection: true,
+    headerCheckboxSelection: true,
+  }),
+  new GridColumn({
+    field: 'firstName',
+    sortable: true,
+    filter: true,
+    headerName: 'First'
+  }),
+]
+
 const orgColumns = [ 
   new GridColumn({
     field: 'id',
@@ -68,6 +86,17 @@ const orgColumns = [
   })
 ];
 
+const subOrgListColumns = [
+  new GridColumn({
+    field: 'name',
+    sortable: true,
+    filter: true,
+    headerName: 'Name',
+    checkboxSelection: true,
+    headerCheckboxSelection: true,
+  }),
+];
+
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDetails>) {
   const orgState = useOrganizationState();  // handle to the org-service and state
   const formState = useState({
@@ -79,7 +108,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   const formStateExtended = useState<OrganizationEditState>(getDefaultOrganizationEditState());
 
   const [showChooserDialog, setChooserDialog] = React.useState(false); // whether to show the Chooser Dialog
-  const [chooserDataType, setChooserDataType] = React.useState<'person' | 'organization'>('person');  // the data to show in Chooser dialog
+  const [chooserDataType, setChooserDataType] = React.useState<OrganizationChooserDataType>(OrganizationChooserDataType.PERSON);  // the data to show in Chooser dialog
   const [chooserDataColumns, setChooserDataColumns] = React.useState(new Array<GridColumn>());  // the chosen row from the chooser dialog
 
   const [orgEditType, setOrgEditType] = React.useState(OrgEditOpType.NONE);  // what part of the org we're adding to
@@ -151,7 +180,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   function onEditLeaderClick() {
     setOrgEditType(OrgEditOpType.LEADER_EDIT);
     setChooserDataColumns(personColumns);
-    setChooserDataType('person');
+    setChooserDataType(OrganizationChooserDataType.PERSON);
     setChooserDialog(true);
   }
 
@@ -159,7 +188,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   function onEditParentOrg() {
     setOrgEditType(OrgEditOpType.PARENT_ORG_EDIT);
     setChooserDataColumns(orgColumns);
-    setChooserDataType('organization');
+    setChooserDataType(OrganizationChooserDataType.ORGANIZATION);
     setChooserDialog(true);
   }
 
@@ -167,7 +196,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   function onAddMemberClick() {
     setOrgEditType(OrgEditOpType.MEMBERS_EDIT);
     setChooserDataColumns(personColumns);
-    setChooserDataType('person');
+    setChooserDataType(OrganizationChooserDataType.PERSON);
     setChooserDialog(true);
   }
 
@@ -175,7 +204,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   const onAddSubOrgClick = () => {
     setOrgEditType(OrgEditOpType.SUB_ORGS_EDIT);
     setChooserDataColumns(orgColumns);
-    setChooserDataType('organization');
+    setChooserDataType(OrganizationChooserDataType.ORGANIZATION);
     setChooserDialog(true);
   }
 
@@ -401,10 +430,10 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
    * @param chooserDataType type of data being passed to Chooser
    * @returns list of string ids to exclude
    */
-  function getIdsToExclude(chooserDataType: 'person' | 'organization'): string[] {
+  function getIdsToExclude(chooserDataType: OrganizationChooserDataType): string[] {
     let ids: string[] = [];
 
-    if (chooserDataType === 'person') {
+    if (chooserDataType === OrganizationChooserDataType.PERSON) {
       ids = formState.members.get().reduce<string[]>((result, item) => {
         if (item.id) {
           result.push(item.id);
@@ -585,22 +614,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                 height="300px"
                 data-testid="membersList"
                 data={formState.members.attach(Downgraded).get() || []}
-                columns={[
-                  new GridColumn({
-                    field: 'lastName',
-                    sortable: true,
-                    filter: true,
-                    headerName: 'Last',
-                    checkboxSelection: true,
-                    headerCheckboxSelection: true,
-                  }),
-                  new GridColumn({
-                    field: 'firstName',
-                    sortable: true,
-                    filter: true,
-                    headerName: 'First'
-                  }),
-                ]}
+                columns={membersListColumns}
                 rowClass="ag-grid--row-pointer"
                 onRowSelected={onOrganizationMembersRowSelection}
                 suppressRowClickSelection
@@ -640,16 +654,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                 height="300px"
                 data-testid="subOrgsList"
                 data={formState.subordinateOrganizations.attach(Downgraded).get() || []}
-                columns={[
-                  new GridColumn({
-                    field: 'name',
-                    sortable: true,
-                    filter: true,
-                    headerName: 'Name',
-                    checkboxSelection: true,
-                    headerCheckboxSelection: true,
-                  }),
-                ]}
+                columns={subOrgListColumns}
                 rowClass="ag-grid--row-pointer"
                 suppressRowClickSelection
                 onRowSelected={onOrganizationSubOrgsRowSelection}

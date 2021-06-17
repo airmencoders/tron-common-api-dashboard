@@ -1,4 +1,4 @@
-import { GridApi, IDatasource, RowClickedEvent } from 'ag-grid-community';
+import { GridApi, RowClickedEvent } from 'ag-grid-community';
 import GridColumn from './GridColumn';
 
 export interface GridProps {

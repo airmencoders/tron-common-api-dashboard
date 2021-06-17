@@ -20,6 +20,7 @@ import { PatchResponse } from '../data-service/patch-response';
 import { OrganizationPatchRequestType } from './organization-patch-request-type';
 import { ResponseType } from '../data-service/response-type';
 import { OrganizationEditState } from '../../pages/Organization/organization-edit-state';
+import { OrganizationChooserDataType } from './organization-chooser-data-type';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -124,8 +125,8 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   private personChooserSort?: string[];
   private organizationChooserSort?: string[];
 
-  async fetchAndStoreChooserPaginatedData(type: 'organization' | 'person', page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[] | OrganizationDto[]> {
-    if (type !== 'organization' && type !== 'person') {
+  async fetchAndStoreChooserPaginatedData(type: OrganizationChooserDataType, page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[] | OrganizationDto[]> {
+    if (type !== OrganizationChooserDataType.ORGANIZATION && type !== OrganizationChooserDataType.PERSON) {
       throw new Error(`${type} is not supported for Chooser data`);
     }
 
@@ -133,7 +134,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       throw TypeValidation.validationError('FilterDto');
     }
 
-    if (type === 'person') {
+    if (type === OrganizationChooserDataType.PERSON) {
       /**
        * If the filter or sort changes, purge the state to start fresh.
        * Set filter to the new value
@@ -200,7 +201,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     return responseData;
   }
 
-  createDatasource(type: 'organization' | 'person', idsToExclude?: string[], infiniteScrollOptions?: InfiniteScrollOptions) {
+  createDatasource(type: OrganizationChooserDataType, idsToExclude?: string[], infiniteScrollOptions?: InfiniteScrollOptions) {
     const datasource: IDatasource = {
       getRows: async (params: IGetRowsParams) => {
         try {
@@ -234,7 +235,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
            * then that is the last page.
            */
           if (data.length == 0 || data.length < limit)
-            lastRow = type === 'person' ? this.personChooserState.length : this.organizationChooserState.length;
+            lastRow = type === OrganizationChooserDataType.PERSON ? this.personChooserState.length : this.organizationChooserState.length;
 
           params.successCallback(data, lastRow);
         } catch (err) {
