@@ -1,0 +1,18 @@
+@import "../../styles/base";
+
+.audit-log-details-form {
+  .success-error-message {
+    margin-top: units(4);
+  }
+}
+.search-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: units(2);
+  margin-left: units(2);
+  .button-container {
+    &__search {
+      margin-left: units(2);
+    }
+  }
+}

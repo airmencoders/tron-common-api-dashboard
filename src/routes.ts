@@ -10,6 +10,7 @@ import HomePage from "./pages/Home/Home";
 import { AppSourcePage } from "./pages/AppSource/AppSourcePage";
 import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 import PubSubPage from "./pages/PubSub/PubSubPage";
+import AuditLogPage from "./pages/AuditLog/AuditLogPage";
 
 export interface RouteItem {
     path: string,
@@ -32,6 +33,7 @@ export enum RoutePath {
     NOT_FOUND = '/not-found',
     NOT_AUTHORIZED = '/not-authorized',
     PUB_SUB = '/pubsub',
+    AUDIT_LOG = '/audit-log',
     APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?',
     API_TEST = '/app-api/:apiId'
 }
@@ -109,6 +111,12 @@ export const routes: RouteItem[] = [
         path: RoutePath.LOGFILE,
         name: 'Logfile',
         component: LogfilePage,
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+    },
+    {
+        path: RoutePath.AUDIT_LOG,
+        name: 'Audit Logs',
+        component: AuditLogPage,
         requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
     }
 ];

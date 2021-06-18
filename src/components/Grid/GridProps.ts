@@ -44,4 +44,7 @@ export interface GridProps {
   rowModelType?: string;
 
   getRowNodeId?: ((item: any) => string);
+  
+  scrollToTop?: boolean;
+  scrollToTopCallback?: () => void;
 }
