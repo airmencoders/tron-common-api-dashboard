@@ -13,4 +13,8 @@
   &--disable-mobile-full-width {
     width: auto;
   }
+  
+  &--disable-transparent:disabled {
+    background-color: transparent;
+  }
 }

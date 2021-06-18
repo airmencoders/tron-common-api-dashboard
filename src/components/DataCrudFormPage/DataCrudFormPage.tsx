@@ -1,30 +1,34 @@
+import { Downgraded, State, useState } from '@hookstate/core';
 import { IDatasource, IGetRowsParams, RowClickedEvent } from 'ag-grid-community';
 import React, { ReactText, useEffect } from 'react';
+import Button from '../../components/Button/Button';
 import Grid from '../../components/Grid/Grid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { StatusType } from '../../components/StatusCard/status-type';
 import StatusCard from '../../components/StatusCard/StatusCard';
-import Button from '../../components/Button/Button';
-import {DataCrudFormPageProps} from './DataCrudFormPageProps';
-import {DataService} from '../../state/data-service/data-service';
-import {CrudPageState, getInitialCrudPageState} from '../../state/crud-page/crud-page-state';
-import { Downgraded, State, useState } from '@hookstate/core';
-import {FormActionType} from '../../state/crud-page/form-action-type';
-import {GridRowData} from '../Grid/grid-row-data';
-import './DataCrudFormPage.scss';
+import { CrudPageState, getInitialCrudPageState } from '../../state/crud-page/crud-page-state';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { DataService } from '../../state/data-service/data-service';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
 import DeleteCellRenderer from '../DeleteCellRenderer/DeleteCellRenderer';
+import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
+import { GridFilter } from '../Grid/grid-filter';
+import { GridRowData } from '../Grid/grid-row-data';
 import GridColumn from '../Grid/GridColumn';
+import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
 import Spinner from '../Spinner/Spinner';
-import DataCrudDelete from './DataCrudDelete';
-import { DataCrudFormErrors } from './data-crud-form-errors';
 import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import ErrorBoundary from '../ErrorBoundary/ErrorBoundary';
-import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../Grid/GridUtils/grid-utils';
-import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
-import { GridFilter } from '../Grid/grid-filter';
+import InfiniteScrollGrid from '../Grid/InfiniteScrollGrid/InfiniteScrollGrid';
+import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
+import { DataCrudFormErrors } from './data-crud-form-errors';
+import DataCrudDelete from './DataCrudDelete';
+import './DataCrudFormPage.scss';
+import { DataCrudFormPageProps } from './DataCrudFormPageProps';
+import { ResponseType } from '../../state/data-service/response-type';
+import { PatchResponse } from '../../state/data-service/patch-response';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -37,7 +41,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   const pageState: State<CrudPageState<R>> = useState<CrudPageState<R>>(getInitialCrudPageState());
 
-  const { infiniteScroll } = props;
+  const { infiniteScrollOptions: infiniteScroll } = props;
 
   const updateInfiniteCache = useState<boolean>(false);
 
@@ -53,6 +57,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   function updateInfiniteCacheCallback() {
     updateInfiniteCache.set(false);
+    props.refreshStateCallback?.();
+  }
+
+  function scrollToTopCallback() {
+    scrollToTopCallback?.();
   }
 
   function setUpdateInfiniteCache(status: boolean) {
@@ -63,7 +72,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     }
   }
 
-  function createInfiniteScrollDatasource(): IDatasource | undefined {
+  function createInfiniteScrollDatasource(): IDatasource {
     if (!infiniteScroll?.enabled) {
       throw new Error('Infinite scroll must be enabled to create datasource');
     }
@@ -81,7 +90,11 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
           const filter = new GridFilter(params.filterModel);
           const sort = convertAgGridSortToQueryParams(params.sortModel);
 
-          const data = await dataState.fetchAndStorePaginatedData(page, limit, true, filter.getFilterDto(), sort);
+          const data = await dataState.fetchAndStorePaginatedData(page,
+            limit,
+            true,
+            filter.getFilterDto(),
+            sort);
 
           let lastRow = -1;
 
@@ -145,9 +158,9 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
     if (props.allowEdit &&
-        !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) &&
-        !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics') &&
-        !(event.api.getFocusedCell()?.column.getColDef().headerName === 'API Spec')) {
+      !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) &&
+      !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics') &&
+      !(event.api.getFocusedCell()?.column.getColDef().headerName === 'API Spec')) {
       let rowData = event.data;
 
       // Ensure a blank row was not click before
@@ -221,6 +234,33 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     return createTextToast(ToastType.SUCCESS, message);
   }
 
+  /**
+   * Creates toast notifying of partial update.
+   * Creates additional error toasts for each error.
+   * 
+   * @param message The message for the toast that is always created
+   * @param errors The error messages for any additional toasts to be created
+   * @returns list of toast ids
+   */
+  function onActionPartialSuccess(message: string, errors?: string[]): ReactText[] {
+    setUpdateInfiniteCache(true);
+
+    const ids: ReactText[] = [];
+    ids.push(createTextToast(ToastType.WARNING, message));
+
+    if (errors != null) {
+      errors.forEach(item => {
+        ids.push(createTextToast(ToastType.ERROR, item));
+      });
+    }
+
+    pageState.merge({
+      isSubmitting: false
+    })
+
+    return ids;
+  }
+
   function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
     let formErrors: DataCrudFormErrors = {
       general: error.message ?? 'Unknown error occurred'
@@ -291,7 +331,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     catch (error) {
       pageState.set(prevState => {
         return {
-          ... prevState,
+          ...prevState,
           formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
@@ -300,25 +340,47 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   }
 
   async function updatePatch(...args: any) {
-
     // make sure service implements this optional method...
     if (!dataState.sendPatch) return;
 
     pageState.merge({
-      isSubmitting: false
+      isSubmitting: true
     });
-    try {
-      await dataState.sendPatch(...args);
 
-      onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
-    }
-    catch (error) {
-      pageState.set(prevState => {
-        return {
-          ... prevState,
-          formErrors: convertErrorToDataCrudFormError(error),
-          isSubmitting: false
+    try {
+      const response = await dataState.sendPatch(...args);
+
+      switch (response.type) {
+        case ResponseType.SUCCESS: {
+          onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
+          break;
         }
+
+        case ResponseType.PARTIAL: {
+          const errors = response.errors;
+          onActionPartialSuccess(`Partial updated on ${props.dataTypeName} successful.`, errors?.map(error => {
+            const preparedMessage = prepareDataCrudErrorResponse(error);
+
+            return preparedMessage.general ?? error.message;
+          }));
+          break;
+        }
+
+        default:
+          break;
+      }
+    } catch (error) {
+      const response = error as PatchResponse<T>;
+      response.errors?.forEach(err => {
+        const preparedMessage = prepareDataCrudErrorResponse(err);
+        createTextToast(ToastType.ERROR, preparedMessage.general ?? err.message);
+      });
+
+      pageState.merge({
+        formErrors: {
+          general: `Failed to update ${props.dataTypeName}`
+        },
+        isSubmitting: false
       });
     }
   }
@@ -335,7 +397,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     catch (error) {
       pageState.set(prevState => {
         return {
-          ... prevState,
+          ...prevState,
           formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
         }
@@ -369,13 +431,23 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     <>
       <PageFormat pageTitle={props.pageTitle} className={`${props.className ?? ''}`}>
         <ErrorBoundary>
+
+          {/* render any children before the ag grid (if present) */}
+          {
+            props.beforeChildren ?
+              <div style={{ marginBottom: '10px' }}>
+                {props.beforeChildren}
+              </div>
+              :
+              null
+          }
           {dataState.isPromised ?
             <Spinner centered />
             :
             dataState.error ?
               <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
               :
-              <div style={{ height: '100%' }} className="data-crud-content">
+              <div className="data-crud-content">
                 {
                   props.allowAdd && CreateForm &&
                   <div className="add-data-container">
@@ -384,21 +456,21 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                     </Button>
                   </div>
                 }
-
                 {infiniteScroll?.enabled ?
-                  <Grid
+                  <InfiniteScrollGrid
                     columns={columns}
                     onRowClicked={onRowClicked}
                     rowClass="ag-grid--row-pointer"
                     autoResizeColumns={props.autoResizeColumns}
                     autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
                     disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
-                    rowModelType="infinite"
                     datasource={createInfiniteScrollDatasource()}
                     cacheBlockSize={generateInfiniteScrollLimit(infiniteScroll)}
                     maxBlocksInCache={infiniteScroll.maxBlocksInCache}
                     maxConcurrentDatasourceRequests={infiniteScroll.maxConcurrentDatasourceRequests}
-                    updateInfiniteCache={updateInfiniteCache.get()}
+                    scrollToTop={props.scrollToTop}
+                    scrollToTopCallback={props.scrollToTopCallback}
+                    updateInfiniteCache={props.refreshState || updateInfiniteCache.get()}
                     updateInfiniteCacheCallback={updateInfiniteCacheCallback}
                   />
                   :
@@ -410,6 +482,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                     autoResizeColumns={props.autoResizeColumns}
                     autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
                     disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
+                    scrollToTop={props.scrollToTop}
+                    scrollToTopCallback={props.scrollToTopCallback}
                   />
                 }
 

@@ -6,8 +6,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
 import { GridProps } from './GridProps';
 import { agGridDefaults } from './GridUtils/grid-utils';
+import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGridProps';
 
-function Grid(props: GridProps) {
+function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const gridSizeRef = useRef(null);
   const gridReady = (event: GridReadyEvent) => {
@@ -68,7 +69,7 @@ function Grid(props: GridProps) {
     if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0))
       gridApi?.sizeColumnsToFit();
 
-  }, [windowWidth.get()])
+    }, [windowWidth.get()])
 
   // Handles updating infinite scroll cache
   useEffect(() => {
@@ -77,6 +78,16 @@ function Grid(props: GridProps) {
       props.updateInfiniteCacheCallback?.();
     }
   }, [props.updateInfiniteCache]);
+
+  // Handles scrolling to top
+  useEffect(() => {
+    if (props.scrollToTop) {
+      gridApi?.purgeInfiniteCache();
+      gridApi?.ensureIndexVisible(0);
+      props.scrollToTopCallback?.();
+    }
+  }, [props.scrollToTop]);
+
 
   function onRowSelected(event: RowSelectedEvent) {
     const data = event.data;
@@ -109,6 +120,7 @@ function Grid(props: GridProps) {
                 cacheBlockSize={props.cacheBlockSize ?? agGridDefaults.cacheBlockSize}
                 maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
                 maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
+                getRowNodeId={props.getRowNodeId}
             >
               {
                 props.columns.map(col => (

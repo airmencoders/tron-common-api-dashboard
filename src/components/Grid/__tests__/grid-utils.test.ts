@@ -1,9 +1,9 @@
 import { agGridDefaults, agGridFilterOptions, convertAgGridSortToQueryParams, createDefaultGridFilterParamsForType, generateInfiniteScrollLimit } from '../GridUtils/grid-utils';
-import { InfiniteScroll } from '../infinite-scroll';
+import { InfiniteScrollOptions } from '../../DataCrudFormPage/infinite-scroll-options';
 
 describe('Grid Utils Test', () => {
   it('Should generate infinite scroll limit correctly', () => {
-    const infiniteScroll: InfiniteScroll = {
+    const infiniteScroll: InfiniteScrollOptions = {
       enabled: true,
       limit: 10
     };

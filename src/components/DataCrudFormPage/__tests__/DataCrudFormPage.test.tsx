@@ -3,11 +3,14 @@ import DataCrudDeleteContent from '../DataCrudDeleteContent';
 import { render, waitFor, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 import {DataCrudFormPage} from '../DataCrudFormPage';
 import {DataService} from '../../../state/data-service/data-service';
-import { createState, none, postpone, State, StateMethodsDestroy, useState } from '@hookstate/core';
+import { createState, none, State, StateMethodsDestroy, useState } from '@hookstate/core';
 import GridColumn from '../../Grid/GridColumn';
 import {MemoryRouter} from 'react-router-dom';
 import { DataCrudDeleteComponentProps } from '../../DataCrudFormPage/DataCrudDeleteComponentProps';
 import { ToastContainer } from '../../Toast/ToastContainer/ToastContainer';
+import { PatchResponse } from '../../../state/data-service/patch-response';
+import { ResponseType } from '../../../state/data-service/response-type';
+import { FilterDto } from '../../../openapi';
 
 interface TestRow {
   id: string;
@@ -29,6 +32,15 @@ class TestDataService implements DataService<TestRow, TestDto> {
     const initData = [
       { id: '0', val: 'val0'},
       { id: '1', val: 'val1'},
+    ];
+    this.state.set(initData);
+    return Promise.resolve(initData);
+  }
+
+  fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<TestRow[]> {
+    const initData = [
+      { id: '0', val: 'val0' },
+      { id: '1', val: 'val1' },
     ];
     this.state.set(initData);
     return Promise.resolve(initData);
@@ -59,8 +71,11 @@ class TestDataService implements DataService<TestRow, TestDto> {
     return Promise.resolve();
   }
 
-  sendPatch(params: any): Promise<TestRow> {
-    return Promise.resolve({ id: '0', val: 'val0' });
+  sendPatch(params: any): Promise<PatchResponse<TestRow>> {
+    return Promise.resolve({
+      type: ResponseType.SUCCESS,
+      data: { id: '0', val: 'val0' }
+    });
   }
 
   convertRowDataToEditableData(rowData: TestRow): Promise<TestDto> {
@@ -160,8 +175,11 @@ class TestDataRequestErrorService implements DataService<TestRow, TestDto> {
     throw new Error(this.errorMsg);
   }
 
-  sendPatch(params: any): Promise<TestRow> {
-    throw new Error(this.errorMsg);
+  sendPatch(params: any): Promise<PatchResponse<TestRow>> {
+    return Promise.reject({
+      type: ResponseType.FAIL,
+      errors: [new Error(this.errorMsg)]
+    });
   }
 
   onPatch(params: any): Promise<TestRow> {
@@ -667,6 +685,43 @@ describe('Test DataCrudFormPage', () => {
     fireEvent.click(patchBtn);
 
     await expect(screen.findByText('Error')).resolves.toBeInTheDocument();
+  });
+
+  it('should render infinite scroll', async () => {
+    render(
+      <MemoryRouter>
+        <DataCrudFormPage<TestRow, TestDto>
+          useDataState={wrappedState}
+          columns={[
+            new GridColumn({
+              field: 'id',
+              headerName: 'id'
+            }),
+            new GridColumn({
+              field: 'val',
+              headerName: 'val'
+            }),
+          ]}
+          createForm={CreateUpdateTestForm}
+          updateForm={CreateUpdateTestForm}
+          deleteComponent={DeleteComponent}
+          pageTitle="Test Page Title"
+          dataTypeName="Test"
+          allowEdit={true}
+          allowAdd
+          allowDelete
+          infiniteScrollOptions={{
+            enabled: true
+          }}
+        />
+      </MemoryRouter>
+    );
+
+    await waitFor(
+      () => expect(screen.getAllByText('Test Page Title')).toBeTruthy()
+    );
+    const tableVal = await screen.findByText('val0');
+    expect(tableVal).toBeTruthy();
   });
 });
 

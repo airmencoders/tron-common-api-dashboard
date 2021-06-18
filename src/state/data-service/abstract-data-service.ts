@@ -2,6 +2,7 @@ import { postpone, State } from '@hookstate/core';
 import { GridRowData } from '../../components/Grid/grid-row-data';
 import { FilterDto } from '../../openapi';
 import { DataService } from './data-service';
+import { PatchResponse } from './patch-response';
 
 export abstract class AbstractDataService<T extends GridRowData, R> implements DataService<T, R> {
   constructor(public state: State<T[]>) {
@@ -13,7 +14,7 @@ export abstract class AbstractDataService<T extends GridRowData, R> implements D
   abstract sendUpdate(toUpdate: R): Promise<T>;
   abstract sendCreate(toCreate: R): Promise<T>;
   abstract sendDelete(toDelete: R): Promise<void>;
-  abstract sendPatch?(...args: any): Promise<T>;
+  abstract sendPatch?(...args: any): Promise<PatchResponse<T>>;
   abstract convertRowDataToEditableData(rowData: T): Promise<R>;
 
   get isPromised(): boolean {
