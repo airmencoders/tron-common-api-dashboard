@@ -6,8 +6,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
 import { GridProps } from './GridProps';
 import { agGridDefaults } from './GridUtils/grid-utils';
+import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGridProps';
 
-function Grid(props: GridProps) {
+function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const gridSizeRef = useRef(null);
   const gridReady = (event: GridReadyEvent) => {
@@ -119,6 +120,7 @@ function Grid(props: GridProps) {
                 cacheBlockSize={props.cacheBlockSize ?? agGridDefaults.cacheBlockSize}
                 maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
                 maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
+                getRowNodeId={props.getRowNodeId}
             >
               {
                 props.columns.map(col => (

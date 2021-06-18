@@ -15,7 +15,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
     private scratchStorageApi: ScratchStorageControllerApiInterface) {
   }
 
-  sendPatch?: ((...args: any) => Promise<ScratchStorageAppRegistryDto>) | undefined;
+  sendPatch = undefined;
 
   async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
     const response = (): AxiosPromise<ScratchStorageAppRegistryDtoResponseWrapper> => this.scratchStorageApi.getScratchSpaceAppsWrapped();

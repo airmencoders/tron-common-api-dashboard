@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterConditionOperatorEnum, FilterCriteria, FilterCriteriaRelationTypeEnum, FilterDto } from '../../openapi';
+import { FilterCondition, FilterConditionOperatorEnum, FilterCriteria, FilterCriteriaRelationTypeEnum, FilterDto } from '../../openapi';
 import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
 import { GridFilterModel } from './grid-filter-model';
 import { GridFilterOperatorType } from './grid-filter-operator-type';
@@ -11,6 +11,8 @@ export class GridFilter {
     this.gridFilter = gridFilter;
   }
 
+  private additionalFilters: Array<FilterCriteria> = [];
+
   /**
    * Gets the FilterDto
    * @returns the FilterDto value, or undefined if no filter exists
@@ -19,25 +21,38 @@ export class GridFilter {
   getFilterDto(): FilterDto | undefined {
     const fieldNames = Object.keys(this.gridFilter);
 
-    if (fieldNames.length === 0) {
-      return;
-    }
-
     const filterDto: FilterDto = {
       filterCriteria: []
     };
 
-    try {
-      for (const fieldName of fieldNames) {
-        const filter = this.gridFilter[fieldName];
+    if (fieldNames.length > 0) {
+      try {
+        for (const fieldName of fieldNames) {
+          const filter = this.gridFilter[fieldName];
 
-        filterDto.filterCriteria.push(GridFilter.convertAgGridFilterToFilterCriteria(fieldName, filter));
+          filterDto.filterCriteria.push(GridFilter.convertAgGridFilterToFilterCriteria(fieldName, filter));
+        }
+      } catch (err) {
+        throw err;
       }
-    } catch (err) {
-      throw err;
     }
 
-    return filterDto;
+    filterDto.filterCriteria = filterDto.filterCriteria.concat(this.additionalFilters);
+
+    return filterDto.filterCriteria.length > 0 ? filterDto : undefined;
+  }
+
+
+  addMultiFilter(fieldName: string, relationType: FilterCriteriaRelationTypeEnum, conditions: FilterCondition[]): void {
+    if (conditions.length === 0) {
+      return;
+    }
+
+    this.additionalFilters.push({
+      relationType,
+      field: fieldName,
+      conditions
+    });
   }
 
   /**

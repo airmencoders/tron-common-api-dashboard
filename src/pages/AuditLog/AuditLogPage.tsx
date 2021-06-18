@@ -283,7 +283,7 @@ function AuditLogPage() {
       autoResizeColumns
       autoResizeColummnsMinWidth={1200}
       beforeChildren={searchForm()}
-      infiniteScroll={{enabled: true}}
+      infiniteScrollOptions={{enabled: true}}
       refreshState={refreshGrid}
       refreshStateCallback={() => setRefreshGrid(false)}
       scrollToTop={scrollToTop}

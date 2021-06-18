@@ -1,4 +1,4 @@
-import { GridApi, IDatasource, RowClickedEvent } from 'ag-grid-community';
+import { GridApi, RowClickedEvent } from 'ag-grid-community';
 import GridColumn from './GridColumn';
 
 export interface GridProps {
@@ -42,13 +42,9 @@ export interface GridProps {
   onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
 
   rowModelType?: string;
-  datasource?: IDatasource;
-  cacheBlockSize?: number;
-  maxBlocksInCache?: number;
-  maxConcurrentDatasourceRequests?: number;
-  updateInfiniteCache?: boolean;
-  updateInfiniteCacheCallback?: () => void;
 
+  getRowNodeId?: ((item: any) => string);
+  
   scrollToTop?: boolean;
   scrollToTopCallback?: () => void;
 }
