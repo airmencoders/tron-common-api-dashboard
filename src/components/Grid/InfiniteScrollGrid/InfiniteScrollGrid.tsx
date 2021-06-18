@@ -23,6 +23,8 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
       getRowNodeId={props.getRowNodeId}
       suppressRowClickSelection={props.suppressRowClickSelection}
       onRowSelected={props.onRowSelected}
+      scrollToTop={props.scrollToTop}
+      scrollToTopCallback={props.scrollToTopCallback}
     />
   );
 }
