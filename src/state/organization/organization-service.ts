@@ -37,7 +37,6 @@ export enum OrgEditOpType {
 }
 
 export default class OrganizationService extends AbstractDataService<OrganizationDto, OrganizationDtoWithDetails> {
-
   private readonly validate: ValidateFunction<OrganizationDto>;
   private readonly filterValidate: ValidateFunction<FilterDto>;
 
@@ -321,15 +320,13 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   }
 
   async sendCreate(toCreate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
-    if(!this.validate(toCreate)) {
-      throw TypeValidation.validationError('OrganizationDto');
-    }
+    const toCreateDto: OrganizationDto = this.convertOrgDetailsToDto(toCreate);
+    
     try {
-      const orgResponse = await this.orgApi.createOrganization(toCreate);
+      const orgResponse = await this.orgApi.createOrganization(toCreateDto);
 
-      const newOrg = orgResponse.data;
-      newOrg.members = undefined;
-      newOrg.subordinateOrganizations = undefined;
+      const newOrg = this.removeUnfriendlyAgGridDataSingle(orgResponse.data);
+
       this.state[this.state.length].set(newOrg);
 
       return Promise.resolve(orgResponse.data);
@@ -346,10 +343,6 @@ export default class OrganizationService extends AbstractDataService<Organizatio
    * @param toUpdate
    */
   async sendUpdate(toUpdate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
-    if(!this.validate(toUpdate)) {
-      throw TypeValidation.validationError('OrganizationDto');
-    }
-
     if (toUpdate?.id == null) {
       return Promise.reject(new Error('Organization to update has undefined id.'));
     }
@@ -362,9 +355,8 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
       const orgResponse = await this.orgApi.jsonPatchOrganization(toUpdate.id, jsonPatchOperations);
 
-      const patchedOrg = orgResponse.data;
-      patchedOrg.members = undefined;
-      patchedOrg.subordinateOrganizations = undefined;
+      const patchedOrg = this.removeUnfriendlyAgGridDataSingle(orgResponse.data);
+      
       const index = this.state.get().findIndex(item => item.id === patchedOrg.id);
       this.state[index].set(patchedOrg);
 
