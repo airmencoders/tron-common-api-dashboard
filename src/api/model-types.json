@@ -1058,16 +1058,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -1124,16 +1118,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -1421,16 +1409,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -2043,16 +2025,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -2201,16 +2177,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"

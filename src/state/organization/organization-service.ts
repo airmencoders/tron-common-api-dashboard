@@ -321,7 +321,9 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
   async sendCreate(toCreate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
     const toCreateDto: OrganizationDto = this.convertOrgDetailsToDto(toCreate);
-    
+
+    console.log(toCreateDto)
+
     try {
       const orgResponse = await this.orgApi.createOrganization(toCreateDto);
 
@@ -560,7 +562,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       leader: withDetails.leader?.id,
       members: withDetails.members?.flatMap(member => member.id != null ? member.id : []),
       parentOrganization: withDetails.parentOrganization?.id,
-      subordinateOrganizations: new Set(withDetails.subordinateOrganizations?.flatMap(org => org.id != null ? org.id : [])),
+      subordinateOrganizations: withDetails.subordinateOrganizations?.flatMap(org => org.id != null ? org.id : []),
       name: withDetails.name,
       orgType: withDetails.orgType,
       branchType: withDetails.branchType
