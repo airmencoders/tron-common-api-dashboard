@@ -211,10 +211,10 @@ describe('Test OrganizationService', () => {
         '1',
         '2'
       ],
-      subordinateOrganizations: new Set([
+      subordinateOrganizations: [
         '3',
         '4'
-      ])
+      ]
     };
 
     const removedFieldsOrg = organizationService.removeUnfriendlyAgGridDataSingle(org);
@@ -609,7 +609,7 @@ describe('Test OrganizationService', () => {
       name: orgDetails.name,
       leader: orgDetails.leader?.id,
       members: [orgDetails.members![0].id!],
-      subordinateOrganizations: new Set([orgDetails.subordinateOrganizations![0].id!]),
+      subordinateOrganizations: [orgDetails.subordinateOrganizations![0].id!],
       parentOrganization: orgDetails.parentOrganization?.id,
       orgType: OrganizationDtoOrgTypeEnum.Group,
       branchType: OrganizationDtoBranchTypeEnum.Usaf
