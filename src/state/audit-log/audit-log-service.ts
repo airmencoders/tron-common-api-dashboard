@@ -5,6 +5,7 @@ import { FilterDto, HttpLogEntryDetailsDto, HttpLogEntryDto, HttpLogsControllerA
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import { AbstractDataService } from '../data-service/abstract-data-service';
 import { SearchLogParams } from './audit-log-state';
+import isEqual from 'fast-deep-equal';
 
 export default class AuditLogService extends AbstractDataService<HttpLogEntryDto, HttpLogEntryDetailsDto> {
   private readonly validate: ValidateFunction<HttpLogEntryDto>;
@@ -33,16 +34,35 @@ export default class AuditLogService extends AbstractDataService<HttpLogEntryDto
   */
   private sort?: string[];
 
+  private searchParams?: SearchLogParams;
+
   async fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<HttpLogEntryDto[]> {
+    const searchParams: SearchLogParams = {
+      date: this.searchParamsState.date.value + "T00:00:00",
+      requestMethod: this.searchParamsState.requestMethod.value,
+      userNameContains: this.searchParamsState.userNameContains.value,
+      statusCode: this.searchParamsState.statusCode.value || String(-1),
+      userAgentContains: this.searchParamsState.userAgentContains.value,
+      requestedUrlContains: this.searchParamsState.requestedUrlContains.value,
+      remoteIpContains: '',
+      hostContains: '',
+      queryStringContains: ''
+    };
+
+    if (!isEqual(this.searchParams, searchParams)) {
+      this.state.set([]);
+      this.searchParams = searchParams;
+    }
+
     let httpResponseData: HttpLogEntryDto[] = [];
     try {        
       httpResponseData = await this.httpLogControllerApi.getHttpLogs(
-            this.searchParamsState.date.value + "T00:00:00", 
-            this.searchParamsState.requestMethod.value,
-            this.searchParamsState.userNameContains.value,
-            Number(this.searchParamsState.statusCode.value) || -1,
-            this.searchParamsState.userAgentContains.value,
-            this.searchParamsState.requestedUrlContains.value,
+            searchParams.date,
+            searchParams.requestMethod,
+            searchParams.userNameContains,
+            Number(searchParams.statusCode),
+            searchParams.userAgentContains,
+            searchParams.requestedUrlContains,
             page, 
             limit,
             sort).then(resp => {
