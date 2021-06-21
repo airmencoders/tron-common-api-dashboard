@@ -322,8 +322,6 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   async sendCreate(toCreate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
     const toCreateDto: OrganizationDto = this.convertOrgDetailsToDto(toCreate);
 
-    console.log(toCreateDto)
-
     try {
       const orgResponse = await this.orgApi.createOrganization(toCreateDto);
 
