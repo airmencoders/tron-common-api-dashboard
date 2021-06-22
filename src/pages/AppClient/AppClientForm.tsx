@@ -24,6 +24,7 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointInfo from './AppSourceEndpointInfo';
+import './AppClientPage.scss';
 
 interface DeveloperEmail {
   email: string;
@@ -262,17 +263,11 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
     return (
       <div>
-        <div style={{          
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          alignContent: 'flex-start',
-          alignItems: 'flex-start'          
-        }} data-testid={kind + '-privileges'}>
+        <div className='crud-level-checkboxes' data-testid={kind + '-privileges'}>
         {
           crudLevelPrivs.map(item => 
             item.priv.name.match(/_EDIT/) ?
-              <div key={item.priv.name} style={{ marginLeft: '10px' }}>
+              <div key={item.priv.name} className='crud-level-checkbox'>
                 <Checkbox
                   id={item.priv.name}
                   name={item.priv.name}       
@@ -287,7 +282,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                 />
               </div>
             :
-              <div key={item.priv.name} style={{ marginLeft: '10px' }}>
+              <div key={item.priv.name} className='crud-level-checkbox'>
                 <Checkbox
                   id={item.priv.name}
                   name={item.priv.name}   
@@ -307,10 +302,10 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
             labelName={kind + "Fields"}
             labelText={kind.substr(0, 1).toUpperCase() + kind.substr(1) + " Fields"}
           >
-            <div style={{height: '200px',overflow: 'auto',}}>
+            <div className='field-level-privs'>
             {
               fieldLevelPrivs.map(item =>
-                <div key={item.priv.name} style={{ marginLeft: '10px' }}>
+                <div key={item.priv.name} className='crud-level-checkbox'>
                   <Checkbox
                     id={item.priv.name}
                     name={item.priv.name}                
@@ -422,14 +417,16 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         />
       </FormGroup>
 
-      <Accordion
-        className="app-source-access"
-        items={[{
-            title: 'Person Entity Permissions',
-            content: buildPrivForm(PrivilegeKind.PERSON),
-            id: 'person-accordian'
-        }]}
-      />
+      <div className='accordian-top-spacer'>
+        <Accordion
+          className="app-source-access"
+          items={[{
+              title: 'Person Entity Permissions',
+              content: buildPrivForm(PrivilegeKind.PERSON),
+              id: 'person-accordian'
+          }]}
+        />
+      </div>
 
       <Accordion
         className="app-source-access"
