@@ -4,6 +4,7 @@ import {
   AppClientControllerApi,
   AppClientControllerApiInterface,
   AppClientUserDtoResponseWrapped,
+  PrivilegeDto,
   SubscriberControllerApi,
   SubscriberControllerApiInterface,
   SubscriberDto,
@@ -16,12 +17,14 @@ import {DataCrudFormErrors} from '../../../components/DataCrudFormPage/data-crud
 import AppClientsService from "../../app-clients/app-clients-service";
 import {accessAppClientsState} from "../../app-clients/app-clients-state";
 import {AppClientFlat} from "../../app-clients/app-client-flat";
+import { PrivilegeType } from '../../privilege/privilege-type';
 
 jest.mock('../../app-clients/app-clients-state');
 
 describe('Subscriber State Test', () => {
   let pubSubUserState: State<SubscriberDto[]> & StateMethodsDestroy;
   let appClientUserState: State<AppClientFlat[]> & StateMethodsDestroy;
+  let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
   let pubSubApi: SubscriberControllerApiInterface;
   let appClientApi: AppClientControllerApiInterface;
   let state: PubSubService;
@@ -96,6 +99,10 @@ describe('Subscriber State Test', () => {
     appClientUserState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
     pubSubApi = new SubscriberControllerApi();
     appClientApi = new AppClientControllerApi();
+
+    let counter = 0;
+    const privilegeDtos: PrivilegeDto[] = Object.values(PrivilegeType).map((item : any) => ({id: counter++, name: item }));
+    privilegeState = createState<PrivilegeDto[]>(privilegeDtos);
     state = wrapState(pubSubUserState, pubSubApi);
   });
 
@@ -104,7 +111,7 @@ describe('Subscriber State Test', () => {
   });
 
   function mockAppClientsState() {
-    (accessAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientUserState, appClientApi));
+    (accessAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientUserState, appClientApi, privilegeState));
     appClientApi.getAppClientUsersWrapped = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve({
         data: { data: [] },
