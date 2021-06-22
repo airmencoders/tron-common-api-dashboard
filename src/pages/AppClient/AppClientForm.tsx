@@ -23,7 +23,6 @@ import { accessAuthorizedUserState } from '../../state/authorized-user/authorize
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
-import './AppClientForm.scss';
 import AppSourceEndpointInfo from './AppSourceEndpointInfo';
 
 interface DeveloperEmail {
