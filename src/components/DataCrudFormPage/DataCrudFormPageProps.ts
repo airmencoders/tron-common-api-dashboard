@@ -1,9 +1,9 @@
 import { DataService } from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
-import { InfiniteScroll } from '../Grid/infinite-scroll';
+import { InfiniteScrollOptions } from './infinite-scroll-options';
 import { CreateUpdateFormProps } from './CreateUpdateFormProps';
 import { DataCrudDeleteComponentProps } from './DataCrudDeleteComponentProps';
-import {SideDrawerSize} from '../SideDrawer/side-drawer-size';
+import { SideDrawerSize } from '../SideDrawer/side-drawer-size';
 
 /***
  * T Row data type.
@@ -84,7 +84,7 @@ export interface DataCrudFormPageProps<T, R> {
 
   className?: string;
 
-  infiniteScroll?: InfiniteScroll;
+  infiniteScrollOptions?: InfiniteScrollOptions;
 
   /**
    * Any JSX elements we want to render above the ag-grid (optional)

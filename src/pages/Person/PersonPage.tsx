@@ -78,7 +78,7 @@ function PersonPage() {
       deleteComponent={PersonDelete}
       autoResizeColumns
       autoResizeColummnsMinWidth={1200}
-      infiniteScroll={{
+      infiniteScrollOptions={{
         enabled: true
       }}
     />

@@ -114,11 +114,9 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
       const personResponse = await this.personApi.updatePerson(toUpdate.id, toUpdate);
-      this.state.set(currentState => {
-        const currentPersonIndex = currentState.findIndex(person => person.id === personResponse.data.id);
-        currentState[currentPersonIndex] = personResponse.data;
-        return [...currentState];
-      });
+
+      this.state.find(personInState => personInState.id.get() === personResponse.data.id)?.set(personResponse.data);
+
       return Promise.resolve(personResponse.data);
     }
     catch (error) {
@@ -127,14 +125,17 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendSelfUpdate(toUpdate: PersonDto): Promise<PersonDto> {
+    if (!this.validate(toUpdate)) {
+      throw TypeValidation.validationError('PersonDto');
+    }
+
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
       const personResponse = await this.personApi.selfUpdatePerson(toUpdate.id, toUpdate);
 
-      const personInState = this.state.find(person => person.id.get() === personResponse.data.id);
-      personInState?.set(personResponse.data);
+      this.state.find(person => person.id.get() === personResponse.data.id)?.set(personResponse.data);
 
       return Promise.resolve(personResponse.data);
     }
@@ -144,14 +145,20 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendDelete(toDelete: PersonDto): Promise<void> {
+    if (!this.validate(toDelete)) {
+      throw TypeValidation.validationError('PersonDto');
+    }
+
+    if (toDelete?.id == null) {
+      return Promise.reject(new Error('Person to delete has undefined id.'));
+    }
+
     try {
-      const response = await this.personApi.deletePerson(toDelete.id || '');
+      await this.personApi.deletePerson(toDelete.id);
 
-      const item = this.state.find(item => item.id.get() === toDelete.id);
-      if (item)
-        item.set(none);
+      this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
-      return Promise.resolve(response.data);
+      return Promise.resolve();
     }
     catch (error) {
       return Promise.reject(error);
@@ -171,15 +178,14 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
 
     // only fetch if not existing
     if (previousRankState[branchEnum] != null) {
-      this.rankState.set(existingRanks => {
-        return Promise.resolve({...existingRanks})
-      });
       return;
     }
+
     const updatedRanksPromise = this.rankApi.getRanks1(branch)
         .then(resp => {
           return resp.data;
         });
+
     this.rankState.set((existingRanks) => {
       return updatedRanksPromise
           .then(branchRanks => {
@@ -189,6 +195,8 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
             }
           });
     });
+
+    return updatedRanksPromise;
   }
 
   async getPersonByEmail(email: string) {

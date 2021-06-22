@@ -4,7 +4,7 @@ import GridColumn from '../../components/Grid/GridColumn';
 import { createDefaultGridFilterParamsForType } from '../../components/Grid/GridUtils/grid-utils';
 import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import { OrganizationDto } from '../../openapi';
-import { useOrganizationState } from '../../state/organization/organization-state';
+import { OrganizationDtoWithDetails, useOrganizationState } from '../../state/organization/organization-state';
 import OrganizationDelete from './OrganizationDelete';
 import OrganizationEditForm from './OrganizationEditForm';
 
@@ -56,7 +56,7 @@ const columns: GridColumn[] =
 
 function OrganizationPage() {
   return (
-      <DataCrudFormPage<OrganizationDto, OrganizationDto>
+    <DataCrudFormPage<OrganizationDto, OrganizationDtoWithDetails>
         allowEdit={true}
         columns={columns}
         createForm={OrganizationEditForm}
@@ -69,7 +69,7 @@ function OrganizationPage() {
         deleteComponent={OrganizationDelete}
         autoResizeColumns
         autoResizeColummnsMinWidth={1200}
-        infiniteScroll={{
+        infiniteScrollOptions={{
           enabled: true
         }}
       />
