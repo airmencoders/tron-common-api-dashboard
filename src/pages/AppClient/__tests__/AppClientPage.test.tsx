@@ -47,14 +47,12 @@ describe('Test App Client Page', () => {
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       name: "Test App Client 1",
-      read: true,
-      write: true
+      clusterUrl: '',
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
       name: "Test App Client 2",
-      read: false,
-      write: false
+      clusterUrl: '',
     }
   ];
 
@@ -70,7 +68,7 @@ describe('Test App Client Page', () => {
 
   it('Test Loading Page', async () => {
     function mockAppClientState() {
-      (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientState, appClientApi));
+      (useAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientState, appClientApi, privilegeState));
 
       jest.spyOn(useAppClientsState(), 'isPromised', 'get').mockReturnValue(true);
     }

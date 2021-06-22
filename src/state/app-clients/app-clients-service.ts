@@ -1,17 +1,17 @@
-import {none, postpone, State} from "@hookstate/core";
-import {DataCrudFormErrors} from "../../components/DataCrudFormPage/data-crud-form-errors";
-import {AppClientControllerApiInterface} from "../../openapi/apis/app-client-controller-api";
-import {AppClientUserDetailsDto, PrivilegeDto} from "../../openapi/models";
-import {AppClientUserDto} from "../../openapi/models/app-client-user-dto";
-import {DataService} from "../data-service/data-service";
-import {prepareDataCrudErrorResponse} from "../data-service/data-service-utils";
-import {PrivilegeType} from "../privilege/privilege-type";
-import {AppClientFlat} from "./app-client-flat";
-import {AppClientPrivilege} from "./app-client-privilege";
-import {ValidateFunction} from 'ajv';
-import TypeValidation from '../../utils/TypeValidation/type-validation';
+import { none, postpone, State } from "@hookstate/core";
+import { ValidateFunction } from 'ajv';
 import ModelTypes from '../../api/model-types.json';
-import {AppSourceDevDetails} from '../app-source/app-source-dev-details';
+import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
+import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
+import { AppClientUserDetailsDto, PrivilegeDto } from "../../openapi/models";
+import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
+import TypeValidation from '../../utils/TypeValidation/type-validation';
+import { AppSourceDevDetails } from '../app-source/app-source-dev-details';
+import { DataService } from "../data-service/data-service";
+import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
+import { PrivilegeType } from "../privilege/privilege-type";
+import { AppClientFlat } from "./app-client-flat";
+import { AppClientPrivilege } from "./app-client-privilege";
 
 /**
  * PII WARNING:
@@ -25,11 +25,13 @@ export default class AppClientsService implements DataService<AppClientFlat, App
 
   private readonly validate: ValidateFunction<AppClientUserDto>;
 
-  constructor(public state: State<AppClientFlat[]>, private appClientsApi: AppClientControllerApiInterface) {
+  constructor(public state: State<AppClientFlat[]>, 
+              private appClientsApi: AppClientControllerApiInterface,
+              public privilegesState: State<PrivilegeDto[]>) {
     this.validate = TypeValidation.validatorFor<AppClientUserDto>(ModelTypes.definitions.AppClientUserDto);
   }
 
-  fetchAndStoreData(): Promise<AppClientFlat[]> {
+  fetchAndStoreData(): Promise<AppClientFlat[]> {   
     const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
       try {
         const result = await this.appClientsApi.getAppClientUsersWrapped();
@@ -40,6 +42,19 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     });
 
     this.state.set(data);
+
+    // fetch privileges that we can use
+    const privData = new Promise<PrivilegeDto[]>(async (resolve, reject) => {
+      try {
+        const result = await this.appClientsApi.getClientTypePrivsWrapped();
+        resolve(result.data.data);
+      } catch (err) {
+        reject(prepareDataCrudErrorResponse(err));
+      }
+    });
+
+    
+    this.privilegesState.set(privData);
 
     return data;
   }
@@ -130,7 +145,8 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       const retVal: AppClientFlat = {
         ...rowData,
         appClientDeveloperEmails: details.appClientDeveloperEmails,
-        appSourceEndpoints: Object.values(appSourceMap)
+        appSourceEndpoints: Object.values(appSourceMap),
+        allPrivs: details.privileges,
       };
 
       return Promise.resolve(Object.assign({}, retVal));
@@ -145,15 +161,32 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     });
   }
 
+  /**
+   * Flattens the AppClientUserDto into an object with no collections (since AgGrid and Hookstate croak).
+   * @param client 
+   * @returns 
+   */
   convertToFlat(client: AppClientUserDto): AppClientFlat {
     const { id, name, clusterUrl } = client;
-
     const privilegeArr = Array.from(client.privileges || []);
 
     const privileges: AppClientPrivilege = {
-      read: privilegeArr.find(privilege => privilege.name === PrivilegeType.READ) ? true : false,
-      write: privilegeArr.find(privilege => privilege.name === PrivilegeType.WRITE) ? true : false,
+      personCreate: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_CREATE) ? true : false,
+      personDelete: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_DELETE) ? true : false,
+      personEdit: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_EDIT) ? true : false,
+      orgCreate: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_CREATE) ? true : false,
+      orgEdit: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_EDIT) ? true : false,
+      orgDelete: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_DELETE) ? true : false,
     };
+
+    // if they have CREATE for PERSON or ORGANIZATIONs, then show they implicitly have EDIT privilege
+    if (privileges.personCreate) {
+      privileges.personEdit = true;
+    }
+
+    if (privileges.orgCreate) {
+      privileges.orgEdit = true;
+    }
 
     return {
       id,
@@ -163,40 +196,44 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     };
   }
 
+  /**
+   * Convert the data from the edit form back into the DTO to send to API.  Here we also
+   * optimize the privileges - so if there's a _CREATE present, then we take out _EDIT and all
+   * the field level privileges (since _CREATE is implicit EDIT and all the fields too)
+   * @param client the data from the edit form
+   * @returns the DTO to send to backend
+   */
   async convertToDto(client: AppClientFlat): Promise<AppClientUserDto> {
+
+    let localPrivs : PrivilegeDto[] = [];
+
+    if (client.allPrivs?.map(item => item.name).includes(PrivilegeType.PERSON_CREATE)) {
+      // find any _EDIT and field level privs and remove them
+      localPrivs = client
+        .allPrivs?.filter(item => item.name !== PrivilegeType.PERSON_EDIT && !item.name.startsWith("Person-"));
+    }
+    else {
+      // otherwise take all person privs as-is
+      localPrivs = localPrivs.concat(client.allPrivs?.filter(item => item.name.toLowerCase().startsWith("person")) ?? []);
+    }
+
+    if (client.allPrivs?.map(item => item.name).includes(PrivilegeType.ORGANIZATION_CREATE)) {
+      // find any _EDIT and field level privs and remove them
+      localPrivs = client
+        .allPrivs?.filter(item => item.name !== PrivilegeType.ORGANIZATION_EDIT && !item.name.startsWith("Organization-"));
+    }
+    else {
+      // otherwise take all organization privs as-is
+      localPrivs = localPrivs.concat(client.allPrivs?.filter(item => item.name.toLowerCase().startsWith("organization")) ?? []);
+    }    
+
     return {
       id: client.id,
       name: client.name,
       clusterUrl: client.clusterUrl,
-      privileges: await this.createAppPrivilegesArr(client),
+      privileges: localPrivs,
       appClientDeveloperEmails: client.appClientDeveloperEmails,
     };
-  }
-
-  async createAppPrivilegesArr(client: AppClientFlat): Promise<Array<PrivilegeDto>> {
-    return Array.from(await this.createAppPrivileges(client));
-  }
-
-  async createAppPrivileges(client: AppClientFlat): Promise<Set<PrivilegeDto>> {
-    const privileges = new Set<PrivilegeDto>();
-    const privilegeResponse = await this.appClientsApi.getClientTypePrivsWrapped();
-    const data = privilegeResponse.data.data;
-
-    if (client.read) {
-      const privilege = data.find(item => item.name === PrivilegeType.READ);
-      if (privilege) {
-        privileges.add(privilege);
-      }
-    }
-
-    if (client.write) {
-      const privilege = data.find(item => item.name === PrivilegeType.WRITE);
-      if (privilege) {
-        privileges.add(privilege);
-      }
-    }
-
-    return privileges;
   }
 
   private isStateReady(): boolean {

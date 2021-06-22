@@ -6,6 +6,7 @@ import '@testing-library/jest-dom';
 import {MockedRequest, RequestParams, ResponseComposition, rest, RestContext} from 'msw';
 import { setupServer } from 'msw/node';
 import {DefaultRequestBodyType} from 'msw/lib/types/utils/handlers/requestHandler';
+import { PrivilegeType } from './state/privilege/privilege-type';
 
 function returnDefaultResponse(req: MockedRequest<DefaultRequestBodyType, RequestParams>,res: ResponseComposition<any>, ctx: RestContext) {
   console.log(`${req.method} - ${req.url.href}`);
@@ -56,6 +57,12 @@ const server = setupServer(
           "name": "APP_CLIENT_DEVELOPER"
         }
       ]
+    }))
+  }),
+  rest.get(/app-client\/privs/, (req, res, ctx) => {
+    let counter = 0;
+    return res(ctx.json({
+      "data": Object.values(PrivilegeType).map((item : any) => ({id: counter++, name: item }))
     }))
   }),
   rest.post('/api/v2/person/find', (req, res, ctx) => {

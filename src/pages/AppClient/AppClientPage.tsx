@@ -1,14 +1,14 @@
 import React from 'react';
+import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
-import {useAppClientsState} from '../../state/app-clients/app-clients-state';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
-import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
-import {AppClientFlat} from '../../state/app-clients/app-client-flat';
-import AppClientForm from './AppClientForm';
+import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
+import { AppClientFlat } from '../../state/app-clients/app-client-flat';
+import { useAppClientsState } from '../../state/app-clients/app-clients-state';
+import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
 import AppClientDelete from './AppClientDelete';
-import {accessAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
-import {PrivilegeType} from '../../state/privilege/privilege-type';
-import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
+import AppClientForm from './AppClientForm';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn({
@@ -18,16 +18,44 @@ const columnHeaders: GridColumn[] = [
     headerName: 'Name'
   }),
   new GridColumn({
-    field: 'read',
+    field: 'personCreate',
     sortable: true,
-    headerName: 'Read',
+    headerName: 'Create Person',
     headerClass: 'header-center',
     cellRenderer: PrivilegeCellRenderer
   }),
   new GridColumn({
-    field: 'write',
+    field: 'personEdit',
     sortable: true,
-    headerName: 'Write',
+    headerName: 'Edit Person',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
+    field: 'personDelete',
+    sortable: true,
+    headerName: 'Delete Person',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
+    field: 'orgCreate',
+    sortable: true,
+    headerName: 'Create Org',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
+    field: 'orgEdit',
+    sortable: true,
+    headerName: 'Edit Org',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
+    field: 'orgDelete',
+    sortable: true,
+    headerName: 'Delete Org',
     headerClass: 'header-center',
     cellRenderer: PrivilegeCellRenderer
   }),
