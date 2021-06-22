@@ -25,9 +25,11 @@ describe('App Client State Tests', () => {
       personCreate: true,
       personEdit: true,
       personDelete: false,
+      personRead: false,
       orgCreate: true,
       orgEdit: true,
       orgDelete: false,
+      orgRead: false,
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
@@ -36,9 +38,11 @@ describe('App Client State Tests', () => {
       personCreate: false,
       personEdit: false,
       personDelete: false,
+      personRead: false, 
       orgCreate: false,
       orgEdit: false,
       orgDelete: false,
+      orgRead: false,
     }
   ];
 
@@ -92,9 +96,11 @@ describe('App Client State Tests', () => {
     personCreate: true,
     personEdit: false,
     personDelete: false,
+    personRead: false,
     orgCreate: true,
     orgEdit: false,
     orgDelete: false,
+    orgRead: false,
     allPrivs: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
   }
 
@@ -107,9 +113,11 @@ describe('App Client State Tests', () => {
     personCreate: true,
     personEdit: false,
     personDelete: false,
+    personRead: false,
     orgCreate: true,
     orgEdit: false,
     orgDelete: false,
+    orgRead: false,
     allPrivs: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
 }
 

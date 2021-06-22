@@ -32,6 +32,13 @@ const columnHeaders: GridColumn[] = [
     cellRenderer: PrivilegeCellRenderer
   }),
   new GridColumn({
+    field: 'personRead',
+    sortable: true,
+    headerName: 'Read Person',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
     field: 'personDelete',
     sortable: true,
     headerName: 'Delete Person',
@@ -49,6 +56,13 @@ const columnHeaders: GridColumn[] = [
     field: 'orgEdit',
     sortable: true,
     headerName: 'Edit Org',
+    headerClass: 'header-center',
+    cellRenderer: PrivilegeCellRenderer
+  }),
+  new GridColumn({
+    field: 'orgRead',
+    sortable: true,
+    headerName: 'Read Org',
     headerClass: 'header-center',
     cellRenderer: PrivilegeCellRenderer
   }),
