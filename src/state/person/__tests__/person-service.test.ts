@@ -155,12 +155,12 @@ describe('Test Person Service', () => {
 
     const personState: PersonDto[] = [personDto];
 
-    let wrappedPersonResponse: PersonDtoPaginationResponseWrapper = {
+    const wrappedPersonResponse: PersonDtoPaginationResponseWrapper = {
       data: personState,
       pagination: {}
     };
 
-    let apiResponse: AxiosResponse<PersonDtoPaginationResponseWrapper> = {
+    const apiResponse: AxiosResponse<PersonDtoPaginationResponseWrapper> = {
       data: wrappedPersonResponse,
       status: 200,
       statusText: 'OK',
@@ -170,7 +170,7 @@ describe('Test Person Service', () => {
 
     personApiSpy.mockResolvedValue(apiResponse);
 
-    let response = await personService.fetchAndStorePaginatedData(0, 100, true, undefined, undefined);
+    const response = await personService.fetchAndStorePaginatedData(0, 100, true, undefined, undefined);
     expect(response).toEqual(personState);
     expect(personService.state.get()).toEqual(personState);
   });
