@@ -46,10 +46,10 @@ export interface OrganizationDto {
     parentOrganization?: string | null;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Array<string>}
      * @memberof OrganizationDto
      */
-    subordinateOrganizations?: Set<string>;
+    subordinateOrganizations?: Array<string>;
     /**
      * 
      * @type {string}
