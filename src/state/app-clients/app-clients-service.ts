@@ -174,9 +174,11 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       personCreate: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_CREATE) ? true : false,
       personDelete: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_DELETE) ? true : false,
       personEdit: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_EDIT) ? true : false,
+      personRead: privilegeArr.find(privilege => privilege.name === PrivilegeType.PERSON_READ) ? true : false,
       orgCreate: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_CREATE) ? true : false,
       orgEdit: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_EDIT) ? true : false,
       orgDelete: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_DELETE) ? true : false,
+      orgRead: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_READ) ? true : false,
     };
 
     // if they have CREATE for PERSON or ORGANIZATIONs, then show they implicitly have EDIT privilege
