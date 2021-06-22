@@ -230,11 +230,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
                 disabled={true}
                 className={'tron-text-input-inline'}
             />
-            <CopyToClipboard text={String(formState.id.get())}>
-              <Button type="button" className={'usa-button inline-icon'}>
-                <CopyIcon iconTitle={'copyToClipboard'} size={1} />
-              </Button>
-            </CopyToClipboard>
+            <CopyToClipboard text={String(formState.id.get())} />
           </FormGroup>
           <FormGroup labelName="appName" labelText="App Name"
                      isError={failsHookstateValidation(formState.appName)}

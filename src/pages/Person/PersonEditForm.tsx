@@ -17,7 +17,7 @@ import { Initial } from '@hookstate/initial';
 
 import './PersonEditForm.scss';
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validDoDId, validPhone } from '../../utils/validation-utils';
-import {CopyToClipboard} from "react-copy-to-clipboard";
+import {CopyToClipboard} from '../../components/CopyToClipboard/CopyToClipboard';``
 import Button from "../../components/Button/Button";
 import CopyIcon from "../../icons/CopyIcon";
 
@@ -127,11 +127,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
               disabled={true}
               className={'tron-text-input-inline'}
           />
-          <CopyToClipboard text={String(formState.id.get())}>
-            <Button type="button" className={'usa-button inline-icon'}>
-              <CopyIcon iconTitle={'copyToClipboard'} size={1} />
-            </Button>
-          </CopyToClipboard>
+          <CopyToClipboard text={String(formState.id.get())} />
         </FormGroup>
         <FormGroup labelName="email" labelText="Email"
           isError={failsHookstateValidation(formState.email)}
