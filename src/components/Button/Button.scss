@@ -16,8 +16,10 @@
 }
 
 .inline-icon {
-  float: right;
+  //float: right;
+  display: inline-block;
   padding: units(1.5) units(1.5);
   margin-top: 0.5rem !important;
+  margin-left: 0.25rem !important;
   text-align: center;
 }

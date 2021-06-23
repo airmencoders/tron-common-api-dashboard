@@ -24,7 +24,7 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
-import {CopyToClipboard} from '../../components/CopyToClipboard/CopyToClipboard';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 interface AdminEmail {
   email: string;

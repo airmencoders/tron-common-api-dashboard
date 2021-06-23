@@ -14,9 +14,7 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
-import Button from "../../components/Button/Button";
-import {CopyToClipboard} from "react-copy-to-clipboard";
-import CopyIcon from "../../icons/CopyIcon";
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
   const formState = useState<DashboardUserFlat>({

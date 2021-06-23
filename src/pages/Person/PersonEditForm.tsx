@@ -17,7 +17,7 @@ import { Initial } from '@hookstate/initial';
 
 import './PersonEditForm.scss';
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validDoDId, validPhone } from '../../utils/validation-utils';
-import {CopyToClipboard} from '../../components/CopyToClipboard/CopyToClipboard';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();

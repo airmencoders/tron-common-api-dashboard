@@ -19,9 +19,8 @@ import { AppClientFlat } from "../../state/app-clients/app-client-flat";
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validateSubscriberAddress } from '../../utils/validation-utils';
-import CopyIcon from "../../icons/CopyIcon";
 import Accordion from '../../components/Accordion/Accordion';
 import {AccordionItem} from '../../components/Accordion/AccordionItem';
 import AppSourceEndpointInfo from './AppSourceEndpointInfo';
@@ -175,11 +174,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
               disabled={true}
               className={'tron-text-input-inline'}
             />
-            <CopyToClipboard text={String(formState.id.get())}>
-              <Button type="button" className={'usa-button inline-icon'}>
-                <CopyIcon iconTitle={'copyToClipboard'} size={1} />
-              </Button>
-            </CopyToClipboard>
+            <CopyToClipboard text={String(formState.id.get())} />
           </div>
         </FormGroup>
       }

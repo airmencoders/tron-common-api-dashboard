@@ -26,7 +26,7 @@ import { useOrganizationState } from '../../state/organization/organization-stat
 import { usePersonState } from '../../state/person/person-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
-import {CopyToClipboard} from '../../components/CopyToClipboard/CopyToClipboard';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDto>) {
   const SELECT_ALL_TEXT = "Select All";
