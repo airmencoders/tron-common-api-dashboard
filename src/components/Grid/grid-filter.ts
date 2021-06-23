@@ -26,15 +26,11 @@ export class GridFilter {
     };
 
     if (fieldNames.length > 0) {
-      try {
         for (const fieldName of fieldNames) {
           const filter = this.gridFilter[fieldName];
 
           filterDto.filterCriteria.push(GridFilter.convertAgGridFilterToFilterCriteria(fieldName, filter));
         }
-      } catch (err) {
-        throw err;
-      }
     }
 
     filterDto.filterCriteria = filterDto.filterCriteria.concat(this.additionalFilters);
@@ -81,7 +77,7 @@ export class GridFilter {
    * @returns {FilterCriteria} the converted value
    */
   private static convertAgGridSingleFilterToFilterCriteria(fieldName: string, filter: GridSingleFilterModel): FilterCriteria {
-    const filterCriteria: FilterCriteria = {
+    return {
       field: fieldName,
       conditions: [
         {
@@ -90,8 +86,6 @@ export class GridFilter {
         }
       ]
     }
-
-    return filterCriteria;
   }
 
   /**
@@ -101,7 +95,7 @@ export class GridFilter {
    * @returns {FilterCriteria} the converted value
    */
   private static convertAgGridMultiFilterToFilterCritiera(fieldName: string, filter: GridMultiFilterModel): FilterCriteria {
-    const filterCritiera: FilterCriteria = {
+    return {
       relationType: filter.operator === 'OR' ? FilterCriteriaRelationTypeEnum.Or : FilterCriteriaRelationTypeEnum.And,
       field: fieldName,
       conditions: [
@@ -115,8 +109,6 @@ export class GridFilter {
         }
       ]
     }
-
-    return filterCritiera;
   }
 
 
