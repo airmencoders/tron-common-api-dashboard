@@ -11,8 +11,8 @@ const appClientsApi: AppClientControllerApiInterface = new AppClientControllerAp
   new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
-export const wrapState = (state: State<AppClientFlat[]>, appClientsApi: AppClientControllerApiInterface, privilegesState: State<PrivilegeDto[]>): AppClientsService => {
-  return new AppClientsService(state, appClientsApi, privilegesState);
+export const wrapState = (state: State<AppClientFlat[]>, appClientApi: AppClientControllerApiInterface, privilegesState: State<PrivilegeDto[]>): AppClientsService => {
+  return new AppClientsService(state, appClientApi, privilegesState);
 };
 
 export const useAppClientsState = () => wrapState(useState(appClientsState), appClientsApi, useState(appClientsPrivileges));
