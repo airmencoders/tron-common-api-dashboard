@@ -2,7 +2,7 @@ import {none, State} from '@hookstate/core';
 import { OrganizationControllerApiInterface, PersonControllerApiInterface } from '../../openapi';
 import { FilterCondition, FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum, OrganizationDto, PersonDto } from '../../openapi/models';
 import {AbstractDataService} from '../data-service/abstract-data-service';
-import {OrganizationDtoWithDetails} from './organization-state';
+import {OrganizationDtoWithDetails, PersonWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';

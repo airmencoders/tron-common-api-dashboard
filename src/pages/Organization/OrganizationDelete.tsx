@@ -1,6 +1,5 @@
 import { DataCrudDeleteComponentProps } from '../../components/DataCrudFormPage/DataCrudDeleteComponentProps';
 import DataCrudDeleteContent from '../../components/DataCrudFormPage/DataCrudDeleteContent';
-import { OrganizationDto } from '../../openapi';
 import { OrganizationDtoWithDetails } from '../../state/organization/organization-state';
 
 function OrganizationDelete(props: DataCrudDeleteComponentProps<OrganizationDtoWithDetails>) {
