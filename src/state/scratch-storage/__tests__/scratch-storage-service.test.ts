@@ -1,9 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { PrivilegeType } from '../../privilege/privilege-type';
-import { PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
-import { accessPrivilegeState } from '../../privilege/privilege-state';
-import PrivilegeService from '../../privilege/privilege-service';
+import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
 import { ScratchStorageFlat } from '../scratch-storage-flat';
 import ScratchStorageService from '../scratch-storage-service';
 import { wrapState } from '../scratch-storage-state';
@@ -12,32 +9,10 @@ jest.mock('../../privilege/privilege-state');
 
 describe('scratch storage service tests', () => {
   let scratchStorageState: State<ScratchStorageAppRegistryDto[]> & StateMethodsDestroy;
+  let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
   let selectedScratchStorageState: State<ScratchStorageFlat> & StateMethodsDestroy;
   let scratchStorageApi: ScratchStorageControllerApiInterface;
   let wrappedState: ScratchStorageService;
-
-  const flats: ScratchStorageFlat[] = [
-      {
-        id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
-        appName: 'Test App Name',
-        appHasImplicitRead: false,
-        userPrivs: [
-            {
-                userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                email: 'test@test.com',
-                read: false,
-                write: false,
-                admin: false
-            }
-        ]
-      },
-      {
-        id: 'ba85f64-5717-4562-b3fc-2c963f66afa6',
-        appName: 'Test App Name 2',
-        appHasImplicitRead: false,
-        userPrivs: []
-      }
-  ];
 
   const dtos: ScratchStorageAppRegistryDto[] = [
       {
@@ -126,21 +101,6 @@ describe('scratch storage service tests', () => {
     headers: {}
   };
 
-  const testClientPrivileges: PrivilegeDto[] = [
-    {
-      id: 1,
-      name: PrivilegeType.SCRATCH_READ
-    },
-    {
-      id: 2,
-      name: PrivilegeType.SCRATCH_WRITE
-    },
-    {
-      id: 3,
-      name: PrivilegeType.SCRATCH_ADMIN
-    }
-  ]
-
   const axiosPostPutResponse = {
     data: entry,
     status: 200,
@@ -157,62 +117,15 @@ describe('scratch storage service tests', () => {
     headers: {}
   };
 
-  const privilegDtos: PrivilegeDto[] = [
-    {
-      id: 1,
-      name: PrivilegeType.SCRATCH_READ
-    },
-    {
-      id: 2,
-      name: PrivilegeType.SCRATCH_WRITE
-    },
-    {
-      id: 3,
-      name: PrivilegeType.SCRATCH_ADMIN
-    }
-  ];
-
-  const axiosRejectResponse = {
-    response: {
-      data: {
-        message: 'failed'
-      },
-      status: 400,
-      statusText: 'OK',
-      config: {},
-      headers: {}
-    }
-  };
-
   const rejectMsg = 'failed';
 
-  let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
-  let privilegeApi: PrivilegeControllerApiInterface;
-
-  function mockPrivilegesState() {
-    (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
-        data: { data: privilegDtos },
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
-    });
-  }
 
   beforeEach(async () => {
     scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
     selectedScratchStorageState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
+    privilegeState = createState<PrivilegeDto[]>([]);
     scratchStorageApi = new ScratchStorageControllerApi();
-    wrappedState = wrapState(scratchStorageState, selectedScratchStorageState, scratchStorageApi);
-
-    privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
-    privilegeApi = new PrivilegeControllerApi();
-
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
+    wrappedState = wrapState(scratchStorageState, selectedScratchStorageState, scratchStorageApi, privilegeState);
   });
 
   afterEach(() => {
