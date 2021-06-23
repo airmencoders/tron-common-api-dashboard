@@ -46,25 +46,19 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   fetchAppClients(): Promise<AppClientSummaryDto[]> {
     const response = (): AxiosPromise<AppClientSummaryDtoResponseWrapper> => this.appSourceApi.getAvailableAppClientsWrapped();
 
-    const result = response().then(res => res.data.data);
-
-    return result;
+    return response().then(res => res.data.data);
   }
 
   fetchAPISpecFile(id: string): Promise<any> {
     const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFile(id)
 
-    const result = response().then(res => res.data);
-
-    return result;
+    return response().then(res => res.data);
   }
 
   fetchAPISpecFileByEndpointId(id: string): Promise<any> {
     const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFileByEndpointPriv(id)
 
-    const result = response().then(res => res.data);
-
-    return result;
+    return response().then(res => res.data);
   }
 
   generateAppSourcePath(appSourcePath?: string): string {
@@ -111,7 +105,8 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   }
 
   /**
-   * // TODO: implement as needed
+   * Not used.
+   * Delete not supported.
    */
   async sendDelete(toDelete: AppSourceDetailsDto): Promise<void> {
     throw new Error('Not yet implemented');
