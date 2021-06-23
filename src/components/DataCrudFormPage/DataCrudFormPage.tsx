@@ -60,10 +60,6 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     props.refreshStateCallback?.();
   }
 
-  function scrollToTopCallback() {
-    scrollToTopCallback?.();
-  }
-
   function setUpdateInfiniteCache(status: boolean) {
     // To avoid sending unnecessary changes to the Grid.
     // Only update infinite cache if infinite scroll is enabled.
@@ -77,7 +73,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
       throw new Error('Infinite scroll must be enabled to create datasource');
     }
 
-    const datasource: IDatasource = {
+    return {
       getRows: async function (params: IGetRowsParams) {
         if (dataState.fetchAndStorePaginatedData == null) {
           throw new Error('fetchAndStorePaginatedData must exist on the service to use infinite scrolling pagination on Grid');
@@ -152,15 +148,13 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         }
       }
     }
-
-    return datasource;
   }
 
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
     if (props.allowEdit &&
-      !(event.api.getFocusedCell()?.column.getColDef().headerName === deleteBtnName) &&
-      !(event.api.getFocusedCell()?.column.getColDef().headerName === 'Metrics') &&
-      !(event.api.getFocusedCell()?.column.getColDef().headerName === 'API Spec')) {
+      event.api.getFocusedCell()?.column.getColDef().headerName !== deleteBtnName &&
+      event.api.getFocusedCell()?.column.getColDef().headerName !== 'Metrics' &&
+      event.api.getFocusedCell()?.column.getColDef().headerName !== 'API Spec') {
       let rowData = event.data;
 
       // Ensure a blank row was not click before
@@ -329,12 +323,9 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
       onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
     }
     catch (error) {
-      pageState.set(prevState => {
-        return {
-          ...prevState,
+      pageState.merge({
           formErrors: convertErrorToDataCrudFormError(error),
           isSubmitting: false
-        }
       });
     }
   }
@@ -395,12 +386,9 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
       onActionSuccess(`Successfully created ${props.dataTypeName}.`);
     }
     catch (error) {
-      pageState.set(prevState => {
-        return {
-          ...prevState,
-          formErrors: convertErrorToDataCrudFormError(error),
-          isSubmitting: false
-        }
+      pageState.merge({
+        formErrors: convertErrorToDataCrudFormError(error),
+        isSubmitting: false
       });
     }
   }
