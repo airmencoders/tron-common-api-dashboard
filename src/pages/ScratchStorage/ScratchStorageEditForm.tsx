@@ -25,8 +25,7 @@ import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
 import { generateStringErrorMessages, failsHookstateValidation, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
-import {CopyToClipboard} from "react-copy-to-clipboard";
-import CopyIcon from "../../icons/CopyIcon";
+import {CopyToClipboard} from '../../components/CopyToClipboard/CopyToClipboard';
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
