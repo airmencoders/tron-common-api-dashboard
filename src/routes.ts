@@ -93,7 +93,7 @@ export const routes: RouteItem[] = [
         path: RoutePath.SCRATCH_STORAGE,
         name: 'Scratch Storage Apps',
         component: ScratchStoragePage,
-        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.SCRATCH_ADMIN]
     },
     {
         path: RoutePath.DASHBOARD_USER,

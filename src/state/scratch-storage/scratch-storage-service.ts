@@ -1,8 +1,7 @@
 import { none, postpone, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
-import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, UserWithPrivs } from '../../openapi';
+import { PrivilegeDto, PrivilegeDtoResponseWrapper, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, UserWithPrivs } from '../../openapi';
 import { DataService } from '../data-service/data-service';
-import { accessPrivilegeState } from '../privilege/privilege-state';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { ScratchStorageFlat } from './scratch-storage-flat';
 import { ScratchStorageUserWithPrivsFlat } from './scratch-storage-user-with-privs-flat';
@@ -12,18 +11,21 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   constructor(
     public state: State<ScratchStorageAppRegistryDto[]>,
     public selectedScratchStorageState: State<ScratchStorageFlat>,
-    private scratchStorageApi: ScratchStorageControllerApiInterface) {
+    private scratchStorageApi: ScratchStorageControllerApiInterface,
+    public privilegeState: State<PrivilegeDto[]>) {
   }
 
   sendPatch = undefined;
 
   async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
     const response = (): AxiosPromise<ScratchStorageAppRegistryDtoResponseWrapper> => this.scratchStorageApi.getScratchSpaceAppsWrapped();
-    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
+    const privilegeResponse = (): AxiosPromise<PrivilegeDtoResponseWrapper> => this.scratchStorageApi.getScratchPrivsWrapped();
 
     const data = new Promise<ScratchStorageAppRegistryDto[]>(async (resolve, reject) => {
       try {
-        await privilegeResponse();
+        const scratchPrivs = await privilegeResponse();
+        this.privilegeState.set(scratchPrivs.data.data);
+
         const result = await response();
         const mappedData = result.data?.data?.map(x => {
           x.userPrivs = undefined;
@@ -94,23 +96,38 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   }
 
   async sendUpdate(toUpdate: ScratchStorageFlat): Promise<ScratchStorageFlat> {
+    const readDto = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_READ);
+    const writeDto = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_WRITE);
+    const adminDto = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_ADMIN);
+
     try {
       if (!toUpdate.id) {
         return Promise.reject(new Error('Scratch Storage App to update has undefined id.'));
       }
+      
+      // build out the privileges in the shape the API wants, so we can do one transaction on updates
+      const privsArray : UserWithPrivs[] = [];
+      for (const userPriv of toUpdate.userPrivs) {
+        const privsPairArray : PrivilegeIdPair[] = [];
+        if (userPriv.read) privsPairArray.push({ priv: readDto } as PrivilegeIdPair);
+        if (userPriv.write) privsPairArray.push({ priv: writeDto } as PrivilegeIdPair);
+        if (userPriv.admin) privsPairArray.push({ priv: adminDto } as PrivilegeIdPair);
 
-      const scratchStorageDto = this.convertToDto(toUpdate);
+        privsArray.push({
+          userId: userPriv.userId ?? null,
+          emailAddress: userPriv.email,
+          privs: privsPairArray
+        });
+      }
+
+      let scratchStorageDto = this.convertToDto(toUpdate);
+      scratchStorageDto = { ...scratchStorageDto, userPrivs: privsArray };
       const updatedResponse = await this.scratchStorageApi.editExistingAppEntry(toUpdate.id, scratchStorageDto as ScratchStorageAppRegistryDto);
 
       const patchedResponse = updatedResponse.data as ScratchStorageAppRegistryDto;
       patchedResponse.userPrivs = undefined;
       const patchedIndex = this.state.get().findIndex(item => item.id === patchedResponse.id);
       this.state[patchedIndex].set(patchedResponse);
-
-      for(const userPriv of toUpdate.userPrivs){
-        await this.addUserPriv(userPriv, toUpdate.id);
-      }
-
       return Promise.resolve(this.convertToFlat(patchedResponse));
     }
     catch (error) {
@@ -118,9 +135,9 @@ export default class ScratchStorageService implements DataService<ScratchStorage
     }
   }
   async addUserPriv(userPriv: ScratchStorageUserWithPrivsFlat, appId: string) {
-    const readId = accessPrivilegeState().getPrivilegeIdFromType(PrivilegeType.SCRATCH_READ);
-    const writeId = accessPrivilegeState().getPrivilegeIdFromType(PrivilegeType.SCRATCH_WRITE);
-    const adminId = accessPrivilegeState().getPrivilegeIdFromType(PrivilegeType.SCRATCH_ADMIN);
+    const readId = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_READ)?.id;
+    const writeId = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_WRITE)?.id;
+    const adminId = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_ADMIN)?.id;
 
     if(userPriv.read && readId)
       await this.scratchStorageApi.addUserPriv(appId, { email: userPriv.email, privilegeId: readId});
