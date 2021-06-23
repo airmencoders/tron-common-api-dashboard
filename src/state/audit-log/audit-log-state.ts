@@ -1,6 +1,6 @@
 import { createState, State, useState } from '@hookstate/core';
 import format from 'date-fns/format';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import {
   Configuration,
   HttpLogsControllerApi

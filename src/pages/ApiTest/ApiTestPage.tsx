@@ -3,7 +3,7 @@ import {Redirect, RouteComponentProps } from 'react-router-dom';
 import SwaggerUI from 'swagger-ui-react';
 import {ApiTestPageProps} from './ApiTestPageProps';
 import './ApiTestPage.scss';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 
 function ApiTestPage(props: RouteComponentProps<ApiTestPageProps>) {
   const params = props.match?.params;

@@ -1,6 +1,6 @@
 import { createState, State, useState } from '@hookstate/core';
 import { AppClientFlat } from './app-client-flat';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import { Configuration, PrivilegeDto } from '../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../openapi/apis/app-client-controller-api';
 import AppClientsService from './app-clients-service';

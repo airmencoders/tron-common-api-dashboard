@@ -1,6 +1,6 @@
 import { createState, State, useState } from '@hookstate/core';
 import { Configuration } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import { DashboardUserControllerApi, DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import DashboardUserService from './dashboard-user-service';
 import { DashboardUserFlat } from './dashboard-user-flat';

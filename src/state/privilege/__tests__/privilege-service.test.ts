@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from "@hookstate/core";
 import { AxiosResponse } from "axios";
-import Config from "../../../api/configuration";
+import Config from "../../../api/config";
 import { Configuration, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from "../../../openapi";
 import PrivilegeService from "../privilege-service";
 

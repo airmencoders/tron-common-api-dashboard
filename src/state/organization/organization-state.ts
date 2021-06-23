@@ -1,7 +1,7 @@
 import {createState, State, useState} from '@hookstate/core';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../openapi/models';
 import { Configuration, OrganizationControllerApi, OrganizationControllerApiInterface, PersonControllerApi, PersonControllerApiInterface } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import OrganizationService from './organization-service';
 
 export interface PersonWithDetails {

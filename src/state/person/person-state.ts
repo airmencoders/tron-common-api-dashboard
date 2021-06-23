@@ -6,7 +6,7 @@ import {
   PersonControllerApiInterface, RankControllerApi,
   RankControllerApiInterface
 } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import PersonService from './person-service';
 import {RankStateModel} from './rank-state-model';
 

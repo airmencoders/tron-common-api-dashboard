@@ -2,7 +2,7 @@ import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
 import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, DashboardUserDto, DashboardUserDtoResponseWrapper, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
-import Config from '../../../api/configuration';
+import Config from '../../../api/config';
 import PrivilegeService from '../../privilege/privilege-service';
 import DashboardUserService from '../dashboard-user-service';
 import { DashboardUserFlat } from '../dashboard-user-flat';

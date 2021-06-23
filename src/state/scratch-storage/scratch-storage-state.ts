@@ -1,7 +1,7 @@
 import {ScratchStorageAppRegistryDto} from '../../openapi/models';
 import {createState, State, useState} from '@hookstate/core';
 import {Configuration, ScratchStorageControllerApi, ScratchStorageControllerApiInterface} from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import ScratchStorageService from './scratch-storage-service';
 import { ScratchStorageFlat } from './scratch-storage-flat';
 

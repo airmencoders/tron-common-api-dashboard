@@ -8,7 +8,7 @@ import {
   AppSourceDetailsDto,
   AppSourceDto
 } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';

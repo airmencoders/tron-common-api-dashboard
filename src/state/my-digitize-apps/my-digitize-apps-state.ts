@@ -1,6 +1,6 @@
 import { createState, State, useState } from '@hookstate/core';
 import { Configuration, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import MyDigitizeAppsService from './my-digitize-apps-service';
 import { ScratchStorageAppFlat } from './scratch-storage-app-flat';
 

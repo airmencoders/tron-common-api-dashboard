@@ -1,6 +1,6 @@
 import { createState, State, useState } from '@hookstate/core';
 import { AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto, Configuration } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import AppSourceService from './app-source-service';
 
 

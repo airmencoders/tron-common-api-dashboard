@@ -1,5 +1,5 @@
 import { createState, State, useState } from "@hookstate/core";
-import Config from "../../api/configuration";
+import Config from "../../api/config";
 import { Configuration } from "../../openapi";
 import { PrivilegeControllerApi, PrivilegeControllerApiInterface } from "../../openapi/apis/privilege-controller-api";
 import { PrivilegeDto } from "../../openapi/models/privilege-dto";

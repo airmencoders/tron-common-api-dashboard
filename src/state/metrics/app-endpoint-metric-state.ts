@@ -1,5 +1,5 @@
 import { createState, State, useState } from '@hookstate/core';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import { Configuration, AppEndpointCountMetricDto, MetricsControllerApi, MetricsControllerApiInterface } from '../../openapi';
 import AppEndpointMetricService from './app-endpoint-metric-service';
 
