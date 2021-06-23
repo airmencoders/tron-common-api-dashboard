@@ -50,8 +50,8 @@ function AppSourceEndpointInfo(props: AppSourceEndpointInfoProps) {
     }
   },[props.isOpened]);
 
-  const handleGridReady = (gridApi: GridApi | undefined) => {
-    setGridApi(gridApi);
+  const handleGridReady = (gridApiToSet: GridApi | undefined) => {
+    setGridApi(gridApiToSet);
   }
 
   const downloadSpec = () => {
