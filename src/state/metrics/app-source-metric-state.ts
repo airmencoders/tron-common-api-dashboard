@@ -5,7 +5,7 @@ import AppSourceMetricService from './app-source-metric-service';
 
 
 const appSourceMetricState = createState<AppSourceCountMetricDto>({});
-const metricsApi = new MetricsControllerApi(new Configuration({
+const metricsControllerApi = new MetricsControllerApi(new Configuration({
   basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
 }));
 
@@ -13,4 +13,4 @@ export const wrapAppSourceMetricState = (state: State<AppSourceCountMetricDto>, 
   return new AppSourceMetricService(state, metricsApi);
 }
 
-export const useAppSourceMetricState = (): AppSourceMetricService => wrapAppSourceMetricState(useState(appSourceMetricState), metricsApi);
+export const useAppSourceMetricState = (): AppSourceMetricService => wrapAppSourceMetricState(useState(appSourceMetricState), metricsControllerApi);

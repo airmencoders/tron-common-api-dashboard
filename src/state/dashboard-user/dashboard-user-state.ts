@@ -7,7 +7,7 @@ import { DashboardUserFlat } from './dashboard-user-flat';
 
 
 const dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardUserFlat>());
-const dashboardUserApi = new DashboardUserControllerApi(new Configuration({
+const dashboardUserControllerApi = new DashboardUserControllerApi(new Configuration({
   basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
 }));
 
@@ -15,4 +15,4 @@ export const wrapDashboardUserState = (state: State<DashboardUserFlat[]>, dashbo
   return new DashboardUserService(state, dashboardUserApi);
 }
 
-export const useDashboardUserState = (): DashboardUserService => wrapDashboardUserState(useState(dashboardUserState), dashboardUserApi);
+export const useDashboardUserState = (): DashboardUserService => wrapDashboardUserState(useState(dashboardUserState), dashboardUserControllerApi);

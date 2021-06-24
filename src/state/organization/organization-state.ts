@@ -32,11 +32,11 @@ const organizationApi: OrganizationControllerApiInterface = new OrganizationCont
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
-const organizationChooserState = createState<OrganizationDto[]>(new Array<OrganizationDto>());
+const organizationChooserGlobalState = createState<OrganizationDto[]>(new Array<OrganizationDto>());
 
-const personChooserState = createState<PersonDto[]>(new Array<PersonDto>());
+const personChooserGlobalState = createState<PersonDto[]>(new Array<PersonDto>());
 
-const personApi: PersonControllerApiInterface = new PersonControllerApi(
+const personControllerApi: PersonControllerApiInterface = new PersonControllerApi(
   new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
@@ -51,7 +51,7 @@ export const wrapState = (
 export const useOrganizationState = () => wrapState(
   useState(organizationState), 
   organizationApi,
-  organizationChooserState,
-  personChooserState,
-  personApi
+  organizationChooserGlobalState,
+  personChooserGlobalState,
+  personControllerApi
 );

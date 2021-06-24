@@ -7,9 +7,9 @@ export interface MetricService {
 }
 
 
-const RequestMethod = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
-export type RequestMethod = typeof RequestMethod[number];
+const requestMethods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
+export type RequestMethod = typeof requestMethods[number];
 
 export function isRequestMethod(a: unknown): a is RequestMethod {
-    return RequestMethod.indexOf(a as RequestMethod) != -1;
+    return requestMethods.indexOf(a as RequestMethod) != -1;
 }

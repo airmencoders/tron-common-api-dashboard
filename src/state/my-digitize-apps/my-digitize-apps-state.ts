@@ -6,7 +6,7 @@ import { ScratchStorageAppFlat } from './scratch-storage-app-flat';
 
 const myDigitizeAppsState = createState<ScratchStorageAppFlat[]>(new Array<ScratchStorageAppFlat>());
 
-const scratchStorageApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
+const scratchStorageControllerApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
   new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
@@ -14,4 +14,4 @@ export const wrapDigitizeAppsState = (state: State<ScratchStorageAppFlat[]>, scr
   return new MyDigitizeAppsService(state, scratchStorageApi);
 }
 
-export const useMyDigitizeAppsState = () => wrapDigitizeAppsState(useState(myDigitizeAppsState), scratchStorageApi);
+export const useMyDigitizeAppsState = () => wrapDigitizeAppsState(useState(myDigitizeAppsState), scratchStorageControllerApi);

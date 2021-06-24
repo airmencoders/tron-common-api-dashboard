@@ -144,16 +144,16 @@ export default class OrganizationService extends AbstractDataService<Organizatio
         this.personChooserSort = sort;
       }
 
-      let responseData: PersonDto[] = [];
+      let personResponseData: PersonDto[] = [];
       try {
         if (filter != null) {
-          responseData = await this.personApi.filterPerson(filter, false, false, page, limit, sort)
+          personResponseData = await this.personApi.filterPerson(filter, false, false, page, limit, sort)
             .then(resp => {
               return resp.data.data;
             });
 
         } else {
-          responseData = await this.personApi.getPersonsWrapped(false, false, page, limit, sort)
+          personResponseData = await this.personApi.getPersonsWrapped(false, false, page, limit, sort)
             .then(resp => {
               return resp.data.data;
             });
@@ -162,9 +162,9 @@ export default class OrganizationService extends AbstractDataService<Organizatio
         throw err;
       }
 
-      mergeDataToState(this.personChooserState, responseData, checkDuplicates);
+      mergeDataToState(this.personChooserState, personResponseData, checkDuplicates);
 
-      return responseData;
+      return personResponseData;
     }
 
     /**
@@ -177,16 +177,16 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       this.organizationChooserSort = sort;
     }
 
-    let responseData: PersonDto[] = [];
+    let organizationResponseData: OrganizationDto[] = [];
 
     try {
       if (filter != null) {
-        responseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
+        organizationResponseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
       } else {
-        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
+        organizationResponseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
@@ -195,9 +195,9 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       throw err;
     }
 
-    mergeDataToState(this.organizationChooserState, this.removeUnfriendlyAgGridData(responseData), checkDuplicates);
+    mergeDataToState(this.organizationChooserState, this.removeUnfriendlyAgGridData(organizationResponseData), checkDuplicates);
 
-    return responseData;
+    return organizationResponseData;
   }
 
   createDatasource(type: OrganizationChooserDataType, idsToExclude?: string[], infiniteScrollOptions?: InfiniteScrollOptions) {
@@ -571,9 +571,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     try {
       const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
 
-      const item = this.state.find(item => item.id.get() === toDelete.id);
-      if (item)
-        item.set(none);
+      this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
       return orgResponse.data;
     }

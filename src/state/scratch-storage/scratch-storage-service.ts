@@ -174,9 +174,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
 
       await this.scratchStorageApi.deleteExistingAppEntry(toDelete.id);
 
-      const item = this.state.find(item => item.id.get() === toDelete.id);
-      if (item)
-        item.set(none);
+      this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
       return Promise.resolve();
     } catch (error) {

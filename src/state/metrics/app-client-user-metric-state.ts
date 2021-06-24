@@ -6,7 +6,7 @@ import AppClientUserMetricService from './app-client-user-metric-service';
 
 
 const appClientMetricState = createState<AppClientCountMetricDto>({});
-const metricsApi = new MetricsControllerApi(new Configuration({
+const metricsControllerApi = new MetricsControllerApi(new Configuration({
   basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
 }));
 
@@ -14,4 +14,4 @@ export const wrapAppClientMetricState = (state: State<AppClientCountMetricDto>, 
   return new AppClientUserMetricService(state, metricsApi);
 }
 
-export const useAppClientMetricState = (): AppClientUserMetricService => wrapAppClientMetricState(useState(appClientMetricState), metricsApi);
+export const useAppClientMetricState = (): AppClientUserMetricService => wrapAppClientMetricState(useState(appClientMetricState), metricsControllerApi);

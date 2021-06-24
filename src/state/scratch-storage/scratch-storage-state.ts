@@ -8,9 +8,9 @@ import { ScratchStorageFlat } from './scratch-storage-flat';
 const scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
 
 // this holds the selected app we're editing/updating
-const selectedScratchStorageState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
+const selectedScratchStorageGlobalState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
 
-const scratchStorageApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
+const scratchStorageControllerApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
@@ -23,5 +23,5 @@ export const wrapState = (
 
 export const useScratchStorageState = () => wrapState(
   useState(scratchStorageState),
-  useState(selectedScratchStorageState),
-  scratchStorageApi);
+  useState(selectedScratchStorageGlobalState),
+  scratchStorageControllerApi);
