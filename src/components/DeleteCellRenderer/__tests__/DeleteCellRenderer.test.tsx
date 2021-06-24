@@ -15,7 +15,7 @@ describe('Delete Cell Renderer', () => {
     const onClick = jest.fn();
 
     const page = render(
-      <DeleteCellRenderer onClick={onClick} />
+      <DeleteCellRenderer onClick={onClick} node={{ test: 'data' }} />
     );
 
     fireEvent.click(page.getByTitle("remove"));
