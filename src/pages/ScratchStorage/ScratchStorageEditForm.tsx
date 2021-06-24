@@ -1,29 +1,29 @@
-import React, {FormEvent} from 'react';
-import Form from '../../components/forms/Form/Form';
-import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import TextInput from '../../components/forms/TextInput/TextInput';
-import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
-import {Downgraded, none, State, useHookstate } from '@hookstate/core';
-import {Validation} from '@hookstate/validation';
-import {Touched} from '@hookstate/touched';
-import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
-import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
+import { Downgraded, none, State, useHookstate } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
-import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scratch-storage-user-with-privs-flat';
-import GridColumn from '../../components/Grid/GridColumn';
-import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
-import Button from '../../components/Button/Button';
+import { Touched } from '@hookstate/touched';
+import { Validation } from '@hookstate/validation';
 import { RowClickedEvent } from 'ag-grid-community';
-import ItemChooser from '../../components/ItemChooser/ItemChooser';
-import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
+import React, { FormEvent } from 'react';
+import Button from '../../components/Button/Button';
+import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import Checkbox from '../../components/forms/Checkbox/Checkbox';
-import './ScratchStorageEditForm.scss';
+import Form from '../../components/forms/Form/Form';
+import FormGroup from '../../components/forms/FormGroup/FormGroup';
+import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
+import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import TextInput from '../../components/forms/TextInput/TextInput';
+import GridColumn from '../../components/Grid/GridColumn';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import Modal from '../../components/Modal/Modal';
-import ModalTitle from '../../components/Modal/ModalTitle';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
+import ModalTitle from '../../components/Modal/ModalTitle';
+import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
+import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
+import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scratch-storage-user-with-privs-flat';
+import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import './ScratchStorageEditForm.scss';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
-import { generateStringErrorMessages, failsHookstateValidation, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -120,6 +120,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       field: 'email', 
       sortable: true,
       filter: true,
+      resizable: true,
       headerName: 'Email'
     }),
     new GridColumn({
@@ -127,6 +128,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       sortable: true,
       headerName: 'Read',
       headerClass: 'header-center',
+      initialWidth: 50,
       cellRenderer: PrivilegeCellRenderer
     }),
     new GridColumn({
@@ -134,6 +136,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       sortable: true,
       headerName: 'Write',
       headerClass: 'header-center',
+      initialWidth: 50,
       cellRenderer: PrivilegeCellRenderer
     }),
     new GridColumn({
@@ -141,6 +144,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
       sortable: true,
       headerName: 'Admin',
       headerClass: 'header-center',
+      initialWidth: 50,
       cellRenderer: PrivilegeCellRenderer
     })
   ];
@@ -151,6 +155,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
         field: '',
         headerName: deleteBtnName,
         headerClass: 'header-center',
+        initialWidth: 75,
         cellRenderer: DeleteCellRenderer,
         cellRendererParams: { onClick: removeUser }
       })
@@ -278,6 +283,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           onHide={userEditorCloseHandler}
           width="auto"
           height="auto"
+          data-testid='new-scratch-user-dlg'
         >
         <ScratchStorageUserAddForm 
           editorState={userEditorState} 

@@ -66,6 +66,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
           id="email"
           name="email"
           type="email"
+          data-testid='new-scratch-email-field'
           value={formState.email.get()}
           error={isEmailModified() && failsHookstateValidation(formState.email)}
           onChange={(event) => formState.email.set(event.target.value)}
@@ -80,6 +81,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
         <Checkbox
           id="read"
           name="read"
+          data-testid="scratch-read"
           label={<>Read</>}
           checked={formState.read.get()}
           onChange={(event) => formState.read.set(event.target.checked)}
@@ -88,6 +90,7 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
         <Checkbox
           id="write"
           name="write"
+          data-testid="scratch-write"
           label={<>Write</>}
           checked={formState.write.get()}
           onChange={(event) => formState.write.set(event.target.checked)}
@@ -96,13 +99,14 @@ function ScratchStorageUserAddForm(props: ScratchStorageAddFormProps) {
         <Checkbox
           id="admin"
           name="admin"
+          data-testid="scratch-admin"
           label={<>Admin</>}
           checked={formState.admin.get()}
           onChange={(event) => formState.admin.set(event.target.checked)}
         />
       </FormGroup>
 
-      <Button type="submit" disabled={!isFormModified() || !(Validation(formState.email).valid() && (formState.read.get() || formState.write.get() || formState.admin.get()))}>
+      <Button data-testid="submit-scratch-user-btn" type="submit" disabled={!isFormModified() || !(Validation(formState.email).valid() && (formState.read.get() || formState.write.get() || formState.admin.get()))}>
         { props.isUpdate ? "Update User": "Add User" }
       </Button>
       <div className="success-error-message">
