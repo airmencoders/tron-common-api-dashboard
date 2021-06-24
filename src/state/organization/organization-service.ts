@@ -124,16 +124,11 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   private personChooserSort?: string[];
   private organizationChooserSort?: string[];
 
-  async fetchAndStoreChooserPaginatedData(type: OrganizationChooserDataType, page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[] | OrganizationDto[]> {
-    if (type !== OrganizationChooserDataType.ORGANIZATION && type !== OrganizationChooserDataType.PERSON) {
-      throw new Error(`${type} is not supported for Chooser data`);
-    }
-
+  async fetchAndStorePersonChooserPaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[]> {
     if (filter != null && !this.filterValidate(filter)) {
       throw TypeValidation.validationError('FilterDto');
     }
 
-    if (type === OrganizationChooserDataType.PERSON) {
       /**
        * If the filter or sort changes, purge the state to start fresh.
        * Set filter to the new value
@@ -165,6 +160,12 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       mergeDataToState(this.personChooserState, personResponseData, checkDuplicates);
 
       return personResponseData;
+
+  }
+
+  async fetchAndStoreOrganizationChooserPaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<OrganizationDto[]> {
+    if (filter != null && !this.filterValidate(filter)) {
+      throw TypeValidation.validationError('FilterDto');
     }
 
     /**
@@ -222,7 +223,13 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
           const sort = convertAgGridSortToQueryParams(params.sortModel);
 
-          const data = await this.fetchAndStoreChooserPaginatedData(type, page, limit, true, filter.getFilterDto(), sort);
+          let data: any[] = [];
+
+          if (type === OrganizationChooserDataType.PERSON) {
+            data = await this.fetchAndStorePersonChooserPaginatedData(page, limit, true, filter.getFilterDto(), sort);
+          } else {
+            data = await this.fetchAndStoreOrganizationChooserPaginatedData(page, limit, true, filter.getFilterDto(), sort);
+          }
 
           let lastRow = -1;
 

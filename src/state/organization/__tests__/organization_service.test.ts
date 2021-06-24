@@ -7,7 +7,6 @@ import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails } from '.
 import { ResponseType } from '../../data-service/response-type';
 import { PatchResponse } from '../../data-service/patch-response';
 import { OrganizationEditState } from '../../../pages/Organization/organization-edit-state';
-import { OrganizationChooserDataType } from '../organization-chooser-data-type';
 
 class MockOrgApi extends OrganizationControllerApi {
   getOrganizationsWrapped(type?: "SQUADRON" | "GROUP" | "FLIGHT" | "WING" | "OTHER_USAF" | "ORGANIZATION",
@@ -510,16 +509,16 @@ describe('Test OrganizationService', () => {
     expect.assertions(4);
 
     // Make sure it calls filter endpoint
-    let response = await organizationService.fetchAndStoreChooserPaginatedData(OrganizationChooserDataType.PERSON, 0, 20, false, filterDto, agGridSort);
+    let response = await organizationService.fetchAndStorePersonChooserPaginatedData(0, 20, false, filterDto, agGridSort);
     expect(filterPersonSpy).toHaveBeenCalledTimes(1);
 
     // No filter, calls get all endpoint
-    response = await organizationService.fetchAndStoreChooserPaginatedData(OrganizationChooserDataType.PERSON, 0, 20, false, undefined, agGridSort);
+    response = await organizationService.fetchAndStorePersonChooserPaginatedData(0, 20, false, undefined, agGridSort);
     expect(getPersonWrappedSpy).toHaveBeenCalledTimes(1);
 
     // Mock an exception
     filterPersonSpy.mockImplementation(() => { return Promise.reject(new Error('Test error')) });
-    await expect(organizationService.fetchAndStoreChooserPaginatedData(OrganizationChooserDataType.PERSON, 0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
+    await expect(organizationService.fetchAndStorePersonChooserPaginatedData(0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
     expect(filterPersonSpy).toHaveBeenCalledTimes(2);
   });
 
@@ -574,16 +573,16 @@ describe('Test OrganizationService', () => {
     expect.assertions(4);
 
     // Make sure it calls filter endpoint
-    let response = await organizationService.fetchAndStoreChooserPaginatedData(OrganizationChooserDataType.ORGANIZATION, 0, 20, false, filterDto, agGridSort);
+    let response = await organizationService.fetchAndStoreOrganizationChooserPaginatedData(0, 20, false, filterDto, agGridSort);
     expect(filterOrganizationsSpy).toHaveBeenCalledTimes(1);
 
     // No filter, calls get all endpoint
-    response = await organizationService.fetchAndStoreChooserPaginatedData(OrganizationChooserDataType.ORGANIZATION, 0, 20, false, undefined, agGridSort);
+    response = await organizationService.fetchAndStoreOrganizationChooserPaginatedData(0, 20, false, undefined, agGridSort);
     expect(getOrganizationsWrappedSpy).toHaveBeenCalledTimes(1);
 
     // Mock an exception
     filterOrganizationsSpy.mockImplementation(() => { return Promise.reject(new Error('Test error')) });
-    await expect(organizationService.fetchAndStoreChooserPaginatedData(OrganizationChooserDataType.ORGANIZATION, 0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
+    await expect(organizationService.fetchAndStoreOrganizationChooserPaginatedData(0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
     expect(filterOrganizationsSpy).toHaveBeenCalledTimes(2);
   });
 
