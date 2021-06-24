@@ -8,7 +8,7 @@ export default class PastLogfileService {
 
   fetchAndStorePastLogfiles(): Promise<LogfileDto[]> {
     const allLogfiles = (): AxiosPromise<LogfileDto[]> => this.logfileApi.getLogfiles();
-    const pastLogRequest = new Promise<LogfileDto[]>(resolve => resolve(allLogfiles().then(r => r.data)));
+    const pastLogRequest = Promise.resolve(allLogfiles().then(r => r.data));
 
     this.pastLogfileState.set(pastLogRequest);
 

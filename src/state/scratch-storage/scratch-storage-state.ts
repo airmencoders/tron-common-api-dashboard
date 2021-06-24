@@ -1,17 +1,17 @@
-import { createState, State, useState } from '@hookstate/core';
-import Config from '../../api/configuration';
-import { Configuration, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../openapi';
+import {createState, State, useState} from '@hookstate/core';
+import {Configuration, ScratchStorageControllerApi, ScratchStorageControllerApiInterface} from '../../openapi';
+import Config from '../../api/config';
+import ScratchStorageService from './scratch-storage-service';
 import { PrivilegeDto, ScratchStorageAppRegistryDto } from '../../openapi/models';
 import { ScratchStorageFlat } from './scratch-storage-flat';
-import ScratchStorageService from './scratch-storage-service';
 
 const scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
 const scratchStoragePrivilegesState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
 
 // this holds the selected app we're editing/updating
-const selectedScratchStorageState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
+const selectedScratchStorageGlobalState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
 
-const scratchStorageApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
+const scratchStorageControllerApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
@@ -25,6 +25,6 @@ export const wrapState = (
 
 export const useScratchStorageState = () => wrapState(
   useState(scratchStorageState),
-  useState(selectedScratchStorageState),
-  scratchStorageApi,
+  useState(selectedScratchStorageGlobalState),
+  scratchStorageControllerApi,
   useState(scratchStoragePrivilegesState));

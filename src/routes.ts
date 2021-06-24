@@ -6,7 +6,7 @@ import OrganizationPage from './pages/Organization/OrganizationPage';
 import LogfilePage from "./pages/Logfile/LogfilePage";
 import DashboardUserPage from "./pages/DashboardUser/DashboardUserPage";
 import ScratchStoragePage from "./pages/ScratchStorage/ScratchStoragePage";
-import HomePage from "./pages/Home/Home";
+import HomePage from "./pages/Home/HomePage";
 import { AppSourcePage } from "./pages/AppSource/AppSourcePage";
 import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 import PubSubPage from "./pages/PubSub/PubSubPage";

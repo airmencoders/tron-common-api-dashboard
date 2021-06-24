@@ -109,7 +109,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       }
 
       await this.appClientsApi.deleteAppClient(toDelete.id);
-      const item = this.state.find(item => item.id.get() === toDelete.id);
+      const item = this.state.find(appClient => appClient.id.get() === toDelete.id);
       if (item)
         item.set(none);
 

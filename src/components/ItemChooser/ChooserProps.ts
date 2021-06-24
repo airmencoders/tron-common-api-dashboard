@@ -1,4 +1,4 @@
-import {GridApi, RowClickedEvent, RowNode} from 'ag-grid-community';
+import {GridApi, RowClickedEvent} from 'ag-grid-community';
 import GridColumn from '../Grid/GridColumn';
 
 export interface ChooserProps {

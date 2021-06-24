@@ -76,8 +76,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const isFormModified = (): boolean => {
     const stateKeys = formState.keys;
     let isChanged = false;
-    for (let i = 0; i < stateKeys.length; i++) {
-      const key = stateKeys[i];
+    for (const key of stateKeys) {
       const origValue = props.data?.[key] == null || props.data[key] === '' ? '' : props.data?.[key];
       const formStateValue = formState[key]?.get() == null || formState[key]?.get() === '' ? '' : formState[key]?.get();
       if (formStateValue !== origValue) {

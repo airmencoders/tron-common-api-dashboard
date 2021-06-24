@@ -5,7 +5,7 @@ export interface SelectProps {
   name: string;
   className?: string;
   children: React.ReactNode;
-  inputRef?: string | ((instance: HTMLSelectElement | null) => void) | React.RefObject<HTMLSelectElement> | null | undefined;
+  inputRef?: string | ((instance: HTMLSelectElement | null) => void) | React.RefObject<HTMLSelectElement>;
 
 }
 
