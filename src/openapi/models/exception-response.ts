@@ -43,7 +43,7 @@ export interface ExceptionResponse {
      * @type {string}
      * @memberof ExceptionResponse
      */
-    message?: string;
+    reason?: string;
     /**
      * 
      * @type {string}
