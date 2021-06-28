@@ -21,6 +21,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { PersonDto } from '../models';
+// @ts-ignore
 import { UserInfoDto } from '../models';
 /**
  * UserInfoControllerApi - axios parameter creator
@@ -28,6 +30,43 @@ import { UserInfoDto } from '../models';
  */
 export const UserInfoControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Returns person record matching email for existing logged in user jwt
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getExistingPersonRecord: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v2/userinfo/existing-person`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Retrieves user information
          * @summary Retrieves the user information from the jwt
@@ -75,6 +114,19 @@ export const UserInfoControllerApiAxiosParamCreator = function (configuration?: 
 export const UserInfoControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * 
+         * @summary Returns person record matching email for existing logged in user jwt
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getExistingPersonRecord(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await UserInfoControllerApiAxiosParamCreator(configuration).getExistingPersonRecord(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves user information
          * @summary Retrieves the user information from the jwt
          * @param {*} [options] Override http request option.
@@ -97,6 +149,15 @@ export const UserInfoControllerApiFp = function(configuration?: Configuration) {
 export const UserInfoControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * 
+         * @summary Returns person record matching email for existing logged in user jwt
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getExistingPersonRecord(options?: any): AxiosPromise<PersonDto> {
+            return UserInfoControllerApiFp(configuration).getExistingPersonRecord(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves user information
          * @summary Retrieves the user information from the jwt
          * @param {*} [options] Override http request option.
@@ -115,6 +176,15 @@ export const UserInfoControllerApiFactory = function (configuration?: Configurat
  */
 export interface UserInfoControllerApiInterface {
     /**
+     * 
+     * @summary Returns person record matching email for existing logged in user jwt
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserInfoControllerApiInterface
+     */
+    getExistingPersonRecord(options?: any): AxiosPromise<PersonDto>;
+
+    /**
      * Retrieves user information
      * @summary Retrieves the user information from the jwt
      * @param {*} [options] Override http request option.
@@ -132,6 +202,17 @@ export interface UserInfoControllerApiInterface {
  * @extends {BaseAPI}
  */
 export class UserInfoControllerApi extends BaseAPI implements UserInfoControllerApiInterface {
+    /**
+     * 
+     * @summary Returns person record matching email for existing logged in user jwt
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserInfoControllerApi
+     */
+    public getExistingPersonRecord(options?: any) {
+        return UserInfoControllerApiFp(this.configuration).getExistingPersonRecord(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Retrieves user information
      * @summary Retrieves the user information from the jwt

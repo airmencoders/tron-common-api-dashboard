@@ -12,6 +12,7 @@ import { createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import { HeaderUserEditorWithLoading } from './HeaderUserEditor';
 import './HeaderUserInfo.scss';
 import {HeaderUserInfoProps} from './HeaderUserInfoProps';
+import {useUserInfoState} from '../../state/user/user-info-state';
 
 /**
  * @member isOpen Tracks the state of the modal
@@ -41,6 +42,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
   }, [userInfo]);
 
   const personState = usePersonState();
+  const userInfoState = useUserInfoState();
   const userEditorState = useHookstate<UserEditorState>({
     isOpen: false,
     currentUserState: {},
@@ -57,13 +59,12 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
      * record in the database. This is used to determine if
      * "Edit Person Record" should be shown in the userinfo header dropdown.
      */
-    async function fetchPerson() {
+    async function checkForUserPersonRecord() {
       if (userInfo?.email) {
         try {
           userEditorState.isLoadingInitial.set(true);
 
-          const person = await personState.getPersonByEmail(userInfo.email);
-
+          const person = await userInfoState.getExistingPersonForUser();
           userEditorState.merge({
             currentUserState: person,
             isLoadingInitial: false
@@ -74,7 +75,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
       }
     }
 
-    fetchPerson();
+    checkForUserPersonRecord();
   }, []);
 
   async function userEditorSubmitModal() {
@@ -116,7 +117,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
       const person = await personState.getPersonByEmail(userInfo.email);
 
       /**
-       * 
+       *
        */
       userEditorState.merge({
         currentUserState: person,

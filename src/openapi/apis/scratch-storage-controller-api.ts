@@ -451,10 +451,10 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeyValuePairsForAppId: async (appId: string, options: any = {}): Promise<RequestArgs> => {
+        getAllKeyValuePairsForAppIdWrapped: async (appId: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'appId' is not null or undefined
             if (appId === null || appId === undefined) {
-                throw new RequiredError('appId','Required parameter appId was null or undefined when calling getAllKeyValuePairsForAppId.');
+                throw new RequiredError('appId','Required parameter appId was null or undefined when calling getAllKeyValuePairsForAppIdWrapped.');
             }
             const localVarPath = `/v2/scratch/{appId}`
                 .replace(`{${"appId"}}`, encodeURIComponent(String(appId)));
@@ -835,7 +835,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
-         * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
+         * @summary Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1320,8 +1320,8 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeyValuePairsForAppId(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntryDto>>> {
-            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeyValuePairsForAppId(appId, options);
+        async getAllKeyValuePairsForAppIdWrapped(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ScratchStorageEntryDtoResponseWrapper>>> {
+            const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeyValuePairsForAppIdWrapped(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1440,7 +1440,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
-         * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
+         * @summary Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1640,8 +1640,8 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDto>> {
-            return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairsForAppId(appId, options).then((request) => request(axios, basePath));
+        getAllKeyValuePairsForAppIdWrapped(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDtoResponseWrapper>> {
+            return ScratchStorageControllerApiFp(configuration).getAllKeyValuePairsForAppIdWrapped(appId, options).then((request) => request(axios, basePath));
         },
         /**
          * Requires request to be under DASHBOARD_ADMIN privileges
@@ -1724,7 +1724,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
         },
         /**
          * Requester has to have DASHBOARD_ADMIN rights
-         * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
+         * @summary Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1897,7 +1897,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeyValuePairsForAppId(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDto>>;
+    getAllKeyValuePairsForAppIdWrapped(appId: string, options?: any): AxiosPromise<Array<ScratchStorageEntryDtoResponseWrapper>>;
 
     /**
      * Requires request to be under DASHBOARD_ADMIN privileges
@@ -1980,7 +1980,7 @@ export interface ScratchStorageControllerApiInterface {
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
-     * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
+     * @summary Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
@@ -2169,8 +2169,8 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi
      */
-    public getAllKeyValuePairsForAppId(appId: string, options?: any) {
-        return ScratchStorageControllerApiFp(this.configuration).getAllKeyValuePairsForAppId(appId, options).then((request) => request(this.axios, this.basePath));
+    public getAllKeyValuePairsForAppIdWrapped(appId: string, options?: any) {
+        return ScratchStorageControllerApiFp(this.configuration).getAllKeyValuePairsForAppIdWrapped(appId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2270,7 +2270,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
-     * @summary Gets the entire table of Scratch Storage apps that are registered with Common API
+     * @summary Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApi

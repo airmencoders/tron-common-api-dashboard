@@ -19,8 +19,6 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { BadRequestException } from '../models';
-// @ts-ignore
 import { EventInfoDto } from '../models';
 // @ts-ignore
 import { EventInfoDtoResponseWrapper } from '../models';

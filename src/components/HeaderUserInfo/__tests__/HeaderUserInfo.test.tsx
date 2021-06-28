@@ -3,13 +3,22 @@ import HeaderUserInfo from '../HeaderUserInfo';
 import { render, waitFor, screen, fireEvent } from '@testing-library/react';
 import { PersonDto, PersonDtoBranchEnum, RankBranchTypeEnum, UserInfoDto } from '../../../openapi/models';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { PersonControllerApi, PersonControllerApiInterface, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
+import {
+  PersonControllerApi,
+  PersonControllerApiInterface,
+  RankControllerApi,
+  RankControllerApiInterface, UserInfoControllerApi,
+  UserInfoControllerApiInterface
+} from '../../../openapi';
 import { RankStateModel } from '../../../state/person/rank-state-model';
 import { usePersonState } from '../../../state/person/person-state';
 import PersonService from '../../../state/person/person-service';
 import { AxiosResponse } from 'axios';
+import {UserInfoState, useUserInfoState} from '../../../state/user/user-info-state';
+import UserInfoService from '../../../state/user/user-info-serivce';
 
 jest.mock('../../../state/person/person-state');
+jest.mock('../../../state/user/user-info-state');
 
 describe('Test HeaderUserInfo', () => {
 
@@ -21,8 +30,15 @@ describe('Test HeaderUserInfo', () => {
   let userInfo: UserInfoDto;
   let personDtoResponse: AxiosResponse<PersonDto>;
 
+  let userInfoState: State<UserInfoState> & StateMethodsDestroy;
+  let userInfoApi: UserInfoControllerApiInterface;
+
   function mockPersonService() {
     (usePersonState as jest.Mock).mockReturnValue(new PersonService(personState, personApi, rankState, rankApi));
+  }
+
+  function mockUserInfoService() {
+    (useUserInfoState as jest.Mock).mockReturnValue(new UserInfoService(userInfoState, userInfoApi));
   }
 
   beforeEach(() => {
@@ -49,6 +65,15 @@ describe('Test HeaderUserInfo', () => {
     rankApi = new RankControllerApi();
 
     mockPersonService();
+
+    userInfoState = createState<UserInfoState>({});
+    userInfoApi = new UserInfoControllerApi();
+
+    userInfoApi.getExistingPersonRecord = jest.fn(() => {
+      return Promise.resolve(personDtoResponse);
+    });
+
+    mockUserInfoService();
 
     userInfo = {
       givenName: 'Test',
@@ -178,7 +203,7 @@ describe('Test HeaderUserInfo', () => {
   });
 
   test('userInfo dropdown should not allow Edit Person Record', async () => {
-    personApi.findPersonBy = jest.fn(() => {
+    userInfoApi.getExistingPersonRecord = jest.fn(() => {
       return Promise.reject(new Error('failed'));
     });
 
