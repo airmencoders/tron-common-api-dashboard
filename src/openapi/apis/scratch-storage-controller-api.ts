@@ -21,6 +21,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { GenericStringArrayResponseWrapper } from '../models';
+// @ts-ignore
 import { PrivilegeDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { ScratchStorageAppRegistryDto } from '../models';
@@ -1347,7 +1349,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeysForAppIdWrapped(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntryDtoResponseWrapper>> {
+        async getAllKeysForAppIdWrapped(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GenericStringArrayResponseWrapper>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeysForAppIdWrapped(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1659,7 +1661,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<ScratchStorageEntryDtoResponseWrapper> {
+        getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<GenericStringArrayResponseWrapper> {
             return ScratchStorageControllerApiFp(configuration).getAllKeysForAppIdWrapped(appId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1916,7 +1918,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<ScratchStorageEntryDtoResponseWrapper>;
+    getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<GenericStringArrayResponseWrapper>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
