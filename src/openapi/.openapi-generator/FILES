@@ -58,6 +58,7 @@ models/filter-criteria.ts
 models/filter-dto.ts
 models/flight-all-of.ts
 models/flight.ts
+models/generic-string-array-response-wrapper.ts
 models/group.ts
 models/http-log-dto-pagination-response-wrapper.ts
 models/http-log-entry-details-dto.ts

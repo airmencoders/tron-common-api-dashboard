@@ -35,6 +35,7 @@ export * from './filter-criteria';
 export * from './filter-dto';
 export * from './flight';
 export * from './flight-all-of';
+export * from './generic-string-array-response-wrapper';
 export * from './group';
 export * from './http-log-dto-pagination-response-wrapper';
 export * from './http-log-entry-details-dto';

@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
+import { GenericStringArrayResponseWrapper, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface, ScratchStorageEntryDto, ScratchStorageEntryDtoResponseWrapper } from '../../../openapi';
 import { ScratchStorageFlat } from '../scratch-storage-flat';
 import ScratchStorageService from '../scratch-storage-service';
 import { wrapState } from '../scratch-storage-state';
@@ -13,12 +13,15 @@ describe('scratch storage service tests', () => {
   let selectedScratchStorageState: State<ScratchStorageFlat> & StateMethodsDestroy;
   let scratchStorageApi: ScratchStorageControllerApiInterface;
   let wrappedState: ScratchStorageService;
+  let scratchStorageKeysToCreateUpdateState : State<ScratchStorageEntryDto[]> & StateMethodsDestroy;
+  let scratchStorageKeysToDeleteState : State<string[]> & StateMethodsDestroy;
 
   const dtos: ScratchStorageAppRegistryDto[] = [
       {
         id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
         appName: 'Test App Name',
         appHasImplicitRead: true,
+        aclMode: false,
         userPrivs: [
             {
                 userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -39,6 +42,7 @@ describe('scratch storage service tests', () => {
         id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
         appName: 'Test App Name',
         appHasImplicitRead: true,
+        aclMode: false,
         userPrivs: []
       }
   ];
@@ -47,6 +51,7 @@ describe('scratch storage service tests', () => {
     id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
     appName: 'Test App Name',
     appHasImplicitRead: true,
+    aclMode: false,
     userPrivs: [
         {
             userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -67,13 +72,16 @@ describe('scratch storage service tests', () => {
   const entry: ScratchStorageAppRegistryDto = {
     id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
     appName: 'Test App Name',
-    appHasImplicitRead: true
+    appHasImplicitRead: true,
+    aclMode: false,
   }
 
   const flat: ScratchStorageFlat = {
     id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
     appName: 'Test App Name',
     appHasImplicitRead: true,
+    aclMode: false,
+    keyNames: [],
     userPrivs: [
         {
             userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
@@ -119,19 +127,39 @@ describe('scratch storage service tests', () => {
 
   const rejectMsg = 'failed';
 
+  const axiosGetKeysResponse : AxiosResponse<GenericStringArrayResponseWrapper> = {
+    data: { data: ['some-key'], pagination: {} },
+    status: 200,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
 
   beforeEach(async () => {
     scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
     selectedScratchStorageState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
     privilegeState = createState<PrivilegeDto[]>([]);
     scratchStorageApi = new ScratchStorageControllerApi();
-    wrappedState = wrapState(scratchStorageState, selectedScratchStorageState, scratchStorageApi, privilegeState);
+    scratchStorageKeysToCreateUpdateState = createState<ScratchStorageEntryDto[]>([{
+      appId: 'some other id',
+      key: 'other-key',
+      value: 'some other value',
+    }]);
+    scratchStorageKeysToDeleteState = createState<string[]>(new Array<string>());
+      wrappedState = wrapState(scratchStorageState, 
+        selectedScratchStorageState, 
+        scratchStorageApi, 
+        privilegeState,
+        scratchStorageKeysToCreateUpdateState,
+        scratchStorageKeysToDeleteState);
   });
 
   afterEach(() => {
     scratchStorageState.destroy();
     selectedScratchStorageState.destroy();
     privilegeState.destroy();
+    scratchStorageKeysToCreateUpdateState.destroy();
+    scratchStorageKeysToDeleteState.destroy();
   });
 
   it('Test fetch and store', async () => {
@@ -263,7 +291,8 @@ describe('scratch storage service tests', () => {
     scratchStorageApi.getScratchAppById = jest.fn(() => {
       return new Promise<AxiosResponse<ScratchStorageAppRegistryDto>>(resolve => resolve(axiosGetByIdResponse));
     });
-    await expect(wrappedState.convertRowDataToEditableData(dto)).resolves.toEqual(flat);
+    scratchStorageApi.getAllKeysForAppIdWrapped = jest.fn(() => Promise.resolve(axiosGetKeysResponse))
+    await expect(wrappedState.convertRowDataToEditableData(dto)).resolves.toEqual({...flat, keyNames: ['some-key']});
   });
 
   it('Test convertAppClientToFlat', () => {

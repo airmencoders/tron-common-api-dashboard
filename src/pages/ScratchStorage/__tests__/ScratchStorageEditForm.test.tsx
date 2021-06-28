@@ -13,12 +13,15 @@ let onClose = jest.fn();
 let successAction: DataCrudSuccessAction | undefined;
 let testScratchStorage: ScratchStorageFlat;
 let testValidScratchStorage: ScratchStorageFlat;
+let testValidScratchStorageWithKeys: ScratchStorageFlat;
 
 beforeEach(() => {
     testScratchStorage = {
         id: '',
         appName: '',
-        userPrivs: []
+        userPrivs: [],
+        keyNames: [],
+        aclMode: false,
     };
 
     testValidScratchStorage = {
@@ -33,8 +36,27 @@ beforeEach(() => {
                 write: false,
                 admin: false
             }
-        ]
+        ],
+        keyNames: [],
+        aclMode: false,
     };
+
+    testValidScratchStorage = {
+      id: 'fa85f64-5717-4562-b3fc-2c963f66afa6',
+      appName: 'Test App Name',
+      appHasImplicitRead: false,
+      userPrivs: [
+          {
+              userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+              email: 'test@test.com',
+              read: false,
+              write: false,
+              admin: false
+          }
+      ],
+      keyNames: ['some-key'],
+      aclMode: false,
+  };
 });
 
 it('should render', async () => {
@@ -127,6 +149,11 @@ it('Update', async () => {
     const readCheckbox = page.getByLabelText('Implicit Read');
     fireEvent.click(readCheckbox);
     expect(readCheckbox).toBeChecked();
+
+    // Acl Mode
+    const aclCheckbox = page.getByLabelText('ACL Mode');
+    fireEvent.click(aclCheckbox);
+    expect(aclCheckbox).toBeChecked();
 
     // Add user
     const addUserBtn = page.getByText('Add User');
@@ -223,25 +250,25 @@ it('Has default values if none given', () => {
     expect(page.getByTestId('scratch-storage-form')).toBeInTheDocument();
   });
 
-it('Shows success', () => {
-    successAction = {
-      success: true,
-      successMsg: 'Success'
-    };
+  it('Shows success', () => {
+      successAction = {
+        success: true,
+        successMsg: 'Success'
+      };
 
-    const page = render(
-      <MemoryRouter>
-        <ScratchStorageEditForm
-          onSubmit={onSubmit}
-          onClose={onClose}
-          formActionType={FormActionType.UPDATE}
-          isSubmitting={false}
-          successAction={successAction}
-          data={testValidScratchStorage}
-        />
-      </MemoryRouter>
-    );
+      const page = render(
+        <MemoryRouter>
+          <ScratchStorageEditForm
+            onSubmit={onSubmit}
+            onClose={onClose}
+            formActionType={FormActionType.UPDATE}
+            isSubmitting={false}
+            successAction={successAction}
+            data={testValidScratchStorage}
+          />
+        </MemoryRouter>
+      );
 
-    expect(page.getByText(successAction.successMsg)).toBeInTheDocument();
-  });
+      expect(page.getByText(successAction.successMsg)).toBeInTheDocument();
+    });
 });

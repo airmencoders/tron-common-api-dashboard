@@ -3,7 +3,7 @@ import { render, waitFor } from '@testing-library/react';
 import { AxiosResponse } from 'axios';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { DashboardUserDto, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageControllerApi, ScratchStorageControllerApiInterface } from '../../../openapi';
+import { DashboardUserDto, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageControllerApi, ScratchStorageControllerApiInterface, ScratchStorageEntryDto } from '../../../openapi';
 import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import { ScratchStorageFlat } from '../../../state/scratch-storage/scratch-storage-flat';
 import ScratchStorageService from '../../../state/scratch-storage/scratch-storage-service';
@@ -15,6 +15,8 @@ jest.mock('../../../state/privilege/privilege-service');
 describe('Test Scratch Storage Page', () => {
   let scratchStorageState: State<ScratchStorageAppRegistryDto[]> & StateMethodsDestroy;
   let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
+  let scratchStorageKeysToCreateUpdateState : State<ScratchStorageEntryDto[]> & StateMethodsDestroy;;
+  let scratchStorageKeysToDeleteState : State<string[]> & StateMethodsDestroy;
   let selectedScratchStorageState: State<ScratchStorageFlat> & StateMethodsDestroy;
   let scratchStorageApi: ScratchStorageControllerApiInterface;
   let privs : PrivilegeDto[] = [
@@ -59,12 +61,22 @@ describe('Test Scratch Storage Page', () => {
     scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
     selectedScratchStorageState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
     privilegeState = createState<PrivilegeDto[]>(privs);
+    scratchStorageKeysToCreateUpdateState = createState<ScratchStorageEntryDto[]>(new Array<ScratchStorageEntryDto>());
+    scratchStorageKeysToDeleteState = createState<string[]>(new Array<string>());
     scratchStorageApi = new ScratchStorageControllerApi();
   });
 
   it('Test Loading Page',  async () => {
     function mockScratchStorageState() {
-      (useScratchStorageState as jest.Mock).mockReturnValue(new ScratchStorageService(scratchStorageState, selectedScratchStorageState, scratchStorageApi, privilegeState));
+      (useScratchStorageState as jest.Mock)
+      .mockReturnValue(
+        new ScratchStorageService(scratchStorageState, 
+          selectedScratchStorageState, 
+          scratchStorageApi, 
+          privilegeState,
+          scratchStorageKeysToCreateUpdateState,
+          scratchStorageKeysToDeleteState));
+          
       useScratchStorageState().fetchAndStoreData = jest.fn(() => Promise.resolve([]))
       jest.spyOn(useScratchStorageState(), 'isPromised', 'get').mockReturnValue(true);
     }
