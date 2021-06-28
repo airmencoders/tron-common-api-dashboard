@@ -1078,6 +1078,25 @@
       },
       "type": "object"
     },
+    "GenericStringArrayResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "pagination": {
+          "$ref": "model-types.json#/definitions/Pagination"
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "type": "object"
+    },
     "Group": {
       "additionalProperties": false,
       "properties": {

@@ -32,6 +32,13 @@ const columns: GridColumn[] =
       headerName: 'Implicit Read',
       headerClass: 'header-center',
       cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: 'aclMode',
+      sortable: true,
+      headerName: 'ACL Mode',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
     })
   ];
 

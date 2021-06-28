@@ -58,16 +58,16 @@ export interface BadRequestExceptionCauseStackTrace {
     lineNumber?: number;
     /**
      * 
-     * @type {string}
-     * @memberof BadRequestExceptionCauseStackTrace
-     */
-    className?: string;
-    /**
-     * 
      * @type {boolean}
      * @memberof BadRequestExceptionCauseStackTrace
      */
     nativeMethod?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof BadRequestExceptionCauseStackTrace
+     */
+    className?: string;
 }
 
 
