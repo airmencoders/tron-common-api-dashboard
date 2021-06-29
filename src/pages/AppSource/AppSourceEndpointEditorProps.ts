@@ -1,5 +1,5 @@
 import { State } from '@hookstate/core';
-import { AppClientUserPrivDto, AppEndpointDto, AppSourceDto } from '../../openapi';
+import { AppClientUserPrivDto, AppEndpointDto } from '../../openapi';
 
 export interface AppSourceEndpointEditorProps {
   appClientPrivileges: State<AppClientUserPrivDto[]>;

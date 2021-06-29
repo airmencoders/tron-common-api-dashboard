@@ -27,7 +27,7 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
         // Convert object to keep track of app clients that are authorized.
         // Set the already authorized apps
         // Filter out the app source from the app clients - can't assign permissions to self
-        const appClientPrivileges = clients?.map(client => {
+        return clients?.map(client => {
           /**
            * Check if this client has privilege to every selected endpoint.
            * If not, the authorized status for this client should be indeterminate.
@@ -56,8 +56,6 @@ function AppSourceEndpointEditor(props: AppSourceEndpointEditorProps) {
             authorized
           } as AppSourceClientPrivilege;
         }).filter(client => client.id !== props.appSourceId.get());
-
-        return appClientPrivileges;
       });
 
     appClients.set(filterResults);

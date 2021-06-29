@@ -2,7 +2,7 @@ import {none, State} from '@hookstate/core';
 import { OrganizationControllerApiInterface, PersonControllerApiInterface } from '../../openapi';
 import { FilterCondition, FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum, OrganizationDto, PersonDto } from '../../openapi/models';
 import {AbstractDataService} from '../data-service/abstract-data-service';
-import {OrganizationDtoWithDetails} from './organization-state';
+import {OrganizationDtoWithDetails, PersonWithDetails} from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
@@ -124,16 +124,11 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   private personChooserSort?: string[];
   private organizationChooserSort?: string[];
 
-  async fetchAndStoreChooserPaginatedData(type: OrganizationChooserDataType, page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[] | OrganizationDto[]> {
-    if (type !== OrganizationChooserDataType.ORGANIZATION && type !== OrganizationChooserDataType.PERSON) {
-      throw new Error(`${type} is not supported for Chooser data`);
-    }
-
+  async fetchAndStorePersonChooserPaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<PersonDto[]> {
     if (filter != null && !this.filterValidate(filter)) {
       throw TypeValidation.validationError('FilterDto');
     }
 
-    if (type === OrganizationChooserDataType.PERSON) {
       /**
        * If the filter or sort changes, purge the state to start fresh.
        * Set filter to the new value
@@ -144,16 +139,16 @@ export default class OrganizationService extends AbstractDataService<Organizatio
         this.personChooserSort = sort;
       }
 
-      let responseData: PersonDto[] = [];
+      let personResponseData: PersonDto[] = [];
       try {
         if (filter != null) {
-          responseData = await this.personApi.filterPerson(filter, false, false, page, limit, sort)
+          personResponseData = await this.personApi.filterPerson(filter, false, false, page, limit, sort)
             .then(resp => {
               return resp.data.data;
             });
 
         } else {
-          responseData = await this.personApi.getPersonsWrapped(false, false, page, limit, sort)
+          personResponseData = await this.personApi.getPersonsWrapped(false, false, page, limit, sort)
             .then(resp => {
               return resp.data.data;
             });
@@ -162,9 +157,15 @@ export default class OrganizationService extends AbstractDataService<Organizatio
         throw err;
       }
 
-      mergeDataToState(this.personChooserState, responseData, checkDuplicates);
+      mergeDataToState(this.personChooserState, personResponseData, checkDuplicates);
 
-      return responseData;
+      return personResponseData;
+
+  }
+
+  async fetchAndStoreOrganizationChooserPaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<OrganizationDto[]> {
+    if (filter != null && !this.filterValidate(filter)) {
+      throw TypeValidation.validationError('FilterDto');
     }
 
     /**
@@ -177,16 +178,16 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       this.organizationChooserSort = sort;
     }
 
-    let responseData: PersonDto[] = [];
+    let organizationResponseData: OrganizationDto[] = [];
 
     try {
       if (filter != null) {
-        responseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
+        organizationResponseData = await this.orgApi.filterOrganizations(filter, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
       } else {
-        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
+        organizationResponseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;
           });
@@ -195,9 +196,9 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       throw err;
     }
 
-    mergeDataToState(this.organizationChooserState, this.removeUnfriendlyAgGridData(responseData), checkDuplicates);
+    mergeDataToState(this.organizationChooserState, this.removeUnfriendlyAgGridData(organizationResponseData), checkDuplicates);
 
-    return responseData;
+    return organizationResponseData;
   }
 
   createDatasource(type: OrganizationChooserDataType, idsToExclude?: string[], infiniteScrollOptions?: InfiniteScrollOptions) {
@@ -222,7 +223,13 @@ export default class OrganizationService extends AbstractDataService<Organizatio
 
           const sort = convertAgGridSortToQueryParams(params.sortModel);
 
-          const data = await this.fetchAndStoreChooserPaginatedData(type, page, limit, true, filter.getFilterDto(), sort);
+          let data: any[] = [];
+
+          if (type === OrganizationChooserDataType.PERSON) {
+            data = await this.fetchAndStorePersonChooserPaginatedData(page, limit, true, filter.getFilterDto(), sort);
+          } else {
+            data = await this.fetchAndStoreOrganizationChooserPaginatedData(page, limit, true, filter.getFilterDto(), sort);
+          }
 
           let lastRow = -1;
 
@@ -417,72 +424,18 @@ export default class OrganizationService extends AbstractDataService<Organizatio
       return Promise.reject(new Error('Organization to update has undefined id.'));
     }
 
-    const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = this.createJsonPatch(original, toUpdate, toPatch);
-
     /**
-     * Check to find only removals that exist in the original. If it does not exist
-     * in the original, then there's no need to add it to the request for removal.
+     * Will contains all of the requests that are sent to patch
+     * the organization for update.
      */
-    let subOrgsToRemove: string[] = [];
-    if (original.subordinateOrganizations != null) {
-      subOrgsToRemove = getDataItemDuplicates(original.subordinateOrganizations, toPatch.subOrgs.toRemove);
-    }
-
-    let membersToRemove: string[] = [];
-    if (original.members != null) {
-      membersToRemove = getDataItemDuplicates(original.members, toPatch.members.toRemove);
-    }
-
-    /**
-     * Check to find only additions that does not exist in the original. If they already
-     * exist in the original, they do not need to be included in the request for addition.
-     */
-    let subOrgsToAdd: string[] = [];
-    if (original.subordinateOrganizations != null) {
-      subOrgsToAdd = getDataItemNonDuplicates(original.subordinateOrganizations, toPatch.subOrgs.toAdd);
-    } else {
-      subOrgsToAdd = mapDataItemsToStringIds(toPatch.subOrgs.toAdd);
-    }
-
-    let membersToAdd: string[] = [];
-    if (original.members != null) {
-      membersToAdd = getDataItemNonDuplicates(original.members, toPatch.members.toAdd);
-    } else {
-      membersToAdd = mapDataItemsToStringIds(toPatch.members.toAdd);
-    }
-
     const requests: Promise<any>[] = [];
-
     /**
      * Keep track of the indexes for the requests that are made
      * to help differentiate the messages on failure of any request.
-     * Ensures that only the requests that must be made are actually sent.
      */
     const requestMap: Map<number, OrganizationPatchRequestType> = new Map();
-    if (jsonPatchOperations.length > 0) {
-      requests.push(this.orgApi.jsonPatchOrganization(toUpdate.id, jsonPatchOperations));
-      requestMap.set(requests.length - 1, OrganizationPatchRequestType.JSON_PATCH);
-    }
 
-    if (subOrgsToRemove.length > 0) {
-      requests.push(this.orgApi.removeSubordinateOrganization(toUpdate.id, subOrgsToRemove));
-      requestMap.set(requests.length - 1, OrganizationPatchRequestType.SUB_ORG_REMOVE);
-    }
-
-    if (subOrgsToAdd.length > 0) {
-      requests.push(this.orgApi.addSubordinateOrganization(toUpdate.id, subOrgsToAdd));
-      requestMap.set(requests.length - 1, OrganizationPatchRequestType.SUB_ORG_ADD);
-    }
-
-    if (membersToRemove.length > 0) {
-      requests.push(this.orgApi.deleteOrganizationMember(toUpdate.id, membersToRemove));
-      requestMap.set(requests.length - 1, OrganizationPatchRequestType.MEMBERS_REMOVE);
-    }
-
-    if (membersToAdd.length > 0) {
-      requests.push(this.orgApi.addOrganizationMember(toUpdate.id, membersToAdd));
-      requestMap.set(requests.length - 1, OrganizationPatchRequestType.MEMBERS_ADD);
-    }
+    this.createJsonPatchRequests(original, toUpdate, toPatch, requests, requestMap);
 
     const data = await Promise.allSettled(requests);
     const failures = data.some(request => request.status === 'rejected');
@@ -549,6 +502,84 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   }
 
   /**
+   * 
+   * Generates all of the necessary requests that need to be made to PATCH an Organization.
+   * Only the requests that are necessary to update an organization will be performed.
+   * 
+   * @param originalOrg the original organization being updated
+   * @param updatedOrg the updated organization
+   * @param patchState the extended state to generate patch operations
+   * @param listOfRequests the list of requests that will be made
+   * @param mapOfRequests the map that maps the index of a request in listOfRequests to its patch request type
+   * 
+   * @throws throws error if the updated organzation does not contain an ID
+   */
+  createJsonPatchRequests(originalOrg: OrganizationDtoWithDetails, updatedOrg: OrganizationDtoWithDetails, patchState: OrganizationEditState, listOfRequests: Promise<any>[], mapOfRequests: Map<number, OrganizationPatchRequestType>): void {
+    const jsonPatchOperations: Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue> = this.createJsonPatch(originalOrg, updatedOrg, patchState);
+
+    if (updatedOrg.id == null) {
+      throw new Error('Organization to update has undefined id.');
+    }
+
+    /**
+     * Check to find only removals that exist in the original. If it does not exist
+     * in the original, then there's no need to add it to the request for removal.
+     */
+    let subOrgsToRemove: string[] = [];
+    if (originalOrg.subordinateOrganizations != null) {
+      subOrgsToRemove = getDataItemDuplicates(originalOrg.subordinateOrganizations, patchState.subOrgs.toRemove);
+    }
+
+    let membersToRemove: string[] = [];
+    if (originalOrg.members != null) {
+      membersToRemove = getDataItemDuplicates(originalOrg.members, patchState.members.toRemove);
+    }
+
+    /**
+     * Check to find only additions that does not exist in the original. If they already
+     * exist in the original, they do not need to be included in the request for addition.
+     */
+    let subOrgsToAdd: string[] = [];
+    if (originalOrg.subordinateOrganizations != null) {
+      subOrgsToAdd = getDataItemNonDuplicates(originalOrg.subordinateOrganizations, patchState.subOrgs.toAdd);
+    } else {
+      subOrgsToAdd = mapDataItemsToStringIds(patchState.subOrgs.toAdd);
+    }
+
+    let membersToAdd: string[] = [];
+    if (originalOrg.members != null) {
+      membersToAdd = getDataItemNonDuplicates(originalOrg.members, patchState.members.toAdd);
+    } else {
+      membersToAdd = mapDataItemsToStringIds(patchState.members.toAdd);
+    }
+
+    if (jsonPatchOperations.length > 0) {
+      listOfRequests.push(this.orgApi.jsonPatchOrganization(updatedOrg.id, jsonPatchOperations));
+      mapOfRequests.set(listOfRequests.length - 1, OrganizationPatchRequestType.JSON_PATCH);
+    }
+
+    if (subOrgsToRemove.length > 0) {
+      listOfRequests.push(this.orgApi.removeSubordinateOrganization(updatedOrg.id, subOrgsToRemove));
+      mapOfRequests.set(listOfRequests.length - 1, OrganizationPatchRequestType.SUB_ORG_REMOVE);
+    }
+
+    if (subOrgsToAdd.length > 0) {
+      listOfRequests.push(this.orgApi.addSubordinateOrganization(updatedOrg.id, subOrgsToAdd));
+      mapOfRequests.set(listOfRequests.length - 1, OrganizationPatchRequestType.SUB_ORG_ADD);
+    }
+
+    if (membersToRemove.length > 0) {
+      listOfRequests.push(this.orgApi.deleteOrganizationMember(updatedOrg.id, membersToRemove));
+      mapOfRequests.set(listOfRequests.length - 1, OrganizationPatchRequestType.MEMBERS_REMOVE);
+    }
+
+    if (membersToAdd.length > 0) {
+      listOfRequests.push(this.orgApi.addOrganizationMember(updatedOrg.id, membersToAdd));
+      mapOfRequests.set(listOfRequests.length - 1, OrganizationPatchRequestType.MEMBERS_ADD);
+    }
+  }
+
+  /**
    * Converts an organization dto with details to OrganizationDto
    * 
    * @param withDetails organization dto with details
@@ -571,9 +602,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     try {
       const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
 
-      const item = this.state.find(item => item.id.get() === toDelete.id);
-      if (item)
-        item.set(none);
+      this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
       return orgResponse.data;
     }

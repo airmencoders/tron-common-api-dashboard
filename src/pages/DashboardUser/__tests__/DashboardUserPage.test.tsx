@@ -6,7 +6,7 @@ import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-
 import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { useDashboardUserState } from '../../../state/dashboard-user/dashboard-user-state';
 import DashboardUserService from '../../../state/dashboard-user/dashboard-user-service';
-import Config from '../../../api/configuration';
+import Config from '../../../api/config';
 import { usePrivilegeState } from '../../../state/privilege/privilege-state';
 import PrivilegeService from '../../../state/privilege/privilege-service';
 import { AxiosResponse } from 'axios';

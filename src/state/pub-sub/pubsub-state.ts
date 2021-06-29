@@ -1,5 +1,5 @@
 import { createState, State, useState } from "@hookstate/core";
-import Config from "../../api/configuration";
+import Config from "../../api/config";
 import { Configuration } from "../../openapi";
 import { SubscriberControllerApi, SubscriberControllerApiInterface } from "../../openapi/apis/subscriber-controller-api";
 import { SubscriberDto } from "../../openapi/models/subscriber-dto";

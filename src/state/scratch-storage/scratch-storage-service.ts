@@ -1,6 +1,6 @@
 import { none, postpone, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
-import { PrivilegeDto, PrivilegeDtoResponseWrapper, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, UserWithPrivs } from '../../openapi';
+import { PrivilegeDto, PrivilegeDtoResponseWrapper, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, ScratchStorageEntryDto, UserWithPrivs } from '../../openapi';
 import { DataService } from '../data-service/data-service';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { ScratchStorageFlat } from './scratch-storage-flat';
@@ -11,8 +11,10 @@ export default class ScratchStorageService implements DataService<ScratchStorage
   constructor(
     public state: State<ScratchStorageAppRegistryDto[]>,
     public selectedScratchStorageState: State<ScratchStorageFlat>,
-    private scratchStorageApi: ScratchStorageControllerApiInterface,
-    public privilegeState: State<PrivilegeDto[]>) {
+    public scratchStorageApi: ScratchStorageControllerApiInterface,
+    public privilegeState: State<PrivilegeDto[]>,
+    public createUpdateState: State<ScratchStorageEntryDto[]>,
+    public deleteState: State<string[]>) {
   }
 
   sendPatch = undefined;
@@ -43,30 +45,31 @@ export default class ScratchStorageService implements DataService<ScratchStorage
     return data;
   }
 
-  convertRowDataToEditableData(rowData: ScratchStorageAppRegistryDto): Promise<ScratchStorageFlat> {
+  async convertRowDataToEditableData(rowData: ScratchStorageAppRegistryDto): Promise<ScratchStorageFlat> {
     if (rowData.id == null || rowData.id.trim().length <= 0) {
       return Promise.reject(new Error('Scratch Storage App ID must be defined'));
     }
 
     try {
-      const scratchStorage = this.scratchStorageApi.getScratchAppById(rowData.id);
+      const scratchStorage = await this.scratchStorageApi.getScratchAppById(rowData.id);
+      const keys = (await this.scratchStorageApi.getAllKeysForAppIdWrapped(rowData.id)).data.data;    
+      this.deleteState.set([]);
+      this.createUpdateState.set([]);
 
-      const result = scratchStorage.then(response => {
-        const convertedToFlat: ScratchStorageFlat = this.convertToFlat(response.data ?? {});
-        return convertedToFlat;
-      });
-
-      return result;
+      return {...this.convertToFlat(scratchStorage.data ?? {}), keyNames: keys};
     } catch (err) {
       return Promise.reject(err);
     }
   }
+
   convertToFlat(dto: ScratchStorageAppRegistryDto): ScratchStorageFlat {
     const convertedToFlat: ScratchStorageFlat = {
       id: dto.id ?? '',
       appName: dto.appName,
       appHasImplicitRead: dto.appHasImplicitRead,
-      userPrivs: this.convertScratchStorageUserPrivsToFlat(dto.userPrivs ?? [])
+      aclMode: dto.aclMode,
+      userPrivs: this.convertScratchStorageUserPrivsToFlat(dto.userPrivs ?? []),
+      keyNames: [],
     }
 
     return convertedToFlat;
@@ -124,6 +127,9 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       scratchStorageDto = { ...scratchStorageDto, userPrivs: privsArray };
       const updatedResponse = await this.scratchStorageApi.editExistingAppEntry(toUpdate.id, scratchStorageDto as ScratchStorageAppRegistryDto);
 
+      // do any pending key-value pair transactions
+      await this.doKvpActions(toUpdate.id);
+
       const patchedResponse = updatedResponse.data as ScratchStorageAppRegistryDto;
       patchedResponse.userPrivs = undefined;
       const patchedIndex = this.state.get().findIndex(item => item.id === patchedResponse.id);
@@ -134,6 +140,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       return Promise.reject(error);
     }
   }
+
   async addUserPriv(userPriv: ScratchStorageUserWithPrivsFlat, appId: string) {
     const readId = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_READ)?.id;
     const writeId = this.privilegeState.value?.find(privilege => privilege.name === PrivilegeType.SCRATCH_WRITE)?.id;
@@ -153,6 +160,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
       id: flat.id,
       appName: flat.appName,
       appHasImplicitRead: flat.appHasImplicitRead,
+      aclMode: flat.aclMode,
     };
 
     return dto;
@@ -191,13 +199,24 @@ export default class ScratchStorageService implements DataService<ScratchStorage
 
       await this.scratchStorageApi.deleteExistingAppEntry(toDelete.id);
 
-      const item = this.state.find(item => item.id.get() === toDelete.id);
-      if (item)
-        item.set(none);
+      this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
+    }
+  }
+
+  async doKvpActions(id : string) {
+
+    // post the new or edited keys for this appid
+    for (const kvp of this.createUpdateState.get()) {
+      await this.scratchStorageApi.setKeyValuePair(kvp);
+    }
+
+    // do any deletions
+    for (const key of this.deleteState.get()) {
+      await this.scratchStorageApi.deleteKeyValuePair(id, key);
     }
   }
 

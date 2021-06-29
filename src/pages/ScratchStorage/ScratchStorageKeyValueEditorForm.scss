@@ -1,0 +1,21 @@
+@import"../../styles/base";
+@import "../../styles/variables";
+@import "../../styles/mixins";
+
+
+.scratch-storage-add-form {
+    max-width: 100% !important;
+}
+
+.value-editor {
+    display: inline-block;
+    margin: 0;
+    padding: .2em;
+    width: 100% !important;
+    min-width: 30em;    
+    max-width: 100%;
+    min-height: 10em;
+    cursor: text;
+    overflow: auto;
+    resize: both;
+}
