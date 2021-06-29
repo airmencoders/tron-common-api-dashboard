@@ -12,7 +12,7 @@ describe('Data Service Utils Test', () => {
             defaultMessage: 'cannot be blank'
           }
         ],
-        message: 'failed'
+        reason: 'failed'
       },
       status: 400,
       statusText: 'OK',
@@ -39,7 +39,7 @@ describe('Data Service Utils Test', () => {
       validation: {
         name: axiosRejectResponse.response.data.errors[0].defaultMessage
       },
-      general: axiosRejectResponse.response.data.message
+      general: axiosRejectResponse.response.data.reason
     } as DataCrudFormErrors;
 
     expect(errorResponse).toEqual(answer);

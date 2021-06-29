@@ -2,11 +2,10 @@ import { RequestError } from "./request-error";
 
 export function prepareRequestError(err: any): RequestError {
   if (err.response) { // Server responded with some error (4xx, 5xx)
-    console.log(err.response)
     return {
       status: err.response.data.status,
       error: err.response.data.error,
-      message: err.response.data.message
+      message: err.response.data.reason
     };
   } else if (err.request) { // Request never left
     return {

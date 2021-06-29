@@ -141,7 +141,7 @@ describe('App Client State Tests', () => {
   const axiosRejectResponse = {
     response: {
       data: {
-        message: 'failed'
+        reason: 'failed'
       },
       status: 400,
       statusText: 'OK',
@@ -159,7 +159,7 @@ describe('App Client State Tests', () => {
   };
 
   const rejectMsg = {
-    general: axiosRejectResponse.response.data.message
+    general: axiosRejectResponse.response.data.reason
   } as DataCrudFormErrors;
 
   let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;

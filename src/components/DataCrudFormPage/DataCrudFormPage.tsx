@@ -257,7 +257,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
     let formErrors: DataCrudFormErrors = {
-      general: error.message ?? 'Unknown error occurred'
+      general: error.response?.data?.reason ?? error.message ?? 'Unknown error occurred'
     };
 
     if (error.general || error.validation) {

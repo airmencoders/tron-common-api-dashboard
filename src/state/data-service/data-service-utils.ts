@@ -5,7 +5,6 @@ import { JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayVa
 
 export function prepareDataCrudErrorResponse(err: any): DataCrudFormErrors {
   if (err.response) { // Server responded with some error (4xx, 5xx)
-    console.log(err.response)
 
     const validation = err.response.data.errors?.reduce((prev: any, current: any) => {
       const updated = { ...prev };
@@ -15,7 +14,7 @@ export function prepareDataCrudErrorResponse(err: any): DataCrudFormErrors {
     }, {});
     return {
       validation,
-      general: err.response.data.message
+      general: err.response.data.reason
     };
   } else if (err.request) { // Request never left
     return {
