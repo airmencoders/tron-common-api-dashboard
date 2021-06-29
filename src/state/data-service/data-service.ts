@@ -15,7 +15,7 @@ export interface DataService<T, R> {
   fetchAndStoreData(): Promise<T[]>;
   sendUpdate(toUpdate: R): Promise<T>;
   sendCreate(toCreate: R): Promise<T>;
-  sendDelete(toDelete: R): Promise<void>;
+  sendDelete(toDelete: T | R): Promise<void>;
   sendPatch?(...args: any): Promise<PatchResponse<T>>;
   /**
    * @param {number} page the page number (0 indexed)

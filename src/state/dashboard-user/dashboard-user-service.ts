@@ -18,10 +18,14 @@ import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils
  * DashboardUserDto
  * * email
  */
-export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserFlat> {
-  constructor(public state: State<DashboardUserFlat[]>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
+export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserDto> {
+
+  constructor(public state: State<DashboardUserFlat[]>,
+              private dashboardUserApi: DashboardUserControllerApiInterface,
+              private dashboardUserDtoCache: State<Record<string, DashboardUserDto>>) { }
 
   fetchAndStoreData(): Promise<DashboardUserFlat[]> {
+    this.dashboardUserDtoCache.set({});
     const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
     const response = (): AxiosPromise<DashboardUserDtoResponseWrapper> => this.dashboardUserApi.getAllDashboardUsersWrapped();
 
@@ -29,8 +33,16 @@ export default class DashboardUserService implements DataService<DashboardUserFl
       try {
         await privilegeResponse();
         const result = await response();
-
-        resolve(this.convertDashboardUsersToFlat(result.data.data));
+        const dashboardUserDtos = result.data.data;
+        // cache dashboard user map
+        const cacheUpdate: Record<string, DashboardUserDto> = {};
+        for(const dashUserDto of dashboardUserDtos) {
+          if (dashUserDto.id != null) {
+            cacheUpdate[dashUserDto.id] = dashUserDto;
+          }
+        }
+        this.dashboardUserDtoCache.set(cacheUpdate);
+        resolve(this.convertDashboardUsersToFlat(dashboardUserDtos));
       } catch (err) {
         reject(prepareDataCrudErrorResponse(err));
       }
@@ -60,7 +72,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return {
       id,
       email: email || '',
-      ...privileges
+      ...privileges,
     } as DashboardUserFlat;
   }
 
@@ -98,10 +110,10 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return privileges;
   }
 
-  async sendCreate(toCreate: DashboardUserFlat): Promise<DashboardUserFlat> {
+  async sendCreate(toCreate: DashboardUserDto): Promise<DashboardUserFlat> {
     try {
-      const dashboardUserDto = this.convertToDto(toCreate);
-      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(dashboardUserDto);
+      // const dashboardUserDto = this.convertToDto(toCreate);
+      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(toCreate);
       const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
 
       this.state[this.state.length].set(dashboardUserFlat);
@@ -113,13 +125,12 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     }
   }
 
-  async sendUpdate(toUpdate: DashboardUserFlat): Promise<DashboardUserFlat> {
+  async sendUpdate(toUpdate: DashboardUserDto): Promise<DashboardUserFlat> {
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Dashboard User to update has undefined id.'));
       }
-      const dashboardUserDto = this.convertToDto(toUpdate);
-      const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, dashboardUserDto);
+      const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, toUpdate);
       const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
 
       const index = this.state.get().findIndex(item => item.id === dashboardUserFlat.id);
@@ -150,8 +161,9 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     }
   }
 
-  convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
-    return Promise.resolve(rowData);
+  convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserDto> {
+    const dashUserDto = rowData.id != null ? this.dashboardUserDtoCache.get()[rowData.id] : {} as DashboardUserDto;
+    return Promise.resolve(dashUserDto);
   }
 
   private isStateReady(): boolean {
