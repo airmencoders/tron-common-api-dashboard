@@ -1,0 +1,81 @@
+/// <reference types="Cypress" />
+
+import { host } from '../support';
+import DataCrudFormPageUtil, { Person, PersonGridColId } from '../support/data-crud-form-functions';
+import UtilityFunctions from '../support/utility-functions';
+
+describe('Person Tests', () => {
+  const dataTypeName = 'Person';
+
+  it('Should allow Person creation & deletion', () => {
+    cy.visit(host);
+
+    cy.get('[href="/person"] > .sidebar-item__name').click();
+
+    const person: Person = {
+      email: `${UtilityFunctions.generateRandomString()}@email.com`,
+      firstName: UtilityFunctions.generateRandomString(),
+      lastName: 'Last Name',
+      branch: 'USAF',
+      rank: 'Lt Gen'
+    };
+
+    DataCrudFormPageUtil.createPersonAndFilterExists(person);
+
+    // Delete it
+    DataCrudFormPageUtil.deleteRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName);
+  });
+
+  it('Should error when trying to add Person with same email', () => {
+    cy.visit(`${host}/person`);
+
+    const person: Person = {
+      email: `${UtilityFunctions.generateRandomString()}@email.com`,
+      firstName: UtilityFunctions.generateRandomString(),
+      lastName: 'Last Name',
+      branch: 'USAF',
+      rank: 'Lt Gen'
+    };
+
+    // Add a new Person
+    DataCrudFormPageUtil.createPersonAndFilterExists(person);
+
+    // Try to add existing and expect an error message
+    DataCrudFormPageUtil.createPersonAndError(person, 'Request failed with status code 409');
+
+    // Cleanup
+    cy.get('button').contains('Cancel').click();
+    DataCrudFormPageUtil.deleteRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName);
+  });
+
+  it('Should allow edit', () => {
+    cy.visit(`${host}/person`);
+
+    const person: Person = {
+      email: `${UtilityFunctions.generateRandomString()}@email.com`,
+      firstName: UtilityFunctions.generateRandomString(),
+      lastName: 'Last Name',
+      branch: 'USAF',
+      rank: 'Lt Gen'
+    };
+
+    // Add a new Person
+    DataCrudFormPageUtil.createPersonAndSuccess(person);
+    DataCrudFormPageUtil.filterPersonAndExists(PersonGridColId.FIRST_NAME, person.firstName);
+    DataCrudFormPageUtil.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName).click();
+
+    person.email = `${UtilityFunctions.generateRandomString()}@email.com`;
+    person.firstName = UtilityFunctions.generateRandomString();
+
+    cy.get('#email').clear().type(person.email).should('have.value', person.email);
+    cy.get('#firstName').clear().type(person.firstName).should('have.value', person.firstName);
+    cy.get('button').contains('Update').should('not.be.disabled').click();
+
+    UtilityFunctions.findToastContainsMessage('Successfully updated ' + dataTypeName);
+
+    DataCrudFormPageUtil.clearFilterColumn(PersonGridColId.FIRST_NAME);
+
+    // clean up
+    DataCrudFormPageUtil.deleteRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName);
+  });
+});
