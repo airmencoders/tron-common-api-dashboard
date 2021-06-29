@@ -21,6 +21,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
+import { GenericStringArrayResponseWrapper } from '../models';
+// @ts-ignore
 import { PrivilegeDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { ScratchStorageAppRegistryDto } from '../models';
@@ -446,7 +448,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         },
         /**
          * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-         * @summary Retrieves all key-value pairs for for a single app
+         * @summary Retrieves all key-value pairs for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1315,7 +1317,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         },
         /**
          * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-         * @summary Retrieves all key-value pairs for for a single app
+         * @summary Retrieves all key-value pairs for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1347,7 +1349,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllKeysForAppIdWrapped(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScratchStorageEntryDtoResponseWrapper>> {
+        async getAllKeysForAppIdWrapped(appId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GenericStringArrayResponseWrapper>> {
             const localVarAxiosArgs = await ScratchStorageControllerApiAxiosParamCreator(configuration).getAllKeysForAppIdWrapped(appId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1635,7 +1637,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
         },
         /**
          * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-         * @summary Retrieves all key-value pairs for for a single app
+         * @summary Retrieves all key-value pairs for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1659,7 +1661,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<ScratchStorageEntryDtoResponseWrapper> {
+        getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<GenericStringArrayResponseWrapper> {
             return ScratchStorageControllerApiFp(configuration).getAllKeysForAppIdWrapped(appId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1891,7 +1893,7 @@ export interface ScratchStorageControllerApiInterface {
 
     /**
      * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-     * @summary Retrieves all key-value pairs for for a single app
+     * @summary Retrieves all key-value pairs for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1916,7 +1918,7 @@ export interface ScratchStorageControllerApiInterface {
      * @throws {RequiredError}
      * @memberof ScratchStorageControllerApiInterface
      */
-    getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<ScratchStorageEntryDtoResponseWrapper>;
+    getAllKeysForAppIdWrapped(appId: string, options?: any): AxiosPromise<GenericStringArrayResponseWrapper>;
 
     /**
      * Requester has to have DASHBOARD_ADMIN rights
@@ -2163,7 +2165,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
 
     /**
      * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-     * @summary Retrieves all key-value pairs for for a single app
+     * @summary Retrieves all key-value pairs for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

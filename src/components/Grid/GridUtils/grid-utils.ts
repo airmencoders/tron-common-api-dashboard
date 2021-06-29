@@ -1,18 +1,6 @@
-import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto } from '../../../openapi';
 import { GridFilterParams } from '../grid-filter-params';
-import { GridFilterOperatorType } from '../grid-filter-operator-type';
 import { AgGridSortModel } from '../grid-sort-model';
 import { InfiniteScrollOptions } from '../../DataCrudFormPage/infinite-scroll-options';
-import { GridMultiFilterModel } from '../grid-multi-filter-condition-model';
-import { GridSingleFilterModel } from '../grid-single-filter-condition-model';
-import { AgGridFilterConversionError } from '../../../utils/Exception/AgGridFilterConversionError';
-import { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { GridRowData } from '../grid-row-data';
-import { GridFilter } from '../grid-filter';
-import { State } from '@hookstate/core';
-import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
-import { createFailedDataFetchToast, createTextToast } from '../../Toast/ToastUtils/ToastUtils';
-import { ToastType } from '../../Toast/ToastUtils/toast-type';
 
 /**
  * Contains all possible Ag Grid filter options

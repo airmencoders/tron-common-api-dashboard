@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import Config from '../../../api/configuration';
+import Config from '../../../api/config';
 import { Configuration, HttpLogDtoPaginationResponseWrapper, HttpLogEntryDto, HttpLogsControllerApi } from '../../../openapi';
 import AuditLogService from '../audit-log-service';
 import { httpLogApi, SearchLogParams, wrapState } from '../audit-log-state';

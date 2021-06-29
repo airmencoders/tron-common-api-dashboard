@@ -79,9 +79,7 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
       }
 
       await this.pubSubApi.cancelSubscription(toDelete.id);
-      const item = this.state.find(item => item.id.get() === toDelete.id);
-      if (item)
-        item.set(none);
+      this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
       return Promise.resolve();
     } catch (error) {

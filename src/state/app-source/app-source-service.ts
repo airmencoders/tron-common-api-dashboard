@@ -8,7 +8,7 @@ import {
   AppSourceDetailsDto,
   AppSourceDto
 } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
@@ -46,25 +46,19 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   fetchAppClients(): Promise<AppClientSummaryDto[]> {
     const response = (): AxiosPromise<AppClientSummaryDtoResponseWrapper> => this.appSourceApi.getAvailableAppClientsWrapped();
 
-    const result = response().then(res => res.data.data);
-
-    return result;
+    return response().then(res => res.data.data);
   }
 
   fetchAPISpecFile(id: string): Promise<any> {
     const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFile(id)
 
-    const result = response().then(res => res.data);
-
-    return result;
+    return response().then(res => res.data);
   }
 
   fetchAPISpecFileByEndpointId(id: string): Promise<any> {
     const response = (): AxiosPromise<any> => this.appSourceApi.getSpecFileByEndpointPriv(id)
 
-    const result = response().then(res => res.data);
-
-    return result;
+    return response().then(res => res.data);
   }
 
   generateAppSourcePath(appSourcePath?: string): string {
@@ -111,7 +105,8 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
   }
 
   /**
-   * // TODO: implement as needed
+   * Not used.
+   * Delete not supported.
    */
   async sendDelete(toDelete: AppSourceDetailsDto): Promise<void> {
     throw new Error('Not yet implemented');

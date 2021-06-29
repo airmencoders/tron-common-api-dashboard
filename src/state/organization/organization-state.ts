@@ -1,7 +1,7 @@
 import {createState, State, useState} from '@hookstate/core';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../openapi/models';
 import { Configuration, OrganizationControllerApi, OrganizationControllerApiInterface, PersonControllerApi, PersonControllerApiInterface } from '../../openapi';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 import OrganizationService from './organization-service';
 
 export interface PersonWithDetails {
@@ -32,11 +32,11 @@ const organizationApi: OrganizationControllerApiInterface = new OrganizationCont
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
-const organizationChooserState = createState<OrganizationDto[]>(new Array<OrganizationDto>());
+const organizationChooserGlobalState = createState<OrganizationDto[]>(new Array<OrganizationDto>());
 
-const personChooserState = createState<PersonDto[]>(new Array<PersonDto>());
+const personChooserGlobalState = createState<PersonDto[]>(new Array<PersonDto>());
 
-const personApi: PersonControllerApiInterface = new PersonControllerApi(
+const personControllerApi: PersonControllerApiInterface = new PersonControllerApi(
   new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
@@ -51,7 +51,7 @@ export const wrapState = (
 export const useOrganizationState = () => wrapState(
   useState(organizationState), 
   organizationApi,
-  organizationChooserState,
-  personChooserState,
-  personApi
+  organizationChooserGlobalState,
+  personChooserGlobalState,
+  personControllerApi
 );

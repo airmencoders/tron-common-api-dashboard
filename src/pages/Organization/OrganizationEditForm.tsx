@@ -2,7 +2,6 @@ import { Downgraded, none, State, useHookstate, useState } from '@hookstate/core
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
-import { RowClickedEvent } from 'ag-grid-community';
 import React, { ChangeEvent, FormEvent } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
@@ -30,6 +29,8 @@ import './OrganizationEditForm.scss';
 import PlusIcon from '../../icons/PlusIcon';
 import { getDefaultOrganizationEditState, OrganizationEditState } from './organization-edit-state';
 import { OrganizationChooserDataType } from '../../state/organization/organization-chooser-data-type';
+import { GridRowData } from '../../components/Grid/grid-row-data';
+import { mapDataItemsToStringIds } from '../../state/data-service/data-service-utils';
 
 const personColumns = [ 
   new GridColumn({
@@ -140,7 +141,6 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
       props.onPatch(props.data, formState.get(), formStateExtended.get());
       return;
     }
-    return;
   }
 
   const isFormDisabled = ():boolean => {
@@ -267,11 +267,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   }
 
   function setNewMembers(): void {
-    const newMembers = (selectedChooserRows.get() as PersonWithDetails[]).map(item => {
-      return {
-        ...item
-      };
-    });
+    const newMembers = (selectedChooserRows.attach(Downgraded).get() as PersonWithDetails[]);
 
     formStateExtended.members.toAdd.merge(newMembers);
 
@@ -291,7 +287,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   }
 
   function removeMembers(): void {
-    const removedMembers = organizationMembersForRemoval.get().map(item => {
+    const removedMembers = (organizationMembersForRemoval.attach(Downgraded).get() as PersonWithDetails[]).map(item => {
       return {
         ...item
       };
@@ -309,11 +305,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   }
 
   function setNewSubOrgs(): void {
-    const newSubOrgs = (selectedChooserRows.get() as OrganizationDto[]).map(item => {
-      return {
-        ...item
-      };
-    });
+    const newSubOrgs = (selectedChooserRows.attach(Downgraded).get() as OrganizationDto[]);
 
     formStateExtended.subOrgs.toAdd.merge(newSubOrgs);
 
@@ -333,11 +325,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   }
 
   function removeSubOrgs(): void {
-    const toBeRemoved = organizationSubOrgsForRemoval.get().map(item => {
-      return {
-        ...item
-      };
-    });
+    const toBeRemoved = organizationSubOrgsForRemoval.attach(Downgraded).get();
 
     formStateExtended.subOrgs.toRemove.merge(toBeRemoved);
 
@@ -427,28 +415,16 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
 
   /**
    *
-   * @param chooserDataType type of data being passed to Chooser
+   * @param dataType type of data being passed to Chooser
    * @returns list of string ids to exclude
    */
-  function getIdsToExclude(chooserDataType: OrganizationChooserDataType): string[] {
+  function getIdsToExclude(dataType: OrganizationChooserDataType): string[] {
     let ids: string[] = [];
 
-    if (chooserDataType === OrganizationChooserDataType.PERSON) {
-      ids = formState.members.get().reduce<string[]>((result, item) => {
-        if (item.id) {
-          result.push(item.id);
-        }
-
-        return result;
-      }, []);
+    if (dataType === OrganizationChooserDataType.PERSON) {
+      ids = mapDataItemsToStringIds(formState.members.get());
     } else {
-      ids = formState.subordinateOrganizations.get().reduce<string[]>((result, item) => {
-        if (item.id) {
-          result.push(item.id);
-        }
-
-        return result;
-      }, []);
+      ids = mapDataItemsToStringIds(formState.subordinateOrganizations.get());
 
       // Add the organization that is being edited as an exluded item
       // Organization cannot be a subordinate org of itself

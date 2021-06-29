@@ -30,14 +30,14 @@ export function MetricPage({ id, type, name, method }: MetricPageProps) {
   const handleOnClickChartEventEndpoint = (config: any) => {
     const splitCategory = (config.w.config.xaxis.categories[config.dataPointIndex] as string).split(':');
     const methodIndex = splitCategory.findIndex(item => isRequestMethod(item));
-    const method = splitCategory.splice(methodIndex, 1)[0] as RequestMethod;    
-    const name = splitCategory.join();
+    const endpointMethod = splitCategory.splice(methodIndex, 1)[0] as RequestMethod;    
+    const endpointName = splitCategory.join();
 
-    handleOnClickChartEvent(MetricType.ENDPOINT, name, method);
+    handleOnClickChartEvent(MetricType.ENDPOINT, endpointName, endpointMethod);
   };
 
-  const handleOnClickChartEvent = (type: MetricType, name: string, method?: RequestMethod | undefined) => {
-    history.push(generateMetricsLink(id, type, name, method));
+  const handleOnClickChartEvent = (metricType: MetricType, metricName: string, metricMethod?: RequestMethod | undefined) => {
+    history.push(generateMetricsLink(id, metricType, metricName, metricMethod));
   }
 
   if (metricsService.error) {

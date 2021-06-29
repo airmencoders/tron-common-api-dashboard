@@ -1,7 +1,7 @@
 import { DataCrudDeleteComponentProps } from '../../components/DataCrudFormPage/DataCrudDeleteComponentProps';
 import DataCrudDeleteContent from '../../components/DataCrudFormPage/DataCrudDeleteContent';
-import { OrganizationDto } from '../../openapi';
 import { OrganizationDtoWithDetails } from '../../state/organization/organization-state';
+import {OrganizationDto} from '../../openapi/models';
 
 function OrganizationDelete(props: DataCrudDeleteComponentProps<OrganizationDtoWithDetails | OrganizationDto>) {
   const fields: Record<string, string> = {

@@ -7,6 +7,4 @@ export interface RadioProps {
   | string
   | ((instance: HTMLInputElement | null) => void)
   | React.RefObject<HTMLInputElement>
-  | null
-  | undefined
 }
