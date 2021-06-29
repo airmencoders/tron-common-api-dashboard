@@ -117,6 +117,7 @@ describe('App Source / App Client Tests', () => {
 
     const appSourceEndpointPath = '/events';
 
+    // Give App Client access
     DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, false, '.endpoint-grid');
     DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, '.endpoint-grid').click();
     UtilityFunctions.getModalContainer('Endpoint Editor').within(modalContainer => {
