@@ -15,9 +15,9 @@ const dashboardUserControllerApi = new DashboardUserControllerApi(new Configurat
 
 export const wrapDashboardUserState = (state: State<DashboardUserFlat[]>,
                                        dashboardUserApi: DashboardUserControllerApiInterface,
-                                       dashboardUserDtoCache: State<Record<string, DashboardUserDto>>):
+                                       dashboardUserDtoCacheState: State<Record<string, DashboardUserDto>>):
     DashboardUserService => {
-  return new DashboardUserService(state, dashboardUserApi, dashboardUserDtoCache);
+  return new DashboardUserService(state, dashboardUserApi, dashboardUserDtoCacheState);
 }
 
 export const useDashboardUserState = (): DashboardUserService => wrapDashboardUserState(useState(dashboardUserState),
