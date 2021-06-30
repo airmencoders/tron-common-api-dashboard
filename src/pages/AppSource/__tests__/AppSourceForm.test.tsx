@@ -31,6 +31,8 @@ describe('Test App Source Form', () => {
     appSourceDetailsDto = {
       id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
       name: 'test',
+      reportStatus: true,
+      healthUrl: "/api/health",
       appClients: [
         {
           appClientUser: 'App Client User ID',

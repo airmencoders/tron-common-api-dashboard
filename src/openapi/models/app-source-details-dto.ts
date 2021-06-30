@@ -48,10 +48,22 @@ export interface AppSourceDetailsDto {
     endpointCount?: number;
     /**
      * 
+     * @type {boolean}
+     * @memberof AppSourceDetailsDto
+     */
+    reportStatus?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof AppSourceDetailsDto
      */
     clientCount?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppSourceDetailsDto
+     */
+    healthUrl?: string;
     /**
      * 
      * @type {Array<string>}

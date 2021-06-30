@@ -7,6 +7,7 @@ import React, { FormEvent } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
+import Checkbox from '../../components/forms/Checkbox/Checkbox';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
@@ -43,7 +44,9 @@ interface DeleteEndpointModalState {
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   const formState = useHookstate({
     id: props.data?.id ?? '',
-    name: props.data?.name ?? '',
+    name: props.data?.name ?? '', 
+    reportStatus: props.data?.reportStatus ?? false,
+    healthUrl: props.data?.healthUrl ?? '',   
     appClients: props.data?.appClients ?? [],
     appSourceAdminUserEmails: props.data?.appSourceAdminUserEmails ?? [],
     endpoints: props.data?.endpoints ?? []
@@ -77,10 +80,14 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
   Validation(formState.name).validate(name => (validateRequiredString(name)), validationErrors.requiredText, 'error');
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+  Validation(formState.healthUrl).validate(value => !formState.reportStatus.value || /[^\s]+/.test(value), 'Health endpoint required when status reporting enabled', 'error');
+  Validation(formState.healthUrl).validate(value => value.match(/^\//) !== null, 'Valid path must start with a forward slash', 'error');
 
   function isFormModified() {
     return Initial(formState.appSourceAdminUserEmails).modified() ||
       Initial(formState.name).modified() ||
+      Initial(formState.reportStatus).modified() ||
+      Initial(formState.healthUrl).modified() ||
       Initial(formState.endpoints).modified() ||
       Initial(formState.appClients).modified();
   }
@@ -301,6 +308,36 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             type="text"
             defaultValue={props.data?.appSourcePath}
             disabled={true}
+          />
+        </FormGroup>
+        <FormGroup
+          labelName="report-status"
+          labelText="App Source Status Reporting"
+          isError={false}
+        >
+          <Checkbox
+            id="report-status"
+            name="report-status"
+            data-testid="report-status"
+            checked={formState.reportStatus.value}
+            label="Report Status to Health Page"
+            onChange={(event) => formState.reportStatus.set(event.target.checked)}
+          />
+        </FormGroup>
+        <FormGroup
+          labelName="health-url"
+          labelText="Health URL Path/Endpoint (GET)"
+          isError={failsHookstateValidation(formState.healthUrl)}
+          errorMessages={generateStringErrorMessages(formState.healthUrl)}
+        >
+          <TextInput
+            id="health-url"
+            name="health-url"
+            type="text"
+            error={failsHookstateValidation(formState.healthUrl)}
+            defaultValue={formState.healthUrl.value}
+            onChange={(event) => formState.healthUrl.set(event.target.value)}
+            disabled={!formState.reportStatus.value}
           />
         </FormGroup>
 
