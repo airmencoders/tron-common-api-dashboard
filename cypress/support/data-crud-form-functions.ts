@@ -1,4 +1,4 @@
-import { apiBase, personApiBase } from '.';
+import { agGridFilterDebounce, apiBase, personApiBase } from '.';
 import UtilityFunctions from './utility-functions';
 
 export default class DataCrudFormFunctions {
@@ -192,6 +192,8 @@ export default class DataCrudFormFunctions {
   static clearFilterColumn(colId: string) {
     DataCrudFormFunctions.openColumnFilterMenu(colId);
     cy.get('.ag-filter-filter input').first().clear().type('{esc}');
+    // This ensures that we wait for ag grid debounce time to take effect
+    cy.wait(agGridFilterDebounce);
   }
 
   static createPerson(person: Person) {

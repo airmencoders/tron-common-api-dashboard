@@ -139,9 +139,7 @@ describe('Organization Tests', () => {
     cy.intercept({ method: 'GET', path: `${orgApiBase}/*` }).as('getDetails');
     DataCrudFormPageUtil.getRowWithColIdContainingValue(OrganizationGridColId.NAME, orgToEdit.name).click();
 
-    cy.wait('@getDetails').then(intercept => {
-
-    });
+    cy.wait('@getDetails');
 
     cy.get('#orgName').should('have.value', orgToEdit.name);
 

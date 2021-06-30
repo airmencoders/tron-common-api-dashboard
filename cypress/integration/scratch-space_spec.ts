@@ -48,7 +48,7 @@ function createScratchAppAndFilterExists(app: ScratchStorageApp) {
 }
 
 function deleteRowWithColIdContainingValue(colId: string, value: string) {
-  DataCrudFormPageUtil.deleteRowWithColIdContainingValue(colId, value, true, true, false);
+  DataCrudFormPageUtil.deleteRowWithColIdContainingValue(colId, value, true, false, false);
 }
 
 function filterColumnWithSearchValueNoRequest(colId: string, searchValue: string, searchParentSelector?: string) {

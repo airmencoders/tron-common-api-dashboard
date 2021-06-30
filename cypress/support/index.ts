@@ -26,5 +26,7 @@ export const pastLogfileApi = `/api/v1/logfile`;
 export const logfileActuatorApi = `/api/actuator/logfile`;
 export const subscriptionsApiBase = `${apiBase}/subscriptions`;
 
+export const agGridFilterDebounce = 500;
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
