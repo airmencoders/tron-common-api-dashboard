@@ -37,4 +37,11 @@ describe('combineArraysByKeys', () => {
     const dupItem = result.find((item) => item.key === 'key4');
     expect(dupItem?.val).toEqual('val4_2');
   });
+
+  it ('should skip concat if array undefined', () => {
+    const result = combineArraysByKey([undefined, array2],
+        (item) => item.key, false);
+    const dupItem = result.find((item) => item.key === 'key4');
+    expect(dupItem?.val).toEqual('val4_2');
+  });
 });

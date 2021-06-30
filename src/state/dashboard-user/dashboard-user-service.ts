@@ -72,7 +72,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return {
       id,
       email: email || '',
-      ...privileges,
+      ...privileges
     } as DashboardUserFlat;
   }
 
@@ -112,7 +112,6 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
   async sendCreate(toCreate: DashboardUserDto): Promise<DashboardUserFlat> {
     try {
-      // const dashboardUserDto = this.convertToDto(toCreate);
       const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(toCreate);
       const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
 
