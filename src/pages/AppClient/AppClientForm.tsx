@@ -369,17 +369,15 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="UUID"
           isError={false}
         >
-          <div className={'tron-text-input'} >
-            <TextInputInline
+          <TextInputInline
               id="uuid"
               name="uuid"
               type="text"
               defaultValue={formState.id.get()}
               disabled={true}
               className={'tron-text-input-inline'}
-            />
-            <CopyToClipboard text={String(formState.id.get())} />
-          </div>
+          />
+          <CopyToClipboard text={String(formState.id.get())} />
         </FormGroup>
       }
 
