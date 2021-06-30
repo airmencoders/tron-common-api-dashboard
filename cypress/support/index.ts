@@ -16,5 +16,17 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
+export const host = Cypress.env('INTEGRATION_TEST_HOST');
+export const apiBase = '/api/v2';
+export const orgApiBase = `${apiBase}/organization`;
+export const personApiBase = `${apiBase}/person`;
+export const scratchAppApiBase = `${apiBase}/scratch`;
+export const dashboardUserApiBase = `${apiBase}/dashboard-users`;
+export const pastLogfileApi = `/api/v1/logfile`;
+export const logfileActuatorApi = `/api/actuator/logfile`;
+export const subscriptionsApiBase = `${apiBase}/subscriptions`;
+
+export const agGridFilterDebounce = 500;
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
