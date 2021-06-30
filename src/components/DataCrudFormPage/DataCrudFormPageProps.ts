@@ -36,7 +36,7 @@ export interface DataCrudFormPageProps<T, R> {
    * React element of the component used to delete the dto.
    * @param props Used by the delete component.
    */
-  deleteComponent?: (props: DataCrudDeleteComponentProps<R>) => JSX.Element;
+  deleteComponent?: (props: DataCrudDeleteComponentProps<R | T>) => JSX.Element;
 
   /**
    * Page title
@@ -100,7 +100,7 @@ export interface DataCrudFormPageProps<T, R> {
    * Optional callback that happens after a infinite scroll datasource updates on the ag-grid
    */
   refreshStateCallback?: () => void;
-  
+
   /**
    * Optional boolean to say to scroll to top or not
    */

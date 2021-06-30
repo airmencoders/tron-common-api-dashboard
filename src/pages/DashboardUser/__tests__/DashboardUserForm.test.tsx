@@ -2,16 +2,17 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import DashboardUserForm from '../DashboardUserForm';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
-import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-flat';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
 import { validationErrors } from '../../../utils/validation-utils';
+import {DashboardUserDto} from '../../../openapi/models';
+import {PrivilegeType} from '../../../state/privilege/privilege-type';
 
 describe('Test Dashboard User Form', () => {
   let onSubmit = jest.fn();
   let onClose = jest.fn();
   let successAction: DataCrudSuccessAction | undefined;
-  let data: DashboardUserFlat;
+  let data: DashboardUserDto;
   let formErrors: DataCrudFormErrors;
 
   beforeEach(() => {
@@ -26,8 +27,7 @@ describe('Test Dashboard User Form', () => {
     data = {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       email: "test@email.com",
-      hasDashboardAdmin: false,
-      hasDashboardUser: false
+      privileges: []
     }
 
     successAction = {
@@ -58,7 +58,7 @@ describe('Test Dashboard User Form', () => {
     const elem = pageRender.getByTestId('dashboard-user-form');
     expect(elem).toBeInTheDocument();
 
-    const emailInput = pageRender.getByDisplayValue(data.email);
+    const emailInput = pageRender.getByDisplayValue(data.email ?? '');
     fireEvent.change(emailInput, { target: { value: 'test@email.com' } });
     expect(emailInput).toHaveValue('test@email.com');
 
@@ -92,10 +92,9 @@ describe('Test Dashboard User Form', () => {
 
   it('Client-side Validation', () => {
     const newData = {
-      ...data,
-      hasDashboardAdmin: true,
-      hasDashboardUser: true
+      ...data
     }
+    newData.privileges?.push({name: PrivilegeType.DASHBOARD_ADMIN}, {name: PrivilegeType.DASHBOARD_USER});
 
     const pageRender = render(
       <DashboardUserForm
@@ -112,7 +111,7 @@ describe('Test Dashboard User Form', () => {
     const elem = pageRender.getByTestId('dashboard-user-form');
     expect(elem).toBeInTheDocument();
 
-    const emailInput = pageRender.getByDisplayValue(data.email);
+    const emailInput = pageRender.getByDisplayValue(data.email ?? '');
     fireEvent.change(emailInput, { target: { value: 'test' } });
     expect(emailInput).toHaveValue('test');
     expect(pageRender.getByText(new RegExp(validationErrors.invalidEmail)));
