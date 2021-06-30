@@ -2,7 +2,7 @@ import {createState, State, useState} from '@hookstate/core';
 import {UserInfoDto} from '../../openapi/models';
 import {Configuration, UserInfoControllerApi, UserInfoControllerApiInterface} from '../../openapi';
 import UserInfoService from './user-info-serivce';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 
 export interface UserInfoState {
   error?: any,

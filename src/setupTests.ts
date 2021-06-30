@@ -6,6 +6,7 @@ import '@testing-library/jest-dom';
 import {MockedRequest, RequestParams, ResponseComposition, rest, RestContext} from 'msw';
 import { setupServer } from 'msw/node';
 import {DefaultRequestBodyType} from 'msw/lib/types/utils/handlers/requestHandler';
+import { PrivilegeType } from './state/privilege/privilege-type';
 
 function returnDefaultResponse(req: MockedRequest<DefaultRequestBodyType, RequestParams>,res: ResponseComposition<any>, ctx: RestContext) {
   console.log(`${req.method} - ${req.url.href}`);
@@ -58,8 +59,46 @@ const server = setupServer(
       ]
     }))
   }),
+  rest.get(/app-client\/privs/, (req, res, ctx) => {
+    let counter = 0;
+    return res(ctx.json({
+      "data": Object.values(PrivilegeType).map((item : any) => ({id: counter++, name: item }))
+    }))
+  }),
   rest.post('/api/v2/person/find', (req, res, ctx) => {
     return res(ctx.json({}));
+  }),
+  rest.get('/api/v1/app-source/spec/*', (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+  rest.get(/\/api\/v2\/logs/, (req, res, ctx) => {
+    return res(ctx.json({ data: [{}], pagination: {}}));
+  }),
+  rest.get(/dashboard-users\/self/, (req, res, ctx) => {
+    return res(ctx.json({
+      "id": "bc621874-99c7-4b4b-8c5b-b6124f563706",
+      "email": "jj2@gmail.com",
+      "privileges": [
+        {
+          "id": 7,
+          "name": "SCRATCH_ADMIN"
+        },
+        {
+          "id": 6,
+          "name": "DASHBOARD_ADMIN"
+        },
+        {
+          "id": 5,
+          "name": "DASHBOARD_USER"
+        }
+        ]
+      }))
+  }),
+  rest.get(/scratch\/users\/privs/, (req, res, ctx) => {
+    let counter = 0;
+    return res(ctx.json({
+      "data": Object.values(PrivilegeType).filter((item : string) => item.startsWith("SCRATCH")).map((item : any) => ({id: counter++, name: item }))
+    }))
   }),
   rest.get('*', returnDefaultResponse),
   rest.post('*', returnDefaultResponse),

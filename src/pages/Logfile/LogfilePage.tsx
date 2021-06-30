@@ -41,7 +41,6 @@ function LogfilePage() {
     }
 
     if (shouldScroll)
-      // lastLogElem.current?.scrollIntoView();
       logsContainer.current?.scrollTo(0, logsContainer.current.scrollHeight);
   }
 

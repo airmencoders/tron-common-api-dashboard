@@ -676,105 +676,6 @@
       },
       "type": "object"
     },
-    "BadRequestException": {
-      "additionalProperties": false,
-      "properties": {
-        "cause": {
-          "$ref": "model-types.json#/definitions/BadRequestExceptionCause"
-        },
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "BadRequestExceptionCause": {
-      "additionalProperties": false,
-      "properties": {
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        },
-        "suppressed": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseSuppressed"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
-    "BadRequestExceptionCauseStackTrace": {
-      "additionalProperties": false,
-      "properties": {
-        "classLoaderName": {
-          "type": "string"
-        },
-        "className": {
-          "type": "string"
-        },
-        "fileName": {
-          "type": "string"
-        },
-        "lineNumber": {
-          "type": "number"
-        },
-        "methodName": {
-          "type": "string"
-        },
-        "moduleName": {
-          "type": "string"
-        },
-        "moduleVersion": {
-          "type": "string"
-        },
-        "nativeMethod": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
-    "BadRequestExceptionCauseSuppressed": {
-      "additionalProperties": false,
-      "properties": {
-        "localizedMessage": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "stackTrace": {
-          "items": {
-            "$ref": "model-types.json#/definitions/BadRequestExceptionCauseStackTrace"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "CoastGuardsman": {
       "$ref": "model-types.json#/definitions/PersonDto"
     },
@@ -916,10 +817,10 @@
         "error": {
           "type": "string"
         },
-        "message": {
+        "path": {
           "type": "string"
         },
-        "path": {
+        "reason": {
           "type": "string"
         },
         "status": {
@@ -1058,16 +959,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -1082,6 +977,25 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "GenericStringArrayResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "pagination": {
+          "$ref": "model-types.json#/definitions/Pagination"
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
       "type": "object"
     },
     "Group": {
@@ -1124,16 +1038,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -1421,16 +1329,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -2043,16 +1945,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"
@@ -2201,16 +2097,10 @@
           ]
         },
         "subordinateOrganizations": {
-          "additionalProperties": false,
-          "properties": {
-            "size": {
-              "type": "number"
-            }
+          "items": {
+            "type": "string"
           },
-          "required": [
-            "size"
-          ],
-          "type": "object"
+          "type": "array"
         }
       },
       "type": "object"

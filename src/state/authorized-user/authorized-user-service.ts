@@ -16,7 +16,7 @@ export default class AuthorizedUserService {
   fetchAndStoreAuthorizedUser(): Promise<DashboardUserDto> {
     const response = (): AxiosPromise<DashboardUserDto> => this.dashboardUserApi.getSelfDashboardUser();
 
-    const data = new Promise<DashboardUserDto>((resolve) => resolve(response().then(r => r.data)));
+    const data = Promise.resolve(response().then(r => r.data));
     this.state.set(data);
 
     return data;

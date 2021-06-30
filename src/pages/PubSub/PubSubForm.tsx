@@ -12,11 +12,10 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 import TextInput from "../../components/forms/TextInput/TextInput";
 import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi';
-import { AppClientFlat } from '../../state/app-clients/app-client-flat';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
-import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
+import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {

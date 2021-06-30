@@ -1,11 +1,6 @@
-import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto } from '../../../openapi';
 import { GridFilterParams } from '../grid-filter-params';
-import { GridFilterOperatorType } from '../grid-filter-operator-type';
 import { AgGridSortModel } from '../grid-sort-model';
-import { InfiniteScroll } from '../infinite-scroll';
-import { GridMultiFilterModel } from '../grid-multi-filter-condition-model';
-import { GridSingleFilterModel } from '../grid-single-filter-condition-model';
-import { AgGridFilterConversionError } from '../../../utils/Exception/AgGridFilterConversionError';
+import { InfiniteScrollOptions } from '../../DataCrudFormPage/infinite-scroll-options';
 
 /**
  * Contains all possible Ag Grid filter options
@@ -45,7 +40,7 @@ export const agGridDefaults = {
  * @param infiniteScroll the infinite scroll options
  * @returns the limit provided by the option or the default
  */
-export function generateInfiniteScrollLimit(infiniteScroll?: InfiniteScroll) {
+export function generateInfiniteScrollLimit(infiniteScroll?: InfiniteScrollOptions) {
   return infiniteScroll?.limit ?? agGridDefaults.cacheBlockSize;
 }
 

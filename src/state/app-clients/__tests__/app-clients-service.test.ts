@@ -1,60 +1,64 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientFlat } from '../app-client-flat';
-import { wrapState } from '../app-clients-state';
-import AppClientsService from '../app-clients-service';
+import { AxiosResponse } from 'axios';
+import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import { AppClientUserDetailsDto, AppClientUserDtoResponseWrapped, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
-import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../privilege/privilege-type';
-import { AppClientUserDetailsDto, AppClientUserDtoResponseWrapped, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
-import { accessPrivilegeState } from '../../privilege/privilege-state';
-import PrivilegeService from '../../privilege/privilege-service';
-import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
-
-jest.mock('../../privilege/privilege-state');
+import { AppClientFlat } from '../app-client-flat';
+import AppClientsService from '../app-clients-service';
+import { wrapState } from '../app-clients-state';
 
 describe('App Client State Tests', () => {
   let appClientsState: State<AppClientFlat[]> & StateMethodsDestroy;
   let appClientsApi: AppClientControllerApiInterface;
   let wrappedState: AppClientsService;
 
+  let counter = 0;
+  const privilegeDtos: PrivilegeDto[] = Object.values(PrivilegeType).map((item : any) => ({id: counter++, name: item }));
+
   const flatClients: AppClientFlat[] = [
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       clusterUrl: "http://app.app.svc.cluster.local/",
       name: "Test",
-      read: true,
-      write: true
+      personCreate: true,
+      personEdit: true,
+      personDelete: false,
+      personRead: false,
+      orgCreate: true,
+      orgEdit: true,
+      orgDelete: false,
+      orgRead: false,
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
       clusterUrl: "http://app2.app2.svc.cluster.local/",
-      name: "Test1",
-      read: false,
-      write: false
+      name: "Test1",      
+      personCreate: false,
+      personEdit: false,
+      personDelete: false,
+      personRead: false, 
+      orgCreate: false,
+      orgEdit: false,
+      orgDelete: false,
+      orgRead: false,
     }
   ];
+
 
   const clients: AppClientUserDto[] = [
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       name: "Test",
       clusterUrl: "http://app.app.svc.cluster.local/",
-      privileges: [
-        {
-          "id": 1,
-          "name": PrivilegeType.READ
-        },
-        {
-          "id": 2,
-          "name": PrivilegeType.WRITE
-        }
-      ],
+      privileges: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
       clusterUrl: "http://app2.app2.svc.cluster.local/",
       name: "Test1",
+      privileges: []
     }
   ];
 
@@ -66,17 +70,7 @@ describe('App Client State Tests', () => {
     headers: {}
   };
 
-  const testClientPrivileges: PrivilegeDto[] = [
-    {
-      id: 1,
-      name: PrivilegeType.READ
-    },
-    {
-      id: 2,
-      name: PrivilegeType.WRITE
-    }
-  ];
-
+  const testClientPrivileges: PrivilegeDto[] = privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
   const testClientPrivilegesDto : PrivilegeDto[] = testClientPrivileges as PrivilegeDto[];
 
   const testClientDto: AppClientUserDto = {
@@ -99,19 +93,33 @@ describe('App Client State Tests', () => {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
     clusterUrl: "http://app.app.svc.cluster.local/",
     name: 'Test Client',
-    read: true,
-    write: true,
+    personCreate: true,
+    personEdit: false,
+    personDelete: false,
+    personRead: false,
+    orgCreate: true,
+    orgEdit: false,
+    orgDelete: false,
+    orgRead: false,
+    allPrivs: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
   }
 
   const testClientFlatWithDetails: AppClientFlat = {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
     clusterUrl: "http://app.app.svc.cluster.local/",
     name: 'Test Client',
-    read: true,
-    write: true,
     appClientDeveloperEmails: [],
     appSourceEndpoints: [],
-  }
+    personCreate: true,
+    personEdit: false,
+    personDelete: false,
+    personRead: false,
+    orgCreate: true,
+    orgEdit: false,
+    orgDelete: false,
+    orgRead: false,
+    allPrivs: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
+}
 
 
   const axiosPostPutResponse = {
@@ -129,17 +137,6 @@ describe('App Client State Tests', () => {
     config: {},
     headers: {}
   };
-
-  const privilegDtos: PrivilegeDto[] = [
-    {
-      id: 1,
-      name: PrivilegeType.READ
-    },
-    {
-      id: 2,
-      name: PrivilegeType.WRITE
-    }
-  ];
 
   const axiosRejectResponse = {
     response: {
@@ -166,31 +163,14 @@ describe('App Client State Tests', () => {
   } as DataCrudFormErrors;
 
   let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
-  let privilegeApi: PrivilegeControllerApiInterface;
-
-  function mockPrivilegesState() {
-    (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
-    privilegeApi.getPrivilegesWrapped = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
-        data: { data: privilegDtos },
-        status: 200,
-        headers: {},
-        config: {},
-        statusText: 'OK'
-      }));
-    });
-  }
 
   beforeEach(async () => {
     appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
     appClientsApi = new AppClientControllerApi();
-    wrappedState = wrapState(appClientsState, appClientsApi);
-
+    
     privilegeState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
-    privilegeApi = new PrivilegeControllerApi();
 
-    mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
+    wrappedState = wrapState(appClientsState, appClientsApi, privilegeState);
   });
 
   afterEach(() => {
@@ -204,7 +184,6 @@ describe('App Client State Tests', () => {
     });
 
     await wrappedState.fetchAndStoreData();
-
     expect(wrappedState.appClients).toEqual(flatClients);
   });
 
@@ -251,10 +230,11 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
+    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
     appClientsState.set([testClientFlat]);
 
-    await expect(wrappedState.sendUpdate(testClientFlat)).resolves.toEqual(testClientFlat);
-    expect(appClientsState.get()).toEqual([testClientFlat]);
+    await expect(wrappedState.sendUpdate(testClientFlat)).resolves.toEqual(localTestClientFlat);
+    expect(appClientsState.get()).toEqual([localTestClientFlat]);
   });
 
   it('Test sendUpdate Fail', async () => {
@@ -293,7 +273,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
-    await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(testClientFlat);
+    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(localTestClientFlat);
   });
 
   it('Test sendCreate Fail', async () => {
@@ -358,47 +339,38 @@ describe('App Client State Tests', () => {
 
   it('Test convertAppClientToFlat', () => {
     const result = wrappedState.convertToFlat(testClientDto);
-    expect(result).toEqual(testClientFlat);
+    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    expect(result).toEqual(localTestClientFlat);
   });
 
   it('Test convertToDto', async () => {
-    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
-    });
-
     const result = wrappedState.convertToDto(testClientFlat);
     await expect(result).resolves.toEqual(testClientDto);
-  });
 
-  it('Test createAppPrivilegesArr', async () => {
-    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
+    const result2 = wrappedState.convertToDto({ id: 'some id',
+      name: 'name',
+      clusterUrl: '',
+      allPrivs: privilegeDtos.filter(item => item.name.match(/PERSON_CREATE|PERSON_EDIT|Person-firstName/))
     });
 
-    const result = await wrappedState.createAppPrivilegesArr(testClientFlat);
-    expect(result).toEqual(testClientPrivileges);
-  });
-
-  it('Test Create App Privileges', async () => {
-    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
+    await expect(result2).resolves.toEqual({ id: 'some id',
+      name: 'name',
+      clusterUrl: '',
+      appClientDeveloperEmails: undefined,
+      privileges: privilegeDtos.filter(item => item.name.match(/PERSON_CREATE/))
     });
 
-    const result = await wrappedState.createAppPrivileges(testClientFlat);
-    expect(result.size).toEqual(2);
-  });
-
-  it('Test No privilege user', async () => {
-    appClientsApi.getClientTypePrivsWrapped = jest.fn(() => {
-      return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
+    const result3 = wrappedState.convertToDto({ id: 'some id',
+      name: 'name',
+      clusterUrl: '',
+      allPrivs: privilegeDtos.filter(item => item.name.match(/ORGANIZATION_CREATE|PERSON_CREATE|ORGANIZATION_EDIT|Person-firstName|Organization-name/))
     });
 
-    const noPrivUser = {
-      ...testClientFlat,
-      read: false,
-      write: false
-    };
-    const result = await wrappedState.createAppPrivileges(noPrivUser);
-    expect(result.size).toEqual(0);
-  });
+    await expect(result3).resolves.toEqual({ id: 'some id',
+      name: 'name',
+      clusterUrl: '',
+      appClientDeveloperEmails: undefined,
+      privileges: privilegeDtos.filter(item => item.name.match(/ORGANIZATION_CREATE|PERSON_CREATE/))
+    });
+  });  
 });

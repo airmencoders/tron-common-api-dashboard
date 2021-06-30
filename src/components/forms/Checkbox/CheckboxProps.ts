@@ -9,8 +9,6 @@ export interface CheckboxProps {
   | string
   | ((instance: HTMLInputElement | null) => void)
   | React.RefObject<HTMLInputElement>
-  | null
-  | undefined
   checked?: boolean
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   disabled?: boolean

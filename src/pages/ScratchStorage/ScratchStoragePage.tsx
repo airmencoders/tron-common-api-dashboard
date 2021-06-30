@@ -1,14 +1,16 @@
 import React from 'react';
-import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPage';
+import { DataCrudFormPage } from '../../components/DataCrudFormPage/DataCrudFormPage';
 import GridColumn from '../../components/Grid/GridColumn';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
-import {ScratchStorageAppRegistryDto} from '../../openapi/models';
-import {ScratchStorageFlat} from '../../state/scratch-storage/scratch-storage-flat';
-import {useScratchStorageState} from '../../state/scratch-storage/scratch-storage-state';
+import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
+import { ScratchStorageAppRegistryDto } from '../../openapi/models';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
+import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
 import ScratchStorageDelete from './ScratchStorageDelete';
 import ScratchStorageEditForm from './ScratchStorageEditForm';
-import './ScratchStoragePage.scss'
-import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
+import './ScratchStoragePage.scss';
 
 const columns: GridColumn[] =
   [
@@ -30,6 +32,13 @@ const columns: GridColumn[] =
       headerName: 'Implicit Read',
       headerClass: 'header-center',
       cellRenderer: PrivilegeCellRenderer
+    }),
+    new GridColumn({
+      field: 'aclMode',
+      sortable: true,
+      headerName: 'ACL Mode',
+      headerClass: 'header-center',
+      cellRenderer: PrivilegeCellRenderer
     })
   ];
 
@@ -44,9 +53,9 @@ function ScratchStoragePage() {
           updateForm={ScratchStorageEditForm}
           useDataState={useScratchStorageState}
           allowEdit={true}
-          allowDelete
+          allowDelete={useAuthorizedUserState().authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
           deleteComponent={ScratchStorageDelete}
-          allowAdd
+          allowAdd={useAuthorizedUserState().authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
           autoResizeColumns
           autoResizeColummnsMinWidth={800}
           sideDrawerSize={SideDrawerSize.WIDE}

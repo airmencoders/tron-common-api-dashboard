@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterConditionOperatorEnum, FilterCriteria, FilterCriteriaRelationTypeEnum, FilterDto } from '../../openapi';
+import { FilterCondition, FilterConditionOperatorEnum, FilterCriteria, FilterCriteriaRelationTypeEnum, FilterDto } from '../../openapi';
 import { AgGridFilterConversionError } from '../../utils/Exception/AgGridFilterConversionError';
 import { GridFilterModel } from './grid-filter-model';
 import { GridFilterOperatorType } from './grid-filter-operator-type';
@@ -11,6 +11,8 @@ export class GridFilter {
     this.gridFilter = gridFilter;
   }
 
+  private additionalFilters: Array<FilterCriteria> = [];
+
   /**
    * Gets the FilterDto
    * @returns the FilterDto value, or undefined if no filter exists
@@ -19,25 +21,34 @@ export class GridFilter {
   getFilterDto(): FilterDto | undefined {
     const fieldNames = Object.keys(this.gridFilter);
 
-    if (fieldNames.length === 0) {
-      return;
-    }
-
     const filterDto: FilterDto = {
       filterCriteria: []
     };
 
-    try {
-      for (const fieldName of fieldNames) {
-        const filter = this.gridFilter[fieldName];
+    if (fieldNames.length > 0) {
+        for (const fieldName of fieldNames) {
+          const filter = this.gridFilter[fieldName];
 
-        filterDto.filterCriteria.push(GridFilter.convertAgGridFilterToFilterCriteria(fieldName, filter));
-      }
-    } catch (err) {
-      throw err;
+          filterDto.filterCriteria.push(GridFilter.convertAgGridFilterToFilterCriteria(fieldName, filter));
+        }
     }
 
-    return filterDto;
+    filterDto.filterCriteria = filterDto.filterCriteria.concat(this.additionalFilters);
+
+    return filterDto.filterCriteria.length > 0 ? filterDto : undefined;
+  }
+
+
+  addMultiFilter(fieldName: string, relationType: FilterCriteriaRelationTypeEnum, conditions: FilterCondition[]): void {
+    if (conditions.length === 0) {
+      return;
+    }
+
+    this.additionalFilters.push({
+      relationType,
+      field: fieldName,
+      conditions
+    });
   }
 
   /**
@@ -66,7 +77,7 @@ export class GridFilter {
    * @returns {FilterCriteria} the converted value
    */
   private static convertAgGridSingleFilterToFilterCriteria(fieldName: string, filter: GridSingleFilterModel): FilterCriteria {
-    const filterCriteria: FilterCriteria = {
+    return {
       field: fieldName,
       conditions: [
         {
@@ -75,8 +86,6 @@ export class GridFilter {
         }
       ]
     }
-
-    return filterCriteria;
   }
 
   /**
@@ -86,7 +95,7 @@ export class GridFilter {
    * @returns {FilterCriteria} the converted value
    */
   private static convertAgGridMultiFilterToFilterCritiera(fieldName: string, filter: GridMultiFilterModel): FilterCriteria {
-    const filterCritiera: FilterCriteria = {
+    return {
       relationType: filter.operator === 'OR' ? FilterCriteriaRelationTypeEnum.Or : FilterCriteriaRelationTypeEnum.And,
       field: fieldName,
       conditions: [
@@ -100,8 +109,6 @@ export class GridFilter {
         }
       ]
     }
-
-    return filterCritiera;
   }
 
 

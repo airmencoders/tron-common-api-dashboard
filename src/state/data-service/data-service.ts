@@ -1,6 +1,7 @@
 import { State } from '@hookstate/core';
 import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
 import { FilterDto } from '../../openapi';
+import { PatchResponse } from './patch-response';
 
 /***
  * Interface for a service providing tabular data.
@@ -15,7 +16,7 @@ export interface DataService<T, R> {
   sendUpdate(toUpdate: R): Promise<T>;
   sendCreate(toCreate: R): Promise<T>;
   sendDelete(toDelete: R): Promise<void>;
-  sendPatch?(...args: any): Promise<T>;
+  sendPatch?(...args: any): Promise<PatchResponse<T>>;
   /**
    * @param {number} page the page number (0 indexed)
    * @param {number} limit the max items to return

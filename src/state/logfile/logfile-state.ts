@@ -6,7 +6,7 @@ import CurrentLogfileService from './current-logfile-service';
 import { CurrentLogfileState } from './current-logfile-state';
 import PastLogfileService from './past-logfile-service';
 
-const logfileState = createState<CurrentLogfileState>({
+const logfileGlobalState = createState<CurrentLogfileState>({
   logs: new Array<string>(),
   maxLines: 5000,
   start: 0,
@@ -16,22 +16,22 @@ const logfileState = createState<CurrentLogfileState>({
   loading: false,
   errors: undefined
 });
-const logfileActuatorApi: LogfileActuatorApi = new LogfileActuatorApi();
+const logfileActuatorControllerApi: LogfileActuatorApi = new LogfileActuatorApi();
 
 export const wrapCurrentLogfileState = (logfileState: State<CurrentLogfileState>, logfileActuatorApi: LogfileActuatorApi): CurrentLogfileService => {
   return new CurrentLogfileService(logfileState, logfileActuatorApi);
 };
 
-export const accessLogfileState = () => wrapCurrentLogfileState(logfileState, logfileActuatorApi);
-export const useLogfileState = () => wrapCurrentLogfileState(useState(logfileState), logfileActuatorApi);
+export const accessLogfileState = () => wrapCurrentLogfileState(logfileGlobalState, logfileActuatorControllerApi);
+export const useLogfileState = () => wrapCurrentLogfileState(useState(logfileGlobalState), logfileActuatorControllerApi);
 
 
-const pastLogfileState = createState<LogfileDto[]>(new Array<LogfileDto>());
-const logfileApi: LogfileApi = new LogfileApi();
+const pastLogfileGlobalState = createState<LogfileDto[]>(new Array<LogfileDto>());
+const logfileControllerApi: LogfileApi = new LogfileApi();
 
 export const wrapPastLogfileState = (pastLogfileState: State<LogfileDto[]>, logfileApi: LogfileApi): PastLogfileService => {
   return new PastLogfileService(pastLogfileState, logfileApi);
 };
 
-export const accessPastLogfileState = () => wrapPastLogfileState(pastLogfileState, logfileApi);
-export const usePastLogfileState = () => wrapPastLogfileState(useState(pastLogfileState), logfileApi);
+export const accessPastLogfileState = () => wrapPastLogfileState(pastLogfileGlobalState, logfileControllerApi);
+export const usePastLogfileState = () => wrapPastLogfileState(useState(pastLogfileGlobalState), logfileControllerApi);

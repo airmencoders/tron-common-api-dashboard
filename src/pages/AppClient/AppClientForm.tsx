@@ -1,8 +1,10 @@
-import { useHookstate, useState } from "@hookstate/core";
+import { Downgraded, useHookstate, useState } from "@hookstate/core";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
 import { Validation } from "@hookstate/validation";
-import React, {FormEvent, useMemo} from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useMemo } from 'react';
+import Accordion from '../../components/Accordion/Accordion';
+import { AccordionItem } from '../../components/Accordion/AccordionItem';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
@@ -15,36 +17,65 @@ import TextInput from "../../components/forms/TextInput/TextInput";
 import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
+import { PrivilegeDto } from "../../openapi/models/privilege-dto";
 import { AppClientFlat } from "../../state/app-clients/app-client-flat";
+import { useAppClientsState } from "../../state/app-clients/app-clients-state";
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
-import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
-import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validateSubscriberAddress } from '../../utils/validation-utils';
-import Accordion from '../../components/Accordion/Accordion';
-import {AccordionItem} from '../../components/Accordion/AccordionItem';
+import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointInfo from './AppSourceEndpointInfo';
+import './AppClientPage.scss';
 
 interface DeveloperEmail {
   email: string;
 }
 
+interface PrivilegeCell {
+  priv: PrivilegeDto,
+  privDisplayName: string,
+}
+
+enum PrivilegeKind {
+  PERSON="person",
+  ORGANIZATION="organization",
+}
+
 function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
-  const formState = useState<AppClientFlat>({
+  const formState = useHookstate<AppClientFlat>({
     id: props.data?.id,
     name: props.data?.name || "",
     clusterUrl: props.data?.clusterUrl || "",
-    read: props.data?.read || false,
-    write: props.data?.write || false,
+    allPrivs: props.data?.allPrivs ?? [],
     appClientDeveloperEmails: props.data?.appClientDeveloperEmails ?? [],
     appSourceEndpoints: props.data?.appSourceEndpoints ?? [],
   });
+  const appClientService = useAppClientsState();
   const expandedAppSource = useState<string | null>(null);
-
   const currentUser = accessAuthorizedUserState();
-  const developerAddState = useHookstate({
-    email: ''
-  });
+  const developerAddState = useHookstate({ email: '' });
+
+  // state of person and org's CREATE checkbox
+  // either of which true will make its EDIT and fields checkboxs disabled/not visible respectively
+  const createPrivState = useHookstate({ person: false, organization: false});
+
+  // state of person and org's EDIT checkbox
+  // either of which true will make its fields checkboxs disabled/not visible respectively
+  const editPrivState = useHookstate({ person: false, organization: false});
+
+  // load initial state of the create and edit checkboxes so we know how to disable/hide
+  // field level privileges (remember CREATE privilege include implicit EDIT for all fields...)
+  useEffect(() => {
+    createPrivState.set({
+      person: formState.allPrivs?.value?.map(item => item.name).includes('PERSON_CREATE') ?? false,
+      organization: formState.allPrivs?.value?.map(item => item.name).includes('ORGANIZATION_CREATE') ?? false
+    });
+    editPrivState.set({
+      person: formState.allPrivs?.value?.map(item => item.name).includes('PERSON_EDIT') ?? false,
+      organization: formState.allPrivs?.value?.map(item => item.name).includes('ORGANIZATION_EDIT') ?? false
+    });
+  }, []);
 
   const appSourceAccordionItems: Array<AccordionItem> = useMemo(() => {
     return formState.appSourceEndpoints?.get()?.map((appSourceDevDetails) => ({
@@ -57,8 +88,9 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     })) || [];
   },[formState.appSourceEndpoints, expandedAppSource.get()]);
 
-  // if the app client record hasn't resolved yet then no point continuing yet
+  // if the app client record hasn't resolved or we haven't gotten available app privs yet, then no point continuing
   if (formState.promised) return <></>;
+  if (appClientService.privilegesState.promised) return <></>;
 
   developerAddState.attach(Validation);
   developerAddState.attach(Initial);
@@ -70,6 +102,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
+  formState.attach(Downgraded);
 
   Validation(formState.clusterUrl).validate(url => validateSubscriberAddress(url), 'Invalid Client App URL Format', 'error');
   Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
@@ -77,7 +110,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   function isFormModified() {
     return Initial(formState.name).modified()
-            || Initial(formState.read).modified() || Initial(formState.write).modified()
+            || Initial(formState.allPrivs).modified()
             || Initial(formState.appClientDeveloperEmails).modified()
             || Initial(formState.clusterUrl).modified()
   }
@@ -124,6 +157,177 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   function handleAccordionExpanded(itemId: string | null) {
     expandedAppSource.set(itemId);
+  }
+
+  /**
+   * Gets the full PrivilegeDto Object for a given privileges string name
+   * @param priv the name of the Privilege
+   * @returns its Dto object
+   */
+  function getPrivObjectFromName(priv: string) : PrivilegeDto | undefined {
+    return appClientService.privilegesState.get().find(item => item.name === priv);
+  }
+
+  /**
+   * Gets all privileges that are field-privileges from the service's privilege state, e.g.
+   * Person-firstName, etc
+   * @param kind "person" or "organization"
+   * @returns array of PrivilegeDtos
+   */
+  function getAllFieldPrivsForKind(kind: PrivilegeKind) : PrivilegeDto[] {
+    return appClientService.privilegesState.value?.filter(item => item.name.toLowerCase().startsWith(kind + "-")) ?? [];
+  }
+
+  /**
+   * Helper to say whether to show the field of edit field checkboxes for person or org
+   * @param kind  "person" or "org"
+   * @returns true or false
+   */
+  function showEditFieldPane(kind : PrivilegeKind) : boolean {
+    // we say true if the CREATE priv is checked, or the EDIT checkbox is unchecked
+    return createPrivState.get()[kind]
+      || !editPrivState.get()[kind]
+  }
+
+  /**
+   * Handles a privilege checkbox toggle state.  Handles the logic of disabling/enabling
+   * others as appropriate, adds/removes the respective privilege to the form state's allPrivs field
+   * @param event the form event
+   * @param kind  "person" or "organization"
+   */
+  function togglePriv(event: ChangeEvent<HTMLInputElement>, kind: PrivilegeKind) {
+    if (event.target.checked) {
+      if (!formState.allPrivs.value?.map(item => item.name).includes(event.target.id)) {
+        const priv = getPrivObjectFromName(event.target.id);
+        if (priv !== undefined) {
+
+          // a _CREATE checkbox is checked, so set create priv state for kind
+          if (priv.name.match(new RegExp(kind.toUpperCase() + '_CREATE'))) {
+            createPrivState.set({...createPrivState.get(), [kind]: true });
+          }
+
+          // an _EDIT checkbox is checked, so check all the field privileges and set the edit state
+          else if (priv.name.match(new RegExp(kind.toUpperCase() + '_EDIT'))) {
+            editPrivState.set({...editPrivState.get(), [kind]: true });
+            formState.allPrivs.merge(getAllFieldPrivsForKind(kind));
+          }
+
+          // enable the overall priv by placing into formState's allPrivs
+          formState.allPrivs.merge([priv]);
+        }
+      }
+    }
+    else {
+
+      // a _CREATE checkbox is unchecked, so unset create priv state for kind
+      if (event.target.id.match(new RegExp(kind.toUpperCase() + '_CREATE'))) {
+        createPrivState.set({...createPrivState.get(), [kind]: false });
+      }
+
+      // an _EDIT checkbox was unchecked, so uncheck all field privileges and unset the edit state
+      else if (event.target.id.match(new RegExp(kind.toUpperCase() + '_EDIT'))) {
+        editPrivState.set({...editPrivState.get(), [kind]: false });
+        formState
+          .allPrivs
+          .set([...formState.allPrivs.value ?? []]
+          .filter(item => !item.name.toLowerCase().startsWith(kind + "-") ));
+      }
+
+      // disable the overall priv by removing from the state's allPrivs
+      formState
+        .allPrivs
+        .set([...formState.allPrivs.value ?? []]
+        .filter(item => item.name !== event.target.id));
+    }
+  }
+
+  /**
+   * Builds the Person and Organization privilege forms
+   * @param kind either "person" or "organization"
+   * @returns React Element containing the form
+   */
+  function buildPrivForm(kind: PrivilegeKind) {
+    const crudLevelPrivs : PrivilegeCell[] = [];
+    const fieldLevelPrivs : PrivilegeCell[]  = [];
+    appClientService.privilegesState
+      .get()
+      .filter((priv : PrivilegeDto) => priv.name.toLowerCase().startsWith(kind))
+      .forEach((priv : PrivilegeDto) => {
+        const regex = new RegExp(kind + "[_|-]", 'i');
+        const privDisplayName = priv.name.replace(regex, '');
+        if (privDisplayName.match(/^CREATE$|^EDIT$|^DELETE$|^READ$/)) {
+          crudLevelPrivs.push({ priv, privDisplayName });
+        }
+        else {
+          fieldLevelPrivs.push({ priv, privDisplayName });
+        }
+      });
+
+    return (
+      <div>
+        <div className='crud-level-checkboxes' data-testid={kind + '-privileges'}>
+        {
+          crudLevelPrivs.map(item =>
+            item.priv.name.match(/_EDIT/) ?
+              <div key={item.priv.name} className='crud-level-checkbox'>
+                <Checkbox
+                  id={item.priv.name}
+                  name={item.priv.name}
+                  data-testid={item.priv.name}
+                  key={item.priv.name}
+                  label={item.privDisplayName}
+                  checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
+                  onChange={(event) => togglePriv(event, kind)}
+                  disabled={isFormDisabled()
+                    || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)
+                    || createPrivState.get()[kind] }
+                />
+              </div>
+            :
+              <div key={item.priv.name} className='crud-level-checkbox'>
+                <Checkbox
+                  id={item.priv.name}
+                  name={item.priv.name}
+                  data-testid={item.priv.name}
+                  key={item.priv.name}
+                  label={item.privDisplayName}
+                  checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
+                  onChange={(event) => togglePriv(event, kind)}
+                  disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+                />
+              </div>
+          )
+        }
+        </div>
+        <div data-testid={kind + '-edit-form'} style={{ display: showEditFieldPane(kind) ? 'none' : 'block' }}>
+          <FormGroup
+            labelName={kind + "Fields"}
+            labelText={kind.substr(0, 1).toUpperCase() + kind.substr(1) + " Fields"}
+          >
+            <div className='field-level-privs'>
+            {
+              fieldLevelPrivs.map(item =>
+                <div key={item.priv.name} className='crud-level-checkbox'>
+                  <Checkbox
+                    id={item.priv.name}
+                    name={item.priv.name}
+                    data-testid={item.priv.name}
+                    key={item.priv.name}
+                    label={item.privDisplayName}
+                    checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
+                    onChange={(event) => togglePriv(event, kind)}
+                    disabled={isFormDisabled()
+                      || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)
+                    }
+                  />
+                </div>
+              )
+            }
+            </div>
+          </FormGroup>
+        </div>
+      </div>
+    )
   }
 
   const deleteBtnName = 'Delete';
@@ -222,28 +426,25 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         />
       </FormGroup>
 
-      <FormGroup
-        labelName="permissions"
-        labelText="Permissions"
-      >
-        <Checkbox
-          id="read"
-          name="read"
-          label={<>Read</>}
-          checked={formState.read.get()}
-          onChange={(event) => formState.read.set(event.target.checked)}
-          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+      <div className='accordian-top-spacer'>
+        <Accordion
+          className="app-source-access"
+          items={[{
+              title: 'Person Entity Permissions',
+              content: buildPrivForm(PrivilegeKind.PERSON),
+              id: 'person-accordian'
+          }]}
         />
+      </div>
 
-        <Checkbox
-          id="write"
-          name="write"
-          label={<>Write</>}
-          checked={formState.write.get()}
-          onChange={(event) => formState.write.set(event.target.checked)}
-          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
-        />
-      </FormGroup>
+      <Accordion
+        className="app-source-access"
+        items={[{
+            title: 'Organization Entity Permissions',
+            content: buildPrivForm(PrivilegeKind.ORGANIZATION),
+            id: 'org-accordian'
+        }]}
+      />
 
       <FormGroup
           labelName="developer"

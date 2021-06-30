@@ -1,7 +1,7 @@
 import {createState, State, useState} from '@hookstate/core';
-import {OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum} from '../../openapi/models';
-import {Configuration, OrganizationControllerApi, OrganizationControllerApiInterface} from '../../openapi';
-import Config from '../../api/configuration';
+import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../openapi/models';
+import { Configuration, OrganizationControllerApi, OrganizationControllerApiInterface, PersonControllerApi, PersonControllerApiInterface } from '../../openapi';
+import Config from '../../api/config';
 import OrganizationService from './organization-service';
 
 export interface PersonWithDetails {
@@ -28,21 +28,30 @@ export interface OrganizationDtoWithDetails {
 
 const organizationState = createState<OrganizationDto[]>(new Array<OrganizationDto>());
 
-// this holds the selected org we're editing/updating
-const selectedOrganizationState = createState<OrganizationDtoWithDetails>({} as OrganizationDtoWithDetails);
-
 const organizationApi: OrganizationControllerApiInterface = new OrganizationControllerApi(
     new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
+const organizationChooserGlobalState = createState<OrganizationDto[]>(new Array<OrganizationDto>());
+
+const personChooserGlobalState = createState<PersonDto[]>(new Array<PersonDto>());
+
+const personControllerApi: PersonControllerApiInterface = new PersonControllerApi(
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+);
+
 export const wrapState = (
   state: State<OrganizationDto[]>, 
-  selectedOrgState: State<OrganizationDtoWithDetails>,
-  orgApi: OrganizationControllerApiInterface) => {
-    return new OrganizationService(state, selectedOrgState, orgApi);
+  orgApi: OrganizationControllerApiInterface,
+  organizationChooserState: State<OrganizationDto[]>,
+  personChooserState: State<PersonDto[]>,
+  personApi: PersonControllerApiInterface) => {
+  return new OrganizationService(state, orgApi, organizationChooserState, personChooserState, personApi);
 }
 export const useOrganizationState = () => wrapState(
   useState(organizationState), 
-  useState(selectedOrganizationState), 
-  organizationApi
+  organizationApi,
+  organizationChooserGlobalState,
+  personChooserGlobalState,
+  personControllerApi
 );

@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import Config from "../configuration";
+import Config from "../config";
 import HttpClient from "../http-client";
 import Health from "./interface/health";
 

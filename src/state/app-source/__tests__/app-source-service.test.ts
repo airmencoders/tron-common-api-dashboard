@@ -149,7 +149,7 @@ describe('App Source State Tests', () => {
   let appClientsApi: AppClientControllerApiInterface;
 
   function mockAppClientsState() {
-    (accessAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi));
+    (accessAppClientsState as jest.Mock).mockReturnValue(new AppClientsService(appClientsState, appClientsApi, privilegeState));
     appClientsApi.getAppClientUsersWrapped = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve({
         data: { data: appClientUserDtos },

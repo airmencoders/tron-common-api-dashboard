@@ -232,11 +232,26 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   const deleteEndpointSelectedData = deleteEndpointModifyState.selected.get();
 
   function deleteEndpoint(): void {
-    const toDeleteId = deleteEndpointSelectedData!.id;
-    formState.merge({
-      appClients: formState.appClients.get()?.filter(client => client.appEndpoint !== toDeleteId),
-      endpoints: formState.endpoints.get()?.filter(endpoint => endpoint.id !== toDeleteId)
-    })
+    const toDeleteId = deleteEndpointSelectedData?.id;
+
+    if (toDeleteId != null) {
+      /**
+       * Deletes all authorized App Clients belonging to this Endpoint.
+       * An Endpoint can have multiple authorized App Clients.
+       * Find all of them and remove them.
+       */
+      const appClientsLength = formState.appClients.length;
+      for (let i = appClientsLength - 1; i >= 0; i--) {
+        const appClientPrivilege = formState.appClients[i];
+        if (appClientPrivilege.appEndpoint.get() === toDeleteId) {
+          appClientPrivilege.set(none);
+        }
+      }
+
+      // Remove the actual endpoint
+      formState.endpoints.find(endpoint => endpoint.id.get() === toDeleteId)?.set(none);
+    }
+
     deleteEndpointModalClose();
   }
 

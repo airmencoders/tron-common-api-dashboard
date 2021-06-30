@@ -1,8 +1,8 @@
-import {UserInfoDto} from '../../openapi/models';
+import {PersonDto, UserInfoDto} from '../../openapi/models';
 import {State} from '@hookstate/core';
 import {UserInfoControllerApiInterface} from '../../openapi';
 import {UserInfoState} from './user-info-state';
-import Config from '../../api/configuration';
+import Config from '../../api/config';
 
 export default class UserInfoService {
 
@@ -43,5 +43,14 @@ export default class UserInfoService {
 
   get error(): any | undefined {
     return this.state.promised ? undefined : this.state.get()?.error;
+  }
+
+  async getExistingPersonForUser(): Promise<PersonDto> {
+    try {
+      const personResponse = await this.userInfoApi.getExistingPersonRecord();
+      return personResponse.data;
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 }

@@ -1,21 +1,21 @@
 import { createState, State, useState } from '@hookstate/core';
-import {AxiosPromise, AxiosResponse} from 'axios';
+import { AxiosPromise } from 'axios';
 import HealthApi from '../../api/health/health-api';
 import Components from '../../api/health/interface/components';
 import Health from '../../api/health/interface/health';
 import HealthService from './interface/health-service';
 
 const healthState = createState<Partial<Health>>({});
-const healthApi: HealthApi = new HealthApi();
+const healthControllerApi: HealthApi = new HealthApi();
 
 export const wrapState = (state: State<Partial<Health>>, healthApi: HealthApi): HealthService => {
   return ({
     async fetchAndStoreHealthStatus(): Promise<Health> {
       const healthRes = (): AxiosPromise<Health> => healthApi.getHealth()
           .catch(e => {
-            return new Promise<AxiosResponse<Health>>((resolve) => resolve(e.response));
+            return Promise.resolve(e.response);
           });
-      const data = new Promise<Health>((resolve) => resolve(healthRes().then(r => r.data)));
+      const data = Promise.resolve(healthRes().then(r => r.data));
 
       state.set(data);
 
@@ -44,5 +44,5 @@ export const wrapState = (state: State<Partial<Health>>, healthApi: HealthApi): 
   })
 };
 
-export const accessHealthState = (): HealthService => wrapState(healthState, healthApi);
-export const useHealthState = (): HealthService => wrapState(useState(healthState), healthApi);
+export const accessHealthState = (): HealthService => wrapState(healthState, healthControllerApi);
+export const useHealthState = (): HealthService => wrapState(useState(healthState), healthControllerApi);
