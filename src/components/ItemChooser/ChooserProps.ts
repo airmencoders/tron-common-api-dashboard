@@ -13,4 +13,5 @@ export interface ChooserProps {
   onEditBtnClick?: () => void;
   onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
   onGridReady?: (event: GridApi | undefined) => void;
+  className?: string;
 }

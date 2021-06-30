@@ -340,6 +340,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             } as AdminEmail
           })}
           onRowClicked={() => { return; }}
+          className="admin-email-grid"
         />
 
         <FormGroup
@@ -358,6 +359,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           disableEditBtn={endpointModifyState.bulkSelected.length === 0}
           onEditBtnClick={onEndpointEditBtnClicked}
           onRowSelected={onRowSelected}
+          className="endpoint-grid"
         />
 
         <SuccessErrorMessage
