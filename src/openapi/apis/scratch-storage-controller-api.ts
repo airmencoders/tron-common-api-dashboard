@@ -448,7 +448,7 @@ export const ScratchStorageControllerApiAxiosParamCreator = function (configurat
         },
         /**
          * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-         * @summary Retrieves all key-value pairs for for a single app
+         * @summary Retrieves all key-value pairs for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1317,7 +1317,7 @@ export const ScratchStorageControllerApiFp = function(configuration?: Configurat
         },
         /**
          * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-         * @summary Retrieves all key-value pairs for for a single app
+         * @summary Retrieves all key-value pairs for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1637,7 +1637,7 @@ export const ScratchStorageControllerApiFactory = function (configuration?: Conf
         },
         /**
          * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-         * @summary Retrieves all key-value pairs for for a single app
+         * @summary Retrieves all key-value pairs for a single app
          * @param {string} appId Application UUID
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1893,7 +1893,7 @@ export interface ScratchStorageControllerApiInterface {
 
     /**
      * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-     * @summary Retrieves all key-value pairs for for a single app
+     * @summary Retrieves all key-value pairs for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2165,7 +2165,7 @@ export class ScratchStorageControllerApi extends BaseAPI implements ScratchStora
 
     /**
      * App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis
-     * @summary Retrieves all key-value pairs for for a single app
+     * @summary Retrieves all key-value pairs for a single app
      * @param {string} appId Application UUID
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
