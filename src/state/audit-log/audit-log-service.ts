@@ -1,11 +1,11 @@
-import { State } from '@hookstate/core';
+import { postpone, State } from '@hookstate/core';
 import { ValidateFunction } from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import { FilterDto, HttpLogEntryDetailsDto, HttpLogEntryDto, HttpLogsControllerApi } from '../../openapi';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import { AbstractDataService } from '../data-service/abstract-data-service';
-import { SearchLogParams } from './audit-log-state';
 import isEqual from 'fast-deep-equal';
+import { getDefaultSearchLogParams, SearchLogParams } from './search-log-params';
 
 export default class AuditLogService extends AbstractDataService<HttpLogEntryDto, HttpLogEntryDetailsDto> {
   private readonly validate: ValidateFunction<HttpLogEntryDto>;
@@ -94,5 +94,15 @@ export default class AuditLogService extends AbstractDataService<HttpLogEntryDto
   }
 
   sendPatch: undefined;
-  
+
+  resetState() {
+    this.state.batch((state) => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.state.set([]);
+      this.searchParamsState.set(getDefaultSearchLogParams());
+    });
+  }
 }
