@@ -6,6 +6,7 @@ import { DashboardUserFlat } from '../../state/dashboard-user/dashboard-user-fla
 import { useDashboardUserState } from '../../state/dashboard-user/dashboard-user-state';
 import DashboardUserDelete from './DashboardUserDelete';
 import DashboardUserForm from './DashboardUserForm';
+import {DashboardUserDto} from '../../openapi/models';
 
 const columns: GridColumn[] = [
   new GridColumn({
@@ -40,7 +41,7 @@ const columns: GridColumn[] = [
 
 function DashboardUserPage() {
   return (
-    <DataCrudFormPage<DashboardUserFlat, DashboardUserFlat>
+    <DataCrudFormPage<DashboardUserFlat, DashboardUserDto>
       columns={columns}
       dataTypeName='Dashboard User'
       pageTitle='Dashboard Users'

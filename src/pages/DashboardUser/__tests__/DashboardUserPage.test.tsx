@@ -3,7 +3,16 @@ import { MemoryRouter } from 'react-router-dom';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import DashboardUserPage from '../DashboardUserPage';
 import { DashboardUserFlat } from '../../../state/dashboard-user/dashboard-user-flat';
-import { Configuration, DashboardUserControllerApi, DashboardUserControllerApiInterface, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
+import {
+  Configuration,
+  DashboardUserControllerApi,
+  DashboardUserControllerApiInterface,
+  DashboardUserDto,
+  PrivilegeControllerApi,
+  PrivilegeControllerApiInterface,
+  PrivilegeDto,
+  PrivilegeDtoResponseWrapper
+} from '../../../openapi';
 import { useDashboardUserState } from '../../../state/dashboard-user/dashboard-user-state';
 import DashboardUserService from '../../../state/dashboard-user/dashboard-user-service';
 import Config from '../../../api/config';
@@ -60,17 +69,20 @@ describe('Test Dashboard User Page', () => {
 
   let dashboardUserState: State<DashboardUserFlat[]> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApiInterface;
+  let dashboardUserDtoCache: State<Record<string, DashboardUserDto>> & StateMethodsDestroy;
 
   beforeEach(() => {
     dashboardUserState = createState<DashboardUserFlat[]>([...initialDashboardUserState]);
     dashboardUserApi = new DashboardUserControllerApi();
+    dashboardUserDtoCache = createState<Record<string, DashboardUserDto>>({});
 
     mockPrivilegesState();
   });
 
   it('Test Loading Page', async () => {
     function mockDashboardUserState() {
-      (useDashboardUserState as jest.Mock).mockReturnValue(new DashboardUserService(dashboardUserState, dashboardUserApi));
+      (useDashboardUserState as jest.Mock).mockReturnValue(new DashboardUserService(dashboardUserState,
+          dashboardUserApi, dashboardUserDtoCache));
 
       jest.spyOn(useDashboardUserState(), 'isPromised', 'get').mockReturnValue(true);
     }

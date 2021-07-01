@@ -10,12 +10,14 @@ import { PrivilegeType } from '../../privilege/privilege-type';
 import { wrapDashboardUserState } from '../dashboard-user-state';
 import { _ } from 'ag-grid-community';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import {create} from 'domain';
 
 jest.mock('../../privilege/privilege-state');
 
 describe('Dashboard User State Test', () => {
   let dashboardUserState: State<DashboardUserFlat[]> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApiInterface;
+  let dashboardUserDtoCache: State<Record<string, DashboardUserDto>> & StateMethodsDestroy;
   let state: DashboardUserService;
 
   const privilegDtos: PrivilegeDto[] = [
@@ -86,13 +88,13 @@ describe('Dashboard User State Test', () => {
 
   const testUserDto: DashboardUserDto = {
     id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
-    email: "Test Client",
+    email: "test@email.com",
     privileges: testUserPrivileges
   };
 
   const testUserFlat: DashboardUserFlat = {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
-    email: 'Test Client',
+    email: 'test@email.com',
     hasDashboardAdmin: true,
     hasDashboardUser: true
   };
@@ -116,7 +118,7 @@ describe('Dashboard User State Test', () => {
   const axiosRejectResponse = {
     response: {
       data: {
-        message: 'failed'
+        reason: 'failed'
       },
       status: 400,
       statusText: 'OK',
@@ -126,7 +128,7 @@ describe('Dashboard User State Test', () => {
   };
 
   const rejectMsg = {
-    general: axiosRejectResponse.response.data.message
+    general: axiosRejectResponse.response.data.reason
   } as DataCrudFormErrors;
 
 
@@ -149,7 +151,8 @@ describe('Dashboard User State Test', () => {
   beforeEach(async () => {
     dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardUserFlat>());
     dashboardUserApi = new DashboardUserControllerApi();
-    state = wrapDashboardUserState(dashboardUserState, dashboardUserApi);
+    dashboardUserDtoCache = createState<Record<string, DashboardUserDto>>({});
+    state = wrapDashboardUserState(dashboardUserState, dashboardUserApi, dashboardUserDtoCache);
 
     mockPrivilegesState();
     await accessPrivilegeState().fetchAndStorePrivileges();
@@ -199,7 +202,7 @@ describe('Dashboard User State Test', () => {
 
     dashboardUserState.set([testUserFlat])
 
-    await expect(state.sendUpdate(testUserFlat)).resolves.toEqual(testUserFlat);
+    await expect(state.sendUpdate(testUserDto)).resolves.toEqual(testUserFlat);
     expect(dashboardUserState.get()).toEqual([testUserFlat]);
   });
 
@@ -303,7 +306,13 @@ describe('Dashboard User State Test', () => {
   });
 
   it('Test convertRowDataToEditableData', async () => {
-    await expect(state.convertRowDataToEditableData(testUserFlat)).resolves.toEqual(testUserFlat);
+    dashboardUserApi.getAllDashboardUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<DashboardUserDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
+    });
+
+    await state.fetchAndStoreData();
+    const editableData = await state.convertRowDataToEditableData(testUserFlat);
+    expect(editableData).toEqual(testUserDto);
   });
 
   it('Test convertToDto', async () => {
