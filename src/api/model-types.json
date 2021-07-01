@@ -601,11 +601,17 @@
           },
           "type": "array"
         },
+        "healthUrl": {
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
         "name": {
           "type": "string"
+        },
+        "reportStatus": {
+          "type": "boolean"
         }
       },
       "required": [
