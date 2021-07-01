@@ -6,7 +6,8 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import GridColumn from '../../components/Grid/GridColumn';
 import { HttpLogEntryDetailsDto, HttpLogEntryDto } from '../../openapi/models';
-import { SearchLogParams, useAuditLogState } from '../../state/audit-log/audit-log-state';
+import { useAuditLogState } from '../../state/audit-log/audit-log-state';
+import { getDefaultSearchLogParams, SearchLogParams } from '../../state/audit-log/search-log-params';
 import './AuditLogDetailsForm.scss';
 import AuditLogDetailsPage from './AuditLogDetailsPage';
 
@@ -71,17 +72,7 @@ const columns: GridColumn[] =
   ];
 
 function AuditLogPage() {
-  const initState: SearchLogParams = {
-    date: format(new Date(), 'yyyy-MM-dd'),
-    requestMethod: '',
-    requestedUrlContains: '',
-    statusCode: '',
-    remoteIpContains: '',
-    hostContains: '',
-    userAgentContains: '',
-    queryStringContains: '',
-    userNameContains: '',
-  };
+  const initState: SearchLogParams = getDefaultSearchLogParams();
 
   const [dateError, setDateError ] = React.useState(false);  // malformed date indicator
   const [searchState, setSearchState] = React.useState<SearchLogParams>(initState);  // local form state
