@@ -118,7 +118,7 @@ describe('Dashboard User State Test', () => {
   const axiosRejectResponse = {
     response: {
       data: {
-        message: 'failed'
+        reason: 'failed'
       },
       status: 400,
       statusText: 'OK',
@@ -128,7 +128,7 @@ describe('Dashboard User State Test', () => {
   };
 
   const rejectMsg = {
-    general: axiosRejectResponse.response.data.message
+    general: axiosRejectResponse.response.data.reason
   } as DataCrudFormErrors;
 
 
