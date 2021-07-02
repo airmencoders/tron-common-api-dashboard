@@ -35,7 +35,7 @@ const columns: GridColumn[] =
       field: 'parentOrganization',
       sortable: true,
       filter: true,
-      headerName: 'Parent Org Id',
+      headerName: 'Parent Org',
       filterParams: createDefaultGridFilterParamsForType('uuid')
     }),
     new GridColumn({
