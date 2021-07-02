@@ -132,7 +132,6 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
     event.preventDefault();
     // Handles adding
     if (props.formActionType === FormActionType.ADD) {
-      console.log(formState.get());
       props.onSubmit(formState.get());
       return;
     }
