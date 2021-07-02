@@ -21,6 +21,7 @@ import { OrganizationPatchRequestType } from './organization-patch-request-type'
 import { ResponseType } from '../data-service/response-type';
 import { OrganizationEditState } from '../../pages/Organization/organization-edit-state';
 import { OrganizationChooserDataType } from './organization-chooser-data-type';
+import ItemChooser from '../../components/ItemChooser/ItemChooser';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -98,9 +99,19 @@ export default class OrganizationService extends AbstractDataService<Organizatio
             return resp.data.data;
           });
       } else {
-        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
-          .then(resp => {
-            return resp.data.data;
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, "id,firstName,lastName", "id,name", page, limit, sort)
+          .then(resp => {  
+            
+            // what we really get is an OrganizationWithDetails since we specified people and org fields to return
+            //  but here we take what we need from it and conform it to the "shape" of an OrganizationDto
+            return resp.data.data.map((item : any) => { 
+              return {...item, 
+                leader: `${item.leader?.firstName ?? ''} ${item.leader?.lastName ?? ''}`.trim(),  // build leader name
+                members: item.members?.map((member : any) => member.id),  // just grab member id as it normally would be returned
+                subordinateOrganizations: item.subordinateOrganizations?.map((org : any) => org.id), // just take id here
+                parentOrganization: item.parentOrganization?.name ?? '',  // take parent org name             
+              } as OrganizationDto; 
+            });
           });
       }
     } catch (err) {
