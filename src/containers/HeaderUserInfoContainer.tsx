@@ -8,9 +8,11 @@ function HeaderUserInfoContainer() {
   useEffect(() => {
     const cancellableFetch = state.fetchAndStoreUserInfo();
 
+    /**
+     * Cancel any pending request
+     */
     return function cleanup() {
-      if (cancellableFetch.isPromised)
-        cancellableFetch.cancel();
+      cancellableFetch.cancelTokenSource.cancel();
     }
   }, []);
 

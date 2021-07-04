@@ -4,14 +4,14 @@ import {UserInfoControllerApiInterface} from '../../openapi';
 import {UserInfoState} from './user-info-state';
 import Config from '../../api/config';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { CancellablePromise } from '../../utils/cancellable-promise';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
+
 
 export default class UserInfoService {
-
   constructor(private state: State<UserInfoState>,
               private userInfoApi: UserInfoControllerApiInterface) { }
 
-  fetchAndStoreUserInfo(): CancellablePromise<UserInfoState> {
+  fetchAndStoreUserInfo(): CancellableDataRequest<UserInfoDto> {
     const requestOptions: any = {};
     // This supports local development and dev token
     if (Config.ACCESS_TOKEN != null) {
@@ -20,7 +20,8 @@ export default class UserInfoService {
       }
     }
 
-    const cancellablePromise = new CancellablePromise(this.userInfoApi.getUserInfo(requestOptions)
+    const wrappedCancellableRequest = makeCancellableDataRequest(this.userInfoApi.getUserInfo.bind(this.userInfoApi), requestOptions);
+    const statePromise = wrappedCancellableRequest.axiosPromise
       .then(response => {
         const userInfo = response.data;
         const result = {
@@ -30,28 +31,24 @@ export default class UserInfoService {
 
         return result;
       })
-    );
-
-    cancellablePromise
-      .promise
-      .then(response => {
-        this.state.set(response);
-      })
-      .catch(({ isCanceled, ...error }) => {
-        // The promise was canceled... don't set the state
-        if (isCanceled == true) {
-          return;
+      .catch(error => {
+        /**
+         * Promise was cancelled.
+         * Return default state value.
+         */
+        if (isDataRequestCancelError(error)) {
+          return {};
         }
 
-        const result = {
+        return {
           error: prepareRequestError(error),
           userInfo: undefined
         } as UserInfoState;
-
-        this.state.set(result);
       });
 
-    return cancellablePromise;
+    this.state.set(statePromise);
+
+    return wrappedCancellableRequest;
   }
 
   get isPromised(): boolean {

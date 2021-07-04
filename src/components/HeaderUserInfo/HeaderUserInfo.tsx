@@ -94,7 +94,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
     return function cleanup() {
       isMounted = false;
     }
-  }, []);
+  }, [userInfo]);
 
   async function userEditorSubmitModal() {
     try {
