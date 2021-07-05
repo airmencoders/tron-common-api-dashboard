@@ -4,13 +4,17 @@ import axios, { AxiosPromise, CancelTokenSource } from 'axios';
  * @member axiosPromise the axios promise
  * @member cancelTokenSource axios cancel token source
  */
-export interface CancellableDataRequest<T> {
-  axiosPromise: AxiosPromise<T>;
+export interface CancellableAxiosDataRequest<T> {
+  axiosPromise: () => AxiosPromise<T>;
   cancelTokenSource: CancelTokenSource;
 }
 
+export interface CancellableDataRequest<T> {
+  promise: Promise<T>,
+  cancelTokenSource: CancelTokenSource
+}
+
 /**
- * 
  * Checks if the given {@link error} is an {@link axios} cancel exception
  * 
  * @param error the error to check against
@@ -22,12 +26,13 @@ export function isDataRequestCancelError(error: any) {
 
 /**
  * A function used to wrap an {@link axios} request generated from openapi generator to make it cancellable.
+ * The cancel token will be automatically generated.
  * 
  * @param request a function that generates the {@link axios} request. Typically will be an api function request generated from openapi generator
  * @param axiosRequestOptions an object containing {@link axios} request options
  * @returns the axios request and its associated cancel token
  */
-export function makeCancellableDataRequest<T>(request: (options: any) => AxiosPromise<T>, axiosRequestOptions: any): CancellableDataRequest<T> {
+export function makeCancellableDataRequestToken<T>(request: (options: any) => AxiosPromise<T>, axiosRequestOptions?: any): CancellableAxiosDataRequest<T> {
   const requestOptions: any = { ...axiosRequestOptions };
 
   const cancelToken = axios.CancelToken;
@@ -35,7 +40,26 @@ export function makeCancellableDataRequest<T>(request: (options: any) => AxiosPr
   requestOptions['cancelToken'] = source.token;
 
   return {
-    axiosPromise: request(requestOptions),
+    axiosPromise: () => request(requestOptions),
     cancelTokenSource: source
+  }
+}
+
+/**
+ * A function used to wrap an {@link axios} request generated from openapi generator to make it cancellable.
+ * The cancel token must be provided.
+ * 
+ * @param request a function that generates the {@link axios} request. Typically will be an api function request generated from openapi generator
+ * @param axiosRequestOptions an object containing {@link axios} request options
+ * @returns the axios request and its associated cancel token
+ */
+export function makeCancellableDataRequest<T>(cancelTokenSource: CancelTokenSource, request: (options: any) => AxiosPromise<T>, axiosRequestOptions?: any,): CancellableAxiosDataRequest<T> {
+  const requestOptions: any = { ...axiosRequestOptions };
+
+  requestOptions['cancelToken'] = cancelTokenSource.token;
+
+  return {
+    axiosPromise: () => request(requestOptions),
+    cancelTokenSource: cancelTokenSource
   }
 }

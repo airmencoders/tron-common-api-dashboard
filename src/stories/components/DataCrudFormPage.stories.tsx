@@ -3,7 +3,7 @@ import {DataCrudFormPage} from '../../components/DataCrudFormPage/DataCrudFormPa
 import {Meta, Story} from '@storybook/react';
 import {DataCrudFormPageProps} from '../../components/DataCrudFormPage/DataCrudFormPageProps';
 import {DataService} from '../../state/data-service/data-service';
-import { createState, postpone, State, useState } from '@hookstate/core';
+import { postpone, State, useState } from '@hookstate/core';
 import GridColumn from '../../components/Grid/GridColumn';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Label from '../../components/forms/Label/Label';
@@ -17,6 +17,8 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 
 import '../../App.scss';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
+import axios from 'axios';
+import { CancellableDataRequest } from '../../utils/cancellable-data-request';
 
 export default {
   title: 'Data Crud Form Page',
@@ -69,8 +71,11 @@ class MockDataService implements DataService<MockRow, MockDto> {
 
   }
 
-  fetchAndStoreData(): Promise<MockRow[]> {
-    return Promise.resolve([]);
+  fetchAndStoreData(): CancellableDataRequest<MockRow[]> {
+    return {
+      promise: Promise.resolve([]),
+      cancelTokenSource: axios.CancelToken.source()
+    }
   }
 
   sendCreate(toCreate: MockDto): Promise<MockRow> {

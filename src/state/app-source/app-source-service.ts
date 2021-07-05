@@ -12,6 +12,8 @@ import Config from '../../api/config';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
+import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 
 /**
  * PII WARNING:
@@ -27,20 +29,16 @@ export default class AppSourceService implements DataService<AppSourceDto, AppSo
     this.validate = TypeValidation.validatorFor<AppSourceDetailsDto>(ModelTypes.definitions.AppSourceDetailsDto);
   }
 
-  fetchAndStoreData(): Promise<AppSourceDto[]> {
-    const data = new Promise<AppSourceDto[]>(async (resolve, reject) => {
-      try {
-        const result = await this.appSourceApi.getAppSourcesWrapped();
+  fetchAndStoreData(): CancellableDataRequest<AppSourceDto[]> {
+    const cancellableRequest = makeCancellableDataRequestToken(this.appSourceApi.getAppSourcesWrapped.bind(this.appSourceApi));
+    const requestPromise = wrapDataCrudWrappedRequest(cancellableRequest.axiosPromise());
 
-        resolve(result.data.data);
-      } catch (err) {
-        reject(err);
-      }
-    });
+    this.state.set(requestPromise);
 
-    this.state.set(data);
-
-    return data;
+    return {
+      promise: requestPromise,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   fetchAppClients(): Promise<AppClientSummaryDto[]> {

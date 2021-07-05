@@ -3,9 +3,10 @@ import { AxiosResponse } from 'axios';
 import Config from '../../../api/config';
 import { Configuration, HttpLogDtoPaginationResponseWrapper, HttpLogEntryDto, HttpLogsControllerApi } from '../../../openapi';
 import AuditLogService from '../audit-log-service';
-import { httpLogApi, SearchLogParams, wrapState } from '../audit-log-state';
+import { httpLogApi, wrapState } from '../audit-log-state';
+import { SearchLogParams } from '../search-log-params';
 
-describe('Dashboard User State Test', () => {
+describe('Audit Log Service Test', () => {
   let auditLogState: State<HttpLogEntryDto[]> & StateMethodsDestroy;
   let auditLogApi: HttpLogsControllerApi = new HttpLogsControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));;
   let searchParamsState: State<SearchLogParams> & StateMethodsDestroy;
@@ -40,7 +41,7 @@ describe('Dashboard User State Test', () => {
   });
 
   it('Test fetch and store', async () => {
-    expect(service.fetchAndStoreData()).rejects.toMatch(/Cannot/);   
+    expect(() => service.fetchAndStoreData()).toThrow();
   });
 
   it('Test sendUpdate', async () => {

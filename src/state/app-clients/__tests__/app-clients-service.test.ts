@@ -4,6 +4,7 @@ import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-cr
 import { AppClientUserDetailsDto, AppClientUserDtoResponseWrapped, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import { PrivilegeType } from '../../privilege/privilege-type';
 import { AppClientFlat } from '../app-client-flat';
 import AppClientsService from '../app-clients-service';
@@ -183,7 +184,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve(axiosGetResponse));
     });
 
-    await wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
+    await cancellableRequest.promise;
     expect(wrappedState.appClients).toEqual(flatClients);
   });
 
@@ -198,10 +200,10 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => setTimeout(() => resolve(axiosGetResponse), 200));
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.appClients).toEqual([]);
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(wrappedState.appClients).toEqual(flatClients);
   });
 
@@ -217,8 +219,10 @@ describe('App Client State Tests', () => {
     const fetch = wrappedState.fetchAndStoreData();
     expect(wrappedState.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual(rejectMsg);
-    expect(wrappedState.error).toEqual(rejectMsg);
+    const errorRequest = prepareDataCrudErrorResponse(axiosRejectResponse);
+
+    await expect(fetch.promise).rejects.toEqual(errorRequest);
+    expect(wrappedState.error).toEqual(errorRequest);
   });
 
   it('Test sendUpdate', async () => {

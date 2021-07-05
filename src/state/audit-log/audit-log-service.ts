@@ -6,6 +6,7 @@ import TypeValidation from '../../utils/TypeValidation/type-validation';
 import { AbstractDataService } from '../data-service/abstract-data-service';
 import isEqual from 'fast-deep-equal';
 import { getDefaultSearchLogParams, SearchLogParams } from './search-log-params';
+import { CancellableDataRequest } from '../../utils/cancellable-data-request';
 
 export default class AuditLogService extends AbstractDataService<HttpLogEntryDto, HttpLogEntryDetailsDto> {
   private readonly validate: ValidateFunction<HttpLogEntryDto>;
@@ -20,8 +21,8 @@ export default class AuditLogService extends AbstractDataService<HttpLogEntryDto
     this.validateDetails = TypeValidation.validatorFor<HttpLogEntryDetailsDto>(ModelTypes.definitions.HttpLogEntryDetailsDto);
   }
 
-  async fetchAndStoreData(): Promise<HttpLogEntryDto[]> {        
-    return Promise.reject("Cannot fetch data");
+  fetchAndStoreData(): CancellableDataRequest<HttpLogEntryDto[]> {
+    throw new Error("Cannot fetch data");
   }
 
   /**

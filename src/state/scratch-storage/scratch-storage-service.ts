@@ -1,7 +1,9 @@
 import { none, postpone, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
-import { PrivilegeDto, PrivilegeDtoResponseWrapper, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, ScratchStorageEntryDto, UserWithPrivs } from '../../openapi';
+import { PrivilegeDto, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, ScratchStorageEntryDto, UserWithPrivs } from '../../openapi';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { DataService } from '../data-service/data-service';
+import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { ScratchStorageFlat } from './scratch-storage-flat';
 import { ScratchStorageUserWithPrivsFlat } from './scratch-storage-user-with-privs-flat';
@@ -19,30 +21,39 @@ export default class ScratchStorageService implements DataService<ScratchStorage
 
   sendPatch = undefined;
 
-  async fetchAndStoreData(): Promise<ScratchStorageAppRegistryDto[]> {
+  fetchAndStoreData(): CancellableDataRequest<ScratchStorageAppRegistryDto[]> {
     const response = (): AxiosPromise<ScratchStorageAppRegistryDtoResponseWrapper> => this.scratchStorageApi.getScratchSpaceAppsWrapped();
-    const privilegeResponse = (): AxiosPromise<PrivilegeDtoResponseWrapper> => this.scratchStorageApi.getScratchPrivsWrapped();
+    const privilegeResponse = makeCancellableDataRequestToken(this.scratchStorageApi.getScratchPrivsWrapped.bind(this.scratchStorageApi));
 
     const data = new Promise<ScratchStorageAppRegistryDto[]>(async (resolve, reject) => {
       try {
-        const scratchPrivs = await privilegeResponse();
+        const scratchPrivs = await privilegeResponse.axiosPromise();
         this.privilegeState.set(scratchPrivs.data.data);
 
         const result = await response();
-        const mappedData = result.data?.data?.map(x => {
-          x.userPrivs = undefined;
-          return x;
-        }) || [];
-        resolve(result.data?.data);
-        this.state.set(mappedData);
+        resolve(this.removeUnfriendlyAgGridData(result.data.data));
       } catch (err) {
-        reject(err);
+        if (isDataRequestCancelError(err)) {
+          return [];
+        }
+
+        reject(prepareDataCrudErrorResponse(err));
       }
     });
 
     this.state.set(data);
 
-    return data;
+    return {
+      promise: data,
+      cancelTokenSource: privilegeResponse.cancelTokenSource
+    };
+  }
+
+  removeUnfriendlyAgGridData(data: ScratchStorageAppRegistryDto[]) {
+    return data.map(x => {
+      x.userPrivs = undefined;
+      return x;
+    });
   }
 
   async convertRowDataToEditableData(rowData: ScratchStorageAppRegistryDto): Promise<ScratchStorageFlat> {

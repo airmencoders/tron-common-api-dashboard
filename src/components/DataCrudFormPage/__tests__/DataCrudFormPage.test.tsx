@@ -11,6 +11,9 @@ import { ToastContainer } from '../../Toast/ToastContainer/ToastContainer';
 import { PatchResponse } from '../../../state/data-service/patch-response';
 import { ResponseType } from '../../../state/data-service/response-type';
 import { FilterDto } from '../../../openapi';
+import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
+import axios from 'axios';
+import { CancellableDataRequest } from '../../../state/data-service/cancellable-data-request';
 
 interface TestRow {
   id: string;
@@ -28,13 +31,18 @@ class TestDataService implements DataService<TestRow, TestDto> {
 
   constructor(public state: State<TestRow[]>) { }
 
-  fetchAndStoreData():Promise<TestRow[]> {
+  fetchAndStoreData(): CancellableDataRequest<TestRow[]> {
     const initData = [
       { id: '0', val: 'val0'},
       { id: '1', val: 'val1'},
     ];
     this.state.set(initData);
-    return Promise.resolve(initData);
+
+    const axiosResponse = createAxiosSuccessResponse(initData);
+    return {
+      promise: Promise.resolve(axiosResponse.data),
+      cancelTokenSource: axios.CancelToken.source()
+    };
   }
 
   fetchAndStorePaginatedData(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<TestRow[]> {
@@ -98,13 +106,18 @@ class TestDataErrorService implements DataService<TestRow, TestDto> {
 
   constructor(public state: State<TestRow[]>) { }
 
-  fetchAndStoreData():Promise<TestRow[]> {
+  fetchAndStoreData(): CancellableDataRequest<TestRow[]> {
     const initData = [
       { id: '0', val: 'val0'},
       { id: '1', val: 'val1'},
     ];
     this.state.set(initData);
-    return Promise.resolve(initData);
+
+    const axiosResponse = createAxiosSuccessResponse(initData);
+    return {
+      promise: Promise.resolve(axiosResponse.data),
+      cancelTokenSource: axios.CancelToken.source()
+    };
   }
 
   sendUpdate(toUpdate: TestDto): Promise<TestRow> {
@@ -154,13 +167,18 @@ class TestDataRequestErrorService implements DataService<TestRow, TestDto> {
 
   constructor(public state: State<TestRow[]>) { }
 
-  fetchAndStoreData(): Promise<TestRow[]> {
+  fetchAndStoreData(): CancellableDataRequest<TestRow[]> {
     const initData = [
       { id: '0', val: 'val0' },
       { id: '1', val: 'val1' },
     ];
     this.state.set(initData);
-    return Promise.resolve(initData);
+
+    const axiosResponse = createAxiosSuccessResponse(initData);
+    return {
+      promise: Promise.resolve(axiosResponse.data),
+      cancelTokenSource: axios.CancelToken.source()
+    };
   }
 
   sendUpdate(toUpdate: TestDto): Promise<TestRow> {

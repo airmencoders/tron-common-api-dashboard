@@ -1,10 +1,9 @@
 import { none, postpone, State } from '@hookstate/core';
-import { AxiosPromise } from 'axios';
-import { SubscriberControllerApiInterface, SubscriberDtoResponseWrapper } from '../../openapi';
-import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi/models/subscriber-dto';
-import AppClientsService from '../app-clients/app-clients-service';
-import { accessAppClientsState } from '../app-clients/app-clients-state';
+import { SubscriberControllerApiInterface } from '../../openapi';
+import { SubscriberDto } from '../../openapi/models/subscriber-dto';
+import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { DataService } from '../data-service/data-service';
+import { wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 
 export default class PubSubService implements DataService<SubscriberDto, SubscriberDto> {
 
@@ -13,22 +12,16 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
     private pubSubApi: SubscriberControllerApiInterface) {
   }
 
-  async fetchAndStoreData(): Promise<SubscriberDto[]> {
-    try {
-      await accessAppClientsState().fetchAndStoreData();
-      const response = await this.pubSubApi.getAllSubscriptionsWrapped()
-          .then(resp => {
-            return resp.data.data;
-          })
-          .catch(err => []);
+  fetchAndStoreData(): CancellableDataRequest<SubscriberDto[]> {
+    const cancellableRequest = makeCancellableDataRequestToken(this.pubSubApi.getAllSubscriptionsWrapped.bind(this.pubSubApi));
+    const requestPromise = wrapDataCrudWrappedRequest(cancellableRequest.axiosPromise());
 
-      this.state.set(response ?? []);
-      return response ?? [];
-    }
-    catch (e) {
-      this.state.set([]);
-      return [];
-    }
+    this.state.set(requestPromise);
+
+    return {
+      promise: requestPromise,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   convertRowDataToEditableData(rowData: SubscriberDto): Promise<SubscriberDto> {

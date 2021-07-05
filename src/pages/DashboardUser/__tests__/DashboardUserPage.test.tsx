@@ -16,7 +16,7 @@ import {
 import { useDashboardUserState } from '../../../state/dashboard-user/dashboard-user-state';
 import DashboardUserService from '../../../state/dashboard-user/dashboard-user-service';
 import Config from '../../../api/config';
-import { usePrivilegeState } from '../../../state/privilege/privilege-state';
+import { accessPrivilegeState } from '../../../state/privilege/privilege-state';
 import PrivilegeService from '../../../state/privilege/privilege-service';
 import { AxiosResponse } from 'axios';
 import { PrivilegeType } from '../../../state/privilege/privilege-type';
@@ -40,7 +40,7 @@ describe('Test Dashboard User Page', () => {
   ];
 
   function mockPrivilegesState() {
-    (usePrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
+    (accessPrivilegeState as jest.Mock).mockReturnValue(new PrivilegeService(privilegeState, privilegeApi));
     privilegeApi.getPrivilegesWrapped = jest.fn(() => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve({
         data: { data: privilegDtos },
