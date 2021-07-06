@@ -13,7 +13,7 @@ import { ResponseType } from '../../../state/data-service/response-type';
 import { FilterDto } from '../../../openapi';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import axios from 'axios';
-import { CancellableDataRequest } from '../../../state/data-service/cancellable-data-request';
+import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 
 interface TestRow {
   id: string;

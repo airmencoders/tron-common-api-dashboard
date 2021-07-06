@@ -248,12 +248,8 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

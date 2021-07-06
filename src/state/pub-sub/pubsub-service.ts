@@ -89,12 +89,8 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

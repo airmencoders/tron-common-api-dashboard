@@ -97,13 +97,12 @@ export default class AuditLogService extends AbstractDataService<HttpLogEntryDto
   sendPatch: undefined;
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
+    }
+
+    if (!this.searchParamsState.promised) {
       this.searchParamsState.set(getDefaultSearchLogParams());
-    });
+    }
   }
 }

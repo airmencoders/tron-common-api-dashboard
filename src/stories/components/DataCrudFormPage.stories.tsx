@@ -127,13 +127,9 @@ class MockDataService implements DataService<MockRow, MockDto> {
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }
 
