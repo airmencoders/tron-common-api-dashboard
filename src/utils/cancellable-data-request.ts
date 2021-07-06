@@ -33,16 +33,9 @@ export function isDataRequestCancelError(error: any) {
  * @returns the axios request and its associated cancel token
  */
 export function makeCancellableDataRequestToken<T>(request: (options: any) => AxiosPromise<T>, axiosRequestOptions?: any): CancellableAxiosDataRequest<T> {
-  const requestOptions: any = { ...axiosRequestOptions };
+  const cancelToken = axios.CancelToken.source();
 
-  const cancelToken = axios.CancelToken;
-  const source = cancelToken.source();
-  requestOptions['cancelToken'] = source.token;
-
-  return {
-    axiosPromise: () => request(requestOptions),
-    cancelTokenSource: source
-  }
+  return makeCancellableDataRequest(cancelToken, request, axiosRequestOptions);
 }
 
 /**
