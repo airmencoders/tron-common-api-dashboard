@@ -19,7 +19,7 @@ const existingOrg: OrganizationDto = {
   name: 'existing',
   members: ['an id'],
   parentOrganization: 'parent org',
-  subordinateOrganizations: new Set(['sub org']),
+  subordinateOrganizations: ['sub org'],
   leader: originalLeader.id,
   branchType: OrganizationDtoBranchTypeEnum.Usaf,
   orgType: OrganizationDtoOrgTypeEnum.Squadron

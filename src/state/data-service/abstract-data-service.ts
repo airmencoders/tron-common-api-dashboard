@@ -1,6 +1,7 @@
-import { postpone, State } from '@hookstate/core';
+import { State } from '@hookstate/core';
 import { GridRowData } from '../../components/Grid/grid-row-data';
 import { FilterDto } from '../../openapi';
+import { CancellableDataRequest } from '../../utils/cancellable-data-request';
 import { DataService } from './data-service';
 import { PatchResponse } from './patch-response';
 
@@ -9,7 +10,7 @@ export abstract class AbstractDataService<T extends GridRowData, R> implements D
 
   }
 
-  abstract fetchAndStoreData(): Promise<T[]>;
+  abstract fetchAndStoreData(): CancellableDataRequest<T[]>;
   abstract fetchAndStorePaginatedData?(page: number, limit: number, checkDuplicates?: boolean, filter?: FilterDto, sort?: string[]): Promise<T[]>;
   abstract sendUpdate(toUpdate: R): Promise<T>;
   abstract sendCreate(toCreate: R): Promise<T>;
@@ -26,13 +27,9 @@ export abstract class AbstractDataService<T extends GridRowData, R> implements D
   }
 
   resetState(): void {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 
   /**

@@ -16,12 +16,22 @@ const testPerson: PersonDto = {
 
 class MockPersonService extends PersonService {
 
-  fetchRankForBranch(branch: string) {
-    this.rankState.set(ranks => Promise.resolve({
-      [branch]: [
-        { abbreviation: 'TEST RANK' }
-      ] as Rank[]
-    }))
+  fetchRankForBranch(branch: string): Promise<Rank[]> | undefined {
+    const ranks = [
+      { abbreviation: 'TEST RANK' }
+    ] as Rank[];
+
+    const promise = Promise.resolve(ranks);
+
+    this.rankState.set(ranks => {
+      return promise.then(res => {
+        return {
+          [branch]: res
+        }
+      });
+    });
+
+    return promise;
   }
 }
 

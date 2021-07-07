@@ -4,7 +4,8 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { HttpLogEntryDto, HttpLogsControllerApi } from '../../../openapi';
 import AuditLogService from '../../../state/audit-log/audit-log-service';
-import { SearchLogParams, useAuditLogState } from '../../../state/audit-log/audit-log-state';
+import { useAuditLogState } from '../../../state/audit-log/audit-log-state';
+import { getDefaultSearchLogParams, SearchLogParams } from '../../../state/audit-log/search-log-params';
 import AuditLogPage from '../AuditLogPage';
 
 jest.mock('../../../state/audit-log/audit-log-state');
@@ -16,6 +17,7 @@ describe('Test Audit Log Page', () => {
 
   beforeEach(() => {
     auditLogState = createState<HttpLogEntryDto[]>(new Array<HttpLogEntryDto>());
+    searchParamLogState = createState<SearchLogParams>(getDefaultSearchLogParams());
     auditLogSourceApi = new HttpLogsControllerApi();
   });
 
@@ -88,7 +90,6 @@ describe('Test Audit Log Page', () => {
       fireEvent.change(statusCodeInput, {target: {value: '200'}});
       expect(statusCodeInput.value).toBe('200');
     });
-
   });
 
   it ('should error for incorrect date format', async () => {

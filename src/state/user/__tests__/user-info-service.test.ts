@@ -1,12 +1,15 @@
 import UserInfoService from '../user-info-serivce';
-import {createState} from '@hookstate/core';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import {UserInfoState} from '../user-info-state';
 import {UserInfoControllerApi, UserInfoDto} from '../../../openapi';
 import {AxiosResponse} from 'axios';
+import { createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 
 describe('User Info Service Tests', () => {
 
   let userInfoApi: UserInfoControllerApi;
+  let state: State<UserInfoState> & StateMethodsDestroy;
 
   const mockAxiosUserInfo: AxiosResponse<UserInfoDto> = {
     config: {}, headers: undefined, status: 200, statusText: '',
@@ -23,6 +26,10 @@ describe('User Info Service Tests', () => {
 
   beforeEach(() => {
     userInfoApi = new UserInfoControllerApi();
+    state = createState<UserInfoState>({
+      error: undefined,
+      userInfo: undefined
+    });
 
     userInfoApi.getUserInfo = jest.fn(() => {
       return new Promise<AxiosResponse<UserInfoDto>>( resolve => {
@@ -31,20 +38,16 @@ describe('User Info Service Tests', () => {
     })
   })
 
+  afterEach(() => {
+    state.destroy();
+  });
+
   it('should be created', () => {
-    const initState = createState<UserInfoState>({
-      error: undefined,
-      userInfo: undefined
-    });
-    const service = new UserInfoService(initState, userInfoApi);
+    const service = new UserInfoService(state, userInfoApi);
     expect(service).toBeTruthy();
   })
 
   it('should provide the promised state', () => {
-    const state = createState<UserInfoState>({
-      error: undefined,
-      userInfo: undefined
-    });
     userInfoApi.getUserInfo = jest.fn(() => {
       return new Promise<AxiosResponse<UserInfoDto>>(resolve => {
         setTimeout(() =>
@@ -56,11 +59,7 @@ describe('User Info Service Tests', () => {
     expect(service.isPromised).toBeTruthy();
   });
 
-  it ('should provide user info after returned from the service', async () => {
-    const state = createState<UserInfoState>({
-      error: undefined,
-      userInfo: undefined
-    });
+  it('should provide user info after returned from the service', async () => {
     const service = new UserInfoService(state, userInfoApi);
     service.fetchAndStoreUserInfo();
     const flushPromises = () => new Promise(setImmediate);
@@ -70,14 +69,13 @@ describe('User Info Service Tests', () => {
     expect(service.userInfo?.name).toEqual('name');
   });
 
-  it ('should show have an error on the state if an error is returned from the service', async () => {
-    const state = createState<UserInfoState>({
-      error: undefined,
-      userInfo: undefined
-    });
+  it('should show have an error on the state if an error is returned from the service', async () => {
+    const axiosRequestError = createGenericAxiosRequestErrorResponse();
+    const requestError = prepareRequestError(axiosRequestError);
+
     userInfoApi.getUserInfo = jest.fn( () => {
       return new Promise<AxiosResponse<UserInfoDto>>((resolve, reject) => {
-        reject('Error');
+        reject(axiosRequestError);
       });
     });
     const service = new UserInfoService(state, userInfoApi);
@@ -86,6 +84,6 @@ describe('User Info Service Tests', () => {
     const flushPromises = () => new Promise(setImmediate);
     await flushPromises();
 
-    expect(service.error).toEqual('Error');
+    expect(service.error).toEqual(requestError);
   });
 });

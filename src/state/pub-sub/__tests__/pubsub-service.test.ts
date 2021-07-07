@@ -129,9 +129,10 @@ describe('Subscriber State Test', () => {
     });
     mockAppClientsState();
     
-    const fetch = await state.fetchAndStoreData();
-    expect(fetch).toEqual(subscribers);
-   
+    const cancellableRequest = state.fetchAndStoreData();
+    const data = await cancellableRequest.promise;
+
+    expect(data).toEqual(subscribers);
   });
 
   it('Test sendUpdate Success', async () => {

@@ -1,25 +1,31 @@
 import { State } from "@hookstate/core";
-import { AxiosPromise } from "axios";
-import { PrivilegeDtoResponseWrapper } from '../../openapi';
 import { PrivilegeControllerApiInterface } from "../../openapi/apis/privilege-controller-api";
 import { PrivilegeDto } from "../../openapi/models/privilege-dto";
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { PrivilegeType } from "./privilege-type";
 
 export default class PrivilegeService {
   constructor(private state: State<PrivilegeDto[]>, private privilegeApi: PrivilegeControllerApiInterface) { }
-  fetchAndStorePrivileges(): Promise<PrivilegeDto[]> {
-    const response = (): AxiosPromise<PrivilegeDtoResponseWrapper> => this.privilegeApi.getPrivilegesWrapped();
+  fetchAndStorePrivileges(): CancellableDataRequest<PrivilegeDto[]> {
+    const cancellableRequest = makeCancellableDataRequestToken(this.privilegeApi.getPrivilegesWrapped.bind(this.privilegeApi));
 
-    const data = new Promise<PrivilegeDto[]>((resolve, reject) =>
-        response()
-            .then(r => resolve(r.data?.data))
-            .catch(err =>
-                reject(err)
-            )
-    );
-    this.state.set(data);
+    const request = cancellableRequest.axiosPromise()
+      .then(r => r.data?.data)
+      .catch(err => {
+        if (isDataRequestCancelError(err)) {
+          return [];
+        }
 
-    return data;
+        return Promise.reject(prepareRequestError(err));
+      });
+
+    this.state.set(request);
+
+    return {
+      promise: request,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   convertDtoToEntity(privilege: PrivilegeDto): PrivilegeDto {

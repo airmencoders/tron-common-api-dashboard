@@ -1,14 +1,14 @@
-import { none, postpone, State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
-import { AxiosPromise } from 'axios';
 import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
-import { DashboardUserDtoResponseWrapper, PrivilegeDto } from '../../openapi';
+import { PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
 
 /**
  * PII WARNING:
@@ -24,15 +24,15 @@ export default class DashboardUserService implements DataService<DashboardUserFl
               private dashboardUserApi: DashboardUserControllerApiInterface,
               private dashboardUserDtoCache: State<Record<string, DashboardUserDto>>) { }
 
-  fetchAndStoreData(): Promise<DashboardUserFlat[]> {
+  fetchAndStoreData(): CancellableDataRequest<DashboardUserFlat[]> {
     this.dashboardUserDtoCache.set({});
-    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
-    const response = (): AxiosPromise<DashboardUserDtoResponseWrapper> => this.dashboardUserApi.getAllDashboardUsersWrapped();
+    const privilegeRequest = accessPrivilegeState().fetchAndStorePrivileges();
+    const response = makeCancellableDataRequest(privilegeRequest.cancelTokenSource, this.dashboardUserApi.getAllDashboardUsersWrapped.bind(this.dashboardUserApi));
 
     const data = new Promise<DashboardUserFlat[]>(async (resolve, reject) => {
       try {
-        await privilegeResponse();
-        const result = await response();
+        await privilegeRequest.promise;
+        const result = await response.axiosPromise();
         const dashboardUserDtos = result.data.data;
         // cache dashboard user map
         const cacheUpdate: Record<string, DashboardUserDto> = {};
@@ -43,14 +43,21 @@ export default class DashboardUserService implements DataService<DashboardUserFl
         }
         this.dashboardUserDtoCache.set(cacheUpdate);
         resolve(this.convertDashboardUsersToFlat(dashboardUserDtos));
-      } catch (err) {
-        reject(prepareDataCrudErrorResponse(err));
+      } catch (error) {
+        if (isDataRequestCancelError(error)) {
+          return [];
+        }
+
+        reject(prepareDataCrudErrorResponse(error));
       }
     });
 
     this.state.set(data);
 
-    return data;
+    return {
+      promise: data,
+      cancelTokenSource: response.cancelTokenSource
+    };
   }
 
   convertDashboardUsersToFlat(users: DashboardUserDto[]): DashboardUserFlat[] {
@@ -180,12 +187,8 @@ export default class DashboardUserService implements DataService<DashboardUserFl
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

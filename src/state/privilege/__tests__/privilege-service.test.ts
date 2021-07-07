@@ -2,6 +2,8 @@ import { createState, State, StateMethodsDestroy } from "@hookstate/core";
 import { AxiosResponse } from "axios";
 import Config from "../../../api/config";
 import { Configuration, PrivilegeControllerApi, PrivilegeControllerApiInterface, PrivilegeDto, PrivilegeDtoResponseWrapper } from "../../../openapi";
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
+import { createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
 import PrivilegeService from "../privilege-service";
 
 describe('Privilege Service', () => {
@@ -45,7 +47,8 @@ describe('Privilege Service', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
-    await state.fetchAndStorePrivileges();
+    const cancellableRequest = state.fetchAndStorePrivileges();
+    await cancellableRequest.promise;
 
     expect(state.privileges).toEqual(privilegeDtos);
   });
@@ -64,19 +67,22 @@ describe('Privilege Service', () => {
   });
 
   it('Test error', async () => {
+    const axiosErrorRequest = createGenericAxiosRequestErrorResponse();
+
     privilegeApi.getPrivilegesWrapped = jest.fn(() => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>((resolve, reject) => {
         setTimeout(() => {
-          reject("Rejected")
+          reject(axiosErrorRequest)
         }, 1000)
       });
     });
 
-    const fetch = state.fetchAndStorePrivileges();
+    const cancellableRequest = state.fetchAndStorePrivileges();
     expect(state.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual("Rejected");
-    expect(state.error).toBe("Rejected");
+    const requestError = prepareRequestError(axiosErrorRequest);
+    await expect(cancellableRequest.promise).rejects.toEqual(requestError);
+    expect(state.error).toEqual(requestError);
   });
 
   it('Test privileges', async () => {
@@ -84,10 +90,10 @@ describe('Privilege Service', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
     });
 
-    const fetch = state.fetchAndStorePrivileges();
+    const cancellableRequest = state.fetchAndStorePrivileges();
     expect(state.privileges).toEqual([]);
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(state.privileges).toEqual(privilegeDtos);
   });
 
@@ -96,10 +102,10 @@ describe('Privilege Service', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => setTimeout(() => resolve(axiosGetResponse), 1000));
     });
 
-    const fetch = state.fetchAndStorePrivileges();
+    const cancellableRequest = state.fetchAndStorePrivileges();
     expect(state.isPromised).toBeTruthy();
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(state.isPromised).toBeFalsy();
   });
 
@@ -108,7 +114,8 @@ describe('Privilege Service', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
-    await state.fetchAndStorePrivileges();
+    const cancellableRequest = state.fetchAndStorePrivileges();
+    await cancellableRequest.promise;
 
     const testPrivilege = privilegeDtos[0];
     const privilege = state.createPrivilegeFromId(testPrivilege.id ?? -1);
@@ -122,7 +129,8 @@ describe('Privilege Service', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
-    await state.fetchAndStorePrivileges();
+    const cancellableRequest = state.fetchAndStorePrivileges();
+    await cancellableRequest.promise;
 
     let ids = [0];
 
@@ -135,5 +143,4 @@ describe('Privilege Service', () => {
     privileges = state.createPrivilegesFromIds(ids);
     expect(privileges.length).toEqual(0);
   });
-
 });

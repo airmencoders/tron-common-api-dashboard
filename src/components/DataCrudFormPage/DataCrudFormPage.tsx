@@ -29,6 +29,7 @@ import './DataCrudFormPage.scss';
 import { DataCrudFormPageProps } from './DataCrudFormPageProps';
 import { ResponseType } from '../../state/data-service/response-type';
 import { PatchResponse } from '../../state/data-service/patch-response';
+import { CancelTokenSource } from 'axios';
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -46,11 +47,14 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   const updateInfiniteCache = useState<boolean>(false);
 
   useEffect(() => {
+    let cancelTokenSource: CancelTokenSource | undefined = undefined;
     if (!infiniteScroll?.enabled) {
-      dataState.fetchAndStoreData();
+      const cancellableFetch = dataState.fetchAndStoreData();
+      cancelTokenSource = cancellableFetch.cancelTokenSource;
     }
 
     return function cleanup() {
+      cancelTokenSource?.cancel();
       dataState.resetState();
     }
   }, []);

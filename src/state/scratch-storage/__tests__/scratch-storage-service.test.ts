@@ -1,6 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { GenericStringArrayResponseWrapper, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface, ScratchStorageEntryDto, ScratchStorageEntryDtoResponseWrapper } from '../../../openapi';
+import { GenericStringArrayResponseWrapper, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApi, ScratchStorageControllerApiInterface, ScratchStorageEntryDto } from '../../../openapi';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import { ScratchStorageFlat } from '../scratch-storage-flat';
 import ScratchStorageService from '../scratch-storage-service';
 import { wrapState } from '../scratch-storage-state';
@@ -167,7 +168,8 @@ describe('scratch storage service tests', () => {
       return new Promise<AxiosResponse<ScratchStorageAppRegistryDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
-    const data = await wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
+    const data = await cancellableRequest.promise;
 
     expect(data).toEqual(dtos);
   });
@@ -187,11 +189,13 @@ describe('scratch storage service tests', () => {
       });
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const errorRequest = prepareDataCrudErrorResponse(rejectMsg);
+
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual(rejectMsg);
-    expect(wrappedState.error).toBe(rejectMsg);
+    await expect(cancellableRequest.promise).rejects.toEqual(errorRequest);
+    expect(wrappedState.error).toEqual(errorRequest);
   });
 
   it('Test sendUpdate', async () => {

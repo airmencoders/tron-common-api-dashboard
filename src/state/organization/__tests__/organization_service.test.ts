@@ -146,7 +146,8 @@ describe('Test OrganizationService', () => {
     const organizationService = new OrganizationService(organizationState,
       new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.fetchAndStoreData();
+    const cancellableRequest = organizationService.fetchAndStoreData();
+    const response = await cancellableRequest.promise;
     expect(response).toHaveLength(1);
   });
 
