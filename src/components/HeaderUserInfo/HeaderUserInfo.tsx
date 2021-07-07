@@ -86,7 +86,7 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
   async function userEditorSubmitModal() {
     try {
       userEditorState.disableSubmit.set(true);
-      const response = await personState.sendSelfUpdate(userEditorState.currentUserState.get());
+      await personState.sendSelfUpdate(userEditorState.currentUserState.get());
 
       userEditorCloseHandler();
       createTextToast(ToastType.SUCCESS, 'Successfully updated Person Record.');
