@@ -1,4 +1,4 @@
-import {postpone, State} from '@hookstate/core';
+import { State } from '@hookstate/core';
 import {AxiosPromise} from 'axios';
 import {DataService} from '../data-service/data-service';
 import {

@@ -1,4 +1,4 @@
-import { none, postpone, State } from "@hookstate/core";
+import { none, State } from "@hookstate/core";
 import { ValidateFunction } from 'ajv';
 import axios from 'axios';
 import ModelTypes from '../../api/model-types.json';

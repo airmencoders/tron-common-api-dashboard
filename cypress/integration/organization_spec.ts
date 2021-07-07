@@ -77,7 +77,7 @@ describe('Organization Tests', () => {
     createOrganizationAndFilterExists(orgToCreate);
 
     // Try to add existing and expect an error message
-    createOrgAndExpectError(orgToCreate, 'Request failed with status code 409');
+    createOrgAndExpectError(orgToCreate, `* Resource with the Name: ${orgToCreate.name} already exists`);
 
     // Cleanup the organization
     cy.get('button').contains('Cancel').click();

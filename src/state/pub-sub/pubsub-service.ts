@@ -1,9 +1,10 @@
-import { none, postpone, State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { SubscriberControllerApiInterface } from '../../openapi';
 import { SubscriberDto } from '../../openapi/models/subscriber-dto';
-import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
+import { accessAppClientsState } from '../app-clients/app-clients-state';
 import { DataService } from '../data-service/data-service';
-import { wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
+import { prepareDataCrudErrorResponse, wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 
 export default class PubSubService implements DataService<SubscriberDto, SubscriberDto> {
 
@@ -13,13 +14,30 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
   }
 
   fetchAndStoreData(): CancellableDataRequest<SubscriberDto[]> {
-    const cancellableRequest = makeCancellableDataRequestToken(this.pubSubApi.getAllSubscriptionsWrapped.bind(this.pubSubApi));
+    const appClientsRequest = accessAppClientsState().fetchAndStoreData();
+
+    const cancellableRequest = makeCancellableDataRequest(appClientsRequest.cancelTokenSource, this.pubSubApi.getAllSubscriptionsWrapped.bind(this.pubSubApi));
     const requestPromise = wrapDataCrudWrappedRequest(cancellableRequest.axiosPromise());
 
-    this.state.set(requestPromise);
+    const data = new Promise<SubscriberDto[]>(async (resolve, reject) => {
+      try {
+        await appClientsRequest.promise;
+        const result = await requestPromise;
+
+        resolve(result);
+      } catch (error) {
+        if (isDataRequestCancelError(error)) {
+          return [];
+        }
+
+        reject(prepareDataCrudErrorResponse(error));
+      }
+    });
+
+    this.state.set(data);
 
     return {
-      promise: requestPromise,
+      promise: data,
       cancelTokenSource: cancellableRequest.cancelTokenSource
     };
   }

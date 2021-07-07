@@ -1,4 +1,4 @@
-import { none, postpone, State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import { DashboardUserPrivilege } from './dashboard-user-privilege';

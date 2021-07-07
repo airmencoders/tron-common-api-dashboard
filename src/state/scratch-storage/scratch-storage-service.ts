@@ -1,4 +1,4 @@
-import { none, postpone, State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
 import { PrivilegeDto, PrivilegeIdPair, ScratchStorageAppRegistryDto, ScratchStorageAppRegistryDtoResponseWrapper, ScratchStorageControllerApiInterface, ScratchStorageEntryDto, UserWithPrivs } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';

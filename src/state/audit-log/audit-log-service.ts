@@ -1,4 +1,4 @@
-import { postpone, State } from '@hookstate/core';
+import { State } from '@hookstate/core';
 import { ValidateFunction } from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import { FilterDto, HttpLogEntryDetailsDto, HttpLogEntryDto, HttpLogsControllerApi } from '../../openapi';
