@@ -1,0 +1,39 @@
+@import "../../styles/base";
+
+.nested-sidebar-nav {
+  &__header {
+    .header {
+      &__link {
+        display: flex;
+        justify-content: space-between;
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      &__label {
+        color: #dddddd;
+        margin-bottom: 0;
+        &:hover {
+          color: $light-accent;
+        }
+      }
+      &__icon {
+        color: white;
+        margin-left: .5rem;
+      }
+    }
+  }
+  .sidebar-item__name {
+    font-size: 1rem;
+    margin-left: .2rem;
+  }
+
+  &__children {
+    height: 0px;
+    overflow: hidden;
+    &.opened {
+      padding-top: 1rem;
+      height: auto;
+    }
+  }
+}
