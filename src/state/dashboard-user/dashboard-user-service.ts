@@ -120,9 +120,16 @@ export default class DashboardUserService implements DataService<DashboardUserFl
   async sendCreate(toCreate: DashboardUserDto): Promise<DashboardUserFlat> {
     try {
       const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(toCreate);
-      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+      const newDashboardUser = dashboardUserResponse.data;
+      const dashboardUserFlat = this.convertToFlat(newDashboardUser);
 
       this.state[this.state.length].set(dashboardUserFlat);
+
+      if (newDashboardUser.id) {
+        this.dashboardUserDtoCache.merge({
+          [newDashboardUser.id]: newDashboardUser
+        });
+      }
 
       return Promise.resolve(dashboardUserFlat);
     }
@@ -137,10 +144,17 @@ export default class DashboardUserService implements DataService<DashboardUserFl
         return Promise.reject(new Error('Dashboard User to update has undefined id.'));
       }
       const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, toUpdate);
-      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+      const updatedDashboardUser = dashboardUserResponse.data;
+      const dashboardUserFlat = this.convertToFlat(updatedDashboardUser);
 
       const index = this.state.get().findIndex(item => item.id === dashboardUserFlat.id);
       this.state[index].set(dashboardUserFlat);
+
+      if (updatedDashboardUser.id) {
+        this.dashboardUserDtoCache.merge({
+          [updatedDashboardUser.id]: updatedDashboardUser
+        });
+      }
 
       return Promise.resolve(dashboardUserFlat);
     }
@@ -158,6 +172,8 @@ export default class DashboardUserService implements DataService<DashboardUserFl
       await this.dashboardUserApi.deleteDashboardUser(toDelete.id);
 
       this.state.find(item => item.id.get() === toDelete.id)?.set(none);
+
+      this.dashboardUserDtoCache[toDelete.id].set(none);
 
       return Promise.resolve();
     } catch (error) {
@@ -178,8 +194,8 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return this.state.promised;
   }
 
-  get dashboardUsers(): DashboardUserDto[] {
-    return !this.isStateReady() ? new Array<DashboardUserDto>() : this.state.get();
+  get dashboardUsers(): DashboardUserFlat[] {
+    return !this.isStateReady() ? [] : this.state.get();
   }
 
   get error(): any | undefined {
@@ -189,6 +205,10 @@ export default class DashboardUserService implements DataService<DashboardUserFl
   resetState() {
     if (!this.state.promised) {
       this.state.set([]);
+    }
+
+    if (!this.dashboardUserDtoCache.promised) {
+      this.dashboardUserDtoCache.set({});
     }
   }
 }
