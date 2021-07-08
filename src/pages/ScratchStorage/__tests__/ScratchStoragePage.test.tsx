@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { render, waitFor } from '@testing-library/react';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { DashboardUserDto, PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageControllerApi, ScratchStorageControllerApiInterface, ScratchStorageEntryDto } from '../../../openapi';
@@ -77,7 +77,13 @@ describe('Test Scratch Storage Page', () => {
           scratchStorageKeysToCreateUpdateState,
           scratchStorageKeysToDeleteState));
           
-      useScratchStorageState().fetchAndStoreData = jest.fn(() => Promise.resolve([]))
+      useScratchStorageState().fetchAndStoreData = jest.fn(() => {
+        const cancelTokenSource = axios.CancelToken.source();
+        return {
+          promise: Promise.resolve([]),
+          cancelTokenSource
+        };
+      });
       jest.spyOn(useScratchStorageState(), 'isPromised', 'get').mockReturnValue(true);
     }
 

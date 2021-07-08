@@ -1,10 +1,10 @@
-import { none, postpone, State } from '@hookstate/core';
-import { AxiosPromise } from 'axios';
-import { SubscriberControllerApiInterface, SubscriberDtoResponseWrapper } from '../../openapi';
-import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi/models/subscriber-dto';
-import AppClientsService from '../app-clients/app-clients-service';
+import { none, State } from '@hookstate/core';
+import { SubscriberControllerApiInterface } from '../../openapi';
+import { SubscriberDto } from '../../openapi/models/subscriber-dto';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
 import { accessAppClientsState } from '../app-clients/app-clients-state';
 import { DataService } from '../data-service/data-service';
+import { prepareDataCrudErrorResponse, wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 
 export default class PubSubService implements DataService<SubscriberDto, SubscriberDto> {
 
@@ -13,22 +13,33 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
     private pubSubApi: SubscriberControllerApiInterface) {
   }
 
-  async fetchAndStoreData(): Promise<SubscriberDto[]> {
-    try {
-      await accessAppClientsState().fetchAndStoreData();
-      const response = await this.pubSubApi.getAllSubscriptionsWrapped()
-          .then(resp => {
-            return resp.data.data;
-          })
-          .catch(err => []);
+  fetchAndStoreData(): CancellableDataRequest<SubscriberDto[]> {
+    const appClientsRequest = accessAppClientsState().fetchAndStoreData();
 
-      this.state.set(response ?? []);
-      return response ?? [];
-    }
-    catch (e) {
-      this.state.set([]);
-      return [];
-    }
+    const cancellableRequest = makeCancellableDataRequest(appClientsRequest.cancelTokenSource, this.pubSubApi.getAllSubscriptionsWrapped.bind(this.pubSubApi));
+    const requestPromise = wrapDataCrudWrappedRequest(cancellableRequest.axiosPromise());
+
+    const data = new Promise<SubscriberDto[]>(async (resolve, reject) => {
+      try {
+        await appClientsRequest.promise;
+        const result = await requestPromise;
+
+        resolve(result);
+      } catch (error) {
+        if (isDataRequestCancelError(error)) {
+          return [];
+        }
+
+        reject(prepareDataCrudErrorResponse(error));
+      }
+    });
+
+    this.state.set(data);
+
+    return {
+      promise: data,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   convertRowDataToEditableData(rowData: SubscriberDto): Promise<SubscriberDto> {
@@ -96,12 +107,8 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

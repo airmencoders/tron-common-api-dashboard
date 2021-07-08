@@ -2,7 +2,7 @@ import { createState, State, StateMethodsDestroy } from "@hookstate/core";
 import { render, waitFor } from "@testing-library/react";
 import { ApexOptions } from "apexcharts";
 import { MemoryRouter } from "react-router";
-import { EndpointCountMetricDto, MetricsControllerApi, MetricsControllerApiInterface } from "../../../../openapi";
+import { AppEndpointCountMetricDto, EndpointCountMetricDto, MetricsControllerApi, MetricsControllerApiInterface } from "../../../../openapi";
 import AppEndpointMetricService from "../../../../state/metrics/app-endpoint-metric-service";
 import { useAppEndpointMetricState } from "../../../../state/metrics/app-endpoint-metric-state";
 import SimpleEndpointMetricChart from "../SimpleEndpointMetricChart";
@@ -31,20 +31,21 @@ jest.mock('react-apexcharts', () => {
 });
 
 describe('Test Metric Page', () => {
-  let metricState: State<EndpointCountMetricDto> & StateMethodsDestroy;
+  let metricState: State<AppEndpointCountMetricDto> & StateMethodsDestroy;
   let appSourceApi: MetricsControllerApiInterface;
   let selectedSourceState: State<{appSourceId: string; name: string; type: string}> & StateMethodsDestroy;
   const clickFunction = (config: any) => null;
 
   beforeEach(() => {
-    metricState = createState<EndpointCountMetricDto>({
-        id: '1',
-        path: 'source1',
-        appClients: [{
-          id: '13132',
-          path: 'appclient1',
-          sum: 1
-        }]
+    metricState = createState<AppEndpointCountMetricDto>({
+      id: '1',
+      path: 'source1',
+      requestType: 'GET',
+      appClients: [{
+        id: '13132',
+        path: 'appclient1',
+        sum: 1
+      }]
     });
     appSourceApi = new MetricsControllerApi();
     selectedSourceState = createState({appSourceId: '1234', name: '', type: 'appsource'});
@@ -63,6 +64,7 @@ describe('Test Metric Page', () => {
         <SimpleEndpointMetricChart
           id="1"
           name="name"
+          method="GET"
           onClick={clickFunction} />
       </MemoryRouter>
     );
@@ -84,6 +86,7 @@ describe('Test Metric Page', () => {
         <SimpleEndpointMetricChart
           id="1"
           name="name"
+          method="GET"
           onClick={clickFunction} />
       </MemoryRouter>
     );

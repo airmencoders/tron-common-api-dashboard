@@ -3,13 +3,15 @@ import {State} from '@hookstate/core';
 import {UserInfoControllerApiInterface} from '../../openapi';
 import {UserInfoState} from './user-info-state';
 import Config from '../../api/config';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { CancellableAxiosDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+
 
 export default class UserInfoService {
-
   constructor(private state: State<UserInfoState>,
               private userInfoApi: UserInfoControllerApiInterface) { }
 
-  fetchAndStoreUserInfo() {
+  fetchAndStoreUserInfo(): CancellableAxiosDataRequest<UserInfoDto> {
     const requestOptions: any = {};
     // This supports local development and dev token
     if (Config.ACCESS_TOKEN != null) {
@@ -17,20 +19,36 @@ export default class UserInfoService {
         'Authorization': `Bearer ${Config.ACCESS_TOKEN}`
       }
     }
-    this.state.set(this.userInfoApi.getUserInfo(requestOptions)
-        .then(response => {
-          const userInfo = response.data;
-          return {
-            error: undefined,
-            userInfo
-          } as UserInfoState
-        })
-        .catch(error => {
-          return {
-            error,
-            userInfo: undefined
-          } as UserInfoState
-        }));
+
+    const wrappedCancellableRequest = makeCancellableDataRequestToken(this.userInfoApi.getUserInfo.bind(this.userInfoApi), requestOptions);
+    const statePromise = wrappedCancellableRequest.axiosPromise()
+      .then(response => {
+        const userInfo = response.data;
+        const result = {
+          error: undefined,
+          userInfo
+        } as UserInfoState;
+
+        return result;
+      })
+      .catch(error => {
+        /**
+         * Promise was cancelled.
+         * Return default state value.
+         */
+        if (isDataRequestCancelError(error)) {
+          return {};
+        }
+
+        return {
+          error: prepareRequestError(error),
+          userInfo: undefined
+        } as UserInfoState;
+      });
+
+    this.state.set(statePromise);
+
+    return wrappedCancellableRequest;
   }
 
   get isPromised(): boolean {
@@ -45,12 +63,7 @@ export default class UserInfoService {
     return this.state.promised ? undefined : this.state.get()?.error;
   }
 
-  async getExistingPersonForUser(): Promise<PersonDto> {
-    try {
-      const personResponse = await this.userInfoApi.getExistingPersonRecord();
-      return personResponse.data;
-    } catch (err) {
-      return Promise.reject(err);
-    }
+  getExistingPersonForUser(): CancellableAxiosDataRequest<PersonDto> {
+    return makeCancellableDataRequestToken(this.userInfoApi.getExistingPersonRecord.bind(this.userInfoApi));
   }
 }

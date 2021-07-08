@@ -80,8 +80,8 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
   Validation(formState.name).validate(name => (validateRequiredString(name)), validationErrors.requiredText, 'error');
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
-  Validation(formState.healthUrl).validate(value => !formState.reportStatus.value || /[^\s]+/.test(value), 'Health endpoint required when status reporting enabled', 'error');
-  Validation(formState.healthUrl).validate(value => value.match(/^\//) !== null, 'Valid path must start with a forward slash', 'error');
+  Validation(formState.healthUrl).validate(value => !formState.reportStatus.value || (/[^\s]+/.test(value) || value.trim() !== ''), 'Health endpoint required when status reporting enabled', 'error');
+  Validation(formState.healthUrl).validate(value => value.match(/^\//) !== null || value === '', 'Valid path must start with a forward slash', 'error');
 
   function isFormModified() {
     return Initial(formState.appSourceAdminUserEmails).modified() ||
@@ -327,14 +327,14 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
         <FormGroup
           labelName="health-url"
           labelText="Health URL Path/Endpoint (GET)"
-          isError={failsHookstateValidation(formState.healthUrl)}
+          isError={!Validation(formState.healthUrl).valid()}
           errorMessages={generateStringErrorMessages(formState.healthUrl)}
         >
           <TextInput
             id="health-url"
             name="health-url"
-            type="text"
-            error={failsHookstateValidation(formState.healthUrl)}
+            type="text"            
+            error={!Validation(formState.healthUrl).valid()}
             defaultValue={formState.healthUrl.value}
             onChange={(event) => formState.healthUrl.set(event.target.value)}
             disabled={!formState.reportStatus.value}

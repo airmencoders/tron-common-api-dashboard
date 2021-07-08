@@ -41,7 +41,7 @@ describe('Person Tests', () => {
     DataCrudFormPageUtil.createPersonAndFilterExists(person);
 
     // Try to add existing and expect an error message
-    DataCrudFormPageUtil.createPersonAndError(person, 'Request failed with status code 409');
+    DataCrudFormPageUtil.createPersonAndError(person, `* Person resource with the email: ${person.email} already exists`);
 
     // Cleanup
     cy.get('button').contains('Cancel').click();

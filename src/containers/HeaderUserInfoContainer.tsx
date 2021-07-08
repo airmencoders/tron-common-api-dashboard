@@ -6,9 +6,15 @@ function HeaderUserInfoContainer() {
   const state = useUserInfoState();
 
   useEffect(() => {
-    state.fetchAndStoreUserInfo();
-  }, []);
+    const cancellableFetch = state.fetchAndStoreUserInfo();
 
+    /**
+     * Cancel any pending request
+     */
+    return function cleanup() {
+      cancellableFetch.cancelTokenSource.cancel();
+    }
+  }, []);
 
   return (
       <HeaderUserInfo userInfo={state?.userInfo}/>

@@ -13,6 +13,7 @@ import {wrapDigitizeAppsState} from '../my-digitize-apps-state';
 import {PrivilegeType} from '../../privilege/privilege-type';
 import {accessAuthorizedUserState} from '../../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../../authorized-user/authorized-user-service';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 
 jest.mock('../../authorized-user/authorized-user-state');
 
@@ -181,7 +182,8 @@ describe('My Digitize Apps Service Tests', () => {
       return new Promise<AxiosResponse<ScratchStorageAppRegistryDto[]>>(resolve => resolve(axiosGetAppSourceDtosResponse));
     });
 
-    await wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
+    await cancellableRequest.promise;
 
     expect(wrappedState.state.get()).toEqual(scratchStorageAppFlats);
   });
@@ -195,11 +197,13 @@ describe('My Digitize Apps Service Tests', () => {
       });
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const errorRequest = prepareDataCrudErrorResponse(rejectMsg);
+
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual(rejectMsg);
-    expect(wrappedState.error).toBe(rejectMsg);
+    await expect(cancellableRequest.promise).rejects.toEqual(errorRequest);
+    expect(wrappedState.error).toEqual(errorRequest);
   });
 
   it('Test promised state', async () => {
@@ -211,10 +215,10 @@ describe('My Digitize Apps Service Tests', () => {
       });
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.isPromised).toBe(true);
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(wrappedState.isPromised).toBe(false);
   });
 

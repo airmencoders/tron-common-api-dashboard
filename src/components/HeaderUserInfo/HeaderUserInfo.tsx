@@ -13,6 +13,7 @@ import { HeaderUserEditorWithLoading } from './HeaderUserEditor';
 import './HeaderUserInfo.scss';
 import {HeaderUserInfoProps} from './HeaderUserInfoProps';
 import {useUserInfoState} from '../../state/user/user-info-state';
+import { isDataRequestCancelError } from '../../utils/cancellable-data-request';
 
 /**
  * @member isOpen Tracks the state of the modal
@@ -54,45 +55,28 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
 
   useEffect(() => {
     /**
-     * State is being set asynchronously, so need to keep track of
-     * when the component dismounts to ensure state is not set
-     * after it has already been destroyed.
-     */
-    let isMounted = true;
-
-    /**
      * Try to fetch the Person record on load first.
-     * This is to identify whether or not the Person has an existing
+     * This is to identify if the Person has an existing
      * record in the database. This is used to determine if
      * "Edit Person Record" should be shown in the userinfo header dropdown.
      */
-    async function checkForUserPersonRecord() {
-      if (userInfo?.email) {
-        try {
-          userEditorState.isLoadingInitial.set(true);
-
-          const person = await userInfoState.getExistingPersonForUser();
-
-          if (!isMounted)
-            return;
-
-          userEditorState.merge({
-            currentUserState: person,
-            isLoadingInitial: false
-          });
-        } catch (err) {
-          if (!isMounted)
-            return;
-
+    userEditorState.isLoadingInitial.set(true);
+    const cancellableRequest = userInfoState.getExistingPersonForUser();
+    cancellableRequest.axiosPromise()
+      .then(response => {
+        userEditorState.merge({
+          currentUserState: response.data,
+          isLoadingInitial: false
+        });
+      })
+      .catch(error => {
+        if (!isDataRequestCancelError(error)) {
           userEditorState.isLoadingInitial.set(false);
         }
-      }
-    }
-
-    checkForUserPersonRecord();
+      });
 
     return function cleanup() {
-      isMounted = false;
+      cancellableRequest.cancelTokenSource.cancel();
     }
   }, []);
 

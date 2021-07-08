@@ -1,14 +1,16 @@
-import { none, postpone, State } from "@hookstate/core";
+import { none, State } from "@hookstate/core";
 import { ValidateFunction } from 'ajv';
+import axios from 'axios';
 import ModelTypes from '../../api/model-types.json';
 import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDetailsDto, PrivilegeDto } from "../../openapi/models";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
+import { CancellableDataRequest, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import { AppSourceDevDetails } from '../app-source/app-source-dev-details';
 import { DataService } from "../data-service/data-service";
-import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
+import { prepareDataCrudErrorResponse, wrapDataCrudWrappedRequest } from "../data-service/data-service-utils";
 import { PrivilegeType } from "../privilege/privilege-type";
 import { AppClientFlat } from "./app-client-flat";
 import { AppClientPrivilege } from "./app-client-privilege";
@@ -31,32 +33,23 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     this.validate = TypeValidation.validatorFor<AppClientUserDto>(ModelTypes.definitions.AppClientUserDto);
   }
 
-  fetchAndStoreData(): Promise<AppClientFlat[]> {   
-    const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
-      try {
-        const result = await this.appClientsApi.getAppClientUsersWrapped();
-        resolve(this.convertAppClientsToFlat(result.data.data));
-      } catch (err) {
-        reject(prepareDataCrudErrorResponse(err));
-      }
-    });
+  fetchAndStoreData(): CancellableDataRequest<AppClientFlat[]> {
+    const cancelTokenSource = axios.CancelToken.source();
 
-    this.state.set(data);
+    const appClientRequest = makeCancellableDataRequest(cancelTokenSource, this.appClientsApi.getAppClientUsersWrapped.bind(this.appClientsApi));
+    const appClientStatePromise = wrapDataCrudWrappedRequest(appClientRequest.axiosPromise(), this.convertAppClientsToFlat.bind(this));
 
-    // fetch privileges that we can use
-    const privData = new Promise<PrivilegeDto[]>(async (resolve, reject) => {
-      try {
-        const result = await this.appClientsApi.getClientTypePrivsWrapped();
-        resolve(result.data.data);
-      } catch (err) {
-        reject(prepareDataCrudErrorResponse(err));
-      }
-    });
+    this.state.set(appClientStatePromise);
 
-    
-    this.privilegesState.set(privData);
+    const privilegeRequest = makeCancellableDataRequest(cancelTokenSource, this.appClientsApi.getClientTypePrivsWrapped.bind(this.appClientsApi));
+    const privilegeStatePromise = wrapDataCrudWrappedRequest(privilegeRequest.axiosPromise());
 
-    return data;
+    this.privilegesState.set(privilegeStatePromise);
+
+    return {
+      promise: appClientStatePromise,
+      cancelTokenSource
+    };
   }
 
   async getSelectedClient(id: string): Promise<AppClientUserDetailsDto> {
@@ -255,12 +248,8 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

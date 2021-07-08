@@ -19,6 +19,7 @@ describe('Test PubSub Delete', () => {
 
     data = {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
+      appClientUser: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
       subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
       subscriberAddress: "http://app.app.svc.cluster.local/",
       secret: "",

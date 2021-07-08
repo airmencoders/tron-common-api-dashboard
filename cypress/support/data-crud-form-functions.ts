@@ -1,3 +1,5 @@
+/// <reference types="Cypress" />
+
 import { agGridFilterDebounce, apiBase, personApiBase } from '.';
 import UtilityFunctions from './utility-functions';
 
@@ -25,11 +27,11 @@ export default class DataCrudFormFunctions {
    * @param value the value to find
    * @param searchParentSelector used to narrow the grid search to a specific parent selector
    */
-  static getRowWithColIdContainingValueNotExist(colId: string, value: string, searchParentSelector?: string) {
+  static noRowsExist(searchParentSelector?: string) {
     if (searchParentSelector != null) {
-      cy.get(searchParentSelector).find('.ag-row').find(`[col-id="${colId}"]`).contains(value).should('not.exist');
+      cy.get(searchParentSelector).find('.ag-row').should('not.exist');
     } else {
-      cy.get('.ag-row').find(`[col-id="${colId}"]`).contains(value).should('not.exist');
+      cy.get('.ag-row').should('not.exist');
     }
   }
 
@@ -99,8 +101,8 @@ export default class DataCrudFormFunctions {
    * if {@link containsDeleteConfirmation} is true, the Delete Confirmation modal
    * will be found and the delete button will be pressed.
    *
-   * if {@link verifyRowDeleted} is true, the grid will be searched again for the
-   * {@link value} and {@link colId} that was specified.
+   * if {@link verifyRowDeleted} is true, an assert that no rows exists in the grid
+   * will be made.
    *
    * if {@link shouldWaitRequest} is true, cypress will be set to wait for the
    * filter request to finish before continuing. This must be set to false for
@@ -124,8 +126,20 @@ export default class DataCrudFormFunctions {
       DataCrudFormFunctions.findDeleteConfirmationSubmitButton().click();
     }
 
-    if (verifyRowDeleted)
-      DataCrudFormFunctions.getRowWithColIdContainingValueNotExist(colId, value);
+    if (verifyRowDeleted) {
+      /**
+       * Force the filter again. Some Grids will hard refresh the grid,
+       * causing everything to reset, including the previous filter value.
+       */
+      DataCrudFormFunctions.filterColumnWithSearchValue(colId, value, shouldWaitFilterRequest, undefined, false);
+
+      /**
+       * The grid has been filtered, so there should exist no rows in the
+       * grid at this point to verify deletion.
+       */
+      DataCrudFormFunctions.noRowsExist();
+    }
+
 
     DataCrudFormFunctions.clearFilterColumn(colId);
   }
@@ -150,7 +164,7 @@ export default class DataCrudFormFunctions {
    * @param shouldWaitRequest if should wait for the api request to finish. Should not be set to true if the filter will not perform an api request
    * @param searchParentSelector used to narrow the grid search to a specific parent selector
    */
-  static filterColumnWithSearchValue(colId: string, searchValue: string, shouldWaitRequest: boolean = true, searchParentSelector?: string) {
+  static filterColumnWithSearchValue(colId: string, searchValue: string, shouldWaitRequest: boolean = true, searchParentSelector?: string, shouldExpectExists: boolean = true) {
     DataCrudFormFunctions.openColumnFilterMenu(colId);
 
     cy.intercept({
@@ -164,24 +178,28 @@ export default class DataCrudFormFunctions {
       if (shouldWaitRequest)
         cy.wait('@filterRequest');
 
-      cy.get(`${searchParentSelector}`)
+      if (shouldExpectExists) {
+        cy.get(`${searchParentSelector}`)
         .find('.ag-center-cols-container')
         .find('.ag-row').should('have.length', 1)
         .first()
         .contains(`[col-id="${colId}"]`, searchValue)
         .should('exist');
+      }
     } else {
       cy.get('.ag-filter-filter input').first().clear().type(`${searchValue}{esc}`);
 
       if (shouldWaitRequest)
         cy.wait('@filterRequest');
 
-      cy.get('.ag-center-cols-container')
-        .find('.ag-row')
-        .should('have.length', 1)
-        .first()
-        .contains(`[col-id="${colId}"]`, searchValue)
-        .should('exist');
+      if (shouldExpectExists) {
+        cy.get('.ag-center-cols-container')
+          .find('.ag-row')
+          .should('have.length', 1)
+          .first()
+          .contains(`[col-id="${colId}"]`, searchValue)
+          .should('exist');
+      }
     }
   }
 
