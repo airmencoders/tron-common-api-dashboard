@@ -172,10 +172,18 @@ describe('Dashboard User State Test', () => {
     });
 
     const cancellableRequest = state.fetchAndStoreData();
-    expect(state.dashboardUsers).toEqual(new Array<DashboardUserDto>());
+    expect(state.dashboardUsers).toEqual([]);
 
     await cancellableRequest.promise;
     expect(state.dashboardUsers).toEqual(flatUsers);
+
+    const dtoCache = users.reduce((prev, curr) => {
+      return {
+        ...prev,
+        [curr.id!]: curr
+      }
+    }, {});
+    expect(dashboardUserDtoCache.get()).toEqual(dtoCache);
   });
 
   it('Test error', async () => {
@@ -205,6 +213,9 @@ describe('Dashboard User State Test', () => {
 
     await expect(state.sendUpdate(testUserDto)).resolves.toEqual(testUserFlat);
     expect(dashboardUserState.get()).toEqual([testUserFlat]);
+    expect(dashboardUserDtoCache.get()).toEqual({
+      [testUserDto.id!]: testUserDto
+    })
   });
 
   it('Test sendUpdate Fail', async () => {
@@ -236,6 +247,10 @@ describe('Dashboard User State Test', () => {
     });
 
     await expect(state.sendCreate(testUserFlat)).resolves.toEqual(testUserFlat);
+    expect(dashboardUserState.get()).toEqual([testUserFlat]);
+    expect(dashboardUserDtoCache.get()).toEqual({
+      [testUserDto.id!]: testUserDto
+    });
   });
 
   it('Test sendCreate Fail', async () => {
@@ -252,6 +267,8 @@ describe('Dashboard User State Test', () => {
     });
 
     await expect(state.sendDelete(testUserFlat)).resolves.not.toThrow();
+    expect(dashboardUserState.get()).toHaveLength(0);
+    expect(Object.keys(dashboardUserDtoCache.get())).toHaveLength(0);
   });
 
   it('Test sendDelete Fail', async () => {
@@ -276,8 +293,14 @@ describe('Dashboard User State Test', () => {
     });
 
     state.state.set([testUserFlat]);
+    dashboardUserDtoCache.set({ [testUserDto.id!]: testUserDto });
+    expect(dashboardUserState.get()).toHaveLength(1);
+    expect(Object.keys(dashboardUserDtoCache.get())).toHaveLength(1);
 
     await expect(state.sendDelete(testUserFlat)).resolves.not.toThrow();
+
+    expect(dashboardUserState.get()).toHaveLength(0);
+    expect(Object.keys(dashboardUserDtoCache.get())).toHaveLength(0);
   });
 
   it('Test convertDashboardUsersToFlat', () => {
