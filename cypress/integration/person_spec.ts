@@ -10,7 +10,7 @@ describe('Person Tests', () => {
   it('Should allow Person creation & deletion', () => {
     cy.visit(host);
 
-    cy.get('[href="/person"] > .sidebar-item__name').click();
+    cy.get('[href="/person"] > .sidebar-item__name').click({ force: true });
 
     const person: Person = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,

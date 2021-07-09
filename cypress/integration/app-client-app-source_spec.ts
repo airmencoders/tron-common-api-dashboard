@@ -8,7 +8,7 @@ describe('App Source / App Client Tests', () => {
   it('Should allow App Client creation & deletion', () => {
     cy.visit(host);
 
-    cy.get('[href="/app-clients"] > .sidebar-item__name').click();
+    cy.get('[href="/app-clients"] > .sidebar-item__name').click({ force: true });
 
     const appClient: AppClient = {
       name: UtilityFunctions.generateRandomString()
@@ -180,7 +180,7 @@ describe('App Source / App Client Tests', () => {
 
     beforeEach(() => {
       cy.visit(`${host}`);
-      cy.get('[href="/app-source"] > .sidebar-item__name').click();
+      cy.get('[href="/app-source"] > .sidebar-item__name').click({ force: true });
 
       const appSourceName = 'puckboard';
       DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);

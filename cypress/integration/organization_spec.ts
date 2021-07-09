@@ -50,7 +50,7 @@ describe('Organization Tests', () => {
   it('Should allow Organization creation & deletion', () => {
     cy.visit(host);
 
-    cy.get('[href="/organization"] > .sidebar-item__name').click();
+    cy.get('[href="/organization"] > .sidebar-item__name').click({ force: true });
 
     const org: Organization = {
       name: UtilityFunctions.generateRandomString(),
@@ -88,7 +88,7 @@ describe('Organization Tests', () => {
     cy.visit(host);
 
     // Go to person page first and create a person
-    cy.get('[href="/person"] > .sidebar-item__name').click();
+    cy.get('[href="/person"] > .sidebar-item__name').click({ force: true });
     const personLeader = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
       firstName: UtilityFunctions.generateRandomString(),
