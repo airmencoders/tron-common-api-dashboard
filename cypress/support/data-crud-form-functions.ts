@@ -153,7 +153,7 @@ export default class DataCrudFormFunctions {
     //   cy.get('.ag-icon-menu').click();
     // });
     cy.get(`[col-id="${colId}"]`).within(() => {
-      cy.get('.ag-icon-menu').click();
+      cy.get('.ag-icon-menu').first().click();
     })
   }
 
@@ -251,7 +251,7 @@ export default class DataCrudFormFunctions {
     DataCrudFormFunctions.createPersonAndSuccess(person);
 
     return cy.wait('@personCreate').then((intercept) => {
-      DataCrudFormFunctions.filterPersonAndExists(PersonGridColId.ID, intercept.response.body.id);
+      DataCrudFormFunctions.filterPersonAndExists(PersonGridColId.ID, intercept?.response?.body.id);
       DataCrudFormFunctions.clearFilterColumn(PersonGridColId.ID);
     });
   }
