@@ -8,6 +8,7 @@ import HealthService from '../../state/health/interface/health-service';
 
 import './HealthPage.scss';
 import ErrorBoundary from '../../components/ErrorBoundary/ErrorBoundary';
+import { GenericComponent } from '../../api/health/interface/components';
 
 function HealthPage() {  
   const state = useHealthState();
@@ -37,7 +38,11 @@ function HealthPageContent(props: { state: HealthService, serviceTitle: string }
       return StatusType.GOOD;
     } else if (healthStatus === 'DOWN') {
       return StatusType.DOWN;
-    } else {
+    } else if (healthStatus === 'UNKNOWN') {
+      return StatusType.UNKNOWN;
+    } else if (healthStatus === 'OUT_OF_SERVICE') {
+      return StatusType.OUT_OF_SERVICE; 
+    } else { 
       return StatusType.ERROR;
     }
   };
@@ -71,6 +76,8 @@ function HealthPageContent(props: { state: HealthService, serviceTitle: string }
                       key={item} 
                       status={getStatusTypeFromHealth(state.components?.[item].status)} 
                       title={item.replace(new RegExp("^" + APP_SOURCE_HEALTH_PREFIX), '')} 
+                      details={"Last Up Time (UTC): " + ((state.components?.[item] as GenericComponent).details?.['Last Up Time'] ?? 'Unknown')}
+                      error={(state.components?.[item] as GenericComponent).details?.['error'] ?? item.replace(new RegExp("^" + APP_SOURCE_HEALTH_PREFIX), '')}
                     />
                   )
               }

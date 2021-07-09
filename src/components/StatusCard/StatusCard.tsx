@@ -8,6 +8,7 @@ import CloseIcon from '../../icons/CloseIcon';
 import DownIcon from '../../icons/DownIcon';
 
 import './StatusCard.scss';
+import QuestionIcon from '../../icons/QuestionIcon';
 
 function renderIcon(status: StatusType): React.ReactNode {
   const iconSize = 4;
@@ -19,8 +20,12 @@ function renderIcon(status: StatusType): React.ReactNode {
     case StatusType.ERROR:
       returnIcon = <CloseIcon size={iconSize} iconTitle="error"/>;
       break;
+    case StatusType.OUT_OF_SERVICE:
     case StatusType.DOWN:
       returnIcon = <DownIcon size={iconSize} iconTitle="down" className="down"/>;
+      break;
+    case StatusType.UNKNOWN:
+      returnIcon = <QuestionIcon size={iconSize} iconTitle="unknown" className="question"/>;
       break;
     default:
       // return default div
@@ -31,7 +36,7 @@ function renderIcon(status: StatusType): React.ReactNode {
 
 function StatusCard(props: StatusCardProps) {
   return (
-      <div className="status-card">
+      <div className="status-card" title={props.error ?? props.title}>
         <Card>
           <div className="status-card__title">
             <h3 className="title__text">{props.title}</h3>
@@ -44,6 +49,12 @@ function StatusCard(props: StatusCardProps) {
           <div className="status-card__status">
             {props.status || 'No Status'}
           </div>
+          {
+            props.details &&
+              <div className="status-card__details">
+                {props.details || 'Unknown'}
+              </div>
+          }
         </Card>
       </div>
   );
