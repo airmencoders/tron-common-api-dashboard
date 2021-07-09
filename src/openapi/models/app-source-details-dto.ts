@@ -82,6 +82,12 @@ export interface AppSourceDetailsDto {
      * @memberof AppSourceDetailsDto
      */
     endpoints?: Array<AppEndpointDto>;
+    /**
+     * 
+     * @type {number}
+     * @memberof AppSourceDetailsDto
+     */
+    throttleRequestCount?: number;
 }
 
 

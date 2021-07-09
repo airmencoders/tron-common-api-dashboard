@@ -612,6 +612,9 @@
         },
         "reportStatus": {
           "type": "boolean"
+        },
+        "throttleRequestCount": {
+          "type": "number"
         }
       },
       "required": [
