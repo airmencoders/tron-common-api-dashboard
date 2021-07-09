@@ -41,8 +41,8 @@ function createScratchAppAndFilterExists(app: ScratchStorageApp) {
   createScratchAppAndSuccess(app);
 
   cy.wait('@scratchAppCreate').then((intercept) => {
-    filterColumnWithSearchValueNoRequest(ScratchStorageGridColId.ID, intercept.response.body.id);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(ScratchStorageGridColId.ID, intercept.response.body.id);
+    filterColumnWithSearchValueNoRequest(ScratchStorageGridColId.ID, intercept?.response?.body.id);
+    DataCrudFormPageUtil.getRowWithColIdContainingValue(ScratchStorageGridColId.ID, intercept?.response?.body.id);
     DataCrudFormPageUtil.clearFilterColumn(ScratchStorageGridColId.ID);
   });
 }
@@ -107,7 +107,7 @@ describe('Scratch Storage Tests', () => {
 
     cy.wait('@getUserInfo').then(intercept => {
       const user: ScratchStorageUser = {
-        email: intercept.response.body.email,
+        email: intercept?.response?.body.email,
         read: true,
         write: true,
         admin: true
