@@ -17,6 +17,10 @@ function renderIcon(status: StatusType): React.ReactNode {
     case StatusType.GOOD:
       returnIcon = <StatusGoodIcon size={iconSize}/>;
       break;
+    case StatusType.WARNING:
+      returnIcon = <WarningIcon size={iconSize}/>;
+      break;
+    case StatusType.APPSOURCE_ERROR:
     case StatusType.ERROR:
       returnIcon = <CloseIcon size={iconSize} iconTitle="error"/>;
       break;
