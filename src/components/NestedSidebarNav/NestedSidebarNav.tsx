@@ -13,7 +13,9 @@ function NestedSidebarNav(props: NestedSidebarNavProps) {
   return (
       <div className="nested-sidebar-nav">
         <div className="nested-sidebar-nav__header">
-          <a className="header__link" href="#" onClick={toggleClicked}>
+          <a className="header__link" href="#" onClick={toggleClicked}
+             data-testid="header__link"
+          >
             <h5 className="header__label">{props.title}</h5>
             <div className="header__icon">
               {
@@ -25,7 +27,9 @@ function NestedSidebarNav(props: NestedSidebarNavProps) {
             </div>
           </a>
         </div>
-        <div className={`nested-sidebar-nav__children ${props.isOpened ? 'opened' : ''}`}>
+        <div className={`nested-sidebar-nav__children ${props.isOpened ? 'opened' : ''}`}
+             data-testid="nested-sidebar-nav__children"
+        >
           {props.children}
         </div>
       </div>

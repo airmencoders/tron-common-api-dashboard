@@ -87,7 +87,7 @@ export const routes: RouteItem[] = [
     },
     {
         path: '#',
-        name: 'App Gateway',
+        name: 'Apps',
         requiredPrivileges: [
             PrivilegeType.APP_CLIENT_DEVELOPER,
             PrivilegeType.DASHBOARD_ADMIN,

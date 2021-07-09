@@ -23,6 +23,11 @@
       }
     }
   }
+  .sidebar-item:last-child {
+    .sidebar-item__name {
+      margin-bottom: 0;
+    }
+  }
   .sidebar-item__name {
     font-size: 1rem;
     margin-left: .2rem;
