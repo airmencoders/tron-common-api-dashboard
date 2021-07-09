@@ -32,25 +32,25 @@ function HealthPage() {
   )
 }
 
-function HealthPageContent(props: { state: HealthService, serviceTitle: string }) {
-  const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
-    if (healthStatus === 'UP' || healthStatus == 'APPSOURCE_UP') {
-      return StatusType.GOOD;
-    } else if (healthStatus === 'DOWN' || healthStatus == 'APPSOURCE_DOWN') {
-      return StatusType.DOWN;
-    } else if (healthStatus === 'UNKNOWN' || healthStatus == 'APPSOURCE_UNKNOWN') {
-      return StatusType.UNKNOWN;
-    } else if (healthStatus === 'WARNING') {
-      return StatusType.WARNING;
-    } else if (healthStatus === 'OUT_OF_SERVICE') {
-      return StatusType.OUT_OF_SERVICE; 
-    } else if (healthStatus === 'APPSOURCE_ERROR') {
-      return StatusType.APPSOURCE_ERROR;
-    } else { 
-      return StatusType.ERROR;
-    }
-  };
+const getStatusTypeFromHealth = (healthStatus: string | undefined): StatusType => {
+  if (healthStatus === 'UP' || healthStatus == 'APPSOURCE_UP') {
+    return StatusType.GOOD;
+  } else if (healthStatus === 'DOWN' || healthStatus == 'APPSOURCE_DOWN') {
+    return StatusType.DOWN;
+  } else if (healthStatus === 'UNKNOWN' || healthStatus == 'APPSOURCE_UNKNOWN') {
+    return StatusType.UNKNOWN;
+  } else if (healthStatus === 'WARNING') {
+    return StatusType.WARNING;
+  } else if (healthStatus === 'OUT_OF_SERVICE') {
+    return StatusType.OUT_OF_SERVICE; 
+  } else if (healthStatus === 'APPSOURCE_ERROR') {
+    return StatusType.APPSOURCE_ERROR;
+  } else { 
+    return StatusType.ERROR;
+  }
+};
 
+function HealthPageContent(props: { state: HealthService, serviceTitle: string }) { 
   const { state, serviceTitle } = props;
   const APP_SOURCE_HEALTH_PREFIX = "appsource_";
   return (
