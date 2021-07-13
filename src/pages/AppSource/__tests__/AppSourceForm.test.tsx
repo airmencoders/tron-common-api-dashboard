@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppSourceForm from '../AppSourceForm';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
@@ -50,7 +50,9 @@ describe('Test App Source Form', () => {
           path: 'endpoint_path',
           requestType: 'GET'
         }
-      ]
+      ],
+      throttleEnabled: false,
+      throttleRequestCount: 0
     };
   });
 
@@ -107,6 +109,26 @@ describe('Test App Source Form', () => {
 
     await waitForAdminEmailRemoval;
 
+    // Change Rate Limit
+    const rateLimitToggle = page.getByLabelText('Enable Rate Limiting');
+    const rateLimit = page.getByLabelText('Rate Limit');
+    expect(rateLimitToggle).not.toBeChecked();
+    expect(rateLimit).toBeDisabled();
+    fireEvent.click(rateLimitToggle);
+    waitFor(() => {
+      expect(rateLimitToggle).toBeChecked();
+      expect(rateLimit).not.toBeDisabled();
+    });
+
+    // Try an empty value
+    fireEvent.change(rateLimit, { target: { value: '' } });
+    expect(rateLimit).toHaveValue('');
+    // Try a valid value
+    fireEvent.change(rateLimit, { target: { value: '123' } });
+    expect(rateLimit).toHaveValue('123');
+    // Try typing a non-number, should not accept it
+    fireEvent.keyPress(rateLimit, { key: 'a', code: 'KeyA' });
+    expect(rateLimit).toHaveValue('123');
 
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);

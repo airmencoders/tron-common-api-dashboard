@@ -84,6 +84,12 @@ export interface AppSourceDetailsDto {
     endpoints?: Array<AppEndpointDto>;
     /**
      * 
+     * @type {boolean}
+     * @memberof AppSourceDetailsDto
+     */
+    throttleEnabled?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof AppSourceDetailsDto
      */

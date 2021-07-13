@@ -3,7 +3,7 @@ import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
 import { RowClickedEvent } from 'ag-grid-community';
-import React, { FormEvent } from 'react';
+import React, { ChangeEvent, FormEvent } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
@@ -49,7 +49,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     healthUrl: props.data?.healthUrl ?? '',   
     appClients: props.data?.appClients ?? [],
     appSourceAdminUserEmails: props.data?.appSourceAdminUserEmails ?? [],
-    endpoints: props.data?.endpoints ?? []
+    endpoints: props.data?.endpoints ?? [],
+    throttleRequestCount: props.data?.throttleRequestCount,
+    throttleEnabled: props.data?.throttleEnabled
   });
 
   const adminAddState = useHookstate({
@@ -89,7 +91,9 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
       Initial(formState.reportStatus).modified() ||
       Initial(formState.healthUrl).modified() ||
       Initial(formState.endpoints).modified() ||
-      Initial(formState.appClients).modified();
+      Initial(formState.appClients).modified() ||
+      Initial(formState.throttleEnabled).modified() ||
+      Initial(formState.throttleRequestCount).modified();
   }
 
   function isFormDisabled() {
@@ -260,6 +264,19 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     deleteEndpointModalClose();
   }
 
+  function onRateLimitChange(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.value === '') {
+      formState.throttleRequestCount.set(undefined);
+      return;
+    }
+
+    const num = Number(event.target.value);
+
+    if (!Number.isNaN(num) && Number.isSafeInteger(num)) {
+      formState.throttleRequestCount.set(num);
+    }
+  }
+
   return (
     <>
       <Form className="app-source-form" onSubmit={(event) => submitForm(event)} data-testid="app-source-form">
@@ -379,6 +396,38 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           onRowClicked={() => { return; }}
           className="admin-email-grid"
         />
+
+        <FormGroup
+          labelName="rate-limit-toggle"
+          labelText="Rate Limit Toggle"
+        >
+          <Checkbox
+            id="rate-limit-toggle"
+            name="rate-limit-toggle"
+            checked={formState.throttleEnabled.value}
+            label="Enable Rate Limiting"
+            onChange={(event) => formState.throttleEnabled.set(event.target.checked)}
+          />
+        </FormGroup>
+
+        <FormGroup
+          labelName="rate-limit-count"
+          labelText="Rate Limit"
+          isError={failsHookstateValidation(formState.throttleRequestCount)}
+          errorMessages={generateStringErrorMessages(formState.throttleRequestCount)}
+        >
+          <TextInput
+            id="rate-limit-count"
+            name="rate-limit-count"
+            type="text"
+            value={formState.throttleRequestCount.ornull?.get() ?? ''}
+            error={failsHookstateValidation(formState.throttleRequestCount)}
+            placeholder="0"
+            onChange={onRateLimitChange}
+            appendedText="Requests / minute"
+            disabled={!formState.throttleEnabled.value}
+          />
+        </FormGroup>
 
         <FormGroup
           labelName="endpoints"
