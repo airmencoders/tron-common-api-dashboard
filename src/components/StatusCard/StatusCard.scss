@@ -26,4 +26,11 @@
     text-transform: capitalize;
     color: $font-color-lighter;
   }
+  &__details {
+    text-align: center;
+    padding-top: units(2);
+    text-transform: capitalize;
+    font-size: 0.60rem;
+    color: $font-color-lighter;
+  }
 }

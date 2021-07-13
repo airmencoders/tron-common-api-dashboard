@@ -1,6 +1,6 @@
-import { Downgraded, State, useState } from '@hookstate/core';
+import {createState, Downgraded, State, StateMethodsDestroy, useState} from '@hookstate/core';
 import { IDatasource, IGetRowsParams, RowClickedEvent } from 'ag-grid-community';
-import React, { ReactText, useEffect } from 'react';
+import React, {ReactText, useEffect, useRef} from 'react';
 import Button from '../../components/Button/Button';
 import Grid from '../../components/Grid/Grid';
 import PageFormat from '../../components/PageFormat/PageFormat';
@@ -46,14 +46,18 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   const updateInfiniteCache = useState<boolean>(false);
 
+  const mountedRef = useRef(false);
+
   useEffect(() => {
     let cancelTokenSource: CancelTokenSource | undefined = undefined;
     if (!infiniteScroll?.enabled) {
       const cancellableFetch = dataState.fetchAndStoreData();
       cancelTokenSource = cancellableFetch.cancelTokenSource;
     }
+    mountedRef.current = true;
 
     return function cleanup() {
+      mountedRef.current = false;
       cancelTokenSource?.cancel();
       dataState.resetState();
     }
@@ -114,7 +118,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
           /**
            * Don't error out the state here. If the request fails for some reason, just show nothing.
-           * 
+           *
            * Call the success callback as a hack to prevent
            * ag grid from showing an infinite loading state on failure.
            */
@@ -235,7 +239,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
   /**
    * Creates toast notifying of partial update.
    * Creates additional error toasts for each error.
-   * 
+   *
    * @param message The message for the toast that is always created
    * @param errors The error messages for any additional toasts to be created
    * @returns list of toast ids
@@ -327,10 +331,12 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
       onActionSuccess(`Successfully updated ${props.dataTypeName}.`);
     }
     catch (error) {
-      pageState.merge({
-          formErrors: convertErrorToDataCrudFormError(error),
-          isSubmitting: false
-      });
+      if (mountedRef.current) {
+        pageState.merge({
+            formErrors: convertErrorToDataCrudFormError(error),
+            isSubmitting: false
+        });
+      }
     }
   }
 
@@ -370,13 +376,14 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
         const preparedMessage = prepareDataCrudErrorResponse(err);
         createTextToast(ToastType.ERROR, preparedMessage.general ?? err.message);
       });
-
-      pageState.merge({
-        formErrors: {
-          general: `Failed to update ${props.dataTypeName}`
-        },
-        isSubmitting: false
-      });
+      if (mountedRef.current) {
+        pageState.merge({
+          formErrors: {
+            general: `Failed to update ${props.dataTypeName}`
+          },
+          isSubmitting: false
+        });
+      }
     }
   }
 
@@ -390,10 +397,12 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
       onActionSuccess(`Successfully created ${props.dataTypeName}.`);
     }
     catch (error) {
-      pageState.merge({
-        formErrors: convertErrorToDataCrudFormError(error),
-        isSubmitting: false
-      });
+      if (mountedRef.current) {
+        pageState.merge({
+          formErrors: convertErrorToDataCrudFormError(error),
+          isSubmitting: false
+        });
+      }
     }
   }
 

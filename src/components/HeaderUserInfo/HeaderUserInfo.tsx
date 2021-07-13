@@ -14,6 +14,7 @@ import './HeaderUserInfo.scss';
 import {HeaderUserInfoProps} from './HeaderUserInfoProps';
 import {useUserInfoState} from '../../state/user/user-info-state';
 import { isDataRequestCancelError } from '../../utils/cancellable-data-request';
+import { CancelTokenSource } from 'axios';
 
 /**
  * @member isOpen Tracks the state of the modal
@@ -32,6 +33,7 @@ export interface UserEditorState {
   original?: PersonDto;
   isLoading: boolean;
   isLoadingInitial: boolean;
+  cancelTokenSource?: CancelTokenSource;
 }
 
 function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
@@ -50,7 +52,8 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
     errorMessage: '',
     disableSubmit: false,
     isLoading: false,
-    isLoadingInitial: false
+    isLoadingInitial: false,
+    cancelTokenSource: undefined
   });
 
   useEffect(() => {
@@ -95,32 +98,37 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
   }
 
   function userEditorCloseHandler() {
+    // Cancel the request in the event it is still pending
+    userEditorState.cancelTokenSource.get()?.cancel();
+
     userEditorState.merge({
       isOpen: false,
       errorMessage: '',
       disableSubmit: false,
-      isLoading: false
+      isLoading: false,
+      cancelTokenSource: undefined
     });
   }
 
   async function onHeaderClick() {
+    if (userInfo?.email == null)
+      return;
+
     try {
-      if (userInfo?.email == null)
-        return;
+      const cancellablePersonRequest = userInfoState.getExistingPersonForUser();
 
       userEditorState.merge({
         isOpen: true,
-        isLoading: true
+        isLoading: true,
+        cancelTokenSource: cancellablePersonRequest.cancelTokenSource
       });
 
       /**
        * Refresh the Person record to get most up to date info.
        */
-      const person = await personState.getPersonByEmail(userInfo.email);
+      const personRequest = await cancellablePersonRequest.axiosPromise();
+      const person = personRequest.data;
 
-      /**
-       *
-       */
       userEditorState.merge({
         currentUserState: person,
         original: { ...person },
@@ -128,8 +136,11 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
         disableSubmit: true
       });
     } catch (err) {
+      if (!isDataRequestCancelError(err)) {
+        createTextToast(ToastType.ERROR, 'Could not load your record.');
+      }
+
       userEditorCloseHandler();
-      createTextToast(ToastType.ERROR, 'Could not load your record.');
     }
   }
 

@@ -19,7 +19,7 @@ export default class UtilityFunctions {
   }
 
   static clickOnPageNav(page: Page) {
-    cy.get(`[href="${page}"] > .sidebar-item__name`).click();
+    cy.get(`[href="${page}"] > .sidebar-item__name`).click({ force: true });
   }
 
   /**

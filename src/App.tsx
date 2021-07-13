@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Route, Switch} from 'react-router-dom';
-import {RoutePath, routes} from './routes';
+import {RouteItem, RoutePath, routes} from './routes';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import {useAuthorizedUserState} from './state/authorized-user/authorized-user-state';
 import withLoading from './hocs/UseLoading/WithLoading';
@@ -37,17 +37,33 @@ function App() {
 }
 
 function AppContent() {
+  const routesFlat = useMemo(() => {
+    const flatCollection: RouteItem[] = [];
+    for (const route of routes) {
+      if (route.childRoutes != null && route.childRoutes.length !== 0) {
+        for (const childRoute of route.childRoutes) {
+          flatCollection.push(childRoute);
+        }
+      }
+      else {
+        flatCollection.push(route);
+      }
+    }
+    return flatCollection;
+  }, []);
   return (
     <ErrorBoundary>
       <Switch>
-        {routes.map((route) => {
-          return <ProtectedRoute
-            key={route.name}
-            exact
-            path={route.path}
-            component={route.component}
-            requiredPrivilege={route.requiredPrivileges}
-          />
+        {routesFlat.map((route) => {
+          if (route.component != null) {
+            return <ProtectedRoute
+              key={route.name}
+              exact
+              path={route.path}
+              component={route.component}
+              requiredPrivilege={route.requiredPrivileges}
+            />
+          }
         })}
 
         <ProtectedRoute
