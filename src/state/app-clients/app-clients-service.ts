@@ -58,11 +58,12 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async sendCreate(toCreate: AppClientFlat): Promise<AppClientFlat> {
+    const appClientDto = await this.convertToDto(toCreate);
+    if (!this.validate(appClientDto)) {
+      throw TypeValidation.validationError('AppClientUserDto');
+    }
+
     try {
-      const appClientDto = await this.convertToDto(toCreate);
-      if(!this.validate(appClientDto)) {
-        throw TypeValidation.validationError('AppClientUserDto');
-      }
       const createdResponse = await this.appClientsApi.createAppClientUser(appClientDto);
       const createdAppClientFlat = this.convertToFlat(createdResponse.data);
       this.state[this.state.length].set(createdAppClientFlat);
@@ -74,11 +75,11 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async sendUpdate(toUpdate: AppClientFlat): Promise<AppClientFlat> {
-    try {
-      if (toUpdate?.id == null) {
-        return Promise.reject(new Error('App Client to update has undefined id.'));
-      }
+    if (toUpdate?.id == null) {
+      return Promise.reject(new Error('App Client to update has undefined id.'));
+    }
 
+    try {
       const appClientDto = await this.convertToDto(toUpdate);
       if(!this.validate(appClientDto)) {
         throw TypeValidation.validationError('AppClientUserDto');
@@ -96,11 +97,11 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async sendDelete(toDelete: AppClientFlat): Promise<void> {
-    try {
-      if (toDelete?.id == null) {
-        return Promise.reject('App Client to delete has undefined id.');
-      }
+    if (toDelete?.id == null) {
+      return Promise.reject('App Client to delete has undefined id.');
+    }
 
+    try {
       await this.appClientsApi.deleteAppClient(toDelete.id);
       const item = this.state.find(appClient => appClient.id.get() === toDelete.id);
       if (item)
@@ -174,15 +175,6 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       orgRead: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_READ) ? true : false,
     };
 
-    // if they have CREATE for PERSON or ORGANIZATIONs, then show they implicitly have EDIT privilege
-    if (privileges.personCreate) {
-      privileges.personEdit = true;
-    }
-
-    if (privileges.orgCreate) {
-      privileges.orgEdit = true;
-    }
-
     return {
       id,
       name: name || '',
@@ -192,35 +184,33 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   /**
-   * Convert the data from the edit form back into the DTO to send to API.  Here we also
-   * optimize the privileges - so if there's a _CREATE present, then we take out _EDIT and all
-   * the field level privileges (since _CREATE is implicit EDIT and all the fields too)
+   * Convert the data from the edit form back into the DTO to send to API.
+   *
    * @param client the data from the edit form
    * @returns the DTO to send to backend
    */
   async convertToDto(client: AppClientFlat): Promise<AppClientUserDto> {
-
+    const includesPersonEdit = client.allPrivs?.map(item => item.name).includes(PrivilegeType.PERSON_EDIT);
+    const includesOrgEdit = client.allPrivs?.map(item => item.name).includes(PrivilegeType.ORGANIZATION_EDIT);
     let localPrivs : PrivilegeDto[] = [];
 
-    if (client.allPrivs?.map(item => item.name).includes(PrivilegeType.PERSON_CREATE)) {
-      // find any _EDIT and field level privs and remove them
-      localPrivs = client
-        .allPrivs?.filter(item => item.name !== PrivilegeType.PERSON_EDIT && !item.name.startsWith("Person-"));
-    }
-    else {
-      // otherwise take all person privs as-is
-      localPrivs = localPrivs.concat(client.allPrivs?.filter(item => item.name.toLowerCase().startsWith("person")) ?? []);
-    }
+    /**
+     * Only include relevant privileges.
+     * If *_EDIT privilege is not given, then don't
+     * include any field level edit privileges for that type.
+     */
+    localPrivs = client.allPrivs?.filter(item => {
+      const isPersonFieldPriv = item.name.startsWith("Person-");
+      const isOrgFieldPriv = item.name.startsWith("Organization-");
 
-    if (client.allPrivs?.map(item => item.name).includes(PrivilegeType.ORGANIZATION_CREATE)) {
-      // find any _EDIT and field level privs and remove them
-      localPrivs = client
-        .allPrivs?.filter(item => item.name !== PrivilegeType.ORGANIZATION_EDIT && !item.name.startsWith("Organization-"));
-    }
-    else {
-      // otherwise take all organization privs as-is
-      localPrivs = localPrivs.concat(client.allPrivs?.filter(item => item.name.toLowerCase().startsWith("organization")) ?? []);
-    }    
+      if ((!isPersonFieldPriv && !isOrgFieldPriv) ||
+        (includesPersonEdit && isPersonFieldPriv) ||
+        (includesOrgEdit && isOrgFieldPriv)) {
+        return true
+      }
+
+      return false;
+    }) ?? [];
 
     return {
       id: client.id,

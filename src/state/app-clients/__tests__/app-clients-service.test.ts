@@ -24,11 +24,11 @@ describe('App Client State Tests', () => {
       clusterUrl: "http://app.app.svc.cluster.local/",
       name: "Test",
       personCreate: true,
-      personEdit: true,
+      personEdit: false,
       personDelete: false,
       personRead: false,
       orgCreate: true,
-      orgEdit: true,
+      orgEdit: false,
       orgDelete: false,
       orgRead: false,
     },
@@ -46,7 +46,6 @@ describe('App Client State Tests', () => {
       orgRead: false,
     }
   ];
-
 
   const clients: AppClientUserDto[] = [
     {
@@ -120,8 +119,7 @@ describe('App Client State Tests', () => {
     orgDelete: false,
     orgRead: false,
     allPrivs: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
-}
-
+  }
 
   const axiosPostPutResponse = {
     data: testClientDto,
@@ -234,7 +232,7 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
-    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    const { allPrivs, ...localTestClientFlat } = { ...testClientFlat };
     appClientsState.set([testClientFlat]);
 
     await expect(wrappedState.sendUpdate(testClientFlat)).resolves.toEqual(localTestClientFlat);
@@ -268,6 +266,16 @@ describe('App Client State Tests', () => {
     }
   });
 
+  it('Test sendUpdate Fail on Dto Validation', async () => {
+    wrappedState.convertToDto = jest.fn(() => {
+      return Promise.resolve({
+        bad: "param"
+      } as unknown as AppClientUserDto);
+    });
+
+    await expect(wrappedState.sendUpdate(testClientFlat)).rejects.toBeTruthy();
+  });
+
   it('Test sendCreate', async () => {
     appClientsApi.createAppClientUser = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
@@ -277,7 +285,7 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
-    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    const { allPrivs, ...localTestClientFlat } = { ...testClientFlat };
     await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(localTestClientFlat);
   });
 
@@ -291,6 +299,16 @@ describe('App Client State Tests', () => {
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendCreate Fail on Dto Validation', async () => {
+    wrappedState.convertToDto = jest.fn(() => {
+      return Promise.resolve({
+        bad: "param"
+      } as unknown as AppClientUserDto);
+    });
+
+    await expect(wrappedState.sendCreate(testClientFlat)).rejects.toBeTruthy();
   });
 
   it('Test sendDelete Success', async () => {
@@ -341,9 +359,13 @@ describe('App Client State Tests', () => {
     await expect(wrappedState.convertRowDataToEditableData(testClientFlat)).resolves.toEqual(testClientFlatWithDetails);
   });
 
+  it('Test convertRowDataToEditableData should fail with no id', async () => {
+    await expect(wrappedState.convertRowDataToEditableData({ bad: "param" } as unknown as AppClientFlat)).rejects.toBeTruthy();
+  });
+
   it('Test convertAppClientToFlat', () => {
     const result = wrappedState.convertToFlat(testClientDto);
-    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    const { allPrivs, ...localTestClientFlat } = { ...testClientFlat };
     expect(result).toEqual(localTestClientFlat);
   });
 
@@ -361,7 +383,7 @@ describe('App Client State Tests', () => {
       name: 'name',
       clusterUrl: '',
       appClientDeveloperEmails: undefined,
-      privileges: privilegeDtos.filter(item => item.name.match(/PERSON_CREATE/))
+      privileges: privilegeDtos.filter(item => item.name.match(/PERSON_CREATE|PERSON_EDIT|Person-firstName/))
     });
 
     const result3 = wrappedState.convertToDto({ id: 'some id',
@@ -374,7 +396,7 @@ describe('App Client State Tests', () => {
       name: 'name',
       clusterUrl: '',
       appClientDeveloperEmails: undefined,
-      privileges: privilegeDtos.filter(item => item.name.match(/ORGANIZATION_CREATE|PERSON_CREATE/))
+      privileges: privilegeDtos.filter(item => item.name.match(/ORGANIZATION_CREATE|PERSON_CREATE|ORGANIZATION_EDIT/))
     });
   });  
 });
