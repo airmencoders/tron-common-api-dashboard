@@ -4,4 +4,19 @@
   input {
     padding: units(.5) units(1);
   }
+
+  &--appended {
+    display: flex;
+    align-items: center;
+
+    input {
+      margin-top: 0;
+    }
+
+    .appended-text {
+      font-weight: 600;
+      padding: units(.5) units(1);
+      width: 100%;
+    }
+  }
 }

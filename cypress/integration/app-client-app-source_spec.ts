@@ -2,13 +2,13 @@
 
 import { apiBase, host } from '../support';
 import DataCrudFormPageUtil, { AppClient, AppClientGridColId, AppSourceEmailGridColId, AppSourceEndpointGridColId, AppSourceGridColId } from '../support/data-crud-form-functions';
-import UtilityFunctions from '../support/utility-functions';
+import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('App Source / App Client Tests', () => {
   it('Should allow App Client creation & deletion', () => {
     cy.visit(host);
 
-    cy.get('[href="/app-clients"] > .sidebar-item__name').click({ force: true });
+    UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
 
     const appClient: AppClient = {
       name: UtilityFunctions.generateRandomString()
@@ -105,7 +105,7 @@ describe('App Source / App Client Tests', () => {
     DataCrudFormPageUtil.createAppClientAndSuccess(appClient);
 
     // Go to app source page and give permission to app client
-    cy.get('[href="/app-source"] > .sidebar-item__name').click();
+    UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
     const appSourceName = 'puckboard';
     DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
     cy.intercept({
@@ -131,7 +131,7 @@ describe('App Source / App Client Tests', () => {
     UtilityFunctions.findToastContainsMessage('Successfully updated App Source');
 
     // Go to app client page and make sure app client has access to app source now
-    cy.get('[href="/app-clients"] > .sidebar-item__name').click();
+    UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
     DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
     cy.intercept({
       method: 'GET',
@@ -145,7 +145,7 @@ describe('App Source / App Client Tests', () => {
     cy.get('button').contains('Cancel').click();
 
     // Go to app source page and revoke permission from app client
-    cy.get('[href="/app-source"] > .sidebar-item__name').click();
+    UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
     DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
     cy.wait('@appSourceDetails');
 
@@ -162,7 +162,7 @@ describe('App Source / App Client Tests', () => {
     UtilityFunctions.findToastContainsMessage('Successfully updated App Source');
 
     // Go to app client page and make sure app client no longer has access to app source
-    cy.get('[href="/app-clients"] > .sidebar-item__name').click();
+    UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
     DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
     DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
@@ -180,7 +180,7 @@ describe('App Source / App Client Tests', () => {
 
     beforeEach(() => {
       cy.visit(`${host}`);
-      cy.get('[href="/app-source"] > .sidebar-item__name').click({ force: true });
+      UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
       const appSourceName = 'puckboard';
       DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
@@ -217,5 +217,27 @@ describe('App Source / App Client Tests', () => {
       DataCrudFormPageUtil.submitDataCrudFormUpdate();
       UtilityFunctions.findToastContainsMessage('Successfully updated App Source');
     });
+  });
+
+  it('Should be able to toggle Rate Limiting and change requests/minutes', () => {
+    cy.visit(`${host}`);
+    UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
+
+    const appSourceName = 'puckboard';
+    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
+    cy.intercept({
+      method: 'GET',
+      path: `${apiBase}/app-source/*`
+    }).as('appSourceDetails');
+    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+    cy.wait('@appSourceDetails');
+
+    // Force it to be checked and try to change rate limit value
+    cy.get('#rate-limit-toggle').check({ force: true }).should('be.checked');
+    cy.get('#rate-limit-count').should('not.be.disabled').type('111a').should('have.value', '111');
+
+    // Force it to be unchecked
+    cy.get('#rate-limit-toggle').uncheck({ force: true }).should('not.be.checked');
+    cy.get('#rate-limit-count').should('be.disabled');
   });
 });

@@ -8,4 +8,5 @@ export interface CustomTextInputProps {
   inputRef?: TextInputRef
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   error?: boolean
+  appendedText?: string
 }
