@@ -186,7 +186,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
       return;
     }
 
-    const updatedRanksPromise = this.rankApi.getRanks1(branch)
+    const updatedRanksPromise = this.rankApi.getRanks(branch)
         .then(resp => {
           return resp.data;
         });
