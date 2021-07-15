@@ -1,4 +1,4 @@
-import { none, useHookstate } from '@hookstate/core';
+import { Downgraded, none, useHookstate } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
@@ -39,6 +39,10 @@ interface EndpointModalState {
 interface DeleteEndpointModalState {
   isOpen: boolean;
   selected?: AppEndpointDto;
+}
+
+function getAppSourceEndpointId(data: AppEndpointDto): string {
+  return data.id ?? '';
 }
 
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
@@ -433,20 +437,21 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           labelName="endpoints"
           labelText="Endpoints"
         >
+          <ItemChooser
+            columns={appSourceEndpointColumns}
+            items={[...formState.endpoints.attach(Downgraded).get()]}
+            onRowClicked={onEndpointRowClicked}
+            suppressRowClickSelection
+            rowSelection="multiple"
+            showEditBtn
+            disableEditBtn={endpointModifyState.bulkSelected.length === 0}
+            onEditBtnClick={onEndpointEditBtnClicked}
+            onRowSelected={onRowSelected}
+            className="endpoint-grid"
+            immutableData
+            getRowNodeId={getAppSourceEndpointId}
+          />
         </FormGroup>
-
-        <ItemChooser
-          columns={appSourceEndpointColumns}
-          items={formState.endpoints.get()}
-          onRowClicked={onEndpointRowClicked}
-          suppressRowClickSelection
-          rowSelection={'multiple'}
-          showEditBtn
-          disableEditBtn={endpointModifyState.bulkSelected.length === 0}
-          onEditBtnClick={onEndpointEditBtnClicked}
-          onRowSelected={onRowSelected}
-          className="endpoint-grid"
-        />
 
         <SuccessErrorMessage
           successMessage={props.successAction?.successMsg}

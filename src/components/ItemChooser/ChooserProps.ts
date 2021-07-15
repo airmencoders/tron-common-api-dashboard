@@ -14,4 +14,6 @@ export interface ChooserProps {
   onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
   onGridReady?: (event: GridApi | undefined) => void;
   className?: string;
+  getRowNodeId?: (data: any) => string;
+  immutableData?: boolean;
 }

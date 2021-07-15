@@ -121,6 +121,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                 maxConcurrentDatasourceRequests={props.maxConcurrentDatasourceRequests ?? agGridDefaults.maxConcurrentDatasourceRequests}
                 maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
                 getRowNodeId={props.getRowNodeId}
+                immutableData={props.immutableData}
             >
               {
                 props.columns.map(col => (
