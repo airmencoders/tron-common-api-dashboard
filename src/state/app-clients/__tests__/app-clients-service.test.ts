@@ -4,6 +4,7 @@ import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-cr
 import { AppClientUserDetailsDto, AppClientUserDtoResponseWrapped, PrivilegeDto, PrivilegeDtoResponseWrapper } from '../../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
 import { AppClientUserDto } from '../../../openapi/models/app-client-user-dto';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import { PrivilegeType } from '../../privilege/privilege-type';
 import { AppClientFlat } from '../app-client-flat';
 import AppClientsService from '../app-clients-service';
@@ -23,11 +24,11 @@ describe('App Client State Tests', () => {
       clusterUrl: "http://app.app.svc.cluster.local/",
       name: "Test",
       personCreate: true,
-      personEdit: true,
+      personEdit: false,
       personDelete: false,
       personRead: false,
       orgCreate: true,
-      orgEdit: true,
+      orgEdit: false,
       orgDelete: false,
       orgRead: false,
     },
@@ -45,7 +46,6 @@ describe('App Client State Tests', () => {
       orgRead: false,
     }
   ];
-
 
   const clients: AppClientUserDto[] = [
     {
@@ -119,8 +119,7 @@ describe('App Client State Tests', () => {
     orgDelete: false,
     orgRead: false,
     allPrivs: privilegeDtos.filter(item => item.name === 'PERSON_CREATE' || item.name === 'ORGANIZATION_CREATE')
-}
-
+  }
 
   const axiosPostPutResponse = {
     data: testClientDto,
@@ -141,7 +140,7 @@ describe('App Client State Tests', () => {
   const axiosRejectResponse = {
     response: {
       data: {
-        message: 'failed'
+        reason: 'failed'
       },
       status: 400,
       statusText: 'OK',
@@ -159,7 +158,7 @@ describe('App Client State Tests', () => {
   };
 
   const rejectMsg = {
-    general: axiosRejectResponse.response.data.message
+    general: axiosRejectResponse.response.data.reason
   } as DataCrudFormErrors;
 
   let privilegeState: State<PrivilegeDto[]> & StateMethodsDestroy;
@@ -183,7 +182,8 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => resolve(axiosGetResponse));
     });
 
-    await wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
+    await cancellableRequest.promise;
     expect(wrappedState.appClients).toEqual(flatClients);
   });
 
@@ -198,10 +198,10 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<AppClientUserDtoResponseWrapped>>(resolve => setTimeout(() => resolve(axiosGetResponse), 200));
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.appClients).toEqual([]);
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(wrappedState.appClients).toEqual(flatClients);
   });
 
@@ -217,8 +217,10 @@ describe('App Client State Tests', () => {
     const fetch = wrappedState.fetchAndStoreData();
     expect(wrappedState.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual(rejectMsg);
-    expect(wrappedState.error).toEqual(rejectMsg);
+    const errorRequest = prepareDataCrudErrorResponse(axiosRejectResponse);
+
+    await expect(fetch.promise).rejects.toEqual(errorRequest);
+    expect(wrappedState.error).toEqual(errorRequest);
   });
 
   it('Test sendUpdate', async () => {
@@ -230,7 +232,7 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
-    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    const { allPrivs, ...localTestClientFlat } = { ...testClientFlat };
     appClientsState.set([testClientFlat]);
 
     await expect(wrappedState.sendUpdate(testClientFlat)).resolves.toEqual(localTestClientFlat);
@@ -264,6 +266,16 @@ describe('App Client State Tests', () => {
     }
   });
 
+  it('Test sendUpdate Fail on Dto Validation', async () => {
+    wrappedState.convertToDto = jest.fn(() => {
+      return Promise.resolve({
+        bad: "param"
+      } as unknown as AppClientUserDto);
+    });
+
+    await expect(wrappedState.sendUpdate(testClientFlat)).rejects.toBeTruthy();
+  });
+
   it('Test sendCreate', async () => {
     appClientsApi.createAppClientUser = jest.fn(() => {
       return new Promise<AxiosResponse<AppClientUserDto>>(resolve => resolve(axiosPostPutResponse));
@@ -273,7 +285,7 @@ describe('App Client State Tests', () => {
       return new Promise<AxiosResponse<PrivilegeDtoResponseWrapper>>(resolve => resolve(getClientTypePrivsWrappedResponse));
     });
 
-    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    const { allPrivs, ...localTestClientFlat } = { ...testClientFlat };
     await expect(wrappedState.sendCreate(testClientFlat)).resolves.toEqual(localTestClientFlat);
   });
 
@@ -287,6 +299,16 @@ describe('App Client State Tests', () => {
     });
 
     await expect(wrappedState.sendCreate(testClientFlat)).rejects.toEqual(rejectMsg);
+  });
+
+  it('Test sendCreate Fail on Dto Validation', async () => {
+    wrappedState.convertToDto = jest.fn(() => {
+      return Promise.resolve({
+        bad: "param"
+      } as unknown as AppClientUserDto);
+    });
+
+    await expect(wrappedState.sendCreate(testClientFlat)).rejects.toBeTruthy();
   });
 
   it('Test sendDelete Success', async () => {
@@ -337,9 +359,13 @@ describe('App Client State Tests', () => {
     await expect(wrappedState.convertRowDataToEditableData(testClientFlat)).resolves.toEqual(testClientFlatWithDetails);
   });
 
+  it('Test convertRowDataToEditableData should fail with no id', async () => {
+    await expect(wrappedState.convertRowDataToEditableData({ bad: "param" } as unknown as AppClientFlat)).rejects.toBeTruthy();
+  });
+
   it('Test convertAppClientToFlat', () => {
     const result = wrappedState.convertToFlat(testClientDto);
-    const { allPrivs, ...localTestClientFlat } = {...testClientFlat, personEdit: true, orgEdit: true};
+    const { allPrivs, ...localTestClientFlat } = { ...testClientFlat };
     expect(result).toEqual(localTestClientFlat);
   });
 
@@ -357,7 +383,7 @@ describe('App Client State Tests', () => {
       name: 'name',
       clusterUrl: '',
       appClientDeveloperEmails: undefined,
-      privileges: privilegeDtos.filter(item => item.name.match(/PERSON_CREATE/))
+      privileges: privilegeDtos.filter(item => item.name.match(/PERSON_CREATE|PERSON_EDIT|Person-firstName/))
     });
 
     const result3 = wrappedState.convertToDto({ id: 'some id',
@@ -370,7 +396,7 @@ describe('App Client State Tests', () => {
       name: 'name',
       clusterUrl: '',
       appClientDeveloperEmails: undefined,
-      privileges: privilegeDtos.filter(item => item.name.match(/ORGANIZATION_CREATE|PERSON_CREATE/))
+      privileges: privilegeDtos.filter(item => item.name.match(/ORGANIZATION_CREATE|PERSON_CREATE|ORGANIZATION_EDIT/))
     });
   });  
 });

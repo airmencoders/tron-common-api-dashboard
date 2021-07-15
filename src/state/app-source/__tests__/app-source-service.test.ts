@@ -4,6 +4,7 @@ import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserD
 import { AppClientFlat } from '../../app-clients/app-client-flat';
 import AppClientsService from '../../app-clients/app-clients-service';
 import { accessAppClientsState } from '../../app-clients/app-clients-state';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import PrivilegeService from '../../privilege/privilege-service';
 import { accessPrivilegeState } from '../../privilege/privilege-state';
 import { PrivilegeType } from '../../privilege/privilege-type';
@@ -173,10 +174,10 @@ describe('App Source State Tests', () => {
     appClientsApi = new AppClientControllerApi();
 
     mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
+    await accessPrivilegeState().fetchAndStorePrivileges().promise;
 
     mockAppClientsState();
-    await accessAppClientsState().fetchAndStoreData();
+    await accessAppClientsState().fetchAndStoreData().promise;
   });
 
   afterEach(() => {
@@ -190,7 +191,8 @@ describe('App Source State Tests', () => {
       return new Promise<AxiosResponse<AppSourceDtoResponseWrapper>>(resolve => resolve(axiosGetAppSourceDtosResponse));
     });
 
-    await wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
+    await cancellableRequest.promise;
 
     expect(wrappedState.appSources).toEqual(appSourceDtos);
   });
@@ -200,10 +202,10 @@ describe('App Source State Tests', () => {
       return new Promise<AxiosResponse<AppSourceDtoResponseWrapper>>(resolve => setTimeout(() => resolve(axiosGetAppSourceDtosResponse), 1000));
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.appSources).toEqual([]);
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(wrappedState.appSources).toEqual(appSourceDtos);
   });
 
@@ -216,11 +218,13 @@ describe('App Source State Tests', () => {
       });
     });
 
-    const fetch = wrappedState.fetchAndStoreData();
+    const errorRequest = prepareDataCrudErrorResponse(rejectMsg);
+
+    const cancellableRequest = wrappedState.fetchAndStoreData();
     expect(wrappedState.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual(rejectMsg);
-    expect(wrappedState.error).toBe(rejectMsg);
+    await expect(cancellableRequest.promise).rejects.toEqual(errorRequest);
+    expect(wrappedState.error).toEqual(errorRequest);
   });
 
   it('Test sendUpdate', async () => {

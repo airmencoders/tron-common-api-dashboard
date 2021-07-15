@@ -7,6 +7,8 @@ import {ValidateFunction} from 'ajv';
 import ModelTypes from '../../api/model-types.json';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import isEqual from 'fast-deep-equal';
+import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 
 /**
  * PII WARNING:
@@ -31,13 +33,16 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
     this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
   }
 
-  async fetchAndStoreData(): Promise<PersonDto[]> {
-    const personResponsePromise = await this.personApi.getPersonsWrapped()
-        .then(resp => {
-          return resp.data.data;
-        });
-    this.state.set(personResponsePromise ?? []);
-    return personResponsePromise ?? [];
+  fetchAndStoreData(): CancellableDataRequest<PersonDto[]> {
+    const cancellableRequest = makeCancellableDataRequestToken(this.personApi.getPersonsWrapped.bind(this.personApi));
+    const requestPromise = wrapDataCrudWrappedRequest(cancellableRequest.axiosPromise());
+
+    this.state.set(requestPromise);
+
+    return {
+      promise: requestPromise,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   /**

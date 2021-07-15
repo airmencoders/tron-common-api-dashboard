@@ -2,12 +2,12 @@ import {none, State} from '@hookstate/core';
 import { OrganizationControllerApiInterface, PersonControllerApiInterface } from '../../openapi';
 import { FilterCondition, FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum, OrganizationDto, PersonDto } from '../../openapi/models';
 import {AbstractDataService} from '../data-service/abstract-data-service';
-import {OrganizationDtoWithDetails, PersonWithDetails} from './organization-state';
+import { OrganizationDtoWithDetails } from './organization-state';
 import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
 import isEqual from 'fast-deep-equal';
-import { createJsonPatchOp, getDataItemDuplicates, getDataItemNonDuplicates, mapDataItemsToStringIds, mergeDataToState } from '../data-service/data-service-utils';
+import { createJsonPatchOp, getDataItemDuplicates, getDataItemNonDuplicates, mapDataItemsToStringIds, mergeDataToState, prepareDataCrudErrorResponse, wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -21,6 +21,7 @@ import { OrganizationPatchRequestType } from './organization-patch-request-type'
 import { ResponseType } from '../data-service/response-type';
 import { OrganizationEditState } from '../../pages/Organization/organization-edit-state';
 import { OrganizationChooserDataType } from './organization-chooser-data-type';
+import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 
 // complex parts of the org we can edit -- for now...
 export enum OrgEditOpType {
@@ -51,17 +52,16 @@ export default class OrganizationService extends AbstractDataService<Organizatio
     this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
   }
 
-  async fetchAndStoreData(): Promise<OrganizationDto[]> {
-    try {
-      const orgDataResponse = await this.orgApi.getOrganizationsWrapped();
-      const orgData = orgDataResponse.data.data;
-      const mappedData = this.removeUnfriendlyAgGridData(orgData);
-      this.state.set(mappedData);
-      return Promise.resolve(orgData);
-    }
-    catch (error) {
-      return Promise.reject(error);
-    }
+  fetchAndStoreData(): CancellableDataRequest<OrganizationDto[]> {
+    const cancellableRequest = makeCancellableDataRequestToken(this.orgApi.getOrganizationsWrapped.bind(this.orgApi));
+    const requestPromise = wrapDataCrudWrappedRequest(cancellableRequest.axiosPromise());
+
+    this.state.set(requestPromise);
+
+    return {
+      promise: requestPromise,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   /**
@@ -98,9 +98,19 @@ export default class OrganizationService extends AbstractDataService<Organizatio
             return resp.data.data;
           });
       } else {
-        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, undefined, undefined, page, limit, sort)
-          .then(resp => {
-            return resp.data.data;
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, "id,firstName,lastName", "id,name", page, limit, sort)
+          .then(resp => {  
+            
+            // what we really get is an OrganizationWithDetails since we specified people and org fields to return
+            //  but here we take what we need from it and conform it to the "shape" of an OrganizationDto
+            return resp.data.data.map((item : any) => { 
+              return {...item, 
+                leader: `${item.leader?.firstName ?? ''} ${item.leader?.lastName ?? ''}`.trim(),  // build leader name
+                members: item.members?.map((member : any) => member.id),  // just grab member id as it normally would be returned
+                subordinateOrganizations: item.subordinateOrganizations?.map((org : any) => org.id), // just take id here
+                parentOrganization: item.parentOrganization?.name ?? '',  // take parent org name             
+              } as OrganizationDto; 
+            });
           });
       }
     } catch (err) {

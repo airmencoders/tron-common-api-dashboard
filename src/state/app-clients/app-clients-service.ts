@@ -1,14 +1,16 @@
-import { none, postpone, State } from "@hookstate/core";
+import { none, State } from "@hookstate/core";
 import { ValidateFunction } from 'ajv';
+import axios from 'axios';
 import ModelTypes from '../../api/model-types.json';
 import { DataCrudFormErrors } from "../../components/DataCrudFormPage/data-crud-form-errors";
 import { AppClientControllerApiInterface } from "../../openapi/apis/app-client-controller-api";
 import { AppClientUserDetailsDto, PrivilegeDto } from "../../openapi/models";
 import { AppClientUserDto } from "../../openapi/models/app-client-user-dto";
+import { CancellableDataRequest, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import { AppSourceDevDetails } from '../app-source/app-source-dev-details';
 import { DataService } from "../data-service/data-service";
-import { prepareDataCrudErrorResponse } from "../data-service/data-service-utils";
+import { prepareDataCrudErrorResponse, wrapDataCrudWrappedRequest } from "../data-service/data-service-utils";
 import { PrivilegeType } from "../privilege/privilege-type";
 import { AppClientFlat } from "./app-client-flat";
 import { AppClientPrivilege } from "./app-client-privilege";
@@ -31,32 +33,23 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     this.validate = TypeValidation.validatorFor<AppClientUserDto>(ModelTypes.definitions.AppClientUserDto);
   }
 
-  fetchAndStoreData(): Promise<AppClientFlat[]> {   
-    const data = new Promise<AppClientFlat[]>(async (resolve, reject) => {
-      try {
-        const result = await this.appClientsApi.getAppClientUsersWrapped();
-        resolve(this.convertAppClientsToFlat(result.data.data));
-      } catch (err) {
-        reject(prepareDataCrudErrorResponse(err));
-      }
-    });
+  fetchAndStoreData(): CancellableDataRequest<AppClientFlat[]> {
+    const cancelTokenSource = axios.CancelToken.source();
 
-    this.state.set(data);
+    const appClientRequest = makeCancellableDataRequest(cancelTokenSource, this.appClientsApi.getAppClientUsersWrapped.bind(this.appClientsApi));
+    const appClientStatePromise = wrapDataCrudWrappedRequest(appClientRequest.axiosPromise(), this.convertAppClientsToFlat.bind(this));
 
-    // fetch privileges that we can use
-    const privData = new Promise<PrivilegeDto[]>(async (resolve, reject) => {
-      try {
-        const result = await this.appClientsApi.getClientTypePrivsWrapped();
-        resolve(result.data.data);
-      } catch (err) {
-        reject(prepareDataCrudErrorResponse(err));
-      }
-    });
+    this.state.set(appClientStatePromise);
 
-    
-    this.privilegesState.set(privData);
+    const privilegeRequest = makeCancellableDataRequest(cancelTokenSource, this.appClientsApi.getClientTypePrivsWrapped.bind(this.appClientsApi));
+    const privilegeStatePromise = wrapDataCrudWrappedRequest(privilegeRequest.axiosPromise());
 
-    return data;
+    this.privilegesState.set(privilegeStatePromise);
+
+    return {
+      promise: appClientStatePromise,
+      cancelTokenSource
+    };
   }
 
   async getSelectedClient(id: string): Promise<AppClientUserDetailsDto> {
@@ -65,11 +58,12 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async sendCreate(toCreate: AppClientFlat): Promise<AppClientFlat> {
+    const appClientDto = await this.convertToDto(toCreate);
+    if (!this.validate(appClientDto)) {
+      throw TypeValidation.validationError('AppClientUserDto');
+    }
+
     try {
-      const appClientDto = await this.convertToDto(toCreate);
-      if(!this.validate(appClientDto)) {
-        throw TypeValidation.validationError('AppClientUserDto');
-      }
       const createdResponse = await this.appClientsApi.createAppClientUser(appClientDto);
       const createdAppClientFlat = this.convertToFlat(createdResponse.data);
       this.state[this.state.length].set(createdAppClientFlat);
@@ -81,11 +75,11 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async sendUpdate(toUpdate: AppClientFlat): Promise<AppClientFlat> {
-    try {
-      if (toUpdate?.id == null) {
-        return Promise.reject(new Error('App Client to update has undefined id.'));
-      }
+    if (toUpdate?.id == null) {
+      return Promise.reject(new Error('App Client to update has undefined id.'));
+    }
 
+    try {
       const appClientDto = await this.convertToDto(toUpdate);
       if(!this.validate(appClientDto)) {
         throw TypeValidation.validationError('AppClientUserDto');
@@ -103,11 +97,11 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   async sendDelete(toDelete: AppClientFlat): Promise<void> {
-    try {
-      if (toDelete?.id == null) {
-        return Promise.reject('App Client to delete has undefined id.');
-      }
+    if (toDelete?.id == null) {
+      return Promise.reject('App Client to delete has undefined id.');
+    }
 
+    try {
       await this.appClientsApi.deleteAppClient(toDelete.id);
       const item = this.state.find(appClient => appClient.id.get() === toDelete.id);
       if (item)
@@ -181,15 +175,6 @@ export default class AppClientsService implements DataService<AppClientFlat, App
       orgRead: privilegeArr.find(privilege => privilege.name === PrivilegeType.ORGANIZATION_READ) ? true : false,
     };
 
-    // if they have CREATE for PERSON or ORGANIZATIONs, then show they implicitly have EDIT privilege
-    if (privileges.personCreate) {
-      privileges.personEdit = true;
-    }
-
-    if (privileges.orgCreate) {
-      privileges.orgEdit = true;
-    }
-
     return {
       id,
       name: name || '',
@@ -199,35 +184,33 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   /**
-   * Convert the data from the edit form back into the DTO to send to API.  Here we also
-   * optimize the privileges - so if there's a _CREATE present, then we take out _EDIT and all
-   * the field level privileges (since _CREATE is implicit EDIT and all the fields too)
+   * Convert the data from the edit form back into the DTO to send to API.
+   *
    * @param client the data from the edit form
    * @returns the DTO to send to backend
    */
   async convertToDto(client: AppClientFlat): Promise<AppClientUserDto> {
-
+    const includesPersonEdit = client.allPrivs?.map(item => item.name).includes(PrivilegeType.PERSON_EDIT);
+    const includesOrgEdit = client.allPrivs?.map(item => item.name).includes(PrivilegeType.ORGANIZATION_EDIT);
     let localPrivs : PrivilegeDto[] = [];
 
-    if (client.allPrivs?.map(item => item.name).includes(PrivilegeType.PERSON_CREATE)) {
-      // find any _EDIT and field level privs and remove them
-      localPrivs = client
-        .allPrivs?.filter(item => item.name !== PrivilegeType.PERSON_EDIT && !item.name.startsWith("Person-"));
-    }
-    else {
-      // otherwise take all person privs as-is
-      localPrivs = localPrivs.concat(client.allPrivs?.filter(item => item.name.toLowerCase().startsWith("person")) ?? []);
-    }
+    /**
+     * Only include relevant privileges.
+     * If *_EDIT privilege is not given, then don't
+     * include any field level edit privileges for that type.
+     */
+    localPrivs = client.allPrivs?.filter(item => {
+      const isPersonFieldPriv = item.name.startsWith("Person-");
+      const isOrgFieldPriv = item.name.startsWith("Organization-");
 
-    if (client.allPrivs?.map(item => item.name).includes(PrivilegeType.ORGANIZATION_CREATE)) {
-      // find any _EDIT and field level privs and remove them
-      localPrivs = client
-        .allPrivs?.filter(item => item.name !== PrivilegeType.ORGANIZATION_EDIT && !item.name.startsWith("Organization-"));
-    }
-    else {
-      // otherwise take all organization privs as-is
-      localPrivs = localPrivs.concat(client.allPrivs?.filter(item => item.name.toLowerCase().startsWith("organization")) ?? []);
-    }    
+      if ((!isPersonFieldPriv && !isOrgFieldPriv) ||
+        (includesPersonEdit && isPersonFieldPriv) ||
+        (includesOrgEdit && isOrgFieldPriv)) {
+        return true
+      }
+
+      return false;
+    }) ?? [];
 
     return {
       id: client.id,
@@ -255,12 +238,8 @@ export default class AppClientsService implements DataService<AppClientFlat, App
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

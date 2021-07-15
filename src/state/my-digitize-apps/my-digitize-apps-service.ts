@@ -1,28 +1,35 @@
 import { DataService } from '../data-service/data-service';
-import { postpone, State } from '@hookstate/core';
+import { State } from '@hookstate/core';
 import { ScratchStorageAppRegistryDto, ScratchStorageControllerApiInterface } from '../../openapi';
 import { ScratchStorageAppFlat } from './scratch-storage-app-flat';
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
 import { PrivilegeType } from '../privilege/privilege-type';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 
 export default class MyDigitizeAppsService implements DataService<ScratchStorageAppFlat, ScratchStorageAppRegistryDto> {
   constructor(public state: State<ScratchStorageAppFlat[]>, private scratchStorageApi: ScratchStorageControllerApiInterface) { }
 
-  fetchAndStoreData(): Promise<ScratchStorageAppFlat[]> {
-    const scratchStorageAppsResponse = this.scratchStorageApi.getScratchSpaceAppsByAuthorizedUser();
+  fetchAndStoreData(): CancellableDataRequest<ScratchStorageAppFlat[]> {
+    const cancellableRequest = makeCancellableDataRequestToken(this.scratchStorageApi.getScratchSpaceAppsByAuthorizedUser.bind(this.scratchStorageApi));
+    const requestPromise = cancellableRequest.axiosPromise()
+      .then(response => {
+        return this.convertScratchStorageAppRegistryDtosToFlat(response.data);
+      })
+      .catch(error => {
+        if (isDataRequestCancelError(error)) {
+          return [];
+        }
 
-    const convertedResponse: Promise<ScratchStorageAppFlat[]> = new Promise(async (resolve, reject) => {
-      try {
-        const dataResponse = (await scratchStorageAppsResponse).data;
-        const converted = this.convertScratchStorageAppRegistryDtosToFlat(dataResponse);
-        resolve(converted);
-      } catch (err) {
-        reject(err);
-      }
-    });
+        return Promise.reject(prepareDataCrudErrorResponse(error));
+      });
 
-    this.state.set(convertedResponse);
-    return convertedResponse;
+    this.state.set(requestPromise);
+
+    return {
+      promise: requestPromise,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
   }
 
   /**
@@ -118,12 +125,8 @@ export default class MyDigitizeAppsService implements DataService<ScratchStorage
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
   }
 }

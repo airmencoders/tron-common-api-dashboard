@@ -1,4 +1,4 @@
-import { Downgraded, useHookstate, useState } from "@hookstate/core";
+import { Downgraded, none, useHookstate, useState } from "@hookstate/core";
 import { Initial } from "@hookstate/initial";
 import { Touched } from "@hookstate/touched";
 import { Validation } from "@hookstate/validation";
@@ -56,21 +56,12 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const currentUser = accessAuthorizedUserState();
   const developerAddState = useHookstate({ email: '' });
 
-  // state of person and org's CREATE checkbox
-  // either of which true will make its EDIT and fields checkboxs disabled/not visible respectively
-  const createPrivState = useHookstate({ person: false, organization: false});
-
   // state of person and org's EDIT checkbox
   // either of which true will make its fields checkboxs disabled/not visible respectively
   const editPrivState = useHookstate({ person: false, organization: false});
 
   // load initial state of the create and edit checkboxes so we know how to disable/hide
-  // field level privileges (remember CREATE privilege include implicit EDIT for all fields...)
   useEffect(() => {
-    createPrivState.set({
-      person: formState.allPrivs?.value?.map(item => item.name).includes('PERSON_CREATE') ?? false,
-      organization: formState.allPrivs?.value?.map(item => item.name).includes('ORGANIZATION_CREATE') ?? false
-    });
     editPrivState.set({
       person: formState.allPrivs?.value?.map(item => item.name).includes('PERSON_EDIT') ?? false,
       organization: formState.allPrivs?.value?.map(item => item.name).includes('ORGANIZATION_EDIT') ?? false
@@ -102,50 +93,33 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
-  formState.attach(Downgraded);
 
   Validation(formState.clusterUrl).validate(url => validateSubscriberAddress(url), 'Invalid Client App URL Format', 'error');
   Validation(formState.name).validate(name => validateRequiredString(name), validationErrors.requiredText, 'error');
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
-  function isFormModified() {
+  function isFormModified(): boolean {
     return Initial(formState.name).modified()
             || Initial(formState.allPrivs).modified()
             || Initial(formState.appClientDeveloperEmails).modified()
-            || Initial(formState.clusterUrl).modified()
+            || Initial(formState.clusterUrl).modified();
   }
 
-  function isFormDisabled() {
-    return props.successAction?.success;
+  function isFormDisabled(): boolean {
+    return props.successAction?.success ?? false;
   }
 
-  function submitForm(event: FormEvent<HTMLFormElement>) {
+  function submitForm(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     props.onSubmit(formState.get());
   }
 
-  function deleteAppClientDeveloper(deleteItem: DeveloperEmail) {
-
-    // get rid of the email we wanna delete and update the state
-    const emails = new Array<string>();
-    const entries = formState.appClientDeveloperEmails.get();
-    if (entries !== undefined) {
-      for (const entry of entries) {
-        if (entry !== deleteItem.email) emails.push(entry);
-      }
-
-      formState.appClientDeveloperEmails.set(emails);
-    }
+  function deleteAppClientDeveloper(deleteItem: DeveloperEmail): void {
+    formState.appClientDeveloperEmails.ornull?.find(email => deleteItem.email === email.value)?.set(none);
   }
 
-  function addAppClientDeveloper() {
-
-    // append new email to the list and update state
-    let emails = new Array<string>();
-    const entries = formState.appClientDeveloperEmails.get() ?? [];
-    emails = [...entries];
-    emails.push(developerAddState.email.get());
-    formState.appClientDeveloperEmails.set(emails);
+  function addAppClientDeveloper(): void {
+    formState.appClientDeveloperEmails.ornull?.merge([developerAddState.email.get()]);
     developerAddState.email.set('');
   }
 
@@ -155,7 +129,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
     return serverNameValid ? errors.concat([serverNameValid]) : errors;
   }
 
-  function handleAccordionExpanded(itemId: string | null) {
+  function handleAccordionExpanded(itemId: string | null): void {
     expandedAppSource.set(itemId);
   }
 
@@ -164,18 +138,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
    * @param priv the name of the Privilege
    * @returns its Dto object
    */
-  function getPrivObjectFromName(priv: string) : PrivilegeDto | undefined {
-    return appClientService.privilegesState.get().find(item => item.name === priv);
-  }
-
-  /**
-   * Gets all privileges that are field-privileges from the service's privilege state, e.g.
-   * Person-firstName, etc
-   * @param kind "person" or "organization"
-   * @returns array of PrivilegeDtos
-   */
-  function getAllFieldPrivsForKind(kind: PrivilegeKind) : PrivilegeDto[] {
-    return appClientService.privilegesState.value?.filter(item => item.name.toLowerCase().startsWith(kind + "-")) ?? [];
+  function getPrivObjectFromName(priv: string): PrivilegeDto | undefined {
+    return appClientService.privilegesState.attach(Downgraded).get().find(item => item.name === priv);
   }
 
   /**
@@ -183,10 +147,9 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
    * @param kind  "person" or "org"
    * @returns true or false
    */
-  function showEditFieldPane(kind : PrivilegeKind) : boolean {
+  function showEditFieldPane(kind: PrivilegeKind): boolean {
     // we say true if the CREATE priv is checked, or the EDIT checkbox is unchecked
-    return createPrivState.get()[kind]
-      || !editPrivState.get()[kind]
+    return editPrivState.get()[kind];
   }
 
   /**
@@ -195,49 +158,29 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
    * @param event the form event
    * @param kind  "person" or "organization"
    */
-  function togglePriv(event: ChangeEvent<HTMLInputElement>, kind: PrivilegeKind) {
+  function togglePriv(event: ChangeEvent<HTMLInputElement>, kind: PrivilegeKind): void {
     if (event.target.checked) {
       if (!formState.allPrivs.value?.map(item => item.name).includes(event.target.id)) {
         const priv = getPrivObjectFromName(event.target.id);
         if (priv !== undefined) {
-
-          // a _CREATE checkbox is checked, so set create priv state for kind
-          if (priv.name.match(new RegExp(kind.toUpperCase() + '_CREATE'))) {
-            createPrivState.set({...createPrivState.get(), [kind]: true });
+          if (priv.name.match(new RegExp(kind.toUpperCase() + '_EDIT'))) {
+            editPrivState.merge({
+              [kind]: true
+            });
           }
 
-          // an _EDIT checkbox is checked, so check all the field privileges and set the edit state
-          else if (priv.name.match(new RegExp(kind.toUpperCase() + '_EDIT'))) {
-            editPrivState.set({...editPrivState.get(), [kind]: true });
-            formState.allPrivs.merge(getAllFieldPrivsForKind(kind));
-          }
-
-          // enable the overall priv by placing into formState's allPrivs
-          formState.allPrivs.merge([priv]);
+          formState.allPrivs.ornull?.merge([priv]);
         }
       }
     }
     else {
-
-      // a _CREATE checkbox is unchecked, so unset create priv state for kind
-      if (event.target.id.match(new RegExp(kind.toUpperCase() + '_CREATE'))) {
-        createPrivState.set({...createPrivState.get(), [kind]: false });
+      if (event.target.id.match(new RegExp(kind.toUpperCase() + '_EDIT'))) {
+        editPrivState.merge({
+          [kind]: false
+        });
       }
 
-      // an _EDIT checkbox was unchecked, so uncheck all field privileges and unset the edit state
-      else if (event.target.id.match(new RegExp(kind.toUpperCase() + '_EDIT'))) {
-        editPrivState.set({...editPrivState.get(), [kind]: false });
-        formState
-          .allPrivs
-          .set([...formState.allPrivs.value ?? []]
-          .filter(item => !item.name.toLowerCase().startsWith(kind + "-") ));
-      }
-
-      // disable the overall priv by removing from the state's allPrivs
-      formState
-        .allPrivs
-        .set([...formState.allPrivs.value ?? []]
-        .filter(item => item.name !== event.target.id));
+      formState.allPrivs.ornull?.find(item => item.name.value === event.target.id)?.set(none);
     }
   }
 
@@ -257,7 +200,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         const privDisplayName = priv.name.replace(regex, '');
         if (privDisplayName.match(/^CREATE$|^EDIT$|^DELETE$|^READ$/)) {
           crudLevelPrivs.push({ priv, privDisplayName });
-        }
+        }   
         else {
           fieldLevelPrivs.push({ priv, privDisplayName });
         }
@@ -268,38 +211,22 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         <div className='crud-level-checkboxes' data-testid={kind + '-privileges'}>
         {
           crudLevelPrivs.map(item =>
-            item.priv.name.match(/_EDIT/) ?
-              <div key={item.priv.name} className='crud-level-checkbox'>
-                <Checkbox
-                  id={item.priv.name}
-                  name={item.priv.name}
-                  data-testid={item.priv.name}
-                  key={item.priv.name}
-                  label={item.privDisplayName}
-                  checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
-                  onChange={(event) => togglePriv(event, kind)}
-                  disabled={isFormDisabled()
-                    || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)
-                    || createPrivState.get()[kind] }
-                />
-              </div>
-            :
-              <div key={item.priv.name} className='crud-level-checkbox'>
-                <Checkbox
-                  id={item.priv.name}
-                  name={item.priv.name}
-                  data-testid={item.priv.name}
-                  key={item.priv.name}
-                  label={item.privDisplayName}
-                  checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
-                  onChange={(event) => togglePriv(event, kind)}
-                  disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
-                />
-              </div>
+            <div key={item.priv.name} className='crud-level-checkbox'>
+              <Checkbox
+                id={item.priv.name}
+                name={item.priv.name}
+                data-testid={item.priv.name}
+                key={item.priv.name}
+                label={item.privDisplayName}
+                checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
+                onChange={(event) => togglePriv(event, kind)}
+                disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+              />
+            </div>
           )
         }
         </div>
-        <div data-testid={kind + '-edit-form'} style={{ display: showEditFieldPane(kind) ? 'none' : 'block' }}>
+        <div data-testid={kind + '-edit-form'} style={{ display: showEditFieldPane(kind) ? 'block' : 'none' }}>
           <FormGroup
             labelName={kind + "Fields"}
             labelText={kind.substr(0, 1).toUpperCase() + kind.substr(1) + " Fields"}
@@ -310,22 +237,22 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                 <div key={item.priv.name} className='crud-level-checkbox'>
                   <Checkbox
                     id={item.priv.name}
-                    name={item.priv.name}
-                    data-testid={item.priv.name}
+                    name={item.priv.name}                
+                    data-testid={item.priv.name}      
                     key={item.priv.name}
                     label={item.privDisplayName}
                     checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
                     onChange={(event) => togglePriv(event, kind)}
-                    disabled={isFormDisabled()
-                      || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)
+                    disabled={isFormDisabled() 
+                      || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)                      
                     }
                   />
                 </div>
               )
             }
             </div>
-          </FormGroup>
-        </div>
+          </FormGroup>      
+        </div>  
       </div>
     )
   }
@@ -358,8 +285,6 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
       })
     );
   }
-
-
 
   return (
     <Form className="app-client-form" onSubmit={(event) => submitForm(event)} data-testid="app-client-form">
@@ -404,7 +329,6 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         labelText="Cluster URL"
         isError={failsHookstateValidation(formState.clusterUrl)}
         errorMessages={generateStringErrorMessages(formState.clusterUrl)}
-        required
       >
         <br/>
         <p>

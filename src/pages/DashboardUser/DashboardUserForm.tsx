@@ -15,13 +15,18 @@ import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
+import {DashboardUserDto} from '../../openapi/models';
+import {PrivilegeType} from '../../state/privilege/privilege-type';
+import {useDashboardUserState} from '../../state/dashboard-user/dashboard-user-state';
+import {combineArraysByKey} from '../../utils/array-utils';
 
-function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
+function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserDto>) {
+  const dashboardUserService = useDashboardUserState();
   const formState = useState<DashboardUserFlat>({
     id: props.data?.id || "",
     email: props.data?.email || "",
-    hasDashboardAdmin: props.data?.hasDashboardAdmin || false,
-    hasDashboardUser: props.data?.hasDashboardUser || false,
+    hasDashboardAdmin: props.data?.privileges?.some(priv => priv.name === PrivilegeType.DASHBOARD_ADMIN) || false,
+    hasDashboardUser: props.data?.privileges?.some(priv => priv.name === PrivilegeType.DASHBOARD_USER) || false,
   });
 
   formState.attach(Validation);
@@ -53,7 +58,15 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
 
   function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    props.onSubmit(formState.get());
+    const updatedForm = formState.get();
+    const updatedDto = dashboardUserService.convertToDto(updatedForm);
+    const existingPrivs = props.data?.privileges ?? [];
+    const filteredExistingPrivs = existingPrivs.filter(priv => priv.name !== PrivilegeType.DASHBOARD_USER &&
+        priv.name !== PrivilegeType.DASHBOARD_ADMIN);
+    const privs = combineArraysByKey([filteredExistingPrivs, updatedDto?.privileges],
+        (priv) => priv.name, false);
+    updatedDto.privileges = privs;
+    props.onSubmit(updatedDto);
   }
 
   function isPermissionsError(): boolean {
@@ -78,15 +91,13 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserFlat>) {
           labelText="UUID"
           isError={false}
         >
-          <TextInputInline
+          <TextInput
             id="uuid"
             name="uuid"
             type="text"
             defaultValue={formState.id.get()}
             disabled={true}
-            className={'tron-text-input-inline'}
           />
-          <CopyToClipboard text={String(formState.id.get())} />
         </FormGroup>
       }
 

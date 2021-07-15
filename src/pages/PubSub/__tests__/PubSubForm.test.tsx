@@ -23,10 +23,11 @@ describe('Test Subscriber Form', () => {
     });
 
     data = {
-        id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
-        subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
-        subscriberAddress: "http://app.app.svc.cluster.local/",
-        secret: "",
+      id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
+      appClientUser: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
+      subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
+      subscriberAddress: "http://app.app.svc.cluster.local/",
+      secret: "",
     }
 
     successAction = {
@@ -88,7 +89,7 @@ describe('Test Subscriber Form', () => {
     const elem = pageRender.getByTestId('subscriber-form');
     expect(elem).toBeInTheDocument();
 
-    const subscriberAddress = pageRender.getByDisplayValue(data.subscriberAddress);
+    const subscriberAddress = pageRender.getByDisplayValue(data.subscriberAddress!);
     fireEvent.change(subscriberAddress, { target: { value: 'http://app2.app2.svc.cluster.local/' } });
     expect(subscriberAddress).toHaveValue('http://app2.app2.svc.cluster.local/');
 

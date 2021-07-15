@@ -1,5 +1,5 @@
 import React from 'react';
-import { waitFor, fireEvent, render, within } from '@testing-library/react';
+import { waitFor, fireEvent, render } from '@testing-library/react';
 import { AppClientSummaryDto, AppClientSummaryDtoResponseWrapper, AppClientUserPrivDto, AppEndpointDto, AppSourceControllerApi, AppSourceControllerApiInterface, AppSourceDto } from '../../../openapi';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import AppSourceEndpointEditor from '../AppSourceEndpointEditor';
@@ -130,12 +130,18 @@ describe('Test App Source Endpoint Editor', () => {
     expect(page.getByText(allClients[0].name!)).toBeInTheDocument();
     expect(page.getByText(allClients[1].name!)).toBeInTheDocument();
 
-    const appClientCheckboxParent = await page.findAllByTestId('checkbox-cell-renderer', {}, { timeout: 3000 });
+    const findCheckboxes = new Promise(resolve => setTimeout(async () => {
+      const appClientCheckboxParent = await page.findAllByTestId('checkbox-cell-renderer');
+      expect(appClientCheckboxParent).toHaveLength(2);
+      resolve(2);
+    }, 5000));
+
+    await findCheckboxes;
 
     // App Client 1
     const appClient1Checkbox = page.container.querySelector('#app-source-client-authorization-0');
     await waitFor(() => expect(appClient1Checkbox).toBeInTheDocument());
-    await waitFor(() => expect(appClient1Checkbox).not.toBeChecked(), { timeout: 3000 });
+    await waitFor(() => expect(appClient1Checkbox).not.toBeChecked());
 
     // check
     fireEvent.click(appClient1Checkbox!);
@@ -161,5 +167,5 @@ describe('Test App Source Endpoint Editor', () => {
     fireEvent.click(appClient2Checkbox!);
     await waitFor(() => expect(appClientPrivileges.length).toBe(2));
     await waitFor(() => expect(appClient2Checkbox).toBeChecked());
-  });
+  }, 15000);
 });

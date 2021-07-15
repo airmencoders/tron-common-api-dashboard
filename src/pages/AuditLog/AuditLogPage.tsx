@@ -6,7 +6,8 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import GridColumn from '../../components/Grid/GridColumn';
 import { HttpLogEntryDetailsDto, HttpLogEntryDto } from '../../openapi/models';
-import { SearchLogParams, useAuditLogState } from '../../state/audit-log/audit-log-state';
+import { useAuditLogState } from '../../state/audit-log/audit-log-state';
+import { getDefaultSearchLogParams, SearchLogParams } from '../../state/audit-log/search-log-params';
 import './AuditLogDetailsForm.scss';
 import AuditLogDetailsPage from './AuditLogDetailsPage';
 
@@ -71,17 +72,7 @@ const columns: GridColumn[] =
   ];
 
 function AuditLogPage() {
-  const initState: SearchLogParams = {
-    date: format(new Date(), 'yyyy-MM-dd'),
-    requestMethod: '',
-    requestedUrlContains: '',
-    statusCode: '',    
-    remoteIpContains: '',
-    hostContains: '',
-    userAgentContains: '',
-    queryStringContains: '',
-    userNameContains: '',
-  };
+  const initState: SearchLogParams = getDefaultSearchLogParams();
 
   const [dateError, setDateError ] = React.useState(false);  // malformed date indicator
   const [searchState, setSearchState] = React.useState<SearchLogParams>(initState);  // local form state
@@ -108,7 +99,7 @@ function AuditLogPage() {
   const refreshSearch = () => {
     httpLogsState.searchParamsState.merge(searchState);
     updateGrid();
-  }  
+  }
 
   const updateGrid = () => {
     setRefreshGrid(true);
@@ -121,20 +112,21 @@ function AuditLogPage() {
       <>
       <div>
         <FormGroup labelName="search-form-requestTimestamp"
-          labelText="From Date (UTC)" 
+          labelText="From Date (UTC)"
           errorMessages={[ 'Please enter a valid date' ]}
           isError={dateError}
           >
-            <input 
-              id='search-form-requestTimestamp' 
-              name='audit-log-from-date' 
+            <input
+              id='search-form-requestTimestamp'
+              aria-label='search-form-requestTimestamp'
+              name='audit-log-from-date'
               type='date'
-              value={searchState.date 
+              value={searchState.date
                   || format(new Date(), 'yyyy-MM-dd')}
               onChange={setNewFromDate}
             />
-        </FormGroup>  
-        <hr/> 
+        </FormGroup>
+        <hr/>
       </div>
       <div data-testid='search-form-container' id='search-form-container' style={{
           display: 'flex',
@@ -145,113 +137,116 @@ function AuditLogPage() {
       }}>
         <div>
           <FormGroup labelName="search-form-requestMethod"
-            labelText="HTTP Method" 
+            labelText="HTTP Method"
             >
-              <TextInput 
-                id="search-form-requestMethod" 
-                name="audit-log-requestMethod" 
-                type="search" 
+              <TextInput
+                id="search-form-requestMethod"
+                aria-label="search-form-requestMethod"
+                name="audit-log-requestMethod"
+                type="search"
                 value={searchState.requestMethod}
                 onChange={(event) => setSearchState({...searchState, requestMethod: event.target.value})}
-              />  
-          </FormGroup>    
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-requestedUrl"
-            labelText="Url Contains" 
+            labelText="Url Contains"
             >
-              <TextInput 
-                id="search-form-requestedUrl" 
-                name="audit-log-requestedUrl" 
+              <TextInput
+                id="search-form-requestedUrl"
+                aria-label="search-form-requestedUrl"
+                name="audit-log-requestedUrl"
                 type="search"
                 value={searchState.requestedUrlContains}
-                onChange={(event) => setSearchState({...searchState, requestedUrlContains: event.target.value})} 
-              />           
-          </FormGroup>    
+                onChange={(event) => setSearchState({...searchState, requestedUrlContains: event.target.value})}
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-statusCode"
-            labelText="Status Code" 
+            labelText="Status Code"
             >
-              <TextInput 
-                id="search-form-statusCode" 
-                name="audit-log-statusCode" 
-                type="search" 
+              <TextInput
+                id="search-form-statusCode"
+                aria-label="search-form-statusCode"
+                name="audit-log-statusCode"
+                type="search"
                 value={searchState.statusCode}
                 onChange={(event) => setSearchState({...searchState, statusCode: event.target.value})}
-              />           
-          </FormGroup>    
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-remoteIp"
-            labelText="Remote IP Contains" 
+            labelText="Remote IP Contains"
             >
-              <TextInput 
-                id="search-form-remoteIp" 
-                name="audit-log-remoteIp" 
+              <TextInput
+                id="search-form-remoteIp"
+                name="audit-log-remoteIp"
                 value={searchState.remoteIpContains}
-                type="search" 
+                type="search"
                 onChange={(event) => setSearchState({...searchState, remoteIpContains: event.target.value})}
-              />           
-          </FormGroup>    
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-requestHost"
-            labelText="Host Contains" 
+            labelText="Host Contains"
             >
-              <TextInput 
-                id="search-form-requestHost" 
-                name="audit-log-requestHost" 
+              <TextInput
+                id="search-form-requestHost"
+                name="audit-log-requestHost"
                 value={searchState.hostContains}
-                type="search" 
+                type="search"
                 onChange={(event) => setSearchState({...searchState, hostContains: event.target.value})}
-              />           
-          </FormGroup>    
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-userAgent"
-            labelText="User Agent Contains" 
+            labelText="User Agent Contains"
             >
-              <TextInput 
-                id="search-form-userAgent" 
-                name="audit-log-userAgent" 
+              <TextInput
+                id="search-form-userAgent"
+                name="audit-log-userAgent"
                 value={searchState.userAgentContains}
-                type="search" 
+                type="search"
                 onChange={(event) => setSearchState({...searchState, userAgentContains: event.target.value})}
-              />           
-          </FormGroup>    
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-queryString"
-            labelText="Query String Contains" 
+            labelText="Query String Contains"
             >
-              <TextInput 
-                id="search-form-queryString" 
-                name="audit-log-queryString" 
+              <TextInput
+                id="search-form-queryString"
+                name="audit-log-queryString"
                 value={searchState.queryStringContains}
-                type="search" 
+                type="search"
                 onChange={(event) => setSearchState({...searchState, queryStringContains: event.target.value})}
-              />           
-          </FormGroup>    
+              />
+          </FormGroup>
         </div>
         <div style={{marginLeft: '5px'}}>
           <FormGroup labelName="search-form-requester"
-            labelText="Username Contains" 
+            labelText="Username Contains"
             >
-              <TextInput 
-                id="search-form-requester" 
-                name="audit-log-requester" 
+              <TextInput
+                id="search-form-requester"
+                name="audit-log-requester"
                 value={searchState.userNameContains}
-                type="search" 
+                type="search"
                 onChange={(event) => setSearchState({...searchState, userNameContains: event.target.value})}
-              />           
-          </FormGroup>    
-        </div>        
+              />
+          </FormGroup>
+        </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between'}}>
         <div className="search-actions button-container">
           <Button
-            type="button" 
+            type="button"
             unstyled
             onClick={() => resetSearch()}>
               Reset Search
@@ -263,7 +258,7 @@ function AuditLogPage() {
             onClick={() => refreshSearch()}>
               Search
           </Button>
-        </div>       
+        </div>
       </div>
       </>
     )

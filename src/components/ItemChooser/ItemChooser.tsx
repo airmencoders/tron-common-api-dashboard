@@ -17,7 +17,7 @@ function ItemChooser(props: ChooserProps) {
   const [filterState, setFilterState] = React.useState('');
 
   return (
-    <div className='item-chooser'>
+    <div className={`item-chooser${props.className ? ' ' + props.className : ''}`}>
       <div className='item-chooser__actions'>
         <TextInput id='chooser-filter' name='chooserFilter' type='search'
           data-testid='chooser-filter'

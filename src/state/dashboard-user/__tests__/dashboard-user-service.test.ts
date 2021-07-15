@@ -8,14 +8,15 @@ import DashboardUserService from '../dashboard-user-service';
 import { DashboardUserFlat } from '../dashboard-user-flat';
 import { PrivilegeType } from '../../privilege/privilege-type';
 import { wrapDashboardUserState } from '../dashboard-user-state';
-import { _ } from 'ag-grid-community';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 
 jest.mock('../../privilege/privilege-state');
 
 describe('Dashboard User State Test', () => {
   let dashboardUserState: State<DashboardUserFlat[]> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApiInterface;
+  let dashboardUserDtoCache: State<Record<string, DashboardUserDto>> & StateMethodsDestroy;
   let state: DashboardUserService;
 
   const privilegDtos: PrivilegeDto[] = [
@@ -86,13 +87,13 @@ describe('Dashboard User State Test', () => {
 
   const testUserDto: DashboardUserDto = {
     id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
-    email: "Test Client",
+    email: "test@email.com",
     privileges: testUserPrivileges
   };
 
   const testUserFlat: DashboardUserFlat = {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
-    email: 'Test Client',
+    email: 'test@email.com',
     hasDashboardAdmin: true,
     hasDashboardUser: true
   };
@@ -116,7 +117,7 @@ describe('Dashboard User State Test', () => {
   const axiosRejectResponse = {
     response: {
       data: {
-        message: 'failed'
+        reason: 'failed'
       },
       status: 400,
       statusText: 'OK',
@@ -126,7 +127,7 @@ describe('Dashboard User State Test', () => {
   };
 
   const rejectMsg = {
-    general: axiosRejectResponse.response.data.message
+    general: axiosRejectResponse.response.data.reason
   } as DataCrudFormErrors;
 
 
@@ -149,10 +150,11 @@ describe('Dashboard User State Test', () => {
   beforeEach(async () => {
     dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardUserFlat>());
     dashboardUserApi = new DashboardUserControllerApi();
-    state = wrapDashboardUserState(dashboardUserState, dashboardUserApi);
+    dashboardUserDtoCache = createState<Record<string, DashboardUserDto>>({});
+    state = wrapDashboardUserState(dashboardUserState, dashboardUserApi, dashboardUserDtoCache);
 
     mockPrivilegesState();
-    await accessPrivilegeState().fetchAndStorePrivileges();
+    await accessPrivilegeState().fetchAndStorePrivileges().promise;
   });
 
   afterEach(() => {
@@ -169,11 +171,19 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
     });
 
-    const fetch = state.fetchAndStoreData();
-    expect(state.dashboardUsers).toEqual(new Array<DashboardUserDto>());
+    const cancellableRequest = state.fetchAndStoreData();
+    expect(state.dashboardUsers).toEqual([]);
 
-    await fetch;
+    await cancellableRequest.promise;
     expect(state.dashboardUsers).toEqual(flatUsers);
+
+    const dtoCache = users.reduce((prev, curr) => {
+      return {
+        ...prev,
+        [curr.id!]: curr
+      }
+    }, {});
+    expect(dashboardUserDtoCache.get()).toEqual(dtoCache);
   });
 
   it('Test error', async () => {
@@ -185,11 +195,13 @@ describe('Dashboard User State Test', () => {
       });
     });
 
-    const fetch = state.fetchAndStoreData();
+    const errorRequest = prepareDataCrudErrorResponse(axiosRejectResponse);
+
+    const cancellableRequest = state.fetchAndStoreData();
     expect(state.error).toBe(undefined);
 
-    await expect(fetch).rejects.toEqual(rejectMsg);
-    expect(state.error).toEqual(rejectMsg);
+    await expect(cancellableRequest.promise).rejects.toEqual(errorRequest);
+    expect(state.error).toEqual(errorRequest);
   });
 
   it('Test sendUpdate Success', async () => {
@@ -199,8 +211,11 @@ describe('Dashboard User State Test', () => {
 
     dashboardUserState.set([testUserFlat])
 
-    await expect(state.sendUpdate(testUserFlat)).resolves.toEqual(testUserFlat);
+    await expect(state.sendUpdate(testUserDto)).resolves.toEqual(testUserFlat);
     expect(dashboardUserState.get()).toEqual([testUserFlat]);
+    expect(dashboardUserDtoCache.get()).toEqual({
+      [testUserDto.id!]: testUserDto
+    })
   });
 
   it('Test sendUpdate Fail', async () => {
@@ -232,6 +247,10 @@ describe('Dashboard User State Test', () => {
     });
 
     await expect(state.sendCreate(testUserFlat)).resolves.toEqual(testUserFlat);
+    expect(dashboardUserState.get()).toEqual([testUserFlat]);
+    expect(dashboardUserDtoCache.get()).toEqual({
+      [testUserDto.id!]: testUserDto
+    });
   });
 
   it('Test sendCreate Fail', async () => {
@@ -248,6 +267,8 @@ describe('Dashboard User State Test', () => {
     });
 
     await expect(state.sendDelete(testUserFlat)).resolves.not.toThrow();
+    expect(dashboardUserState.get()).toHaveLength(0);
+    expect(Object.keys(dashboardUserDtoCache.get())).toHaveLength(0);
   });
 
   it('Test sendDelete Fail', async () => {
@@ -272,8 +293,14 @@ describe('Dashboard User State Test', () => {
     });
 
     state.state.set([testUserFlat]);
+    dashboardUserDtoCache.set({ [testUserDto.id!]: testUserDto });
+    expect(dashboardUserState.get()).toHaveLength(1);
+    expect(Object.keys(dashboardUserDtoCache.get())).toHaveLength(1);
 
     await expect(state.sendDelete(testUserFlat)).resolves.not.toThrow();
+
+    expect(dashboardUserState.get()).toHaveLength(0);
+    expect(Object.keys(dashboardUserDtoCache.get())).toHaveLength(0);
   });
 
   it('Test convertDashboardUsersToFlat', () => {
@@ -303,7 +330,13 @@ describe('Dashboard User State Test', () => {
   });
 
   it('Test convertRowDataToEditableData', async () => {
-    await expect(state.convertRowDataToEditableData(testUserFlat)).resolves.toEqual(testUserFlat);
+    dashboardUserApi.getAllDashboardUsersWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<DashboardUserDtoResponseWrapper>>(resolve => resolve(axiosGetResponse));
+    });
+
+    await state.fetchAndStoreData().promise;
+    const editableData = await state.convertRowDataToEditableData(testUserFlat);
+    expect(editableData).toEqual(testUserDto);
   });
 
   it('Test convertToDto', async () => {
@@ -337,7 +370,7 @@ describe('Dashboard User State Test', () => {
       }));
     });
 
-    await accessPrivilegeState().fetchAndStorePrivileges();
+    await accessPrivilegeState().fetchAndStorePrivileges().promise;
 
     const result = state.createPrivileges(testUserFlat);
     expect(result.size).toEqual(0);

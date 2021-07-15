@@ -1,4 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
+import axios from 'axios';
+import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 import { flushPromises } from '../../../utils/TestUtils/test-utils';
 import { AbstractDataService } from '../abstract-data-service';
 
@@ -12,8 +14,12 @@ class TestDataService extends AbstractDataService<MockDto, MockDto> {
     super(state);
   }
 
-  fetchAndStoreData(): Promise<MockDto[]> {
-    return Promise.resolve([]);
+  fetchAndStoreData(): CancellableDataRequest<MockDto[]> {
+    const cancelTokenSource = axios.CancelToken.source();
+    return {
+      promise: Promise.resolve([]),
+      cancelTokenSource
+    };
   }
 
   sendUpdate(toUpdate: MockDto): Promise<MockDto> {
@@ -118,16 +124,20 @@ describe('Abstract Data Service Test', () => {
   });
 
   it('Test resetState', async () => {
+    const data = [{ id: 1, name: '1' }];
+    mockState.set(data);
+
+    expect(mockState.get()).toEqual(data);
+
     const promiseState: Promise<MockDto[]> = new Promise(resolve => setTimeout(() => resolve([{ id: 1, name: '1' }]), 1000));
     mockState.set(promiseState);
 
     expect(mockState.promised);
 
-    mockService.resetState();
-
     jest.runOnlyPendingTimers();
     await flushPromises();
 
+    mockService.resetState();
     expect(mockState.promised).toEqual(false);
     expect(mockState.get()).toEqual([]);
   });

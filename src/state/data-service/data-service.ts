@@ -1,6 +1,7 @@
 import { State } from '@hookstate/core';
 import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
 import { FilterDto } from '../../openapi';
+import { CancellableDataRequest } from '../../utils/cancellable-data-request';
 import { PatchResponse } from './patch-response';
 
 /***
@@ -12,10 +13,10 @@ export interface DataService<T, R> {
   isPromised: boolean;
   state: State<T[]>;
   error: string | DataCrudFormErrors | undefined;
-  fetchAndStoreData(): Promise<T[]>;
+  fetchAndStoreData(): CancellableDataRequest<T[]>;
   sendUpdate(toUpdate: R): Promise<T>;
   sendCreate(toCreate: R): Promise<T>;
-  sendDelete(toDelete: R): Promise<void>;
+  sendDelete(toDelete: T | R): Promise<void>;
   sendPatch?(...args: any): Promise<PatchResponse<T>>;
   /**
    * @param {number} page the page number (0 indexed)

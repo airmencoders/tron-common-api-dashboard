@@ -1,20 +1,26 @@
 import { State } from '@hookstate/core';
+import { AxiosPromise } from 'axios';
 import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
 import { GridRowData } from '../../components/Grid/grid-row-data';
 import { JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum } from '../../openapi';
+import { isDataRequestCancelError } from '../../utils/cancellable-data-request';
+
+interface WrappedResponse<T> {
+  data: T
+}
 
 export function prepareDataCrudErrorResponse(err: any): DataCrudFormErrors {
   if (err.response) { // Server responded with some error (4xx, 5xx)
+
     const validation = err.response.data.errors?.reduce((prev: any, current: any) => {
       const updated = { ...prev };
       updated[current.field] = current.defaultMessage;
 
       return updated;
     }, {});
-
     return {
       validation,
-      general: err.response.data.message
+      general: err.response.data.reason
     };
   } else if (err.request) { // Request never left
     return {
@@ -103,7 +109,7 @@ export function mapDataItemsToStringIds<T extends GridRowData>(items: T[]): stri
  * @param toCheck the items to check against the original
  * @returns list of id strings of values in toCheck that exist in original
  */
-export function getDataItemDuplicates<T extends GridRowData, R extends GridRowData>(original: T[], toCheck: R[]) {
+export function getDataItemDuplicates<T extends GridRowData, R extends GridRowData>(original: T[], toCheck: R[]): string[] {
   const originalIdSet = new Set(mapDataItemsToStringIds(original));
   const toCheckIdArr = mapDataItemsToStringIds(toCheck)
 
@@ -125,7 +131,7 @@ export function getDataItemDuplicates<T extends GridRowData, R extends GridRowDa
  * @param toCheck the items to check against the original
  * @returns list of id strings of values in toCheck that do not exist in original
  */
-export function getDataItemNonDuplicates<T extends GridRowData, R extends GridRowData>(original: T[], toCheck: R[]) {
+export function getDataItemNonDuplicates<T extends GridRowData, R extends GridRowData>(original: T[], toCheck: R[]): string[] {
   const originalSet = new Set(mapDataItemsToStringIds(original));
   const toCheckIdArr = mapDataItemsToStringIds(toCheck)
 
@@ -138,4 +144,27 @@ export function getDataItemNonDuplicates<T extends GridRowData, R extends GridRo
   }, []);
 
   return itemDups;
+}
+
+/**
+ * Handles processing of axios requests returning wrapped data. Will also handle converting the data if given a {@link dataTransformation} function.
+ * 
+ * @template T the type of the request data
+ * @template R Optional type. The type of the converted data. Will default to {@link T} if no {@link dataTransformation} function is given. The data will be force typed to {@link R} if provided.
+ * 
+ * @param {T} requestPromise the axios request
+ * @returns {R} promise with default handling
+ */
+export function wrapDataCrudWrappedRequest<T, R = T>(requestPromise: AxiosPromise<WrappedResponse<T>>, dataTransformation?: (data: T) => R): Promise<R | never[]> {
+  return requestPromise
+    .then(response => {
+      return dataTransformation ? dataTransformation(response.data.data) : response.data.data as unknown as R;
+    })
+    .catch(error => {
+      if (isDataRequestCancelError(error)) {
+        return [];
+      }
+
+      return Promise.reject(prepareDataCrudErrorResponse(error));
+    });
 }

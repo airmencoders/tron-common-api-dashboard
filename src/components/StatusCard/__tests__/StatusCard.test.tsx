@@ -23,3 +23,10 @@ test('StatusCard shows error icon if error', async () => {
       () => expect(screen.getByTitle('error')).toBeTruthy()
   );
 });
+
+test('StatusCard shows down icon if error', async () => {
+  render(<StatusCard status={StatusType.DOWN} title="Status Card" />);
+  await waitFor(
+      () => expect(screen.getByTitle('down')).toBeTruthy()
+  );
+});

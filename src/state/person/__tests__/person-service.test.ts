@@ -1,6 +1,8 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
 import { FilterConditionOperatorEnum, FilterDto, PersonControllerApi, PersonControllerApiInterface, PersonDto, PersonDtoPaginationResponseWrapper, Rank, RankBranchTypeEnum, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
+import { createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
+import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import PersonService from '../person-service';
 import { RankStateModel } from '../rank-state-model';
 
@@ -35,12 +37,10 @@ afterEach(() => {
 
 describe('Test Person Service', () => {
   it('Should fetch and store data', async () => {
-    const personApiSpy = jest.spyOn(personApi, 'getPersonsWrapped');
-
-    const personState: PersonDto[] = [personDto];
+    const personData: PersonDto[] = [personDto];
 
     const wrappedPersonResponse: PersonDtoPaginationResponseWrapper = {
-      data: personState,
+      data: personData,
       pagination: {}
     };
 
@@ -52,20 +52,30 @@ describe('Test Person Service', () => {
       config: {}
     };
 
-    personApiSpy.mockResolvedValue(apiResponse);
+    personApi.getPersonsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PersonDtoPaginationResponseWrapper>>(resolve => resolve(apiResponse));
+    });
 
-    const response = await personService.fetchAndStoreData();
-    expect(response).toEqual(personState);
-    expect(personService.state.get()).toEqual(personState);
+    const cancellableRequest = personService.fetchAndStoreData();
+    await cancellableRequest.promise;
+
+    expect(personState.get()).toEqual(personData);
   });
 
   it('Should fetch and store data on bad request', async () => {
-    const personApiSpy = jest.spyOn(personApi, 'getPersonsWrapped');
+    personApi.getPersonsWrapped = jest.fn(() => {
+      return new Promise<AxiosResponse<PersonDtoPaginationResponseWrapper>>((resolve, reject) => reject(createGenericAxiosRequestErrorResponse()));
+    });
 
-    personApiSpy.mockRejectedValue(new Error('To Fail'));
+    const error = createGenericAxiosRequestErrorResponse();
 
-    await expect(() => personService.fetchAndStoreData()).rejects.toThrow();
-    expect(personService.state.get()).toEqual([]);
+    const errorRequest = prepareDataCrudErrorResponse(error);
+
+    const cancellableRequest = personService.fetchAndStoreData();
+    expect(personService.error).toBe(undefined);
+
+    await expect(cancellableRequest.promise).rejects.toEqual(errorRequest);
+    expect(personService.error).toEqual(errorRequest);
   });
 
   it('Should fetch and store person paginated data with filter', async () => {
@@ -334,8 +344,6 @@ describe('Test Person Service', () => {
 
     await expect(() => personService.sendDelete(personDto)).rejects.toThrow('Fail');
   });
-
-
 
   it('Should fetch rank for branch successfully', async () => {
     const rankApiSpy = jest.spyOn(rankApi, 'getRanks1');

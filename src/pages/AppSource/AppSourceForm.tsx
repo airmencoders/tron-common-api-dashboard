@@ -3,10 +3,11 @@ import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
 import { RowClickedEvent } from 'ag-grid-community';
-import React, { FormEvent } from 'react';
+import React, { ChangeEvent, FormEvent } from 'react';
 import Button from '../../components/Button/Button';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
+import Checkbox from '../../components/forms/Checkbox/Checkbox';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
@@ -45,10 +46,14 @@ interface DeleteEndpointModalState {
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   const formState = useHookstate({
     id: props.data?.id ?? '',
-    name: props.data?.name ?? '',
+    name: props.data?.name ?? '', 
+    reportStatus: props.data?.reportStatus ?? false,
+    healthUrl: props.data?.healthUrl ?? '',   
     appClients: props.data?.appClients ?? [],
     appSourceAdminUserEmails: props.data?.appSourceAdminUserEmails ?? [],
-    endpoints: props.data?.endpoints ?? []
+    endpoints: props.data?.endpoints ?? [],
+    throttleRequestCount: props.data?.throttleRequestCount,
+    throttleEnabled: props.data?.throttleEnabled
   });
 
   const adminAddState = useHookstate({
@@ -79,12 +84,18 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
 
   Validation(formState.name).validate(name => (validateRequiredString(name)), validationErrors.requiredText, 'error');
   Validation(formState.name).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+  Validation(formState.healthUrl).validate(value => !formState.reportStatus.value || (/[^\s]+/.test(value) || value.trim() !== ''), 'Health endpoint required when status reporting enabled', 'error');
+  Validation(formState.healthUrl).validate(value => value.match(/^\//) !== null || value === '', 'Valid path must start with a forward slash', 'error');
 
   function isFormModified() {
     return Initial(formState.appSourceAdminUserEmails).modified() ||
       Initial(formState.name).modified() ||
+      Initial(formState.reportStatus).modified() ||
+      Initial(formState.healthUrl).modified() ||
       Initial(formState.endpoints).modified() ||
-      Initial(formState.appClients).modified();
+      Initial(formState.appClients).modified() ||
+      Initial(formState.throttleEnabled).modified() ||
+      Initial(formState.throttleRequestCount).modified();
   }
 
   function isFormDisabled() {
@@ -255,6 +266,19 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     deleteEndpointModalClose();
   }
 
+  function onRateLimitChange(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.value === '') {
+      formState.throttleRequestCount.set(undefined);
+      return;
+    }
+
+    const num = Number(event.target.value);
+
+    if (!Number.isNaN(num) && Number.isSafeInteger(num)) {
+      formState.throttleRequestCount.set(num);
+    }
+  }
+
   return (
     <>
       <Form className="app-source-form" onSubmit={(event) => submitForm(event)} data-testid="app-source-form">
@@ -307,6 +331,36 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             disabled={true}
           />
         </FormGroup>
+        <FormGroup
+          labelName="report-status"
+          labelText="App Source Status Reporting"
+          isError={false}
+        >
+          <Checkbox
+            id="report-status"
+            name="report-status"
+            data-testid="report-status"
+            checked={formState.reportStatus.value}
+            label="Report Status to Health Page"
+            onChange={(event) => formState.reportStatus.set(event.target.checked)}
+          />
+        </FormGroup>
+        <FormGroup
+          labelName="health-url"
+          labelText="Health URL Path/Endpoint (GET)"
+          isError={!Validation(formState.healthUrl).valid()}
+          errorMessages={generateStringErrorMessages(formState.healthUrl)}
+        >
+          <TextInput
+            id="health-url"
+            name="health-url"
+            type="text"            
+            error={!Validation(formState.healthUrl).valid()}
+            defaultValue={formState.healthUrl.value}
+            onChange={(event) => formState.healthUrl.set(event.target.value)}
+            disabled={!formState.reportStatus.value}
+          />
+        </FormGroup>
 
         <FormGroup
           labelName="admin"
@@ -344,7 +398,40 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             } as AdminEmail
           })}
           onRowClicked={() => { return; }}
+          className="admin-email-grid"
         />
+
+        <FormGroup
+          labelName="rate-limit-toggle"
+          labelText="Rate Limit Toggle"
+        >
+          <Checkbox
+            id="rate-limit-toggle"
+            name="rate-limit-toggle"
+            checked={formState.throttleEnabled.value}
+            label="Enable Rate Limiting"
+            onChange={(event) => formState.throttleEnabled.set(event.target.checked)}
+          />
+        </FormGroup>
+
+        <FormGroup
+          labelName="rate-limit-count"
+          labelText="Rate Limit"
+          isError={failsHookstateValidation(formState.throttleRequestCount)}
+          errorMessages={generateStringErrorMessages(formState.throttleRequestCount)}
+        >
+          <TextInput
+            id="rate-limit-count"
+            name="rate-limit-count"
+            type="text"
+            value={formState.throttleRequestCount.ornull?.get() ?? ''}
+            error={failsHookstateValidation(formState.throttleRequestCount)}
+            placeholder="0"
+            onChange={onRateLimitChange}
+            appendedText="Requests / minute"
+            disabled={!formState.throttleEnabled.value}
+          />
+        </FormGroup>
 
         <FormGroup
           labelName="endpoints"
@@ -362,6 +449,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           disableEditBtn={endpointModifyState.bulkSelected.length === 0}
           onEditBtnClick={onEndpointEditBtnClicked}
           onRowSelected={onRowSelected}
+          className="endpoint-grid"
         />
 
         <SuccessErrorMessage

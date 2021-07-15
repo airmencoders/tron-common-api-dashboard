@@ -1,14 +1,14 @@
-import { none, postpone, State } from '@hookstate/core';
+import { none, State } from '@hookstate/core';
 import { DashboardUserDto } from '../../openapi/models/dashboard-user-dto';
 import { DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
-import { AxiosPromise } from 'axios';
 import { DashboardUserPrivilege } from './dashboard-user-privilege';
 import { DashboardUserFlat } from './dashboard-user-flat';
 import { PrivilegeType } from '../privilege/privilege-type';
 import { DataService } from '../data-service/data-service';
-import { DashboardUserDtoResponseWrapper, PrivilegeDto } from '../../openapi';
+import { PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
 
 /**
  * PII WARNING:
@@ -18,27 +18,46 @@ import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils
  * DashboardUserDto
  * * email
  */
-export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserFlat> {
-  constructor(public state: State<DashboardUserFlat[]>, private dashboardUserApi: DashboardUserControllerApiInterface) { }
+export default class DashboardUserService implements DataService<DashboardUserFlat, DashboardUserDto> {
 
-  fetchAndStoreData(): Promise<DashboardUserFlat[]> {
-    const privilegeResponse = (): Promise<PrivilegeDto[]> => accessPrivilegeState().fetchAndStorePrivileges();
-    const response = (): AxiosPromise<DashboardUserDtoResponseWrapper> => this.dashboardUserApi.getAllDashboardUsersWrapped();
+  constructor(public state: State<DashboardUserFlat[]>,
+              private dashboardUserApi: DashboardUserControllerApiInterface,
+              private dashboardUserDtoCache: State<Record<string, DashboardUserDto>>) { }
+
+  fetchAndStoreData(): CancellableDataRequest<DashboardUserFlat[]> {
+    this.dashboardUserDtoCache.set({});
+    const privilegeRequest = accessPrivilegeState().fetchAndStorePrivileges();
+    const response = makeCancellableDataRequest(privilegeRequest.cancelTokenSource, this.dashboardUserApi.getAllDashboardUsersWrapped.bind(this.dashboardUserApi));
 
     const data = new Promise<DashboardUserFlat[]>(async (resolve, reject) => {
       try {
-        await privilegeResponse();
-        const result = await response();
+        await privilegeRequest.promise;
+        const result = await response.axiosPromise();
+        const dashboardUserDtos = result.data.data;
+        // cache dashboard user map
+        const cacheUpdate: Record<string, DashboardUserDto> = {};
+        for(const dashUserDto of dashboardUserDtos) {
+          if (dashUserDto.id != null) {
+            cacheUpdate[dashUserDto.id] = dashUserDto;
+          }
+        }
+        this.dashboardUserDtoCache.set(cacheUpdate);
+        resolve(this.convertDashboardUsersToFlat(dashboardUserDtos));
+      } catch (error) {
+        if (isDataRequestCancelError(error)) {
+          return [];
+        }
 
-        resolve(this.convertDashboardUsersToFlat(result.data.data));
-      } catch (err) {
-        reject(prepareDataCrudErrorResponse(err));
+        reject(prepareDataCrudErrorResponse(error));
       }
     });
 
     this.state.set(data);
 
-    return data;
+    return {
+      promise: data,
+      cancelTokenSource: response.cancelTokenSource
+    };
   }
 
   convertDashboardUsersToFlat(users: DashboardUserDto[]): DashboardUserFlat[] {
@@ -98,13 +117,19 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return privileges;
   }
 
-  async sendCreate(toCreate: DashboardUserFlat): Promise<DashboardUserFlat> {
+  async sendCreate(toCreate: DashboardUserDto): Promise<DashboardUserFlat> {
     try {
-      const dashboardUserDto = this.convertToDto(toCreate);
-      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(dashboardUserDto);
-      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+      const dashboardUserResponse = await this.dashboardUserApi.addDashboardUser(toCreate);
+      const newDashboardUser = dashboardUserResponse.data;
+      const dashboardUserFlat = this.convertToFlat(newDashboardUser);
 
       this.state[this.state.length].set(dashboardUserFlat);
+
+      if (newDashboardUser.id) {
+        this.dashboardUserDtoCache.merge({
+          [newDashboardUser.id]: newDashboardUser
+        });
+      }
 
       return Promise.resolve(dashboardUserFlat);
     }
@@ -113,17 +138,23 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     }
   }
 
-  async sendUpdate(toUpdate: DashboardUserFlat): Promise<DashboardUserFlat> {
+  async sendUpdate(toUpdate: DashboardUserDto): Promise<DashboardUserFlat> {
     try {
       if (toUpdate?.id == null) {
         return Promise.reject(new Error('Dashboard User to update has undefined id.'));
       }
-      const dashboardUserDto = this.convertToDto(toUpdate);
-      const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, dashboardUserDto);
-      const dashboardUserFlat = this.convertToFlat(dashboardUserResponse.data);
+      const dashboardUserResponse = await this.dashboardUserApi.updateDashboardUser(toUpdate.id, toUpdate);
+      const updatedDashboardUser = dashboardUserResponse.data;
+      const dashboardUserFlat = this.convertToFlat(updatedDashboardUser);
 
       const index = this.state.get().findIndex(item => item.id === dashboardUserFlat.id);
       this.state[index].set(dashboardUserFlat);
+
+      if (updatedDashboardUser.id) {
+        this.dashboardUserDtoCache.merge({
+          [updatedDashboardUser.id]: updatedDashboardUser
+        });
+      }
 
       return Promise.resolve(dashboardUserFlat);
     }
@@ -142,14 +173,17 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
       this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
+      this.dashboardUserDtoCache[toDelete.id].set(none);
+
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(prepareDataCrudErrorResponse(error));
     }
   }
 
-  convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserFlat> {
-    return Promise.resolve(rowData);
+  convertRowDataToEditableData(rowData: DashboardUserFlat): Promise<DashboardUserDto> {
+    const dashUserDto = rowData.id != null ? this.dashboardUserDtoCache.get()[rowData.id] : {} as DashboardUserDto;
+    return Promise.resolve(dashUserDto);
   }
 
   private isStateReady(): boolean {
@@ -160,8 +194,8 @@ export default class DashboardUserService implements DataService<DashboardUserFl
     return this.state.promised;
   }
 
-  get dashboardUsers(): DashboardUserDto[] {
-    return !this.isStateReady() ? new Array<DashboardUserDto>() : this.state.get();
+  get dashboardUsers(): DashboardUserFlat[] {
+    return !this.isStateReady() ? [] : this.state.get();
   }
 
   get error(): any | undefined {
@@ -169,12 +203,12 @@ export default class DashboardUserService implements DataService<DashboardUserFl
   }
 
   resetState() {
-    this.state.batch((state) => {
-      if (state.promised) {
-        return postpone;
-      }
-
+    if (!this.state.promised) {
       this.state.set([]);
-    });
+    }
+
+    if (!this.dashboardUserDtoCache.promised) {
+      this.dashboardUserDtoCache.set({});
+    }
   }
 }

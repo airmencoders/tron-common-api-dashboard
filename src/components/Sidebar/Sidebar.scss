@@ -10,4 +10,8 @@
     margin-top: calculateRem(30px);
     margin-left: calculateRem(12px);
   }
+  .nested-sidebar-nav {
+    margin-left: calculateRem(10px);
+    margin-bottom: 1rem;
+  }
 }

@@ -5,7 +5,7 @@ export function prepareRequestError(err: any): RequestError {
     return {
       status: err.response.data.status,
       error: err.response.data.error,
-      message: err.response.data.message
+      message: err.response.data.reason
     };
   } else if (err.request) { // Request never left
     return {

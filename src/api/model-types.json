@@ -601,11 +601,23 @@
           },
           "type": "array"
         },
+        "healthUrl": {
+          "type": "string"
+        },
         "id": {
           "type": "string"
         },
         "name": {
           "type": "string"
+        },
+        "reportStatus": {
+          "type": "boolean"
+        },
+        "throttleEnabled": {
+          "type": "boolean"
+        },
+        "throttleRequestCount": {
+          "type": "number"
         }
       },
       "required": [

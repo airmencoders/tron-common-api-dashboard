@@ -48,10 +48,22 @@ export interface AppSourceDetailsDto {
     endpointCount?: number;
     /**
      * 
+     * @type {boolean}
+     * @memberof AppSourceDetailsDto
+     */
+    reportStatus?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof AppSourceDetailsDto
      */
     clientCount?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppSourceDetailsDto
+     */
+    healthUrl?: string;
     /**
      * 
      * @type {Array<string>}
@@ -70,6 +82,18 @@ export interface AppSourceDetailsDto {
      * @memberof AppSourceDetailsDto
      */
     endpoints?: Array<AppEndpointDto>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AppSourceDetailsDto
+     */
+    throttleEnabled?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof AppSourceDetailsDto
+     */
+    throttleRequestCount?: number;
 }
 
 

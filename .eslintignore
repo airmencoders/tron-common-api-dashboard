@@ -2,3 +2,4 @@ src/stories/**
 *.test.*
 *.tests.*
 src/utils/TestUtils/**
+cypress/**
