@@ -264,7 +264,7 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
                 {
                   formState.get().branch && personState.rankState.get()[formState.get()?.branch ||
                     PersonDtoBranchEnum.Other]?.map(rank => (
-                      <option key={`${rank.branchType}-${rank.abbreviation}`} value={rank.abbreviation}>{rank.abbreviation}</option>
+                      <option key={`${rank.branchType}-${rank.abbreviation}`} value={rank.abbreviation}>{rank.name} ({rank.abbreviation})</option>
                     ))
                 }
               </Select>
