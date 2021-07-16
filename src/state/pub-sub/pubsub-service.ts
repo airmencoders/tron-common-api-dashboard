@@ -52,11 +52,11 @@ export default class PubSubService implements DataService<SubscriberDto, Subscri
         return Promise.reject(new Error('Subscriber to update has undefined id.'));
       }
       const updatedResponse = await this.pubSubApi.createSubscription(toUpdate as SubscriberDto);
-      const currentIndex = this.state.get().findIndex(sub => sub.id === updatedResponse.data.id);
-      if (currentIndex) {
-        this.state[currentIndex].set(updatedResponse.data);
-      }
-      return Promise.resolve(updatedResponse.data);
+      const updatedData = updatedResponse.data;
+
+      this.state.find(item => item.id.get() === updatedData.id)?.set(updatedData);
+      
+      return Promise.resolve(updatedData);
     }
     catch (error) {
       return Promise.reject(error);

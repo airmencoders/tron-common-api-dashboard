@@ -47,4 +47,6 @@ export interface GridProps {
   
   scrollToTop?: boolean;
   scrollToTopCallback?: () => void;
+
+  immutableData?: boolean;
 }

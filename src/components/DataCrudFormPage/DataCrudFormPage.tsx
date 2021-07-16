@@ -158,6 +158,10 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     }
   }
 
+  function getRowNodeId(data: T): string {
+    return data.id != null ? String(data.id) : '';
+  }
+
   async function onRowClicked(event: RowClickedEvent): Promise<void> {
     if (props.allowEdit &&
       event.api.getFocusedCell()?.column.getColDef().headerName !== deleteBtnName &&
@@ -476,7 +480,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                   />
                   :
                   <Grid
-                    data={dataState.state.get()}
+                    data={[...dataState.state.attach(Downgraded).get()]}
                     columns={columns}
                     onRowClicked={onRowClicked}
                     rowClass="ag-grid--row-pointer"
@@ -485,6 +489,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                     disabledGridColumnVirtualization={props.disableGridColumnVirtualization}
                     scrollToTop={props.scrollToTop}
                     scrollToTopCallback={props.scrollToTopCallback}
+                    getRowNodeId={getRowNodeId}
+                    immutableData
                   />
                 }
 
