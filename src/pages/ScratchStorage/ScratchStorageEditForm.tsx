@@ -20,6 +20,7 @@ import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ModalTitle from '../../components/Modal/ModalTitle';
 import PrivilegeCellRenderer from '../../components/PrivilegeCellRenderer/PrivilegeCellRenderer';
 import { ScratchStorageEntryDto } from '../../openapi';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { ScratchStorageFlat } from '../../state/scratch-storage/scratch-storage-flat';
 import { useScratchStorageState } from '../../state/scratch-storage/scratch-storage-state';
 import { ScratchStorageUserWithPrivsFlat } from '../../state/scratch-storage/scratch-storage-user-with-privs-flat';
@@ -43,7 +44,7 @@ export interface ScratchStorageCreateUpdateState {
 }
 
 function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>) {
-
+  const authorizedUserState = useAuthorizedUserState();
   const formState = useHookstate<ScratchStorageFlat>({
     id: props.data?.id ?? "",
     appName: props.data?.appName ?? "",
@@ -400,7 +401,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
               type='button' 
               className="scratch-storage-edit-form__mb1" 
               onClick={() => onAddKeyValue()} 
-              disabled={isFormDisabled()}
+              disabled={isFormDisabled() || !(formState.userPrivs.get().filter(item => item.email === authorizedUserState.authorizedUser?.email && item.admin).length > 0) }
             >
               Add Key/Value
             </Button>
