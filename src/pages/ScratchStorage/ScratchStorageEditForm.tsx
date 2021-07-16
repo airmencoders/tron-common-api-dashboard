@@ -466,7 +466,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           />
         </Modal>
         <Modal
-          headerComponent={<ModalTitle title={keyCreateEditState.isEdit.get() ? "Edit Key/Value" : "Create Key/Value"} />}
+          headerComponent={<ModalTitle title={keyCreateEditState.isEdit.get() ? "Edit Value" : "Create Key/Value"} />}
           footerComponent={<ModalFooterSubmit
             onCancel={keyEditorCloseHandler}
             onSubmit={keyEditorSubmit}
