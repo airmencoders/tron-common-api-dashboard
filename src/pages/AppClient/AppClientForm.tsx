@@ -369,50 +369,51 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="Manage Developers"
           isError={failsHookstateValidation(developerAddState.email)}
           errorMessages={generateStringErrorMessages(developerAddState.email)}
-        >
-          <TextInput
-            id="developer"
-            name="developer"
-            type="email"
-            data-testid="app-client-developer-field"
-            placeholder={"Developer Email"}
-            value={developerAddState.email.get()}
-            error={failsHookstateValidation(developerAddState.email)}
-            onChange={(event) => developerAddState.email.set(event.target.value)}
-            disabled={isFormDisabled()}
-          />
-        </FormGroup>
-
-        <Button
-          type="button"
-          className="app-client-form__add-developer-btn"
-          data-testid="app-client-developer__add-btn"
-          onClick={addAppClientDeveloper}
-          disabled={developerAddState.email?.get().length === 0 || ((Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid()) || isFormDisabled())}
-        >
-          Add Developer
-        </Button>
-
-        <ItemChooser
-          columns={appClientDeveloperColumns}
-          items={formState.appClientDeveloperEmails.get()?.map(r => {
-            return {
-              email: r
-            } as DeveloperEmail
-          }) ?? []}
-          onRowClicked={() => { return; }}
+      >
+        <TextInput
+          id="developer"
+          name="developer"
+          type="email"
+          data-testid="app-client-developer-field"
+          placeholder={"Developer Email"}
+          value={developerAddState.email.get()}
+          error={failsHookstateValidation(developerAddState.email)}
+          onChange={(event) => developerAddState.email.set(event.target.value)}
+          disabled={isFormDisabled()}
         />
+      </FormGroup>
 
+      <Button
+        type="button"
+        className="app-client-form__add-developer-btn"
+        data-testid="app-client-developer__add-btn"
+        onClick={addAppClientDeveloper}
+        disabled={developerAddState.email?.get().length === 0 || ((Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid()) || isFormDisabled())}
+      >
+        Add Developer
+      </Button>
+
+      <ItemChooser
+        columns={appClientDeveloperColumns}
+        items={formState.appClientDeveloperEmails.get()?.map(r => {
+          return {
+            email: r
+          } as DeveloperEmail
+        }) ?? []}
+        onRowClicked={() => { return; }}
+      />
+
+      {appSourceAccordionItems.length > 0 &&
         <FormGroup
           labelName="endpoints"
           labelText="Authorized App Source Endpoints"
         >
+          <Accordion
+            className="app-source-access"
+            items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}
+          />
         </FormGroup>
-
-      <Accordion
-          className="app-source-access"
-          items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}
-      />
+      }
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}
