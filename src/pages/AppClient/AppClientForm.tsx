@@ -40,6 +40,10 @@ enum PrivilegeKind {
   ORGANIZATION="organization",
 }
 
+function getRowNodeIdForDevEmail(email: DeveloperEmail): string {
+  return email.email;
+}
+
 function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const formState = useHookstate<AppClientFlat>({
     id: props.data?.id,
@@ -87,6 +91,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   Validation(developerAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
   Validation(developerAddState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+  Validation(developerAddState.email).validate(email => !formState.appClientDeveloperEmails.ornull?.get().find(item => item.toLowerCase() === email.toLowerCase()), 'Developer already exists with that email', 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
@@ -402,12 +407,16 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
       <ItemChooser
         columns={appClientDeveloperColumns}
-        items={formState.appClientDeveloperEmails.get()?.map(r => {
-          return {
-            email: r
-          } as DeveloperEmail
-        }) ?? []}
+        items={[
+          ...formState.appClientDeveloperEmails.attach(Downgraded).get()?.map(r => {
+            return {
+              email: r
+            } as DeveloperEmail
+          }) ?? []
+        ]}
         onRowClicked={() => { return; }}
+        immutableData
+        getRowNodeId={getRowNodeIdForDevEmail}
       />
 
       {appSourceAccordionItems.length > 0 &&
