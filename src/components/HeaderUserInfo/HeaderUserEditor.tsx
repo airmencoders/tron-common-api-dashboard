@@ -59,7 +59,7 @@ function HeaderUserEditor(props: UserInfoFormProps) {
 
   useEffect(() => {
     props.editorState.disableSubmit.set(Validation(formState).invalid() || !isFormModified(props.editorState.original.ornull?.get(), formState.get()));
-  }, [formState.address.get(), formState.branch.get(), formState.dodid.get(), formState.dutyPhone.get(), formState.dutyTitle.get(), formState.title.get(), formState.firstName.get(), formState.lastName.get(), formState.middleName.get(), formState.phone.get(), formState.title.get()]);
+  }, [formState.address.get(), formState.branch.get(), formState.rank.get(), formState.dutyPhone.get(), formState.dutyTitle.get(), formState.title.get(), formState.firstName.get(), formState.lastName.get(), formState.middleName.get(), formState.phone.get(), formState.title.get()]);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
