@@ -87,6 +87,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   Validation(developerAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
   Validation(developerAddState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+  Validation(developerAddState.email).validate(email => !formState.appClientDeveloperEmails.ornull?.get().includes(email), 'Developer already exists with that email', 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
