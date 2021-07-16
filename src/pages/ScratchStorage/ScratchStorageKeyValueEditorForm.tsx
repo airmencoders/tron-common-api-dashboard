@@ -57,7 +57,7 @@ function ScratchStorageKeyValueEditorForm(props: ScratchStorageAddKVPProps) {
           labelText="Key Name"
           isError={isKeyNameModified() && failsHookstateValidation(props.createUpdateState.keyName)}
           errorMessages={generateStringErrorMessages(props.createUpdateState.keyName)}
-          required
+          required={!props.createUpdateState.isEdit.value}
       >
         <TextInput
             id="keyName"
@@ -65,6 +65,7 @@ function ScratchStorageKeyValueEditorForm(props: ScratchStorageAddKVPProps) {
             type="text"
             autoFocus={true}
             data-testid='scratch-kvp-keyname'
+            disabled={props.createUpdateState.isEdit.value}
             value={props.createUpdateState.keyName.get()}
             error={isKeyNameModified() && failsHookstateValidation(props.createUpdateState.keyName)}
             onChange={(event) => props.createUpdateState.keyName.set(event.target.value)}
