@@ -40,6 +40,10 @@ enum PrivilegeKind {
   ORGANIZATION="organization",
 }
 
+function getRowNodeIdForDevEmail(email: DeveloperEmail): string {
+  return email.email;
+}
+
 function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const formState = useHookstate<AppClientFlat>({
     id: props.data?.id,
@@ -403,12 +407,16 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
       <ItemChooser
         columns={appClientDeveloperColumns}
-        items={formState.appClientDeveloperEmails.get()?.map(r => {
-          return {
-            email: r
-          } as DeveloperEmail
-        }) ?? []}
+        items={[
+          ...formState.appClientDeveloperEmails.attach(Downgraded).get()?.map(r => {
+            return {
+              email: r
+            } as DeveloperEmail
+          }) ?? []
+        ]}
         onRowClicked={() => { return; }}
+        immutableData
+        getRowNodeId={getRowNodeIdForDevEmail}
       />
 
       {appSourceAccordionItems.length > 0 &&
