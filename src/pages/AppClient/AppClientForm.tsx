@@ -183,6 +183,15 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   }
 
   /**
+   * Determines if the Entity Field Authorization checkboxes
+   * should be disabled.
+   * @returns true if should be disabled, false
+   */
+  function isEfaCheckboxesDisabled(): boolean {
+    return isFormDisabled() || !currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
+  }
+
+  /**
    * Builds the Person and Organization privilege forms
    * @param kind either "person" or "organization"
    * @returns React Element containing the form
@@ -218,7 +227,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                 label={item.privDisplayName}
                 checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
                 onChange={(event) => togglePriv(event, kind)}
-                disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+                disabled={isEfaCheckboxesDisabled()}
               />
             </div>
           )
@@ -241,9 +250,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                     label={item.privDisplayName}
                     checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
                     onChange={(event) => togglePriv(event, kind)}
-                    disabled={isFormDisabled() 
-                      || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)                      
-                    }
+                    disabled={isEfaCheckboxesDisabled()}
                   />
                 </div>
               )
