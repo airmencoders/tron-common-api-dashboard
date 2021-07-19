@@ -47,6 +47,8 @@ function ItemChooser(props: ChooserProps) {
         suppressRowClickSelection={props.suppressRowClickSelection}
         onRowSelected={props.onRowSelected}
         onGridReady={props.onGridReady}
+        immutableData={props.immutableData}
+        getRowNodeId={props.getRowNodeId}
       />
     </div>
   )

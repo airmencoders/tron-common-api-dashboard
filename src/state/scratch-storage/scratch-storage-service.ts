@@ -189,7 +189,13 @@ export default class ScratchStorageService implements DataService<ScratchStorage
         for(const userPriv of toCreate.userPrivs)
           await this.addUserPriv(userPriv, scratchStorageDto.id);
 
+
+      // do any pending key-value pair transactions
+      await this.doKvpActions(scratchStorageDto.id ?? '');
+
       this.state[this.state.length].set(Object.assign({}, scratchStorageDto, { userPrivs: undefined }));
+
+
       return Promise.resolve(this.convertToFlat(scratchStorageDto));
     }
     catch (error) {
@@ -222,7 +228,7 @@ export default class ScratchStorageService implements DataService<ScratchStorage
 
     // post the new or edited keys for this appid
     for (const kvp of this.createUpdateState.get()) {
-      await this.scratchStorageApi.setKeyValuePair(kvp);
+      await this.scratchStorageApi.setKeyValuePair({...kvp, appId: id});
     }
 
     // do any deletions

@@ -42,6 +42,10 @@ enum PrivilegeKind {
   ORGANIZATION="organization",
 }
 
+function getRowNodeIdForDevEmail(email: DeveloperEmail): string {
+  return email.email;
+}
+
 function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   const formState = useHookstate<AppClientFlat>({
     id: props.data?.id,
@@ -89,6 +93,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   Validation(developerAddState.email).validate(email => validateEmail(email), validationErrors.invalidEmail, 'error');
   Validation(developerAddState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+  Validation(developerAddState.email).validate(email => !formState.appClientDeveloperEmails.ornull?.get().find(item => item.toLowerCase() === email.toLowerCase()), 'Developer already exists with that email', 'error');
 
   formState.attach(Validation);
   formState.attach(Initial);
@@ -185,6 +190,15 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
   }
 
   /**
+   * Determines if the Entity Field Authorization checkboxes
+   * should be disabled.
+   * @returns true if should be disabled, false
+   */
+  function isEfaCheckboxesDisabled(): boolean {
+    return isFormDisabled() || !currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
+  }
+
+  /**
    * Builds the Person and Organization privilege forms
    * @param kind either "person" or "organization"
    * @returns React Element containing the form
@@ -220,7 +234,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                 label={item.privDisplayName}
                 checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
                 onChange={(event) => togglePriv(event, kind)}
-                disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+                disabled={isEfaCheckboxesDisabled()}
               />
             </div>
           )
@@ -243,9 +257,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                     label={item.privDisplayName}
                     checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
                     onChange={(event) => togglePriv(event, kind)}
-                    disabled={isFormDisabled() 
-                      || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)                      
-                    }
+                    disabled={isEfaCheckboxesDisabled()}
                   />
                 </div>
               )
@@ -373,50 +385,55 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="Manage Developers"
           isError={failsHookstateValidation(developerAddState.email)}
           errorMessages={generateStringErrorMessages(developerAddState.email)}
-        >
-          <TextInput
-            id="developer"
-            name="developer"
-            type="email"
-            data-testid="app-client-developer-field"
-            placeholder={"Developer Email"}
-            value={developerAddState.email.get()}
-            error={failsHookstateValidation(developerAddState.email)}
-            onChange={(event) => developerAddState.email.set(event.target.value)}
-            disabled={isFormDisabled()}
-          />
-        </FormGroup>
+      >
+        <TextInput
+          id="developer"
+          name="developer"
+          type="email"
+          data-testid="app-client-developer-field"
+          placeholder={"Developer Email"}
+          value={developerAddState.email.get()}
+          error={failsHookstateValidation(developerAddState.email)}
+          onChange={(event) => developerAddState.email.set(event.target.value)}
+          disabled={isFormDisabled()}
+        />
+      </FormGroup>
 
-        <Button
-          type="button"
-          className="app-client-form__add-developer-btn"
-          data-testid="app-client-developer__add-btn"
-          onClick={addAppClientDeveloper}
-          disabled={developerAddState.email?.get().length === 0 || ((Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid()) || isFormDisabled())}
-        >
-          Add Developer
-        </Button>
+      <Button
+        type="button"
+        className="app-client-form__add-developer-btn"
+        data-testid="app-client-developer__add-btn"
+        onClick={addAppClientDeveloper}
+        disabled={developerAddState.email?.get().length === 0 || ((Touched(developerAddState.email).touched() && Validation(developerAddState.email).invalid()) || isFormDisabled())}
+      >
+        Add Developer
+      </Button>
 
-        <ItemChooser
-          columns={appClientDeveloperColumns}
-          items={formState.appClientDeveloperEmails.get()?.map(r => {
+      <ItemChooser
+        columns={appClientDeveloperColumns}
+        items={[
+          ...formState.appClientDeveloperEmails.attach(Downgraded).get()?.map(r => {
             return {
               email: r
             } as DeveloperEmail
-          }) ?? []}
-          onRowClicked={() => { return; }}
-        />
+          }) ?? []
+        ]}
+        onRowClicked={() => { return; }}
+        immutableData
+        getRowNodeId={getRowNodeIdForDevEmail}
+      />
 
+      {appSourceAccordionItems.length > 0 &&
         <FormGroup
           labelName="endpoints"
           labelText="Authorized App Source Endpoints"
         >
+          <Accordion
+            className="app-source-access"
+            items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}
+          />
         </FormGroup>
-
-      <Accordion
-          className="app-source-access"
-          items={appSourceAccordionItems} onItemExpanded={handleAccordionExpanded}
-      />
+      }
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}

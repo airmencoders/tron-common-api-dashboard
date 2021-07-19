@@ -43,6 +43,12 @@ describe('App Source / App Client Tests', () => {
     cy.get('#developer').type(adminDevEmail).should('have.value', adminDevEmail);
     cy.get('button').contains('Add Developer').should('not.be.disabled').click();
 
+    // Add same Admin, should get validation error
+    cy.get('button').contains('Add Developer').should('be.disabled');
+    cy.get('#developer').clear().type(adminDevEmail).should('have.value', adminDevEmail);
+    cy.get('button').contains('Add Developer').should('be.disabled');
+    cy.contains('Developer already exists with that email');
+
     // Save it
     cy.get('button').contains('Update').should('not.be.disabled').click();
     UtilityFunctions.findToastContainsMessage('Successfully updated App Client');
@@ -76,14 +82,14 @@ describe('App Source / App Client Tests', () => {
     cy.get('#PERSON_CREATE').should('not.be.checked').check({ force: true }).should('be.checked');
     cy.get('#PERSON_DELETE').should('not.be.checked').check({ force: true }).should('be.checked');
     cy.get('#PERSON_READ').should('not.be.checked').check({ force: true }).should('be.checked');
-    cy.get('#PERSON_EDIT').should('be.disabled');
+    cy.get('#PERSON_EDIT').should('not.be.checked').check({ force: true }).should('be.checked');
 
     // Organization Entity Permissions
     cy.get('button').contains('Organization Entity Permissions').click();
     cy.get('#ORGANIZATION_CREATE').should('not.be.checked').check({ force: true }).should('be.checked');
     cy.get('#ORGANIZATION_DELETE').should('not.be.checked').check({ force: true }).should('be.checked');
     cy.get('#ORGANIZATION_READ').should('not.be.checked').check({ force: true }).should('be.checked');
-    cy.get('#ORGANIZATION_EDIT').should('be.disabled');
+    cy.get('#ORGANIZATION_EDIT').should('not.be.checked').check({ force: true }).should('be.checked');
 
     // Save it
     cy.get('button').contains('Update').should('not.be.disabled').click();
@@ -234,7 +240,7 @@ describe('App Source / App Client Tests', () => {
 
     // Force it to be checked and try to change rate limit value
     cy.get('#rate-limit-toggle').check({ force: true }).should('be.checked');
-    cy.get('#rate-limit-count').should('not.be.disabled').type('111a').should('have.value', '111');
+    cy.get('#rate-limit-count').should('not.be.disabled').clear().type('111a').should('have.value', '111');
 
     // Force it to be unchecked
     cy.get('#rate-limit-toggle').uncheck({ force: true }).should('not.be.checked');

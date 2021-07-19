@@ -346,7 +346,7 @@ describe('Test Person Service', () => {
   });
 
   it('Should fetch rank for branch successfully', async () => {
-    const rankApiSpy = jest.spyOn(rankApi, 'getRanks1');
+    const rankApiSpy = jest.spyOn(rankApi, 'getRanks');
 
     const ranks = [
       {
