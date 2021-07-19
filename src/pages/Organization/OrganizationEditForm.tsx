@@ -29,15 +29,17 @@ import './OrganizationEditForm.scss';
 import PlusIcon from '../../icons/PlusIcon';
 import { getDefaultOrganizationEditState, OrganizationEditState } from './organization-edit-state';
 import { OrganizationChooserDataType } from '../../state/organization/organization-chooser-data-type';
-import { GridRowData } from '../../components/Grid/grid-row-data';
 import { mapDataItemsToStringIds } from '../../state/data-service/data-service-utils';
+import Fieldset from '../../components/forms/Fieldset/Fieldset';
+import Label from '../../components/forms/Label/Label';
+import TextInputWithDelete from '../../components/forms/TextInputWithDelete/TextInputWithDelete';
 
 const personColumns = [ 
   new GridColumn({
-    field: 'id',
+    field: 'email',
     sortable: true,
     filter: true,
-    headerName: 'ID',
+    headerName: 'Email',
     checkboxSelection: true,
   }),
   new GridColumn({
@@ -73,17 +75,11 @@ const membersListColumns = [
 
 const orgColumns = [ 
   new GridColumn({
-    field: 'id',
-    sortable: true,
-    filter: true,
-    headerName: 'ID',
-    checkboxSelection: true,
-  }),
-  new GridColumn({
     field: 'name',
     sortable: true,
     filter: true,
-    headerName: 'Name'
+    headerName: 'Name',
+    checkboxSelection: true,
   })
 ];
 
@@ -360,6 +356,33 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
     chooserDialogClose();
   }
 
+  /**
+   * Generates the title of the Chooser modal based on the edit type
+   * @returns the title
+   */
+  function chooserDialogTitle(): string {
+    let title = '';
+    switch (orgEditType) {
+      case OrgEditOpType.LEADER_EDIT:
+        title = 'Leader';
+        break;
+      case OrgEditOpType.MEMBERS_EDIT:
+        title = 'Members';
+        break;
+      case OrgEditOpType.SUB_ORGS_EDIT:
+        title = 'Subordinate Organizations';
+        break;
+      case OrgEditOpType.PARENT_ORG_EDIT:
+        title = 'Parent Organization';
+        break;
+      default:
+        title = 'Choose Entry';
+        break;
+    }
+
+    return title;
+  }
+
   // close remove attribute confirm dialog
   const confirmDialogClose = () => {
     setRemoveAction({ data: null, func: () => true});
@@ -492,10 +515,18 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
           {/* Edit/Remove Org Leader Section */}
           <FormGroup labelName="leaderName" labelText="Leader">
             <div className="organization-edit-form__input-actions">
-              <TextInput id="leaderName" name="leader" type="text" data-testid='org-leader-name'
+              <TextInputWithDelete
+                id="leaderName"
+                name="leader"
+                type="text"
+                data-testid='org-leader-name'
                 value={resolveLeaderName()}
                 disabled={true}
+                onDeleteClickHandler={() => { resolveLeaderName() !== '' && removeActionInitiated(() => { removeLeader() }, null) }}
+                deleteButtonTitle="Remove Leader"
+                className="input-actions__remove-input"
               />
+
               <Button
                 data-testid='change-org-leader__btn'
                 disableMobileFullWidth
@@ -504,20 +535,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                 unstyled
                 className="input-actions__icon-btn"
               >
-                <EditIcon iconTitle="Change Leader" size={1.75} />
-              </Button>
-
-              <Button
-                data-testid='remove-org-leader__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={formState.leader.get() == null}
-                onClick={() => { resolveLeaderName() !== '' && removeActionInitiated(() => { removeLeader() }, null) }}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Leader" disabled={formState.leader.get() == null} size={1.75} />
+                <EditIcon iconTitle="Change Leader" size={1.5} />
               </Button>
             </div>
           </FormGroup>
@@ -525,9 +543,16 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
           {/* Edit/Remove Parent Org Section */}
           <FormGroup labelName="parentOrg" labelText="Parent Organization">
             <div className="organization-edit-form__input-actions">
-              <TextInput id="parentOrg" name="parentOrg" type="text" data-testid='org-parent-name'
+              <TextInputWithDelete
+                id="parentOrg"
+                name="parentOrg"
+                type="text"
+                data-testid='org-parent-name'
                 value={formState.parentOrganization.get()?.name ?? ''}
                 disabled={true}
+                onDeleteClickHandler={() => { formState.parentOrganization.get()?.name && removeActionInitiated(() => { removeParentOrg() }, null) }}
+                deleteButtonTitle="Remove Parent Organization"
+                className="input-actions__remove-input"
               />
 
               <Button
@@ -538,51 +563,41 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                 unstyled
                 className="input-actions__icon-btn"
               >
-                <EditIcon iconTitle="Change Parent Organization" size={1.75} />
-              </Button>
-
-              <Button
-                data-testid='remove-org-parent__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={formState.parentOrganization.get() == null}
-                onClick={() => { formState.parentOrganization.get()?.name && removeActionInitiated(() => { removeParentOrg() }, null) }}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Parent Organization" disabled={formState.parentOrganization.get() == null} size={1.75} />
+                <EditIcon iconTitle="Change Parent Organization" size={1.5} />
               </Button>
             </div>
           </FormGroup>
 
           {/* Add/Remove Org Members Section */}
-          <FormGroup labelName="membersList" labelText={`Organization Members (${formState.members.get()?.length || 0})`} >
-            <div className="organization-edit-form__input-actions--grid">
-              <Button
-                data-testid='org-add-member__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onAddMemberClick}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <PlusIcon iconTitle="Add Members" size={2} />
-              </Button>
+          <Fieldset>
+            <Label htmlFor='membersList'>
+              {`Organization Members (${formState.members.get()?.length || 0})`}
+              <div className="organization-edit-form__input-actions organization-edit-form__input-actions--grid">
+                <Button
+                  data-testid='org-add-member__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  onClick={onAddMemberClick}
+                  unstyled
+                  className="input-actions__icon-btn"
+                >
+                  <PlusIcon iconTitle="Add Members" size={1.5} />
+                </Button>
 
-              <Button
-                data-testid='org-member-remove-selected__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={organizationMembersForRemoval.get().length === 0}
-                onClick={removeMembers}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={1.75} />
-              </Button>
-            </div>
+                <Button
+                  data-testid='org-member-remove-selected__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  disabled={organizationMembersForRemoval.get().length === 0}
+                  onClick={removeMembers}
+                  unstyled
+                  transparentOnDisabled
+                  className="input-actions__icon-btn"
+                >
+                  <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={1.5} />
+                </Button>
+              </div>
+            </Label>
 
             <Grid
               rowSelection='multiple'
@@ -592,37 +607,40 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
               columns={membersListColumns}
               rowClass="ag-grid--row-pointer"
               onRowSelected={onOrganizationMembersRowSelection}
-              suppressRowClickSelection
+              // suppressRowClickSelection
             />
-          </FormGroup>
+          </Fieldset>
 
           {/* Add/Remove Org Subordinate Orgs Section */}
-          <FormGroup labelName="subOrgsList" labelText={`Subordinate Organizations  (${formState.subordinateOrganizations.get()?.length || 0})`}>
-            <div className="organization-edit-form__input-actions--grid">
-              <Button
-                data-testid='org-add-suborg__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onAddSubOrgClick}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <PlusIcon iconTitle="Add Sub Orgs" size={2} />
-              </Button>
+          <Fieldset>
+            <Label htmlFor="subOrgsList">
+              {`Subordinate Organizations  (${formState.subordinateOrganizations.get()?.length || 0})`}
+              <div className="organization-edit-form__input-actions organization-edit-form__input-actions--grid">
+                <Button
+                  data-testid='org-add-suborg__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  onClick={onAddSubOrgClick}
+                  unstyled
+                  className="input-actions__icon-btn"
+                >
+                  <PlusIcon iconTitle="Add Sub Orgs" size={1.5} />
+                </Button>
 
-              <Button
-                data-testid='org-suborg-remove-selected__btn'
-                disableMobileFullWidth
-                type={'button'}
-                disabled={organizationSubOrgsForRemoval.get().length === 0}
-                onClick={removeSubOrgs}
-                unstyled
-                transparentOnDisabled
-                className="input-actions__icon-btn"
-              >
-                <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={1.75} />
-              </Button>
-            </div>
+                <Button
+                  data-testid='org-suborg-remove-selected__btn'
+                  disableMobileFullWidth
+                  type={'button'}
+                  disabled={organizationSubOrgsForRemoval.get().length === 0}
+                  onClick={removeSubOrgs}
+                  unstyled
+                  transparentOnDisabled
+                  className="input-actions__icon-btn"
+                >
+                  <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={1.5} />
+                </Button>
+              </div>
+            </Label>
 
             <Grid
               rowSelection='multiple'
@@ -631,10 +649,10 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
               data={formState.subordinateOrganizations.attach(Downgraded).get() || []}
               columns={subOrgListColumns}
               rowClass="ag-grid--row-pointer"
-              suppressRowClickSelection
+              // suppressRowClickSelection
               onRowSelected={onOrganizationSubOrgsRowSelection}
             />
-          </FormGroup>
+          </Fieldset>
         </>
 
         <SuccessErrorMessage
@@ -659,14 +677,14 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
 
       <Modal
         show={showChooserDialog}
-        headerComponent={<ModalTitle title="Choose Entry" />}
+        headerComponent={<ModalTitle title={chooserDialogTitle()} />}
         footerComponent={(
           <div className={'modal-footer-submit'}>
             <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" onClick={chooserDialogClose}>
               Cancel
             </Button>
             <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" onClick={chooserDialogConfirmed} disabled={selectedChooserRows.length === 0}>
-              Done
+              Select
             </Button>
           </div>
         )}
@@ -681,7 +699,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
           rowSelection={orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.SUB_ORGS_EDIT ? 'multiple' : 'single'}
           datasource={orgState.createDatasource(chooserDataType, getIdsToExclude(chooserDataType))}
           className='item-chooser__grid'
-          suppressRowClickSelection
+          // suppressRowClickSelection
           getRowNodeId={function (item) { return item.id }}
           onRowSelected={onChooserRowSelected}
         />

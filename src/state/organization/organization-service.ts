@@ -98,7 +98,7 @@ export default class OrganizationService extends AbstractDataService<Organizatio
             return resp.data.data;
           });
       } else {
-        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, "id,firstName,lastName", "id,name", page, limit, sort)
+        responseData = await this.orgApi.getOrganizationsWrapped(undefined, undefined, undefined, "id,email,firstName,lastName", "id,name", page, limit, sort)
           .then(resp => {  
             
             // what we really get is an OrganizationWithDetails since we specified people and org fields to return
