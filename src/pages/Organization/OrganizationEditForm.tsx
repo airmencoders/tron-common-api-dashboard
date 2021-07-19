@@ -607,7 +607,6 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
               columns={membersListColumns}
               rowClass="ag-grid--row-pointer"
               onRowSelected={onOrganizationMembersRowSelection}
-              // suppressRowClickSelection
             />
           </Fieldset>
 
@@ -649,7 +648,6 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
               data={formState.subordinateOrganizations.attach(Downgraded).get() || []}
               columns={subOrgListColumns}
               rowClass="ag-grid--row-pointer"
-              // suppressRowClickSelection
               onRowSelected={onOrganizationSubOrgsRowSelection}
             />
           </Fieldset>
@@ -699,7 +697,6 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
           rowSelection={orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.SUB_ORGS_EDIT ? 'multiple' : 'single'}
           datasource={orgState.createDatasource(chooserDataType, getIdsToExclude(chooserDataType))}
           className='item-chooser__grid'
-          // suppressRowClickSelection
           getRowNodeId={function (item) { return item.id }}
           onRowSelected={onChooserRowSelected}
         />
