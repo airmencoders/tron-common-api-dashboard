@@ -10,7 +10,7 @@ function CopyToClipboard(props: CopyToClipboardProps) {
   const { ...rest } = props;
   return (
     <ReactCopyToClipboard {...rest } >
-      <Button type="button" className={'usa-button inline-icon'}>
+      <Button type="button" className={'usa-button inline-icon'} data-testid="copy-to-clipboard-component">
         <CopyIcon iconTitle={'copyToClipboard'} size={1} />
       </Button>
     </ReactCopyToClipboard>
