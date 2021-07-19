@@ -28,8 +28,6 @@ import { failsHookstateValidation, generateStringErrorMessages, validateRequired
 import './ScratchStorageEditForm.scss';
 import ScratchStorageKeyValueEditorForm from './ScratchStorageKeyValueEditorForm';
 import ScratchStorageUserAddForm from './ScratchStorageUserAddForm';
-import TextInputInline from "../../components/forms/TextInput/TextInputInline";
-import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 export interface ScratchStorageEditorState {
   isOpen: boolean;
@@ -81,10 +79,10 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   })
 
   const userAddState = useHookstate({ isOpen: false, });
-  const keyCreateEditState = useHookstate<ScratchStorageCreateUpdateState>({ 
-    isEdit: false, 
+  const keyCreateEditState = useHookstate<ScratchStorageCreateUpdateState>({
+    isEdit: false,
     isOpen: false,
-    keyName: '', 
+    keyName: '',
     appId: props.data?.id ?? ""
   });
   const keyValue = useHookstate<string>('');  // state to hold an existing key value's value (when editing)
@@ -120,9 +118,9 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
     formState.userPrivs.find(item => item.get().email === downgraded.email)?.set(downgraded);
     userEditorState.merge({
       original: downgraded
-    }); 
-  }  
-  
+    });
+  }
+
   function onAddUser(toUpdate: State<ScratchStorageUserWithPrivsFlat>) {
     try{
       userEditorState.errorMessage.set('');
@@ -146,7 +144,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   const deleteBtnName = 'Delete';
   const userColumns: GridColumn[] = [
     new GridColumn({
-      field: 'email', 
+      field: 'email',
       sortable: true,
       filter: true,
       resizable: true,
@@ -183,10 +181,10 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   ];
 
   const keyColumns: GridColumn[] = [
-    new GridColumn({  
+    new GridColumn({
       field: 'name',
       resizable: true,
-      headerName: 'Key Name',      
+      headerName: 'Key Name',
     }),
   ];
 
@@ -341,10 +339,10 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   return (
       <div className="scratch-storage-edit-form">
         <Form onSubmit={submitForm} data-testid="scratch-storage-form">
-          
+
           <FormGroup labelName="appId" labelText="App ID">
             <TextInput id="appId" name="appId" type="text"
-                        className="scratch-storage-edit-form__appId" 
+                        className="scratch-storage-edit-form__appId"
                         defaultValue={props.data?.id || ''}
                         error={failsHookstateValidation(formState.id)}
                         disabled={true}
@@ -356,7 +354,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
                      required
           >
             <TextInput id="appName" name="appName" type="text"
-                       className="scratch-storage-edit-form__mb1" 
+                       className="scratch-storage-edit-form__mb1"
                        defaultValue={props.data?.appName || ''}
                        error={failsHookstateValidation(formState.appName)}
                        onChange={(event) => formState.appName.set(event.target.value)}
@@ -386,7 +384,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
             <Button type='button' className="scratch-storage-edit-form__mb1" onClick={() => userAddState.isOpen.set(true)} disabled={isFormDisabled()}>
               Add User
             </Button>
-            
+
             <ItemChooser
               items={formState.userPrivs.get()}
               columns={userColumns}
@@ -398,12 +396,14 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
             labelName="scratch-storage-keys"
             labelText={`Key / Values (${formState.keyNames.length} Total)`}
           >
-            <Button 
+            <Button
               data-testid='add-kvp-btn'
-              type='button' 
-              className="scratch-storage-edit-form__mb1" 
-              onClick={() => onAddKeyValue()} 
-              disabled={isFormDisabled()}
+              type='button'
+              className="scratch-storage-edit-form__mb1"
+              onClick={() => onAddKeyValue()}
+              disabled={isFormDisabled() ||
+                !(formState.userPrivs.get().filter(item => item.email ===
+                    authorizedUserState.authorizedUser?.email && item.admin).length > 0)}
             >
               Add Key/Value
             </Button>
@@ -444,9 +444,9 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           height="auto"
           data-testid='new-scratch-user-dlg'
         >
-          <ScratchStorageUserAddForm 
-            editorState={userEditorState} 
-            onSubmit={onUpdateUser} 
+          <ScratchStorageUserAddForm
+            editorState={userEditorState}
+            onSubmit={onUpdateUser}
             isUpdate={true}
           />
         </Modal>
@@ -480,7 +480,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
           width="75%"
           height="auto"
         >
-          <ScratchStorageKeyValueEditorForm 
+          <ScratchStorageKeyValueEditorForm
             createUpdateState={keyCreateEditState}
             onSubmit={keyEditorSubmit}
             valueState={keyValue}
