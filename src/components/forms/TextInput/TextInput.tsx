@@ -9,7 +9,7 @@ import CloseIcon from '../../../icons/CloseIcon';
 function TextInput({ appendedText, deleteButtonTitle, onDeleteClickHandler, withDelete, ...props }: TextInputProps & Partial<TextInputWithDeleteProps>) {
   const hasValidValue = props.value != null && String(props.value).trim().length > 0;
   return (
-    <div className={`tron-text-input${appendedText ? ' tron-text-input--appended' : ''}${props.className ? ` ${props.className}` : ''}`}>
+    <div className={`tron-text-input${appendedText ? ' tron-text-input--appended' : ''}${props.className ? (' ' + props.className) : ''}`}>
       <div className={`tron-text-input__input-container${withDelete ? ' tron-text-input__input-container--delete' : ''}`}>
         <UswdsTextInput {...props} />
         {withDelete && hasValidValue &&
