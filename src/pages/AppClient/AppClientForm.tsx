@@ -328,7 +328,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           defaultValue={formState.name.get()}
           error={failsHookstateValidation(formState.name) || props.formErrors?.validation?.name != null}
           onChange={(event) => formState.name.set(event.target.value)}
-          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+          disabled={isFormDisabled() || !currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
         />
       </FormGroup>
 
@@ -352,7 +352,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           defaultValue={formState.clusterUrl.get()}
           error={failsHookstateValidation(formState.clusterUrl)}
           onChange={(event) => formState.clusterUrl.set(event.target.value)}
-          disabled={isFormDisabled() || currentUser.authorizedUserHasPrivilege(PrivilegeType.APP_CLIENT_DEVELOPER)}
+          disabled={isFormDisabled() || !currentUser.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN)}
         />
       </FormGroup>
 
