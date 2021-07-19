@@ -10,11 +10,13 @@ import Select from '../../components/forms/Select/Select';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../openapi';
 import { useAppClientsState } from '../../state/app-clients/app-clients-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { failsHookstateValidation, generateStringErrorMessages, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
   const appClientsAvail = useAppClientsState().appClients;
@@ -75,14 +77,15 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
           labelText="UUID"
           isError={false}
         >
-          <TextInput
+          <TextInputInline
             id="uuid"
             name="uuid"
             type="text"
             defaultValue={formState.id.get()}
             disabled={true}
+            className={'tron-text-input-inline'}
           />
-          <br/>
+          <CopyToClipboard text={String(formState.id.get())} />
         </FormGroup>
       }
 

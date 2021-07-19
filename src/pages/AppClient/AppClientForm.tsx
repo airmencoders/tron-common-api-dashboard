@@ -14,11 +14,13 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import { PrivilegeDto } from "../../openapi/models/privilege-dto";
 import { AppClientFlat } from "../../state/app-clients/app-client-flat";
 import { useAppClientsState } from "../../state/app-clients/app-clients-state";
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import { accessAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
@@ -60,11 +62,11 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
 
   // state of person and org's EDIT checkbox
   // either of which true will make its fields checkboxs disabled/not visible respectively
-  const editPrivState = useHookstate({ person: false, organization: false}); 
+  const editPrivState = useHookstate({ person: false, organization: false});
 
   // load initial state of the create and edit checkboxes so we know how to disable/hide
   useEffect(() => {
-    editPrivState.set({ 
+    editPrivState.set({
       person: formState.allPrivs?.value?.map(item => item.name).includes('PERSON_EDIT') ?? false,
       organization: formState.allPrivs?.value?.map(item => item.name).includes('ORGANIZATION_EDIT') ?? false
     });
@@ -304,13 +306,15 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="UUID"
           isError={false}
         >
-          <TextInput
-            id="uuid"
-            name="uuid"
-            type="text"
-            defaultValue={formState.id.get()}
-            disabled={true}
+          <TextInputInline
+              id="uuid"
+              name="uuid"
+              type="text"
+              defaultValue={formState.id.get()}
+              disabled={true}
+              className={'tron-text-input-inline'}
           />
+          <CopyToClipboard text={String(formState.id.get())} />
         </FormGroup>
       }
 

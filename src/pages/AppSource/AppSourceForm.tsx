@@ -13,6 +13,7 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from '../../components/forms/TextInput/TextInput';
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import GridColumn from '../../components/Grid/GridColumn';
 import ItemChooser from '../../components/ItemChooser/ItemChooser';
 import Modal from '../../components/Modal/Modal';
@@ -24,6 +25,7 @@ import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 interface AdminEmail {
   email: string;
@@ -290,13 +292,15 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
             labelText="UUID"
             isError={false}
           >
-            <TextInput
+            <TextInputInline
               id="uuid"
               name="uuid"
               type="text"
               defaultValue={formState.id.get()}
               disabled={true}
+              className={'tron-text-input-inline'}
             />
+            <CopyToClipboard text={String(formState.id.get())} />
           </FormGroup>
         }
 

@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useEffect } from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import TextInput from '../../components/forms/TextInput/TextInput';
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import Select from '../../components/forms/Select/Select';
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import { PersonDto, PersonDtoBranchEnum } from '../../openapi/models';
@@ -16,6 +17,7 @@ import { Initial } from '@hookstate/initial';
 
 import './PersonEditForm.scss';
 import { generateStringErrorMessages, failsHookstateValidation, validateEmail, validateRequiredString, validateStringLength, validationErrors, validDoDId, validPhone } from '../../utils/validation-utils';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 
 function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   const personState = usePersonState();
@@ -109,6 +111,21 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
   return (
     <div className="person-edit-form">
       <Form onSubmit={submitForm}>
+        <FormGroup
+            labelName="uuid"
+            labelText="UUID"
+            isError={false}
+        >
+          <TextInputInline
+              id="uuid"
+              name="uuid"
+              type="text"
+              defaultValue={formState.id.get()}
+              disabled={true}
+              className={'tron-text-input-inline'}
+          />
+          <CopyToClipboard text={String(formState.id.get())} />
+        </FormGroup>
         <FormGroup labelName="email" labelText="Email"
           isError={failsHookstateValidation(formState.email)}
           errorMessages={generateStringErrorMessages(formState.email)}

@@ -11,6 +11,7 @@ import Select from '../../components/forms/Select/Select';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from '../../components/forms/TextInput/TextInput';
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import Grid from '../../components/Grid/Grid';
 import GridColumn from '../../components/Grid/GridColumn';
 import Modal from '../../components/Modal/Modal';
@@ -22,6 +23,7 @@ import { OrgEditOpType } from '../../state/organization/organization-service';
 import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails, useOrganizationState } from '../../state/organization/organization-state';
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import EditIcon from '../../icons/EditIcon';
 import RemoveIcon from '../../icons/RemoveIcon';
@@ -32,7 +34,7 @@ import { OrganizationChooserDataType } from '../../state/organization/organizati
 import { GridRowData } from '../../components/Grid/grid-row-data';
 import { mapDataItemsToStringIds } from '../../state/data-service/data-service-utils';
 
-const personColumns = [ 
+const personColumns = [
   new GridColumn({
     field: 'id',
     sortable: true,
@@ -71,7 +73,7 @@ const membersListColumns = [
   }),
 ]
 
-const orgColumns = [ 
+const orgColumns = [
   new GridColumn({
     field: 'id',
     sortable: true,
@@ -329,7 +331,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
 
     formStateExtended.subOrgs.toRemove.merge(toBeRemoved);
 
-    // Remove items from formState & toAdd 
+    // Remove items from formState & toAdd
     toBeRemoved.forEach(removedSubOrg => {
       formState.subordinateOrganizations.ornull?.find(subOrg => subOrg.id.get() === removedSubOrg.id)?.set(none);
       formStateExtended.subOrgs.toAdd.find(subOrg => subOrg.id.get() === removedSubOrg.id)?.set(none);
@@ -440,6 +442,21 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   return (
     <div className="organization-edit-form">
       <Form onSubmit={submitForm}>
+        <FormGroup
+            labelName="uuid"
+            labelText="UUID"
+            isError={false}
+        >
+          <TextInputInline
+              id="uuid"
+              name="uuid"
+              type="text"
+              defaultValue={formState.id.get()}
+              disabled={true}
+              className={'tron-text-input-inline'}
+          />
+          <CopyToClipboard text={String(formState.id.get())} />
+        </FormGroup>
         <FormGroup
           labelName="orgName" labelText="Organization Name"
           isError={Touched(formState.name).touched() && Validation(formState.name).invalid()}

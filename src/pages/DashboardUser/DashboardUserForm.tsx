@@ -6,6 +6,7 @@ import { Touched } from "@hookstate/touched";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Form from "../../components/forms/Form/Form";
 import TextInput from "../../components/forms/TextInput/TextInput";
+import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import { DashboardUserFlat } from '../../state/dashboard-user/dashboard-user-flat';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
@@ -13,6 +14,7 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import {DashboardUserDto} from '../../openapi/models';
 import {PrivilegeType} from '../../state/privilege/privilege-type';
 import {useDashboardUserState} from '../../state/dashboard-user/dashboard-user-state';
