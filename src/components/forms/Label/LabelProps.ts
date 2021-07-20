@@ -5,4 +5,5 @@ export interface LabelProps {
   error?: boolean
   hint?: React.ReactNode
   srOnly?: boolean
+  required?: boolean
 }

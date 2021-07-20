@@ -1,6 +1,14 @@
+@import '../../../styles/base';
 
 .tron-label {
   label {
     font-weight: bold;
+  }
+
+  .label {
+    &--required::after {
+      content: ' *';
+      color: $required-input;
+    }
   }
 }

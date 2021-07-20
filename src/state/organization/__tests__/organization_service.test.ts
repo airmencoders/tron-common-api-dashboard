@@ -350,6 +350,51 @@ describe('Test OrganizationService', () => {
     }
   });
 
+  it('should send patch -- fail with no ID', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    const original: OrganizationDtoWithDetails = {
+      id: 'some id',
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf,
+      leader: {
+        id: 'leader id'
+      },
+      parentOrganization: {
+        id: 'parent org id'
+      }
+    };
+
+    const toUpdate: OrganizationDtoWithDetails = {
+      name: 'some new name',
+      orgType: OrganizationDtoOrgTypeEnum.Flight,
+      branchType: OrganizationDtoBranchTypeEnum.Ussf,
+    };
+
+    const toPatch: OrganizationEditState = {
+      leader: {
+        removed: true,
+      },
+      parentOrg: {
+        removed: true
+      },
+      members: {
+        toAdd: [{ id: 'new member 1' }],
+        toRemove: []
+      },
+      subOrgs: {
+        toAdd: [{ id: 'new sub org 1' }
+        ],
+        toRemove: []
+      }
+    };
+
+    await expect(organizationService.sendPatch(original, toUpdate, toPatch)).rejects.toEqual(Error('Organization to update has undefined id.'));
+  });
+
   it('should send patch -- partial', async () => {
     const api = new MockOrgApi();
     const organizationService = new OrganizationService(organizationState,
@@ -457,6 +502,14 @@ describe('Test OrganizationService', () => {
     expect(filterOrganizationsSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('test fetchAndStorePaginatedData, should throw on bad filter', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    await expect(organizationService.fetchAndStorePaginatedData(0, 20, false, { bad: 'param' } as unknown as FilterDto)).rejects.toThrowError();
+  });
+
   it('test fetchAndStoreChooserPaginatedData -- person', async () => {
     const api = new MockOrgApi();
     const organizationService = new OrganizationService(organizationState,
@@ -523,6 +576,14 @@ describe('Test OrganizationService', () => {
     expect(filterPersonSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('test fetchAndStoreChooserPaginatedData -- person, should throw on bad filter', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    await expect(organizationService.fetchAndStorePersonChooserPaginatedData(0, 20, false, { bad: 'param' } as unknown as FilterDto)).rejects.toThrowError();
+  });
+
   it('test fetchAndStoreChooserPaginatedData -- organization', async () => {
     const api = new MockOrgApi();
     const organizationService = new OrganizationService(organizationState,
@@ -585,6 +646,14 @@ describe('Test OrganizationService', () => {
     filterOrganizationsSpy.mockImplementation(() => { return Promise.reject(new Error('Test error')) });
     await expect(organizationService.fetchAndStoreOrganizationChooserPaginatedData(0, 20, false, filterDto, agGridSort)).rejects.toThrowError();
     expect(filterOrganizationsSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('test fetchAndStoreChooserPaginatedData -- organization, should throw on bad filter', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    await expect(organizationService.fetchAndStoreOrganizationChooserPaginatedData(0, 20, false, { bad: 'param' } as unknown as FilterDto)).rejects.toThrowError();
   });
 
   it('should convert Org Details Dto to Org Dto', () => {

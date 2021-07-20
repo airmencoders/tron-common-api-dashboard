@@ -9,20 +9,21 @@
       &__icon-btn {
         margin: 0 0 0 units(1);
       }
+
+      &__remove-input {
+        width: 100%;
+      }
     }
 
-    .tron-text-input {
+    .tron-text-input-delete {
       flex: 1 1;
-
-      input {
-        margin: 0;
-      }
     }
     
     &--grid {
+      display: inline-flex;
       .input-actions {
         &__icon-btn {
-          margin: units(1) units(1) units(1.5) 0;
+          margin: 0 0 0 units(0.5);
         }
       }
     }

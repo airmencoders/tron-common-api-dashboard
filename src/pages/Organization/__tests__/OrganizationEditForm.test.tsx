@@ -306,7 +306,7 @@ it('should allow to remove parent', async () => {
     () => expect(form.getByDisplayValue(`${orgWithParent.parentOrganization!.name}`)).toBeInTheDocument()
   )
 
-  const parentBtn = form.getByTestId('remove-org-parent__btn');
+  const parentBtn = form.getByTitle('Remove Parent Organization');
   fireEvent.click(parentBtn);
 
   await waitFor(
@@ -425,7 +425,7 @@ it('should allow to remove leader', async () => {
           .toBeInTheDocument()
   )
 
-  const leaderBtn = form.getByTestId('remove-org-leader__btn');
+  const leaderBtn = form.getByTitle('Remove Leader');
   fireEvent.click(leaderBtn);
 
   await waitFor(
@@ -623,7 +623,7 @@ it('should allow to add new sub org', async () => {
       }
   );
 
-  const orgRow = await form.findByText(existingOrg.id!);
+  const orgRow = await form.findByText(existingOrg.name!);
   expect(orgRow.parentElement).toBeInTheDocument();
   const orgRowCheckbox = orgRow.parentElement?.querySelector('.ag-checkbox-input');
   expect(orgRowCheckbox).toBeInTheDocument();

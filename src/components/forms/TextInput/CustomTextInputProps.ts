@@ -9,4 +9,5 @@ export interface CustomTextInputProps {
   onChange?: (event: ChangeEvent<HTMLInputElement>) => void
   error?: boolean
   appendedText?: string
+  withDelete?: boolean
 }
