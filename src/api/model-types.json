@@ -1271,6 +1271,24 @@
       ],
       "type": "string"
     },
+    "KpiSummaryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientToAppSourceRequestCount": {
+          "type": "number"
+        },
+        "appSourceCount": {
+          "type": "number"
+        },
+        "averageLatencyForSuccessfulRequests": {
+          "type": "number"
+        },
+        "uniqueVisitorySummary": {
+          "$ref": "model-types.json#/definitions/UniqueVisitorSummaryDto"
+        }
+      },
+      "type": "object"
+    },
     "LogfileDto": {
       "additionalProperties": false,
       "properties": {
@@ -1368,6 +1386,17 @@
         "FLIGHT",
         "WING",
         "OTHER_USAF",
+        "DIVISION",
+        "REGIMENT",
+        "BRIGADE",
+        "BATTALION",
+        "COMPANY",
+        "TROOP",
+        "OTHER_USA",
+        "OTHER_USN",
+        "OTHER_USSF",
+        "OTHER_USCG",
+        "OTHER_USMC",
         "ORGANIZATION"
       ],
       "type": "string"
@@ -2017,6 +2046,24 @@
         "SUB_ORG_REMOVE"
       ],
       "type": "string"
+    },
+    "UniqueVisitorSummaryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientCount": {
+          "type": "number"
+        },
+        "appClientRequestCount": {
+          "type": "number"
+        },
+        "dashboardUserCount": {
+          "type": "number"
+        },
+        "dashboardUserRequestCount": {
+          "type": "number"
+        }
+      },
+      "type": "object"
     },
     "UserInfoDto": {
       "additionalProperties": false,
