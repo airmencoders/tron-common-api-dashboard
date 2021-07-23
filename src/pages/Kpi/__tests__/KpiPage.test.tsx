@@ -46,8 +46,8 @@ describe('Test Kpi Page', () => {
       </MemoryRouter>
     );
 
-    const startDateElem = page.getByLabelText('From');
-    const endDateElem = page.getByLabelText('To');
+    const startDateElem = page.getByLabelText('From (UTC)');
+    const endDateElem = page.getByLabelText('To (UTC)');
     expect(startDateElem).toBeInTheDocument();
     expect(endDateElem).toBeInTheDocument();
 

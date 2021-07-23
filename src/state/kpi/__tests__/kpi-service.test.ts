@@ -4,7 +4,7 @@ import { formatDateToEnCa } from '../../../utils/date-utils';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import KpiService from '../kpi-service';
 
-describe('App Client State Tests', () => {
+describe('KPI Service Tests', () => {
   let kpiState: State<KpiSummaryDto> & StateMethodsDestroy;
   let kpiApi: KpiControllerApiInterface;
   let kpiService: KpiService;
