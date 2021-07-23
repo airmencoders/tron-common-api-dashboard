@@ -1,0 +1,35 @@
+@import "../../styles/mixins";
+@import "../../styles/base";
+
+.kpi-content {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+
+  &__actions {
+    input[type=date] {
+      display: block;
+    }
+
+    .actions {
+      &__form {
+        .form {
+          &__date-range {
+            display: flex;
+            flex-direction: row;
+            &> *:not(:last-child) {
+              margin-right: units(2);
+            }
+    
+            @include breakpoint-below(tablet) {
+              flex-direction: column;
+              &> *:not(:last-child) {
+                margin-right: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

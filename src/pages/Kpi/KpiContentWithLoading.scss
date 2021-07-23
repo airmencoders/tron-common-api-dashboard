@@ -1,0 +1,27 @@
+@import "../../styles/base";
+
+.kpi-summary {
+  overflow-x: auto;
+
+  :first-child {
+    margin-top: units(2);
+  }
+
+  &> *:not(:last-child):not(h5) {
+    margin-bottom: units(2);
+  }
+
+  table {
+    width: 100%;
+  }
+
+  td, th {
+    border: 1px solid #ccc;
+    text-align: left;
+    padding: units(1);
+  }
+
+  tr:nth-child(even) {
+    background-color: #ccc;
+  }
+}
