@@ -69,7 +69,7 @@ function KpiPage() {
               <div>
                 <FormGroup
                   labelName="start-date"
-                  labelText="From"
+                  labelText="From (UTC)"
                   isError={Validation(pageState.startDate).invalid()}
                   errorMessages={generateStringErrorMessages(pageState.startDate)}
                 >
@@ -86,7 +86,7 @@ function KpiPage() {
               <div>
                 <FormGroup
                   labelName="end-date"
-                  labelText="To"
+                  labelText="To (UTC)"
                   isError={Validation(pageState.endDate).invalid()}
                   errorMessages={generateStringErrorMessages(pageState.endDate)}
                 >
