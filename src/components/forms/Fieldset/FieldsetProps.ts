@@ -1,6 +1,6 @@
 export interface FieldsetProps {
   children: React.ReactNode
   legend?: React.ReactNode
-  legendSrOnly?: boolean
+  legendStyle?: 'default' | 'large' | 'srOnly'
   className?: string
 }

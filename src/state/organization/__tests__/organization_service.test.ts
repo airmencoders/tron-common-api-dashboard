@@ -90,12 +90,12 @@ class MockOrgApi extends OrganizationControllerApi {
 
   removeSubordinateOrganization(id?: string, requestBody? : string[], options?: any)
     : Promise<AxiosResponse<void>>{
-      return {} as Promise<AxiosResponse<void>>;
+    return {} as Promise<AxiosResponse<void>>
   }
 
   addSubordinateOrganization(id?: string, requestBody? : string[], options?: any)
-    : Promise<AxiosResponse<void>>{
-      return {} as Promise<AxiosResponse<void>>;
+    : Promise<AxiosResponse<OrganizationDto>> {
+    return this.genericFunctionThatReturnsReponse();
   }
 
   deleteOrganizationMember(id?: string, requestBody? : string[], options?: any)
@@ -104,8 +104,8 @@ class MockOrgApi extends OrganizationControllerApi {
   }
 
   addOrganizationMember(id?: string, requestBody? : string[], options?: any)
-  : Promise<AxiosResponse<void>>{
-    return {} as Promise<AxiosResponse<void>>;
+    : Promise<AxiosResponse<OrganizationDto>> {
+    return this.genericFunctionThatReturnsReponse();
   }
 
   deleteOrganization(id: string, options?: any): Promise<AxiosResponse<void>> {
