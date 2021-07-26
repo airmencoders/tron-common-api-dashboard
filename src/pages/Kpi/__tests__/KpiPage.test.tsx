@@ -52,7 +52,7 @@ describe('Test Kpi Page', () => {
     expect(endDateElem).toBeInTheDocument();
 
     let date = new Date();
-    date.setDate(date.getDate() + 1);
+    date.setDate(date.getUTCDate() + 1);
     const dateInFutureString = formatDateToEnCa(date);
     fireEvent.change(startDateElem, { target: { value: dateInFutureString } });
     expect(page.getByText(/Start Date cannot be in the future/i)).toBeInTheDocument();
@@ -63,8 +63,7 @@ describe('Test Kpi Page', () => {
     endDate.setDate(endDate.getDate() - 10);
     fireEvent.change(startDateElem, { target: { value: formatDateToEnCa(date) } });
     fireEvent.change(endDateElem, { target: { value: formatDateToEnCa(endDate) } });
-    expect(page.getByText(/Start Date must be before End Date/i)).toBeInTheDocument();
-    expect(page.getByText(/End Date must be after Start Date/i)).toBeInTheDocument();
+    expect(page.getByText(/Start Date must be equal to or before End Date/i)).toBeInTheDocument();
   });
 
   it('Fetch data button click handler', () => {

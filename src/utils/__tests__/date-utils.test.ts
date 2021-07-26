@@ -1,10 +1,10 @@
-import { formatDateToEnCa, getFirstDayOfWeek, isDateBefore, isDateFuture } from '../date-utils';
+import { formatDateToEnCa, getFirstDayOfWeek, isDateBefore, isDateEqual, isDateFuture } from '../date-utils';
 
 describe('Date util tests', () => {
   it('should get the first day of the week', () => {
-    const date = new Date('2021-07-23');
+    const date = new Date(2021, 6, 23);
     const firstDayOfWeek = getFirstDayOfWeek(date, 1);
-    const expected = new Date('2021-07-19');
+    const expected = new Date(2021, 6, 19);
     expect(formatDateToEnCa(firstDayOfWeek)).toBe(formatDateToEnCa(expected));
   });
 
@@ -28,5 +28,14 @@ describe('Date util tests', () => {
     const dateInPast = new Date();
     dateInPast.setDate(dateInPast.getDate() - 10);
     expect(isDateFuture(dateInPast)).toBe(false);
+  });
+
+  it('should determine if date is equal', () => {
+    const date = new Date(2021, 8, 22);
+    const second_date = new Date(2021, 8, 22);
+    expect(isDateEqual(date, second_date)).toBe(true);
+
+    second_date.setDate(second_date.getUTCDate() + 1);
+    expect(isDateEqual(date, second_date)).toBe(false);
   });
 });

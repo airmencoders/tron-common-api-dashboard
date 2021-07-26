@@ -8,7 +8,7 @@ import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import { useKpiState } from '../../state/kpi/kpi-state';
-import { formatDateToEnCa, getFirstDayOfWeek, isDateBefore, isDateFuture } from '../../utils/date-utils';
+import { formatDateToEnCa, getFirstDayOfWeek, isDateBefore, isDateEqual, isDateFuture } from '../../utils/date-utils';
 import KpiContentWithLoading from './KpiContentWithLoading';
 import './KpiPage.scss';
 import { Validation } from '@hookstate/validation';
@@ -31,17 +31,15 @@ function KpiPage() {
   pageState.attach(Validation);
 
   Validation(pageState.startDate).validate(date => !isDateFuture(Date.parse(date)), 'Start Date cannot be in the future', 'error');
-  Validation(pageState.startDate).validate(date => isDateBefore(Date.parse(date), Date.parse(pageState.endDate.value)), 'Start Date must be before End Date', 'error');
-  Validation(pageState.endDate).validate(date => !isDateBefore(Date.parse(date), Date.parse(pageState.startDate.value)), 'End Date must be after Start Date', 'error');
+  Validation(pageState.startDate).validate(date => isDateBefore(Date.parse(date), Date.parse(pageState.endDate.value)) || isDateEqual(Date.parse(date), Date.parse(pageState.endDate.value)), 'Start Date must be equal to or before End Date', 'error');
 
   useEffect(() => {
-    const todayAsString = formatDateToEnCa(Date.now());
-    const todayAsDate = Date.parse(todayAsString);
-    const startOfWeek = formatDateToEnCa(getFirstDayOfWeek(todayAsDate, 1));
+    const today = new Date();
+    const startOfWeek = formatDateToEnCa(getFirstDayOfWeek(today, 1));
 
     pageState.set({
       startDate: startOfWeek,
-      endDate: todayAsString
+      endDate: formatDateToEnCa(today)
     });
 
     return function cleanup() {
