@@ -1,4 +1,4 @@
-import { startOfWeek, isBefore, isFuture } from 'date-fns';
+import { startOfWeek, isBefore, isFuture, isEqual } from 'date-fns';
 
 /**
  * Gets the first day of the week, given a date object
@@ -18,7 +18,7 @@ export function getFirstDayOfWeek(date: number | Date, firstDayOfWeek: 0 | 1 | 2
  * @returns {string} formatted date in yyyy-MM-dd
  */
 export function formatDateToEnCa(date: number | Date): string {
-  return new Date(date).toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour12: false, timeZone: 'UTC' });
+  return new Date(date).toLocaleDateString('en-Ca');
 }
 
 /**
@@ -32,6 +32,23 @@ export function isDateBefore(firstDate: Date | number, secondDate: Date | number
   return isBefore(firstDate, secondDate);
 }
 
+/**
+ * Checks if two dates are equal
+ * 
+ * @param firstDate first date
+ * @param secondDate second date
+ * @returns true if {@link firstDate} is equal to {@link secondDate}, false otherwise
+ */
+export function isDateEqual(firstDate: Date | number, secondDate: Date | number): boolean {
+  return isEqual(firstDate, secondDate);
+}
+
+/**
+ * Checks if a date is in the future
+ *
+ * @param date the date to check
+ * @returns true if {@link date} is in the future
+ */
 export function isDateFuture(date: Date | number) {
   return isFuture(date);
 }

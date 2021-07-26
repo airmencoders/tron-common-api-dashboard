@@ -36,8 +36,8 @@ describe('Test Kpi Contet', () => {
       }
     });
 
-    const startDate = new Date('2021-07-11');
-    const endDate = new Date('2021-07-12');
+    const startDate = new Date(2021, 6, 11);
+    const endDate = new Date(2021, 6, 12);
 
     const page = render(
       <MemoryRouter>
@@ -61,8 +61,8 @@ describe('Test Kpi Contet', () => {
       }
     });
 
-    const startDate = new Date('2021-07-11');
-    const endDate = new Date('2021-07-12');
+    const startDate = new Date(2021, 6, 11);
+    const endDate = new Date(2021, 6, 12);
 
     const page = render(
       <MemoryRouter>
