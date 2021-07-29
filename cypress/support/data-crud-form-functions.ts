@@ -16,7 +16,7 @@ export default class DataCrudFormFunctions {
     if (searchParentSelector != null) {
       return cy.get(searchParentSelector).find('.ag-row').find(`[col-id="${colId}"]`).contains(value).parents('.ag-row').first();
     } else {
-      return cy.get('.ag-row').find(`[col-id="${colId}"]`).contains(value).parents('.ag-row').first();
+      return cy.get('.ag-row').find(`[col-id="${colId}"]`).contains(value, {matchCase: false}).parents('.ag-row').first();
     }
   }
 
@@ -197,7 +197,7 @@ export default class DataCrudFormFunctions {
           .find('.ag-row')
           .should('have.length', 1)
           .first()
-          .contains(`[col-id="${colId}"]`, searchValue)
+          .contains(`[col-id="${colId}"]`, searchValue, {matchCase: false})
           .should('exist');
       }
     }
