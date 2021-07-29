@@ -22,6 +22,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { ExceptionResponse } from '../models';
 // @ts-ignore
 import { KpiSummaryDto } from '../models';
+// @ts-ignore
+import { KpiSummaryDtoResponseWrapper } from '../models';
 /**
  * KpiControllerApi - axios parameter creator
  * @export
@@ -29,10 +31,65 @@ import { KpiSummaryDto } from '../models';
 export const KpiControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Retrieves previously recorded KPIs. The KPIs will be reported in weekly increments. Monday is the start of the week and Sunday is the end of the week.
+         * @summary Retrieves previously recorded KPIs.
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the previous week from today if not provided.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getKpiSeries: async (startDate: string, endDate?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getKpiSeries.');
+            }
+            const localVarPath = `/v2/kpi/series`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substr(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substr(0,10) :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieves all KPI information between two dates.
          * @summary Retrieves all KPI information
-         * @param {string} startDate Earliest date to include
-         * @param {string} [endDate] Latest date to include. Will default to today if not provided
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -55,13 +112,13 @@ export const KpiControllerApiAxiosParamCreator = function (configuration?: Confi
 
             if (startDate !== undefined) {
                 localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
-                    (startDate as any).toISOString() :
+                    (startDate as any).toISOString().substr(0,10) :
                     startDate;
             }
 
             if (endDate !== undefined) {
                 localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
-                    (endDate as any).toISOString() :
+                    (endDate as any).toISOString().substr(0,10) :
                     endDate;
             }
 
@@ -93,10 +150,25 @@ export const KpiControllerApiAxiosParamCreator = function (configuration?: Confi
 export const KpiControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * Retrieves previously recorded KPIs. The KPIs will be reported in weekly increments. Monday is the start of the week and Sunday is the end of the week.
+         * @summary Retrieves previously recorded KPIs.
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the previous week from today if not provided.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getKpiSeries(startDate: string, endDate?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<KpiSummaryDtoResponseWrapper>> {
+            const localVarAxiosArgs = await KpiControllerApiAxiosParamCreator(configuration).getKpiSeries(startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Retrieves all KPI information between two dates.
          * @summary Retrieves all KPI information
-         * @param {string} startDate Earliest date to include
-         * @param {string} [endDate] Latest date to include. Will default to today if not provided
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -117,10 +189,21 @@ export const KpiControllerApiFp = function(configuration?: Configuration) {
 export const KpiControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * Retrieves previously recorded KPIs. The KPIs will be reported in weekly increments. Monday is the start of the week and Sunday is the end of the week.
+         * @summary Retrieves previously recorded KPIs.
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the previous week from today if not provided.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getKpiSeries(startDate: string, endDate?: string, options?: any): AxiosPromise<KpiSummaryDtoResponseWrapper> {
+            return KpiControllerApiFp(configuration).getKpiSeries(startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieves all KPI information between two dates.
          * @summary Retrieves all KPI information
-         * @param {string} startDate Earliest date to include
-         * @param {string} [endDate] Latest date to include. Will default to today if not provided
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -137,10 +220,21 @@ export const KpiControllerApiFactory = function (configuration?: Configuration, 
  */
 export interface KpiControllerApiInterface {
     /**
+     * Retrieves previously recorded KPIs. The KPIs will be reported in weekly increments. Monday is the start of the week and Sunday is the end of the week.
+     * @summary Retrieves previously recorded KPIs.
+     * @param {string} startDate Earliest date to include in UTC.
+     * @param {string} [endDate] Latest date to include in UTC. Will default to the previous week from today if not provided.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof KpiControllerApiInterface
+     */
+    getKpiSeries(startDate: string, endDate?: string, options?: any): AxiosPromise<KpiSummaryDtoResponseWrapper>;
+
+    /**
      * Retrieves all KPI information between two dates.
      * @summary Retrieves all KPI information
-     * @param {string} startDate Earliest date to include
-     * @param {string} [endDate] Latest date to include. Will default to today if not provided
+     * @param {string} startDate Earliest date to include in UTC.
+     * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof KpiControllerApiInterface
@@ -157,10 +251,23 @@ export interface KpiControllerApiInterface {
  */
 export class KpiControllerApi extends BaseAPI implements KpiControllerApiInterface {
     /**
+     * Retrieves previously recorded KPIs. The KPIs will be reported in weekly increments. Monday is the start of the week and Sunday is the end of the week.
+     * @summary Retrieves previously recorded KPIs.
+     * @param {string} startDate Earliest date to include in UTC.
+     * @param {string} [endDate] Latest date to include in UTC. Will default to the previous week from today if not provided.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof KpiControllerApi
+     */
+    public getKpiSeries(startDate: string, endDate?: string, options?: any) {
+        return KpiControllerApiFp(this.configuration).getKpiSeries(startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Retrieves all KPI information between two dates.
      * @summary Retrieves all KPI information
-     * @param {string} startDate Earliest date to include
-     * @param {string} [endDate] Latest date to include. Will default to today if not provided
+     * @param {string} startDate Earliest date to include in UTC.
+     * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof KpiControllerApi

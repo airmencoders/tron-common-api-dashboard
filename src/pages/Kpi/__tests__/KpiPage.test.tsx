@@ -1,7 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto } from '../../../openapi';
+import { KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto, UniqueVisitorCountDtoVisitorTypeEnum } from '../../../openapi';
 import KpiService from '../../../state/kpi/kpi-service';
 import { useKpiState } from '../../../state/kpi/kpi-state';
 import { formatDateToEnCa } from '../../../utils/date-utils';
@@ -10,11 +10,11 @@ import KpiPage from '../KpiPage';
 
 jest.mock('../../../state/kpi/kpi-state');
 describe('Test Kpi Page', () => {
-  let kpiState: State<KpiSummaryDto> & StateMethodsDestroy;
+  let kpiState: State<KpiSummaryDto | undefined> & StateMethodsDestroy;
   let kpiApi: KpiControllerApiInterface;
 
   beforeEach(() => {
-    kpiState = createState<KpiSummaryDto>({});
+    kpiState = createState<KpiSummaryDto | undefined>(undefined);
     kpiApi = new KpiControllerApi();
 
     mockKpiState();
@@ -71,15 +71,23 @@ describe('Test Kpi Page', () => {
 
       return Promise.resolve(
         createAxiosSuccessResponse({
+          startDate: formatDateToEnCa(new Date(2021, 6, 19)),
+          endDate: formatDateToEnCa(new Date(2021, 6, 25)),
           averageLatencyForSuccessfulRequests: 28,
           appSourceCount: 6,
           appClientToAppSourceRequestCount: 10,
-          uniqueVisitorySummary: {
-            dashboardUserCount: 6,
-            dashboardUserRequestCount: 48108,
-            appClientCount: 4,
-            appClientRequestCount: 476
-          }
+          uniqueVisitorCounts: [
+            {
+              visitorType: UniqueVisitorCountDtoVisitorTypeEnum.AppClient,
+              uniqueCount: 6,
+              requestCount: 48108
+            },
+            {
+              visitorType: UniqueVisitorCountDtoVisitorTypeEnum.DashboardUser,
+              uniqueCount: 4,
+              requestCount: 476
+            }
+          ]
         })
       );
     });

@@ -65,6 +65,7 @@ models/json-patch-object-array-value.ts
 models/json-patch-object-value.ts
 models/json-patch-string-array-value.ts
 models/json-patch-string-value.ts
+models/kpi-summary-dto-response-wrapper.ts
 models/kpi-summary-dto.ts
 models/logfile-dto.ts
 models/marine.ts
@@ -100,7 +101,7 @@ models/spaceman.ts
 models/squadron.ts
 models/subscriber-dto-response-wrapper.ts
 models/subscriber-dto.ts
-models/unique-visitor-summary-dto.ts
+models/unique-visitor-count-dto.ts
 models/user-info-dto.ts
 models/user-with-privs.ts
 models/wing.ts

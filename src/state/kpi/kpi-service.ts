@@ -4,11 +4,11 @@ import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../u
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 export default class KpiService {
-  constructor(public state: State<KpiSummaryDto>,
+  constructor(public state: State<KpiSummaryDto | undefined>,
     private kpiControllerApi: KpiControllerApiInterface
   ) { }
 
-  fetchAndStoreData(startDate: string, endDate: string): CancellableDataRequest<KpiSummaryDto> {
+  fetchAndStoreData(startDate: string, endDate: string): CancellableDataRequest<KpiSummaryDto | undefined> {
     if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
       throw new Error("Could not parse date");
     }
@@ -29,10 +29,6 @@ export default class KpiService {
     };
   }
 
-  get isSet(): boolean {
-    return Object.keys(this.state.value).length !== 0;
-  }
-
   get isPromised(): boolean {
     return this.state.promised;
   }
@@ -43,7 +39,7 @@ export default class KpiService {
 
   resetState() {
     if (!this.state.promised) {
-      this.state.set({});
+      this.state.set(undefined);
     }
   }
 }

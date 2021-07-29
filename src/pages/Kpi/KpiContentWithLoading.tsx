@@ -1,5 +1,6 @@
 import React from 'react';
 import withLoading from '../../hocs/UseLoading/WithLoading';
+import { UniqueVisitorCountDtoVisitorTypeEnum } from '../../openapi';
 import { useKpiState } from '../../state/kpi/kpi-state';
 import './KpiContentWithLoading.scss';
 import { KpiContentWithLoadingProps } from './KpiContentWithLoadingProps';
@@ -7,13 +8,15 @@ import { KpiContentWithLoadingProps } from './KpiContentWithLoadingProps';
 function KpiContent(props: KpiContentWithLoadingProps) {
   const kpiService = useKpiState();
 
-  if (!kpiService.isSet) {
+  const kpis = kpiService.state.value;
+  if (kpis == null) {
     return (
       <></>
     );
   }
 
-  const kpis = kpiService.state.value;
+  const appClientVisitorCount = kpis.uniqueVisitorCounts?.find(visitor => visitor.visitorType === UniqueVisitorCountDtoVisitorTypeEnum.AppClient);
+  const dashboardVisitorCount = kpis.uniqueVisitorCounts?.find(visitor => visitor.visitorType === UniqueVisitorCountDtoVisitorTypeEnum.DashboardUser);
 
   return (
     <div className="kpi-summary">
@@ -30,13 +33,13 @@ function KpiContent(props: KpiContentWithLoadingProps) {
         <tbody>
           <tr>
             <td>App Clients</td>
-            <td>{kpis.uniqueVisitorySummary?.appClientCount ?? 'N/A'}</td>
-            <td>{kpis.uniqueVisitorySummary?.appClientRequestCount ?? 'N/A'}</td>
+            <td>{appClientVisitorCount?.uniqueCount ?? 'N/A'}</td>
+            <td>{appClientVisitorCount?.requestCount ?? 'N/A'}</td>
           </tr>
           <tr>
             <td>Dashboard Users</td>
-            <td>{kpis.uniqueVisitorySummary?.dashboardUserCount ?? 'N/A'}</td>
-            <td>{kpis.uniqueVisitorySummary?.dashboardUserRequestCount ?? 'N/A'}</td>
+            <td>{dashboardVisitorCount?.uniqueCount ?? 'N/A'}</td>
+            <td>{dashboardVisitorCount?.requestCount ?? 'N/A'}</td>
           </tr>
         </tbody>
       </table>
@@ -51,7 +54,7 @@ function KpiContent(props: KpiContentWithLoadingProps) {
         <tbody>
           <tr>
             <td>App Client to App Source Requests</td>
-            <td>{kpis.appClientToAppSourceRequestCount ?? 'N/A'}</td>
+            <td>{kpis.appClientToAppSourceRequestCount}</td>
           </tr>
         </tbody>
       </table>
@@ -67,7 +70,7 @@ function KpiContent(props: KpiContentWithLoadingProps) {
         <tbody>
           <tr>
             <td>Total App Source Count</td>
-            <td>{kpis.appSourceCount ?? 'N/A'}</td>
+            <td>{kpis.appSourceCount}</td>
           </tr>
         </tbody>
       </table>

@@ -1283,10 +1283,40 @@
         "averageLatencyForSuccessfulRequests": {
           "type": "number"
         },
-        "uniqueVisitorySummary": {
-          "$ref": "model-types.json#/definitions/UniqueVisitorSummaryDto"
+        "endDate": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        },
+        "uniqueVisitorCounts": {
+          "items": {
+            "$ref": "model-types.json#/definitions/UniqueVisitorCountDto"
+          },
+          "type": "array"
         }
       },
+      "required": [
+        "startDate",
+        "endDate",
+        "appSourceCount",
+        "appClientToAppSourceRequestCount"
+      ],
+      "type": "object"
+    },
+    "KpiSummaryDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/KpiSummaryDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
       "type": "object"
     },
     "LogfileDto": {
@@ -2047,23 +2077,32 @@
       ],
       "type": "string"
     },
-    "UniqueVisitorSummaryDto": {
+    "UniqueVisitorCountDto": {
       "additionalProperties": false,
       "properties": {
-        "appClientCount": {
+        "requestCount": {
           "type": "number"
         },
-        "appClientRequestCount": {
+        "uniqueCount": {
           "type": "number"
         },
-        "dashboardUserCount": {
-          "type": "number"
-        },
-        "dashboardUserRequestCount": {
-          "type": "number"
+        "visitorType": {
+          "$ref": "model-types.json#/definitions/UniqueVisitorCountDtoVisitorTypeEnum"
         }
       },
+      "required": [
+        "visitorType",
+        "uniqueCount",
+        "requestCount"
+      ],
       "type": "object"
+    },
+    "UniqueVisitorCountDtoVisitorTypeEnum": {
+      "enum": [
+        "DASHBOARD_USER",
+        "APP_CLIENT"
+      ],
+      "type": "string"
     },
     "UserInfoDto": {
       "additionalProperties": false,
