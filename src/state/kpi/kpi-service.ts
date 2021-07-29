@@ -4,7 +4,7 @@ import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../u
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 export default class KpiService {
-  constructor(public state: State<KpiSummaryDto | undefined>,
+  constructor(public state: State<KpiSummaryDto | KpiSummaryDto[] | undefined>,
     private kpiControllerApi: KpiControllerApiInterface
   ) { }
 
@@ -17,6 +17,27 @@ export default class KpiService {
 
     const handledPromise = kpiRequest.axiosPromise()
       .then(response => response.data)
+      .catch(error => {
+        return Promise.reject(prepareRequestError(error));
+      });
+
+    this.state.set(handledPromise);
+
+    return {
+      promise: handledPromise,
+      cancelTokenSource: kpiRequest.cancelTokenSource
+    };
+  }
+
+  fetchAndStoreSeriesData(startDate: string, endDate: string): CancellableDataRequest<KpiSummaryDto[] | undefined> {
+    if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
+      throw new Error("Could not parse date");
+    }
+
+    const kpiRequest = makeCancellableDataRequestToken(this.kpiControllerApi.getKpiSeries.bind(this.kpiControllerApi, startDate, endDate));
+
+    const handledPromise = kpiRequest.axiosPromise()
+      .then(response => response.data.data)
       .catch(error => {
         return Promise.reject(prepareRequestError(error));
       });

@@ -1,15 +1,13 @@
 import React from 'react';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { ApexOptions } from 'apexcharts';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { AppSourceCountMetricDto, MetricsControllerApi, MetricsControllerApiInterface } from '../../../../openapi';
 import AppSourceMetricService from '../../../../state/metrics/app-source-metric-service';
 import { useAppSourceMetricState } from '../../../../state/metrics/app-source-metric-state';
-import { MetricPage } from '../MetricPage';
 import { MetricType } from '../metric-type';
 import { RoutePath } from '../../../../routes';
-import { generateMetricsLink } from '../metric-page-utils';
 import { RequestMethod } from '../../../../state/metrics/metric-service';
 import { MetricPageProtectedWrapper } from '../MetricPageProtectedWrapper';
 import { routerTestProps } from '../../../../utils/TestUtils/react-router-context-utils';

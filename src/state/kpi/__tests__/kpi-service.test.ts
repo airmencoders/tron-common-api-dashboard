@@ -6,14 +6,14 @@ import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils'
 import KpiService from '../kpi-service';
 
 describe('KPI Service Tests', () => {
-  let kpiState: State<KpiSummaryDto | undefined> & StateMethodsDestroy;
+  let kpiState: State<KpiSummaryDto | KpiSummaryDto[] | undefined> & StateMethodsDestroy;
   let kpiApi: KpiControllerApiInterface;
   let kpiService: KpiService;
 
   let testKpiSummary: KpiSummaryDto;
 
   beforeEach(async () => {
-    kpiState = createState<KpiSummaryDto | undefined>(undefined);
+    kpiState = createState<KpiSummaryDto | KpiSummaryDto[] | undefined>(undefined);
     kpiApi = new KpiControllerApi();
     kpiService = new KpiService(kpiState, kpiApi);
 
@@ -42,7 +42,7 @@ describe('KPI Service Tests', () => {
     kpiState.destroy();
   });
 
-  it('should fetch and store data', async () => {
+  it('should fetch and store Summary data', async () => {
     kpiApi.getKpiSummary = jest.fn(() => {
       return Promise.resolve(createAxiosSuccessResponse(testKpiSummary));
     });
@@ -56,7 +56,7 @@ describe('KPI Service Tests', () => {
     expect(kpiService.state.value).toEqual(testKpiSummary);
   });
 
-  it('should reject on fetch and store data if error', async () => {
+  it('should reject on fetch and store Summary data if error', async () => {
     kpiApi.getKpiSummary = jest.fn(() => {
       return Promise.reject(Error('rejected'));
     });
@@ -67,6 +67,41 @@ describe('KPI Service Tests', () => {
     const cancellableRequest = kpiService.fetchAndStoreData(formatDateToEnCa(startDate), formatDateToEnCa(endDate));
 
     await expect(cancellableRequest.promise).rejects.toEqual({ message: 'rejected' } as RequestError);
+  });
+
+  it('should throw on bad date when fetch and store Summary data', () => {
+    expect(() => kpiService.fetchAndStoreData("bad date", "bad date")).toThrow('Could not parse date');
+  });
+
+  it('should fetch and store Series data', async () => {
+    kpiApi.getKpiSeries = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse({ data: [testKpiSummary] }));
+    });
+
+    const startDate = new Date();
+    const endDate = new Date(startDate.getDate() + 2);
+
+    const cancellableRequest = kpiService.fetchAndStoreSeriesData(formatDateToEnCa(startDate), formatDateToEnCa(endDate));
+    await cancellableRequest.promise;
+
+    expect(kpiService.state.value).toEqual([testKpiSummary]);
+  });
+
+  it('should reject on fetch and store Series data if error', async () => {
+    kpiApi.getKpiSeries = jest.fn(() => {
+      return Promise.reject(Error('rejected'));
+    });
+
+    const startDate = new Date();
+    const endDate = new Date(startDate.getDate() + 2);
+
+    const cancellableRequest = kpiService.fetchAndStoreSeriesData(formatDateToEnCa(startDate), formatDateToEnCa(endDate));
+
+    await expect(cancellableRequest.promise).rejects.toEqual({ message: 'rejected' } as RequestError);
+  });
+
+  it('should throw on bad date when fetch and store Series data', () => {
+    expect(() => kpiService.fetchAndStoreSeriesData("bad date", "bad date")).toThrow('Could not parse date');
   });
 
   it('should return error if state is in error state', async () => {
@@ -81,10 +116,6 @@ describe('KPI Service Tests', () => {
     await expect(cancellableRequest.promise).rejects.toBeTruthy();
 
     expect(kpiService.error).toEqual({ message: 'rejected' } as RequestError);
-  });
-
-  it('fetch and store should throw on bad date', () => {
-    expect(() => kpiService.fetchAndStoreData("bad date", "bad date")).toThrow('Could not parse date');
   });
 
   it('should not reset state if promised state', async () => {

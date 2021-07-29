@@ -1,0 +1,28 @@
+@import '../../styles/base';
+@import "../../styles/mixins";
+
+.kpi-series {
+  > :not(:last-child) {
+    margin-bottom: units(1);
+  }
+
+  > :first-child {
+    margin-top: units(2);
+  }
+
+  &__flex-chart {
+    display: flex;
+    flex-direction: row;
+    column-gap: units(1);
+    row-gap: units(1);
+    > * {
+      flex: 1;
+    }
+  }
+
+  @include breakpoint-below(tablet) {
+    &__flex-chart {
+      flex-direction: column;
+    }
+  }
+}

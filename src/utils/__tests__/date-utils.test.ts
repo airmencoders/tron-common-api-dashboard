@@ -1,4 +1,4 @@
-import { formatDateToEnCa, getFirstDayOfWeek, isDateBefore, isDateEqual, isDateFuture } from '../date-utils';
+import { addWeeksToDate, formatDateToEnCa, getEndOfWeek, getFirstDayOfWeek, getStartOfDay, isDateBefore, isDateEqual, isDateFuture, isDateInThisWeek, parseIsoDate } from '../date-utils';
 
 describe('Date util tests', () => {
   it('should get the first day of the week', () => {
@@ -37,5 +37,43 @@ describe('Date util tests', () => {
 
     second_date.setDate(second_date.getUTCDate() + 1);
     expect(isDateEqual(date, second_date)).toBe(false);
+  });
+
+  it('should determine if date is within this week', () => {
+    const today = new Date();
+    expect(isDateInThisWeek(today)).toBe(true);
+
+    const someTimeInPast = new Date(2021, 0, 1);
+    expect(isDateInThisWeek(someTimeInPast)).toBe(false);
+  });
+
+  it('should add weeks to a day', () => {
+    const date = new Date(2021, 0, 1);
+    const dateWithWeekAdded = addWeeksToDate(date, 1);
+    expect(dateWithWeekAdded.getDate()).toEqual(8);
+  });
+
+  it('should get end of week given a day', () => {
+    const date = new Date(2021, 6, 29);
+    console.log(getEndOfWeek(date, 1))
+    expect(getEndOfWeek(date, 1).getDate()).toBe(1);
+  });
+
+  it('should parse iso date', () => {
+    const isoDateString = '2021-01-01';
+    const parsed = parseIsoDate(isoDateString);
+    expect(parsed.getDate()).toBe(1);
+    expect(parsed.getMonth()).toBe(0);
+    expect(parsed.getFullYear()).toBe(2021);
+  });
+
+  it('should get the start of a given day', () => {
+    const date = new Date(2021, 0, 1, 20);
+    const startOfDay = getStartOfDay(date);
+    console.log(date, startOfDay)
+    expect(startOfDay.getDate()).toBe(1);
+    expect(startOfDay.getMonth()).toBe(0);
+    expect(startOfDay.getFullYear()).toBe(2021);
+    expect(startOfDay.getHours()).toBe(0);
   });
 });

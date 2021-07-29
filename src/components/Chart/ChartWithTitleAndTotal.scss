@@ -1,0 +1,31 @@
+@import '../../styles/base';
+@import "../../styles/mixins";
+
+.chart-with-total {
+  display: flex;
+  flex-direction: row;
+  padding: $default-panel-padding-x;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+
+  &__total {
+    width: 30%;
+  }
+
+  &__chart-container {
+    width: 70%;
+    max-height: 300px;
+  }
+
+  @include breakpoint-below(tablet) {
+    flex-direction: column;
+
+    &__total {
+      width: 100%;
+    }
+
+    &__chart-container {
+      width: 100%;
+    }
+  }
+}

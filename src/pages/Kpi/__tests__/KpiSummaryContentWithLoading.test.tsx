@@ -4,16 +4,15 @@ import { MemoryRouter } from 'react-router-dom';
 import { KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto, UniqueVisitorCountDtoVisitorTypeEnum } from '../../../openapi';
 import KpiService from '../../../state/kpi/kpi-service';
 import { useKpiState } from '../../../state/kpi/kpi-state';
-import { formatDateToEnCa } from '../../../utils/date-utils';
-import KpiContentWithLoading from '../KpiContentWithLoading';
+import KpiContentWithLoading from '../KpiSummaryContentWithLoading';
 
 jest.mock('../../../state/kpi/kpi-state');
-describe('Test Kpi Contet', () => {
-  let kpiState: State<KpiSummaryDto | undefined> & StateMethodsDestroy;
+describe('Test Kpi Summary Content', () => {
+  let kpiState: State<KpiSummaryDto | KpiSummaryDto[] | undefined> & StateMethodsDestroy;
   let kpiApi: KpiControllerApiInterface;
 
   beforeEach(() => {
-    kpiState = createState<KpiSummaryDto | undefined>(undefined);
+    kpiState = createState<KpiSummaryDto | KpiSummaryDto[] | undefined>(undefined);
     kpiApi = new KpiControllerApi();
 
     mockKpiState();
@@ -44,12 +43,9 @@ describe('Test Kpi Contet', () => {
       ]
     });
 
-    const startDate = new Date(2021, 6, 19);
-    const endDate = new Date(2021, 6, 25);
-
     const page = render(
       <MemoryRouter>
-        <KpiContentWithLoading isLoading={false} startDate={formatDateToEnCa(startDate)} endDate={formatDateToEnCa(endDate)} />
+        <KpiContentWithLoading isLoading={false} />
       </MemoryRouter>
     );
 
@@ -64,12 +60,9 @@ describe('Test Kpi Contet', () => {
       appClientToAppSourceRequestCount: 0
     });
 
-    const startDate = new Date(2021, 6, 19);
-    const endDate = new Date(2021, 6, 25);
-
     const page = render(
       <MemoryRouter>
-        <KpiContentWithLoading isLoading={false} startDate={formatDateToEnCa(startDate)} endDate={formatDateToEnCa(endDate)} />
+        <KpiContentWithLoading isLoading={false} />
       </MemoryRouter>
     );
 
@@ -79,12 +72,9 @@ describe('Test Kpi Contet', () => {
   it('Should render nothing if state is not set', async () => {
     kpiState.set(undefined);
 
-    const startDate = new Date(2021, 6, 19);
-    const endDate = new Date(2021, 6, 25);
-
     const page = render(
       <MemoryRouter>
-        <KpiContentWithLoading isLoading={false} startDate={formatDateToEnCa(startDate)} endDate={formatDateToEnCa(endDate)} />
+        <KpiContentWithLoading isLoading={false} />
       </MemoryRouter>
     );
 
