@@ -80,6 +80,17 @@ export enum OrganizationDtoOrgTypeEnum {
     Flight = 'FLIGHT',
     Wing = 'WING',
     OtherUsaf = 'OTHER_USAF',
+    Division = 'DIVISION',
+    Regiment = 'REGIMENT',
+    Brigade = 'BRIGADE',
+    Battalion = 'BATTALION',
+    Company = 'COMPANY',
+    Troop = 'TROOP',
+    OtherUsa = 'OTHER_USA',
+    OtherUsn = 'OTHER_USN',
+    OtherUssf = 'OTHER_USSF',
+    OtherUscg = 'OTHER_USCG',
+    OtherUsmc = 'OTHER_USMC',
     Organization = 'ORGANIZATION'
 }
 /**

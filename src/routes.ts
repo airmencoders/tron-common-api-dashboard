@@ -11,6 +11,7 @@ import {AppSourcePage} from "./pages/AppSource/AppSourcePage";
 import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 import PubSubPage from "./pages/PubSub/PubSubPage";
 import AuditLogPage from "./pages/AuditLog/AuditLogPage";
+import KpiPage from './pages/Kpi/KpiPage';
 
 export interface RouteItem {
     path: string,
@@ -36,7 +37,8 @@ export enum RoutePath {
     PUB_SUB = '/pubsub',
     AUDIT_LOG = '/audit-log',
     APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?',
-    API_TEST = '/app-api/:apiId'
+    API_TEST = '/app-api/:apiId',
+    KPI = '/kpi'
 }
 
 export const routes: RouteItem[] = [
@@ -155,6 +157,12 @@ export const routes: RouteItem[] = [
                 path: RoutePath.AUDIT_LOG,
                 name: 'Audit Logs',
                 component: AuditLogPage,
+                requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+            },
+            {
+                path: RoutePath.KPI,
+                name: 'KPI',
+                component: KpiPage,
                 requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
             }
         ]
