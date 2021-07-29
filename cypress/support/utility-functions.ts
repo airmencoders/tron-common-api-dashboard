@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import {PrivilegeDto, PrivilegeDtoResponseWrapper} from '../../src/openapi';
 
 export default class UtilityFunctions {
   /**
@@ -18,6 +19,17 @@ export default class UtilityFunctions {
     return `0.${crypto.randomBytes(16).toString('hex')}`;
   }
 
+  static randomStringOfLength(length: number, chars: string): string {
+    let mask = '';
+    if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
+    if (chars.indexOf('A') > -1) mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (chars.indexOf('#') > -1) mask += '0123456789';
+    if (chars.indexOf('!') > -1) mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
+    let result = '';
+    for (let i = length; i > 0; --i) result += mask[Math.floor(Math.random() * mask.length)];
+    return result;
+  }
+
   static clickOnPageNav(page: Page) {
     cy.get(`[href="${page}"] > .sidebar-item__name`).click({ force: true });
   }
@@ -29,6 +41,14 @@ export default class UtilityFunctions {
    */
   static getModalContainer(titleToSearch: string) {
     return cy.get('.modal-title__text').should('have.text', titleToSearch).parents('.modal-component__container').first();
+  }
+
+  static findPrivilegeFromResponse(privNamesToFind: string[], privResponse: PrivilegeDtoResponseWrapper):
+      Array<PrivilegeDto> {
+    const privs: Array<PrivilegeDto> = privResponse.data;
+    return privs.filter((priv) => {
+      return privNamesToFind.findIndex((privName) => privName === priv.name) >= 0;
+    });
   }
 }
 

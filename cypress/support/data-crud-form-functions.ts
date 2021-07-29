@@ -215,13 +215,44 @@ export default class DataCrudFormFunctions {
   }
 
   static createPerson(person: Person) {
-    const { email, firstName, lastName, branch, rank } = person;
+    const {
+      email,
+      firstName,
+      middleName,
+      lastName,
+      branch,
+      rank,
+      title,
+      dodid,
+      phone,
+      address,
+      dutyPhone
+    } = person;
 
     cy.get('.add-data-container > [data-testid=button]').click();
 
     cy.get('#email').type(email).should('have.value', email);
     cy.get('#firstName').type(firstName).should('have.value', firstName);
+    if (middleName != null) {
+      cy.get('#middleName').type(middleName).should('have.value', middleName);
+    }
     cy.get('#lastName').type(lastName).should('have.value', lastName);
+    if (title != null) {
+      cy.get('#title').type(title).should('have.value', title);
+    }
+    if (dodid != null) {
+      cy.get('#dodid').type(dodid).should('have.value', dodid);
+    }
+    if (phone != null) {
+      cy.get('#phone').type(phone).should('have.value', phone);
+    }
+    if (address != null) {
+      cy.get('#address').type(address).should('have.value', address);
+    }
+    if (dutyPhone != null) {
+      cy.get('#dutyPhone').type(dutyPhone).should('have.value', dutyPhone);
+
+    }
     cy.get('#branch').select(branch).should('have.value', branch);
     cy.get('#rank').should('exist').select(rank).should('have.value', rank);
   }
@@ -346,9 +377,17 @@ export enum SubscriberGridColId {
 export interface Person {
   email: string;
   firstName: string;
+  middleName?: string;
   lastName: string;
   branch: string;
   rank: string;
+  title?: string;
+  dodid?: string;
+  phone?: string;
+  address?: string;
+  dutyPhone?: string;
+  dutyTitle?: string;
+  primaryOrganization?: string; // uuid
 }
 
 export interface Organization {

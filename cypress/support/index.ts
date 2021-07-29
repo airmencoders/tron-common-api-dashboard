@@ -17,11 +17,16 @@
 import './commands'
 
 export const host = Cypress.env('INTEGRATION_TEST_HOST');
+export const apiHost = Cypress.env('ADMIN_API_HOST') ?? 'http://localhost:9000';
+export const appClientApiHost = Cypress.env('APP_CLIENT_API_HOST') ?? 'http://localhost:9100';
 export const apiBase = '/api/v2';
 export const orgApiBase = `${apiBase}/organization`;
 export const personApiBase = `${apiBase}/person`;
+export const appClientApiBase = `${apiBase}/app-client`;
+export const privilegeApiBase = `${apiBase}/privilege`;
 export const scratchAppApiBase = `${apiBase}/scratch`;
 export const dashboardUserApiBase = `${apiBase}/dashboard-users`;
+export const userInfoApiBase = `${apiBase}/userinfo`;
 export const pastLogfileApi = `/api/v1/logfile`;
 export const logfileActuatorApi = `/api/actuator/logfile`;
 export const subscriptionsApiBase = `${apiBase}/subscriptions`;
