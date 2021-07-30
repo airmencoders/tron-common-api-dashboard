@@ -17,6 +17,7 @@ function getDefaultOptions(labels: string[]) {
     },
     dataLabels: {
       enabled: true,
+      textAnchor: 'start',
       style: {
         colors: ['#333']
       },
@@ -56,7 +57,7 @@ function ChartWithTitleAndTotal({ title, series, options, labels, calculateAvera
         <ReactApexChart
           options={options ?? getDefaultOptions(labels)}
           series={[series]}
-          type="bar"
+          type="line"
           className="chart-container__chart"
           width="100%"
           height="100%"

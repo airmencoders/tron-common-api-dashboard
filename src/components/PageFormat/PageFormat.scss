@@ -2,14 +2,17 @@
 
 .page-format {
   display: flex;
+
   &__nav-menu {
     flex: 0 0 220px;
     background: $dark-shade;
     min-height: 100vh;
+    position: sticky;
   }
   &__page-body-container {
     flex: 1;
     min-width: 0;
+    overflow: auto;
   }
 
   &__top-nav {
@@ -24,7 +27,7 @@
   }
 
   &__page-body {
-    height: calc(100vh - 60px);
+    height: calc(100vh - 70px);
     display: flex;
     flex-direction: column;
   }
