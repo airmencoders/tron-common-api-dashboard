@@ -78,7 +78,7 @@ describe('Person Put API', () => {
     ];
 
     cy.wrap(fieldArray).each((field : string) => {
-      const newValue = UtilityFunctions.randomStringOfLength(260, 'a');
+      const newValue = UtilityFunctions.randomStringOfLength(260);
       cy
           .request({
             method: 'POST',

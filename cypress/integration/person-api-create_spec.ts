@@ -135,7 +135,7 @@ describe('Person Create API', () => {
     const baseUrl = 'http://localhost:9000';
     cy.wrap(fieldArray).each((field : string) => {
       const body: {[key: string]: any} = {};
-      body[field] = UtilityFunctions.randomStringOfLength(260, 'a');
+      body[field] = UtilityFunctions.randomStringOfLength(260);
       cy
           .request({
             method: 'POST',
