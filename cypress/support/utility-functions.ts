@@ -20,7 +20,7 @@ export default class UtilityFunctions {
   }
 
   static randomStringOfLength(length: number): string {
-    let mask = 'abcdefghijklmnopqrstuvwxyz';
+    let mask = 'abcdefghijkpqrstuvwxyz';
     let result = '';
     for (let i = length; i > 0; --i) result += mask[Math.floor(Math.random() * mask.length)];
     return result;
