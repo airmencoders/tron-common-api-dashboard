@@ -150,10 +150,6 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendDelete(toDelete: PersonDto): Promise<void> {
-    if (!this.validate(toDelete)) {
-      throw TypeValidation.validationError('PersonDto');
-    }
-
     if (toDelete?.id == null) {
       return Promise.reject(new Error('Person to delete has undefined id.'));
     }
