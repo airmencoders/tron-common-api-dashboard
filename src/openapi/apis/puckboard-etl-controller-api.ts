@@ -62,10 +62,11 @@ export const PuckboardEtlControllerApiAxiosParamCreator = function (configuratio
         },
         /**
          * 
+         * @param {string} [type] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        testPuckboardComms: async (options: any = {}): Promise<RequestArgs> => {
+        testPuckboardComms: async (type?: string, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/v2/puckboard/test`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -77,6 +78,10 @@ export const PuckboardEtlControllerApiAxiosParamCreator = function (configuratio
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
 
 
     
@@ -119,11 +124,12 @@ export const PuckboardEtlControllerApiFp = function(configuration?: Configuratio
         },
         /**
          * 
+         * @param {string} [type] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async testPuckboardComms(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await PuckboardEtlControllerApiAxiosParamCreator(configuration).testPuckboardComms(options);
+        async testPuckboardComms(type?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await PuckboardEtlControllerApiAxiosParamCreator(configuration).testPuckboardComms(type, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -148,11 +154,12 @@ export const PuckboardEtlControllerApiFactory = function (configuration?: Config
         },
         /**
          * 
+         * @param {string} [type] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        testPuckboardComms(options?: any): AxiosPromise<object> {
-            return PuckboardEtlControllerApiFp(configuration).testPuckboardComms(options).then((request) => request(axios, basePath));
+        testPuckboardComms(type?: string, options?: any): AxiosPromise<object> {
+            return PuckboardEtlControllerApiFp(configuration).testPuckboardComms(type, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -173,11 +180,12 @@ export interface PuckboardEtlControllerApiInterface {
 
     /**
      * 
+     * @param {string} [type] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PuckboardEtlControllerApiInterface
      */
-    testPuckboardComms(options?: any): AxiosPromise<object>;
+    testPuckboardComms(type?: string, options?: any): AxiosPromise<object>;
 
 }
 
@@ -200,11 +208,12 @@ export class PuckboardEtlControllerApi extends BaseAPI implements PuckboardEtlCo
 
     /**
      * 
+     * @param {string} [type] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PuckboardEtlControllerApi
      */
-    public testPuckboardComms(options?: any) {
-        return PuckboardEtlControllerApiFp(this.configuration).testPuckboardComms(options).then((request) => request(this.axios, this.basePath));
+    public testPuckboardComms(type?: string, options?: any) {
+        return PuckboardEtlControllerApiFp(this.configuration).testPuckboardComms(type, options).then((request) => request(this.axios, this.basePath));
     }
 }

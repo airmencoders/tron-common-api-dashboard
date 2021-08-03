@@ -17,33 +17,37 @@
 /**
  * 
  * @export
- * @interface UniqueVisitorSummaryDto
+ * @interface UniqueVisitorCountDto
  */
-export interface UniqueVisitorSummaryDto {
+export interface UniqueVisitorCountDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof UniqueVisitorCountDto
+     */
+    visitorType: UniqueVisitorCountDtoVisitorTypeEnum;
     /**
      * 
      * @type {number}
-     * @memberof UniqueVisitorSummaryDto
+     * @memberof UniqueVisitorCountDto
      */
-    dashboardUserCount?: number;
+    uniqueCount: number;
     /**
      * 
      * @type {number}
-     * @memberof UniqueVisitorSummaryDto
+     * @memberof UniqueVisitorCountDto
      */
-    dashboardUserRequestCount?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof UniqueVisitorSummaryDto
-     */
-    appClientCount?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof UniqueVisitorSummaryDto
-     */
-    appClientRequestCount?: number;
+    requestCount: number;
 }
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum UniqueVisitorCountDtoVisitorTypeEnum {
+    DashboardUser = 'DASHBOARD_USER',
+    AppClient = 'APP_CLIENT'
+}
+
 
 

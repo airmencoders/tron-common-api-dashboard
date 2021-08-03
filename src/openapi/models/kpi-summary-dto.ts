@@ -13,7 +13,7 @@
  */
 
 
-import { UniqueVisitorSummaryDto } from './unique-visitor-summary-dto';
+import { UniqueVisitorCountDto } from './unique-visitor-count-dto';
 
 /**
  * 
@@ -21,6 +21,18 @@ import { UniqueVisitorSummaryDto } from './unique-visitor-summary-dto';
  * @interface KpiSummaryDto
  */
 export interface KpiSummaryDto {
+    /**
+     * 
+     * @type {string}
+     * @memberof KpiSummaryDto
+     */
+    startDate: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof KpiSummaryDto
+     */
+    endDate: string;
     /**
      * 
      * @type {number}
@@ -32,19 +44,19 @@ export interface KpiSummaryDto {
      * @type {number}
      * @memberof KpiSummaryDto
      */
-    appSourceCount?: number;
+    appSourceCount: number;
     /**
      * 
      * @type {number}
      * @memberof KpiSummaryDto
      */
-    appClientToAppSourceRequestCount?: number;
+    appClientToAppSourceRequestCount: number;
     /**
      * 
-     * @type {UniqueVisitorSummaryDto}
+     * @type {Array<UniqueVisitorCountDto>}
      * @memberof KpiSummaryDto
      */
-    uniqueVisitorySummary?: UniqueVisitorSummaryDto;
+    uniqueVisitorCounts?: Array<UniqueVisitorCountDto>;
 }
 
 
