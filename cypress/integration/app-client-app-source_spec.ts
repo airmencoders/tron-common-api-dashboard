@@ -146,7 +146,7 @@ describe('App Source / App Client Tests', () => {
     DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
     cy.get('#name').should('have.value', appClient.name);
-    cy.get('button').contains(appSourceName).should('exist').click();
+    cy.get('button').contains(appSourceName, {matchCase: false}).should('exist').click();
     cy.contains(appSourceEndpointPath).should('exist');
     cy.get('button').contains('Cancel').click();
 

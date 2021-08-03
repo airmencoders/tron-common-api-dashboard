@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import { host } from '../support';
+import {host, orgApiBase} from '../support';
 import DataCrudFormPageUtil, { Person, PersonGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions from '../support/utility-functions';
 
@@ -15,9 +15,15 @@ describe('Person Tests', () => {
     const person: Person = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
       firstName: UtilityFunctions.generateRandomString(),
+      middleName: 'Middle Name',
       lastName: 'Last Name',
       branch: 'USAF',
-      rank: 'Lt Gen'
+      rank: 'Lt Gen',
+      title: 'Person Title',
+      dodid: '555555',
+      phone: '(555)555-5555',
+      address: '123 Lane Lane, Honolulu, HI 96825',
+      dutyPhone: '(555)555-5555'
     };
 
     DataCrudFormPageUtil.createPersonAndFilterExists(person);
@@ -34,7 +40,7 @@ describe('Person Tests', () => {
       firstName: UtilityFunctions.generateRandomString(),
       lastName: 'Last Name',
       branch: 'USAF',
-      rank: 'Lt Gen'
+      rank: 'Lt Gen',
     };
 
     // Add a new Person
