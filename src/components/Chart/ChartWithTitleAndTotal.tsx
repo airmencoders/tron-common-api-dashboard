@@ -1,5 +1,5 @@
 import { ApexOptions } from 'apexcharts';
-import { HTMLProps } from 'react';
+import { HTMLProps, useMemo } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { ChartWithTitleAndTotalProps } from './ChartWithTitleAndTotalProps';
 import './ChartWithTitleAndTotal.scss';
@@ -45,6 +45,10 @@ function ChartWithTitleAndTotal({ title, series, options, labels, calculateAvera
     return prev + currVal;
   }, 0);
 
+  const chartOptions = useMemo(() => {
+    return getDefaultOptions(labels);
+  }, [labels]);
+
   return (
     <div className={`chart-with-total${className ? ' ' + className : ''}`} {...props}>
       <div className="chart-with-total__total">
@@ -55,7 +59,7 @@ function ChartWithTitleAndTotal({ title, series, options, labels, calculateAvera
       </div>
       <div className="chart-with-total__chart-container">
         <ReactApexChart
-          options={options ?? getDefaultOptions(labels)}
+          options={options ?? chartOptions}
           series={[series]}
           type="line"
           className="chart-container__chart"
