@@ -1,18 +1,15 @@
 import React from 'react';
 import withLoading from '../../hocs/UseLoading/WithLoading';
-import { UniqueVisitorCountDtoVisitorTypeEnum } from '../../openapi';
+import { KpiSummaryDto, UniqueVisitorCountDtoVisitorTypeEnum } from '../../openapi';
 import { useKpiState } from '../../state/kpi/kpi-state';
-import './KpiContentWithLoading.scss';
-import { KpiContentWithLoadingProps } from './KpiContentWithLoadingProps';
+import './KpiSummaryContentWithLoading.scss';
 
-function KpiContent(props: KpiContentWithLoadingProps) {
+function KpiSummaryContent() {
   const kpiService = useKpiState();
 
-  const kpis = kpiService.state.value;
+  const kpis = kpiService.state.value as KpiSummaryDto;
   if (kpis == null) {
-    return (
-      <></>
-    );
+    return null;
   }
 
   const appClientVisitorCount = kpis.uniqueVisitorCounts?.find(visitor => visitor.visitorType === UniqueVisitorCountDtoVisitorTypeEnum.AppClient);
@@ -20,7 +17,7 @@ function KpiContent(props: KpiContentWithLoadingProps) {
 
   return (
     <div className="kpi-summary">
-      <h4>Showing KPIs for {props.startDate} to {props.endDate}</h4>
+      <h4>Showing KPIs for {kpis.startDate} to {kpis.endDate}</h4>
       <h5>Usage</h5>
       <table>
         <thead>
@@ -86,7 +83,7 @@ function KpiContent(props: KpiContentWithLoadingProps) {
         <tbody>
           <tr>
             <td>Avg Latency for Successful Requests</td>
-            <td>{kpis.averageLatencyForSuccessfulRequests ?? 'N/A'}</td>
+            <td>{kpis.averageLatencyForSuccessfulRequests?.toFixed(2) ?? 'N/A'}</td>
           </tr>
         </tbody>
       </table>
@@ -94,4 +91,4 @@ function KpiContent(props: KpiContentWithLoadingProps) {
   );
 }
 
-export default withLoading(KpiContent);
+export default withLoading(KpiSummaryContent);

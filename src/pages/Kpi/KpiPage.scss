@@ -2,34 +2,16 @@
 @import "../../styles/base";
 
 .kpi-content {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
+  &__date-picker {
+    display: flex;
+    flex-direction: row;
+    column-gap: units(10);
+  }
 
-  &__actions {
-    input[type=date] {
-      display: block;
-    }
-
-    .actions {
-      &__form {
-        .form {
-          &__date-range {
-            display: flex;
-            flex-direction: row;
-            &> *:not(:last-child) {
-              margin-right: units(2);
-            }
-    
-            @include breakpoint-below(tablet) {
-              flex-direction: column;
-              &> *:not(:last-child) {
-                margin-right: 0;
-              }
-            }
-          }
-        }
-      }
+  @include breakpoint-below(desktop) {
+    &__date-picker {
+      flex-direction: column;
+      row-gap: units(2);
     }
   }
 }
