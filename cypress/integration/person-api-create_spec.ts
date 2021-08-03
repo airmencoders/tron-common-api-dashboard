@@ -1,32 +1,30 @@
 /// <reference types="Cypress" />
 
-import {personApiBase} from '../support';
+import {apiBase, apiHost, personApiBase} from '../support';
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Create API', () => {
 
   it('Should create a Person via API', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {}
         })
         .then((response) => {
           cy.request({
             method: 'DELETE',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`
           })
         })
   });
 
   it('Should fail for invalid branch', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
             branch: 'INVALID'
           },
@@ -38,11 +36,10 @@ describe('Person Create API', () => {
         })
   });
   it('Should set rank to Unk if invalid', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
             branch: 'USAF',
             rank: 'INVALID'
@@ -55,11 +52,10 @@ describe('Person Create API', () => {
   });
 
   it('Should fail for invalid dodid', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
             dodid: '0'
           },
@@ -72,11 +68,10 @@ describe('Person Create API', () => {
   });
 
   it('Should fail for invalid email', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
             branch: 'INVALID'
           },
@@ -89,11 +84,10 @@ describe('Person Create API', () => {
   });
 
   it('Should fail for invalid phone', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
             phone: 'INVALID'
           },
@@ -105,11 +99,10 @@ describe('Person Create API', () => {
         })
   });
   it('Should fail for invalid duty phone', () => {
-    const baseUrl = 'http://localhost:9000';
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
             dutyPhone: 'INVALID'
           },
@@ -132,14 +125,13 @@ describe('Person Create API', () => {
       'dutyTitle'
     ];
 
-    const baseUrl = 'http://localhost:9000';
     cy.wrap(fieldArray).each((field : string) => {
       const body: {[key: string]: any} = {};
       body[field] = UtilityFunctions.randomStringOfLength(260);
       cy
           .request({
             method: 'POST',
-            url: `${baseUrl}${personApiBase}`,
+            url: `${apiHost}${personApiBase}`,
             body,
             failOnStatusCode: false
           })

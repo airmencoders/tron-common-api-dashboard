@@ -1,22 +1,21 @@
 /// <reference types="Cypress" />
 
-import {personApiBase} from '../support';
+import {apiHost, personApiBase} from '../support';
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Put API', () => {
-  const baseUrl = 'http://localhost:9000';
 
   it('Should replace a Person via API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {}
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id
             }
@@ -25,7 +24,7 @@ describe('Person Put API', () => {
         .then((response) => {
           cy.request({
             method: 'DELETE',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`
           })
         })
   });
@@ -47,14 +46,14 @@ describe('Person Put API', () => {
       cy
           .request({
             method: 'POST',
-            url: `${baseUrl}${personApiBase}`,
+            url: `${apiHost}${personApiBase}`,
             body: {},
             failOnStatusCode: false
           })
           .then((response) => {
             return cy.request({
               method: 'PUT',
-              url: `${baseUrl}${personApiBase}/${response.body.id}`,
+              url: `${apiHost}${personApiBase}/${response.body.id}`,
               body: {
                 id: response.body.id,
                 ...body
@@ -71,7 +70,7 @@ describe('Person Put API', () => {
             const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
             cy.request({
               method: 'DELETE',
-              url: `${baseUrl}${personApiBase}/${requestBody.id}`
+              url: `${apiHost}${personApiBase}/${requestBody.id}`
             })
           })
     });
@@ -80,14 +79,14 @@ describe('Person Put API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {},
           failOnStatusCode: false
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id,
               branch: 'INVALID'
@@ -104,7 +103,7 @@ describe('Person Put API', () => {
           const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
           cy.request({
             method: 'DELETE',
-            url: `${baseUrl}${personApiBase}/${requestBody.id}`
+            url: `${apiHost}${personApiBase}/${requestBody.id}`
           })
         })
   });
@@ -112,14 +111,14 @@ describe('Person Put API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {},
           failOnStatusCode: false
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id,
               branch: 'USAF',
@@ -132,7 +131,7 @@ describe('Person Put API', () => {
           expect(response.body.rank).equal('Unk');
           cy.request({
             method: 'DELETE',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`
           })
         });
 
@@ -142,14 +141,14 @@ describe('Person Put API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {},
           failOnStatusCode: false
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id,
               dodid: '0'
@@ -166,7 +165,7 @@ describe('Person Put API', () => {
           const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
           cy.request({
             method: 'DELETE',
-            url: `${baseUrl}${personApiBase}/${requestBody.id}`
+            url: `${apiHost}${personApiBase}/${requestBody.id}`
           })
         })
 
@@ -176,7 +175,7 @@ describe('Person Put API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
           },
           failOnStatusCode: false
@@ -184,7 +183,7 @@ describe('Person Put API', () => {
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id,
               branch: 'INVALID'
@@ -203,7 +202,7 @@ describe('Person Put API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
           },
           failOnStatusCode: false
@@ -211,7 +210,7 @@ describe('Person Put API', () => {
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id,
               phone: 'INVALID'
@@ -229,7 +228,7 @@ describe('Person Put API', () => {
     cy
         .request({
           method: 'POST',
-          url: `${baseUrl}${personApiBase}`,
+          url: `${apiHost}${personApiBase}`,
           body: {
           },
           failOnStatusCode: false
@@ -237,7 +236,7 @@ describe('Person Put API', () => {
         .then((response) => {
           return cy.request({
             method: 'PUT',
-            url: `${baseUrl}${personApiBase}/${response.body.id}`,
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
             body: {
               id: response.body.id,
               dutyPhone: 'INVALID'
