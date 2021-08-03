@@ -333,11 +333,6 @@ describe('Test Person Service', () => {
     await expect(() => personService.sendDelete(badPerson)).rejects.toThrow('Person to delete has undefined id.');
   });
 
-  it('Should throw json validation exception on person delete with bad dto', async () => {
-    const badPerson = { badParam: 'badParam' } as unknown as PersonDto;
-    await expect(() => personService.sendDelete(badPerson)).rejects.toThrow(jsonValidationError);
-  });
-
   it('Should reject on api error on person delete', async () => {
     const personApiSpy = jest.spyOn(personApi, 'deletePerson');
     personApiSpy.mockRejectedValue(new Error('Fail'));
