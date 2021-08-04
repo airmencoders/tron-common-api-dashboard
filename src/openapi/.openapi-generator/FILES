@@ -104,4 +104,5 @@ models/subscriber-dto.ts
 models/unique-visitor-count-dto.ts
 models/user-info-dto.ts
 models/user-with-privs.ts
+models/validation-error.ts
 models/wing.ts

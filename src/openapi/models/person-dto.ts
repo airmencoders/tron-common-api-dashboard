@@ -27,35 +27,35 @@ export interface PersonDto {
      */
     id?: string;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     firstName?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     middleName?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     lastName?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     title?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
-    email?: string;
+    email?: string | null;
     /**
      * 
      * @type {string}
@@ -75,25 +75,25 @@ export interface PersonDto {
      */
     branch?: PersonDtoBranchEnum;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     phone?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     address?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */
     dutyPhone?: string | null;
     /**
-     * 
+     * Must be null or not blank
      * @type {string}
      * @memberof PersonDto
      */

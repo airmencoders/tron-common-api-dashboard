@@ -9,6 +9,7 @@ import TypeValidation from '../../utils/TypeValidation/type-validation';
 import isEqual from 'fast-deep-equal';
 import { CancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
+import { getNullableFieldsFromSchema } from '../../utils/validation-utils';
 
 /**
  * PII WARNING:
@@ -25,12 +26,16 @@ import { wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 export default class PersonService extends AbstractDataService<PersonDto, PersonDto> {
   private readonly validate: ValidateFunction<PersonDto>;
   private readonly filterValidate: ValidateFunction<FilterDto>;
+  private readonly nullableStringFields: Set<keyof PersonDto>;
 
   constructor(public state: State<PersonDto[]>, private personApi: PersonControllerApiInterface,
     public rankState: State<RankStateModel>, private rankApi: RankControllerApiInterface) {
     super(state);
-    this.validate = TypeValidation.validatorFor<PersonDto>(ModelTypes.definitions.PersonDto);
+    const personDtoSchema = ModelTypes.definitions.PersonDto;
+    this.validate = TypeValidation.validatorFor<PersonDto>(personDtoSchema);
     this.filterValidate = TypeValidation.validatorFor<FilterDto>(ModelTypes.definitions.FilterDto);
+
+    this.nullableStringFields = getNullableFieldsFromSchema<PersonDto>(personDtoSchema.properties);
   }
 
   fetchAndStoreData(): CancellableDataRequest<PersonDto[]> {
@@ -98,11 +103,13 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendCreate(toCreate: PersonDto): Promise<PersonDto> {
-    if(!this.validate(toCreate)) {
+    const sanitizedDto = this.sanitizeDto(toCreate);
+
+    if (!this.validate(sanitizedDto)) {
       throw TypeValidation.validationError('PersonDto');
     }
     try {
-      const personResponse = await this.personApi.createPerson(toCreate);
+      const personResponse = await this.personApi.createPerson(sanitizedDto);
       return Promise.resolve(personResponse.data);
     }
     catch (error) {
@@ -111,14 +118,16 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendUpdate(toUpdate: PersonDto): Promise<PersonDto> {
-    if(!this.validate(toUpdate)) {
+    const sanitizedDto = this.sanitizeDto(toUpdate);
+
+    if (!this.validate(sanitizedDto)) {
       throw TypeValidation.validationError('PersonDto');
     }
     try {
-      if (toUpdate?.id == null) {
+      if (sanitizedDto?.id == null) {
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
-      const personResponse = await this.personApi.updatePerson(toUpdate.id, toUpdate);
+      const personResponse = await this.personApi.updatePerson(sanitizedDto.id, sanitizedDto);
 
       this.state.find(personInState => personInState.id.get() === personResponse.data.id)?.set(personResponse.data);
 
@@ -130,15 +139,17 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   }
 
   async sendSelfUpdate(toUpdate: PersonDto): Promise<PersonDto> {
-    if (!this.validate(toUpdate)) {
+    const sanitizedDto = this.sanitizeDto(toUpdate);
+
+    if (!this.validate(sanitizedDto)) {
       throw TypeValidation.validationError('PersonDto');
     }
 
     try {
-      if (toUpdate?.id == null) {
+      if (sanitizedDto?.id == null) {
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
-      const personResponse = await this.personApi.selfUpdatePerson(toUpdate.id, toUpdate);
+      const personResponse = await this.personApi.selfUpdatePerson(sanitizedDto.id, sanitizedDto);
 
       this.state.find(person => person.id.get() === personResponse.data.id)?.set(personResponse.data);
 
@@ -207,5 +218,30 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
     } catch (err) {
       return Promise.reject(err);
     }
+  }
+
+  /**
+   * Sanitizes a PersonDto. Will check nullable string fields and convert those to
+   * null if they are blank.
+   * 
+   * @param dto the dto to sanitize
+   * @returns sanitized dto
+   */
+  sanitizeDto(dto: PersonDto): PersonDto {
+    return Object.keys(dto).reduce<PersonDto>((prev, field) => {
+      const key = field as keyof PersonDto;
+      let value = dto[key];
+
+      if (value != null && this.nullableStringFields.has(key)) {
+        if (typeof value === 'string' && value.trim().length === 0) {
+          value = null;
+        }
+      }
+
+      return {
+        ...prev,
+        [field]: value
+      };
+    }, {});
   }
 }

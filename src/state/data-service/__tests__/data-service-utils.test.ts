@@ -8,7 +8,7 @@ describe('Data Service Utils Test', () => {
       data: {
         errors: [
           {
-            field: 'name',
+            fieldName: 'name',
             defaultMessage: 'cannot be blank'
           }
         ],
@@ -39,7 +39,7 @@ describe('Data Service Utils Test', () => {
       validation: {
         name: axiosRejectResponse.response.data.errors[0].defaultMessage
       },
-      general: axiosRejectResponse.response.data.reason
+      general: 'Form Validation failed. Error count: 1'
     } as DataCrudFormErrors;
 
     expect(errorResponse).toEqual(answer);

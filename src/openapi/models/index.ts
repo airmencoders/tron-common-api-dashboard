@@ -79,4 +79,5 @@ export * from './subscriber-dto-response-wrapper';
 export * from './unique-visitor-count-dto';
 export * from './user-info-dto';
 export * from './user-with-privs';
+export * from './validation-error';
 export * from './wing';

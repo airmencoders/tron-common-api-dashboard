@@ -2,7 +2,7 @@ import { State } from '@hookstate/core';
 import { AxiosPromise } from 'axios';
 import { DataCrudFormErrors } from '../../components/DataCrudFormPage/data-crud-form-errors';
 import { GridRowData } from '../../components/Grid/grid-row-data';
-import { JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum } from '../../openapi';
+import { ExceptionResponse, JsonPatchObjectArrayValue, JsonPatchObjectValue, JsonPatchStringArrayValue, JsonPatchStringValue, JsonPatchStringValueOpEnum } from '../../openapi';
 import { isDataRequestCancelError } from '../../utils/cancellable-data-request';
 
 interface WrappedResponse<T> {
@@ -10,19 +10,21 @@ interface WrappedResponse<T> {
 }
 
 export function prepareDataCrudErrorResponse(err: any): DataCrudFormErrors {
-  if (err.response) { // Server responded with some error (4xx, 5xx)
-
-    const validation = err.response.data.errors?.reduce((prev: any, current: any) => {
+  if (err.response != null) { // Server responded with some error (4xx, 5xx)
+    const exceptionResponse = err.response.data as ExceptionResponse;
+    const validation = exceptionResponse.errors?.reduce<Record<string, string>>((prev: any, current) => {
       const updated = { ...prev };
-      updated[current.field] = current.defaultMessage;
+      updated[current.fieldName] = current.defaultMessage;
 
       return updated;
     }, {});
+    const validationKeyCount = validation != null ? Object.keys(validation).length : 0;
+    const validationObject = validationKeyCount > 0 ? validation : undefined;
     return {
-      validation,
-      general: err.response.data.reason
+      validation: validationObject,
+      general: validationObject == null ? err.response.data.reason : `Form Validation failed. Error count: ${validationKeyCount}`
     };
-  } else if (err.request) { // Request never left
+  } else if (err.request != null) { // Request never left
     return {
       general: 'Error contacting server. Try again later.'
     }

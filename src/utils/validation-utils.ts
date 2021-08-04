@@ -154,3 +154,36 @@ export function isFormModified<T>(original: T, toCheck: T): boolean {
     return getProperty(original, key as keyof T) !== getProperty(toCheck, key as keyof T);
   });
 }
+
+const nullableStringTypes = ['null', 'string'];
+interface SchemaFieldFormat {
+  type?: string | string[];
+  $ref?: string;
+}
+/**
+ * Extracts the string fields that are nullable from a JSON Schema.
+ * A field must have the types 'null' and 'string' to be considered
+ * a nullable field.
+ * 
+ * 
+ * @param schema schema to extract nullable string fields from
+ */
+export function getNullableFieldsFromSchema<T>(schema: Record<string, SchemaFieldFormat>): Set<keyof T> {
+  const nullableStringFields = new Set<keyof T>();
+
+  Object.entries(schema).forEach(([field, value]) => {
+    const hasTypeProperty = value.hasOwnProperty('type');
+    if (hasTypeProperty) {
+      const typeValue = value as { type: string | string[] };
+      if (typeValue.type instanceof Array) {
+        const isNullableString = nullableStringTypes.every(nullableType => typeValue.type.includes(nullableType));
+
+        if (isNullableString) {
+          nullableStringFields.add(field as keyof T);
+        }
+      }
+    }
+  });
+
+  return nullableStringFields;
+}
