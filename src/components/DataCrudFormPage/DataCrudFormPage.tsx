@@ -267,18 +267,6 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     return ids;
   }
 
-  function convertErrorToDataCrudFormError(error: any): DataCrudFormErrors {
-    let formErrors: DataCrudFormErrors = {
-      general: error.response?.data?.reason ?? error.message ?? 'Unknown error occurred'
-    };
-
-    if (error.general || error.validation) {
-      formErrors = error as DataCrudFormErrors;
-    }
-
-    return formErrors;
-  }
-
   async function deleteConfirmation(deleteItem: T) {
     if (props.allowDelete && deleteItem != null) {
       /**
@@ -319,7 +307,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     }
     catch (error) {
       pageState.merge({
-        formErrors: convertErrorToDataCrudFormError(error),
+        formErrors: prepareDataCrudErrorResponse(error),
         isSubmitting: false
       });
     }
@@ -337,8 +325,8 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     catch (error) {
       if (mountedRef.current) {
         pageState.merge({
-            formErrors: convertErrorToDataCrudFormError(error),
-            isSubmitting: false
+          formErrors: prepareDataCrudErrorResponse(error),
+          isSubmitting: false
         });
       }
     }
@@ -403,7 +391,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     catch (error) {
       if (mountedRef.current) {
         pageState.merge({
-          formErrors: convertErrorToDataCrudFormError(error),
+          formErrors: prepareDataCrudErrorResponse(error),
           isSubmitting: false
         });
       }

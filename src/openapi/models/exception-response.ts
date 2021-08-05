@@ -13,6 +13,7 @@
  */
 
 
+import { ValidationError } from './validation-error';
 
 /**
  * 
@@ -25,31 +26,37 @@ export interface ExceptionResponse {
      * @type {string}
      * @memberof ExceptionResponse
      */
-    timestamp?: string;
+    timestamp: string;
     /**
      * 
      * @type {number}
      * @memberof ExceptionResponse
      */
-    status?: number;
+    status: number;
     /**
      * 
      * @type {string}
      * @memberof ExceptionResponse
      */
-    error?: string;
+    error: string;
     /**
      * 
      * @type {string}
      * @memberof ExceptionResponse
      */
-    reason?: string;
+    reason: string;
     /**
      * 
      * @type {string}
      * @memberof ExceptionResponse
      */
-    path?: string;
+    path: string;
+    /**
+     * Field will only exist if there are validation errors
+     * @type {Array<ValidationError>}
+     * @memberof ExceptionResponse
+     */
+    errors?: Array<ValidationError> | null;
 }
 
 

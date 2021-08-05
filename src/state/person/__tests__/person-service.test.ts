@@ -1,7 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
 import { FilterConditionOperatorEnum, FilterDto, PersonControllerApi, PersonControllerApiInterface, PersonDto, PersonDtoPaginationResponseWrapper, Rank, RankBranchTypeEnum, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
-import { createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
+import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
 import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import PersonService from '../person-service';
 import { RankStateModel } from '../rank-state-model';
@@ -224,8 +224,6 @@ describe('Test Person Service', () => {
     await expect(() => personService.sendCreate(personDto)).rejects.toThrow('Fail');
   });
 
-
-
   it('Should send person update successfully', async () => {
     const personApiSpy = jest.spyOn(personApi, 'updatePerson');
 
@@ -239,8 +237,17 @@ describe('Test Person Service', () => {
 
     personApiSpy.mockResolvedValue(apiResponse);
 
+    personState.merge([
+      {
+        ...personDto,
+        firstName: 'Different First Name'
+      }
+    ]);
+
     await expect(personService.sendUpdate(personDto)).resolves.toEqual(personDto);
 
+    // Check to make sure state gets updated
+    expect(personState.get()[0]).toEqual(personDto);
   });
 
   it('Should reject if person id does not exist on person update', async () => {
@@ -279,8 +286,17 @@ describe('Test Person Service', () => {
 
     personApiSpy.mockResolvedValue(apiResponse);
 
+    personState.merge([
+      {
+        ...personDto,
+        firstName: 'Different First Name'
+      }
+    ]);
+
     await expect(personService.sendSelfUpdate(personDto)).resolves.toEqual(personDto);
 
+    // Check state gets updated
+    expect(personState.get()[0]).toEqual(personDto);
   });
 
   it('Should reject if self person id does not exist on person self update', async () => {
@@ -304,9 +320,6 @@ describe('Test Person Service', () => {
     await expect(() => personService.sendSelfUpdate(personDto)).rejects.toThrow('Fail');
   });
 
-
-
-
   it('Should send delete successfully', async () => {
     const personApiSpy = jest.spyOn(personApi, 'deletePerson');
 
@@ -320,8 +333,16 @@ describe('Test Person Service', () => {
 
     personApiSpy.mockResolvedValue(apiResponse);
 
+    personState.merge([
+      {
+        ...personDto
+      }
+    ]);
+
     await expect(personService.sendDelete(personDto)).resolves.toEqual(undefined);
 
+    // Check state is updated
+    expect(personState.get().length).toEqual(0);
   });
 
   it('Should reject if person id does not exist on person delete', async () => {
@@ -370,4 +391,51 @@ describe('Test Person Service', () => {
     expect(response).toBe(undefined);
   });
 
+  it('should reject on get person by email error', async () => {
+    const personApiSpy = jest.spyOn(personApi, 'findPersonBy');
+    personApiSpy.mockRejectedValue(new Error('Fail'));
+
+    await expect(() => personService.getPersonByEmail('test@email.com')).rejects.toThrow('Fail');
+  });
+
+  it('should get person by email', async () => {
+    const personApiSpy = jest.spyOn(personApi, 'findPersonBy');
+    const response = createAxiosSuccessResponse({
+      id: 'some id',
+      email: 'test@email.com'
+    });
+    personApiSpy.mockReturnValue(Promise.resolve(response));
+
+    await expect(personService.getPersonByEmail('test@email.com')).resolves.toEqual(response.data);
+  });
+
+  it('should sanitize PersonDto (all blank strings should be converted to null if they are nullable)', () => {
+    const personDtoWithBlankStrings: PersonDto = {
+      id: 'person id',
+      firstName: ' ',
+      middleName: ' ',
+      lastName: '',
+      email: '',
+      title: '',
+      dutyTitle: '',
+      phone: '',
+      dutyPhone: '',
+      address: ''
+    };
+
+    const personDtoSanitized: PersonDto = {
+      id: 'person id',
+      firstName: null,
+      middleName: null,
+      lastName: null,
+      email: null,
+      title: null,
+      dutyTitle: null,
+      phone: null,
+      dutyPhone: null,
+      address: null
+    };
+
+    expect(personService.sanitizeDto(personDtoWithBlankStrings)).toEqual(personDtoSanitized);
+  });
 });

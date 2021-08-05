@@ -564,8 +564,8 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * Updates an existing person
-         * @summary Updates an existing person
+         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+         * @summary Allows a Person to update their own existing record.
          * @param {string} id Person ID to update
          * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
@@ -827,8 +827,8 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
-         * Updates an existing person
-         * @summary Updates an existing person
+         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+         * @summary Allows a Person to update their own existing record.
          * @param {string} id Person ID to update
          * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
@@ -970,8 +970,8 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
             return PersonControllerApiFp(configuration).patchPerson(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(axios, basePath));
         },
         /**
-         * Updates an existing person
-         * @summary Updates an existing person
+         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+         * @summary Allows a Person to update their own existing record.
          * @param {string} id Person ID to update
          * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
@@ -1105,8 +1105,8 @@ export interface PersonControllerApiInterface {
     patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<PersonDto>;
 
     /**
-     * Updates an existing person
-     * @summary Updates an existing person
+     * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+     * @summary Allows a Person to update their own existing record.
      * @param {string} id Person ID to update
      * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
@@ -1258,8 +1258,8 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     }
 
     /**
-     * Updates an existing person
-     * @summary Updates an existing person
+     * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+     * @summary Allows a Person to update their own existing record.
      * @param {string} id Person ID to update
      * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.

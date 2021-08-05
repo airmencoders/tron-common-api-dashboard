@@ -6,6 +6,7 @@
       "additionalProperties": false,
       "properties": {
         "address": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -45,19 +46,25 @@
           ]
         },
         "dutyPhone": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
           ]
         },
         "dutyTitle": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
           ]
         },
         "email": {
-          "type": "string"
+          "description": "Must be null or not blank",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "etsDate": {
           "type": [
@@ -66,6 +73,7 @@
           ]
         },
         "firstName": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -99,6 +107,7 @@
           ]
         },
         "lastName": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -111,6 +120,7 @@
           ]
         },
         "middleName": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -141,6 +151,7 @@
           "type": "object"
         },
         "phone": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -168,6 +179,7 @@
           ]
         },
         "title": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -829,6 +841,20 @@
         "error": {
           "type": "string"
         },
+        "errors": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "model-types.json#/definitions/ValidationError"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Field will only exist if there are validation errors"
+        },
         "path": {
           "type": "string"
         },
@@ -842,6 +868,13 @@
           "type": "string"
         }
       },
+      "required": [
+        "timestamp",
+        "status",
+        "error",
+        "reason",
+        "path"
+      ],
       "type": "object"
     },
     "FilterCondition": {
@@ -1511,6 +1544,7 @@
       "additionalProperties": false,
       "properties": {
         "address": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -1526,21 +1560,28 @@
           ]
         },
         "dutyPhone": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
           ]
         },
         "dutyTitle": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
           ]
         },
         "email": {
-          "type": "string"
+          "description": "Must be null or not blank",
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "firstName": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -1550,12 +1591,14 @@
           "type": "string"
         },
         "lastName": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
           ]
         },
         "middleName": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -1586,6 +1629,7 @@
           "type": "object"
         },
         "phone": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -1601,6 +1645,7 @@
           "type": "string"
         },
         "title": {
+          "description": "Must be null or not blank",
           "type": [
             "string",
             "null"
@@ -2153,6 +2198,35 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "ValidationError": {
+      "additionalProperties": false,
+      "description": "Field will only exist if there are validation errors",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "defaultMessage": {
+          "type": "string"
+        },
+        "fieldName": {
+          "type": "string"
+        },
+        "objectName": {
+          "type": "string"
+        },
+        "rejectedValue": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "defaultMessage",
+        "objectName",
+        "rejectedValue",
+        "code",
+        "fieldName"
+      ],
       "type": "object"
     },
     "Wing": {
