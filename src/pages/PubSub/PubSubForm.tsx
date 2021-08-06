@@ -22,7 +22,7 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
   const appClientsAvail = useAppClientsState().appClients;
   const formState = useState({ 
     ...props.data, 
-    appClientUser: props.data?.appClientUser ?? (appClientsAvail[0]?.name ?? ''),
+    appClientUser: props.data?.appClientUser ?? (appClientsAvail.filter(item => item.orgRead || item.personRead)[0]?.name ?? ''),
     subscribedEvent: props.data?.subscribedEvent ?? Object.values(SubscriberDtoSubscribedEventEnum)[0]
   });  
 
@@ -69,6 +69,21 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
     formState.appClientUser.set(event.target.value);
   }
 
+  const filterOutIneligibleEvents = (item : SubscriberDtoSubscribedEventEnum) => {
+    const entityType = item.split('_')[0].startsWith('SUB') ? 'ORGANIZATION' : item.split('_')[0];  
+    const appClient = appClientsAvail // find the DTO based on App Client name
+      .find(elem => elem.name === formState.appClientUser.value);
+    console.log(appClientsAvail)
+    switch (entityType) {
+      case 'ORGANIZATION':
+        return appClient?.orgRead;
+      case 'PERSON':
+        return appClient?.personRead;
+      default:
+        return false;
+    }    
+}
+
   return (
     <Form className="subscriber-form" onSubmit={(event) => submitForm(event)} data-testid="subscriber-form">
       {props.formActionType === FormActionType.UPDATE &&
@@ -102,7 +117,9 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
           disabled={isFormDisabled()}
         >
           {
-            appClientsAvail.map((app) => {
+            appClientsAvail
+              .filter(item => item.orgRead || item.personRead)  // app client should have at least some sort of read privilege
+              .map((app) => {
                 return <option key={app.name} value={app.name}>{app.name}</option>
             })
           }
@@ -140,7 +157,9 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
           disabled={isFormDisabled()}
         >
           {
-            Object.values(SubscriberDtoSubscribedEventEnum).map((name) => {
+            Object.values(SubscriberDtoSubscribedEventEnum)
+              .filter(filterOutIneligibleEvents)
+              .map((name) => {
                 return <option key={name} value={name}>{name}</option>
             })
           }
