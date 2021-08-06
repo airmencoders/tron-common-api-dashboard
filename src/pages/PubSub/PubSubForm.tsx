@@ -73,7 +73,7 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
     const entityType = item.split('_')[0].startsWith('SUB') ? 'ORGANIZATION' : item.split('_')[0];  
     const appClient = appClientsAvail // find the DTO based on App Client name
       .find(elem => elem.name === formState.appClientUser.value);
-    console.log(appClientsAvail)
+
     switch (entityType) {
       case 'ORGANIZATION':
         return appClient?.orgRead;
