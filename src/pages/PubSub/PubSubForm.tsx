@@ -69,7 +69,7 @@ function PubSubForm(props: CreateUpdateFormProps<SubscriberDto>) {
     formState.appClientUser.set(event.target.value);
   }
 
-  const filterOutIneligibleEvents = (item : SubscriberDtoSubscribedEventEnum) => {
+  const filterOutIneligibleEvents = (item : SubscriberDtoSubscribedEventEnum) : boolean | undefined => {
     const entityType = item.split('_')[0].startsWith('SUB') ? 'ORGANIZATION' : item.split('_')[0];  
     const appClient = appClientsAvail // find the DTO based on App Client name
       .find(elem => elem.name === formState.appClientUser.value);
