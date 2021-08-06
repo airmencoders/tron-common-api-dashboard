@@ -19,6 +19,13 @@ export default class UtilityFunctions {
     return `0.${crypto.randomBytes(16).toString('hex')}`;
   }
 
+  static uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   static randomStringOfLength(length: number): string {
     let mask = 'abcdefghijkpqrstuvwxyz';
     let result = '';

@@ -15,6 +15,7 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+import './cleanup-helper';
 
 export const host = Cypress.env('INTEGRATION_TEST_HOST');
 export const apiHost = Cypress.env('ADMIN_API_HOST') ?? 'http://localhost:9000';
@@ -30,6 +31,13 @@ export const userInfoApiBase = `${apiBase}/userinfo`;
 export const pastLogfileApi = `/api/v1/logfile`;
 export const logfileActuatorApi = `/api/actuator/logfile`;
 export const subscriptionsApiBase = `${apiBase}/subscriptions`;
+
+export const organizationUrl = `${apiHost}${orgApiBase}`;
+export const appClientUrl = `${apiHost}${appClientApiBase}`;
+export const personUrl = `${apiHost}${personApiBase}`;
+
+export const appClientHostAppClientUrl = `${appClientApiHost}${appClientApiBase}`;
+export const appClientHostOrganizationUrl = `${appClientApiHost}${orgApiBase}`;
 
 export const agGridFilterDebounce = 500;
 
