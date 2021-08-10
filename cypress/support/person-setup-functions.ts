@@ -4,6 +4,7 @@ import Chainable = Cypress.Chainable;
 import {apiHost, personApiBase} from './index';
 import {Person} from './data-crud-form-functions';
 import UtilityFunctions from './utility-functions';
+import { PersonDto, PersonDtoBranchEnum } from '../../src/openapi';
 
 export const mockPerson: Person = {
   email: `${UtilityFunctions.generateRandomString()}@email.com`,
@@ -42,7 +43,7 @@ export default class PersonSetupFunctions {
    *
    * @param userFields If email and dodid is not provided they are set with default.
    */
-  static addTestUser(userFields: Partial<Person> = {}): Chainable<any> {
+  static addTestUser(userFields: Partial<Person> = {}): Chainable<Cypress.Response<PersonDto>> {
     return cy
         .request({
           method: 'POST',
@@ -84,7 +85,7 @@ export default class PersonSetupFunctions {
         })
         .then(() => {
           return cy
-              .request({
+            .request<PersonDto>({
                 method: 'POST',
                 url: `${apiHost}${personApiBase}`,
                 body: {
@@ -93,5 +94,47 @@ export default class PersonSetupFunctions {
                 failOnStatusCode: false
               })
         });
+  }
+
+  static generateBasePerson(): PersonDto {
+    return {
+      email: `${UtilityFunctions.generateRandomString()}@email.com`,
+      firstName: 'First Name',
+      middleName: 'Middle Name',
+      lastName: 'Last Name',
+      branch: PersonDtoBranchEnum.Usaf,
+      rank: 'Lt Gen',
+      title: 'Person Title',
+      phone: '(555)555-5555',
+      address: '123 Lane Lane, Honolulu, HI 96825',
+      dutyPhone: '(555)555-5555'
+    }
+  }
+
+  /**
+   * Will generate a base person with random id and random email.
+   * Will not handle data clean up of itself.
+   * 
+   * Any field of {@link PersonDto} can be provided and it will
+   * override the default values. For example, a known id can be provided
+   * so that the person is created with that id.
+   * 
+   * See {@link PersonSetupFunctions.generateBasePerson} for default values
+   * 
+   * @param org optional values to override the default values for organization creation
+   */
+  static createPerson(person: Partial<PersonDto>) {
+    return cy.request<PersonDto>({
+      url: `${apiHost}${personApiBase}`,
+      method: 'POST',
+      body: {
+        ...this.generateBasePerson(),
+        ...person
+      }
+    }).then(response => {
+      expect(response.status).to.eq(201);
+
+      return response;
+    });
   }
 }
