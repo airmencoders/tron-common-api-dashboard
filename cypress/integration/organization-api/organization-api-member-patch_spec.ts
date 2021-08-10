@@ -78,24 +78,6 @@ describe('Organization API Member PATCH', () => {
     });
   });
 
-  it('should fail PATCH members with empty array', () => {
-    const orgA = {
-      id: UtilityFunctions.uuidv4(),
-      name: "A" + UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgA);
-    orgIdsToDelete.add(orgA.id);
-
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgA.id}/members`,
-      method: 'PATCH',
-      body: [],
-      failOnStatusCode: false
-    }).then(response => {
-      expect(response.status).to.eq(400);
-    });
-  });
-
   it('should fail PATCH members with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/members`,

@@ -119,44 +119,6 @@ describe('Organization API Subordinate DELETE', () => {
     });
   });
 
-  it('should fail delete sub organizations with empty array', () => {
-    const orgA = {
-      id: UtilityFunctions.uuidv4(),
-      name: UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgA);
-    orgIdsToDelete.add(orgA.id);
-
-    const orgC = {
-      id: UtilityFunctions.uuidv4(),
-      name: UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgC)
-      .then(response => {
-        cy.request<OrganizationDto>({
-          url: `${organizationUrl}/${response.body.id}`,
-          method: 'PUT',
-          body: {
-            ...response.body,
-            subordinateOrganizations: [orgA.id]
-          }
-        }).then(response => {
-          expect(response.status).to.eq(200);
-          expect(response.body.subordinateOrganizations).to.have.members([orgA.id]);
-        });
-      });
-    orgIdsToDelete.add(orgC.id);
-
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgC.id}/subordinates`,
-      method: 'DELETE',
-      body: [],
-      failOnStatusCode: false
-    }).then(response => {
-      expect(response.status).to.eq(400);
-    });
-  });
-
   it('should fail delete sub organizations with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,

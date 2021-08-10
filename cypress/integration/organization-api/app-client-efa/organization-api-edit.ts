@@ -274,7 +274,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         body: [createdPerson.id]
       }).then(response => {
         expect(response.status).to.eq(203);
-        expect(response.body.members).to.contain([createdPerson.id]);
+        expect(response.body.members).to.contain(createdPerson.id);
         expect(response.headers['warning']).to.contain('members');
       });
     });
@@ -309,7 +309,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         body: [createdPerson.id]
       }).then(response => {
         expect(response.status).to.eq(200);
-        expect(response.body.members).to.not.contain([createdPerson.id]);
+        expect(response.body.members).to.not.contain(createdPerson.id);
       });
     });
   });

@@ -71,21 +71,4 @@ describe('Organization API Leader DELETE', () => {
       expect(response.status).to.eq(400);
     });
   });
-
-  it('should fail delete leader with organization with no leader', () => {
-    const orgA = {
-      id: UtilityFunctions.uuidv4(),
-      name: UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgA);
-    orgIdsToDelete.add(orgA.id);
-
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgA.id}/leader`,
-      method: 'DELETE',
-      failOnStatusCode: false
-    }).then(response => {
-      expect(response.status).to.eq(400);
-    });
-  });
 });

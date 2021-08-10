@@ -85,24 +85,6 @@ describe('Organization API Subordinate PATCH', () => {
     });
   });
 
-  it('should fail PATCH sub organizations with empty array', () => {
-    const orgA = {
-      id: UtilityFunctions.uuidv4(),
-      name: UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgA);
-    orgIdsToDelete.add(orgA.id);
-
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgA.id}/subordinates`,
-      method: 'PATCH',
-      body: [],
-      failOnStatusCode: false
-    }).then(response => {
-      expect(response.status).to.eq(400);
-    });
-  });
-
   it('should fail PATCH sub organizations with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,

@@ -71,21 +71,4 @@ describe('Organization API Parent DELETE', () => {
       expect(response.status).to.eq(400);
     });
   });
-
-  it('should fail delete parent with organization with no parent', () => {
-    const orgA = {
-      id: UtilityFunctions.uuidv4(),
-      name: UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgA);
-    orgIdsToDelete.add(orgA.id);
-
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgA.id}/parent`,
-      method: 'DELETE',
-      failOnStatusCode: false
-    }).then(response => {
-      expect(response.status).to.eq(400);
-    });
-  });
 });
