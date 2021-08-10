@@ -1,10 +1,26 @@
 @import '../../../styles/base';
 @import '../../../styles/colors';
 
-.validation {
-  list-style-position: inside;
-  padding: 0;
-  &__error {
-    color: $error;
+.form-group {
+
+  &__label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .25em;
+  }
+
+  &__actions {
+    align-self: center;
+    button {
+      position: relative;
+      top: calculateRem(-7px);
+    }
+  }
+  .validation {
+    list-style-position: inside;
+    padding: 0;
+    &__error {
+      color: $error;
+    }
   }
 }

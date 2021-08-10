@@ -3,8 +3,11 @@
 @import "../../styles/mixins";
 
 
-.scratch-storage-add-form {
-    max-width: 100% !important;
+.scratch-storage-key-value-editor-form {
+    &.scratch-storage-add-form {
+        width: 100%;
+        max-width: 100% !important;
+    }
 }
 
 .value-editor {
@@ -12,7 +15,7 @@
     margin: 0;
     padding: .2em;
     width: 100% !important;
-    min-width: 30em;    
+    min-width: 30em;
     max-width: 100%;
     min-height: 10em;
     cursor: text;

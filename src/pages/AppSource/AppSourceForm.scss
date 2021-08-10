@@ -1,10 +1,17 @@
 @import '../../styles/base';
 
 .app-source-form {
-  &__add-admin-btn {
+  &__add-admin-btn.usa-button {
     width: 100%;
-    margin-top: units(0.5) !important;
+    margin-top: 0;
     margin-bottom: units(0.5);
+  }
+  &__admins-form-group {
+    margin-bottom: .5rem;
+  }
+
+  .admin-email-grid {
+    margin-top: 1rem;
   }
 }
 

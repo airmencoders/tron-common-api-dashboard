@@ -49,7 +49,7 @@ function ScratchStorageKeyValueEditorForm(props: ScratchStorageAddKVPProps) {
 
   return (
     <div
-      className="scratch-storage-add-form"
+      className="scratch-storage-add-form scratch-storage-key-value-editor-form"
       data-testid="scratch-storage-add-kvp-form"
     >
       <FormGroup

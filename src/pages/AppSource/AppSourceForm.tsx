@@ -50,9 +50,9 @@ function getAppSourceEndpointId(data: AppEndpointDto): string {
 function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
   const formState = useHookstate({
     id: props.data?.id ?? '',
-    name: props.data?.name ?? '', 
+    name: props.data?.name ?? '',
     reportStatus: props.data?.reportStatus ?? false,
-    healthUrl: props.data?.healthUrl ?? '',   
+    healthUrl: props.data?.healthUrl ?? '',
     appClients: props.data?.appClients ?? [],
     appSourceAdminUserEmails: props.data?.appSourceAdminUserEmails ?? [],
     endpoints: props.data?.endpoints ?? [],
@@ -358,7 +358,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           <TextInput
             id="health-url"
             name="health-url"
-            type="text"            
+            type="text"
             error={!Validation(formState.healthUrl).valid()}
             defaultValue={formState.healthUrl.value}
             onChange={(event) => formState.healthUrl.set(event.target.value)}
@@ -372,6 +372,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
           isError={Touched(adminAddState.email).touched() && Validation(adminAddState.email).invalid() && adminAddState.email.get().trim().length > 0}
           errorMessages={Validation(adminAddState.email).errors()
             .map(validationError => validationError.message)}
+          className="app-source-form__admins-form-group"
         >
           <TextInput
             id="admin"
