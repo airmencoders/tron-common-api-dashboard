@@ -78,11 +78,14 @@ describe('Person Put API', () => {
 
     cy.wrap(fieldArray).each((field : string) => {
       const newValue = UtilityFunctions.randomStringOfLength(260);
+      const uuid = UtilityFunctions.uuidv4();
       cy
           .request({
             method: 'POST',
             url: `${apiHost}${personApiBase}`,
-            body: {},
+            body: {
+              id: uuid
+            },
             failOnStatusCode: false
           })
           .then((response) => {
@@ -99,15 +102,13 @@ describe('Person Put API', () => {
             })
           })
           .then(response => {
-            expect(response.status).to.be.gte(400)
-                .and.lt(500);
+            expect(response.status).to.eq(400)
             return response;
           })
           .then((response) => {
-            const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
             cy.request({
               method: 'DELETE',
-              url: `${apiHost}${personApiBase}/${requestBody.id}`
+              url: `${apiHost}${personApiBase}/${uuid}`
             })
           })
     });
