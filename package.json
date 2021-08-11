@@ -121,6 +121,9 @@
   },
   "resolutions": {
     "remark-parse": "9.0.0",
-    "prismjs": "1.24.0"
+    "prismjs": "1.24.0",
+    "url-parse": "1.5.3",
+    "tar": "6.1.7",
+    "path-parse": "1.0.7"
   }
 }
