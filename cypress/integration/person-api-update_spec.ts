@@ -171,62 +171,6 @@ describe('Person Put API', () => {
         });
   });
 
-  it('Should set the organization membership through PATCH request via API', () => {
-    cy
-        .request({
-          method: 'POST',
-          url: `${apiHost}${personApiBase}`,
-          body: {
-            email: `${UtilityFunctions.generateRandomString()}@email.com`
-          }
-        })
-        .then((personCreateResp) => {
-          return cy.request({
-            method: 'POST',
-            url: `${apiHost}${orgApiBase}`,
-            body: {
-              name: UtilityFunctions.generateRandomString(),
-              orgType: 'SQUADRON',
-              branchType: 'USAF',
-              members: [],
-              subordinateOrganizations: []
-            }
-          })
-              .then((orgCreateResp) => {
-                return {
-                  person: personCreateResp.body,
-                  org: orgCreateResp.body
-                }
-              })
-        })
-        .then((entities) => {
-          return cy.request({
-            method: 'PATCH',
-            url: `${apiHost}${personApiBase}/${entities.person.id}`,
-            headers: {
-              "Content-Type": "application/json-patch+json"
-            },
-            body:
-                [
-                  { op: 'add', path: '/organizationMemberships', value: entities.org.id }
-                ]
-          })
-              .then((resp) => {
-                expect(resp?.body?.primaryOrganizationId).to.equal(entities.org.id);
-                return entities;
-              })
-        })
-        .then((entities) => {
-          cy.request({
-            method: 'DELETE',
-            url: `${apiHost}${orgApiBase}/${entities.org.id}`
-          })
-              .request({
-                method: 'DELETE',
-                url: `${apiHost}${personApiBase}/${entities.person.id}`
-              })
-        });
-  });
   it('Should fail for invalid branch', () => {
     cy
         .request({

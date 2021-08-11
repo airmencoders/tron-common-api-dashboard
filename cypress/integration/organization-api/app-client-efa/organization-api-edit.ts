@@ -440,6 +440,13 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       orgIdsToDelete.add(createdSubOrg.id);
       OrgSetupFunctions.createOrganization(createdSubOrg);
 
+      // Create org for subordinate
+      const createdSubOrgB = {
+        id: UtilityFunctions.uuidv4()
+      };
+      orgIdsToDelete.add(createdSubOrgB.id);
+      OrgSetupFunctions.createOrganization(createdSubOrgB);
+
       // Create org
       const createdOrg = {
         id: UtilityFunctions.uuidv4()
@@ -450,10 +457,10 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'PATCH',
-        body: [createdSubOrg.id]
+        body: [createdSubOrg.id, createdSubOrgB.id]
       }).then(response => {
         expect(response.status).to.eq(200);
-        expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
+        expect(response.body.subordinateOrganizations).to.contain.members([createdSubOrg.id, createdSubOrgB.id])
       });
     });
   });
@@ -505,7 +512,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         body: [createdSubOrg.id]
       }).then(response => {
         expect(response.status).to.eq(203);
-        expect(response.body.subordinateOrganizations).to.contain(createdOrg.id);
+        expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
         expect(response.headers['warning']).to.contain('subordinateOrganizations');
       });
     });
