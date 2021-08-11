@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import {apiBase, apiHost, personApiBase} from '../support';
+import {apiHost, personApiBase} from '../support';
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Create API', () => {
@@ -136,8 +136,7 @@ describe('Person Create API', () => {
             failOnStatusCode: false
           })
           .then(response => {
-            expect(response.status).to.be.gt(400)
-                .and.lt(500);
+            expect(response.status).to.eq(400);
           })
     });
   });

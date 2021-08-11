@@ -78,11 +78,14 @@ describe('Person Put API', () => {
 
     cy.wrap(fieldArray).each((field : string) => {
       const newValue = UtilityFunctions.randomStringOfLength(260);
+      const uuid = UtilityFunctions.uuidv4();
       cy
           .request({
             method: 'POST',
             url: `${apiHost}${personApiBase}`,
-            body: {},
+            body: {
+              id: uuid
+            },
             failOnStatusCode: false
           })
           .then((response) => {
@@ -99,15 +102,13 @@ describe('Person Put API', () => {
             })
           })
           .then(response => {
-            expect(response.status).to.be.gte(400)
-                .and.lt(500);
+            expect(response.status).to.eq(400)
             return response;
           })
           .then((response) => {
-            const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
             cy.request({
               method: 'DELETE',
-              url: `${apiHost}${personApiBase}/${requestBody.id}`
+              url: `${apiHost}${personApiBase}/${uuid}`
             })
           })
     });
@@ -170,62 +171,6 @@ describe('Person Put API', () => {
         });
   });
 
-  it('Should set the organization membership through PATCH request via API', () => {
-    cy
-        .request({
-          method: 'POST',
-          url: `${apiHost}${personApiBase}`,
-          body: {
-            email: `${UtilityFunctions.generateRandomString()}@email.com`
-          }
-        })
-        .then((personCreateResp) => {
-          return cy.request({
-            method: 'POST',
-            url: `${apiHost}${orgApiBase}`,
-            body: {
-              name: UtilityFunctions.generateRandomString(),
-              orgType: 'SQUADRON',
-              branchType: 'USAF',
-              members: [],
-              subordinateOrganizations: []
-            }
-          })
-              .then((orgCreateResp) => {
-                return {
-                  person: personCreateResp.body,
-                  org: orgCreateResp.body
-                }
-              })
-        })
-        .then((entities) => {
-          return cy.request({
-            method: 'PATCH',
-            url: `${apiHost}${personApiBase}/${entities.person.id}`,
-            headers: {
-              "Content-Type": "application/json-patch+json"
-            },
-            body:
-                [
-                  { op: 'add', path: '/organizationMemberships', value: entities.org.id }
-                ]
-          })
-              .then((resp) => {
-                expect(resp?.body?.primaryOrganizationId).to.equal(entities.org.id);
-                return entities;
-              })
-        })
-        .then((entities) => {
-          cy.request({
-            method: 'DELETE',
-            url: `${apiHost}${orgApiBase}/${entities.org.id}`
-          })
-              .request({
-                method: 'DELETE',
-                url: `${apiHost}${personApiBase}/${entities.person.id}`
-              })
-        });
-  });
   it('Should fail for invalid branch', () => {
     cy
         .request({
