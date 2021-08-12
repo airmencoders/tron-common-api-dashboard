@@ -1,4 +1,5 @@
 import { startOfWeek, isBefore, isFuture, isEqual, isThisISOWeek, addWeeks, endOfWeek, parseISO, startOfDay } from 'date-fns';
+import format from 'date-fns/format';
 
 /**
  * Gets the first day of the week, given a date object
@@ -18,12 +19,12 @@ export function getFirstDayOfWeek(date: number | Date, weekStartsOn: 0 | 1 | 2 |
  * @returns {string} formatted date in yyyy-MM-dd
  */
 export function formatDateToEnCa(date: number | Date): string {
-  return new Date(date).toLocaleDateString('en-Ca', { timeZone: 'UTC' });
+  return format(new Date(date),'yyyy-MM-dd');
 }
 
 /**
  * Checks if a date is before another date.
- * 
+ *
  * @param firstDate the first date
  * @param secondDate the second date
  * @returns true if {@link firstDate} is before {@link secondDate}, false otherwise
@@ -34,7 +35,7 @@ export function isDateBefore(firstDate: Date | number, secondDate: Date | number
 
 /**
  * Checks if two dates are equal
- * 
+ *
  * @param firstDate first date
  * @param secondDate second date
  * @returns true if {@link firstDate} is equal to {@link secondDate}, false otherwise
@@ -65,7 +66,7 @@ export function isDateInThisWeek(date: Date | number): boolean {
 /**
  * Add an amount of weeks to a date
  * @param date date
- * @param weeksToAdd amount of weeks to add 
+ * @param weeksToAdd amount of weeks to add
  * @returns date with added weeks
  */
 export function addWeeksToDate(date: Date | number, weeksToAdd: number): Date {
@@ -76,7 +77,7 @@ export function addWeeksToDate(date: Date | number, weeksToAdd: number): Date {
  * Gets the end of the week given a date
  * @param date date
  * @param weekStartsOn 0 = Sunday, 1 = Monday, ...
- * @returns 
+ * @returns
  */
 export function getEndOfWeek(date: Date | number, weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6): Date {
   return endOfWeek(date, { weekStartsOn });
@@ -85,7 +86,7 @@ export function getEndOfWeek(date: Date | number, weekStartsOn: 0 | 1 | 2 | 3 | 
 /**
  * Parses an ISO date to Date
  * @param date iso date string
- * @returns 
+ * @returns
  */
 export function parseIsoDate(date: string): Date {
   return parseISO(date);
@@ -94,7 +95,7 @@ export function parseIsoDate(date: string): Date {
 /**
  * Gets the start of the day given a date
  * @param date date
- * @returns 
+ * @returns
  */
 export function getStartOfDay(date: Date | number): Date {
   return startOfDay(date);
