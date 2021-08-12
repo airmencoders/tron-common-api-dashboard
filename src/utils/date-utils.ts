@@ -19,7 +19,7 @@ export function getFirstDayOfWeek(date: number | Date, weekStartsOn: 0 | 1 | 2 |
  * @returns {string} formatted date in yyyy-MM-dd
  */
 export function formatDateToEnCa(date: number | Date): string {
-  return format(new Date(date),'yyyy-MM-dd');
+  return new Date(date).toLocaleDateString('en-Ca', { timeZone: 'UTC' });
 }
 
 /**
