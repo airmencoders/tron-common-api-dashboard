@@ -50,6 +50,15 @@ describe('Organization API Leader DELETE', () => {
       expect(response.status).to.eq(200);
       assert.notExists(response.body.leader, 'Leader should not exist');
     });
+
+    // Ensure leader has truly been deleted
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${orgA.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      assert.notExists(response.body.leader, 'Leader should not exist');
+    });
   });
 
   it('should fail delete leader with org id that does not exist', () => {

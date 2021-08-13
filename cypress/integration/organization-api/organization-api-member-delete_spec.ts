@@ -1,11 +1,12 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { appClientHostOrganizationUrl, organizationUrl, personUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete, personIdsToDelete } from '../../support/cleanup-helper';
 import PersonSetupFunctions from '../../support/person-setup-functions';
+import AppClientSetupFunctions from '../../support/app-client-setup-functions';
 
 describe('Organization API Member DELETE', () => {
   beforeEach(() => {
@@ -43,6 +44,7 @@ describe('Organization API Member DELETE', () => {
       });
     orgIdsToDelete.add(orgA.id);
 
+    // Delete personA from orgA
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/members`,
       method: 'DELETE',
@@ -50,6 +52,96 @@ describe('Organization API Member DELETE', () => {
     }).then(response => {
       expect(response.status).to.eq(200);
       expect(response.body.members).to.not.include(personA.id);
+    });
+
+    // Ensure orgA still no longer has personA
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${orgA.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.members).to.not.include(personA.id);
+    });
+
+    // Ensure personA does not have memberships to orgA
+    cy.request({
+      url: `${personUrl}/${personA.id}`,
+      method: 'GET',
+      qs: {
+        memberships: true
+      }
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.organizationMemberships).to.not.include(orgA.id);
+    });
+  });
+
+  it('should rollback transaction if EFA fails, no permissions', () => {
+    AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
+
+    // Create org
+    const orgA = {
+      id: UtilityFunctions.uuidv4(),
+      name: UtilityFunctions.generateRandomString()
+    };
+    orgIdsToDelete.add(orgA.id);
+    OrgSetupFunctions.createOrganization(orgA);
+
+    // Create person for member
+    const personA = {
+      id: UtilityFunctions.uuidv4(),
+      firstName: UtilityFunctions.generateRandomString(),
+      primaryOrganizationId: orgA.id
+    };
+    PersonSetupFunctions.createPerson(personA);
+    personIdsToDelete.add(personA.id);
+
+    // Add person as member
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${orgA.id}`,
+      method: 'GET'
+    }).then(response => {
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${response.body.id}`,
+        method: 'PUT',
+        body: {
+          ...response.body,
+          members: [personA.id]
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.members).to.have.members([personA.id]);
+      });
+    });
+
+    // Request through App Client
+    // This should return 203, no permission
+    cy.request({
+      url: `${appClientHostOrganizationUrl}/${orgA.id}/members`,
+      method: 'DELETE',
+      body: [personA.id]
+    }).then(response => {
+      expect(response.status).to.eq(203);
+      expect(response.body.members).to.have.members([personA.id]);
+      expect(response.headers['warning']).to.contain('members');
+    });
+
+    // orgA should still have personA as member
+    cy.request({
+      url: `${organizationUrl}/${orgA.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.members).to.have.members([personA.id]);
+    });
+
+    // personA should still have primaryOrganizationId set to orgA
+    cy.request({
+      url: `${personUrl}/${personA.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.primaryOrganizationId).to.eq(orgA.id);
     });
   });
 
