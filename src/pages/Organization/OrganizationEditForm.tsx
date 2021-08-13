@@ -100,6 +100,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   const orgState = useOrganizationState();  // handle to the org-service and state
   const formState = useState({
     ...props.data,
+    orgType: props.data?.orgType ?? Object.values(OrganizationDtoOrgTypeEnum)[0] ?? '',
     subordinateOrganizations: props.data?.subordinateOrganizations ? [...props.data?.subordinateOrganizations] : [],
     members: props.data?.members ? [...props.data.members] : []
   }); // data from the UI form
