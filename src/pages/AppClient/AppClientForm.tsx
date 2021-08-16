@@ -214,7 +214,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         const privDisplayName = priv.name.replace(regex, '');
         if (privDisplayName.match(/^CREATE$|^EDIT$|^DELETE$|^READ$/)) {
           crudLevelPrivs.push({ priv, privDisplayName });
-        }   
+        }
         else {
           fieldLevelPrivs.push({ priv, privDisplayName });
         }
@@ -251,8 +251,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
                 <div key={item.priv.name} className='crud-level-checkbox'>
                   <Checkbox
                     id={item.priv.name}
-                    name={item.priv.name}                
-                    data-testid={item.priv.name}      
+                    name={item.priv.name}
+                    data-testid={item.priv.name}
                     key={item.priv.name}
                     label={item.privDisplayName}
                     checked={formState.allPrivs.value?.find(priv => priv.name === item.priv.name) !== undefined}
@@ -263,8 +263,8 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
               )
             }
             </div>
-          </FormGroup>      
-        </div>  
+          </FormGroup>
+        </div>
       </div>
     )
   }
@@ -385,6 +385,7 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
           labelText="Manage Developers"
           isError={failsHookstateValidation(developerAddState.email)}
           errorMessages={generateStringErrorMessages(developerAddState.email)}
+          className="app-client-form__add-developer-form-group"
       >
         <TextInput
           id="developer"

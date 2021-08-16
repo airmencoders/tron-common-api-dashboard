@@ -36,6 +36,8 @@ import Fieldset from '../../components/forms/Fieldset/Fieldset';
 import Label from '../../components/forms/Label/Label';
 import TextInputWithDelete from '../../components/forms/TextInputWithDelete/TextInputWithDelete';
 
+const ACTION_BUTTON_SIZE = 1.25;
+
 const personColumns = [
   new GridColumn({
     field: 'email',
@@ -146,7 +148,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
     return false;
   }
 
-  // helper to construct the leader's name 
+  // helper to construct the leader's name
   const resolveLeaderName = () => {
     return `${formState.leader.get()?.firstName ?? ''} ${formState.leader.get()?.lastName ?? ''}`;
   }
@@ -531,8 +533,22 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
         </FormGroup>
         <>
           {/* Edit/Remove Org Leader Section */}
-          <FormGroup labelName="leaderName" labelText="Leader">
-            <div className="organization-edit-form__input-actions">
+          <FormGroup labelName="leaderName"
+                     labelText="Leader"
+                     actionsNode={
+                       <Button
+                           data-testid='change-org-leader__btn'
+                           disableMobileFullWidth
+                           type={'button'}
+                           onClick={onEditLeaderClick}
+                           unstyled
+                           className="organization-edit-form__input-actions input-actions__icon-btn"
+                       >
+                         <EditIcon iconTitle="Change Leader" size={ACTION_BUTTON_SIZE} />
+                       </Button>
+                     }
+          >
+            <div className="">
               <TextInputWithDelete
                 id="leaderName"
                 name="leader"
@@ -545,22 +561,27 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                 className="input-actions__remove-input"
               />
 
-              <Button
-                data-testid='change-org-leader__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onEditLeaderClick}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <EditIcon iconTitle="Change Leader" size={1.5} />
-              </Button>
+
             </div>
           </FormGroup>
 
           {/* Edit/Remove Parent Org Section */}
-          <FormGroup labelName="parentOrg" labelText="Parent Organization">
-            <div className="organization-edit-form__input-actions">
+          <FormGroup labelName="parentOrg"
+                     labelText="Parent Organization"
+                      actionsNode={
+                        <Button
+                            data-testid='change-org-parent__btn'
+                            disableMobileFullWidth
+                            type={'button'}
+                            onClick={onEditParentOrg}
+                            unstyled
+                            className="organization-edit-form__input-actions input-actions__icon-btn"
+                        >
+                          <EditIcon iconTitle="Change Parent Organization" size={ACTION_BUTTON_SIZE} />
+                        </Button>
+                      }
+          >
+            <div className="">
               <TextInputWithDelete
                 id="parentOrg"
                 name="parentOrg"
@@ -573,16 +594,8 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                 className="input-actions__remove-input"
               />
 
-              <Button
-                data-testid='change-org-parent__btn'
-                disableMobileFullWidth
-                type={'button'}
-                onClick={onEditParentOrg}
-                unstyled
-                className="input-actions__icon-btn"
-              >
-                <EditIcon iconTitle="Change Parent Organization" size={1.5} />
-              </Button>
+
+
             </div>
           </FormGroup>
 
@@ -597,9 +610,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                   type={'button'}
                   onClick={onAddMemberClick}
                   unstyled
-                  className="input-actions__icon-btn"
+                  className="input-actions__icon-btn add-action"
                 >
-                  <PlusIcon iconTitle="Add Members" size={1.5} />
+                  <PlusIcon iconTitle="Add Members" size={ACTION_BUTTON_SIZE} />
                 </Button>
 
                 <Button
@@ -612,7 +625,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                   transparentOnDisabled
                   className="input-actions__icon-btn"
                 >
-                  <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={1.5} />
+                  <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={ACTION_BUTTON_SIZE} />
                 </Button>
               </div>
             </Label>
@@ -629,7 +642,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
           </Fieldset>
 
           {/* Add/Remove Org Subordinate Orgs Section */}
-          <Fieldset>
+          <Fieldset className="organization-edit-form__members-input">
             <Label htmlFor="subOrgsList">
               {`Subordinate Organizations  (${formState.subordinateOrganizations.get()?.length || 0})`}
               <div className="organization-edit-form__input-actions organization-edit-form__input-actions--grid">
@@ -639,9 +652,9 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                   type={'button'}
                   onClick={onAddSubOrgClick}
                   unstyled
-                  className="input-actions__icon-btn"
+                  className="input-actions__icon-btn add-action"
                 >
-                  <PlusIcon iconTitle="Add Sub Orgs" size={1.5} />
+                  <PlusIcon iconTitle="Add Sub Orgs" size={ACTION_BUTTON_SIZE} />
                 </Button>
 
                 <Button
@@ -654,7 +667,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                   transparentOnDisabled
                   className="input-actions__icon-btn"
                 >
-                  <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={1.5} />
+                  <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={ACTION_BUTTON_SIZE} />
                 </Button>
               </div>
             </Label>
@@ -696,7 +709,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
         headerComponent={<ModalTitle title={chooserDialogTitle()} />}
         footerComponent={(
           <div className={'modal-footer-submit'}>
-            <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" onClick={chooserDialogClose}>
+            <Button type="button" data-testid='chooser-cancel__btn' className="add-app-client__btn" inverse outline onClick={chooserDialogClose}>
               Cancel
             </Button>
             <Button type="button" data-testid='chooser-ok__btn' className="add-app-client__btn" onClick={chooserDialogConfirmed} disabled={selectedChooserRows.length === 0}>
@@ -724,11 +737,11 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
         headerComponent={<ModalTitle title="Confirm Remove" />}
         footerComponent={(
           <div className={'modal-footer-submit'}>
-            <Button type="button" data-testid='remove-cancel__btn' className="add-app-client__btn" secondary onClick={confirmDialogClose}>
-              No
+            <Button type="button" data-testid='remove-cancel__btn' className="add-app-client__btn" inverse outline onClick={confirmDialogClose}>
+              Cancel
             </Button>
-            <Button type="button" data-testid='remove-confirm-ok__btn' className="add-app-client__btn" secondary onClick={confirmDialogAffirmed}>
-              Yes
+            <Button type="button" data-testid='remove-confirm-ok__btn' className="add-app-client__btn" onClick={confirmDialogAffirmed}>
+              Remove
             </Button>
           </div>
         )}

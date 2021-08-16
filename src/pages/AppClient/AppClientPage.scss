@@ -5,7 +5,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-content: flex-start;
-    align-items: flex-start;    
+    align-items: flex-start;
 }
 
 .crud-level-checkbox {
@@ -19,4 +19,15 @@
 
 .accordian-top-spacer {
     margin-top: 10px;
+}
+
+.app-client-form {
+    &__add-developer-btn.usa-button {
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    &__add-developer-form-group {
+        margin-bottom: .5rem;
+    }
 }
