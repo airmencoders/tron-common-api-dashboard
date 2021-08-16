@@ -112,4 +112,6 @@ export interface DataCrudFormPageProps<T, R> {
   scrollToTopCallback?: () => void;
 
   sideDrawerSize?: SideDrawerSize;
+
+  dataTypeIcon?: any;
 }
