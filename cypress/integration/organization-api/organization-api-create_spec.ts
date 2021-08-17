@@ -38,64 +38,72 @@ describe('Organization API Creation', () => {
 
       return response.body;
     }).then(response => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       // Create an org with same name
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
-          name: response.name
+          name: response.name,
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id)
         expect(response.status).to.eq(409);
       });
     });
   });
 
   it('should fail Organization creation with bad orgType field with 400', () => {
+    const id = UtilityFunctions.uuidv4();
+    orgIdsToDelete.add(id);
     cy.request<OrganizationDto>({
       url: organizationUrl,
       method: 'POST',
       body: {
         ...OrgSetupFunctions.generateBaseOrg(),
+        id,
         orgType: 'bad org type'
       },
       failOnStatusCode: false
     }).then(response => {
-      orgIdsToDelete.add(response.body.id);
       expect(response.status).to.eq(400);
     });
   });
 
   it('should fail Organization creation with bad branchType field with 400', () => {
+    const id = UtilityFunctions.uuidv4();
+    orgIdsToDelete.add(id);
     cy.request<OrganizationDto>({
       url: organizationUrl,
       method: 'POST',
       body: {
         ...OrgSetupFunctions.generateBaseOrg(),
-        branchType: 'bad branch type'
+        branchType: 'bad branch type',
+        id
       },
       failOnStatusCode: false
     }).then(response => {
-      orgIdsToDelete.add(response.body.id);
       expect(response.status).to.eq(400);
     });
   });
 
   it('should fail Organization Creation with fields above 255 character limit with 400', () => {
     const fieldsWithCharacterLimit = ['name'];
+    const id = UtilityFunctions.uuidv4();
+    orgIdsToDelete.add(id);
     fieldsWithCharacterLimit.forEach(field => {
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          [field]: UtilityFunctions.randomStringOfLength(256)
+          [field]: UtilityFunctions.randomStringOfLength(256),
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(400);
       });
     });
@@ -103,17 +111,19 @@ describe('Organization API Creation', () => {
 
   it('should fail creation with blank string fields with 400', () => {
     const fieldsWithNotBlankConstraint = ['name'];
+    const id = UtilityFunctions.uuidv4();
+    orgIdsToDelete.add(id);
     fieldsWithNotBlankConstraint.forEach(field => {
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          [field]: UtilityFunctions.randomStringOfLength(256)
+          [field]: UtilityFunctions.randomStringOfLength(256),
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(400);
       });
     });
@@ -144,31 +154,35 @@ describe('Organization API Creation', () => {
     });
 
     it('should fail Organization creation with bad leader uuid with 400', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          leader: 'bad uuid'
+          leader: 'bad uuid',
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(400);
       });
     });
 
-    it('should fail Organization creation with non-existant leader uuid with 400', () => {
+    it('should fail Organization creation with non-existant leader uuid with 404', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          leader: UtilityFunctions.uuidv4()
+          leader: UtilityFunctions.uuidv4(),
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(404);
       });
     });
@@ -201,31 +215,35 @@ describe('Organization API Creation', () => {
     });
 
     it('should fail Organization creation with bad members uuid with 400', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          members: ['bad uuid']
+          members: ['bad uuid'],
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(400);
       });
     });
 
     it('should fail Organization creation with non-existant members uuid with 404', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          members: [UtilityFunctions.uuidv4()]
+          members: [UtilityFunctions.uuidv4()],
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(404);
       });
     });
@@ -259,31 +277,35 @@ describe('Organization API Creation', () => {
     });
 
     it('should fail Organization creation with bad uuid parent org with 400', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          parentOrganization: 'bad uuid'
+          parentOrganization: 'bad uuid',
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(400);
       });
     });
 
     it('should fail Organization creation with non-existant uuid parent org with 404', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          parentOrganization: UtilityFunctions.uuidv4()
+          parentOrganization: UtilityFunctions.uuidv4(),
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(404);
       });
     });
@@ -319,31 +341,35 @@ describe('Organization API Creation', () => {
     });
 
     it('should fail on bad subordinateOrganizations field with 400', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          subordinateOrganizations: ['bad uuid']
+          subordinateOrganizations: ['bad uuid'],
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(400);
       })
     });
 
     it('should fail on non-existant subordinateOrganizations with 404', () => {
+      const id = UtilityFunctions.uuidv4();
+      orgIdsToDelete.add(id);
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
-          subordinateOrganizations: [UtilityFunctions.uuidv4()]
+          subordinateOrganizations: [UtilityFunctions.uuidv4()],
+          id
         },
         failOnStatusCode: false
       }).then(response => {
-        orgIdsToDelete.add(response.body.id);
         expect(response.status).to.eq(404);
       })
     });

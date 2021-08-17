@@ -1,5 +1,5 @@
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../../src/openapi';
-import { appClientHostOrganizationUrl, organizationUrl, personUrl } from '../../../support';
+import { appClientHostOrganizationUrl, personUrl } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete, personIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -77,7 +77,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should fail with only ORGANIZATION_EDIT and no Organization-leader with 203', () => {
+    it('should fail with only ORGANIZATION_EDIT and no Organization-leader with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
       // Create person for leader
@@ -104,11 +104,10 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete leader
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${orgA.id}/leader`,
-        method: 'DELETE'
+        method: 'DELETE',
+        failOnStatusCode: false
       }).then(response => {
-        expect(response.status).to.eq(203);
-        expect(response.body.leader).to.eq(createdPerson.id);
-        expect(response.headers['warning']).to.contain('leader');
+        expect(response.status).to.eq(403);
       });
     });
 
@@ -160,7 +159,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should fail with only ORGANIZATION_EDIT and no Organization-parentOrganization with 203', () => {
+    it('should fail with only ORGANIZATION_EDIT and no Organization-parentOrganization with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
       // Create org for parent
@@ -187,11 +186,10 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete parent
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${subOrg.id}/parent`,
-        method: 'DELETE'
+        method: 'DELETE',
+        failOnStatusCode: false
       }).then(response => {
-        expect(response.status).to.eq(203);
-        expect(response.body.parentOrganization).to.eq(parentOrg.id);
-        expect(response.headers['warning']).to.contain('parentOrganization');
+        expect(response.status).to.eq(403);
       });
     });
 
@@ -244,7 +242,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should fail with ORGANIZATION_EDIT and no Organization-members privilege with 203', () => {
+    it('should fail with ORGANIZATION_EDIT and no Organization-members privilege with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
       // Create person for member
@@ -271,11 +269,10 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
         method: 'DELETE',
-        body: [createdPerson.id]
+        body: [createdPerson.id],
+        failOnStatusCode: false
       }).then(response => {
-        expect(response.status).to.eq(203);
-        expect(response.body.members).to.contain(createdPerson.id);
-        expect(response.headers['warning']).to.contain('members');
+        expect(response.status).to.eq(403);
       });
     });
 
@@ -328,7 +325,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should fail with ORGANIZATION_EDIT and no Organization-members privilege with 203', () => {
+    it('should fail with ORGANIZATION_EDIT and no Organization-members privilege with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
       // Create person for member
@@ -350,11 +347,10 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
         method: 'PATCH',
-        body: [createdPerson.id]
+        body: [createdPerson.id],
+        failOnStatusCode: false
       }).then(response => {
-        expect(response.status).to.eq(203);
-        expect(response.body.members).to.not.contain(createdPerson.id);
-        expect(response.headers['warning']).to.contain('members');
+        expect(response.status).to.eq(403);
       });
     });
 
@@ -402,7 +398,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should fail with ORGANIZATION_EDIT and not Organization-subordinateOrganizations privilege with 203', () => {
+    it('should fail with ORGANIZATION_EDIT and not Organization-subordinateOrganizations privilege with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
       // Create org for subordinate
@@ -422,11 +418,10 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'PATCH',
-        body: [createdSubOrg.id]
+        body: [createdSubOrg.id],
+        failOnStatusCode: false
       }).then(response => {
-        expect(response.status).to.eq(203);
-        expect(response.body.subordinateOrganizations).to.not.contain(createdSubOrg.id);
-        expect(response.headers['warning']).to.contain('subordinateOrganizations');
+        expect(response.status).to.eq(403);
       });
     });
 
@@ -479,7 +474,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should fail with ORGANIZATION_EDIT and not Organization-subordinateOrganizations privilege with 203', () => {
+    it('should fail with ORGANIZATION_EDIT and not Organization-subordinateOrganizations privilege with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
       // Create org for subordinate
@@ -491,29 +486,22 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       // Create org
       const createdOrg = {
-        id: UtilityFunctions.uuidv4()
+        id: UtilityFunctions.uuidv4(),
+        subordinateOrganizations: [createdSubOrg.id]
       };
       orgIdsToDelete.add(createdOrg.id);
-      OrgSetupFunctions.createOrganization(createdOrg);
-
-      // Add sub org
-      cy.request({
-        url: `${organizationUrl}/${createdOrg.id}/subordinates`,
-        method: 'PATCH',
-        body: [createdSubOrg.id]
-      }).then(response => {
-        expect(response.status).to.eq(200);
-        expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
-      });
+      OrgSetupFunctions.createOrganization(createdOrg)
+        .then(response => {
+          expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
+        });
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'DELETE',
-        body: [createdSubOrg.id]
+        body: [createdSubOrg.id],
+        failOnStatusCode: false
       }).then(response => {
-        expect(response.status).to.eq(203);
-        expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
-        expect(response.headers['warning']).to.contain('subordinateOrganizations');
+        expect(response.status).to.eq(403);
       });
     });
 
@@ -529,20 +517,14 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       // Create org
       const createdOrg = {
-        id: UtilityFunctions.uuidv4()
+        id: UtilityFunctions.uuidv4(),
+        subordinateOrganizations: [createdSubOrg.id]
       };
       orgIdsToDelete.add(createdOrg.id);
-      OrgSetupFunctions.createOrganization(createdOrg);
-
-      // Add sub org
-      cy.request({
-        url: `${organizationUrl}/${createdOrg.id}/subordinates`,
-        method: 'PATCH',
-        body: [createdSubOrg.id]
-      }).then(response => {
-        expect(response.status).to.eq(200);
-        expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
-      });
+      OrgSetupFunctions.createOrganization(createdOrg)
+        .then(response => {
+          expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
+        });
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
