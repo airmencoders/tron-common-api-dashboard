@@ -1,12 +1,12 @@
 import { IconProps } from './IconProps';
 
-function MetricIcon(props: IconProps) {
+function SearchIcon(props: IconProps) {
   return (
-      <i className={`metric-icon bi bi-bar-chart-line ${props.className}`}
+      <i className={`search-icon bi bi-search ${props.className}`}
          style={{fontSize: `${props.size}rem`}}
-         title={ props.iconTitle != null ? props.iconTitle : 'metric'}
+         title={ props.iconTitle != null ? props.iconTitle : 'search'}
       ></i>
   );
 }
 
-export default MetricIcon;
+export default SearchIcon;
