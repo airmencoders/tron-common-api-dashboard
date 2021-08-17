@@ -44,6 +44,7 @@ describe('Organization API Member DELETE', () => {
       });
     orgIdsToDelete.add(orgA.id);
 
+    // Delete personA from orgA
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/members`,
       method: 'DELETE',

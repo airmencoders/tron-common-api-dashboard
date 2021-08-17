@@ -50,7 +50,7 @@ $required-input: #b50909;
 .icon-disabled-color {
   color: $disabled;
 }
-
+$add-action-green: color('green-30v');
 .plus-icon-color {
-  color: color('green-30v');
+  color: $add-action-green;
 }

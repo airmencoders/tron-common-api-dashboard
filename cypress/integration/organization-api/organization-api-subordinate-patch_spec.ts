@@ -1,10 +1,11 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { appClientHostOrganizationUrl, organizationUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../support/cleanup-helper';
+import AppClientSetupFunctions from '../../support/app-client-setup-functions';
 
 describe('Organization API Subordinate PATCH', () => {
   beforeEach(() => {
@@ -37,6 +38,7 @@ describe('Organization API Subordinate PATCH', () => {
     OrgSetupFunctions.createOrganization(orgC)
     orgIdsToDelete.add(orgC.id);
 
+    // PATCH to add subordinate orgs
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
       method: 'PATCH',
@@ -127,7 +129,6 @@ describe('Organization API Subordinate PATCH', () => {
     });
 
     // createdSubOrg should still have initialParentOrg as parent
-
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdSubOrg.id}`,
       method: 'GET'

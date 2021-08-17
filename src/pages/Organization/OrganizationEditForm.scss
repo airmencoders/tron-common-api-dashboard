@@ -4,7 +4,9 @@
   &__input-actions {
     display: flex;
     align-items: center;
-
+    position: relative;
+    top: 3px;
+    float: right;
     .input-actions {
       &__icon-btn {
         margin: 0 0 0 units(1);
@@ -18,14 +20,23 @@
     .tron-text-input-delete {
       flex: 1 1;
     }
-    
+
     &--grid {
       display: inline-flex;
       .input-actions {
         &__icon-btn {
-          margin: 0 0 0 units(0.5);
+          margin: 0 units(1) 0 units(0.5);
         }
       }
+    }
+  }
+
+  .add-action {
+    border: 1px solid $add-action-green;
+    border-radius: 3px;
+    :hover {
+      background-color: $add-action-green;
+      color: white;
     }
   }
 }

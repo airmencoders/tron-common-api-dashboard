@@ -5,8 +5,16 @@ import './FormGroup.scss';
 
 function FormGroup(props: FormGroupProps) {
   return (
-      <>
-        <Label required={props.required} htmlFor={props.labelName}>{props.labelText}</Label>
+      <div className={`${props.className ?? ''} form-group`}>
+        <div className="form-group__label">
+          <Label required={props.required} htmlFor={props.labelName}>{props.labelText}</Label>
+          {
+            props.actionsNode  &&
+            <div className="form-group__actions">
+              { props.actionsNode }
+            </div>
+          }
+        </div>
         {props.children}
         {props.isError &&
           <ul className="validation">
@@ -17,7 +25,7 @@ function FormGroup(props: FormGroupProps) {
             }
           </ul>
         }
-      </>
+      </div>
   );
 }
 

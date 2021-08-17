@@ -1,26 +1,28 @@
 
-.success-error-message {
-
+.scratch-storage-add-form {
+  width: 400px;
+  .success-error-message {
     .success-container {
       &__validation-error {
         color: red;
       }
-  
+
       &__successful-operation {
         color: green;
         margin: 0;
       }
-  
+
       &__close {
         margin: 0;
       }
     }
-  
+
     &__success-container {
       display: flex;
       align-items: center;
       justify-content: space-between;
-  
+
     }
   }
-  
+}
+

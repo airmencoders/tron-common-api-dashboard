@@ -1,5 +1,5 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { fireEvent, render } from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto, UniqueVisitorCountDtoVisitorTypeEnum } from '../../../openapi';
 import KpiService from '../../../state/kpi/kpi-service';

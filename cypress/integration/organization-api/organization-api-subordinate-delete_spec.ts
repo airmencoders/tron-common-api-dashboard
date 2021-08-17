@@ -1,10 +1,11 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { appClientHostOrganizationUrl, organizationUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../support/cleanup-helper';
+import AppClientSetupFunctions from '../../support/app-client-setup-functions';
 
 describe('Organization API Subordinate DELETE', () => {
   beforeEach(() => {
@@ -50,6 +51,7 @@ describe('Organization API Subordinate DELETE', () => {
       });
     orgIdsToDelete.add(orgC.id);
 
+    // Send request to delete only orgA
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
       method: 'DELETE',

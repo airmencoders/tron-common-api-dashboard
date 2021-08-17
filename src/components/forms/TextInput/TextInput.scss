@@ -22,21 +22,27 @@
 
   .tron-text-input__input-container {
     width: 100%;
-    
+
     &--delete {
       position: relative;
-  
+
       input[type="text"] {
         margin-top: 0;
         padding-right: 30px;
       }
-  
+
       button[type="button"] {
         position: absolute;
         top: 0;
-        right: 0;
+        right: 4px;
         margin: 0;
         height: 100%;
+        .remove-icon-color {
+          color: $font-color-lighter;
+          &:hover {
+            color: $error;
+          }
+        }
       }
     }
   }
