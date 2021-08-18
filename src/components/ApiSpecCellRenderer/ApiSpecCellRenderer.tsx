@@ -27,7 +27,7 @@ function ApiSpecCellRenderer(props: Partial<ICellRendererParams> & ApiSpecCellRe
 
   return (
     <div className="api-spec-cell-renderer">
-        <Button type="button" onClick={() => download(props.data)} unstyled className="api-spec-cell-renderer__btn no-bg-button" disableMobileFullWidth data-testid="api-spec-btn-cell-renderer">
+        <Button type="button" onClick={() => download(props.data)} unstyled className="api-spec-cell-renderer__btn" disableMobileFullWidth transparentBackground data-testid="api-spec-btn-cell-renderer">
           <DownloadIcon iconTitle={'api-spec-download'} size={showAsText ? 1 : 1.25} />
         </Button>
       {(showAsText) ? <a data-testid="api-spec-link-cell-renderer" onClick={() => download(props.data)}>{" "+ props.value}</a> : ''}

@@ -9,7 +9,7 @@ import './SubmitActions.scss';
 function SubmitActions(props: SubmitActionsProps) {
   return (
       <div className="submit-actions button-container">
-        <Button type="button" onClick={props.onCancel} className="no-bg-button" unstyled>Cancel</Button>
+        <Button type="button" onClick={props.onCancel} transparentBackground unstyled>Cancel</Button>
         <Button
             type="submit"
             className="button-container__submit"

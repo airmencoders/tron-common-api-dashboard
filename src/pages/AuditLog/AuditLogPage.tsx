@@ -247,7 +247,7 @@ function AuditLogPage() {
         <div className="search-actions button-container">
           <Button
             type="button"
-            className="no-bg-button"
+            transparentBackground
             unstyled
             onClick={() => resetSearch()}>
               Reset Search
