@@ -7,7 +7,7 @@ import {ValidateFunction} from 'ajv';
 import TypeValidation from '../../utils/TypeValidation/type-validation';
 import ModelTypes from '../../api/model-types.json';
 import isEqual from 'fast-deep-equal';
-import { createJsonPatchOp, getDataItemDuplicates, getDataItemNonDuplicates, mapDataItemsToStringIds, mergeDataToState, prepareDataCrudErrorResponse, wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
+import { createJsonPatchOp, getDataItemDuplicates, getDataItemNonDuplicates, mapDataItemsToStringIds, mergeDataToState, wrapDataCrudWrappedRequest } from '../data-service/data-service-utils';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -339,6 +339,10 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   async sendCreate(toCreate: OrganizationDtoWithDetails): Promise<OrganizationDto> {
     const toCreateDto: OrganizationDto = this.convertOrgDetailsToDto(toCreate);
 
+    if (!this.validate(toCreateDto)) {
+      throw TypeValidation.validationError('OrganizationDto');
+    }
+
     try {
       const orgResponse = await this.orgApi.createOrganization(toCreateDto);
 
@@ -609,15 +613,19 @@ export default class OrganizationService extends AbstractDataService<Organizatio
   }
 
   async sendDelete(toDelete: OrganizationDtoWithDetails): Promise<void> {
+    if (toDelete.id == null) {
+      throw new Error('Organization to delete has undefined id.');
+    }
+
     try {
-      const orgResponse = await this.orgApi.deleteOrganization(toDelete.id || '');
+      const orgResponse = await this.orgApi.deleteOrganization(toDelete.id);
 
       this.state.find(item => item.id.get() === toDelete.id)?.set(none);
 
       return orgResponse.data;
     }
     catch (error) {
-      return error;
+      return Promise.reject(error);
     }
   }
 }
