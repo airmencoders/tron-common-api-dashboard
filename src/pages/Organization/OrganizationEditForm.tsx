@@ -608,7 +608,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                   disabled={organizationMembersForRemoval.get().length === 0}
                   onClick={removeMembers}
                   unstyled
-                  transparentBackground
+                  transparentOnDisabled
                   className="input-actions__icon-btn"
                 >
                   <RemoveIcon iconTitle="Remove Selected Members" disabled={organizationMembersForRemoval.get().length === 0} size={1.5} />
@@ -650,7 +650,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
                   disabled={organizationSubOrgsForRemoval.get().length === 0}
                   onClick={removeSubOrgs}
                   unstyled
-                  transparentBackground
+                  transparentOnDisabled
                   className="input-actions__icon-btn"
                 >
                   <RemoveIcon iconTitle="Remove Selected Sub Orgs" disabled={organizationSubOrgsForRemoval.get().length === 0} size={1.5} />

@@ -19,7 +19,7 @@ function TextInput({ appendedText, deleteButtonTitle, onDeleteClickHandler, with
             type="button"
             onClick={onDeleteClickHandler}
             unstyled
-            transparentBackground
+            transparentOnDisabled
             className="tron-text-input-delete__delete-btn"
           >
             <CloseIcon iconTitle={deleteButtonTitle ?? 'Remove'} size={1.5} className="delete-btn__icon remove-icon-color" />
