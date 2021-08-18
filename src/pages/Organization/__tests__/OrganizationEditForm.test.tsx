@@ -208,80 +208,7 @@ it('should set formState for orgType', async () => {
   );
 });
 
-it('should allow to choose parent', async () => {
-  const form = render(
-    <OrganizationEditForm
-      data={testValidOrganization}
-      formErrors={{}}
-      onSubmit={() => { }}
-      onPatch={onPatch}
-      onClose={() => { }}
-      isSubmitting={false}
-      formActionType={FormActionType.UPDATE}
-    />
-  );
-
-  jest.spyOn(organizationApi, 'filterOrganizations').mockImplementation(() => {
-    return Promise.resolve({
-      data: {
-        data: [
-          existingOrg
-        ],
-        pagination: {
-
-        }
-      },
-      status: 200,
-      headers: {},
-      config: {},
-      statusText: 'OK'
-    });
-  });
-
-  const parentBtn = form.getByTestId('change-org-parent__btn');
-  fireEvent.click(parentBtn);
-
-  await waitFor(
-    () => {
-      expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
-    }
-  );
-
-  // Find checkbox
-  const orgRow = await form.findByText(new RegExp(existingOrg.name!, 'i'));
-  expect(orgRow.parentElement).toBeInTheDocument();
-  const orgRowCheckbox = orgRow.parentElement?.querySelector('.ag-checkbox-input');
-  expect(orgRowCheckbox).toBeInTheDocument();
-
-  // Check it
-  fireEvent.click(orgRowCheckbox!);
-  expect(orgRowCheckbox).toBeChecked();
-
-  // ack the dialog selection to set the parent
-  const okBtn = form.getByTestId('chooser-ok__btn');
-  await waitFor(
-    () => {
-      expect(okBtn).not.toBeDisabled();
-    }
-  );
-  expect(okBtn).not.toBeDisabled();
-  fireEvent.click(okBtn);
-
-  expect(form.getByDisplayValue(existingOrg.name!)).toBeInTheDocument();
-
-  const updateBtn = form.getByText('Update');
-  expect(updateBtn).toBeInTheDocument();
-  await waitFor(
-    () => {
-      expect(updateBtn).not.toBeDisabled();
-    }
-  );
-  fireEvent.click(updateBtn);
-  expect(onPatch).toHaveBeenCalledTimes(1);
-});
-
-
-it('should allow to remove parent', async () => {  
+it('should allow to remove parent', async () => {
   const orgWithParent: OrganizationDtoWithDetails = {
     ...testValidOrganization,
     parentOrganization: {
@@ -373,7 +300,7 @@ it('should allow to choose leader', async () => {
 
   // close dialog
   const closeCloseBtn = form.getByTestId('chooser-cancel__btn');
-  fireEvent.click(closeCloseBtn); 
+  fireEvent.click(closeCloseBtn);
 
   fireEvent.click(leaderBtn);
 
@@ -491,13 +418,13 @@ it('should allow to add new member', async () => {
   await waitFor(
     () => expect(form.getByText('Organization Members (0)')).toBeVisible()
   )
-  
+
   const memberBtn = form.getByTestId('org-add-member__btn');
   fireEvent.click(memberBtn);
 
   await waitFor(
       () => {
-          expect(form.getByTestId('chooser-ok__btn')).toBeVisible();          
+          expect(form.getByTestId('chooser-ok__btn')).toBeVisible();
       }
   );
 
