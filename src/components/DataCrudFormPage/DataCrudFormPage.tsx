@@ -444,7 +444,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                 {
                   props.allowAdd && CreateForm &&
                   <div className="add-data-container">
-                    <Button type="button" className="add-data-container__btn add-button" onClick={onAddEntityClick}>
+                    <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
                       { props.dataTypeIcon !== undefined && props.dataTypeIcon }
                       Add {props.dataTypeName}
                     </Button>
