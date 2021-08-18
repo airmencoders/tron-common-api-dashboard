@@ -13,7 +13,7 @@ function TextInput({ appendedText, deleteButtonTitle, onDeleteClickHandler, with
     <div className={`tron-text-input${appendedText ? ' tron-text-input--appended' : ''}${props.className ? (' ' + props.className) : ''}`}>
       <div className={`tron-text-input__input-container${withDelete ? ' tron-text-input__input-container--delete' : ''}`}>
         <UswdsTextInput {...props} />
-        <SearchIcon iconTitle="Search" size={1.5} />
+        {props.searchInput && <SearchIcon iconTitle="Search" size={1.5} />}
         {withDelete && hasValidValue &&
           <Button
             data-testid={deleteButtonTitle ? `${deleteButtonTitle}-btn` : undefined}
