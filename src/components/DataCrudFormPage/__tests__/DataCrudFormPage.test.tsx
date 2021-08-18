@@ -482,50 +482,6 @@ describe('Test DataCrudFormPage', () => {
     await expect(screen.findByText(updateToastMsg)).resolves.toBeInTheDocument();
   });
 
-  it('test delete', async () => {
-    render(
-      <MemoryRouter>
-        <ToastContainer />
-        <DataCrudFormPage<TestRow, TestDto>
-          useDataState={wrappedState}
-          columns={[
-            new GridColumn({
-              field: 'id',
-              headerName: 'id'
-            }),
-            new GridColumn({
-              field: 'val',
-              headerName: 'val'
-            }),
-          ]}
-          createForm={() => <></>}
-          updateForm={() => <></>}
-          pageTitle="Test Page Title"
-          dataTypeName="Test"
-          allowEdit={false}
-          allowDelete
-          deleteComponent={DeleteComponent}
-          disableGridColumnVirtualization={true}
-        />
-      </MemoryRouter>
-    );
-
-    const removeIcon = (await screen.findByTitle('remove')).closest('button');
-    expect(removeIcon).toBeDefined();
-    if (removeIcon) fireEvent.click(removeIcon);
-
-    const deleteModal = await screen.findByText(new RegExp('Delete Confirmation', 'i'));
-    expect(deleteModal).toBeDefined();
-
-    const deleteBtnSearch = await screen.findAllByText('Delete');
-    const deleteBtn = deleteBtnSearch.find(x => x?.className?.includes('usa-button'));
-
-    if (deleteBtn) fireEvent.click(deleteBtn);
-    await waitForElementToBeRemoved(deleteModal);
-
-    await expect(screen.findByText(deleteToastMsg)).resolves.toBeInTheDocument();
-  });
-
   it('should close sidedrawer when close button clicked', async () => {
     render(
       <MemoryRouter>
