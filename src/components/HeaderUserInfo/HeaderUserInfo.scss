@@ -24,6 +24,17 @@
   &__edit {
     font-weight: 600;
   }
+  &__body {
+    padding: .75rem 1rem;
+  }
+  &__section-header {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: .5rem;
+  }
+  &__user-field {
+    margin-bottom: .5rem;
+  }
 }
 .user-info-modal .modal-component__body {
     padding: 0!important;
