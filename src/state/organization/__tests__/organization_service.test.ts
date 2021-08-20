@@ -90,8 +90,8 @@ class MockOrgApi extends OrganizationControllerApi {
   }
 
   removeSubordinateOrganization(id?: string, requestBody? : string[], options?: any)
-    : Promise<AxiosResponse<void>>{
-    return {} as Promise<AxiosResponse<void>>
+    : Promise<AxiosResponse<OrganizationDto>> {
+    return {} as Promise<AxiosResponse<OrganizationDto>>
   }
 
   addSubordinateOrganization(id?: string, requestBody? : string[], options?: any)
@@ -100,8 +100,8 @@ class MockOrgApi extends OrganizationControllerApi {
   }
 
   deleteOrganizationMember(id?: string, requestBody? : string[], options?: any)
-  : Promise<AxiosResponse<void>>{
-    return {} as Promise<AxiosResponse<void>>;
+    : Promise<AxiosResponse<OrganizationDto>> {
+    return {} as Promise<AxiosResponse<OrganizationDto>>;
   }
 
   addOrganizationMember(id?: string, requestBody? : string[], options?: any)
@@ -193,7 +193,10 @@ describe('Test OrganizationService', () => {
     const organizationService = new OrganizationService(organizationState,
       new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendCreate({ id: 'some id' } as OrganizationDtoWithDetails);
+    const response = await organizationService.sendCreate({
+      id: 'some id',
+      name: 'some org name'
+    });
     expect(response).toBeTruthy();
 
     expect(organizationState.find(i => i.id.get() === response.id)?.get()).toEqual(response);
@@ -216,7 +219,10 @@ describe('Test OrganizationService', () => {
       return Promise.reject(requestError);
     });
 
-    await expect(organizationService.sendCreate({ id: 'some id' } as OrganizationDtoWithDetails)).rejects.toEqual(requestError);
+    await expect(organizationService.sendCreate({
+      id: 'some id',
+      name: 'some org name'
+    })).rejects.toEqual(requestError);
   });
 
   it('send Update', async () => {
@@ -547,7 +553,8 @@ describe('Test OrganizationService', () => {
 
     organizationState.merge([
       {
-        id: 'some id'
+        id: 'some id',
+        name: 'some org name'
       }
     ]);
     expect(organizationState.find(i => i.id.get() === 'some id')?.get()).not.toBeUndefined();
