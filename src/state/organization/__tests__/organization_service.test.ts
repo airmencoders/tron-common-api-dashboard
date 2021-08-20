@@ -7,6 +7,7 @@ import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails } from '.
 import { ResponseType } from '../../data-service/response-type';
 import { PatchResponse } from '../../data-service/patch-response';
 import { OrganizationEditState } from '../../../pages/Organization/organization-edit-state';
+import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 
 class MockOrgApi extends OrganizationControllerApi {
   getOrganizationsWrapped(type?: "SQUADRON" | "GROUP" | "FLIGHT" | "WING" | "OTHER_USAF" | "ORGANIZATION",
@@ -151,16 +152,20 @@ describe('Test OrganizationService', () => {
     expect(response).toHaveLength(1);
   });
 
-  it('get convertRowDataToEditableData (get org details)', async () => {
-    const mockApi = new MockOrgApi();
+  it('should convert rowData(OrganizationDto) on convertRowDataToEditableData (get org details)', async () => {
     const organizationService = new OrganizationService(organizationState,
-      mockApi, organizationChooserState, personChooserState, personApi);
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
     const response = await organizationService.convertRowDataToEditableData({
       id: 'some id',
       name: 'some name'
     });
     expect(response).toBeTruthy();
+  });
+
+  it('should throw on convertRowDataToEditableData with undefined ID', async () => {
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
     // Test invalid id
     await expect(organizationService.convertRowDataToEditableData({
@@ -168,25 +173,84 @@ describe('Test OrganizationService', () => {
     })).rejects.toBeTruthy();
   });
 
-  it('send Create', async () => {
+  it('should reject on convertRowDataToEditableData when api request fails', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    const requestError = new Error('Error');
+    api.getOrganization = jest.fn(() => {
+      return Promise.reject(requestError);
+    });
+
+    await expect(organizationService.convertRowDataToEditableData({
+      id: 'some id',
+      name: 'some name'
+    })).rejects.toEqual(requestError);
+  });
+
+  it('should create an org on success sendCreate', async () => {
     const organizationService = new OrganizationService(organizationState,
       new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
     const response = await organizationService.sendCreate({ id: 'some id' } as OrganizationDtoWithDetails);
     expect(response).toBeTruthy();
+
+    expect(organizationState.find(i => i.id.get() === response.id)?.get()).toEqual(response);
   });
 
-  it('send Update', async () => {
+  it('should throw on sendCreate when fail validation OrganizationDto validation', async () => {
     const organizationService = new OrganizationService(organizationState,
       new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
-    const response = await organizationService.sendUpdate({
+    await expect(organizationService.sendCreate({ id: 123 } as unknown as OrganizationDtoWithDetails)).rejects.toBeTruthy();
+  });
+
+  it('should reject on sendCreate when api request fails', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    const requestError = new Error('Error');
+    api.createOrganization = jest.fn(() => {
+      return Promise.reject(requestError);
+    });
+
+    await expect(organizationService.sendCreate({ id: 'some id' } as OrganizationDtoWithDetails)).rejects.toEqual(requestError);
+  });
+
+  it('send Update', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    organizationState.merge([
+      {
+        id: 'some id',
+        name: 'prev name',
+        orgType: OrganizationDtoOrgTypeEnum.Group,
+        branchType: OrganizationDtoBranchTypeEnum.Usaf
+      }
+    ]);
+
+    const toUpdate = {
       id: 'some id',
       name: 'some name',
       orgType: OrganizationDtoOrgTypeEnum.Group,
       branchType: OrganizationDtoBranchTypeEnum.Usaf
-    } as OrganizationDtoWithDetails);
+    } as OrganizationDtoWithDetails;
+
+    api.jsonPatchOrganization = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse(toUpdate as OrganizationDto));
+    });
+
+    const response = await organizationService.sendUpdate(toUpdate);
     expect(response).toBeTruthy();
+
+    // Check to make sure state is updated correctly
+    const updatedOrgInState = organizationState.find(i => i.id.get() === response.id)?.get();
+    expect(updatedOrgInState).not.toBeUndefined();
+    expect(updatedOrgInState?.name).toEqual(response.name);
 
     // fail validation
     await expect(organizationService.sendUpdate({
@@ -200,6 +264,18 @@ describe('Test OrganizationService', () => {
       orgType: OrganizationDtoOrgTypeEnum.Group,
       branchType: OrganizationDtoBranchTypeEnum.Usaf
     } as OrganizationDtoWithDetails)).rejects.toBeTruthy();
+
+    // should reject on api error
+    const updateError = new Error('Error');
+    api.jsonPatchOrganization = jest.fn(() => {
+      return Promise.reject(updateError);
+    });
+    await expect(organizationService.sendUpdate({
+      id: "some id",
+      name: 'some name',
+      orgType: OrganizationDtoOrgTypeEnum.Group,
+      branchType: OrganizationDtoBranchTypeEnum.Usaf
+    } as OrganizationDtoWithDetails)).rejects.toEqual(updateError);
   });
 
   it('should remove unfriendly ag grid fields', () => {
@@ -465,12 +541,41 @@ describe('Test OrganizationService', () => {
     expect(response.type).toEqual(ResponseType.PARTIAL);
   });
 
-  it('deletes an org', async () => {
+  it('should delete an org when sendDelete succeeds', async () => {
     const organizationService = new OrganizationService(organizationState,
       new MockOrgApi(), organizationChooserState, personChooserState, personApi);
 
+    organizationState.merge([
+      {
+        id: 'some id'
+      }
+    ]);
+    expect(organizationState.find(i => i.id.get() === 'some id')?.get()).not.toBeUndefined();
+
     const response = await organizationService.sendDelete({ id: 'some id', name: 'some org' });
     expect(response).toBe(undefined);
+
+    expect(organizationState.find(i => i.id.get() === 'some id')?.get()).toBeUndefined();
+  });
+
+  it('should reject when sendDelete api request fails', async () => {
+    const api = new MockOrgApi();
+    const organizationService = new OrganizationService(organizationState,
+      api, organizationChooserState, personChooserState, personApi);
+
+    const requestError = new Error('Error');
+    api.deleteOrganization = jest.fn(() => {
+      return Promise.reject(requestError);
+    });
+
+    await expect(organizationService.sendDelete({ id: 'some id', name: 'some org' })).rejects.toEqual(requestError);
+  });
+
+  it('should throw on sendDelete when ID is not defined', async () => {
+    const organizationService = new OrganizationService(organizationState,
+      new MockOrgApi(), organizationChooserState, personChooserState, personApi);
+
+    await expect(organizationService.sendDelete({ name: 'some org' })).rejects.toEqual(new Error('Organization to delete has undefined id.'));
   });
 
   it('test fetchAndStorePaginatedData', async () => {
