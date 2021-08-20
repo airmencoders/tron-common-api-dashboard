@@ -191,9 +191,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
     });
 
     /**
-     * 
      * Handle subordinateOrganization and members serparately because these have side effects
-     * 
      */
     it('should allow with ORGANIZATION_EDIT + Organization-subordinateOrganizations & Organization-members privileges with 200', () => {
       AppClientSetupFunctions.addAndConfigureAppClient([
@@ -253,6 +251,29 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           subordinateOrganizations: [orgForSubordinate.id],
           members: [personForMember.id]
         });
+      });
+
+      // Make sure orgForSubordinate contains orgForCreate as parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${orgForSubordinate.id}`,
+        method: 'GET'
+      }).then(response => {
+        const org = response.body;
+        expect(response.status).to.eq(200);
+        expect(org.parentOrganization).to.eq(orgToCreate.id);
+      });
+
+      // Make sure personForMember actually has orgToCreate as organizationMemberships
+      cy.request({
+        url: `${personUrl}/${personForMember.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true
+        }
+      }).then(response => {
+        const person = response.body;
+        expect(response.status).to.eq(200);
+        expect(person.organizationMemberships).to.include(orgToCreate.id);
       });
     });
 
@@ -403,6 +424,18 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           expect(response.body.leader).to.eq(createdPerson.id);
         });
 
+      // Ensure createdPerson has orgA under organizationLeaderships
+      cy.request({
+        url: `${personUrl}/${createdPerson.id}`,
+        method: 'GET',
+        qs: {
+          leaderships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationLeaderships).to.include(orgA.id);
+      });
+
       // Try to delete leader
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${orgA.id}/leader`,
@@ -410,6 +443,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(200);
         expect(response.body.leader).to.eq(null);
+      });
+
+      // Ensure createPerson no longer has orgA in organizationLeaderships
+      cy.request({
+        url: `${personUrl}/${createdPerson.id}`,
+        method: 'GET',
+        qs: {
+          leaderships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationLeaderships).to.not.include(orgA.id);
+      });
+
+      // Ensure orgA no longer has a leader
+      cy.request({
+        url: `${organizationUrl}/${orgA.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        assert.notExists(response.body.leader, 'should not have a leader');
       });
     });
   });
@@ -459,6 +513,24 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(403);
       });
+
+      // subOrg should still have parentOrg as parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${subOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.parentOrganization).to.eq(parentOrg.id);
+      });
+
+      // parentOrg should still have subOrg in subordinateOrganizations
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${parentOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations).to.include(subOrg.id);
+      });
     });
 
     it('should allow with ORGANIZATION_EDIT + Organization-parentOrganization privilege with 200', () => {
@@ -492,6 +564,24 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(200);
         expect(response.body.parentOrganization).to.eq(null);
+      });
+
+      // subOrg should not have parentOrg as parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${subOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        assert.notExists(response.body.parentOrganization, 'parent organization should not exist');
+      });
+
+      // parentOrg should not have subOrg in subordinateOrganizations
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${parentOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations).to.not.include(subOrg.id);
       });
     });
   });
@@ -534,6 +624,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           expect(response.body.members).to.contain(createdPerson.id);
         });
 
+      // Try to delete members
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
         method: 'DELETE',
@@ -541,6 +632,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(403);
+      });
+
+      // Org should still have members
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.members).to.include(createdPerson.id);
+      });
+
+      // Person should still be a part of org
+      cy.request({
+        url: `${personUrl}/${createdPerson.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationMemberships).to.include(createdOrg.id);
       });
     });
 
@@ -568,6 +680,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           expect(response.body.members).to.contain(createdPerson.id);
         });
 
+      // try to delete
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
         method: 'DELETE',
@@ -575,6 +688,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(200);
         expect(response.body.members).to.not.contain(createdPerson.id);
+      });
+
+      // Org should no longer have members
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.members).to.not.include(createdPerson.id);
+      });
+
+      // Person should not be a part of org
+      cy.request({
+        url: `${personUrl}/${createdPerson.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationMemberships).to.not.include(createdOrg.id);
       });
     });
   });
@@ -620,6 +754,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(403);
       });
+
+      // Org should no not have members
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.members).to.not.include(createdPerson.id);
+      });
+
+      // Person should not be a part of org
+      cy.request({
+        url: `${personUrl}/${createdPerson.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationMemberships).to.not.include(createdOrg.id);
+      });
     });
 
     it('should allow with ORGANIZATION_EDIT + Organization-members privilege with 200', () => {
@@ -648,6 +803,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(200);
         expect(response.body.members).to.contain(createdPerson.id);
+      });
+
+      // Org should have members
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.members).to.include(createdPerson.id);
+      });
+
+      // Person should be a part of org
+      cy.request({
+        url: `${personUrl}/${createdPerson.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationMemberships).to.include(createdOrg.id);
       });
     });
   });
@@ -683,6 +859,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       orgIdsToDelete.add(createdOrg.id);
       OrgSetupFunctions.createOrganization(createdOrg);
 
+      // try to add subordinate
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'PATCH',
@@ -691,17 +868,35 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(403);
       });
+
+      // Org should not have any subordinates
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations).to.not.include(createdSubOrg.id);
+      });
+
+      // sub org should not have a parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdSubOrg.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        assert.notExists(response.body.parentOrganization, 'should not have a parent');
+      });
     });
 
     it('should allow with ORGANIZATION_EDIT + Organization-subordinateOrganizations privilege with 200', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT', 'Organization-subordinateOrganizations']);
 
       // Create org for subordinate
-      const createdSubOrg = {
+      const createdSubOrgA = {
         id: UtilityFunctions.uuidv4()
       };
-      orgIdsToDelete.add(createdSubOrg.id);
-      OrgSetupFunctions.createOrganization(createdSubOrg);
+      orgIdsToDelete.add(createdSubOrgA.id);
+      OrgSetupFunctions.createOrganization(createdSubOrgA);
 
       // Create org for subordinate
       const createdSubOrgB = {
@@ -717,13 +912,41 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       orgIdsToDelete.add(createdOrg.id);
       OrgSetupFunctions.createOrganization(createdOrg);
 
+      // try to add a, b subordinates
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'PATCH',
-        body: [createdSubOrg.id, createdSubOrgB.id]
+        body: [createdSubOrgA.id, createdSubOrgB.id]
       }).then(response => {
         expect(response.status).to.eq(200);
-        expect(response.body.subordinateOrganizations).to.contain.members([createdSubOrg.id, createdSubOrgB.id])
+        expect(response.body.subordinateOrganizations).to.contain.members([createdSubOrgA.id, createdSubOrgB.id])
+      });
+
+      // Org should have a, b subordinates
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET',
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations).include.members([createdSubOrgB.id, createdSubOrgA.id]);
+      });
+
+      // sub org a should have a parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdSubOrgA.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.parentOrganization).to.eq(createdOrg.id);
+      });
+
+      // sub org b should have a parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdSubOrgB.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.parentOrganization).to.eq(createdOrg.id);
       });
     });
   });
@@ -763,6 +986,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
         });
 
+      // try to delete subordinates
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'DELETE',
@@ -770,6 +994,24 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(403);
+      });
+
+      // sub org should still have parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdSubOrg.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.parentOrganization).to.eq(createdOrg.id);
+      });
+
+      // parent org should still have suborg
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations).to.include(createdSubOrg.id);
       });
     });
 
@@ -794,6 +1036,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           expect(response.body.subordinateOrganizations).to.contain(createdSubOrg.id);
         });
 
+      // try to delete
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
         method: 'DELETE',
@@ -801,6 +1044,24 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }).then(response => {
         expect(response.status).to.eq(200);
         expect(response.body.subordinateOrganizations).to.not.contain(createdSubOrg.id);
+      });
+
+      // sub org should no longer have parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdSubOrg.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        assert.notExists(response.body.parentOrganization, 'should not have parent');
+      });
+
+      // parent org should not have suborg
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${createdOrg.id}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations).not.to.include(createdSubOrg.id);
       });
     });
   });
@@ -885,6 +1146,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         expect(response.body.leader).to.not.eq(patchOrgDetails.leader);
       });
 
+      // ensure leader does not have organizationLeadership
+      cy.request({
+        url: `${personUrl}/${patchOrgDetails.leader}`,
+        method: 'GET',
+        qs: {
+          leaderships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationLeaderships, 'the patched leader should not organization leaderships').to.not.include(patchOrgDetails.id);
+      });
+
+      // ensure parent org does not have subordinate
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${patchOrgDetails.parentOrganization}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations, 'the patched parent org should not have subordinates').to.not.include(patchOrgDetails.id);
+      });
+
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT', 'Organization-leader', 'Organization-name', 'Organization-parentOrganization', 'Organization-orgType', 'Organization-branchType']);
 
       // Try to patch with all privileges
@@ -908,6 +1190,27 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         expect(response.body.parentOrganization).to.eq(patchOrgDetails.parentOrganization);
         expect(response.body.name).to.eq(patchOrgDetails.name);
         expect(response.body.leader).to.eq(patchOrgDetails.leader);
+      });
+
+      // ensure leader has organizationLeadership
+      cy.request({
+        url: `${personUrl}/${patchOrgDetails.leader}`,
+        method: 'GET',
+        qs: {
+          leaderships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationLeaderships, 'the patched leader should include organization leaderships').to.include(patchOrgDetails.id);
+      });
+
+      // ensure parent org has subordinate
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${patchOrgDetails.parentOrganization}`,
+        method: 'GET'
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.subordinateOrganizations, 'the patched parent org should have subordinates').to.include(patchOrgDetails.id);
       });
     });
   });

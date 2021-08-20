@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { organizationUrl, personUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -58,6 +58,18 @@ describe('Organization API Leader DELETE', () => {
     }).then(response => {
       expect(response.status).to.eq(200);
       assert.notExists(response.body.leader, 'Leader should not exist');
+    });
+
+    // Ensure person no longer has organization leaderships
+    cy.request({
+      url: `${personUrl}/${personA.id}`,
+      method: 'GET',
+      qs: {
+        leaderships: true
+      }
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.organizationLeaderships, 'person should not have any organization leaderships').to.not.include(orgA.id);
     });
   });
 

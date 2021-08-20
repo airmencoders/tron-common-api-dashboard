@@ -5,6 +5,7 @@ import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete, personIdsToDelete } from '../../support/cleanup-helper';
+import PersonSetupFunctions from '../../support/person-setup-functions';
 
 describe('Organization API Update', () => {
   beforeEach(() => {
@@ -17,54 +18,26 @@ describe('Organization API Update', () => {
 
   it('should allow organization update through PATCH', () => {
     // Create org for parent
-    const createdOrgParentId = UtilityFunctions.uuidv4();
-    orgIdsToDelete.add(createdOrgParentId);
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}`,
-      method: 'POST',
-      body: {
-        ...OrgSetupFunctions.generateBaseOrg(),
-        id: createdOrgParentId
-      }
-    }).then(response => {
-      expect(response.status).to.eq(201);
-    });
+    const createdOrgParent = OrgSetupFunctions.generateBaseOrg();
+    orgIdsToDelete.add(createdOrgParent.id);
+    OrgSetupFunctions.createOrganization(createdOrgParent);
 
     // Create person for Leader
-    const createdLeaderId = UtilityFunctions.uuidv4();
-    personIdsToDelete.add(createdLeaderId);
-    cy.request<PersonDto>({
-      url: `${personUrl}`,
-      method: 'POST',
-      body: {
-        id: createdLeaderId,
-        firstName: UtilityFunctions.generateRandomString()
-      }
-    }).then(response => {
-      expect(response.status).to.eq(201);
-    });
+    const createdLeader = PersonSetupFunctions.generateBasePerson();
+    personIdsToDelete.add(createdLeader.id);
+    PersonSetupFunctions.createPerson(createdLeader);
 
     // Create org to patch
-    const createdPatchOrg = {
-      ...OrgSetupFunctions.generateBaseOrg(),
-    }
+    const createdPatchOrg = OrgSetupFunctions.generateBaseOrg();
     orgIdsToDelete.add(createdPatchOrg.id);
-    cy.request({
-      url: `${organizationUrl}`,
-      method: 'POST',
-      body: {
-        ...createdPatchOrg
-      }
-    }).then(response => {
-      expect(response.status).to.eq(201);
-    });
+    OrgSetupFunctions.createOrganization(createdPatchOrg);
 
     // Try to patch
     const createdPatchOrgNew = {
       ...createdPatchOrg,
-      leader: createdLeaderId,
+      leader: createdLeader.id,
       name: UtilityFunctions.generateRandomString(),
-      parentOrganization: createdOrgParentId,
+      parentOrganization: createdOrgParent.id,
       orgType: OrganizationDtoOrgTypeEnum.Flight,
       branchType: OrganizationDtoBranchTypeEnum.Ussf
     };
@@ -88,6 +61,27 @@ describe('Organization API Update', () => {
       expect(response.body.parentOrganization).to.eq(createdPatchOrgNew.parentOrganization);
       expect(response.body.name).to.eq(createdPatchOrgNew.name);
       expect(response.body.leader).to.eq(createdPatchOrgNew.leader);
+    });
+
+    // Ensure Parent org has subordinate
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${createdPatchOrgNew.parentOrganization}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.subordinateOrganizations, 'parent org should have subordinates').to.include(createdPatchOrgNew.id);
+    });
+
+    // Ensure Leader has organization leaderships
+    cy.request({
+      url: `${personUrl}/${createdPatchOrgNew.leader}`,
+      method: 'GET',
+      qs: {
+        leaderships: true
+      }
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.organizationLeaderships, 'leader should have organization leaderships').to.include(createdPatchOrgNew.id);
     });
 
     // Try to undo the patch
