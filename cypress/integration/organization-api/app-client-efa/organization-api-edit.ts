@@ -1,5 +1,5 @@
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../../src/openapi';
-import { appClientHostOrganizationUrl, personUrl } from '../../../support';
+import { appClientHostOrganizationUrl, organizationUrl, personUrl } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete, personIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -31,36 +31,304 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       });
     });
 
-    it('should allow with ORGANIZATION_EDIT + Organization-name privilege with 200', () => {
-      AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT', 'Organization-name']);
+    it('should fail with ORGANIZATION_EDIT and not Organization-* privileges with 203', () => {
+      AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
-      OrgSetupFunctions.createOrganization()
+      const personForLeader = {
+        ...PersonSetupFunctions.generateBasePerson()
+      };
+      personIdsToDelete.add(personForLeader.id);
+      PersonSetupFunctions.createPerson(personForLeader);
+
+      const orgForParent = {
+        ...OrgSetupFunctions.generateBaseOrg()
+      };
+      orgIdsToDelete.add(orgForParent.id);
+      OrgSetupFunctions.createOrganization(orgForParent);
+
+      const orgToCreate = {
+        ...OrgSetupFunctions.generateBaseOrg()
+      };
+      OrgSetupFunctions.createOrganization(orgToCreate)
         .then(postResponse => {
           const createdOrg = postResponse.body;
           orgIdsToDelete.add(createdOrg.id);
           expect(postResponse.status).to.eq(201);
-
-          // Try to replace the org
-          cy.request({
-            url: `${appClientHostOrganizationUrl}/${createdOrg.id}`,
-            method: 'PUT',
-            body: {
-              ...createdOrg,
-              name: 'New Org Name'
-            }
-          }).then(putResponse => {
-            const updatedOrg = putResponse.body;
-            expect(putResponse.status).to.eq(200);
-            expect(updatedOrg).to.deep.eq({
-              ...createdOrg,
-              name: 'New Org Name',
-              leader: null,
-              members: [],
-              parentOrganization: null,
-              subordinateOrganizations: []
-            });
-          });
         });
+
+      // Try to replace the org
+      // Should get back denied fields for name, leader, parentOrganization, orgType, branchType
+      cy.request({
+        url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        method: 'PUT',
+        body: {
+          ...orgToCreate,
+          name: UtilityFunctions.generateRandomString(),
+          leader: personForLeader.id,
+          parentOrganization: orgForParent.id,
+          orgType: OrganizationDtoOrgTypeEnum.Flight,
+          branchType: OrganizationDtoBranchTypeEnum.Usn,
+          pas: '123'
+        }
+      }).then(putResponse => {
+        const updatedOrg = putResponse.body;
+        expect(putResponse.status).to.eq(203);
+        expect(putResponse.headers['warning']).to.contain('leader');
+        expect(putResponse.headers['warning']).to.contain('name');
+        expect(putResponse.headers['warning']).to.contain('parentOrganization');
+        expect(putResponse.headers['warning']).to.contain('orgType');
+        expect(putResponse.headers['warning']).to.contain('branchType');
+        expect(putResponse.headers['warning']).to.contain('metadata');
+        expect(updatedOrg).to.deep.eq({
+          ...orgToCreate
+        });
+      });
+
+      // Get the new entity again just to make sure
+      cy.request({
+        url: `${organizationUrl}/${orgToCreate.id}`,
+        method: 'GET'
+      }).then(response => {
+        const updatedOrg = response.body;
+        expect(response.status).to.eq(200);
+        expect(updatedOrg).to.deep.eq({
+          ...orgToCreate
+        });
+      });
+
+      // Make sure orgForParent does not contain orgToCreate as child
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${orgForParent.id}`,
+        method: 'GET'
+      }).then(response => {
+        const org = response.body;
+        expect(response.status).to.eq(200);
+        expect(org.subordinateOrganizations).not.to.include(orgToCreate.id);
+      });
+
+      // Make sure personForLeader does not contain organizationLeaderships or organizationMemberships
+      cy.request({
+        url: `${personUrl}/${personForLeader.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true,
+          leaderships: true
+        }
+      }).then(response => {
+        const person = response.body;
+        expect(response.status).to.eq(200);
+        expect(person.organizationMemberships).not.to.include(orgToCreate.id);
+        expect(person.organizationLeaderships).not.to.include(orgToCreate.id);
+      });
+    });
+
+    it('should allow with ORGANIZATION_EDIT + Organization-* privileges with 200', () => {
+      AppClientSetupFunctions.addAndConfigureAppClient([
+        'ORGANIZATION_EDIT',
+        'Organization-name',
+        'Organization-leader',
+        'Organization-parentOrganization',
+        'Organization-orgType',
+        'Organization-branchType',
+        'Organization-metadata'
+      ]);
+
+      const orgToCreate = OrgSetupFunctions.generateBaseOrg();
+      orgIdsToDelete.add(orgToCreate.id);
+      OrgSetupFunctions.createOrganization(orgToCreate)
+        .then(postResponse => {
+          const createdOrg = postResponse.body;
+          orgIdsToDelete.add(createdOrg.id);
+          expect(postResponse.status).to.eq(201);
+        });
+
+      const personForLeader = {
+        ...PersonSetupFunctions.generateBasePerson()
+      };
+      personIdsToDelete.add(personForLeader.id);
+      PersonSetupFunctions.createPerson(personForLeader);
+
+      const orgForParent = {
+        ...OrgSetupFunctions.generateBaseOrg()
+      };
+      orgIdsToDelete.add(orgForParent.id);
+      OrgSetupFunctions.createOrganization(orgForParent);
+      // Try to replace the org
+      const replacedOrg = {
+        ...orgToCreate,
+        name: UtilityFunctions.generateRandomString(),
+        leader: personForLeader.id,
+        parentOrganization: orgForParent.id,
+        orgType: OrganizationDtoOrgTypeEnum.Flight,
+        branchType: OrganizationDtoBranchTypeEnum.Usn,
+        pas: '123'
+      }
+      cy.request({
+        url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        method: 'PUT',
+        body: {
+          ...replacedOrg
+        }
+      }).then(putResponse => {
+        const updatedOrg = putResponse.body;
+        expect(putResponse.status).to.eq(200);
+        expect(updatedOrg).to.deep.eq({
+          ...replacedOrg
+        });
+      });
+
+      // Ensure a GET request for the org also returns correctly
+      cy.request({
+        url: `${organizationUrl}/${orgToCreate.id}`,
+        method: 'GET'
+      }).then(response => {
+        const org = response.body;
+        expect(response.status).to.eq(200);
+        expect(org).to.deep.eq({
+          ...replacedOrg
+        });
+      });
+    });
+
+    /**
+     * 
+     * Handle subordinateOrganization and members serparately because these have side effects
+     * 
+     */
+    it('should allow with ORGANIZATION_EDIT + Organization-subordinateOrganizations & Organization-members privileges with 200', () => {
+      AppClientSetupFunctions.addAndConfigureAppClient([
+        'ORGANIZATION_EDIT',
+        'Organization-members',
+        'Organization-subordinateOrganizations',
+      ]);
+
+      const orgToCreate = OrgSetupFunctions.generateBaseOrg();
+      orgIdsToDelete.add(orgToCreate.id);
+      OrgSetupFunctions.createOrganization(orgToCreate)
+        .then(postResponse => {
+          const createdOrg = postResponse.body;
+          orgIdsToDelete.add(createdOrg.id);
+          expect(postResponse.status).to.eq(201);
+        });
+
+      const personForMember = {
+        ...PersonSetupFunctions.generateBasePerson()
+      };
+      personIdsToDelete.add(personForMember.id);
+      PersonSetupFunctions.createPerson(personForMember);
+
+      const orgForSubordinate = {
+        ...OrgSetupFunctions.generateBaseOrg()
+      };
+      orgIdsToDelete.add(orgForSubordinate.id);
+      OrgSetupFunctions.createOrganization(orgForSubordinate);
+
+      // Try to replace the org
+      cy.request({
+        url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        method: 'PUT',
+        body: {
+          ...orgToCreate,
+          subordinateOrganizations: [orgForSubordinate.id],
+          members: [personForMember.id]
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.deep.eq({
+          ...orgToCreate,
+          subordinateOrganizations: [orgForSubordinate.id],
+          members: [personForMember.id]
+        });
+      });
+
+      // Ensure a GET request for the org also returns correctly
+      cy.request({
+        url: `${organizationUrl}/${orgToCreate.id}`,
+        method: 'GET'
+      }).then(response => {
+        const org = response.body;
+        expect(response.status).to.eq(200);
+        expect(org).to.deep.eq({
+          ...orgToCreate,
+          subordinateOrganizations: [orgForSubordinate.id],
+          members: [personForMember.id]
+        });
+      });
+    });
+
+    it('should fail with ORGANIZATION_EDIT and not Organization-subordinateOrganizations & Organization-members privileges with 203 and no side effects should not exist', () => {
+      AppClientSetupFunctions.addAndConfigureAppClient([
+        'ORGANIZATION_EDIT'
+      ]);
+
+      const orgToCreate = OrgSetupFunctions.generateBaseOrg();
+      orgIdsToDelete.add(orgToCreate.id);
+      OrgSetupFunctions.createOrganization(orgToCreate)
+        .then(postResponse => {
+          const createdOrg = postResponse.body;
+          orgIdsToDelete.add(createdOrg.id);
+          expect(postResponse.status).to.eq(201);
+        });
+
+      const personForMember = {
+        ...PersonSetupFunctions.generateBasePerson()
+      };
+      personIdsToDelete.add(personForMember.id);
+      PersonSetupFunctions.createPerson(personForMember);
+
+      const orgForSubordinate = {
+        ...OrgSetupFunctions.generateBaseOrg()
+      };
+      orgIdsToDelete.add(orgForSubordinate.id);
+      OrgSetupFunctions.createOrganization(orgForSubordinate);
+
+      // Try to replace the org
+      cy.request({
+        url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        method: 'PUT',
+        body: {
+          ...orgToCreate,
+          subordinateOrganizations: [orgForSubordinate.id],
+          members: [personForMember.id]
+        }
+      }).then(response => {
+        expect(response.status).to.eq(203);
+        expect(response.headers['warning']).to.contain('subordinateOrganizations');
+        expect(response.headers['warning']).to.contain('members');
+      });
+
+      // Ensure a GET request for the org also returns correctly
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${orgToCreate.id}`,
+        method: 'GET'
+      }).then(response => {
+        const org = response.body;
+        expect(response.status).to.eq(200);
+        expect(org.subordinateOrganizations).not.to.include(orgForSubordinate.id);
+        expect(org.members).not.to.include(personForMember.id);
+      });
+
+      // Ensure the subordinate org does not have a parent
+      cy.request<OrganizationDto>({
+        url: `${organizationUrl}/${orgForSubordinate.id}`,
+        method: 'GET'
+      }).then(response => {
+        const org = response.body;
+        expect(response.status).to.eq(200);
+        assert.notExists(org.parentOrganization);
+      });
+
+      // Ensure the person for member does not belong to the organization
+      cy.request({
+        url: `${personUrl}/${personForMember.id}`,
+        method: 'GET',
+        qs: {
+          memberships: true
+        }
+      }).then(response => {
+        expect(response.status).to.eq(200);
+        expect(response.body.organizationMemberships).not.to.include(orgForSubordinate.id);
+      });
     });
   });
 
@@ -582,6 +850,14 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       OrgSetupFunctions.createOrganization(createdOrg);
 
       // Try to patch with no field privileges
+      const patchOrgDetails = {
+        ...createdOrg,
+        name: UtilityFunctions.generateRandomString(),
+        leader: createdLeaderId,
+        parentOrganization: createdParentOrg.id,
+        orgType: OrganizationDtoOrgTypeEnum.Flight,
+        branchType: OrganizationDtoBranchTypeEnum.Ussf
+      };
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}`,
         method: 'PATCH',
@@ -589,11 +865,11 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           "Content-Type": "application/json-patch+json"
         },
         body: [
-          { op: 'replace', path: '/leader', value: createdLeaderId },
-          { op: 'replace', path: '/name', value: 'new org name' },
-          { op: 'replace', path: '/parentOrganization', value: createdParentOrg.id },
-          { op: 'replace', path: '/orgType', value: OrganizationDtoOrgTypeEnum.Flight },
-          { op: 'replace', path: '/branchType', value: OrganizationDtoBranchTypeEnum.Ussf }
+          { op: 'replace', path: '/leader', value: patchOrgDetails.leader },
+          { op: 'replace', path: '/name', value: patchOrgDetails.name },
+          { op: 'replace', path: '/parentOrganization', value: patchOrgDetails.parentOrganization },
+          { op: 'replace', path: '/orgType', value: patchOrgDetails.orgType },
+          { op: 'replace', path: '/branchType', value: patchOrgDetails.branchType }
         ]
       }).then(response => {
         expect(response.status).to.eq(203);
@@ -602,11 +878,11 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         expect(response.headers['warning']).to.contain('parentOrganization');
         expect(response.headers['warning']).to.contain('orgType');
         expect(response.headers['warning']).to.contain('branchType');
-        expect(response.body.branchType).to.not.eq(OrganizationDtoBranchTypeEnum.Ussf);
-        expect(response.body.orgType).to.not.eq(OrganizationDtoOrgTypeEnum.Flight);
-        expect(response.body.parentOrganization).to.not.eq(createdParentOrg.id);
-        expect(response.body.name).to.not.eq('new org name');
-        expect(response.body.leader).to.not.eq(createdLeaderId);
+        expect(response.body.branchType).to.not.eq(patchOrgDetails.branchType);
+        expect(response.body.orgType).to.not.eq(patchOrgDetails.orgType);
+        expect(response.body.parentOrganization).to.not.eq(patchOrgDetails.parentOrganization);
+        expect(response.body.name).to.not.eq(patchOrgDetails.name);
+        expect(response.body.leader).to.not.eq(patchOrgDetails.leader);
       });
 
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT', 'Organization-leader', 'Organization-name', 'Organization-parentOrganization', 'Organization-orgType', 'Organization-branchType']);
@@ -619,19 +895,19 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
           "Content-Type": "application/json-patch+json"
         },
         body: [
-          { op: 'replace', path: '/leader', value: createdLeaderId },
-          { op: 'replace', path: '/name', value: 'new org name' },
-          { op: 'replace', path: '/parentOrganization', value: createdParentOrg.id },
-          { op: 'replace', path: '/orgType', value: OrganizationDtoOrgTypeEnum.Flight },
-          { op: 'replace', path: '/branchType', value: OrganizationDtoBranchTypeEnum.Ussf }
+          { op: 'replace', path: '/leader', value: patchOrgDetails.leader },
+          { op: 'replace', path: '/name', value: patchOrgDetails.name },
+          { op: 'replace', path: '/parentOrganization', value: patchOrgDetails.parentOrganization },
+          { op: 'replace', path: '/orgType', value: patchOrgDetails.orgType },
+          { op: 'replace', path: '/branchType', value: patchOrgDetails.branchType }
         ]
       }).then(response => {
         expect(response.status).to.eq(200);
-        expect(response.body.branchType).to.eq(OrganizationDtoBranchTypeEnum.Ussf);
-        expect(response.body.orgType).to.eq(OrganizationDtoOrgTypeEnum.Flight);
-        expect(response.body.parentOrganization).to.eq(createdParentOrg.id);
-        expect(response.body.name).to.eq('new org name');
-        expect(response.body.leader).to.eq(createdLeaderId);
+        expect(response.body.branchType).to.eq(patchOrgDetails.branchType);
+        expect(response.body.orgType).to.eq(patchOrgDetails.orgType);
+        expect(response.body.parentOrganization).to.eq(patchOrgDetails.parentOrganization);
+        expect(response.body.name).to.eq(patchOrgDetails.name);
+        expect(response.body.leader).to.eq(patchOrgDetails.leader);
       });
     });
   });

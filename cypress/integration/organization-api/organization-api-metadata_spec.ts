@@ -86,5 +86,27 @@ describe('Organization API Metadata', () => {
       expect(response.status).to.eq(200);
       expect(response.body.pas).to.eq('Another PAS test');
     });
+
+    // Try to update an existing PAS metadata value
+    cy.request({
+      url: `${organizationUrl}/${orgToCreate.id}`,
+      method: 'PUT',
+      body: {
+        ...orgToCreate,
+        pas: 'Updated PAS'
+      }
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.pas).to.eq('Updated PAS');
+    });
+
+    // ensure metadata actually updated
+    cy.request({
+      url: `${organizationUrl}/${orgToCreate.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.pas).to.eq('Updated PAS');
+    });
   });
 });

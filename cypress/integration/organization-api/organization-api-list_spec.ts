@@ -2,7 +2,7 @@
 
 import { organizationUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
-import { OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper } from '../../../src/openapi';
+import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete, personIdsToDelete } from '../../support/cleanup-helper';
 import PersonSetupFunctions from '../../support/person-setup-functions';
@@ -201,13 +201,6 @@ describe('Organization API List', () => {
     OrgSetupFunctions.createOrganization(orgA);
     orgIdsToDelete.add(orgA.id);
 
-    const orgB = {
-      id: UtilityFunctions.uuidv4(),
-      name: "B" + UtilityFunctions.generateRandomString(),
-    };
-    OrgSetupFunctions.createOrganization(orgB);
-    orgIdsToDelete.add(orgB.id);
-
     const orgC = {
       id: UtilityFunctions.uuidv4(),
       name: "C" + UtilityFunctions.generateRandomString(),
@@ -215,14 +208,44 @@ describe('Organization API List', () => {
     OrgSetupFunctions.createOrganization(orgC);
     orgIdsToDelete.add(orgC.id);
 
+    const orgB = {
+      id: UtilityFunctions.uuidv4(),
+      name: "B" + UtilityFunctions.generateRandomString(),
+    };
+    OrgSetupFunctions.createOrganization(orgB);
+    orgIdsToDelete.add(orgB.id);
+
     cy.request<OrganizationDtoPaginationResponseWrapper>({
-      url: `${organizationUrl}`,
-      method: 'GET',
+      url: `${organizationUrl}/filter`,
+      method: 'POST',
+      failOnStatusCode: false,
       qs: {
         page: 0,
         size: 10,
         sort: 'name,desc'
-      }
+      },
+      body: {
+        filterCriteria: [
+          {
+            field: 'name',
+            relationType: FilterCriteriaRelationTypeEnum.Or,
+            conditions: [
+              {
+                operator: FilterConditionOperatorEnum.Equals,
+                value: orgA.name
+              },
+              {
+                operator: FilterConditionOperatorEnum.Equals,
+                value: orgB.name
+              },
+              {
+                operator: FilterConditionOperatorEnum.Equals,
+                value: orgC.name
+              },
+            ]
+          }
+        ]
+      } as FilterDto
     }).then(response => {
       expect(response.status).to.eq(200);
       assert.exists(response.body.pagination, 'pagination does not exist');
@@ -230,7 +253,7 @@ describe('Organization API List', () => {
       expect(data.length).to.be.gte(3);
       let isSorted = true;
       for (let i = 1; i < data.length; i++) {
-        if (data[i - 1].name < data[i].name) {
+        if (data[i - 1].name.localeCompare(data[i].name) < 0) {
           isSorted = false;
         }
       }

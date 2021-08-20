@@ -157,7 +157,8 @@ describe('Test OrganizationService', () => {
       mockApi, organizationChooserState, personChooserState, personApi);
 
     const response = await organizationService.convertRowDataToEditableData({
-      id: 'some id'
+      id: 'some id',
+      name: 'some name'
     });
     expect(response).toBeTruthy();
 
@@ -189,7 +190,8 @@ describe('Test OrganizationService', () => {
 
     // fail validation
     await expect(organizationService.sendUpdate({
-      badParam: 'bad'
+      badParam: 'bad',
+      name: 'some name'
     } as OrganizationDtoWithDetails)).rejects.toBeTruthy();
 
     // fail due to no id
@@ -231,7 +233,12 @@ describe('Test OrganizationService', () => {
       api, organizationChooserState, personChooserState, personApi);
 
     const originalMembers: PersonWithDetails[] = [{ id: '1' }];
-    const originalSubOrgs: OrgWithDetails[] = [{ id: '111' }];
+    const originalSubOrgs: OrgWithDetails[] = [
+      {
+        id: '111',
+        name: 'some name'
+      }
+    ];
 
     const original: OrganizationDtoWithDetails = {
       id: 'some id',
@@ -259,7 +266,8 @@ describe('Test OrganizationService', () => {
       parentOrg: {
         removed: false,
         newParent: {
-          id: 'new parent id'
+          id: 'new parent id',
+          name: 'new parent name'
         }
       },
       members: {
@@ -267,9 +275,9 @@ describe('Test OrganizationService', () => {
         toRemove: [{ id: originalMembers[0].id }]
       },
       subOrgs: {
-        toAdd: [{ id: 'new sub org 1' }
+        toAdd: [{ id: 'new sub org 1', name: 'new sub org name' }
         ],
-        toRemove: [{ id: originalSubOrgs[0].id }]
+        toRemove: [{ id: originalSubOrgs[0].id, name: 'sub org to remove' }]
       }
     };
 
@@ -292,7 +300,8 @@ describe('Test OrganizationService', () => {
         id: 'leader id'
       },
       parentOrganization: {
-        id: 'parent org id'
+        id: 'parent org id',
+        name: 'parent org'
       }
     };
 
@@ -315,7 +324,7 @@ describe('Test OrganizationService', () => {
         toRemove: []
       },
       subOrgs: {
-        toAdd: [{ id: 'new sub org 1' }
+        toAdd: [{ id: 'new sub org 1', name: 'sub org to add' }
         ],
         toRemove: []
       }
@@ -364,7 +373,8 @@ describe('Test OrganizationService', () => {
         id: 'leader id'
       },
       parentOrganization: {
-        id: 'parent org id'
+        id: 'parent org id',
+        name: 'parent org'
       }
     };
 
@@ -386,7 +396,7 @@ describe('Test OrganizationService', () => {
         toRemove: []
       },
       subOrgs: {
-        toAdd: [{ id: 'new sub org 1' }
+        toAdd: [{ id: 'new sub org 1', name: 'sub org to add' }
         ],
         toRemove: []
       }
@@ -401,7 +411,7 @@ describe('Test OrganizationService', () => {
       api, organizationChooserState, personChooserState, personApi);
 
     const originalMembers: PersonWithDetails[] = [{ id: '1' }];
-    const originalSubOrgs: OrgWithDetails[] = [{ id: '111' }];
+    const originalSubOrgs: OrgWithDetails[] = [{ id: '111', name: 'original sub org' }];
 
     const original: OrganizationDtoWithDetails = {
       id: 'some id',
@@ -428,7 +438,8 @@ describe('Test OrganizationService', () => {
       parentOrg: {
         removed: false,
         newParent: {
-          id: 'new parent id'
+          id: 'new parent id',
+          name: 'new parent name'
         }
       },
       members: {
@@ -437,7 +448,7 @@ describe('Test OrganizationService', () => {
       },
       subOrgs: {
         toAdd: [],
-        toRemove: [{ id: originalSubOrgs[0].id }]
+        toRemove: [{ id: originalSubOrgs[0].id, name: 'sub org to remove' }]
       }
     };
 
@@ -667,8 +678,8 @@ describe('Test OrganizationService', () => {
         id: 'leader id'
       },
       members: [{ id: 'member id' }],
-      subordinateOrganizations: [{ id: 'sub org id' }],
-      parentOrganization: { id: 'parent org id' },
+      subordinateOrganizations: [{ id: 'sub org id', name: 'sub org name' }],
+      parentOrganization: { id: 'parent org id', name: 'parent org name' },
       orgType: OrganizationDtoOrgTypeEnum.Group,
       branchType: OrganizationDtoBranchTypeEnum.Usaf
     };

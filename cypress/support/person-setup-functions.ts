@@ -98,6 +98,7 @@ export default class PersonSetupFunctions {
 
   static generateBasePerson(): PersonDto {
     return {
+      id: UtilityFunctions.uuidv4(),
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
       firstName: 'First Name',
       middleName: 'Middle Name',
@@ -123,7 +124,7 @@ export default class PersonSetupFunctions {
    * 
    * @param org optional values to override the default values for organization creation
    */
-  static createPerson(person: Partial<PersonDto>) {
+  static createPerson(person?: Partial<PersonDto>) {
     return cy.request<PersonDto>({
       url: `${apiHost}${personApiBase}`,
       method: 'POST',

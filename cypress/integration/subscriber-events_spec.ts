@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 
 import { host, subscriptionsApiBase } from '../support';
+import AppClientSetupFunctions from '../support/app-client-setup-functions';
 import DataCrudFormPageUtil, { SubscribeEvent, Subscriber, SubscriberGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
@@ -48,32 +49,39 @@ function filterColumnWithSearchValueNoRequest(colId: string, searchValue: string
 
 describe('Subscriber Events Tests', () => {
   it('Should allow to subscribe/unsubscribe to events ', () => {
+    // Create an App Client first
+    AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ', 'PERSON_CREATE', 'PERSON_EDIT', 'PERSON_DELETE']);
+
     cy.visit(host);
 
+    // Create subscription
     UtilityFunctions.clickOnPageNav(Page.PUB_SUB);
 
     const subscriber: Subscriber = {
-      appClientName: 'puckboard',
+      appClientName: AppClientSetupFunctions.APP_CLIENT_NAME,
       subscriberAddress: `/test/${UtilityFunctions.generateRandomString()}`,
-      event: SubscribeEvent.ORGANIZATION_DELETE,
+      event: SubscribeEvent.PERSON_CHANGE,
       secret: UtilityFunctions.generateRandomString()
     };
 
     createSubscriberAndFilterExists(subscriber);
 
-    // Delete it
+    // Delete subscription
     deleteRowWithColIdContainingValue(SubscriberGridColId.SUBSCRIBER_URL, subscriber.subscriberAddress);
   });
 
   it('Should allow to edit subscribed events ', () => {
+    // Create an App Client first
+    AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ', 'PERSON_CREATE', 'PERSON_EDIT', 'PERSON_DELETE']);
+
     cy.visit(host);
 
     UtilityFunctions.clickOnPageNav(Page.PUB_SUB);
 
     const subscriber: Subscriber = {
-      appClientName: 'puckboard',
+      appClientName: AppClientSetupFunctions.APP_CLIENT_NAME,
       subscriberAddress: `/test/${UtilityFunctions.generateRandomString()}`,
-      event: SubscribeEvent.ORGANIZATION_DELETE,
+      event: SubscribeEvent.PERSON_CHANGE,
       secret: UtilityFunctions.generateRandomString()
     };
 

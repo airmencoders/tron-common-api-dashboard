@@ -1,4 +1,5 @@
 import { OrganizationDto, PersonDto } from '../../openapi';
+import { PersonWithDetails } from '../../state/organization/organization-state';
 
 export interface OrganizationEditState {
   leader: OrganizationLeaderState;
@@ -18,8 +19,8 @@ interface OrganizationParentState {
 }
 
 interface OrganizationMemberState {
-  toRemove: OrganizationDto[];
-  toAdd: OrganizationDto[];
+  toRemove: PersonWithDetails[];
+  toAdd: PersonWithDetails[];
 }
 
 interface OrganizationSubOrgState {
