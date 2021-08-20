@@ -221,4 +221,43 @@ describe('Organization API Update', () => {
       expect(response.status).to.eq(400);
     });
   });
+
+  it('should fail when modifying non-patchable fields (subordinateOrganizations / members) with 400', () => {
+    // Create org to patch
+    const createdOrg = OrgSetupFunctions.generateBaseOrg();
+    orgIdsToDelete.add(createdOrg.id);
+    OrgSetupFunctions.createOrganization(createdOrg);
+
+    // Try to patch subordinateOrganizations
+    cy.request({
+      url: `${organizationUrl}/${createdOrg.id}`,
+      method: 'PATCH',
+      headers: {
+        "Content-Type": "application/json-patch+json"
+      },
+      body: [
+        { op: 'add', path: '/subordinateOrganizations/-', value: UtilityFunctions.uuidv4() }
+      ],
+      failOnStatusCode: false
+    }).then(response => {
+      expect(response.status).to.eq(400);
+      expect(response.body.reason).to.eq('Cannot JSON Patch the field subordinateOrganizations');
+    });
+
+    // Try to patch members
+    cy.request({
+      url: `${organizationUrl}/${createdOrg.id}`,
+      method: 'PATCH',
+      headers: {
+        "Content-Type": "application/json-patch+json"
+      },
+      body: [
+        { op: 'add', path: '/members/-', value: UtilityFunctions.uuidv4() }
+      ],
+      failOnStatusCode: false
+    }).then(response => {
+      expect(response.status).to.eq(400);
+      expect(response.body.reason).to.eq('Cannot JSON Patch the field members');
+    });
+  });
 });
