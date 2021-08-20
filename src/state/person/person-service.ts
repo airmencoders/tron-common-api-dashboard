@@ -78,7 +78,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
         if (!this.filterValidate(filter)) {
           throw TypeValidation.validationError('FilterDto');
         }
-        
+
         personResponseData = await this.personApi.filterPerson(filter, undefined, undefined, page, limit, sort)
           .then(resp => {
             return resp.data.data;
@@ -149,7 +149,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
       if (sanitizedDto?.id == null) {
         return Promise.reject(new Error('Person to update has undefined id.'));
       }
-      const personResponse = await this.personApi.selfUpdatePerson(sanitizedDto.id, sanitizedDto);
+      const personResponse = await this.personApi.selfUpdatePerson(sanitizedDto);
 
       this.state.find(person => person.id.get() === personResponse.data.id)?.set(personResponse.data);
 
@@ -223,7 +223,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
   /**
    * Sanitizes a PersonDto. Will check nullable string fields and convert those to
    * null if they are blank.
-   * 
+   *
    * @param dto the dto to sanitize
    * @returns sanitized dto
    */
