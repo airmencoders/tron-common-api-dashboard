@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { organizationUrl, personUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -18,25 +18,27 @@ describe('Organization API Replace', () => {
 
   it('should allow Organization to be replaced through PUT', () => {
     // Create org for parent
-    const createdParentOrg = {
-      id: UtilityFunctions.uuidv4()
-    };
+    const createdParentOrg = OrgSetupFunctions.generateBaseOrg();
     orgIdsToDelete.add(createdParentOrg.id);
     OrgSetupFunctions.createOrganization(createdParentOrg);
 
+    // Create org for suborg
+    const createdSubOrg = OrgSetupFunctions.generateBaseOrg();
+    orgIdsToDelete.add(createdSubOrg.id);
+    OrgSetupFunctions.createOrganization(createdSubOrg);
+
     // Create person for Leader
-    const createdLeaderPerson = {
-      id: UtilityFunctions.uuidv4(),
-      firstName: UtilityFunctions.generateRandomString()
-    };
+    const createdLeaderPerson = PersonSetupFunctions.generateBasePerson();
     PersonSetupFunctions.createPerson(createdLeaderPerson);
     personIdsToDelete.add(createdLeaderPerson.id);
 
+    // Create person for member
+    const createdMemberPerson = PersonSetupFunctions.generateBasePerson();
+    PersonSetupFunctions.createPerson(createdMemberPerson);
+    personIdsToDelete.add(createdMemberPerson.id);
+
     // Create org for replacement
-    const baseOrg = {
-      ...OrgSetupFunctions.generateBaseOrg(),
-      id: UtilityFunctions.uuidv4()
-    };
+    const baseOrg = OrgSetupFunctions.generateBaseOrg();
     orgIdsToDelete.add(baseOrg.id);
     OrgSetupFunctions.createOrganization(baseOrg)
       .then(response => {
@@ -49,25 +51,74 @@ describe('Organization API Replace', () => {
       });
 
     // Replace Org and expect the new values in response
-    const newName = UtilityFunctions.generateRandomString();
+    const replacedOrg = {
+      ...baseOrg,
+      name: UtilityFunctions.generateRandomString(),
+      branchType: OrganizationDtoBranchTypeEnum.Ussf,
+      orgType: OrganizationDtoOrgTypeEnum.Flight,
+      parentOrganization: createdParentOrg.id,
+      leader: createdLeaderPerson.id,
+      members: [createdMemberPerson.id],
+      subordinateOrganizations: [createdSubOrg.id]
+    }
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${baseOrg.id}`,
       method: 'PUT',
       body: {
         ...baseOrg,
-        branchType: OrganizationDtoBranchTypeEnum.Ussf,
-        orgType: OrganizationDtoOrgTypeEnum.Flight,
-        parentOrganization: createdParentOrg.id,
-        leader: createdLeaderPerson.id,
-        name: newName
+        ...replacedOrg
       }
     }).then(response => {
       expect(response.status).to.eq(200);
-      expect(response.body.branchType).to.eq(OrganizationDtoBranchTypeEnum.Ussf);
-      expect(response.body.orgType).to.eq(OrganizationDtoOrgTypeEnum.Flight);
-      expect(response.body.parentOrganization).to.eq(createdParentOrg.id);
-      expect(response.body.name).to.eq(newName);
-      expect(response.body.leader).to.eq(createdLeaderPerson.id);
+      expect(response.body.branchType).to.eq(replacedOrg.branchType);
+      expect(response.body.orgType).to.eq(replacedOrg.orgType);
+      expect(response.body.parentOrganization).to.eq(replacedOrg.parentOrganization);
+      expect(response.body.name).to.eq(replacedOrg.name);
+      expect(response.body.leader).to.eq(replacedOrg.leader);
+      expect(response.body.members).include.members(replacedOrg.members);
+      expect(response.body.subordinateOrganizations).include.members(replacedOrg.subordinateOrganizations);
+    });
+
+    // Ensure sub org has parent
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${createdSubOrg.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.parentOrganization, 'sub org should have parent').to.eq(replacedOrg.id);
+    });
+
+    // Ensure Parent org has subordinate
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${replacedOrg.parentOrganization}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.subordinateOrganizations, 'parent org should have subordinates').to.include(replacedOrg.id);
+    });
+
+    // Ensure Leader has organization leaderships
+    cy.request({
+      url: `${personUrl}/${replacedOrg.leader}`,
+      method: 'GET',
+      qs: {
+        leaderships: true
+      }
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.organizationLeaderships, 'leader should have organization leaderships').to.include(replacedOrg.id);
+    });
+
+    // Ensure Member has organization membership
+    cy.request({
+      url: `${personUrl}/${createdMemberPerson.id}`,
+      method: 'GET',
+      qs: {
+        memberships: true
+      }
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.organizationMemberships, 'member should have organization memberships').to.include(replacedOrg.id);
     });
   });
 });

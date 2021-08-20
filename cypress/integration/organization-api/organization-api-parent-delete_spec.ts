@@ -59,6 +59,15 @@ describe('Organization API Parent DELETE', () => {
       expect(response.status).to.eq(200);
       assert.notExists(response.body.parentOrganization, 'Parent Org should not exist');
     });
+
+    // ensure parent does not have subordinate orgs
+    cy.request<OrganizationDto>({
+      url: `${organizationUrl}/${orgA.id}`,
+      method: 'GET'
+    }).then(response => {
+      expect(response.status).to.eq(200);
+      expect(response.body.subordinateOrganizations, 'Parent Org should not have subordinate orgs').to.not.include(orgB.id);
+    });
   });
 
   it('should fail delete parent with org id that does not exist', () => {

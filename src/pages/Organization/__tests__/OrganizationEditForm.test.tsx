@@ -72,7 +72,9 @@ afterEach(() => {
   existingOrg.leader = originalLeader.id;
 });
 
-const testOrganization: OrganizationDtoWithDetails = {};
+const testOrganization: OrganizationDtoWithDetails = {
+  name: ''
+};
 
 const membersSet = new Set<string>();
 membersSet.add('some id');

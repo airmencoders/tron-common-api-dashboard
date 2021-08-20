@@ -12,7 +12,7 @@ export interface PersonWithDetails {
 
 export interface OrgWithDetails {
   id?: string,
-  name?: string,
+  name: string,
 }
 
 export interface OrganizationDtoWithDetails {
@@ -21,7 +21,7 @@ export interface OrganizationDtoWithDetails {
   members?: Array<PersonWithDetails>;
   parentOrganization?: OrgWithDetails;
   subordinateOrganizations?: Array<OrgWithDetails>;
-  name?: string;
+  name: string;
   orgType?: OrganizationDtoOrgTypeEnum;
   branchType?: OrganizationDtoBranchTypeEnum;
 }

@@ -5,6 +5,7 @@ import UtilityFunctions from '../utility-functions';
 export default class OrgSetupFunctions {
   static generateBaseOrg(): OrganizationDto {
     return {
+      id: UtilityFunctions.uuidv4(),
       name: UtilityFunctions.generateRandomString(),
       orgType: OrganizationDtoOrgTypeEnum.Squadron,
       branchType: OrganizationDtoBranchTypeEnum.Usaf,
