@@ -1,12 +1,13 @@
 import React from 'react';
 
-import './InfoNotice.scss';
 import {InfoNoticeProps} from './InfoNoticeProps';
+import { Alert } from '@trussworks/react-uswds/lib/index'
+import './InfoNotice.scss';
 
 function InfoNotice(props: InfoNoticeProps) {
   return (
       <div className="info-notice">
-        <
+        <Alert {...props}>{props.children}</Alert>
       </div>
   );
 }
