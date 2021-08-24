@@ -4,7 +4,7 @@
   position: relative;
   top: calculateRem(-7px);
   &__initials {
-    $container-size: calculateRem(14px);
+    $container-size: calculateRem(40px);
     background: $main-brand-color;
     display: table;
     color: white;
