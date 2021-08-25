@@ -15,6 +15,7 @@ import { usePersonState } from '../../state/person/person-state';
 import { RankStateModel } from '../../state/person/rank-state-model';
 import { failsHookstateValidation, generateStringErrorMessages, isFormModified, validateRequiredString, validateStringLength, validationErrors, validPhone } from '../../utils/validation-utils';
 import withLoading from '../../hocs/UseLoading/WithLoading';
+import InfoNotice from '../InfoNotice/InfoNotice';
 
 interface UserInfoFormProps {
   editorState: State<UserEditorState>;
@@ -25,7 +26,7 @@ function HeaderUserEditor(props: UserInfoFormProps) {
   const personState = usePersonState();
   const rankState = useHookstate<RankStateModel>(personState.rankState);
   const formState = useHookstate(props.editorState.currentUserState);
-  
+
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
@@ -83,7 +84,7 @@ function HeaderUserEditor(props: UserInfoFormProps) {
             <div className="d-flex align-items-center">
               <div className="header-user-editor__initials">
                 {props.userInitials}
-              </div>  
+              </div>
               <div>
                 <div className="user-editor-email">{formState.email.get()?.toUpperCase()}</div>
                 <div className="user-editor-dodid text-muted">{formState.dodid.get()}</div>
@@ -92,6 +93,9 @@ function HeaderUserEditor(props: UserInfoFormProps) {
           </div>
         </div>
         <div className="user-editor-body">
+          <InfoNotice className="user-editor__info-notice" type="info" slim>
+            The following information corresponds to the Common API Personnel record matching your P1 SSO email.
+          </InfoNotice>
           <div className="d-flex justify-content-between">
             <div>
               <FormGroup labelName="firstName" labelText="First Name"
