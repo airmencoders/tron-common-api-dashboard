@@ -102,6 +102,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   const orgState = useOrganizationState();  // handle to the org-service and state
   const formState = useState({
     ...props.data,
+    name: props.data?.name ?? '',
     orgType: props.data?.orgType ?? Object.values(OrganizationDtoOrgTypeEnum)[0] ?? '',
     subordinateOrganizations: props.data?.subordinateOrganizations ? [...props.data?.subordinateOrganizations] : [],
     members: props.data?.members ? [...props.data.members] : []
@@ -410,13 +411,13 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
   function onChooserRowSelected(data: PersonDto | OrganizationDto, selectionEvent: 'selected' | 'unselected'): void {
     if (orgEditType === OrgEditOpType.MEMBERS_EDIT || orgEditType === OrgEditOpType.LEADER_EDIT) {
       if (selectionEvent === 'selected') {
-        selectedChooserRows[selectedChooserRows.length].set(data);
+        (selectedChooserRows as State<PersonDto[]>)[selectedChooserRows.length].set(data as PersonDto);
       } else {
         (selectedChooserRows as State<PersonDto[]>).find(obj => obj.id.get() === data.id)?.set(none);
       }
     } else {
       if (selectionEvent === 'selected') {
-        selectedChooserRows[selectedChooserRows.length].set(data);
+        (selectedChooserRows as State<OrganizationDto[]>)[selectedChooserRows.length].set(data as OrganizationDto);
       } else {
         (selectedChooserRows as State<OrganizationDto[]>).find(obj => obj.id.get() === data.id)?.set(none);
       }

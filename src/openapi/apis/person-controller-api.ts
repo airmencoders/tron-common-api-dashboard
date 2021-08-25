@@ -564,24 +564,18 @@ export const PersonControllerApiAxiosParamCreator = function (configuration?: Co
             };
         },
         /**
-         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.  Request must be from the web (SSO) and not an app client.
          * @summary Allows a Person to update their own existing record.
-         * @param {string} id Person ID to update
          * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        selfUpdatePerson: async (id: string, personDto: PersonDto, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling selfUpdatePerson.');
-            }
+        selfUpdatePerson: async (personDto: PersonDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'personDto' is not null or undefined
             if (personDto === null || personDto === undefined) {
                 throw new RequiredError('personDto','Required parameter personDto was null or undefined when calling selfUpdatePerson.');
             }
-            const localVarPath = `/v2/person/self/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            const localVarPath = `/v2/person/self`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -827,15 +821,14 @@ export const PersonControllerApiFp = function(configuration?: Configuration) {
             };
         },
         /**
-         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.  Request must be from the web (SSO) and not an app client.
          * @summary Allows a Person to update their own existing record.
-         * @param {string} id Person ID to update
          * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async selfUpdatePerson(id: string, personDto: PersonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
-            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).selfUpdatePerson(id, personDto, options);
+        async selfUpdatePerson(personDto: PersonDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonDto>> {
+            const localVarAxiosArgs = await PersonControllerApiAxiosParamCreator(configuration).selfUpdatePerson(personDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -970,15 +963,14 @@ export const PersonControllerApiFactory = function (configuration?: Configuratio
             return PersonControllerApiFp(configuration).patchPerson(id, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue, options).then((request) => request(axios, basePath));
         },
         /**
-         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+         * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.  Request must be from the web (SSO) and not an app client.
          * @summary Allows a Person to update their own existing record.
-         * @param {string} id Person ID to update
          * @param {PersonDto} personDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        selfUpdatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto> {
-            return PersonControllerApiFp(configuration).selfUpdatePerson(id, personDto, options).then((request) => request(axios, basePath));
+        selfUpdatePerson(personDto: PersonDto, options?: any): AxiosPromise<PersonDto> {
+            return PersonControllerApiFp(configuration).selfUpdatePerson(personDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Updates an existing person
@@ -1105,15 +1097,14 @@ export interface PersonControllerApiInterface {
     patchPerson(id: string, jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue: JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue, options?: any): AxiosPromise<PersonDto>;
 
     /**
-     * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+     * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.  Request must be from the web (SSO) and not an app client.
      * @summary Allows a Person to update their own existing record.
-     * @param {string} id Person ID to update
      * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApiInterface
      */
-    selfUpdatePerson(id: string, personDto: PersonDto, options?: any): AxiosPromise<PersonDto>;
+    selfUpdatePerson(personDto: PersonDto, options?: any): AxiosPromise<PersonDto>;
 
     /**
      * Updates an existing person
@@ -1258,16 +1249,15 @@ export class PersonControllerApi extends BaseAPI implements PersonControllerApiI
     }
 
     /**
-     * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.
+     * The email from the updated Person record must match the email in the authenticated user\'s JWT, otherwise this action will be rejected.  Request must be from the web (SSO) and not an app client.
      * @summary Allows a Person to update their own existing record.
-     * @param {string} id Person ID to update
      * @param {PersonDto} personDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonControllerApi
      */
-    public selfUpdatePerson(id: string, personDto: PersonDto, options?: any) {
-        return PersonControllerApiFp(this.configuration).selfUpdatePerson(id, personDto, options).then((request) => request(this.axios, this.basePath));
+    public selfUpdatePerson(personDto: PersonDto, options?: any) {
+        return PersonControllerApiFp(this.configuration).selfUpdatePerson(personDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

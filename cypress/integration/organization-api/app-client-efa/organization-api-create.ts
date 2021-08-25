@@ -14,7 +14,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
     cleanup();
   });
 
-  describe('POST endpoint: /}', () => {
+  describe('POST endpoint: /', () => {
     it('should fail without ORGANIZATION_CREATE privilege with 403', () => {
       AppClientSetupFunctions.addAndConfigureAppClient([]);
 

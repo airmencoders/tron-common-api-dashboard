@@ -15,4 +15,5 @@ export interface ButtonProps {
   style?: React.CSSProperties;
   disableMobileFullWidth?: boolean;
   transparentOnDisabled?: boolean;
+  transparentBackground?: boolean;
 }

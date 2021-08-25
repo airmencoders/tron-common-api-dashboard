@@ -55,7 +55,7 @@ export interface OrganizationDto {
      * @type {string}
      * @memberof OrganizationDto
      */
-    name?: string;
+    name: string;
     /**
      * 
      * @type {string}

@@ -80,7 +80,7 @@ describe('Organization API Member PATCH', () => {
     });
   });
 
-  it('should rollback transaction if EFA fails, no permissions', () => {
+  it('should get Not Authorized with no Organization-members EFA permission', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
     // Create org
@@ -100,18 +100,17 @@ describe('Organization API Member PATCH', () => {
     personIdsToDelete.add(personA.id);
 
     // Request through App Client
-    // This should return 203, no permission
+    // This should return 403, no permission
     cy.request({
       url: `${appClientHostOrganizationUrl}/${orgA.id}/members`,
       method: 'PATCH',
       body: [personA.id],
       qs: {
         primary: true
-      }
+      },
+      failOnStatusCode: false
     }).then(response => {
-      expect(response.status).to.eq(203);
-      expect(response.body.members).to.not.have.members([personA.id]);
-      expect(response.headers['warning']).to.contain('members');
+      expect(response.status).to.eq(403);
     });
 
     // orgA should not have personA
@@ -129,7 +128,7 @@ describe('Organization API Member PATCH', () => {
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
-      assert.notExists(response.body.primaryOrganizationId);
+      assert.notExists(response.body.primaryOrganizationId, 'primaryOrganizationId should not exist');
     });
   });
 
