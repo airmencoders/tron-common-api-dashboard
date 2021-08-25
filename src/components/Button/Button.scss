@@ -10,6 +10,11 @@
 }
 
 .usa-button {
+  // Default button color
+  background-color: color($theme-color-primary);
+  border-radius: 8px;
+  padding: 12px;
+
   &--disable-mobile-full-width {
     width: auto;
   }
@@ -17,7 +22,12 @@
   &--disable-transparent:disabled {
     background-color: transparent;
   }
+
+  &--no-bg-button {
+    background-color: transparent;
+  }
 }
+
 
 .inline-icon {
   //float: right;

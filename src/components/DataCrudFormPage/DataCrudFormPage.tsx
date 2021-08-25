@@ -440,11 +440,12 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
             dataState.error ?
               <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
               :
-              <div className="data-crud-content">
+              <div className="data-crud-content" >
                 {
                   props.allowAdd && CreateForm &&
                   <div className="add-data-container">
                     <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
+                      { props.dataTypeIcon !== undefined && props.dataTypeIcon }
                       Add {props.dataTypeName}
                     </Button>
                   </div>
