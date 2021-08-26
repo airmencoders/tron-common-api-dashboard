@@ -1,6 +1,6 @@
 import { useHookstate } from '@hookstate/core';
 import { GridApi } from 'ag-grid-community';
-import { GridReadyEvent, RowSelectedEvent } from 'ag-grid-community/dist/lib/events';
+import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
@@ -12,13 +12,15 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const gridSizeRef = useRef(null);
   const gridReady = (event: GridReadyEvent) => {
-    event.api.sizeColumnsToFit();
-
     setGridApi(event.api);
 
     // call parent's onReady if present
     props.onGridReady && props.onGridReady(event.api);
   };
+
+  const onModelUpdated = (event: ModelUpdatedEvent) => {
+    event.api.sizeColumnsToFit();
+  }
 
   const rowDataLengthChanged = useRef(false);
 
@@ -107,6 +109,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
             <AgGridReact
                 rowData={props.data}
                 onGridReady={gridReady}
+                onModelUpdated={onModelUpdated}
                 onRowClicked={props.onRowClicked}
                 rowClass={props.rowClass}
                 quickFilterText={props.quickFilterText || ''}

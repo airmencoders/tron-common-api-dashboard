@@ -23,7 +23,6 @@ import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import InfiniteScrollGrid from '../Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
-import { DataCrudFormErrors } from './data-crud-form-errors';
 import DataCrudDelete from './DataCrudDelete';
 import './DataCrudFormPage.scss';
 import { DataCrudFormPageProps } from './DataCrudFormPageProps';
