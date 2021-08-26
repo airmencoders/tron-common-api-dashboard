@@ -56,8 +56,6 @@ describe('Test App Source Form', () => {
     };
   });
 
-
-
   it('Update', async () => {
     successAction = undefined;
 
@@ -109,31 +107,43 @@ describe('Test App Source Form', () => {
     expect(rateLimitToggle).not.toBeChecked();
     expect(rateLimit).toBeDisabled();
     fireEvent.click(rateLimitToggle);
-    waitFor(() => {
-      expect(rateLimitToggle).toBeChecked();
-      expect(rateLimit).not.toBeDisabled();
-    });
+    expect(page.getByLabelText('Enable Rate Limiting')).toBeChecked();
+    expect(page.getByLabelText('Rate Limit')).not.toBeDisabled();
 
     fireEvent.change(rateLimit, { target: { value: '123' } });
     expect(rateLimit).toHaveValue('123');
 
     fireEvent.click(page.getByText('Update'));
     expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  it('should open endpoint editor modal when clicking an endpoint to edit', async () => {
+    successAction = undefined;
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    const elem = page.getByTestId('app-source-form');
+    expect(elem).toBeInTheDocument();
 
     // Click an endpoint to edit
     await (expect(page.findByText('endpoint_path'))).resolves.toBeInTheDocument();
     fireEvent.click(page.getByText('endpoint_path'));
 
     await (expect(page.findByText('Endpoint Editor'))).resolves.toBeInTheDocument();
-
-    // Close endpoint editor
-    const closeBtn = (await (screen.findByTitle('close-modal')));
-    expect(closeBtn).toBeInTheDocument();
-    expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
-    fireEvent.click(closeBtn!);
   });
 
-  it('test client side validation', () => {
+  it('test name client side validation', () => {
     successAction = undefined;
 
     const page = render(
@@ -155,9 +165,31 @@ describe('Test App Source Form', () => {
     // Test client-side validation on Name
     const nameInput = page.getByDisplayValue(appSourceDetailsDto.name);
 
+    fireEvent.change(nameInput, { target: { value: 'asdf' } });
+    expect(nameInput).toHaveValue('asdf');
     fireEvent.change(nameInput, { target: { value: '' } });
     expect(nameInput).toHaveValue('');
     expect(page.getByText(new RegExp(validationErrors.requiredText)));
+  });
+
+  it('test admin client side validation', () => {
+    successAction = undefined;
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    const elem = page.getByTestId('app-source-form');
+    expect(elem).toBeInTheDocument();
 
     // Client-side validation on Admin Email
     const adminEmailInput = page.getByLabelText('Admins');
@@ -165,18 +197,35 @@ describe('Test App Source Form', () => {
     fireEvent.change(adminEmailInput, { target: { value: 'bad_email' } });
     expect(adminEmailInput).toHaveValue('bad_email');
     expect(page.getByText(new RegExp(validationErrors.invalidEmail)));
+  });
 
-    // Client-side validation on rate limit
+  it('test rate limit client side validation', () => {
+    successAction = undefined;
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    const elem = page.getByTestId('app-source-form');
+    expect(elem).toBeInTheDocument();
+
+    // Change Rate Limit
     const rateLimitToggle = page.getByLabelText('Enable Rate Limiting');
     const rateLimit = page.getByLabelText('Rate Limit');
-
     expect(rateLimitToggle).not.toBeChecked();
     expect(rateLimit).toBeDisabled();
     fireEvent.click(rateLimitToggle);
-    waitFor(() => {
-      expect(rateLimitToggle).toBeChecked();
-      expect(rateLimit).not.toBeDisabled();
-    });
+    expect(page.getByLabelText('Enable Rate Limiting')).toBeChecked();
+    expect(page.getByLabelText('Rate Limit')).not.toBeDisabled();
 
     // Try typing a non-number, should not accept it
     fireEvent.keyPress(rateLimit, { key: 'a', code: 'KeyA' });
@@ -212,7 +261,7 @@ describe('Test App Source Form', () => {
     fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
-    
+
     // Close delete confirmation modal
     const xCloseBtn = (await (screen.findByTitle('close-modal')));
     expect(xCloseBtn).toBeInTheDocument();
@@ -223,7 +272,7 @@ describe('Test App Source Form', () => {
     fireEvent.click(deleteEndpointBtn);
 
     await (expect(page.findByText('Delete Confirmation'))).resolves.toBeInTheDocument();
-    
+
     // Click the button to close delete confirmation modal
     const closeBtn = (screen.getAllByText('Cancel')).find(element => element.getAttribute('type') === 'button');
     expect(closeBtn).toBeInTheDocument();
@@ -288,6 +337,5 @@ describe('Test App Source Form', () => {
     );
 
     expect(page.getByText(successAction.successMsg)).toBeInTheDocument();
-  })
-
+  });
 });
