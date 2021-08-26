@@ -46,7 +46,7 @@ describe('Test App Source Form', () => {
       endpoints: [
         {
           id: 'ee05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
-          deleted: false,
+          deleted: true,
           path: 'endpoint_path',
           requestType: 'GET'
         }
