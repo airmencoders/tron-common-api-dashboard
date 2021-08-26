@@ -56,6 +56,8 @@ describe('Test App Source Form', () => {
     };
   });
 
+
+
   it('Update', async () => {
     successAction = undefined;
 
@@ -75,22 +77,14 @@ describe('Test App Source Form', () => {
     const elem = page.getByTestId('app-source-form');
     expect(elem).toBeInTheDocument();
 
-    // Test client-side validation on Name
+    // Set name
     const nameInput = page.getByDisplayValue(appSourceDetailsDto.name);
-
-    fireEvent.change(nameInput, { target: { value: '' } });
-    expect(nameInput).toHaveValue('');
-    expect(page.getByText(new RegExp(validationErrors.requiredText)));
 
     fireEvent.change(nameInput, { target: { value: 'Test 2' } });
     expect(nameInput).toHaveValue('Test 2');
 
-    // Client-side validation on Admin Email
+    // Set email
     const adminEmailInput = page.getByLabelText('Admins');
-
-    fireEvent.change(adminEmailInput, { target: { value: 'bad_email' } });
-    expect(adminEmailInput).toHaveValue('bad_email');
-    expect(page.getByText(new RegExp(validationErrors.invalidEmail)));
 
     const adminEmailTest = 'email@test.com';
     fireEvent.change(adminEmailInput, { target: { value: adminEmailTest } });
@@ -120,14 +114,7 @@ describe('Test App Source Form', () => {
       expect(rateLimit).not.toBeDisabled();
     });
 
-    // Try an empty value
-    fireEvent.change(rateLimit, { target: { value: '' } });
-    expect(rateLimit).toHaveValue('');
-    // Try a valid value
     fireEvent.change(rateLimit, { target: { value: '123' } });
-    expect(rateLimit).toHaveValue('123');
-    // Try typing a non-number, should not accept it
-    fireEvent.keyPress(rateLimit, { key: 'a', code: 'KeyA' });
     expect(rateLimit).toHaveValue('123');
 
     fireEvent.click(page.getByText('Update'));
@@ -144,6 +131,60 @@ describe('Test App Source Form', () => {
     expect(closeBtn).toBeInTheDocument();
     expect(closeBtn?.classList.contains('close-btn')).toBeTruthy();
     fireEvent.click(closeBtn!);
+  });
+
+  it('test client side validation', () => {
+    successAction = undefined;
+
+    const page = render(
+      <MemoryRouter>
+        <AppSourceForm
+          onSubmit={onSubmit}
+          onClose={onClose}
+          formActionType={FormActionType.UPDATE}
+          isSubmitting={false}
+          successAction={successAction}
+          data={appSourceDetailsDto}
+        />
+      </MemoryRouter>
+    );
+
+    const elem = page.getByTestId('app-source-form');
+    expect(elem).toBeInTheDocument();
+
+    // Test client-side validation on Name
+    const nameInput = page.getByDisplayValue(appSourceDetailsDto.name);
+
+    fireEvent.change(nameInput, { target: { value: '' } });
+    expect(nameInput).toHaveValue('');
+    expect(page.getByText(new RegExp(validationErrors.requiredText)));
+
+    // Client-side validation on Admin Email
+    const adminEmailInput = page.getByLabelText('Admins');
+
+    fireEvent.change(adminEmailInput, { target: { value: 'bad_email' } });
+    expect(adminEmailInput).toHaveValue('bad_email');
+    expect(page.getByText(new RegExp(validationErrors.invalidEmail)));
+
+    // Client-side validation on rate limit
+    const rateLimitToggle = page.getByLabelText('Enable Rate Limiting');
+    const rateLimit = page.getByLabelText('Rate Limit');
+
+    expect(rateLimitToggle).not.toBeChecked();
+    expect(rateLimit).toBeDisabled();
+    fireEvent.click(rateLimitToggle);
+    waitFor(() => {
+      expect(rateLimitToggle).toBeChecked();
+      expect(rateLimit).not.toBeDisabled();
+    });
+
+    // Try typing a non-number, should not accept it
+    fireEvent.keyPress(rateLimit, { key: 'a', code: 'KeyA' });
+    expect(rateLimit).toHaveValue('0');
+
+    // Try an empty value
+    fireEvent.change(rateLimit, { target: { value: '' } });
+    expect(rateLimit).toHaveValue('');
   });
 
   it('should delete endpoint and send update to server', async () => {
