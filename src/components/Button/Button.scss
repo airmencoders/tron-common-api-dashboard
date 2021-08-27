@@ -26,6 +26,12 @@
   &--no-bg-button {
     background-color: transparent;
   }
+
+  &--no-styling {
+    background-color: transparent;
+    border-radius: 0px;
+    padding: 0px;
+  }
 }
 
 

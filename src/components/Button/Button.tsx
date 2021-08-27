@@ -11,8 +11,9 @@ function Button(props: ButtonProps) {
       {...rest}
       className={`${props.className ?? ''}${disableMobileFullWidth ? ' usa-button--disable-mobile-full-width' : ''}
                   ${transparentOnDisabled ? ' usa-button--disable-transparent' : ''}
-                  ${transparentBackground ? ' usa-button--no-bg-button' : ''}`
-                }
+                  ${transparentBackground ? ' usa-button--no-bg-button' : ''}
+                  ${rest.unstyled ? ' usa-button--no-styling': ''}`
+                } 
     />
   );
 }
