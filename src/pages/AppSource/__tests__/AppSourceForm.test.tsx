@@ -137,7 +137,7 @@ describe('Test App Source Form', () => {
     expect(elem).toBeInTheDocument();
 
     // Click an endpoint to edit
-    await (expect(page.findByText('endpoint_path'))).resolves.toBeInTheDocument();
+    await (expect(page.findByText('endpoint_path', {}, { timeout: 10000 }))).resolves.toBeInTheDocument();
     fireEvent.click(page.getByText('endpoint_path'));
 
     await (expect(page.findByText('Endpoint Editor'))).resolves.toBeInTheDocument();
@@ -256,7 +256,7 @@ describe('Test App Source Form', () => {
     expect(elem).toBeInTheDocument();
 
     // Click the button to delete endpoint
-    await (expect(page.findByTestId('unused-true', {}, { timeout: 3000 }))).resolves.toBeInTheDocument();
+    await (expect(page.findByTestId('unused-true', {}, { timeout: 10000 }))).resolves.toBeInTheDocument();
     const deleteEndpointBtn = page.getByTestId('unused-true');
     fireEvent.click(deleteEndpointBtn);
 
