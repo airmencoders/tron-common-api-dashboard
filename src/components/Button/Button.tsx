@@ -13,7 +13,7 @@ function Button(props: ButtonProps) {
                   ${transparentOnDisabled ? ' usa-button--disable-transparent' : ''}
                   ${transparentBackground ? ' usa-button--no-bg-button' : ''}
                   ${rest.unstyled ? ' usa-button--no-styling': ''}`
-                } 
+                }
     />
   );
 }
