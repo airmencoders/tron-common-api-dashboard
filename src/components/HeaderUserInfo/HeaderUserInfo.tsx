@@ -151,29 +151,32 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
           {userInitials}
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <Dropdown.Item>
+          <div className="header-user-info__body">
+            <div className="header-user-info__section-header">P1 User Info</div>
+            <div className="header-user-info__user-field">
               <div className="font-italic text-muted header-user-info__label">Name</div>
               {userInfo?.name}
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <div className="font-italic text-muted header-user-info__label">DoD ID</div>
-            {userInfo?.dodId}
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <div className="font-italic text-muted header-user-info__label">Email</div>
-            {userInfo?.email}
-          </Dropdown.Item>
-          <Dropdown.Item>
-            <div className="font-italic text-muted header-user-info__label">Organization</div>
-            {userInfo?.organization}
-          </Dropdown.Item>
+            </div>
+            <div className="header-user-info__user-field">
+              <div className="font-italic text-muted header-user-info__label">DoD ID</div>
+              {userInfo?.dodId}
+            </div>
+            <div className="header-user-info__user-field">
+              <div className="font-italic text-muted header-user-info__label">Email</div>
+              {userInfo?.email}
+            </div>
+            <div className="header-user-info__user-field">
+              <div className="font-italic text-muted header-user-info__label">Organization</div>
+              {userInfo?.organization}
+            </div>
+          </div>
           {userEditorState.isLoadingInitial.get() ?
             <Spinner />
             :
             userEditorState.currentUserState.email.get() &&
             <div>
               <Dropdown.Divider />
-              <a className="d-flex justify-content-center header-user-info__edit" href="#" onClick={onHeaderClick}>Edit Person Record</a>
+              <a className="d-flex justify-content-center header-user-info__edit" href="#" onClick={onHeaderClick}>Edit Associated Record</a>
             </div>
           }
         </Dropdown.Menu>

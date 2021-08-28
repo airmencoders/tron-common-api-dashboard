@@ -2,6 +2,8 @@
 
 .add-data-container {
   margin-bottom: calculateRem(16px);
+  display: flex;
+  justify-content: flex-end;
 }
 
 .data-crud-content {

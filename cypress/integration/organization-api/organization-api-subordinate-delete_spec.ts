@@ -91,74 +91,6 @@ describe('Organization API Subordinate DELETE', () => {
     });
   });
 
-  it('should rollback transaction if EFA fails, no permissions', () => {
-    AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
-
-    // Create org for subordinate
-    const orgA = {
-      id: UtilityFunctions.uuidv4()
-    };
-    orgIdsToDelete.add(orgA.id);
-    OrgSetupFunctions.createOrganization(orgA);
-
-    // Create org for subordinate
-    const orgB = {
-      id: UtilityFunctions.uuidv4()
-    };
-    orgIdsToDelete.add(orgB.id);
-    OrgSetupFunctions.createOrganization(orgB);
-
-    // Create parent
-    const orgC = {
-      id: UtilityFunctions.uuidv4(),
-      subordinateOrganizations: [orgA.id, orgB.id]
-    };
-    orgIdsToDelete.add(orgC.id);
-    OrgSetupFunctions.createOrganization(orgC)
-      .then(response => {
-        expect(response.status).to.eq(201);
-        expect(response.body.subordinateOrganizations).to.have.members([orgA.id, orgB.id]);
-      });
-
-    // Request through App Client
-    // This should return 203, no permission
-    cy.request({
-      url: `${appClientHostOrganizationUrl}/${orgC.id}/subordinates`,
-      method: 'DELETE',
-      body: [orgB.id, orgA.id]
-    }).then(response => {
-      expect(response.status).to.eq(203);
-      expect(response.body.subordinateOrganizations).to.have.members([orgA.id, orgB.id]);
-      expect(response.headers['warning']).to.contain('subordinateOrganizations');
-    });
-
-    // Ensure orgC still has orgA, orgB as suborgs
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgC.id}`,
-      method: 'GET',
-    }).then(response => {
-      expect(response.status).to.eq(200);
-      expect(response.body.subordinateOrganizations).to.have.members([orgA.id, orgB.id]);
-    });
-
-    // orgA, orgB should still have orgC as parent
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgA.id}`,
-      method: 'GET'
-    }).then(response => {
-      expect(response.status).to.eq(200);
-      expect(response.body.parentOrganization).to.eq(orgC.id);
-    });
-
-    cy.request<OrganizationDto>({
-      url: `${organizationUrl}/${orgB.id}`,
-      method: 'GET'
-    }).then(response => {
-      expect(response.status).to.eq(200);
-      expect(response.body.parentOrganization).to.eq(orgC.id);
-    });
-  });
-
   it('should fail delete sub organizations with no body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
@@ -196,7 +128,7 @@ describe('Organization API Subordinate DELETE', () => {
         expect(response.body.subordinateOrganizations).to.have.members([orgA.id, orgB.id]);
       });
 
-    // This should fail because by passing in non-existant suborg id
+    // This should fail because passing in non-existant suborg id
     cy.request({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
       method: 'DELETE',
@@ -215,7 +147,7 @@ describe('Organization API Subordinate DELETE', () => {
       expect(response.body.subordinateOrganizations).to.have.members([orgA.id, orgB.id]);
     });
 
-    // orgA, orgB should still have orgC as parent
+    // orgA should still have orgC as parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
       method: 'GET'
@@ -224,6 +156,7 @@ describe('Organization API Subordinate DELETE', () => {
       expect(response.body.parentOrganization).to.eq(orgC.id);
     });
 
+    // orgB should still have orgC as parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgB.id}`,
       method: 'GET'

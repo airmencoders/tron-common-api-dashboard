@@ -30,7 +30,15 @@
         padding: 1.25rem 1.25rem;
     }
     .user-editor-body {
-        padding: 0 1.25rem 1.25rem 1.25rem;
+        padding: 1.25rem;
+      .user-editor__info-notice {
+        &::before {
+          height: 100%;
+        }
+        .usa-alert__text {
+          font-size: .85rem;
+        }
+      }
     }
     .branch-rank-container {
         width: 220px;

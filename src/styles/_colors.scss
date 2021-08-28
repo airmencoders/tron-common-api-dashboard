@@ -47,6 +47,10 @@ $required-input: #b50909;
   color: color($theme-color-primary);
 }
 
+.pencil-square-color {
+  color: color('white');
+}
+
 .icon-disabled-color {
   color: $disabled;
 }

@@ -9,6 +9,7 @@ import { accessAuthorizedUserState } from '../../state/authorized-user/authorize
 import { PrivilegeType } from '../../state/privilege/privilege-type';
 import AppClientDelete from './AppClientDelete';
 import AppClientForm from './AppClientForm';
+import PencilSquare from '../../icons/PencilSquare';
 
 const columnHeaders: GridColumn[] = [
   new GridColumn({
@@ -93,6 +94,7 @@ export function AppClientPage() {
       autoResizeColumns
       autoResizeColummnsMinWidth={700}
       sideDrawerSize={SideDrawerSize.WIDE}
+      dataTypeIcon={<PencilSquare className="edit-icon-color" size={12} />}
     />
   )
 }

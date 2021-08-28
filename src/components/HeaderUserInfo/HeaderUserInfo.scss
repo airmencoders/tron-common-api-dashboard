@@ -2,20 +2,23 @@
 
 .header-user-info {
   position: relative;
-  top: calculateRem(-14px);
+  top: calculateRem(-7px);
   &__initials {
+    $container-size: calculateRem(40px);
     background: $main-brand-color;
     display: table;
     color: white;
-    padding: units(1);
+    padding: .25rem;
     border-radius: 50%;
     font-family: $headings-font-family;
     font-weight: bold;
     font-size: calculateRem(14px);
-    min-width: 56px;
-    min-height: 56px;
+    min-width: $container-size;
+    min-height: $container-size;
+    max-width: $container-size;
+    max-height: $container-size;
     &:after {
-      font-size: calculateRem(10px);
+      display: none;
     }
   }
   &__label {
@@ -23,6 +26,17 @@
   }
   &__edit {
     font-weight: 600;
+  }
+  &__body {
+    padding: .75rem 1rem;
+  }
+  &__section-header {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: .5rem;
+  }
+  &__user-field {
+    margin-bottom: .5rem;
   }
 }
 .user-info-modal .modal-component__body {

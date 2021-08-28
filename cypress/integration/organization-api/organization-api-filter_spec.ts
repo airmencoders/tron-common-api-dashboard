@@ -2,7 +2,7 @@
 
 import { organizationUrl } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
-import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper } from '../../../src/openapi';
+import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../support/cleanup-helper';
 
