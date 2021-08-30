@@ -1,0 +1,1 @@
+export type IconStyleType = 'primary' | 'default';

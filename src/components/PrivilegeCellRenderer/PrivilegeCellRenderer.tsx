@@ -8,11 +8,11 @@ function PrivilegeCellRenderer(props: any) {
     <div className="privilege-cell-renderer">
       {props.value ?
         <div data-testid="privilege-true" className="privilege-cell-renderer__value">
-          <StatusGoodIcon size={1.25} />
+          <StatusGoodIcon style="primary" iconTitle="true" size={1.25} />
         </div>
         :
         <div data-testid="privilege-false" className="privilege-cell-renderer__value">
-          <CloseIcon size={1.25} />
+          <CloseIcon iconTitle="false" size={1.25} />
         </div>
       }
     </div>
