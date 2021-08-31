@@ -76,7 +76,7 @@ describe('Organization API Member DELETE', () => {
     });
   });
 
-  it('should rollback transaction if EFA fails, no permissions', () => {
+  it('should get Not Authorized with no Organization-members EFA permission', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_EDIT']);
 
     // Create org
@@ -115,15 +115,14 @@ describe('Organization API Member DELETE', () => {
     });
 
     // Request through App Client
-    // This should return 203, no permission
+    // This should return 403, no permission
     cy.request({
       url: `${appClientHostOrganizationUrl}/${orgA.id}/members`,
       method: 'DELETE',
-      body: [personA.id]
+      body: [personA.id],
+      failOnStatusCode: false
     }).then(response => {
-      expect(response.status).to.eq(203);
-      expect(response.body.members).to.have.members([personA.id]);
-      expect(response.headers['warning']).to.contain('members');
+      expect(response.status).to.eq(403);
     });
 
     // orgA should still have personA as member

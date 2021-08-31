@@ -1,5 +1,30 @@
-@import "~ag-grid-community/dist/styles/ag-grid.css";
-@import "~ag-grid-community/dist/styles/ag-theme-alpine.css";
+@import '~ag-grid-community/src/styles/ag-grid.scss';
+@import '~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin';
+@import '../../styles/mixins';
+
+.ag-theme-alpine {
+  @include ag-theme-alpine((
+    odd-row-background-color: #f4f4f4,
+    row-height: 65px,
+    header-height: ag-derived(row-height)
+  ));
+
+  .ag-root-wrapper {
+    border-radius: 8px;
+    border-width: 2px;
+  }
+
+  .ag-header-row {
+    &.ag-header-row-column {
+      .ag-header-cell-label {
+        span.ag-header-cell-text {
+          font-weight: 600;
+          font-size: calculateRem(14px);
+        }
+      }
+    }
+  }
+}
 
 .grid-component {
   .header-center {
@@ -7,8 +32,8 @@
       justify-content: center;
     }
   }
-}
 
-.ag-grid--row-pointer {
-  cursor: pointer;
+  .ag-grid--row-pointer {
+    cursor: pointer;
+  }
 }

@@ -130,7 +130,7 @@ describe('Test HeaderUserInfo', () => {
       expect(screen.getByText('Test User')).toBeTruthy();
     });
 
-    expect(element.getByText('Edit Person Record')).toBeInTheDocument();
+    expect(element.getByText('Edit Associated Record')).toBeInTheDocument();
   });
 
   test('should show Edit Person Record modal', async () => {
@@ -143,7 +143,7 @@ describe('Test HeaderUserInfo', () => {
     });
 
     // Open the modal
-    const editPerson = element.getByText('Edit Person Record');
+    const editPerson = element.getByText('Edit Associated Record');
     expect(editPerson).toBeInTheDocument();
     fireEvent.click(editPerson);
 
@@ -215,6 +215,6 @@ describe('Test HeaderUserInfo', () => {
       expect(screen.getByText('Test User')).toBeTruthy();
     });
 
-    await expect(element.findByText('Edit Person Record')).rejects.toBeDefined();
+    await expect(element.findByText('Edit Associated Record')).rejects.toBeDefined();
   });
 });

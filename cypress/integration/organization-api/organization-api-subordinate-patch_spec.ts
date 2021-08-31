@@ -129,7 +129,6 @@ describe('Organization API Subordinate PATCH', () => {
     });
 
     // createdSubOrg should still have initialParentOrg as parent
-    // and initialParentOrg should still have createdSubOrg as subordinate
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdSubOrg.id}`,
       method: 'GET'
@@ -138,6 +137,7 @@ describe('Organization API Subordinate PATCH', () => {
       expect(response.body.parentOrganization).to.eq(initialParentOrg.id);
     });
 
+    // and initialParentOrg should still have createdSubOrg as subordinate
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${initialParentOrg.id}`,
       method: 'GET'

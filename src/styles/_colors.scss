@@ -31,6 +31,10 @@ $error: color($theme-color-error);
 $disabled: #c9c9c9;
 $required-input: #b50909;
 
+.icon-color-primary {
+  color: color($theme-color-primary);
+}
+
 .success-icon-color {
   color: $success;
 }
@@ -45,6 +49,10 @@ $required-input: #b50909;
 
 .edit-icon-color {
   color: color($theme-color-primary);
+}
+
+.pencil-square-color {
+  color: color('white');
 }
 
 .icon-disabled-color {

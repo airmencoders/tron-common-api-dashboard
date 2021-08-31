@@ -25,6 +25,18 @@ export interface AirmanAllOf {
      * @type {string}
      * @memberof AirmanAllOf
      */
+    armsUnitCode?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AirmanAllOf
+     */
+    armsHarmCode?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof AirmanAllOf
+     */
     afsc?: string | null;
     /**
      * 

@@ -24,6 +24,18 @@
         "approved": {
           "type": "boolean"
         },
+        "armsHarmCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "armsUnitCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "branch": {
           "$ref": "model-types.json#/definitions/PersonDtoBranchEnum"
         },
@@ -220,6 +232,18 @@
         },
         "approved": {
           "type": "boolean"
+        },
+        "armsHarmCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "armsUnitCode": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "deros": {
           "type": [
@@ -1010,6 +1034,9 @@
           "type": "array"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "FlightAllOf": {
@@ -1089,6 +1116,9 @@
           "type": "array"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "HttpLogDtoPaginationResponseWrapper": {
@@ -1428,6 +1458,9 @@
           "type": "array"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "OrganizationDtoBranchTypeEnum": {
@@ -2067,6 +2100,9 @@
           "type": "array"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "SubscriberDto": {
@@ -2275,6 +2311,9 @@
           "type": "array"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     }
   }

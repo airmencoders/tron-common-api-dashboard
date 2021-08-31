@@ -1,3 +1,4 @@
+import React from 'react';
 import { DataService } from '../../state/data-service/data-service';
 import GridColumn from '../Grid/GridColumn';
 import { InfiniteScrollOptions } from './infinite-scroll-options';
@@ -112,4 +113,6 @@ export interface DataCrudFormPageProps<T, R> {
   scrollToTopCallback?: () => void;
 
   sideDrawerSize?: SideDrawerSize;
+
+  dataTypeIcon?: React.ReactNode;
 }

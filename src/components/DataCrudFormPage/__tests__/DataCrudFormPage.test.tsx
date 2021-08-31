@@ -611,7 +611,7 @@ describe('Test DataCrudFormPage', () => {
       </MemoryRouter>
     );
 
-    const removeIcon = (await screen.findByTitle('remove')).closest('button');
+    const removeIcon = (await screen.findByTitle('remove', {}, { timeout: 10000 })).closest('button');
     expect(removeIcon).toBeDefined();
     if (removeIcon) fireEvent.click(removeIcon);
 

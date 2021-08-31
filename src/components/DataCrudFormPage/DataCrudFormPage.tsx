@@ -23,7 +23,6 @@ import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
 import InfiniteScrollGrid from '../Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
-import { DataCrudFormErrors } from './data-crud-form-errors';
 import DataCrudDelete from './DataCrudDelete';
 import './DataCrudFormPage.scss';
 import { DataCrudFormPageProps } from './DataCrudFormPageProps';
@@ -440,11 +439,12 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
             dataState.error ?
               <StatusCard status={StatusType.ERROR} title={props.pageTitle} />
               :
-              <div className="data-crud-content">
+              <div className="data-crud-content" >
                 {
                   props.allowAdd && CreateForm &&
                   <div className="add-data-container">
                     <Button type="button" className="add-data-container__btn" onClick={onAddEntityClick}>
+                      { props.dataTypeIcon !== undefined && props.dataTypeIcon }
                       Add {props.dataTypeName}
                     </Button>
                   </div>

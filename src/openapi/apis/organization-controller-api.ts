@@ -949,7 +949,7 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).deleteOrganizationMember(id, requestBody, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1034,7 +1034,7 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OrganizationDto>> {
             const localVarAxiosArgs = await OrganizationControllerApiAxiosParamCreator(configuration).removeSubordinateOrganization(id, requestBody, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -1146,7 +1146,7 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
+        deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<OrganizationDto> {
             return OrganizationControllerApiFp(configuration).deleteOrganizationMember(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1211,7 +1211,7 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void> {
+        removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): AxiosPromise<OrganizationDto> {
             return OrganizationControllerApiFp(configuration).removeSubordinateOrganization(id, requestBody, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1316,7 +1316,7 @@ export interface OrganizationControllerApiInterface {
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+    deleteOrganizationMember(id: string, requestBody: Array<string>, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Retrieves filtered list of organizations
@@ -1381,7 +1381,7 @@ export interface OrganizationControllerApiInterface {
      * @throws {RequiredError}
      * @memberof OrganizationControllerApiInterface
      */
-    removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): AxiosPromise<void>;
+    removeSubordinateOrganization(id: string, requestBody: Array<string>, options?: any): AxiosPromise<OrganizationDto>;
 
     /**
      * Updates an existing organization
