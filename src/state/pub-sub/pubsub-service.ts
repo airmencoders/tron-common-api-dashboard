@@ -30,6 +30,17 @@ export interface PubSubCollection {
   subOrgRemove?: boolean;
 }
 
+enum OperationType {
+  UPDATE,
+  CREATE,
+  DELETE
+}
+
+interface Operation {
+  op : OperationType,
+  dto: SubscriberDto | undefined,
+}
+
 export default class PubSubService implements DataService<PubSubCollection, PubSubCollection> {
 
   constructor(
@@ -71,16 +82,6 @@ export default class PubSubService implements DataService<PubSubCollection, PubS
   }
 
   async reconcileCollectionToSubscriberData(collection: PubSubCollection): Promise<PubSubCollection> {
-    enum OperationType {
-      UPDATE,
-      CREATE,
-      DELETE
-    }
-
-    interface Operation {
-      op : OperationType,
-      dto: SubscriberDto,
-    }
 
     // this list of API operations we'll perform at the end
     const operationsToPerform = new Array<Operation>();
@@ -132,37 +133,41 @@ export default class PubSubService implements DataService<PubSubCollection, PubS
 
     // see what to delete now (whats left over in the original subscriber events list
     originalSubscriberEvents.forEach(item => {
-      if (item) {
         operationsToPerform.push({
           op: OperationType.DELETE,
           dto: item
         });
-      }
     });
 
     // now do the operations
     try {
-      for (const item of operationsToPerform) {
-        switch (item.op) {
-          case OperationType.DELETE:
-            await this.sendSubscriptionDelete(item.dto);
-            break;
-          case OperationType.CREATE:
-            await this.sendSubscriptionCreate(item.dto);
-            break;
-          case OperationType.UPDATE:
-            await this.sendSubscriptionUpdate(item.dto);
-            break;
-          default:
-            break;
-        }
-      }
+      await this.performOperations(operationsToPerform);
     }
     catch (e) {
       return Promise.reject(e);
     }
 
     return Promise.resolve(collection);
+  }
+
+  async performOperations(operationsToPerform: Operation[]) {
+    for (const item of operationsToPerform) {
+      if (item.dto === undefined) continue;
+
+      switch (item.op) {
+        case OperationType.DELETE:
+          await this.sendSubscriptionDelete(item.dto);
+          break;
+        case OperationType.CREATE:
+          await this.sendSubscriptionCreate(item.dto);
+          break;
+        case OperationType.UPDATE:
+          await this.sendSubscriptionUpdate(item.dto);
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   // Called from the Pub Sub editor form
