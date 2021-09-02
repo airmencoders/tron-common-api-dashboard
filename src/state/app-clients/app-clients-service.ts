@@ -178,6 +178,7 @@ export default class AppClientsService implements DataService<AppClientFlat, App
     return {
       id,
       name: name || '',
+      appClientDeveloperEmails: client.appClientDeveloperEmails,
       clusterUrl: clusterUrl || '',
       ...privileges
     };

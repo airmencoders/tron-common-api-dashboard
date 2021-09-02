@@ -1,15 +1,21 @@
 import React from 'react';
-import { render, fireEvent, within } from '@testing-library/react';
-import { useAppClientsState, wrapState } from '../../../state/app-clients/app-clients-state';
-import { PrivilegeType } from '../../../state/privilege/privilege-type';
+import {fireEvent, render} from '@testing-library/react';
+import {useAppClientsState} from '../../../state/app-clients/app-clients-state';
+import {PrivilegeType} from '../../../state/privilege/privilege-type';
 import AppClientsService from '../../../state/app-clients/app-clients-service';
 import PubSubForm from '../PubSubForm';
-import { FormActionType } from '../../../state/crud-page/form-action-type';
-import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
-import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
-import { AppClientControllerApi, AppClientControllerApiInterface, AppClientUserDto, PrivilegeDto, SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../../openapi';
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
+import {FormActionType} from '../../../state/crud-page/form-action-type';
+import {DataCrudSuccessAction} from '../../../components/DataCrudFormPage/data-crud-success-action';
+import {DataCrudFormErrors} from '../../../components/DataCrudFormPage/data-crud-form-errors';
+import {
+  AppClientControllerApi,
+  AppClientControllerApiInterface,
+  PrivilegeDto,
+  SubscriberDtoSubscribedEventEnum
+} from '../../../openapi';
+import {createState, State, StateMethodsDestroy} from '@hookstate/core';
+import {AppClientFlat} from '../../../state/app-clients/app-client-flat';
+import {PubSubCollection} from "../../../state/pub-sub/pubsub-service";
 
 jest.mock('../../../state/app-clients/app-clients-state');
 
@@ -17,22 +23,8 @@ describe('Test Subscriber Form', () => {
   let onSubmit = jest.fn();
   let onClose = jest.fn();
   let successAction: DataCrudSuccessAction | undefined;
-  let data: SubscriberDto;
+  let data: PubSubCollection;
   let formErrors: DataCrudFormErrors;
-
-  const app1 : AppClientUserDto = {
-    id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9',
-    name: 'App1',
-    privileges: [ {
-        "id": 4,
-        "name": "PERSON_READ"
-      },
-      {
-        "id": 5,
-        "name": "ORGANIZATION_READ"
-      }
-    ]
-  };
 
   let appClientState: State<AppClientFlat[]> & StateMethodsDestroy;
   let appClientApi: AppClientControllerApiInterface;
@@ -48,9 +40,9 @@ describe('Test Subscriber Form', () => {
     });
 
     data = {
-      id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
+      id: "1",
       appClientUser: "App1",
-      subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
+      events: [SubscriberDtoSubscribedEventEnum.PersonChange],
       subscriberAddress: "http://app.app.svc.cluster.local/",
       secret: "",
     }
@@ -76,7 +68,6 @@ describe('Test Subscriber Form', () => {
       jest.spyOn(useAppClientsState(), 'isPromised', 'get').mockReturnValue(false);
     }
     mockAppClientState();
-
   });
 
 
@@ -106,10 +97,10 @@ describe('Test Subscriber Form', () => {
     fireEvent.change(subscriberAddress, { target: { value: 'http://app2.app2.svc.cluster.local/' } });
     expect(subscriberAddress).toHaveValue('http://app2.app2.svc.cluster.local/');
 
-    const subscribedEvent = await pageRender.getByLabelText('Subscribed Event', {selector: 'select'});
-    fireEvent.change(subscribedEvent, { target: { value: SubscriberDtoSubscribedEventEnum.PersonDelete }});
+    const subscribedEvent = pageRender.getByLabelText('PERSON_DELETE');
+    fireEvent.click(subscribedEvent);
+    expect(subscribedEvent).toBeChecked();
 
-    expect(pageRender.getByLabelText('Subscribed Event', {selector: 'select'})).not.toHaveTextContent("ORGANIZATION");
     const secret = await pageRender.getByLabelText('Secret');
     fireEvent.change(secret, { target: { value: 'test' }});
 
@@ -138,8 +129,9 @@ describe('Test Subscriber Form', () => {
     fireEvent.change(subscriberAddress, { target: { value: 'http://app2.app2.svc.cluster.local/' } });
     expect(subscriberAddress).toHaveValue('http://app2.app2.svc.cluster.local/');
 
-    const subscribedEvent = await pageRender.getByLabelText('Subscribed Event', {selector: 'select'});
-    fireEvent.change(subscribedEvent, { target: { value: SubscriberDtoSubscribedEventEnum.PersonDelete }});
+    const subscribedEvent = pageRender.getByLabelText('PERSON_DELETE');
+    fireEvent.click(subscribedEvent);
+    expect(subscribedEvent).toBeChecked();
 
     fireEvent.click(pageRender.getByText(/Update/i));
     expect(onSubmit).toHaveBeenCalledTimes(1);

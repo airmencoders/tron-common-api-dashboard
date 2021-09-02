@@ -1,12 +1,13 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import {render} from '@testing-library/react';
 import PubSubDelete from '../PubSubDelete';
-import { SubscriberDto, SubscriberDtoSubscribedEventEnum } from '../../../openapi';
+import {SubscriberDtoSubscribedEventEnum} from '../../../openapi';
+import {PubSubCollection} from "../../../state/pub-sub/pubsub-service";
 
 describe('Test PubSub Delete', () => {
   let onSubmit = jest.fn();
   let onClose = jest.fn();
-  let data: SubscriberDto;
+  let data: PubSubCollection;
 
   beforeEach(() => {
     onSubmit = jest.fn().mockImplementation(() => {
@@ -18,9 +19,9 @@ describe('Test PubSub Delete', () => {
     });
 
     data = {
-      id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
-      appClientUser: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
-      subscribedEvent: SubscriberDtoSubscribedEventEnum.PersonChange,
+      id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
+      appClientUser: "SomeApp",
+      events: [SubscriberDtoSubscribedEventEnum.PersonChange],
       subscriberAddress: "http://app.app.svc.cluster.local/",
       secret: "",
     }
@@ -35,6 +36,6 @@ describe('Test PubSub Delete', () => {
     );
 
     expect(pageRender.getByTestId('data-crud-delete-content')).toBeInTheDocument();
-    expect(pageRender.getByText(data.id!)).toBeInTheDocument();
+    expect(pageRender.getByText(data.appClientUser)).toBeInTheDocument();
   });
 })
