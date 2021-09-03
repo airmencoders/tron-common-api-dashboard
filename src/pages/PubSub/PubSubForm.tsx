@@ -1,8 +1,8 @@
-import {useState} from '@hookstate/core';
+import {useHookstate, useState} from '@hookstate/core';
 import {Initial} from "@hookstate/initial";
 import {Touched} from "@hookstate/touched";
 import {Validation} from "@hookstate/validation";
-import React, {ChangeEvent, FormEvent} from 'react';
+import React, {ChangeEvent, FormEvent, useEffect} from 'react';
 import {CreateUpdateFormProps} from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import Form from "../../components/forms/Form/Form";
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
@@ -28,8 +28,9 @@ import {useSubscriptionState} from "../../state/pub-sub/pubsub-state";
 function PubSubForm(props: CreateUpdateFormProps<PubSubCollection>) {
   const pubSubState = useSubscriptionState();
   const appClientsAvail = useAppClientsState().appClients;
+  const newSecretCheckBox = useHookstate(props.formActionType == FormActionType.ADD);
   const formState = useState<PubSubCollection>({
-    appClientUser: props.data?.appClientUser ?? (appClientsAvail.filter(item => item.orgRead || item.personRead)[0]?.name ?? ''),
+    appClientUser: props.data?.appClientUser ?? '',
     events: props.data?.events,
     subscriberAddress: props.data?.subscriberAddress ?? '',
     secret: '',
@@ -39,20 +40,40 @@ function PubSubForm(props: CreateUpdateFormProps<PubSubCollection>) {
   formState.attach(Initial);
   formState.attach(Touched);
 
+  useEffect(() => {
+    if (formState.appClientUser.get() === '') {
+      formState.appClientUser.set(getFirstValidAppClient()[0].name);
+    }
+  }, []);
+
   if (props.formActionType == FormActionType.ADD) {
-    Validation(formState.secret).validate(validateRequiredString, validationErrors.requiredText, 'error');
-    Validation(formState.secret).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
+    Validation(formState.secret)
+      .validate((value) => validateRequiredString(value), validationErrors.requiredText, 'error');
+    Validation(formState.secret)
+      .validate((value) => validateStringLength(value), validationErrors.generateStringLengthError(), 'error');
+  }
+  else if (props.formActionType == FormActionType.UPDATE) {
+    Validation(formState.secret)
+      .validate((value) => validateRequiredString(value) || !newSecretCheckBox.get(), validationErrors.requiredText, 'error');
+    Validation(formState.secret)
+      .validate((value) => validateStringLength(value) || !newSecretCheckBox.get(), validationErrors.generateStringLengthError(), 'error');
+    Validation(formState.events)
+      .validate((value: SubscriberDtoSubscribedEventEnum[] | undefined) => !!(value && (value.length > 0)), 'Must have at least one subscription', 'error');
   }
 
 
   function isFormModified() {
     if (props.formActionType === FormActionType.ADD) {
-      return Initial(formState.subscriberAddress).modified() && Initial(formState.secret).modified();
+      return Initial(formState.subscriberAddress).modified()
+        && Initial(formState.secret).modified()
+        && Initial(formState.events).modified()
     }
     else {
       return Initial(formState.subscriberAddress).modified()
         || Initial(formState.events).modified()
-        || Initial(formState.appClientUser).modified();
+        || Initial(formState.appClientUser).modified()
+        || Initial(formState.events).modified()
+        || (Initial(formState.secret).modified() || newSecretCheckBox.get())
     }
   }
 
@@ -112,6 +133,12 @@ function PubSubForm(props: CreateUpdateFormProps<PubSubCollection>) {
     }
   }
 
+  const getFirstValidAppClient = () : AppClientFlat[] => {
+    return appClientsAvail
+      .filter(item => item.orgRead || item.personRead)  // app client should have at least some sort of read privilege
+      .filter(item => props.formActionType == FormActionType.UPDATE || checkAppClientIsAvailable(item.name)) // and not already have a subscription entry
+  }
+
   return (
     <Form className="subscriber-form" onSubmit={(event) => submitForm(event)} data-testid="subscriber-form">
       <FormGroup
@@ -127,9 +154,7 @@ function PubSubForm(props: CreateUpdateFormProps<PubSubCollection>) {
           disabled={isFormDisabled() || props.formActionType == FormActionType.UPDATE}
         >
           {
-            appClientsAvail
-              .filter(item => item.orgRead || item.personRead)  // app client should have at least some sort of read privilege
-              .filter(item => props.formActionType == FormActionType.UPDATE || checkAppClientIsAvailable(item.name)) // and not already have a subscription entry
+            getFirstValidAppClient()
               .map((app: AppClientFlat) => {
                 return <option key={app.name} value={app.name}>{app.name}</option>
             })
@@ -158,6 +183,8 @@ function PubSubForm(props: CreateUpdateFormProps<PubSubCollection>) {
       <FormGroup
         labelName="events"
         labelText="Subscribed Event(s)"
+        isError={failsHookstateValidation(formState.events)}
+        errorMessages={generateStringErrorMessages(formState.events)}
         required
       >
         {
@@ -181,25 +208,38 @@ function PubSubForm(props: CreateUpdateFormProps<PubSubCollection>) {
         }
       </FormGroup>
 
-      { props.formActionType === FormActionType.ADD &&
-        <FormGroup
-          labelName="secretPhrase"
-          labelText="Secret"
-          isError={failsHookstateValidation(formState.secret)}
-          errorMessages={generateStringErrorMessages(formState.secret)}
-          required
-        >
-          <TextInput
-            id="secretPhrase"
-            name="secretPhrase"
-            type="password"
-            defaultValue={formState.secret.get()}
-            error={failsHookstateValidation(formState.secret)}
-            onChange={(event) => formState.secret.set(event.target.value)}
+      <FormGroup
+        labelName="secretPhrase"
+        labelText="Secret"
+        isError={failsHookstateValidation(formState.secret)}
+        errorMessages={generateStringErrorMessages(formState.secret)}
+        required
+      >
+        { props.formActionType == FormActionType.UPDATE &&
+          <Checkbox
+            id="secret_change_checkbox"
+            name="secret_change_checkbox"
+            key="secret_change_checkbox"
+            label="Supply New Secret?"
+            checked={newSecretCheckBox.get()}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              if (!event.target.checked) formState.secret.set('');
+              newSecretCheckBox.set(event.target.checked)
+            }}
             disabled={isFormDisabled()}
           />
-        </FormGroup>
-      }
+        }
+        <TextInput
+          id="secretPhrase"
+          name="secretPhrase"
+          type="password"
+          defaultValue={formState.secret.get()}
+          error={failsHookstateValidation(formState.secret)}
+          onChange={(event) => formState.secret.set(event.target.value)}
+          disabled={isFormDisabled() || (props.formActionType == FormActionType.UPDATE && !newSecretCheckBox.get())}
+        />
+      </FormGroup>
+
 
       <SuccessErrorMessage
         successMessage={props.successAction?.successMsg}
