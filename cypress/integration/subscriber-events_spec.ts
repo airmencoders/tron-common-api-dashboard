@@ -17,7 +17,7 @@ function fillSubscriberForm(data: Subscriber) {
 
   cy.get('#appclients').select(appClientName).should('have.value', appClientName);
   cy.get('#subscriberAddress').clear().type(subscriberAddress).should('have.value', subscriberAddress);
-  cy.get('#events').select(event).should('have.value', event);
+  cy.get('#event_PERSON_CHANGE').check({ force: true }).should('be.checked');
   cy.get('#secretPhrase').clear().type(secret).should('have.value', secret);
 }
 
@@ -33,9 +33,9 @@ function createSubscriberAndFilterExists(data: Subscriber) {
   createSubscriberAndSuccess(data);
 
   cy.wait('@subscriberCreate').then((intercept) => {
-    filterColumnWithSearchValueNoRequest(SubscriberGridColId.ID, intercept.response.body.id);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(SubscriberGridColId.ID, intercept.response.body.id);
-    DataCrudFormPageUtil.clearFilterColumn(SubscriberGridColId.ID);
+    filterColumnWithSearchValueNoRequest(SubscriberGridColId.APP_CLIENT_NAME, intercept.response.body.appClientUser);
+    DataCrudFormPageUtil.getRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, intercept.response.body.appClientUser);
+    DataCrudFormPageUtil.clearFilterColumn(SubscriberGridColId.APP_CLIENT_NAME);
   });
 }
 
@@ -67,7 +67,7 @@ describe('Subscriber Events Tests', () => {
     createSubscriberAndFilterExists(subscriber);
 
     // Delete subscription
-    deleteRowWithColIdContainingValue(SubscriberGridColId.SUBSCRIBER_URL, subscriber.subscriberAddress);
+    deleteRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName);
   });
 
   it('Should allow to edit subscribed events ', () => {
@@ -88,17 +88,17 @@ describe('Subscriber Events Tests', () => {
     createSubscriberAndSuccess(subscriber);
 
     // Open edit form
-    filterColumnWithSearchValueNoRequest(SubscriberGridColId.SUBSCRIBER_URL, subscriber.subscriberAddress);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(SubscriberGridColId.SUBSCRIBER_URL, subscriber.subscriberAddress).click();
+    filterColumnWithSearchValueNoRequest(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName);
+    DataCrudFormPageUtil.getRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName).click();
     cy.get('#subscriberAddress').should('have.value', subscriber.subscriberAddress);
 
     // Change it
-    cy.get('#events').select(SubscribeEvent.PERSON_ORG_REMOVE).should('have.value', SubscribeEvent.PERSON_ORG_REMOVE);
+    cy.get('#event_PERSON_ORG_REMOVE').check({ force: true }).should('be.checked');
 
     // Save it
     DataCrudFormPageUtil.submitDataCrudFormUpdate();
 
     // Delete it
-    deleteRowWithColIdContainingValue(SubscriberGridColId.SUBSCRIBER_URL, subscriber.subscriberAddress);
+    deleteRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName);
   });
 });
