@@ -33,7 +33,7 @@ export interface OrganizationDto {
      */
     leader?: string | null;
     /**
-     * 
+     * Field cannot be modified through JSON Patch
      * @type {Array<string>}
      * @memberof OrganizationDto
      */
@@ -45,7 +45,7 @@ export interface OrganizationDto {
      */
     parentOrganization?: string | null;
     /**
-     * 
+     * Field cannot be modified through JSON Patch
      * @type {Array<string>}
      * @memberof OrganizationDto
      */
