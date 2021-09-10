@@ -63,8 +63,7 @@ function EventRequestLog({ id }: EventRequestLogProps) {
   const eventRequestLogService = useEventRequestLogState();
 
   const eventRequestLogState = useHookstate<EventRequestLogState>({
-    show: false,
-    onClose: eventRequestLogCloseHandler
+    show: false
   });
 
   function eventRequestLogCloseHandler() {
