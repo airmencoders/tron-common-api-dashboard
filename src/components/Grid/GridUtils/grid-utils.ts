@@ -73,6 +73,7 @@ export function createDefaultGridFilterParamsForType(type: 'enum' | 'uuid' | 'nu
   switch (type) {
     case 'enum':
     case 'uuid':
+    case 'boolean':
       return {
         filterOptions: [agGridFilterOptions.equals, agGridFilterOptions.notEquals]
       };
@@ -85,11 +86,6 @@ export function createDefaultGridFilterParamsForType(type: 'enum' | 'uuid' | 'nu
           agGridFilterOptions.greaterThan,
           agGridFilterOptions.lessThan
         ]
-      };
-
-    case 'boolean':
-      return {
-        filterOptions: [agGridFilterOptions.equals, agGridFilterOptions.notEquals]
       };
 
     case 'date':

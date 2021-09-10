@@ -40,7 +40,8 @@ describe('Test Kpi Summary Content', () => {
           uniqueCount: 0,
           requestCount: 0
         }
-      ]
+      ],
+      serviceMetrics: []
     });
 
     const page = render(
@@ -57,7 +58,9 @@ describe('Test Kpi Summary Content', () => {
       startDate: '2021-07-19',
       endDate: '2021-07-25',
       appSourceCount: 0,
-      appClientToAppSourceRequestCount: 0
+      appClientToAppSourceRequestCount: 0,
+      uniqueVisitorCounts: [],
+      serviceMetrics: []
     });
 
     const page = render(
