@@ -129,7 +129,7 @@ function ScratchStorageKeyValueEditorForm(props: ScratchStorageAddKVPProps) {
               className="button"
               onClick={beautifyJsonValue}
             >
-              Beautify Json
+              Beautify JSON
             </Button>
           </div>
         }
