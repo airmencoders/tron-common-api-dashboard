@@ -21,7 +21,7 @@
     "ag-grid-react": "^25.0.1",
     "ajv": "^8.4.0",
     "apexcharts": "^3.26.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "bootstrap": "^4.5.3",
     "bootstrap-icons": "^1.3.0",
     "chai": "^4.2.0",
@@ -124,6 +124,7 @@
     "prismjs": "1.24.0",
     "url-parse": "1.5.3",
     "tar": "6.1.7",
-    "path-parse": "1.0.7"
+    "path-parse": "1.0.7",
+    "axios": "0.21.4"
   }
 }
