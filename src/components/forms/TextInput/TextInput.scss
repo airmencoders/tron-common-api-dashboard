@@ -46,6 +46,16 @@
       }
     }
   }
+
+  input.tron-text-input__search-bar {
+    padding: 0 .5rem 0 2.5rem;
+  }
+
+  .search-icon {
+    color: $font-color-lighter;
+    padding: calculateRem(7px) calculateRem(12px);
+    position: absolute;
+  }
 }
 
 .tron-text-input-inline {
