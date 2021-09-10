@@ -1,19 +1,25 @@
-import { createState, State, StateMethodsDestroy, useState } from '@hookstate/core';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render, waitFor } from '@testing-library/react';
+import { AxiosResponse } from 'axios';
 import React from 'react';
 import { DataCrudFormErrors } from '../../../components/DataCrudFormPage/data-crud-form-errors';
 import { DataCrudSuccessAction } from '../../../components/DataCrudFormPage/data-crud-success-action';
+import { EventRequestLogControllerApi, EventRequestLogControllerApiInterface, EventRequestLogDtoEventTypeEnum, EventRequestLogDtoPaginationResponseWrapper } from '../../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../../openapi/apis/app-client-controller-api';
 import { PrivilegeDto } from '../../../openapi/models/privilege-dto';
 import { AppClientFlat } from '../../../state/app-clients/app-client-flat';
 import AppClientsService from '../../../state/app-clients/app-clients-service';
 import { useAppClientsState, wrapState } from '../../../state/app-clients/app-clients-state';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
+import EventRequestLogService from '../../../state/event-request-log/event-request-log-service';
+import { useEventRequestLogState } from '../../../state/event-request-log/event-request-log-state';
 import { PrivilegeType } from '../../../state/privilege/privilege-type';
+import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import { validationErrors } from '../../../utils/validation-utils';
 import AppClientForm from '../AppClientForm';
 
 jest.mock("../../../state/app-clients/app-clients-state");
+jest.mock('../../../state/event-request-log/event-request-log-state');
 
 describe('Test App Client Form', () => {
   let onSubmit = jest.fn();
@@ -40,6 +46,7 @@ describe('Test App Client Form', () => {
   let appClientState: State<AppClientFlat[]> & StateMethodsDestroy;
   let appClientApi: AppClientControllerApiInterface;
   let wrappedState: AppClientsService;
+  let eventRequestLogApi: EventRequestLogControllerApiInterface;
 
   beforeEach(() => {
     onSubmit = jest.fn().mockImplementation(() => { });
@@ -69,6 +76,9 @@ describe('Test App Client Form', () => {
       jest.spyOn(useAppClientsState(), 'isPromised', 'get').mockReturnValue(true);
     }
     mockAppClientState();
+
+    eventRequestLogApi = new EventRequestLogControllerApi();
+    (useEventRequestLogState as jest.Mock).mockReturnValue(new EventRequestLogService(eventRequestLogApi));
   });
 
   it('Update', async () => {
@@ -223,5 +233,54 @@ describe('Test App Client Form', () => {
       expect(pageRender.getByText('joe@test.com')).toBeInTheDocument();
     });
 
+  });
+
+  it('should show Event Request Log modal', () => {
+    const pageRender = render(
+      <AppClientForm
+        onClose={onClose}
+        data={client}
+        onSubmit={onSubmit}
+        formActionType={FormActionType.UPDATE}
+        isSubmitting={false}
+        successAction={successAction}
+      />
+    );
+
+    const eventRequestLogResponse: AxiosResponse<EventRequestLogDtoPaginationResponseWrapper> = createAxiosSuccessResponse({
+      data: [
+        {
+          appClientUser: {
+            id: client.id,
+            name: "guardianangel"
+          },
+          eventType: EventRequestLogDtoEventTypeEnum.OrganizationChange,
+          eventCount: 523,
+          wasSuccessful: false,
+          reason: "Event request to recipient failed: 404 NOT_FOUND",
+          lastAttempted: "2021-09-03T12:56:44.482Z"
+        }
+      ],
+      pagination: {
+        page: 0,
+        size: 1,
+        totalElements: 29,
+        totalPages: 15,
+        links: {
+          next: "http://localhost:8888/api/v2/event-request-log/all?page=1&size=2",
+          last: "http://localhost:8888/api/v2/event-request-log/all?page=14&size=2"
+        }
+      }
+    });
+
+    eventRequestLogApi.getEventRequestLogsByAppClientId = jest.fn(() => {
+      return Promise.resolve(eventRequestLogResponse);
+    });
+
+    const viewLogsBtn = pageRender.getByText('View Event Logs');
+    expect(viewLogsBtn).toBeInTheDocument();
+    fireEvent.click(viewLogsBtn);
+
+    expect(pageRender.getByText('Event Request Logs')).toBeInTheDocument();
   });
 })

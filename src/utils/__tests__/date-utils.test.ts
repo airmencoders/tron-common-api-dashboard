@@ -55,7 +55,6 @@ describe('Date util tests', () => {
 
   it('should get end of week given a day', () => {
     const date = new Date(2021, 6, 29);
-    console.log(getEndOfWeek(date, 1))
     expect(getEndOfWeek(date, 1).getDate()).toBe(1);
   });
 
@@ -70,7 +69,6 @@ describe('Date util tests', () => {
   it('should get the start of a given day', () => {
     const date = new Date(2021, 0, 1, 20);
     const startOfDay = getStartOfDay(date);
-    console.log(date, startOfDay)
     expect(startOfDay.getDate()).toBe(1);
     expect(startOfDay.getMonth()).toBe(0);
     expect(startOfDay.getFullYear()).toBe(2021);

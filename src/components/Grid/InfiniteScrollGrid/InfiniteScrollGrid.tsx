@@ -25,6 +25,7 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
       onRowSelected={props.onRowSelected}
       scrollToTop={props.scrollToTop}
       scrollToTopCallback={props.scrollToTopCallback}
+      suppressCellSelection={props.suppressCellSelection}
     />
   );
 }

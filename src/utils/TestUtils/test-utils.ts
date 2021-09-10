@@ -4,15 +4,15 @@ export function flushPromises() {
   return new Promise(resolve => setImmediate(resolve));
 }
 
-export function createGenericAxiosRequestErrorResponse() {
+export function createGenericAxiosRequestErrorResponse(statusCode: number = 400) {
   return {
     response: {
       data: {
         reason: 'Generic Axios Request Failure',
-        status: 400,
+        status: statusCode,
         error: 'Failed Request'
       },
-      status: 400,
+      status: statusCode,
       statusText: 'Failed Request',
       config: {},
       headers: {}

@@ -69,12 +69,35 @@ export function convertAgGridSortToQueryParams(sort?: AgGridSortModel[]): string
  * @param type the field type
  * @returns default GridFilterParams if one exists for type, undefined otherwise
  */
-export function createDefaultGridFilterParamsForType(type: 'enum' | 'uuid'): GridFilterParams | undefined {
+export function createDefaultGridFilterParamsForType(type: 'enum' | 'uuid' | 'number' | 'boolean' | 'date'): GridFilterParams | undefined {
   switch (type) {
     case 'enum':
     case 'uuid':
       return {
         filterOptions: [agGridFilterOptions.equals, agGridFilterOptions.notEquals]
+      };
+
+    case 'number':
+      return {
+        filterOptions: [
+          agGridFilterOptions.equals,
+          agGridFilterOptions.notEquals,
+          agGridFilterOptions.greaterThan,
+          agGridFilterOptions.lessThan
+        ]
+      };
+
+    case 'boolean':
+      return {
+        filterOptions: [agGridFilterOptions.equals, agGridFilterOptions.notEquals]
+      };
+
+    case 'date':
+      return {
+        filterOptions: [
+          agGridFilterOptions.greaterThan,
+          agGridFilterOptions.lessThan
+        ]
       };
 
     default:

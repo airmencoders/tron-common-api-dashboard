@@ -125,6 +125,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                 maxBlocksInCache={props.maxBlocksInCache ?? agGridDefaults.maxBlocksInCache}
                 getRowNodeId={props.getRowNodeId}
                 immutableData={props.immutableData}
+                suppressCellSelection={props.suppressCellSelection}
             >
               {
                 props.columns.map(col => (

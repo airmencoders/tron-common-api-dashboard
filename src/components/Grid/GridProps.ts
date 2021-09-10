@@ -35,6 +35,7 @@ export interface GridProps {
 
   className?: string;
   suppressRowClickSelection?: boolean;
+  suppressCellSelection?: boolean;
 
   /**
    * Returns the data of the row and the event that occurred (selected or unselected)
