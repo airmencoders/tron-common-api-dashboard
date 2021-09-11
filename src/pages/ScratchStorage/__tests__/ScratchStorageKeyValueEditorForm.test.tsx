@@ -106,6 +106,14 @@ describe('Test Scratch Storage Key Value Editor Form', () => {
         await waitFor(() => expect(page.getByTestId('scratch-kvp-value'))
             .toHaveDisplayValue('some value'));
 
+        fireEvent.click(page.getByText('Beautify JSON'));
+        await waitFor(() => expect(page.getByText(/Could not beautify/i)).toBeVisible());
+
+        createEditState.set({ ...createEditState.get(), value: '{ "name": "Chris" }' } as ScratchStorageCreateUpdateState);
+
+        fireEvent.click(page.getByText('Beautify JSON'));
+        await waitFor(() => expect(page.findByText(/Could not beautify/i)).rejects);
+
     });
 
     it('Creates new key form', async () => {
