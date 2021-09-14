@@ -5,7 +5,9 @@ api.ts
 apis/app-client-controller-api.ts
 apis/app-source-controller-api.ts
 apis/app-version-controller-api.ts
+apis/dashboard-controller-api.ts
 apis/dashboard-user-controller-api.ts
+apis/event-request-log-controller-api.ts
 apis/http-logs-controller-api.ts
 apis/kpi-controller-api.ts
 apis/logfile-controller-api.ts
@@ -39,7 +41,11 @@ models/app-source-count-metric-dto.ts
 models/app-source-details-dto.ts
 models/app-source-dto-response-wrapper.ts
 models/app-source-dto.ts
+models/app-source-error-response-dto.ts
+models/app-source-error-usage-dto.ts
 models/app-source-metric-dto.ts
+models/app-source-usage-dto.ts
+models/app-source-usage-response-dto.ts
 models/app-version-info-dto.ts
 models/coast-guardsman.ts
 models/count-metric-dto.ts
@@ -47,8 +53,12 @@ models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
 models/endpoint-count-metric-dto.ts
 models/endpoint-metric-dto.ts
+models/entity-accessor-dto.ts
+models/entity-accessor-response-dto.ts
 models/event-info-dto-response-wrapper.ts
 models/event-info-dto.ts
+models/event-request-log-dto-pagination-response-wrapper.ts
+models/event-request-log-dto.ts
 models/exception-response.ts
 models/filter-condition.ts
 models/filter-criteria.ts
@@ -87,6 +97,7 @@ models/privilege-id-pair.ts
 models/pub-sub-ledger-entry-dto-response-wrapper.ts
 models/pub-sub-ledger-entry-dto.ts
 models/rank.ts
+models/response-dto.ts
 models/sailor.ts
 models/scratch-storage-app-registry-dto-response-wrapper.ts
 models/scratch-storage-app-registry-dto.ts
@@ -96,6 +107,7 @@ models/scratch-storage-entry-dto.ts
 models/scratch-storage-user-dto-response-wrapper.ts
 models/scratch-storage-user-dto.ts
 models/scratch-value-patch-json-dto.ts
+models/service-metric-dto.ts
 models/soldier.ts
 models/spaceman.ts
 models/squadron.ts

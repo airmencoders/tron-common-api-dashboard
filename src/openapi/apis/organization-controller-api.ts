@@ -661,7 +661,7 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             };
         },
         /**
-         * Patches an existing organization
+         * Patches an existing organization. Fields (subordinateOrganizations and members) cannot be modified through this operation.
          * @summary Patches an existing organization
          * @param {string} id Organization ID to patch
          * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
@@ -1012,7 +1012,7 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             };
         },
         /**
-         * Patches an existing organization
+         * Patches an existing organization. Fields (subordinateOrganizations and members) cannot be modified through this operation.
          * @summary Patches an existing organization
          * @param {string} id Organization ID to patch
          * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
@@ -1193,7 +1193,7 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
             return OrganizationControllerApiFp(configuration).getOrganizationsWrapped(type, branch, search, people, organizations, page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
-         * Patches an existing organization
+         * Patches an existing organization. Fields (subordinateOrganizations and members) cannot be modified through this operation.
          * @summary Patches an existing organization
          * @param {string} id Organization ID to patch
          * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
@@ -1362,7 +1362,7 @@ export interface OrganizationControllerApiInterface {
     getOrganizationsWrapped(type?: 'SQUADRON' | 'GROUP' | 'FLIGHT' | 'WING' | 'OTHER_USAF' | 'DIVISION' | 'REGIMENT' | 'BRIGADE' | 'BATTALION' | 'COMPANY' | 'TROOP' | 'OTHER_USA' | 'OTHER_USN' | 'OTHER_USSF' | 'OTHER_USCG' | 'OTHER_USMC' | 'ORGANIZATION', branch?: 'OTHER' | 'USA' | 'USAF' | 'USMC' | 'USN' | 'USSF' | 'USCG', search?: string, people?: string, organizations?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<OrganizationDtoPaginationResponseWrapper>;
 
     /**
-     * Patches an existing organization
+     * Patches an existing organization. Fields (subordinateOrganizations and members) cannot be modified through this operation.
      * @summary Patches an existing organization
      * @param {string} id Organization ID to patch
      * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 
@@ -1553,7 +1553,7 @@ export class OrganizationControllerApi extends BaseAPI implements OrganizationCo
     }
 
     /**
-     * Patches an existing organization
+     * Patches an existing organization. Fields (subordinateOrganizations and members) cannot be modified through this operation.
      * @summary Patches an existing organization
      * @param {string} id Organization ID to patch
      * @param {Array<JsonPatchStringArrayValue | JsonPatchStringValue | JsonPatchObjectValue | JsonPatchObjectArrayValue>} jsonPatchStringArrayValueJsonPatchStringValueJsonPatchObjectValueJsonPatchObjectArrayValue 

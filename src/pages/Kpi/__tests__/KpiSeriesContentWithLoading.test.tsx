@@ -56,7 +56,8 @@ describe('Test Kpi Series Content', () => {
             uniqueCount: 0,
             requestCount: 0
           }
-        ]
+        ],
+        serviceMetrics: []
       },
       {
         startDate: '2021-07-26',
@@ -75,7 +76,8 @@ describe('Test Kpi Series Content', () => {
             uniqueCount: 0,
             requestCount: 0
           }
-        ]
+        ],
+        serviceMetrics: []
       },
     ]);
 
