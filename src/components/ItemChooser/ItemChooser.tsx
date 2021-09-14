@@ -23,6 +23,7 @@ function ItemChooser(props: ChooserProps) {
           data-testid='chooser-filter'
           placeholder='Search'
           defaultValue={filterState}
+          searchInput
           onChange={(event) => setFilterState(event.target.value)}
           className='actions__input'
         />

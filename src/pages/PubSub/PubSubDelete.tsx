@@ -1,10 +1,10 @@
-import { DataCrudDeleteComponentProps } from '../../components/DataCrudFormPage/DataCrudDeleteComponentProps';
+import {DataCrudDeleteComponentProps} from '../../components/DataCrudFormPage/DataCrudDeleteComponentProps';
 import DataCrudDeleteContent from '../../components/DataCrudFormPage/DataCrudDeleteContent';
-import { SubscriberDto } from '../../openapi';
+import {PubSubCollection} from "../../state/pub-sub/pubsub-service";
 
-function PubSubDelete(props: DataCrudDeleteComponentProps<SubscriberDto>) {
+function PubSubDelete(props: DataCrudDeleteComponentProps<PubSubCollection>) {
   const fields: Record<string, string> = {
-    "ID": props.data.id || 'Unknown'
+    "App Client": props.data.appClientUser || 'Unknown'
   };
 
   return (
