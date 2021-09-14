@@ -11,7 +11,7 @@ function ChevronUpIcon(props: IconProps) {
           `${props.className}`
         }
          style={{fontSize: `${props.size}em`}}
-         title={ props.iconTitle != null ? props.iconTitle : 'close'}
+         title={ props.iconTitle != null ? props.iconTitle : 'up'}
       ></i>
   );
 }

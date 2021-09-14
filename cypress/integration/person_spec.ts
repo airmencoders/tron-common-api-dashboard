@@ -2,7 +2,7 @@
 
 import {host, orgApiBase} from '../support';
 import DataCrudFormPageUtil, { Person, PersonGridColId } from '../support/data-crud-form-functions';
-import UtilityFunctions from '../support/utility-functions';
+import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('Person Tests', () => {
   const dataTypeName = 'Person';
@@ -10,7 +10,7 @@ describe('Person Tests', () => {
   it('Should allow Person creation & deletion', () => {
     cy.visit(host);
 
-    cy.get('[href="/person"] > .sidebar-item__name').click({ force: true });
+    UtilityFunctions.clickOnPageNav(Page.PERSON);
 
     const person: Person = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,

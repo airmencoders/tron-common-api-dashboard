@@ -12,13 +12,21 @@ import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 import PubSubPage from "./pages/PubSub/PubSubPage";
 import AuditLogPage from "./pages/AuditLog/AuditLogPage";
 import KpiPage from './pages/Kpi/KpiPage';
+import { IconProps } from './icons/IconProps';
+import HomeIcon from './icons/HomeIcon';
+import HealthIcon from './icons/HealthIcon';
+import RecordIcon from './icons/RecordIcon';
+import AppsIcon from './icons/AppsIcon';
+import DigitizeIcon from './icons/DigitizeIcon';
+import SystemIcon from './icons/SystemIcon';
 
 export interface RouteItem {
-    path: string,
-    name: string,
-    component?: React.FunctionComponent,
-    requiredPrivileges: PrivilegeType[],
-    childRoutes?: RouteItem[]
+    path: string;
+    name: string;
+    component?: React.FunctionComponent;
+    requiredPrivileges: PrivilegeType[];
+    childRoutes?: RouteItem[];
+    icon?: (props: IconProps) => JSX.Element;
 }
 
 export enum RoutePath {
@@ -54,13 +62,15 @@ export const routes: RouteItem[] = [
             PrivilegeType.SCRATCH_WRITE,
             PrivilegeType.SCRATCH_ADMIN,
             PrivilegeType.APP_CLIENT_DEVELOPER,
-        ]
+        ],
+        icon: HomeIcon
     },
     {
         path: RoutePath.HEALTH,
         name: 'Health',
         component: HealthPage,
-        requiredPrivileges: [PrivilegeType.DASHBOARD_USER, PrivilegeType.APP_CLIENT_DEVELOPER]
+        requiredPrivileges: [PrivilegeType.DASHBOARD_USER, PrivilegeType.APP_CLIENT_DEVELOPER],
+        icon: HealthIcon
     },
     {
         path: '#',
@@ -85,7 +95,8 @@ export const routes: RouteItem[] = [
                 component: PubSubPage,
                 requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN,PrivilegeType.APP_CLIENT_DEVELOPER]
             }
-        ]
+        ],
+        icon: RecordIcon
     },
     {
         path: '#',
@@ -108,7 +119,8 @@ export const routes: RouteItem[] = [
                 component: AppSourcePage,
                 requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_SOURCE_ADMIN]
             }
-        ]
+        ],
+        icon: AppsIcon
     },
     {
         path: '#',
@@ -131,7 +143,8 @@ export const routes: RouteItem[] = [
                 component: ScratchStoragePage,
                 requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.SCRATCH_ADMIN]
             },
-        ]
+        ],
+        icon: DigitizeIcon
     },
     {
         path: '#',
@@ -165,6 +178,7 @@ export const routes: RouteItem[] = [
                 component: KpiPage,
                 requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
             }
-        ]
+        ],
+        icon: SystemIcon
     },
 ];

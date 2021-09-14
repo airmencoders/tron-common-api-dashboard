@@ -5,9 +5,18 @@
 
   &__nav-menu {
     flex: 0 0 220px;
-    background: $dark-shade;
+    background: rgba(28, 62, 107, 1);
     min-height: 100vh;
     position: sticky;
+
+    .nav-menu {
+      &__user-info {
+        position: absolute;
+        bottom: 0;
+        padding-left: calculateRem(15px);
+        padding-bottom: calculateRem(23px);
+      }
+    }
   }
   &__page-body-container {
     flex: 1;
@@ -15,19 +24,8 @@
     overflow: auto;
   }
 
-  &__top-nav {
-    height: 70px;
-    border-bottom: 1px solid $page-border-color;
-    display: flex;
-    justify-content: flex-end;
-    padding: $default-panel-padding-y $page-padding ;
-    .header-user-info {
-      align-self: center;
-    }
-  }
-
   &__page-body {
-    height: calc(100vh - 70px);
+    height: 100vh;
     display: flex;
     flex-direction: column;
   }
