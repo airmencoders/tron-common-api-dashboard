@@ -23,10 +23,6 @@ describe('Dashboard User State Test', () => {
     {
       id: 1,
       name: PrivilegeType.DASHBOARD_ADMIN
-    },
-    {
-      id: 2,
-      name: PrivilegeType.DASHBOARD_USER
     }
   ];
 
@@ -35,13 +31,11 @@ describe('Dashboard User State Test', () => {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       email: "test@email.com",
       hasDashboardAdmin: true,
-      hasDashboardUser: true
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
       email: "test1@email.com",
       hasDashboardAdmin: false,
-      hasDashboardUser: false
     }
   ];
 
@@ -53,10 +47,6 @@ describe('Dashboard User State Test', () => {
         {
           id: privilegDtos[0].id,
           name: privilegDtos[0].name
-        },
-        {
-          id: privilegDtos[1].id,
-          name: privilegDtos[1].name
         }
       ]
     },
@@ -78,10 +68,6 @@ describe('Dashboard User State Test', () => {
     {
       id: privilegDtos[0].id,
       name: privilegDtos[0].name
-    },
-    {
-      id: privilegDtos[1].id,
-      name: privilegDtos[1].name
     }
   ];
 
@@ -95,7 +81,6 @@ describe('Dashboard User State Test', () => {
     id: 'dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8',
     email: 'test@email.com',
     hasDashboardAdmin: true,
-    hasDashboardUser: true
   };
 
   const axiosPostPutResponse = {

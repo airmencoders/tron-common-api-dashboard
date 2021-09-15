@@ -73,7 +73,6 @@ export default class DashboardUserService implements DataService<DashboardUserFl
 
     const privileges: DashboardUserPrivilege = {
       hasDashboardAdmin: privilegeArr.find(privilege => privilege.name === PrivilegeType.DASHBOARD_ADMIN) ? true : false,
-      hasDashboardUser: privilegeArr.find(privilege => privilege.name === PrivilegeType.DASHBOARD_USER) ? true : false,
     };
 
     return {
@@ -105,15 +104,6 @@ export default class DashboardUserService implements DataService<DashboardUserFl
         privileges.add(privilege);
       }
     }
-
-    if (dashboardUser.hasDashboardUser) {
-      const privilege = accessPrivilegeState().createPrivilegeFromType(PrivilegeType.DASHBOARD_USER);
-
-      if (privilege) {
-        privileges.add(privilege);
-      }
-    }
-
     return privileges;
   }
 
