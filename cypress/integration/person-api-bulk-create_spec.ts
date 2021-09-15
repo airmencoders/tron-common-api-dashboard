@@ -4,7 +4,7 @@ import AppClientSetupFunctions from '../support/app-client-setup-functions';
 import {apiHost, personApiBase} from '../support';
 import {PersonDto} from '../../src/openapi';
 
-describe('Person Delete API', () => {
+describe('Person API Bulk Create', () => {
 
   it('Should allow an authorized App Client to bulk create people', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_CREATE'])
@@ -33,7 +33,7 @@ describe('Person Delete API', () => {
         });
   });
 
-  it('Should allow partial updates', () => {
+  it('Should not allow partial updates', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_CREATE'])
         .then(() => {
           return cy
@@ -44,18 +44,7 @@ describe('Person Delete API', () => {
                 failOnStatusCode: false
               })
               .then((resp) => {
-                expect(resp.status).to.equal(201);
-                const createdPeople = resp.body?.data;
-                cy.wrap(createdPeople).each( (created: PersonDto) => {
-                  cy.request({
-                    method: 'DELETE',
-                    url: `${apiHost}${personApiBase}/${created.id}`,
-                    failOnStatusCode: false
-                  })
-                      .then((resp) => {
-                        expect(resp.status).to.equal(204);
-                      })
-                })
+                expect(resp.status).to.equal(400);
               })
         });
   });

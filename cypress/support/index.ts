@@ -20,6 +20,7 @@ import './cleanup-helper';
 export const host = Cypress.env('INTEGRATION_TEST_HOST');
 export const apiHost = Cypress.env('ADMIN_API_HOST') ?? 'http://localhost:9000';
 export const appClientApiHost = Cypress.env('APP_CLIENT_API_HOST') ?? 'http://localhost:9100';
+export const appClientDashboardApiHost = Cypress.env('APP_CLIENT_DASHBOARD_API_HOST') ?? 'http://localhost:9200';
 export const apiBase = '/api/v2';
 export const orgApiBase = `${apiBase}/organization`;
 export const personApiBase = `${apiBase}/person`;

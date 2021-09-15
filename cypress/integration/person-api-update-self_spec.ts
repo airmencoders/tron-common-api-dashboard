@@ -1,10 +1,10 @@
 /// <reference types="Cypress" />
 
-import {apiHost, appClientApiHost, personApiBase, userInfoApiBase} from '../support';
+import {apiHost, appClientApiHost, appClientDashboardApiHost, personApiBase, userInfoApiBase} from '../support';
 import UtilityFunctions from '../support/utility-functions';
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
 
-describe('Person update self', () => {
+describe('Person can update self from dashboard', () => {
   const userBaseUrl = appClientApiHost;
   const adminBaseUrl = apiHost;
 
@@ -32,7 +32,7 @@ describe('Person update self', () => {
         })
         .request({
           method: 'POST',
-          url: `${userBaseUrl}${personApiBase}`,
+          url: `${adminBaseUrl}${personApiBase}`,
           body: {
             email: updatePersonEmail
           },
@@ -42,17 +42,18 @@ describe('Person update self', () => {
           return cy
               .request({
                 method: 'GET',
-                url: `${userBaseUrl}${userInfoApiBase}/existing-person`
+                url: `${appClientDashboardApiHost}${userInfoApiBase}/existing-person`
               })
               .then((resp) => {
                 return cy
                     .request({
                       method: 'PUT',
-                      url: `${userBaseUrl}${personApiBase}/self/${resp.body?.id}`,
+                      url: `${appClientDashboardApiHost}${personApiBase}/self`,
                       body: {
                         ... resp.body,
                         firstName: 'NewFirst'
-                      }
+                      },
+                      failOnStatusCode: false
                     });
               })
         })
