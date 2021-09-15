@@ -4,7 +4,7 @@ import { host, logfileActuatorApi, pastLogfileApi } from '../support';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('Logfile & Audit Log Tests', () => {
-  // Log files are avail running under docker qa env
+  // Log files are not available running under docker qa env
   // it('Should show logfile page & should show at least current logfile', () => {
   //   cy.visit(host);
   //

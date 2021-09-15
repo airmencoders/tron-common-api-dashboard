@@ -4,7 +4,7 @@ import {apiHost, appClientApiHost, appClientDashboardApiHost, personApiBase, use
 import UtilityFunctions from '../support/utility-functions';
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
 
-describe('Person can update self from app client', () => {
+describe('Person can update self from dashboard', () => {
   const userBaseUrl = appClientApiHost;
   const adminBaseUrl = apiHost;
 
