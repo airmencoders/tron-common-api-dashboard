@@ -19,6 +19,7 @@ export * from './apis/app-source-controller-api';
 export * from './apis/app-version-controller-api';
 export * from './apis/dashboard-controller-api';
 export * from './apis/dashboard-user-controller-api';
+export * from './apis/document-space-controller-api';
 export * from './apis/event-request-log-controller-api';
 export * from './apis/http-logs-controller-api';
 export * from './apis/kpi-controller-api';

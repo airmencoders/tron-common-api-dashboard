@@ -7,6 +7,7 @@ apis/app-source-controller-api.ts
 apis/app-version-controller-api.ts
 apis/dashboard-controller-api.ts
 apis/dashboard-user-controller-api.ts
+apis/document-space-controller-api.ts
 apis/event-request-log-controller-api.ts
 apis/http-logs-controller-api.ts
 apis/kpi-controller-api.ts
@@ -51,6 +52,10 @@ models/coast-guardsman.ts
 models/count-metric-dto.ts
 models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
+models/document-dto-response-wrapper.ts
+models/document-dto.ts
+models/document-space-info-dto-response-wrapper.ts
+models/document-space-info-dto.ts
 models/endpoint-count-metric-dto.ts
 models/endpoint-metric-dto.ts
 models/entity-accessor-dto.ts
@@ -71,6 +76,7 @@ models/http-log-dto-pagination-response-wrapper.ts
 models/http-log-entry-details-dto.ts
 models/http-log-entry-dto.ts
 models/index.ts
+models/inline-object.ts
 models/json-patch-object-array-value.ts
 models/json-patch-object-value.ts
 models/json-patch-string-array-value.ts
@@ -96,6 +102,7 @@ models/privilege-dto.ts
 models/privilege-id-pair.ts
 models/pub-sub-ledger-entry-dto-response-wrapper.ts
 models/pub-sub-ledger-entry-dto.ts
+models/query-dto.ts
 models/rank.ts
 models/response-dto.ts
 models/sailor.ts

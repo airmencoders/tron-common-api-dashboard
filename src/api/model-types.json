@@ -842,6 +842,69 @@
       ],
       "type": "object"
     },
+    "DocumentDto": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "uploadedBy": {
+          "type": "string"
+        },
+        "uploadedDate": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "path",
+        "uploadedDate",
+        "uploadedBy"
+      ],
+      "type": "object"
+    },
+    "DocumentDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "DocumentSpaceInfoDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceInfoDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "EndpointCountMetricDto": {
       "additionalProperties": false,
       "properties": {
@@ -1376,6 +1439,14 @@
         },
         "userName": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "InlineObject": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
         }
       },
       "type": "object"
@@ -2037,6 +2108,15 @@
       "required": [
         "data"
       ],
+      "type": "object"
+    },
+    "QueryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "Rank": {
