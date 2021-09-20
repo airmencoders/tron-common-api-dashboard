@@ -87,6 +87,14 @@ function DocumentSpacePage() {
   }
 
   function getSpaceValues(): DocumentSpaceInfoDto[] {
+    if (isDocumentSpacesLoading) {
+      return [{name: 'Loading...'}];
+    }
+
+    if (isDocumentSpacesErrored) {
+      return [{name: 'Could not load Document Spaces'}]
+    }
+
     if (isSelectedSpaceValid()) {
       return documentSpaceService.documentSpaces;
     }
@@ -130,7 +138,7 @@ function DocumentSpacePage() {
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
-  const selectedSpace = pageState.selectedSpace.value;
+  const currentSelectedSpace = pageState.selectedSpace.value;
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -174,10 +182,7 @@ function DocumentSpacePage() {
       {isSelectedSpaceValid() && (
         <InfiniteScrollGrid
           columns={documentDtoColumns}
-          datasource={documentSpaceService.createDatasource(
-            selectedSpace,
-            infiniteScrollOptions
-          )}
+          datasource={documentSpaceService.createDatasource(currentSelectedSpace, infiniteScrollOptions)}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
           maxConcurrentDatasourceRequests={
