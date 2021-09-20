@@ -1,0 +1,17 @@
+@import "../../styles/mixins";
+@import "../../styles/colors";
+
+.sidebar-container {
+  &--active {
+    background-color: rgba($color: $light-shade, $alpha: 0.1);
+    border-right: calculateRem(5px) solid $light-accent;
+  }
+
+  &--active-nested {
+    background-color: rgba($color: $light-shade, $alpha: 0.1);
+  }
+
+  padding-left: calculateRem(22px);
+  padding-top: calculateRem(16px);
+  padding-bottom: calculateRem(16px);
+}

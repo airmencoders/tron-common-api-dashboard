@@ -44,6 +44,16 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
     return '--';
   }, [userInfo]);
 
+  const userName = useMemo(() => {
+    if (userInfo != null) {
+      const firstName = userInfo.givenName;
+      const lastNameInitial = userInfo.familyName?.[0];
+
+      return `${firstName ? (firstName + ' ') : ''}${lastNameInitial ? (lastNameInitial + '.') : ''}`
+    }
+    return '';
+  }, [userInfo]);
+
   const personState = usePersonState();
   const userInfoState = useUserInfoState();
   const userEditorState = useHookstate<UserEditorState>({
@@ -147,9 +157,13 @@ function HeaderUserInfo({userInfo}: HeaderUserInfoProps) {
   return (
     <div>
       <Dropdown className="header-user-info">
-        <Dropdown.Toggle className="header-user-info__initials" type="button">
+        <Dropdown.Toggle className="header-user-info__initials" variant="none">
           {userInitials}
         </Dropdown.Toggle>
+        <span className="header-user-info__name">
+          {userName}
+        </span>
+
         <Dropdown.Menu>
           <div className="header-user-info__body">
             <div className="header-user-info__section-header">P1 User Info</div>

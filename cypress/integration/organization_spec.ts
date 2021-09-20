@@ -2,7 +2,7 @@
 
 import { host, orgApiBase } from '../support';
 import DataCrudFormPageUtil, { Organization, OrganizationGridColId, PersonGridColId } from '../support/data-crud-form-functions';
-import UtilityFunctions from '../support/utility-functions';
+import UtilityFunctions, { Page } from '../support/utility-functions';
 
 function createOrganization(org: Organization) {
   const { name, branch, type } = org;
@@ -50,7 +50,7 @@ describe('Organization Tests', () => {
   it('Should allow Organization creation & deletion', () => {
     cy.visit(host);
 
-    cy.get('[href="/organization"] > .sidebar-item__name').click({ force: true });
+    UtilityFunctions.clickOnPageNav(Page.ORGANIZATION);
 
     const org: Organization = {
       name: UtilityFunctions.generateRandomString(),
@@ -88,7 +88,7 @@ describe('Organization Tests', () => {
     cy.visit(host);
 
     // Go to person page first and create a person
-    cy.get('[href="/person"] > .sidebar-item__name').click({ force: true });
+    UtilityFunctions.clickOnPageNav(Page.PERSON);
     const personLeader = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
       firstName: UtilityFunctions.generateRandomString(),
@@ -109,7 +109,7 @@ describe('Organization Tests', () => {
     DataCrudFormPageUtil.createPersonAndFilterExists(personMember);
 
     // Go to Organization page, create new org, and edit it
-    cy.get('[href="/organization"] > .sidebar-item__name').click();
+    UtilityFunctions.clickOnPageNav(Page.ORGANIZATION);
 
     const parentOrg = {
       name: UtilityFunctions.generateRandomString(),
@@ -185,7 +185,7 @@ describe('Organization Tests', () => {
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(OrganizationGridColId.NAME, parentOrg.name);
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(OrganizationGridColId.NAME, subordinateOrg.name);
 
-    cy.get('[href="/person"] > .sidebar-item__name').click();
+    UtilityFunctions.clickOnPageNav(Page.PERSON);
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, personLeader.firstName);
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, personMember.firstName);
   });

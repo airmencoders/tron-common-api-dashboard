@@ -2,29 +2,60 @@
 @import "../../styles/mixins";
 
 .sidebar-item {
-  color: $light-shade;
   text-decoration: none;
-
-  &.active {
-    .sidebar-item__name {
-      border-left: calculateRem(5px) solid $light-accent;
-      color: $light-accent;
-    }
-  }
-
-  &__name {
-    transition: 0.5s;
-    padding-left: calculateRem(5px);
-    border-left: calculateRem(5px) solid transparent;
-    margin-bottom: calculateRem(16px);
-    color: $light-shade;
-
-    &:hover {
-      color: $light-accent;
-    }
-  }
 
   &:hover {
     text-decoration: none;
+  }
+
+  &--active {
+    .sidebar-item {
+      &__container {
+        > * {
+          color: $light-accent;
+          stroke: $light-accent;
+        }
+      }
+    }
+  }
+
+  &--active-border {
+    .sidebar-item {
+      &__container {
+        border-right: calculateRem(5px) solid $light-accent;
+      }
+    }
+  }
+
+  &__container {
+    color: $light-shade;
+    display: flex;
+    align-items: center;
+    padding-right: 5px;
+
+    & > * {
+      color: $light-shade;
+    }
+
+    &:hover {
+      > * {
+        transition: 0.5s;
+        color: $light-accent;
+        stroke: $light-accent;
+      }
+    }
+
+    .container {
+      &__name {
+        font-size: calculateRem(14px);
+        font-weight: 500;
+        line-height: calculateRem(16.41px);
+      }
+
+      &__icon {
+        margin-right: calculateRem(25px);
+        flex: 0 0 25px;
+      }
+    }
   }
 }
