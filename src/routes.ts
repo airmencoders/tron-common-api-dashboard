@@ -12,6 +12,7 @@ import MyDigitizeAppsPage from "./pages/MyDigitizeApps/MyDigitizeAppsPage";
 import PubSubPage from "./pages/PubSub/PubSubPage";
 import AuditLogPage from "./pages/AuditLog/AuditLogPage";
 import KpiPage from './pages/Kpi/KpiPage';
+import DocumentSpacePage from './pages/DocumentSpace/DocumentSpacePage';
 import { IconProps } from './icons/IconProps';
 import HomeIcon from './icons/HomeIcon';
 import HealthIcon from './icons/HealthIcon';
@@ -46,7 +47,9 @@ export enum RoutePath {
     AUDIT_LOG = '/audit-log',
     APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?',
     API_TEST = '/app-api/:apiId',
-    KPI = '/kpi'
+    KPI = '/kpi',
+    DOCUMENT_SPACE = '/document-space',
+    DOCUMENT_SPACE_SPACES = '/document-space/spaces'
 }
 
 export const routes: RouteItem[] = [
@@ -145,6 +148,21 @@ export const routes: RouteItem[] = [
             },
         ],
         icon: DigitizeIcon
+    },
+    {
+        path: '#',
+        name: 'Document Space',
+        requiredPrivileges: [
+            PrivilegeType.DASHBOARD_ADMIN
+        ],
+        childRoutes: [
+            {
+                path: RoutePath.DOCUMENT_SPACE_SPACES,
+                name: 'Spaces',
+                component: DocumentSpacePage,
+                requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+            }
+        ]
     },
     {
         path: '#',
