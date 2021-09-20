@@ -1,12 +1,14 @@
-import { useHookstate } from '@hookstate/core';
 import React, { ChangeEvent, useEffect } from 'react';
+import { useHookstate } from '@hookstate/core';
+import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import Select from '../../components/forms/Select/Select';
 import GridColumn from '../../components/Grid/GridColumn';
+import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import { DocumentDto } from '../../openapi';
+import { DocumentSpaceInfoDto } from '../../openapi';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { CancellableDataRequest } from '../../utils/cancellable-data-request';
+import FormGroup from '../../components/forms/FormGroup/FormGroup';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -26,8 +28,19 @@ const documentDtoColumns: GridColumn[] = [
   })
 ];
 
+const infiniteScrollOptions: InfiniteScrollOptions = {
+  enabled: true,
+  limit: 100
+};
+
+interface DocumentSpacePageState {
+  selectedSpace: string;
+}
+
+const selectedSpaceDefaultValue = "Select a Space";
+
 function DocumentSpacePage() {
-  const pageState = useHookstate({
+  const pageState = useHookstate<DocumentSpacePageState>({
     selectedSpace: ''
   });
   const documentSpaceService = useDocumentSpaceState();
@@ -36,51 +49,71 @@ function DocumentSpacePage() {
     const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
 
     return function cleanup() {
-      if (spacesCancellableRequest) {
-        spacesCancellableRequest.cancelTokenSource.cancel;
+      if (spacesCancellableRequest != null) {
+        spacesCancellableRequest.cancelTokenSource.cancel();
       }
+
+      documentSpaceService.resetState();
     }
   }, []);
 
-  useEffect(() => {
-    let filesCancellableRequest: CancellableDataRequest<DocumentDto[]>;
-
-    if (pageState.selectedSpace.value !== '') {
-      filesCancellableRequest = documentSpaceService.fetchAndStoreDocuments(pageState.selectedSpace.value);
-    }
-
-    return function cleanup() {
-      if (filesCancellableRequest) {
-        filesCancellableRequest.cancelTokenSource.cancel;
-      }
-    }
-  }, [pageState.selectedSpace.value]);
-
-  function onDocumentSpaceSelectionChange(event: ChangeEvent<HTMLSelectElement>) {
+  function onDocumentSpaceSelectionChange(event: ChangeEvent<HTMLSelectElement>): void {
     pageState.selectedSpace.set(event.target.value);
   }
 
-  const documentSpacesLoading = documentSpaceService.documentSpacesState.promised;
-  const documentSpaces = documentSpacesLoading ? [] : documentSpaceService.documentSpacesState.value;
+  function isSelectedSpaceValid(): boolean {
+    const selectedSpace = pageState.selectedSpace.value;
 
-  console.log(pageState.selectedSpace.value)
+    return selectedSpace?.trim() !== '' && selectedSpace !== selectedSpaceDefaultValue;
+  }
+
+  function getSpaceValues(): DocumentSpaceInfoDto[] {
+    if (isSelectedSpaceValid()) {
+      return documentSpaceService.documentSpaces;
+    }
+
+    return [{ name: selectedSpaceDefaultValue }, ...documentSpaceService.documentSpaces];
+  }
+
+  const isDocumentSpacesLoading = documentSpaceService.isDocumentSpacesStatePromised;
+  const isDocumentSpacesErrored = documentSpaceService.isDocumentSpacesStateErrored;
+  const selectedSpace = pageState.selectedSpace.value;
 
   return (
-    <PageFormat pageTitle="Document Spaces">
+    <PageFormat pageTitle="Document Space">
 
-      <Select id="document-space" name="document-space"
-        defaultValue="Select a Space"
-        disabled={documentSpacesLoading}
-        onChange={onDocumentSpaceSelectionChange}
+      <FormGroup
+        labelName="document-space"
+        labelText="Spaces"
+        isError={false}
       >
-        {documentSpacesLoading ?
-          <option key="document-space-loading" value="Loading...">Loading...</option>
-          :
-          [{ name: 'Select a Space' }, ...documentSpaceService.documentSpacesState.value].map(item => {
-            return <option key={item.name} value={item.name}>{item.name}</option>;
-          })
-        }
-      </Select>
+        <Select id="document-space" name="document-space"
+          defaultValue={selectedSpaceDefaultValue}
+          disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
+          onChange={onDocumentSpaceSelectionChange}
+        >
+          {isDocumentSpacesLoading ?
+            <option key="document-space-loading" value="Loading...">Loading...</option>
+            : isDocumentSpacesErrored ?
+              <option key="document-space-error" value="Error">Could not load Document Spaces</option>
+              :
+              getSpaceValues().map(item => {
+                return <option key={item.name} value={item.name}>{item.name}</option>;
+              })
+          }
+        </Select>
+      </FormGroup>
+
+      {isSelectedSpaceValid() &&
+        <InfiniteScrollGrid
+          columns={documentDtoColumns}
+          datasource={documentSpaceService.createDatasource(selectedSpace, infiniteScrollOptions)}
+          cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
+          maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
+          maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
+          suppressCellSelection
+        />
+      }
 
     </PageFormat>
   );

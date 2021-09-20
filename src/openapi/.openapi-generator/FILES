@@ -52,7 +52,6 @@ models/coast-guardsman.ts
 models/count-metric-dto.ts
 models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
-models/document-dto-response-wrapper.ts
 models/document-dto.ts
 models/document-space-info-dto-response-wrapper.ts
 models/document-space-info-dto.ts
@@ -105,6 +104,7 @@ models/pub-sub-ledger-entry-dto.ts
 models/query-dto.ts
 models/rank.ts
 models/response-dto.ts
+models/s3-pagination-dto.ts
 models/sailor.ts
 models/scratch-storage-app-registry-dto-response-wrapper.ts
 models/scratch-storage-app-registry-dto.ts

@@ -866,21 +866,6 @@
       ],
       "type": "object"
     },
-    "DocumentDtoResponseWrapper": {
-      "additionalProperties": false,
-      "properties": {
-        "data": {
-          "items": {
-            "$ref": "model-types.json#/definitions/DocumentDto"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "data"
-      ],
-      "type": "object"
-    },
     "DocumentSpaceInfoDto": {
       "additionalProperties": false,
       "properties": {
@@ -888,6 +873,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "name"
+      ],
       "type": "object"
     },
     "DocumentSpaceInfoDtoResponseWrapper": {
@@ -2159,6 +2147,37 @@
           "type": "number"
         }
       },
+      "type": "object"
+    },
+    "S3PaginationDto": {
+      "additionalProperties": false,
+      "properties": {
+        "currentContinuationToken": {
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentDto"
+          },
+          "type": "array"
+        },
+        "nextContinuationToken": {
+          "type": "string"
+        },
+        "size": {
+          "description": "The size of the page",
+          "type": "number"
+        },
+        "totalElements": {
+          "description": "The size of the returned elements of this page",
+          "type": "number"
+        }
+      },
+      "required": [
+        "documents",
+        "size",
+        "totalElements"
+      ],
       "type": "object"
     },
     "Sailor": {

@@ -19,8 +19,6 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { DocumentDtoResponseWrapper } from '../models';
-// @ts-ignore
 import { DocumentSpaceInfoDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceInfoDtoResponseWrapper } from '../models';
@@ -28,6 +26,8 @@ import { DocumentSpaceInfoDtoResponseWrapper } from '../models';
 import { ExceptionResponse } from '../models';
 // @ts-ignore
 import { InlineObject } from '../models';
+// @ts-ignore
+import { S3PaginationDto } from '../models';
 /**
  * DocumentSpaceControllerApi - axios parameter creator
  * @export
@@ -313,13 +313,15 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * Gets all file details from a space. This is not a download
-         * @summary Retrieves all file details from a space
+         * Gets files from a space. This is not a download
+         * @summary Retrieves files from a space
          * @param {string} space 
+         * @param {string} [continuation] the continuation token
+         * @param {number} [limit] page limit
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listObjects: async (space: string, options: any = {}): Promise<RequestArgs> => {
+        listObjects: async (space: string, continuation?: string, limit?: number, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'space' is not null or undefined
             if (space === null || space === undefined) {
                 throw new RequiredError('space','Required parameter space was null or undefined when calling listObjects.');
@@ -336,6 +338,14 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (continuation !== undefined) {
+                localVarQueryParameter['continuation'] = continuation;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
 
 
     
@@ -504,14 +514,16 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-         * Gets all file details from a space. This is not a download
-         * @summary Retrieves all file details from a space
+         * Gets files from a space. This is not a download
+         * @summary Retrieves files from a space
          * @param {string} space 
+         * @param {string} [continuation] the continuation token
+         * @param {number} [limit] page limit
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listObjects(space: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentDtoResponseWrapper>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).listObjects(space, options);
+        async listObjects(space: string, continuation?: string, limit?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<S3PaginationDto>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).listObjects(space, continuation, limit, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -604,14 +616,16 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).getSpaces(options).then((request) => request(axios, basePath));
         },
         /**
-         * Gets all file details from a space. This is not a download
-         * @summary Retrieves all file details from a space
+         * Gets files from a space. This is not a download
+         * @summary Retrieves files from a space
          * @param {string} space 
+         * @param {string} [continuation] the continuation token
+         * @param {number} [limit] page limit
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listObjects(space: string, options?: any): AxiosPromise<DocumentDtoResponseWrapper> {
-            return DocumentSpaceControllerApiFp(configuration).listObjects(space, options).then((request) => request(axios, basePath));
+        listObjects(space: string, continuation?: string, limit?: number, options?: any): AxiosPromise<S3PaginationDto> {
+            return DocumentSpaceControllerApiFp(configuration).listObjects(space, continuation, limit, options).then((request) => request(axios, basePath));
         },
         /**
          * Uploads a file to a Document Space
@@ -696,14 +710,16 @@ export interface DocumentSpaceControllerApiInterface {
     getSpaces(options?: any): AxiosPromise<DocumentSpaceInfoDtoResponseWrapper>;
 
     /**
-     * Gets all file details from a space. This is not a download
-     * @summary Retrieves all file details from a space
+     * Gets files from a space. This is not a download
+     * @summary Retrieves files from a space
      * @param {string} space 
+     * @param {string} [continuation] the continuation token
+     * @param {number} [limit] page limit
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    listObjects(space: string, options?: any): AxiosPromise<DocumentDtoResponseWrapper>;
+    listObjects(space: string, continuation?: string, limit?: number, options?: any): AxiosPromise<S3PaginationDto>;
 
     /**
      * Uploads a file to a Document Space
@@ -800,15 +816,17 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-     * Gets all file details from a space. This is not a download
-     * @summary Retrieves all file details from a space
+     * Gets files from a space. This is not a download
+     * @summary Retrieves files from a space
      * @param {string} space 
+     * @param {string} [continuation] the continuation token
+     * @param {number} [limit] page limit
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApi
      */
-    public listObjects(space: string, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).listObjects(space, options).then((request) => request(this.axios, this.basePath));
+    public listObjects(space: string, continuation?: string, limit?: number, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).listObjects(space, continuation, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,9 +1,8 @@
 import { createState, State, useState } from '@hookstate/core';
-import { Configuration, DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto } from '../../openapi';
+import { Configuration, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto } from '../../openapi';
 import Config from '../../api/config';
 import DocumentSpaceService from './document-space-service';
 
-const documentFilesState = createState<DocumentDto[]>(new Array<DocumentDto>());
 const documentSpacesState = createState<DocumentSpaceInfoDto[]>(new Array<DocumentSpaceInfoDto>());
 
 const documentSpaceApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
@@ -11,18 +10,15 @@ const documentSpaceApi: DocumentSpaceControllerApiInterface = new DocumentSpaceC
 );
 
 export const wrapState = (
-  documentFilesState: State<DocumentDto[]>,
-  documentSpacesState: State<DocumentSpaceInfoDto[]>,
-  documentSpaceApi: DocumentSpaceControllerApiInterface) => {
+  documentSpaceApi: DocumentSpaceControllerApiInterface,
+  documentSpacesState: State<DocumentSpaceInfoDto[]>) => {
   return new DocumentSpaceService(
-    documentFilesState,
-    documentSpacesState,
-    documentSpaceApi
+    documentSpaceApi,
+    documentSpacesState
   );
 }
 
 export const useDocumentSpaceState = () => wrapState(
-  useState(documentFilesState),
-  useState(documentSpacesState),
-  documentSpaceApi
+  documentSpaceApi,
+  useState(documentSpacesState)
 );
