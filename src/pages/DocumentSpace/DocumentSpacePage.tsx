@@ -151,23 +151,11 @@ function DocumentSpacePage() {
             disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
             onChange={onDocumentSpaceSelectionChange}
           >
-            {isDocumentSpacesLoading ? (
-              <option key="document-space-loading" value="Loading...">
-                Loading...
-              </option>
-            ) : isDocumentSpacesErrored ? (
-              <option key="document-space-error" value="Error">
-                Could not load Document Spaces
-              </option>
-            ) : (
-              getSpaceValues().map((item) => {
-                return (
-                  <option key={item.name} value={item.name}>
-                    {item.name}
-                  </option>
-                );
-              })
-            )}
+          {
+            getSpaceValues().map(item => {
+              return <option key={item.name} value={item.name}>{item.name}</option>;
+            })
+          }
           </Select>
           <Button
             data-testid="add-doc-space__btn"
