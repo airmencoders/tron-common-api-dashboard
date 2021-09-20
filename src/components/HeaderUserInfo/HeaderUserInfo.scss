@@ -5,8 +5,8 @@
   top: calculateRem(-7px);
   &__initials {
     $container-size: calculateRem(40px);
-    background: $main-brand-color;
-    display: table;
+    background: rgba(210, 156, 223, 1);
+    display: inline-block;
     color: white;
     padding: .25rem;
     border-radius: 50%;
@@ -20,6 +20,17 @@
     &:after {
       display: none;
     }
+
+    &:hover {
+      color: white;
+      background: rgba(189, 140, 201, 1);
+    }
+  }
+  &__name {
+    padding-left: calculateRem(11px);
+    font-size: calculateRem(12px);
+    line-height: calculateRem(14.06px);
+    color: white;
   }
   &__label {
     font-size: 0.67em;

@@ -6,11 +6,14 @@ import './Sidebar.scss';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
+import SidebarContainer from './SidebarContainer';
+import { useHookstate } from '@hookstate/core';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   const authorizedUserState = useAuthorizedUserState();
   const location = useLocation();
   const [openedMenu, setOpenedMenu] = useState('');
+  const activeItem = useHookstate('');
 
   useEffect(() => {
     for (const item of items) {
@@ -19,7 +22,14 @@ function Sidebar({ items }: { items: RouteItem[] }) {
           const pathMatch = new RegExp('^' + child.path, 'g');
           if (location.pathname.match(pathMatch)) {
             setOpenedMenu(item.name);
+            activeItem.set(child.name);
+            break;
           }
+        }
+      } else {
+        if (location.pathname === item.path) {
+          activeItem.set(item.name);
+          break;
         }
       }
     }
@@ -46,22 +56,32 @@ function Sidebar({ items }: { items: RouteItem[] }) {
         {items.map((item) => {
           if (authorizedUserState.authorizedUserHasAnyPrivilege(item.requiredPrivileges)){
             if (item.childRoutes != null && item.childRoutes.length > 0) {
-              return (<NestedSidebarNav key={item.name}
-                                        id={item.name}
-                                        title={item.name}
-                                        isOpened={openedMenu === item.name}
-                                        onToggleClicked={handleMenuToggleClicked}>
-                {
-                  item.childRoutes.map((child) => {
-                    if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
-                      return <SidebarItem key={child.name} path={child.path} name={child.name} />
+              return (
+                <SidebarContainer containsNestedItems isActive={openedMenu === item.name}>
+                  <NestedSidebarNav key={item.name}
+                    id={item.name}
+                    title={item.name}
+                    isOpened={openedMenu === item.name}
+                    onToggleClicked={handleMenuToggleClicked}
+                    icon={item.icon}
+                  >
+                    {
+                      item.childRoutes.map((child) => {
+                        if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
+                          return <SidebarItem key={child.name} path={child.path} name={child.name} showActiveBorder />
+                        }
+                      })
                     }
-                  })
-                }
-              </NestedSidebarNav>);
+                  </NestedSidebarNav>
+                </SidebarContainer>
+              );
             }
             else {
-              return <SidebarItem key={item.name} path={item.path} name={item.name} />
+              return (
+                <SidebarContainer isActive={activeItem.value === item.name}>
+                  <SidebarItem key={item.name} path={item.path} name={item.name} icon={item.icon} />
+                </SidebarContainer>
+              )
             }
           }
         })}

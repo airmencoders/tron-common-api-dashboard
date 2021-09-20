@@ -34,7 +34,7 @@ export default class UtilityFunctions {
   }
 
   static clickOnPageNav(page: Page) {
-    cy.get(`[href="${page}"] > .sidebar-item__name`).click({ force: true });
+    cy.get(`[href="${page}"] > .sidebar-item__container`).click({ force: true });
   }
 
   /**

@@ -2,16 +2,10 @@
 
 .sidebar {
   &__logo-section {
+    text-align: center;
     img {
-      margin-bottom: .75rem;
+      margin-top: calculateRem(28px);
+      margin-bottom: calculateRem(50px);
     }
-  }
-  &__nav {
-    margin-top: calculateRem(30px);
-    margin-left: calculateRem(12px);
-  }
-  .nested-sidebar-nav {
-    margin-left: calculateRem(10px);
-    margin-bottom: 1rem;
   }
 }
