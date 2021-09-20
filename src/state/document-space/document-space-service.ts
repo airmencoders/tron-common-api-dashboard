@@ -1,5 +1,6 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { AxiosError, AxiosPromise } from 'axios';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
@@ -90,6 +91,17 @@ export default class DocumentSpaceService {
       promise: spacesRequest,
       cancelTokenSource: cancellableRequest.cancelTokenSource
     };
+  }
+
+  async createDocumentSpace(dto: DocumentSpaceInfoDto): Promise<DocumentSpaceInfoDto> {
+    try {
+      const spaceDto = await this.documentSpaceApi.createSpace(dto);
+      this.documentSpacesState[this.documentSpacesState.length].set(spaceDto.data);
+      return Promise.resolve(spaceDto.data);
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
   }
 
   get isDocumentSpacesStatePromised(): boolean {

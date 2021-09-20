@@ -100,4 +100,15 @@ describe('Test Document Space Page', () => {
     userEvent.selectOptions(documentSpacesSelect, documentSpaces[0].name);
     expect(documentSpacesSelect).toHaveValue(documentSpaces[0].name);
   });
+
+  it('should have Add New Space button', async () => {
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpacePage />
+      </MemoryRouter>
+    );
+
+    const addBtn = page.getByText('Add New Space');
+    await waitFor(() => expect(addBtn).toBeVisible());
+  });
 })
