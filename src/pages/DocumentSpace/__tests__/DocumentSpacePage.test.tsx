@@ -61,7 +61,7 @@ describe('Test Document Space Page', () => {
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeDisabled();
-    expect(documentSpacesSelect).toHaveValue('Error');
+    expect(documentSpacesSelect).toHaveValue('Could not load Document Spaces');
   });
 
   it('should show Document Spaces options select when retrieving Document Spaces succeeds', () => {

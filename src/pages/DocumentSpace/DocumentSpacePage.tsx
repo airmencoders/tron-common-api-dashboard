@@ -68,6 +68,14 @@ function DocumentSpacePage() {
   }
 
   function getSpaceValues(): DocumentSpaceInfoDto[] {
+    if (isDocumentSpacesLoading) {
+      return [{name: 'Loading...'}];
+    }
+
+    if (isDocumentSpacesErrored) {
+      return [{name: 'Could not load Document Spaces'}]
+    }
+
     if (isSelectedSpaceValid()) {
       return documentSpaceService.documentSpaces;
     }
@@ -77,7 +85,7 @@ function DocumentSpacePage() {
 
   const isDocumentSpacesLoading = documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored = documentSpaceService.isDocumentSpacesStateErrored;
-  const selectedSpace = pageState.selectedSpace.value;
+  const currentSelectedSpace = pageState.selectedSpace.value;
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -92,14 +100,10 @@ function DocumentSpacePage() {
           disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
           onChange={onDocumentSpaceSelectionChange}
         >
-          {isDocumentSpacesLoading ?
-            <option key="document-space-loading" value="Loading...">Loading...</option>
-            : isDocumentSpacesErrored ?
-              <option key="document-space-error" value="Error">Could not load Document Spaces</option>
-              :
-              getSpaceValues().map(item => {
-                return <option key={item.name} value={item.name}>{item.name}</option>;
-              })
+          {
+            getSpaceValues().map(item => {
+              return <option key={item.name} value={item.name}>{item.name}</option>;
+            })
           }
         </Select>
       </FormGroup>
@@ -107,7 +111,7 @@ function DocumentSpacePage() {
       {isSelectedSpaceValid() &&
         <InfiniteScrollGrid
           columns={documentDtoColumns}
-          datasource={documentSpaceService.createDatasource(selectedSpace, infiniteScrollOptions)}
+          datasource={documentSpaceService.createDatasource(currentSelectedSpace, infiniteScrollOptions)}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
           maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}

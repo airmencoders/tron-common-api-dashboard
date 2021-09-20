@@ -3,9 +3,8 @@ import { Configuration, DocumentSpaceControllerApi, DocumentSpaceControllerApiIn
 import Config from '../../api/config';
 import DocumentSpaceService from './document-space-service';
 
-const documentSpacesState = createState<DocumentSpaceInfoDto[]>(new Array<DocumentSpaceInfoDto>());
-
-const documentSpaceApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
+const spacesState = createState<DocumentSpaceInfoDto[]>(new Array<DocumentSpaceInfoDto>());
+const documentSpaceControllerApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
   new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
@@ -19,6 +18,6 @@ export const wrapState = (
 }
 
 export const useDocumentSpaceState = () => wrapState(
-  documentSpaceApi,
-  useState(documentSpacesState)
+  documentSpaceControllerApi,
+  useState(spacesState)
 );
