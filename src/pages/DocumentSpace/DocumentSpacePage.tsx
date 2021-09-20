@@ -101,12 +101,12 @@ function DocumentSpacePage() {
     pageState.merge({ isSubmitting: true });
     documentSpaceService
       .createDocumentSpace(space)
-      .then(space => {
+      .then(s => {
         pageState.merge({
           drawerOpen: false,
           isSubmitting: false,
           showErrorMessage: false,
-          selectedSpace: space.name,
+          selectedSpace: s.name,
         });
       })
       .catch(message =>
