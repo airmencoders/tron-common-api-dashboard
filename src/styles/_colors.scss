@@ -62,3 +62,15 @@ $add-action-green: color('green-30v');
 .plus-icon-color {
   color: $add-action-green;
 }
+
+.svg-icon-color {
+  stroke: $light-shade;
+}
+
+.svg-icon-disabled {
+  stroke: $disabled;
+}
+
+.svg-icon-primary {
+  stroke: color($theme-color-primary);
+}
