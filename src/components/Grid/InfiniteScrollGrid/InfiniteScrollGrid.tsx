@@ -12,10 +12,16 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
   }
 
   useEffect(() => {
+    if (!props.updateDatasource) {
+      return;
+    }
+
     const datasource = props.datasource;
     if (datasource) {
       gridApi.current?.setDatasource(datasource);
     }
+
+    props.updateDatasourceCallback?.();
   }, [props.datasource]);
 
   return (

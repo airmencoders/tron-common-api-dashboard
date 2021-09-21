@@ -7,4 +7,6 @@ export interface InfiniteScrollGridProps {
   cacheBlockSize?: number;
   updateInfiniteCache?: boolean;
   updateInfiniteCacheCallback?: () => void;
+  updateDatasource?: boolean;
+  updateDatasourceCallback?: () => void;
 }
