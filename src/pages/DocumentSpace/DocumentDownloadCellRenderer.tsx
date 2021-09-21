@@ -7,11 +7,11 @@ import './DocumentDownloadCellRenderer.scss';
 function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
   const documentSpaceService = useDocumentSpaceState();
 
-  const fileKey = props?.data?.key;
-  const space = props?.data?.path;
+  const fileKey = props?.node?.data?.key;
+  const space = props?.node?.data?.path;
 
   return (
-    <>
+    <div>
       {fileKey && space &&
         <div className="document-download-cell-renderer">
           <a href={documentSpaceService.createRelativeDownloadFileUrl(space, fileKey)}>
@@ -21,7 +21,7 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
           </a>
         </div>
       }
-    </>
+    </div>
   );
 }
 

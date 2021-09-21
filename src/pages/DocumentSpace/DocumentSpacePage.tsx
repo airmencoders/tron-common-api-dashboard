@@ -40,7 +40,6 @@ const documentDtoColumns: GridColumn[] = [
   new GridColumn({
     headerName: 'Download',
     headerClass: 'header-center',
-    initialWidth: 80,
     resizable: true,
     cellRenderer: DocumentDownloadCellRenderer
   })
@@ -59,7 +58,6 @@ interface DocumentSpacePageState {
   selectedSpace: string;
   shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
-  addSpaceBtnDisabled: boolean;
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
   fileToDelete: string;
@@ -76,7 +74,6 @@ function DocumentSpacePage() {
     selectedSpace: '',
     shouldUpdateDatasource: false,
     datasource: undefined,
-    addSpaceBtnDisabled: true,
     showUploadDialog: false,
     showDeleteDialog: false,
     fileToDelete: '',
@@ -119,8 +116,7 @@ function DocumentSpacePage() {
       datasource: documentSpaceService.createDatasource(
         event.target.value,
         infiniteScrollOptions
-      ),
-      addSpaceBtnDisabled: false,
+      )
     });
   }
 
@@ -231,7 +227,7 @@ function DocumentSpacePage() {
               data-testid="add-doc-space__btn"
               type="button"
               onClick={() => pageState.merge({ drawerOpen: true })}
-              disabled={pageState.addSpaceBtnDisabled.get()}
+              disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
             >
               Add New Space
             </Button>
