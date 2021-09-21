@@ -1,4 +1,5 @@
 import { useHookstate } from '@hookstate/core';
+import { IDatasource } from 'ag-grid-community';
 import React, { ChangeEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
@@ -40,23 +41,28 @@ const infiniteScrollOptions: InfiniteScrollOptions = {
 };
 
 interface DocumentSpacePageState {
-  selectedSpace: string;
   drawerOpen: boolean;
   isSubmitting: boolean;
   errorMessage: string;
   showErrorMessage: boolean;
+  selectedSpace: string;
+  shouldUpdateDatasource: boolean;
+  datasource?: IDatasource;
 }
 
 const selectedSpaceDefaultValue = 'Select a Space';
 
 function DocumentSpacePage() {
   const pageState = useHookstate<DocumentSpacePageState>({
-    selectedSpace: '',
     drawerOpen: false,
     isSubmitting: false,
     showErrorMessage: false,
     errorMessage: '',
+    selectedSpace: '',
+    shouldUpdateDatasource: false,
+    datasource: undefined
   });
+
   const documentSpaceService = useDocumentSpaceState();
 
   useEffect(() => {
@@ -74,7 +80,15 @@ function DocumentSpacePage() {
   function onDocumentSpaceSelectionChange(
     event: ChangeEvent<HTMLSelectElement>
   ): void {
-    pageState.selectedSpace.set(event.target.value);
+    pageState.merge({
+      selectedSpace: event.target.value,
+      shouldUpdateDatasource: true,
+      datasource: documentSpaceService.createDatasource(event.target.value, infiniteScrollOptions)
+    });
+  }
+
+  function onDatasourceUpdateCallback() {
+    pageState.shouldUpdateDatasource.set(false);
   }
 
   function isSelectedSpaceValid(): boolean {
@@ -138,7 +152,6 @@ function DocumentSpacePage() {
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
-  const currentSelectedSpace = pageState.selectedSpace.value;
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -169,19 +182,18 @@ function DocumentSpacePage() {
         </div>
       </FormGroup>
 
-      {isSelectedSpaceValid() && (
+      {isSelectedSpaceValid() && pageState.datasource.value && (
         <InfiniteScrollGrid
           columns={documentDtoColumns}
-          datasource={documentSpaceService.createDatasource(
-            currentSelectedSpace,
-            infiniteScrollOptions
-          )}
+          datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
           maxConcurrentDatasourceRequests={
             infiniteScrollOptions.maxConcurrentDatasourceRequests
           }
           suppressCellSelection
+          updateDatasource={pageState.shouldUpdateDatasource.value}
+          updateDatasourceCallback={onDatasourceUpdateCallback}
         />
       )}
 
