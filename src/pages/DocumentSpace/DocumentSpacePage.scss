@@ -6,11 +6,23 @@
   flex-direction: row;
   font-family: Source Sans Pro, Roboto, Arial, sans-serif;
   height: calculateRem(39px);
+  justify-content: space-between;
 
-  .select-component {
+  div {
     display: flex;
-    flex: 1.0;
+    justify-content: flex-start;
     max-height: inherit;
+    align-items: center;
+
+    .select-component {
+      display: flex;
+      max-height: inherit;
+    }
+
+    button {
+      margin-left: calculateRem(10px);
+      max-height: inherit;
+    }
   }
 
   button {

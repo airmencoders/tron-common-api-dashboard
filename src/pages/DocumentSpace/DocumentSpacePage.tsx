@@ -3,6 +3,7 @@ import { IDatasource } from 'ag-grid-community';
 import React, { ChangeEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
+import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
 import GridColumn from '../../components/Grid/GridColumn';
@@ -11,12 +12,14 @@ import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/Infinit
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import { DocumentSpaceInfoDto } from '../../openapi';
+import { DocumentDto, DocumentSpaceInfoDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import './DocumentSpacePage.scss';
+import DocumentUploadDialog from './DocumentUploadDialog';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -56,6 +59,10 @@ interface DocumentSpacePageState {
   selectedSpace: string;
   shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
+  addSpaceBtnDisabled: boolean;
+  showUploadDialog: boolean;
+  showDeleteDialog: boolean;
+  fileToDelete: string;
 }
 
 const selectedSpaceDefaultValue = 'Select a Space';
@@ -68,13 +75,31 @@ function DocumentSpacePage() {
     errorMessage: '',
     selectedSpace: '',
     shouldUpdateDatasource: false,
-    datasource: undefined
+    datasource: undefined,
+    addSpaceBtnDisabled: true,
+    showUploadDialog: false,
+    showDeleteDialog: false,
+    fileToDelete: '',
   });
 
   const documentSpaceService = useDocumentSpaceState();
 
   useEffect(() => {
     const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
+
+    // add the delete column and handler
+    documentDtoColumns.push(
+      new GridColumn({
+        headerName: 'Delete',
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: {
+          onClick: (doc: DocumentDto) => {
+            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+          },
+        },
+      })
+    );
 
     return function cleanup() {
       if (spacesCancellableRequest != null) {
@@ -91,7 +116,11 @@ function DocumentSpacePage() {
     pageState.merge({
       selectedSpace: event.target.value,
       shouldUpdateDatasource: true,
-      datasource: documentSpaceService.createDatasource(event.target.value, infiniteScrollOptions)
+      datasource: documentSpaceService.createDatasource(
+        event.target.value,
+        infiniteScrollOptions
+      ),
+      addSpaceBtnDisabled: false,
     });
   }
 
@@ -158,6 +187,21 @@ function DocumentSpacePage() {
     pageState.merge({ showErrorMessage: false });
   }
 
+  function closeDeleteDialog(): void {
+    pageState.merge({ showDeleteDialog: false });
+  }
+
+  async function deleteFile(): Promise<void> {
+    await documentSpaceService.deleteFile(
+      pageState.selectedSpace.get(),
+      pageState.fileToDelete.get()
+    );
+    pageState.merge({
+      shouldUpdateDatasource: true,
+    });
+    closeDeleteDialog();
+  }
+
   const isDocumentSpacesLoading =
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
@@ -167,28 +211,40 @@ function DocumentSpacePage() {
     <PageFormat pageTitle="Document Space">
       <FormGroup labelName="document-space" labelText="Spaces" isError={false}>
         <div className="add-space-container">
-          <Select
-            id="document-space"
-            name="document-space"
-            value={pageState.selectedSpace.get()}
-            disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
-            onChange={onDocumentSpaceSelectionChange}
-          >
-            {getSpaceValues().map((item) => {
-              return (
-                <option key={item.name} value={item.name}>
-                  {item.name}
-                </option>
-              );
-            })}
-          </Select>
-          <Button
-            data-testid="add-doc-space__btn"
-            type="button"
-            onClick={() => pageState.merge({ drawerOpen: true })}
-          >
-            Add New Space
-          </Button>
+          <div>
+            <Select
+              id="document-space"
+              name="document-space"
+              value={pageState.selectedSpace.get()}
+              disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
+              onChange={onDocumentSpaceSelectionChange}
+            >
+              {getSpaceValues().map((item) => {
+                return (
+                  <option key={item.name} value={item.name}>
+                    {item.name}
+                  </option>
+                );
+              })}
+            </Select>
+            <Button
+              data-testid="add-doc-space__btn"
+              type="button"
+              onClick={() => pageState.merge({ drawerOpen: true })}
+              disabled={pageState.addSpaceBtnDisabled.get()}
+            >
+              Add New Space
+            </Button>
+          </div>
+          {pageState.selectedSpace.get() &&
+            pageState.selectedSpace.get() !== selectedSpaceDefaultValue ? (
+            <DocumentUploadDialog
+              space={pageState.selectedSpace.get()}
+              onFinish={() => pageState.shouldUpdateDatasource.set(true)}
+            />
+          ) : (
+            <div></div>
+          )}
         </div>
       </FormGroup>
 
@@ -224,6 +280,12 @@ function DocumentSpacePage() {
           errorMessage={pageState.errorMessage.get()}
         />
       </SideDrawer>
+      <DeleteDocumentDialog
+        show={pageState.showDeleteDialog.get()}
+        onCancel={closeDeleteDialog}
+        onSubmit={deleteFile}
+        file={pageState.fileToDelete.get()}
+      />
     </PageFormat>
   );
 }
