@@ -65,8 +65,9 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
       <input
         data-testid="file-uploader-input"
         type="file"
-        onChange={(e) => handleFileSelection(e.target.files!)}
+        onChange={(e) => handleFileSelection(e.target.files ?? new FileList())}
         ref={inputFileRef}
+        multiple
         style={{ display: 'none' }}
       />
       <Button data-testid='upload-file__btn' onClick={uploadFiles} type='button'>Upload Files</Button>
