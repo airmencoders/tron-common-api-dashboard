@@ -104,6 +104,14 @@ export default class DocumentSpaceService {
     }
   }
 
+  async deleteFile(space: string, file: any): Promise<void> {
+    await this.documentSpaceApi._delete(space, file);
+  }
+
+  async uploadFile(space: string, file: any): Promise<void> {
+    await this.documentSpaceApi.upload(space, file);
+  }
+
   get isDocumentSpacesStatePromised(): boolean {
     return this.documentSpacesState.promised;
   }

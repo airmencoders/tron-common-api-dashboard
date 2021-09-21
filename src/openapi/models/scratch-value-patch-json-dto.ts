@@ -32,6 +32,18 @@ export interface ScratchValuePatchJsonDto {
      * @memberof ScratchValuePatchJsonDto
      */
     value?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScratchValuePatchJsonDto
+     */
+    newFieldName?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ScratchValuePatchJsonDto
+     */
+    newEntry?: boolean;
 }
 
 

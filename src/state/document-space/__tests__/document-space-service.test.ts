@@ -290,6 +290,28 @@ describe('Test Document Space Service', () => {
     expect(documentSpaceService.isDocumentSpacesStateErrored).toEqual(false);
   });
 
+  it('should handle file upload', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'upload').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<{ [key: string]: string }>({ 'file': 'test' })
+      )
+    );
+
+    await documentSpaceService.uploadFile('test', 'file contents');
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should handle file delete', async () => {
+    const mock = jest.spyOn(documentSpaceApi, '_delete').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<object>({ 'file': 'test' })
+      )
+    );
+
+    await documentSpaceService.deleteFile('test', 'file');
+    expect(mock).toHaveBeenCalled();
+  });
+
   it('should reset state', () => {
     const isDocumentSpacesStatePromisedSpy = jest.spyOn(
       documentSpaceService,
