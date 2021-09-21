@@ -14,6 +14,7 @@ import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { DocumentSpaceInfoDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import './DocumentSpacePage.scss';
 
@@ -33,6 +34,13 @@ const documentDtoColumns: GridColumn[] = [
     headerName: 'Updated By',
     resizable: true,
   }),
+  new GridColumn({
+    headerName: 'Download',
+    headerClass: 'header-center',
+    initialWidth: 80,
+    resizable: true,
+    cellRenderer: DocumentDownloadCellRenderer
+  })
 ];
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -129,6 +137,8 @@ function DocumentSpacePage() {
           isSubmitting: false,
           showErrorMessage: false,
           selectedSpace: s.name,
+          shouldUpdateDatasource: true,
+          datasource: documentSpaceService.createDatasource(s.name, infiniteScrollOptions)
         });
       })
       .catch((message) =>

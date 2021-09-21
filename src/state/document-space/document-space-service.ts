@@ -1,6 +1,7 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { AxiosError, AxiosPromise } from 'axios';
+import Config from '../../api/config';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
@@ -102,6 +103,10 @@ export default class DocumentSpaceService {
     catch (e) {
       return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
     }
+  }
+
+  createRelativeDownloadFileUrl(space: string, key: string): string {
+    return `${Config.API_URL_V2}document-space/file/${space}/${key}`;
   }
 
   get isDocumentSpacesStatePromised(): boolean {

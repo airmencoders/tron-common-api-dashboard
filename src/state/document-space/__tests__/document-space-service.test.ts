@@ -326,4 +326,13 @@ describe('Test Document Space Service', () => {
     expect(mock).toHaveBeenCalled();
     expect(response.name).toEqual('test');
   });
+
+  it('should create relative download url for a single file download', () => {
+    const space = 'testspace';
+    const fileKey = 'testfile.key';
+
+    const url = documentSpaceService.createRelativeDownloadFileUrl(space, fileKey);
+
+    expect(url.endsWith(`/document-space/file/${space}/${fileKey}`)).toBeTruthy();
+  });
 });
