@@ -2,16 +2,26 @@ import { createState, State } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
-import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto, DocumentSpaceInfoDtoResponseWrapper, EventRequestLogDtoPaginationResponseWrapper, S3PaginationDto } from '../../../openapi';
-import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
-import DocumentSpaceService from '../document-space-service';
+import {
+  DocumentDto,
+  DocumentSpaceControllerApi,
+  DocumentSpaceControllerApiInterface,
+  DocumentSpaceInfoDto,
+  DocumentSpaceInfoDtoResponseWrapper,
+  S3PaginationDto,
+} from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
 import { RequestError } from '../../../utils/ErrorHandling/request-error';
+import {
+  createAxiosSuccessResponse,
+  createGenericAxiosRequestErrorResponse,
+} from '../../../utils/TestUtils/test-utils';
+import DocumentSpaceService from '../document-space-service';
 
 describe('Test Document Space Service', () => {
   const infiniteScrollOptions: InfiniteScrollOptions = {
     enabled: true,
-    limit: 5
+    limit: 5,
   };
 
   const spaceName = 'somespace';
@@ -21,36 +31,40 @@ describe('Test Document Space Service', () => {
       key: 'file.txt',
       path: spaceName,
       uploadedBy: '',
-      uploadedDate: '2021-09-17T14:09:10.154Z'
+      uploadedDate: '2021-09-17T14:09:10.154Z',
     },
     {
       key: 'file2.txt',
       path: spaceName,
       uploadedBy: '',
-      uploadedDate: '2021-09-17T15:09:10.154Z'
+      uploadedDate: '2021-09-17T15:09:10.154Z',
     },
   ];
 
-  const listObjectsResponse: AxiosResponse<S3PaginationDto> = createAxiosSuccessResponse({
-    documents: documents,
-    currentContinuationToken: "",
-    nextContinuationToken: "",
-    size: generateInfiniteScrollLimit(infiniteScrollOptions),
-    totalElements: documents.length
-  });
+  const listObjectsResponse: AxiosResponse<S3PaginationDto> = createAxiosSuccessResponse(
+    {
+      documents: documents,
+      currentContinuationToken: '',
+      nextContinuationToken: '',
+      size: generateInfiniteScrollLimit(infiniteScrollOptions),
+      totalElements: documents.length,
+    }
+  );
 
   const documentSpaces: DocumentSpaceInfoDto[] = [
     {
-      name: 'space1'
+      name: 'space1',
     },
     {
-      name: 'space2'
-    }
+      name: 'space2',
+    },
   ];
 
-  const getSpacesResponse: AxiosResponse<DocumentSpaceInfoDtoResponseWrapper> = createAxiosSuccessResponse({
-    data: documentSpaces
-  });
+  const getSpacesResponse: AxiosResponse<DocumentSpaceInfoDtoResponseWrapper> = createAxiosSuccessResponse(
+    {
+      data: documentSpaces,
+    }
+  );
 
   let documentSpacesState: State<DocumentSpaceInfoDto[]>;
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
@@ -59,7 +73,10 @@ describe('Test Document Space Service', () => {
   beforeEach(() => {
     documentSpacesState = createState<DocumentSpaceInfoDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
-    documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
+    documentSpaceService = new DocumentSpaceService(
+      documentSpaceApi,
+      documentSpacesState
+    );
   });
 
   it('should create datasource and fetch documents', (done) => {
@@ -71,14 +88,19 @@ describe('Test Document Space Service', () => {
 
     const onSuccess = jest.fn((data, lastRow) => {
       try {
-        expect(data).toEqual(expect.arrayContaining(listObjectsResponse.data.documents));
+        expect(data).toEqual(
+          expect.arrayContaining(listObjectsResponse.data.documents)
+        );
         done();
       } catch (err) {
         done(err);
       }
     });
     const onFail = jest.fn();
-    const datasource = documentSpaceService.createDatasource(spaceName, infiniteScrollOptions);
+    const datasource = documentSpaceService.createDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
     datasource.getRows({
       successCallback: onSuccess,
       failCallback: onFail,
@@ -86,7 +108,7 @@ describe('Test Document Space Service', () => {
       endRow: 100,
       sortModel: [],
       filterModel: {},
-      context: undefined
+      context: undefined,
     });
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
@@ -109,7 +131,10 @@ describe('Test Document Space Service', () => {
         done(err);
       }
     });
-    const datasource = documentSpaceService.createDatasource(spaceName, infiniteScrollOptions);
+    const datasource = documentSpaceService.createDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
     datasource.getRows({
       successCallback: onSuccess,
       failCallback: onFail,
@@ -117,7 +142,7 @@ describe('Test Document Space Service', () => {
       endRow: 100,
       sortModel: [],
       filterModel: {},
-      context: undefined
+      context: undefined,
     });
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
@@ -138,7 +163,10 @@ describe('Test Document Space Service', () => {
         done(err);
       }
     });
-    const datasource = documentSpaceService.createDatasource(spaceName, infiniteScrollOptions);
+    const datasource = documentSpaceService.createDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
     datasource.getRows({
       successCallback: onSuccess,
       failCallback: onFail,
@@ -146,7 +174,7 @@ describe('Test Document Space Service', () => {
       endRow: 100,
       sortModel: [],
       filterModel: {},
-      context: undefined
+      context: undefined,
     });
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
@@ -175,7 +203,10 @@ describe('Test Document Space Service', () => {
 
     const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getSpaces');
 
-    const cancelErrorSpy = jest.spyOn(cancellableDataRequestImp, 'isDataRequestCancelError');
+    const cancelErrorSpy = jest.spyOn(
+      cancellableDataRequestImp,
+      'isDataRequestCancelError'
+    );
     cancelErrorSpy.mockReturnValue(true);
 
     const cancellableRequest = documentSpaceService.fetchAndStoreSpaces();
@@ -199,7 +230,7 @@ describe('Test Document Space Service', () => {
     await expect(cancellableRequest.promise).rejects.toEqual({
       status: errorResponse.response.data.status,
       error: errorResponse.response.data.error,
-      message: errorResponse.response.data.reason
+      message: errorResponse.response.data.reason,
     } as RequestError);
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
@@ -212,9 +243,11 @@ describe('Test Document Space Service', () => {
     jest.useFakeTimers();
 
     documentSpaceApi.getSpaces = jest.fn(() => {
-      return new Promise(resolve => setTimeout(async () => {
-        resolve(getSpacesResponse);
-      }, 1000));
+      return new Promise((resolve) =>
+        setTimeout(async () => {
+          resolve(getSpacesResponse);
+        }, 1000)
+      );
     });
 
     expect(documentSpaceService.isDocumentSpacesStatePromised).toEqual(false);
@@ -233,7 +266,11 @@ describe('Test Document Space Service', () => {
   });
 
   it('should get error status of Document Spaces States', async () => {
-    const isDocumentSpacesStatePromisedSpy = jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get');
+    const isDocumentSpacesStatePromisedSpy = jest.spyOn(
+      documentSpaceService,
+      'isDocumentSpacesStatePromised',
+      'get'
+    );
 
     // Test while state is promised
     isDocumentSpacesStatePromisedSpy.mockReturnValueOnce(true);
@@ -254,7 +291,11 @@ describe('Test Document Space Service', () => {
   });
 
   it('should reset state', () => {
-    const isDocumentSpacesStatePromisedSpy = jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get');
+    const isDocumentSpacesStatePromisedSpy = jest.spyOn(
+      documentSpaceService,
+      'isDocumentSpacesStatePromised',
+      'get'
+    );
 
     // Try to reset state while it is promised
     documentSpacesState.set(documentSpaces);
@@ -272,4 +313,17 @@ describe('Test Document Space Service', () => {
     expect(documentSpacesState.value).toEqual([]);
   });
 
+  it('should allow creation of space', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'createSpace').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<DocumentSpaceInfoDto>({ name: 'test' })
+      )
+    );
+
+    const response = await documentSpaceService.createDocumentSpace({
+      name: 'test',
+    });
+    expect(mock).toHaveBeenCalled();
+    expect(response.name).toEqual('test');
+  });
 });

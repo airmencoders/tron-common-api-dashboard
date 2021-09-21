@@ -1,0 +1,19 @@
+@import "../../styles/mixins";
+
+.add-space-container {
+  margin-bottom: calculateRem(16px);
+  display: flex;
+  flex-direction: row;
+  font-family: Source Sans Pro, Roboto, Arial, sans-serif;
+  height: calculateRem(39px);
+
+  .select-component {
+    display: flex;
+    flex: 1.0;
+    max-height: inherit;
+  }
+
+  button {
+    max-height: inherit;
+  }
+}
