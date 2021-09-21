@@ -229,6 +229,7 @@ function DocumentSpacePage() {
           {pageState.selectedSpace.get() &&
           pageState.selectedSpace.get() !== selectedSpaceDefaultValue ? (
             <DocumentUploadDialog
+              space={pageState.selectedSpace.get()}
               onFinish={() => pageState.shouldUpdateDatasource.set(true)}
             />
           ) : (

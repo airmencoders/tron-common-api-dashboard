@@ -13,6 +13,7 @@ interface UploadState {
 }
 
 export interface DocumentUploadProps {
+  space: string;
   onFinish: () => void;
 }
 
@@ -45,7 +46,7 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
 
       for (let i =0; i< files.length; i++) {
         uploadState.merge({ number: i+1, currentFile: files[i].name });
-        await documentSpaceService.uploadFile('heather', files[i]);
+        await documentSpaceService.uploadFile(props.space, files[i]);
       }
 
       uploadState.merge({
