@@ -25,8 +25,6 @@ import { DocumentSpaceInfoDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
-import { InlineObject } from '../models';
-// @ts-ignore
 import { S3PaginationDto } from '../models';
 /**
  * DocumentSpaceControllerApi - axios parameter creator
@@ -369,11 +367,11 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
          * Uploads a file to a Document Space
          * @summary Uploads a file to a Document Space
          * @param {string} space 
-         * @param {InlineObject} [inlineObject] 
+         * @param {any} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        upload: async (space: string, inlineObject?: InlineObject, options: any = {}): Promise<RequestArgs> => {
+        upload: async (space: string, file?: any, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'space' is not null or undefined
             if (space === null || space === undefined) {
                 throw new RequiredError('space','Required parameter space was null or undefined when calling upload.');
@@ -390,11 +388,16 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
 
 
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
             const queryParameters = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
                 queryParameters.set(key, localVarQueryParameter[key]);
@@ -405,13 +408,7 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof inlineObject !== 'string';
-            const needsSerialization = nonString && configuration && configuration.isJsonMime
-                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
-                : nonString;
-            localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(inlineObject !== undefined ? inlineObject : {})
-                : (inlineObject || "");
+            localVarRequestOptions.data = localVarFormParams;
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -533,12 +530,12 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          * Uploads a file to a Document Space
          * @summary Uploads a file to a Document Space
          * @param {string} space 
-         * @param {InlineObject} [inlineObject] 
+         * @param {any} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async upload(space: string, inlineObject?: InlineObject, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: string; }>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).upload(space, inlineObject, options);
+        async upload(space: string, file?: any, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: string; }>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).upload(space, file, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -631,12 +628,12 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          * Uploads a file to a Document Space
          * @summary Uploads a file to a Document Space
          * @param {string} space 
-         * @param {InlineObject} [inlineObject] 
+         * @param {any} [file] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        upload(space: string, inlineObject?: InlineObject, options?: any): AxiosPromise<{ [key: string]: string; }> {
-            return DocumentSpaceControllerApiFp(configuration).upload(space, inlineObject, options).then((request) => request(axios, basePath));
+        upload(space: string, file?: any, options?: any): AxiosPromise<{ [key: string]: string; }> {
+            return DocumentSpaceControllerApiFp(configuration).upload(space, file, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -725,12 +722,12 @@ export interface DocumentSpaceControllerApiInterface {
      * Uploads a file to a Document Space
      * @summary Uploads a file to a Document Space
      * @param {string} space 
-     * @param {InlineObject} [inlineObject] 
+     * @param {any} [file] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    upload(space: string, inlineObject?: InlineObject, options?: any): AxiosPromise<{ [key: string]: string; }>;
+    upload(space: string, file?: any, options?: any): AxiosPromise<{ [key: string]: string; }>;
 
 }
 
@@ -833,12 +830,12 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      * Uploads a file to a Document Space
      * @summary Uploads a file to a Document Space
      * @param {string} space 
-     * @param {InlineObject} [inlineObject] 
+     * @param {any} [file] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApi
      */
-    public upload(space: string, inlineObject?: InlineObject, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).upload(space, inlineObject, options).then((request) => request(this.axios, this.basePath));
+    public upload(space: string, file?: any, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).upload(space, file, options).then((request) => request(this.axios, this.basePath));
     }
 }

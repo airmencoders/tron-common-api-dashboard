@@ -111,4 +111,26 @@ describe('Test Document Space Page', () => {
     const addBtn = page.getByText('Add New Space');
     await waitFor(() => expect(addBtn).toBeVisible());
   });
+
+  it('should have Not Show Upload Files unless a space is selected', async () => {
+    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpacePage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(page.queryByText('Upload Files')).rejects.not.toBeDefined);
+
+    const documentSpacesSelect = page.getByLabelText('Spaces');
+    expect(documentSpacesSelect).toBeEnabled();
+    userEvent.selectOptions(documentSpacesSelect, documentSpaces[0].name);
+    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].name);
+
+    await waitFor(() => expect(page.getByText('Upload Files')).toBeVisible());
+  });
 })

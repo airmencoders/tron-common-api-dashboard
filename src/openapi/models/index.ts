@@ -47,7 +47,6 @@ export * from './group';
 export * from './http-log-dto-pagination-response-wrapper';
 export * from './http-log-entry-details-dto';
 export * from './http-log-entry-dto';
-export * from './inline-object';
 export * from './json-patch-object-array-value';
 export * from './json-patch-object-value';
 export * from './json-patch-string-array-value';
