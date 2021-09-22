@@ -407,6 +407,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
     columns = [
       ...props.columns,
       new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
         headerName: deleteBtnName,
         headerClass: 'header-center',
         cellRenderer: DeleteCellRenderer,

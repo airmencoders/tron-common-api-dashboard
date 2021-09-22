@@ -1,6 +1,6 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { AxiosError, AxiosPromise } from 'axios';
+import { AxiosError } from 'axios';
 import Config from '../../api/config';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -108,6 +108,10 @@ export default class DocumentSpaceService {
   createRelativeFilesDownloadUrl(space: string, documents: DocumentDto[]) {
     const fileKeysParam = documents.map(document => document.key).join(',');
     return `${Config.API_URL_V2}document-space/files/${space}/${fileKeysParam}`;
+  }
+
+  createRelativeDownloadFileUrl(space: string, key: string): string {
+    return `${Config.API_URL_V2}document-space/file/${space}/${key}`;
   }
 
   async deleteFile(space: string, file: any): Promise<void> {

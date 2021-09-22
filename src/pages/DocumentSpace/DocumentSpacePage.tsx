@@ -18,6 +18,7 @@ import { DocumentDto, DocumentSpaceInfoDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import DeleteDocumentDialog from './DocumentDelete';
+import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
@@ -40,6 +41,13 @@ const documentDtoColumns: GridColumn[] = [
     headerName: 'Updated By',
     resizable: true,
   }),
+  new GridColumn({
+    valueGetter: GridColumn.defaultValueGetter,
+    headerName: 'Download',
+    headerClass: 'header-center',
+    resizable: true,
+    cellRenderer: DocumentDownloadCellRenderer
+  })
 ];
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -55,7 +63,6 @@ interface DocumentSpacePageState {
   selectedSpace: string;
   shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
-  addSpaceBtnDisabled: boolean;
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
   fileToDelete: string;
@@ -77,7 +84,6 @@ function DocumentSpacePage() {
     selectedSpace: '',
     shouldUpdateDatasource: false,
     datasource: undefined,
-    addSpaceBtnDisabled: true,
     showUploadDialog: false,
     showDeleteDialog: false,
     fileToDelete: '',
@@ -88,20 +94,6 @@ function DocumentSpacePage() {
 
   useEffect(() => {
     const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-
-    // add the delete column and handler
-    documentDtoColumns.push(
-      new GridColumn({
-        headerName: 'Delete',
-        headerClass: 'header-center',
-        cellRenderer: DeleteCellRenderer,
-        cellRendererParams: {
-          onClick: (doc: DocumentDto) => {
-            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
-          },
-        },
-      })
-    );
 
     return function cleanup() {
       if (spacesCancellableRequest != null) {
@@ -121,8 +113,7 @@ function DocumentSpacePage() {
       datasource: documentSpaceService.createDatasource(
         event.target.value,
         infiniteScrollOptions
-      ),
-      addSpaceBtnDisabled: false,
+      )
     });
   }
 
@@ -168,6 +159,8 @@ function DocumentSpacePage() {
           isSubmitting: false,
           showErrorMessage: false,
           selectedSpace: s.name,
+          shouldUpdateDatasource: true,
+          datasource: documentSpaceService.createDatasource(s.name, infiniteScrollOptions)
         });
       })
       .catch((message) =>
@@ -211,10 +204,25 @@ function DocumentSpacePage() {
     }
   }
 
-  const isDocumentSpacesLoading = 
+  const isDocumentSpacesLoading =
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
+
+  const documentDtoColumnsWithDelete = [
+    ...documentDtoColumns,
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'Delete',
+      headerClass: 'header-center',
+      cellRenderer: DeleteCellRenderer,
+      cellRendererParams: {
+        onClick: (doc: DocumentDto) => {
+          pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+        },
+      },
+    })
+  ];
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -240,7 +248,7 @@ function DocumentSpacePage() {
               data-testid="add-doc-space__btn"
               type="button"
               onClick={() => pageState.merge({ drawerOpen: true })}
-              disabled={pageState.addSpaceBtnDisabled.get()}
+              disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
             >
               Add New Space
             </Button>
@@ -268,7 +276,7 @@ function DocumentSpacePage() {
 
       {isSelectedSpaceValid() && pageState.datasource.value && (
         <InfiniteScrollGrid
-          columns={documentDtoColumns}
+          columns={documentDtoColumnsWithDelete}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
