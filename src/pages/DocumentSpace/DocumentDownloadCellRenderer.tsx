@@ -7,8 +7,8 @@ import './DocumentDownloadCellRenderer.scss';
 function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
   const documentSpaceService = useDocumentSpaceState();
 
-  const fileKey = props?.node?.data?.key;
-  const space = props?.node?.data?.path;
+  const fileKey = props.node?.data?.key;
+  const space = props.node?.data?.path;
 
   return (
     <div>

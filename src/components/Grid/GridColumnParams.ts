@@ -1,6 +1,7 @@
 import { GridFilterParams } from './grid-filter-params';
 
 import {GridColumnPinnedOption} from './grid-column-pinned-option';
+import { ValueGetterParams } from 'ag-grid-community';
 
 export interface GridColumnParams {
   field: string;
@@ -18,4 +19,5 @@ export interface GridColumnParams {
   pinned: GridColumnPinnedOption,
   initialWidth: number | undefined; // in pixels
   filterParams: GridFilterParams;
+  valueGetter?: (params: ValueGetterParams) => any;
 }
