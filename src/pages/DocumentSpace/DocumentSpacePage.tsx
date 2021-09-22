@@ -38,6 +38,7 @@ const documentDtoColumns: GridColumn[] = [
     resizable: true,
   }),
   new GridColumn({
+    valueGetter: GridColumn.defaultValueGetter,
     headerName: 'Download',
     headerClass: 'header-center',
     resizable: true,
@@ -83,20 +84,6 @@ function DocumentSpacePage() {
 
   useEffect(() => {
     const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-
-    // add the delete column and handler
-    documentDtoColumns.push(
-      new GridColumn({
-        headerName: 'Delete',
-        headerClass: 'header-center',
-        cellRenderer: DeleteCellRenderer,
-        cellRendererParams: {
-          onClick: (doc: DocumentDto) => {
-            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
-          },
-        },
-      })
-    );
 
     return function cleanup() {
       if (spacesCancellableRequest != null) {
@@ -203,6 +190,21 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
+  const documentDtoColumnsWithDelete = [
+    ...documentDtoColumns,
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'Delete',
+      headerClass: 'header-center',
+      cellRenderer: DeleteCellRenderer,
+      cellRendererParams: {
+        onClick: (doc: DocumentDto) => {
+          pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+        },
+      },
+    })
+  ];
+
   return (
     <PageFormat pageTitle="Document Space">
       <FormGroup labelName="document-space" labelText="Spaces" isError={false}>
@@ -246,7 +248,7 @@ function DocumentSpacePage() {
 
       {isSelectedSpaceValid() && pageState.datasource.value && (
         <InfiniteScrollGrid
-          columns={documentDtoColumns}
+          columns={documentDtoColumnsWithDelete}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
