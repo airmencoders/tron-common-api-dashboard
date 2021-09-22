@@ -11,8 +11,16 @@ class Config {
         return process.env.REACT_APP_API_VERSION_PREFIX || '';
     }
 
+    public static get API_VERSION_2_PREFIX(): string {
+        return process.env.REACT_APP_API_VERSION_2_PREFIX || '';
+    }
+
     public static get API_URL(): string {
         return this.API_BASE_URL + this.API_PATH_PREFIX + "/" + this.API_VERSION_PREFIX + "/";
+    }
+
+    public static get API_URL_V2(): string {
+        return this.API_BASE_URL + this.API_PATH_PREFIX + "/" + this.API_VERSION_2_PREFIX + "/";
     }
 
     public static get ACTUATOR_URL(): string {

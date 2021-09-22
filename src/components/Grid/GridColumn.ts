@@ -1,6 +1,7 @@
 import { GridFilterParams } from './grid-filter-params';
 import { GridColumnParams } from "./GridColumnParams";
 import {GridColumnPinnedOption} from './grid-column-pinned-option';
+import { ValueGetterParams } from 'ag-grid-community';
 
 export default class GridColumn {
   constructor(params: Partial<GridColumnParams>) {
@@ -19,7 +20,8 @@ export default class GridColumn {
       headerCheckboxSelectionFilteredOnly = false,
       pinned = undefined,
       initialWidth = undefined,
-      filterParams = undefined
+      filterParams = undefined,
+      valueGetter = undefined
     } = params;
 
     this._field = field;
@@ -37,6 +39,7 @@ export default class GridColumn {
     this._filterParams = filterParams;
     this._pinned = pinned;
     this._initialWidth = initialWidth;
+    this._valueGetter = valueGetter;
   }
 
   private _field: string;
@@ -54,6 +57,7 @@ export default class GridColumn {
   private _filterParams?: GridFilterParams;
   private _pinned: GridColumnPinnedOption;
   private _initialWidth: number | undefined;
+  private _valueGetter?: (params: ValueGetterParams) => any;
 
   get field(): string {
     return this._field;
@@ -113,5 +117,15 @@ export default class GridColumn {
 
   get intialWidth(): number | undefined {
     return this._initialWidth;
+  }
+
+  get valueGetter(): ((params: ValueGetterParams) => any) | undefined {
+    return this._valueGetter;
+  }
+
+  static get defaultValueGetter() {
+    return function deleteValueGetter(params: ValueGetterParams) {
+      return params.data;
+    };
   }
 }

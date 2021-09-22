@@ -5,7 +5,7 @@ import DeleteCellRenderer from '../DeleteCellRenderer';
 describe('Delete Cell Renderer', () => {
   it('Renders correctly', async () => {
     const page = render(
-      <DeleteCellRenderer />
+      <DeleteCellRenderer node={{ data: 'data' }} />
     );
 
     expect(page.getByTestId('delete-cell-renderer')).toBeTruthy();
@@ -15,7 +15,7 @@ describe('Delete Cell Renderer', () => {
     const onClick = jest.fn();
 
     const page = render(
-      <DeleteCellRenderer onClick={onClick} node={{ test: 'data' }} />
+      <DeleteCellRenderer onClick={onClick} node={{ data: 'data' }} />
     );
 
     fireEvent.click(page.getByTitle("remove"));
