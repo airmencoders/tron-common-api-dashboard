@@ -297,7 +297,7 @@ describe('Test Document Space Service', () => {
       )
     );
 
-    await documentSpaceService.uploadFile('test', 'file contents');
+    await documentSpaceService.uploadFile('test', 'file contents', () => {}).promise;
     expect(mock).toHaveBeenCalled();
   });
 
