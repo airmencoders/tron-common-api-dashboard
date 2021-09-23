@@ -6,14 +6,16 @@
   },
   "servers": [
     {
-      "url": "http://localhost:9000/api",
+      "url": "http://localhost:8080/api",
       "description": "Generated server url"
     }
   ],
   "paths": {
     "/v2/scratch/users/{id}": {
       "put": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Edits an existing Scratch Space user information",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "editScratchUser",
@@ -50,8 +52,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed Scratch Storage object or malformed user UUID",
+          "409": {
+            "description": "Scratch User Email Address is already is use",
             "content": {
               "*/*": {
                 "schema": {
@@ -60,8 +62,8 @@
               }
             }
           },
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
+          "400": {
+            "description": "Malformed Scratch Storage object or malformed user UUID",
             "content": {
               "*/*": {
                 "schema": {
@@ -80,8 +82,8 @@
               }
             }
           },
-          "409": {
-            "description": "Scratch User Email Address is already is use",
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -93,7 +95,9 @@
         }
       },
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Deletes a scratch user",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "deleteScratchUser",
@@ -110,6 +114,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Malformed user UUID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Operation Successful",
             "content": {
@@ -120,8 +134,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed user UUID",
+          "404": {
+            "description": "User id not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -139,23 +153,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "User id not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/scratch/apps/{id}": {
       "put": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Edit existing scratch space app information (its name)",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "editExistingAppEntry",
@@ -182,16 +188,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "App Info Changed OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Malformed request body / app name already exists or appId is malformed",
             "content": {
@@ -212,8 +208,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID not found",
+          "409": {
+            "description": "App Name is already is use",
             "content": {
               "*/*": {
                 "schema": {
@@ -222,8 +218,18 @@
               }
             }
           },
-          "409": {
-            "description": "App Name is already is use",
+          "200": {
+            "description": "App Info Changed OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application ID not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -235,7 +241,9 @@
         }
       },
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Deletes this application from the Common API registry (removes from scratch space use)",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "deleteExistingAppEntry",
@@ -262,16 +270,6 @@
               }
             }
           },
-          "400": {
-            "description": "AppId is malformed",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges",
             "content": {
@@ -291,13 +289,25 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "AppId is malformed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/person/{id}": {
       "get": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Retrieves a person by ID",
         "description": "Retrieves a person by ID",
         "operationId": "getPerson",
@@ -332,22 +342,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -365,7 +375,9 @@
         }
       },
       "put": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Updates an existing person",
         "description": "Updates an existing person",
         "operationId": "updatePerson",
@@ -425,7 +437,9 @@
         }
       },
       "delete": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Deletes an existing person",
         "description": "Deletes an existing person",
         "operationId": "deletePerson",
@@ -458,7 +472,9 @@
         }
       },
       "patch": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Patches an existing person",
         "description": "Patches an existing person",
         "operationId": "patchPerson",
@@ -500,6 +516,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -520,16 +546,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -545,7 +561,9 @@
     },
     "/v2/person/self": {
       "put": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Allows a Person to update their own existing record.",
         "description": "The email from the updated Person record must match the email in the authenticated user's JWT, otherwise this action will be rejected.  Request must be from the web (SSO) and not an app client.",
         "operationId": "selfUpdatePerson",
@@ -560,22 +578,22 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Mismatch in email between updated Person record and user's JWT or Request was from an app client)",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -595,7 +613,9 @@
     },
     "/v2/organization/{id}": {
       "get": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Retrieves an organization by ID",
         "description": "Retrieves an organization by ID",
         "operationId": "getOrganization",
@@ -652,6 +672,9 @@
               }
             }
           },
+          "404": {
+            "description": "Resource not found"
+          },
           "400": {
             "description": "Bad Request or malformed UUID",
             "content": {
@@ -661,14 +684,13 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found"
           }
         }
       },
       "put": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Updates an existing organization",
         "description": "Updates an existing organization",
         "operationId": "updateOrganization",
@@ -695,6 +717,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -715,16 +747,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -738,7 +760,9 @@
         }
       },
       "delete": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Deletes an existing organization",
         "description": "Deletes an existing organization",
         "operationId": "deleteOrganization",
@@ -771,7 +795,9 @@
         }
       },
       "patch": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Patches an existing organization",
         "description": "Patches an existing organization. Fields (subordinateOrganizations and members) cannot be modified through this operation.",
         "operationId": "jsonPatchOrganization",
@@ -815,6 +841,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -835,16 +871,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -860,7 +886,9 @@
     },
     "/v2/dashboard-users/{id}": {
       "get": {
-        "tags": ["dashboard-user-controller"],
+        "tags": [
+          "dashboard-user-controller"
+        ],
         "summary": "Retrieves a dashboard user by ID",
         "description": "Retrieves a dashboard user by ID",
         "operationId": "getDashboardUser",
@@ -877,22 +905,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/DashboardUserDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardUserDto"
                 }
               }
             }
@@ -910,7 +938,9 @@
         }
       },
       "put": {
-        "tags": ["dashboard-user-controller"],
+        "tags": [
+          "dashboard-user-controller"
+        ],
         "summary": "Updates an existing dashboard user",
         "description": "Updates an existing dashboard user",
         "operationId": "updateDashboardUser",
@@ -960,7 +990,9 @@
         }
       },
       "delete": {
-        "tags": ["dashboard-user-controller"],
+        "tags": [
+          "dashboard-user-controller"
+        ],
         "summary": "Deletes an existing person",
         "description": "Deletes an existing person",
         "operationId": "deleteDashboardUser",
@@ -995,7 +1027,9 @@
     },
     "/v2/app-source/{id}": {
       "get": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Returns the details for an App Source",
         "description": "Requires DASHBOARD_ADMIN or APP_SOURCE_ADMIN rights.",
         "operationId": "getAppSourceDetails",
@@ -1012,6 +1046,16 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Requested App Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -1031,21 +1075,13 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Requested App Source not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       },
       "put": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Updates the details for an App Source",
         "description": "Requires DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN  of given App Id. Admin users can also be managed via this request method.  Emails for app source admins to a given App Source UUID will be implicitly added as new  DashboardUsers with the APP_SOURCE_ADMIN privilege.  Conversely a PUT that takes away an email that was there before  will be deleted as a DashboardUser if that email address does not have any other privileges in the system or its an  app source admin to some other app source application.",
         "operationId": "updateAppSourceDetails",
@@ -1072,6 +1108,16 @@
           "required": true
         },
         "responses": {
+          "404": {
+            "description": "Requested App Source not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -1101,21 +1147,13 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Requested App Source not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       },
       "delete": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Deletes the App Source",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "deleteAppSource",
@@ -1177,7 +1215,9 @@
     },
     "/v2/app-client/{id}": {
       "get": {
-        "tags": ["app-client-controller"],
+        "tags": [
+          "app-client-controller"
+        ],
         "summary": "Get an App Client's Information",
         "description": "Get an App Client by its UUID. Requires DASHBOARD_ADMIN or be an App Client Developer of that UUID.",
         "operationId": "getAppClientRecord",
@@ -1193,22 +1233,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppClientUserDetailsDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppClientUserDetailsDto"
                 }
               }
             }
@@ -1236,7 +1276,9 @@
         }
       },
       "put": {
-        "tags": ["app-client-controller"],
+        "tags": [
+          "app-client-controller"
+        ],
         "summary": "Updates an existing Application Client",
         "description": "Updates an existing Application Client. Requires DASHBOARD_ADMIN access to change any attribute,or be APP_CLIENT_DEVELOPER role for app client of given UUID to be able to manage change App Client Developers - any of fields changed as APP_CLIENT_DEVELOPER will not be changed.",
         "operationId": "updateAppClient",
@@ -1296,7 +1338,9 @@
         }
       },
       "delete": {
-        "tags": ["app-client-controller"],
+        "tags": [
+          "app-client-controller"
+        ],
         "summary": "Deletes an App Client",
         "description": "Deletes an existing App Client. Requires DASHBOARD_ADMIN access.",
         "operationId": "deleteAppClient",
@@ -1338,7 +1382,9 @@
     },
     "/v2/subscriptions/events/replay-events": {
       "post": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Retrieves all ledger entries from specified event count(s) and event types(s)",
         "description": "Simply provide a list of type EventInfoDto containing the event types and the LAST event count received for that event. The returned list will contain, as its start point, the point in time at which the oldest of those event types(s)/event count(s) occurred at - the remainder of that list will be event entries containing only events specified in the request body. Note the event count(s) provided should be equal to the actual count received from Common.  This endpoint will know to return events from that count + 1.",
         "operationId": "getEventsSinceCountAndTypeWrapped",
@@ -1385,7 +1431,9 @@
     },
     "/v2/scratch/{appId}/jsondb/{table}/query": {
       "post": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "operationId": "queryJsonTable",
         "parameters": [
           {
@@ -1432,7 +1480,9 @@
     },
     "/v2/scratch/{appId}/jsondb/{table}/create": {
       "post": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "operationId": "insertIntoTable",
         "parameters": [
           {
@@ -1479,7 +1529,9 @@
     },
     "/v2/person/persons": {
       "post": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Add one or more members to the database",
         "description": "Adds one or more person entities - returns that same array of input persons with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then no new persons will have been committed to the database (if one entity fails, the entire operation fails). The return error message will list the offending UUID or other data that caused the error.",
         "operationId": "addPersonsWrapped",
@@ -1520,16 +1572,6 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDtoResponseWrapper"
-                }
-              }
-            }
-          },
           "203": {
             "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
@@ -1550,6 +1592,16 @@
               }
             }
           },
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDtoResponseWrapper"
+                }
+              }
+            }
+          },
           "409": {
             "description": "A person already exists with the id provided",
             "content": {
@@ -1565,7 +1617,9 @@
     },
     "/v2/person/find": {
       "post": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Retrieves a person by email or dodid",
         "description": "Retrieves a person using a single identifying property.",
         "operationId": "findPersonBy",
@@ -1600,22 +1654,22 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -1635,7 +1689,9 @@
     },
     "/v2/person/filter": {
       "post": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Retrieves persons filtered",
         "description": "Retrieves filtered list of persons",
         "operationId": "filterPerson",
@@ -1704,6 +1760,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request - most likely bad field or value given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "headers": {
@@ -1722,23 +1788,15 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad request - most likely bad field or value given",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/organization/organizations": {
       "post": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Adds one or more organization entities",
         "description": "Adds one or more organization entities - returns that same array of input organizations with their assigned UUIDs. If the request does NOT return 201 (Created) because of an error (see other return codes), then any new organizations up to that organization that caused the failure will have been committed (but none thereafter)The return error message will list the offending UUID or other data that caused the error.",
         "operationId": "addNewOrganizationsWrapped",
@@ -1785,16 +1843,6 @@
               }
             }
           },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDtoResponseWrapper"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad data or validation error",
             "content": {
@@ -1814,13 +1862,25 @@
                 }
               }
             }
+          },
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDtoResponseWrapper"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/organization/filter": {
       "post": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Retrieves organizations filtered",
         "description": "Retrieves filtered list of organizations",
         "operationId": "filterOrganizations",
@@ -1871,6 +1931,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request - most likely bad field or value given",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "headers": {
@@ -1889,23 +1959,15 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad request - most likely bad field or value given",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/event-request-log/app-client/self/filter": {
       "post": {
-        "tags": ["event-request-log-controller"],
+        "tags": [
+          "event-request-log-controller"
+        ],
         "summary": "Retrieves webhook requests sent to the requesting App Client with filtering",
         "description": "Any filters creating targeting appClientUser will be ignored",
         "operationId": "getEventRequestLogsByAppClientWithFilter",
@@ -1981,7 +2043,9 @@
     },
     "/v2/event-request-log/app-client/id/{appId}/filter": {
       "post": {
-        "tags": ["event-request-log-controller"],
+        "tags": [
+          "event-request-log-controller"
+        ],
         "summary": "Retrieves webhook requests sent to an App Client pubsub event subscriber with filtering",
         "description": "Any filters creating targeting appClientUser will be ignored",
         "operationId": "getEventRequestLogsByAppClientIdWithFilter",
@@ -2042,16 +2106,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden -- requester must be the App Client itself or an App Client Developer of the App Client",
             "content": {
@@ -2061,13 +2115,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/event-request-log/all/filter": {
       "post": {
-        "tags": ["event-request-log-controller"],
+        "tags": [
+          "event-request-log-controller"
+        ],
         "summary": "Retrieves webhook requests sent to all pubsub event subscribers with filtering",
         "operationId": "getAllEventRequestLogsWithFilter",
         "parameters": [
@@ -2117,16 +2183,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden -- requester must have DASHBOARD_ADMIN privilege",
             "content": {
@@ -2136,13 +2192,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/document-space/spaces": {
       "get": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Retrieves all document space names",
         "operationId": "getSpaces",
         "responses": {
@@ -2159,7 +2227,9 @@
         }
       },
       "post": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Creates a Document Space",
         "description": "Creates a Document Space",
         "operationId": "createSpace",
@@ -2174,16 +2244,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentSpaceInfoDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request - Bad space name",
             "content": {
@@ -2203,13 +2263,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSpaceInfoDto"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/document-space/files/{space}": {
       "get": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Retrieves files from a space",
         "description": "Gets files from a space. This is not a download",
         "operationId": "listObjects",
@@ -2266,7 +2338,9 @@
         }
       },
       "post": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Uploads a file to a Document Space",
         "description": "Uploads a file to a Document Space",
         "operationId": "upload",
@@ -2296,19 +2370,6 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request - Bad space name",
             "content": {
@@ -2328,13 +2389,28 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/subscriptions": {
       "get": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Retrieves all registered subscriptions",
         "description": "Retrieves all subscriptions",
         "operationId": "getAllSubscriptionsWrapped",
@@ -2352,7 +2428,9 @@
         }
       },
       "post": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Adds/updates a subscription",
         "description": "Adds a new subscription, or updates an existing subscription",
         "operationId": "createSubscription",
@@ -2382,7 +2460,9 @@
     },
     "/v2/scratch/{appId}/{keyName}/jsonize": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Retrieves a single key-value pair for for a single app but JSON-ize it first before sending back",
         "description": "App ID is the UUID of the owning application",
         "operationId": "getKeyValueByKeyNameJsonized",
@@ -2451,7 +2531,9 @@
         }
       },
       "post": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Treats the key's value as JSON and returns the JsonPath query invoked onto that JSON structure. Returns JSON string matching the specified JSON Path",
         "description": "App ID is the UUID of the owning application",
         "operationId": "getKeyValueByKeyNameAsJson",
@@ -2531,7 +2613,9 @@
         }
       },
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Treats the key's value as JSON and attempts to delete a portion of it from given JSON Patch spec. Returns NO_CONTENT response on successful update.",
         "description": "App ID is the UUID of the owning application",
         "operationId": "deleteKeyValuePairAsJson",
@@ -2600,7 +2684,9 @@
         }
       },
       "patch": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Treats the key's value as JSON and attempts to update a portion of it from given JSON Patch spec with provided value.  Returns NO_CONTENT response on successful update.",
         "description": "App ID is the UUID of the owning application",
         "operationId": "patchKeyValuePairAsJson",
@@ -2671,21 +2757,13 @@
     },
     "/v2/scratch/users": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets the entire table of Scratch Space users (ID, email...)",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "getAllUsersWrapped",
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageUserDtoResponseWrapper"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges",
             "content": {
@@ -2695,11 +2773,23 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageUserDtoResponseWrapper"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Adds a new Scratch Space user by their P1 email address",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "addNewScratchUser",
@@ -2714,12 +2804,32 @@
           "required": true
         },
         "responses": {
+          "409": {
+            "description": "Scratch User UUID or email address is already is use",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "201": {
             "description": "New user added operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageUserDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2733,7 +2843,19 @@
                 }
               }
             }
-          },
+          }
+        }
+      }
+    },
+    "/v2/scratch/apps": {
+      "get": {
+        "tags": [
+          "scratch-storage-controller"
+        ],
+        "summary": "Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for",
+        "description": "Requester has to have DASHBOARD_ADMIN rights",
+        "operationId": "getScratchSpaceAppsWrapped",
+        "responses": {
           "403": {
             "description": "No DASHBOARD_ADMIN privileges",
             "content": {
@@ -2744,26 +2866,6 @@
               }
             }
           },
-          "409": {
-            "description": "Scratch User UUID or email address is already is use",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v2/scratch/apps": {
-      "get": {
-        "tags": ["scratch-storage-controller"],
-        "summary": "Gets the entire table of Scratch Storage apps that are registered with Common API if requesteris a dashboard admin, otherwise returns the scratch space apps the requester is a scratch admin for",
-        "description": "Requester has to have DASHBOARD_ADMIN rights",
-        "operationId": "getScratchSpaceAppsWrapped",
-        "responses": {
           "200": {
             "description": "Successful operation",
             "content": {
@@ -2773,21 +2875,13 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       },
       "post": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Adds a new Scratch Strorage consuming app name to the Common API scratch storage space",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "postNewScratchSpaceApp",
@@ -2802,18 +2896,8 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "App Registered OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Malformed request body or app name already exists",
+          "409": {
+            "description": "App UUID or App Name is already is use",
             "content": {
               "*/*": {
                 "schema": {
@@ -2832,12 +2916,22 @@
               }
             }
           },
-          "409": {
-            "description": "App UUID or App Name is already is use",
+          "400": {
+            "description": "Malformed request body or app name already exists",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "App Registered OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
                 }
               }
             }
@@ -2847,7 +2941,9 @@
     },
     "/v2/scratch": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Retrieves all key-value pairs for all scratch space consuming apps",
         "description": "Requires request to be under DASHBOARD_ADMIN privileges",
         "operationId": "getAllKeyValuePairsWrapped",
@@ -2885,7 +2981,9 @@
         }
       },
       "post": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Adds or updates a key-value pair for a given App Id",
         "description": "SCRATCH_WRITE privileges are required for the requester for the given App Id",
         "operationId": "setKeyValuePair",
@@ -2910,16 +3008,6 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed Request Body",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Write / Update action forbidden - no WRITE privileges",
             "content": {
@@ -2939,13 +3027,25 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Malformed Request Body",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/person/person-jwt": {
       "post": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Adds a person using info from P1 JWT",
         "operationId": "createPersonFromJwt",
         "requestBody": {
@@ -2969,22 +3069,22 @@
               }
             }
           },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -3004,7 +3104,9 @@
     },
     "/v2/person": {
       "get": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Retrieves all persons",
         "description": "Retrieves all persons  with pagination information",
         "operationId": "getPersonsWrapped",
@@ -3085,7 +3187,9 @@
         }
       },
       "post": {
-        "tags": ["person-controller"],
+        "tags": [
+          "person-controller"
+        ],
         "summary": "Adds a person",
         "description": "Adds a person.  Query Ranks controller for available Ranks and Branches. If a given Rank or Branch is invalid, the Person will be created with rank 'Unknown' and branch 'Other'",
         "operationId": "createPerson",
@@ -3110,22 +3214,22 @@
               }
             }
           },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -3145,7 +3249,9 @@
     },
     "/v2/organization": {
       "get": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Retrieves all organizations",
         "description": "Retrieves all organizations.  Optionally can provide 'type' parameter (e.g. 'WING') to filter by Organization type and/or 'branch' parameter to filter by branch of service (e.g 'USAF'). If neither parameter is given, then no filters are applied and request returns all Organizations.  Optionally can also provide 'search' parameter to search on organization names within the result set (case in-sensitive).",
         "operationId": "getOrganizationsWrapped",
@@ -3270,6 +3376,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Request - likely due to invalid unit type or branch of service specified",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "headers": {
@@ -3288,21 +3404,13 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad Request - likely due to invalid unit type or branch of service specified",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       },
       "post": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Adds an organization",
         "description": "Adds an organization",
         "operationId": "createOrganization",
@@ -3352,7 +3460,9 @@
     },
     "/v2/dashboard-users": {
       "get": {
-        "tags": ["dashboard-user-controller"],
+        "tags": [
+          "dashboard-user-controller"
+        ],
         "summary": "Retrieves all Dashboard Users",
         "description": "Retrieves all Dashboard Users",
         "operationId": "getAllDashboardUsersWrapped",
@@ -3370,7 +3480,9 @@
         }
       },
       "post": {
-        "tags": ["dashboard-user-controller"],
+        "tags": [
+          "dashboard-user-controller"
+        ],
         "summary": "Adds a Dashboard User",
         "description": "Adds a Dashboard User",
         "operationId": "addDashboardUser",
@@ -3385,16 +3497,6 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/DashboardUserDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
@@ -3414,13 +3516,25 @@
                 }
               }
             }
+          },
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardUserDto"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/app-source/app-clients": {
       "get": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Gets a list of the available app clients (their names and UUIDs)",
         "operationId": "getAvailableAppClientsWrapped",
         "responses": {
@@ -3447,7 +3561,9 @@
         }
       },
       "post": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Adds an app source's endpoint to app client privilege relationship",
         "description": "Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.",
         "operationId": "addClientToEndpointPriv",
@@ -3482,20 +3598,20 @@
               }
             }
           },
-          "403": {
-            "description": "Insufficient privileges",
+          "404": {
+            "description": "App Source/End Point/App Client not found",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
           },
-          "404": {
-            "description": "App Source/End Point/App Client not found",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
                 }
@@ -3507,21 +3623,13 @@
     },
     "/v2/app-source": {
       "get": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Gets all App Sources.",
         "description": "Requires DASHBOARD_ADMIN rights",
         "operationId": "getAppSourcesWrapped",
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSourceDtoResponseWrapper"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges",
             "content": {
@@ -3531,11 +3639,23 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSourceDtoResponseWrapper"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Creates an App Source including App Client permissions.",
         "description": "Requires DASHBOARD_ADMIN rights",
         "operationId": "createAppSource",
@@ -3550,22 +3670,22 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Successful creation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSourceDetailsDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Malformed Request Body",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Successful creation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSourceDetailsDto"
                 }
               }
             }
@@ -3585,7 +3705,9 @@
     },
     "/v2/app-client": {
       "get": {
-        "tags": ["app-client-controller"],
+        "tags": [
+          "app-client-controller"
+        ],
         "summary": "Retrieves all application client user information",
         "description": "Retrieves application client user information.  Requires Dashboard Admin access or App Client Developer.",
         "operationId": "getAppClientUsersWrapped",
@@ -3603,7 +3725,9 @@
         }
       },
       "post": {
-        "tags": ["app-client-controller"],
+        "tags": [
+          "app-client-controller"
+        ],
         "summary": "Adds an App Client",
         "description": "Adds a App Client User. Requires DASHBOARD_ADMIN access.",
         "operationId": "createAppClientUser",
@@ -3618,22 +3742,22 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppClientUserDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppClientUserDto"
                 }
               }
             }
@@ -3653,7 +3777,9 @@
     },
     "/v2/scratch/{appId}/jsondb/{table}/update/{id}": {
       "patch": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "operationId": "updateJsonTable",
         "parameters": [
           {
@@ -3708,7 +3834,9 @@
     },
     "/v2/scratch/apps/{id}/user": {
       "patch": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Adds a user privilege to this app's data",
         "description": "Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID",
         "operationId": "addUserPriv",
@@ -3735,16 +3863,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "App Priv Added OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Malformed request body / app name already exists or appId is malformed",
             "content": {
@@ -3755,8 +3873,8 @@
               }
             }
           },
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
+          "409": {
+            "description": "This app/user/priv combo already exists",
             "content": {
               "*/*": {
                 "schema": {
@@ -3775,12 +3893,22 @@
               }
             }
           },
-          "409": {
-            "description": "This app/user/priv combo already exists",
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "App Priv Added OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
                 }
               }
             }
@@ -3790,7 +3918,9 @@
     },
     "/v2/scratch/apps/{id}/implicitRead": {
       "patch": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Sets or un-sets the app's implicit read field",
         "description": "Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID",
         "operationId": "setImplicitReadSetting",
@@ -3827,8 +3957,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed appId or query parameter",
+          "404": {
+            "description": "Application ID not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -3847,8 +3977,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID not found",
+          "400": {
+            "description": "Malformed appId or query parameter",
             "content": {
               "*/*": {
                 "schema": {
@@ -3862,7 +3992,9 @@
     },
     "/v2/scratch/apps/{id}/aclMode": {
       "patch": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Sets or un-sets the app's ACL mode setting",
         "description": "Requester has to have DASHBOARD_ADMIN rights, or have SCRATCH_ADMIN rights for given app ID",
         "operationId": "setAclModeSetting",
@@ -3899,8 +4031,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed appId or query parameter",
+          "404": {
+            "description": "Application ID not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -3919,8 +4051,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID not found",
+          "400": {
+            "description": "Malformed appId or query parameter",
             "content": {
               "*/*": {
                 "schema": {
@@ -3934,7 +4066,9 @@
     },
     "/v2/organization/{id}/subordinates": {
       "delete": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Remove subordinate organizations from an organization",
         "description": "Removes subordinate orgs from an organization",
         "operationId": "removeSubordinateOrganization",
@@ -3966,16 +4100,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Provided org UUID(s) was/were invalid",
             "content": {
@@ -3996,6 +4120,16 @@
               }
             }
           },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Host organization UUID was invalid",
             "content": {
@@ -4009,7 +4143,9 @@
         }
       },
       "patch": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Add subordinate organizations to an organization",
         "description": "Adds subordinate orgs to an organization",
         "operationId": "addSubordinateOrganization",
@@ -4041,16 +4177,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Provided org UUID(s) was/were invalid",
             "content": {
@@ -4071,6 +4197,16 @@
               }
             }
           },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Host organization UUID was invalid",
             "content": {
@@ -4086,7 +4222,9 @@
     },
     "/v2/organization/{id}/members": {
       "delete": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Deletes a member(s) from the organization",
         "description": "Deletes a member(s) from an organization",
         "operationId": "deleteOrganizationMember",
@@ -4118,16 +4256,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Provided person UUID(s) was/were invalid",
             "content": {
@@ -4148,6 +4276,16 @@
               }
             }
           },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Provided organization UUID was invalid",
             "content": {
@@ -4161,7 +4299,9 @@
         }
       },
       "patch": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Add member(s) to an organization",
         "description": "Adds member(s) to an organization",
         "operationId": "addOrganizationMember",
@@ -4203,18 +4343,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Provided person UUID(s) was/were invalid",
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
@@ -4223,8 +4353,8 @@
               }
             }
           },
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
+          "400": {
+            "description": "Provided person UUID(s) was/were invalid",
             "content": {
               "*/*": {
                 "schema": {
@@ -4242,13 +4372,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/app-source/admins/{id}": {
       "delete": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Deletes a single app source admin by email address from provided App Source",
         "description": "Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.",
         "operationId": "removeAppSourceAdmin",
@@ -4318,7 +4460,9 @@
         }
       },
       "patch": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Adds single app source admin by email address to provided App Source",
         "description": "Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.  Request payload is a DashboardUserDto, but only needed/required fields are the email address.",
         "operationId": "addAppSourceAdmin",
@@ -4390,7 +4534,9 @@
     },
     "/v2/subscriptions/events/replay": {
       "get": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Retrieves all ledger entries from specified date/time regardless of event type",
         "description": "Date/time needs to be in zulu time with format yyyy-MM-ddTHH:mm:ss",
         "operationId": "getEventSinceDateWrapped",
@@ -4430,7 +4576,9 @@
     },
     "/v2/subscriptions/events/latest": {
       "get": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Retrieves most current counts for each event type",
         "description": "Retrieves latest counts for each event type in a key-value pair object",
         "operationId": "getLatestCountsWrapped",
@@ -4450,7 +4598,9 @@
     },
     "/v2/scratch/{appId}": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Retrieves all key-value pairs for a single app",
         "description": "App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis",
         "operationId": "getAllKeyValuePairsForAppIdWrapped",
@@ -4480,6 +4630,16 @@
               }
             }
           },
+          "404": {
+            "description": "Application ID not valid or found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Malformed Application UUID",
             "content": {
@@ -4499,21 +4659,13 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Application ID not valid or found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       },
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Deletes all key-value pairs for a given App Id",
         "description": "SCRATCH_WRITE privileges are required for the requester for the given App Id",
         "operationId": "deleteAllKeyValuePairsForAppId",
@@ -4540,8 +4692,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed Request Body",
+          "404": {
+            "description": "Application ID not valid or found",
             "content": {
               "*/*": {
                 "schema": {
@@ -4560,8 +4712,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID not valid or found",
+          "400": {
+            "description": "Malformed Request Body",
             "content": {
               "*/*": {
                 "schema": {
@@ -4575,7 +4727,9 @@
     },
     "/v2/scratch/{appId}/jsondb/{table}/list": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "operationId": "listTable",
         "parameters": [
           {
@@ -4612,7 +4766,9 @@
     },
     "/v2/scratch/{appId}/jsondb/{table}/get/{id}": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "operationId": "getById",
         "parameters": [
           {
@@ -4657,7 +4813,9 @@
     },
     "/v2/scratch/users/privs": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets all SCRATCH space privileges available",
         "description": "Gets all the SCRATCH space privileges so that privilege names can be mapped to their IDs",
         "operationId": "getScratchPrivsWrapped",
@@ -4677,7 +4835,9 @@
     },
     "/v2/scratch/apps/{id}/write": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets the list of key names the requesting user can write to (based on their email)",
         "description": "Checks write access against all keys in given appId, if allowed, keyname is included in return list",
         "operationId": "getAppKeysUserCanWriteTo",
@@ -4709,7 +4869,9 @@
     },
     "/v2/scratch/apps/{id}/read": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets the list of key names the requesting user can access (based on their email)",
         "description": "Checks read access against all keys in given appId, if allowed, keyname is included in return list",
         "operationId": "getAppKeysUserCanReadFrom",
@@ -4741,7 +4903,9 @@
     },
     "/v2/scratch/apps/{id}/admin": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets the list of key names the requesting user can admin (based on their email)",
         "description": "Checks admin access against all keys in given appId, if allowed, keyname is included in return list",
         "operationId": "getAppKeysUserIsAdminOf",
@@ -4773,7 +4937,9 @@
     },
     "/v2/scratch/apps/{appId}/keys": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Retrieves all keys for for a single app",
         "description": "App ID is the UUID of the owning application. Note if app is in ACL mode, then this endpointwill not work unless requester is a SCRATCH_ADMIN - since ACL mode restricts read/write on a key bykey basis",
         "operationId": "getAllKeysForAppIdWrapped",
@@ -4790,12 +4956,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Application ID not valid or found",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericStringArrayResponseWrapper"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4810,18 +4976,18 @@
               }
             }
           },
-          "403": {
-            "description": "Insufficient privileges",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/GenericStringArrayResponseWrapper"
                 }
               }
             }
           },
-          "404": {
-            "description": "Application ID not valid or found",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -4835,7 +5001,9 @@
     },
     "/v2/privilege": {
       "get": {
-        "tags": ["privilege-controller"],
+        "tags": [
+          "privilege-controller"
+        ],
         "summary": "Retrieves all Privilege information",
         "description": "Retrieves Privilege information",
         "operationId": "getPrivilegesWrapped",
@@ -4855,7 +5023,9 @@
     },
     "/v2/kpi/summary": {
       "get": {
-        "tags": ["kpi-controller"],
+        "tags": [
+          "kpi-controller"
+        ],
         "summary": "Retrieves all KPI information",
         "description": "Retrieves all KPI information between two dates.",
         "operationId": "getKpiSummary",
@@ -4894,8 +5064,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
@@ -4904,8 +5074,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "400": {
+            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
               "*/*": {
                 "schema": {
@@ -4919,7 +5089,9 @@
     },
     "/v2/kpi/series": {
       "get": {
-        "tags": ["kpi-controller"],
+        "tags": [
+          "kpi-controller"
+        ],
         "summary": "Retrieves previously recorded KPIs.",
         "description": "Retrieves previously recorded KPIs. The KPIs will be reported in weekly increments. Monday is the start of the week and Sunday is the end of the week.",
         "operationId": "getKpiSeries",
@@ -4948,22 +5120,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/KpiSummaryDtoResponseWrapper"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be set to within the current week or in the future (there would be no data).",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/KpiSummaryDtoResponseWrapper"
                 }
               }
             }
@@ -4983,7 +5155,9 @@
     },
     "/v2/event-request-log/app-client/self": {
       "get": {
-        "tags": ["event-request-log-controller"],
+        "tags": [
+          "event-request-log-controller"
+        ],
         "summary": "Retrieves webhook requests sent to the requesting App Client",
         "description": "Any filters creating targeting appClientUser will be ignored",
         "operationId": "getEventRequestLogsByAppClient",
@@ -5049,7 +5223,9 @@
     },
     "/v2/event-request-log/app-client/id/{appId}": {
       "get": {
-        "tags": ["event-request-log-controller"],
+        "tags": [
+          "event-request-log-controller"
+        ],
         "summary": "Retrieves webhook requests sent to an App Client pubsub event subscriber",
         "description": "Any filters creating targeting appClientUser will be ignored",
         "operationId": "getEventRequestLogsByAppClientId",
@@ -5100,16 +5276,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden -- requester must be the App Client itself or an App Client Developer of the App Client",
             "content": {
@@ -5119,13 +5285,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/event-request-log/all": {
       "get": {
-        "tags": ["event-request-log-controller"],
+        "tags": [
+          "event-request-log-controller"
+        ],
         "summary": "Retrieves webhook requests sent to all pubsub event subscribers",
         "operationId": "getAllEventRequestLogs",
         "parameters": [
@@ -5165,16 +5343,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden -- requester must have DASHBOARD_ADMIN privilege",
             "content": {
@@ -5184,13 +5352,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/document-space/files/{space}/{keyNames}": {
       "get": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Download multiple files from a Document Space",
         "description": "Downloads multiple files from a space as a zip file",
         "operationId": "downloadFiles",
@@ -5217,16 +5397,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/StreamingResponseBody"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request - Bad space name",
             "content": {
@@ -5246,13 +5416,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamingResponseBody"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/document-space/file/{space}/{keyName}": {
       "get": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Download from a Document Space",
         "description": "Download a single file from a Document Space",
         "operationId": "downloadFile",
@@ -5275,17 +5457,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request - Bad space name",
             "content": {
@@ -5305,13 +5476,26 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/dashboard/app-source-usage": {
       "get": {
-        "tags": ["dashboard-controller"],
+        "tags": [
+          "dashboard-controller"
+        ],
         "summary": "Get a list of App Sources along with their respective request count.",
         "description": "Get a list of App Sources along with their respective request counts between two dates. Will only include successful requests (http status between 200 and 300)",
         "operationId": "getAppSourceUsageCount",
@@ -5350,8 +5534,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
@@ -5360,8 +5544,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "400": {
+            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
               "*/*": {
                 "schema": {
@@ -5375,7 +5559,9 @@
     },
     "/v2/dashboard/app-source-error-usage": {
       "get": {
-        "tags": ["dashboard-controller"],
+        "tags": [
+          "dashboard-controller"
+        ],
         "summary": "Get a list of App Sources along with their respective error request count.",
         "description": "Get a list of App Sources along with their respective error request counts between two dates. Will only include successful requests (http status between 200 and 300)",
         "operationId": "getAppSourceErrorUsageCount",
@@ -5414,8 +5600,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
@@ -5424,8 +5610,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "400": {
+            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
               "*/*": {
                 "schema": {
@@ -5439,7 +5625,9 @@
     },
     "/v2/dashboard/app-client-personnel-accessors": {
       "get": {
-        "tags": ["dashboard-controller"],
+        "tags": [
+          "dashboard-controller"
+        ],
         "summary": "Get a list of App Clients that have accessed personnel records",
         "description": "Get a list of App Clients that have accessed personnel records between two dates with their request count. Will only include App Clients that have made successful requests to access personnel records (http status between 200 and 300.)",
         "operationId": "getAppClientsAccessingPersonnelRecords",
@@ -5468,12 +5656,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityAccessorResponseDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5488,12 +5676,12 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/EntityAccessorResponseDto"
                 }
               }
             }
@@ -5503,7 +5691,9 @@
     },
     "/v2/dashboard/app-client-organization-accessors": {
       "get": {
-        "tags": ["dashboard-controller"],
+        "tags": [
+          "dashboard-controller"
+        ],
         "summary": "Get a list of App Clients that have accessed organization records",
         "description": "Get a list of App Clients that have accessed organization records between two dates with their request count. Will only include App Clients that have made successful requests to access organization records (http status between 200 and 300.)",
         "operationId": "getAppClientsAccessingOrganizations",
@@ -5532,12 +5722,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/EntityAccessorResponseDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5552,12 +5742,12 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/EntityAccessorResponseDto"
                 }
               }
             }
@@ -5567,7 +5757,9 @@
     },
     "/v2/app-client/privs": {
       "get": {
-        "tags": ["app-client-controller"],
+        "tags": [
+          "app-client-controller"
+        ],
         "summary": "Gets all available privileges available for an app-client",
         "description": "Gets all the app client privileges so that privilege names can be mapped to their IDs. Must be a DASHBOARD_ADMIN or APP_CLIENT_DEVELOPER",
         "operationId": "getClientTypePrivsWrapped",
@@ -5587,7 +5779,9 @@
     },
     "/v2/version": {
       "get": {
-        "tags": ["app-version-controller"],
+        "tags": [
+          "app-version-controller"
+        ],
         "summary": "Retrieves current running application version",
         "description": "The version is the first 8-characters of the SHA-1 commit hash of the master branch that this version was compiled from",
         "operationId": "getVersion",
@@ -5607,7 +5801,9 @@
     },
     "/v2/userinfo/existing-person": {
       "get": {
-        "tags": ["user-info-controller"],
+        "tags": [
+          "user-info-controller"
+        ],
         "summary": "Returns person record matching email for existing logged in user jwt",
         "operationId": "getExistingPersonRecord",
         "responses": {
@@ -5636,21 +5832,13 @@
     },
     "/v2/userinfo": {
       "get": {
-        "tags": ["user-info-controller"],
+        "tags": [
+          "user-info-controller"
+        ],
         "summary": "Retrieves the user information from the jwt",
         "description": "Retrieves user information",
         "operationId": "getUserInfo",
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfoDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
@@ -5660,13 +5848,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfoDto"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/subscriptions/{id}": {
       "get": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Retrieves a registered subscription",
         "description": "Retrieve a subscription by its UUID",
         "operationId": "getSubscription",
@@ -5682,16 +5882,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriberDto"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Record not found",
             "content": {
@@ -5701,11 +5891,23 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriberDto"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "tags": ["subscriber-controller"],
+        "tags": [
+          "subscriber-controller"
+        ],
         "summary": "Deletes a subscription",
         "description": "Deletes a subscription by its UUID",
         "operationId": "cancelSubscription",
@@ -5721,16 +5923,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriberDto"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Record not found",
             "content": {
@@ -5740,13 +5932,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriberDto"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/scratch/{appId}/{keyName}": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Retrieves a single key-value pair for for a single app",
         "description": "App ID is the UUID of the owning application",
         "operationId": "getKeyValueByKeyName",
@@ -5817,7 +6021,9 @@
     },
     "/v2/scratch/apps/{appId}": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets a single Scratch Storage app's record that is registered with Common API",
         "description": "Requester has to have DASHBOARD_ADMIN rights or have SCRATCH_ADMIN rights for given app ID.",
         "operationId": "getScratchAppById",
@@ -5833,16 +6039,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privilege for given app ID.",
             "content": {
@@ -5852,13 +6048,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/scratch/apps/self": {
       "get": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Gets all Scratch Storage apps that the current Authorized User is a user of",
         "description": "Each Scratch Storage App returned will only contain user privileges for the Authorized User. It will not contain the privileges of other users.",
         "operationId": "getScratchSpaceAppsByAuthorizedUser",
@@ -5891,7 +6099,9 @@
     },
     "/v2/rank/{branch}/{abbreviation}": {
       "get": {
-        "tags": ["rank-controller"],
+        "tags": [
+          "rank-controller"
+        ],
         "summary": "Retrieves information for a particular rank",
         "description": "Retrieves information for a particular rank",
         "operationId": "getRank",
@@ -5914,6 +6124,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Resource not found"
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -5923,16 +6136,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found"
           }
         }
       }
     },
     "/v2/rank/{branch}": {
       "get": {
-        "tags": ["rank-controller"],
+        "tags": [
+          "rank-controller"
+        ],
         "summary": "Retrieves all ranks for a particular branch",
         "description": "Retrieves all ranks for a particular branch",
         "operationId": "getRanks",
@@ -5947,6 +6159,9 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Resource not found"
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -5959,16 +6174,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found"
           }
         }
       }
     },
     "/v2/rank": {
       "get": {
-        "tags": ["rank-controller"],
+        "tags": [
+          "rank-controller"
+        ],
         "summary": "Retrieves all ranks",
         "description": "Retrieves all ranks",
         "operationId": "getRanks_1",
@@ -5991,7 +6205,9 @@
     },
     "/v2/puckboard/test": {
       "get": {
-        "tags": ["puckboard-etl-controller"],
+        "tags": [
+          "puckboard-etl-controller"
+        ],
         "operationId": "testPuckboardComms",
         "parameters": [
           {
@@ -6020,7 +6236,9 @@
     },
     "/v2/puckboard/extract": {
       "get": {
-        "tags": ["puckboard-etl-controller"],
+        "tags": [
+          "puckboard-etl-controller"
+        ],
         "operationId": "getPuckboardData",
         "responses": {
           "200": {
@@ -6038,7 +6256,9 @@
     },
     "/v2/metrics/endpoint/{id}": {
       "get": {
-        "tags": ["metrics-controller"],
+        "tags": [
+          "metrics-controller"
+        ],
         "summary": "Retrieves all stored metrics values for given endpoint",
         "description": "Retrieves all stored metric values for given endpoint",
         "operationId": "getAllMetricsForEndpoint",
@@ -6085,16 +6305,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Rquest (Start date and end date are both required. Start date must be before end date)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Requires DASHBOARD_ADMIN privilege or must be an Admin of the endpoint's App Source)",
             "content": {
@@ -6114,13 +6324,25 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Rquest (Start date and end date are both required. Start date must be before end date)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/metrics/count/{id}/endpoint": {
       "get": {
-        "tags": ["metrics-controller"],
+        "tags": [
+          "metrics-controller"
+        ],
         "summary": "Retrieves sum of stored metric values for given endpoint path on given app source",
         "description": "Retrieves sum of stored metric values for given endpoint path on given app source for each app client",
         "operationId": "getCountOfMetricsForEndpoint",
@@ -6205,8 +6427,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege or must be an Admin of the App Source)",
+          "404": {
+            "description": "Resource not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -6215,8 +6437,8 @@
               }
             }
           },
-          "404": {
-            "description": "Resource not found",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege or must be an Admin of the App Source)",
             "content": {
               "*/*": {
                 "schema": {
@@ -6230,7 +6452,9 @@
     },
     "/v2/metrics/count/{id}/appclient": {
       "get": {
-        "tags": ["metrics-controller"],
+        "tags": [
+          "metrics-controller"
+        ],
         "summary": "Retrieves sum of stored metric values for given app client name on given app source",
         "description": "Retrieves sum of stored metric values for given app client name on given app source for each endpoint",
         "operationId": "getCountOfMetricsForAppClient",
@@ -6276,6 +6500,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Rquest (Start date, end date, and name are all required. Start date must be before end date)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -6286,8 +6520,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Rquest (Start date, end date, and name are all required. Start date must be before end date)",
+          "404": {
+            "description": "Resource not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -6305,23 +6539,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/metrics/count/{id}": {
       "get": {
-        "tags": ["metrics-controller"],
+        "tags": [
+          "metrics-controller"
+        ],
         "summary": "Retrieves sum of stored metric values for given app source",
         "description": "Retrieves sum of stored metric values for given app source for each endppoint and for each app client",
         "operationId": "getCountOfMetricsForAppSource",
@@ -6358,6 +6584,26 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege or must be an Admin of the App Source)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -6377,33 +6623,15 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege or must be an Admin of the App Source)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/metrics/appsource/{id}": {
       "get": {
-        "tags": ["metrics-controller"],
+        "tags": [
+          "metrics-controller"
+        ],
         "summary": "Retrieves all stored metrics values for given app source",
         "description": "Retrieves all stored metric values for given app source",
         "operationId": "getAllMetricsForAppSource",
@@ -6450,8 +6678,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Rquest (Start date and end date are both required. Start date must be before end date)",
+          "404": {
+            "description": "Resource not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -6470,8 +6698,8 @@
               }
             }
           },
-          "404": {
-            "description": "Resource not found",
+          "400": {
+            "description": "Bad Rquest (Start date and end date are both required. Start date must be before end date)",
             "content": {
               "*/*": {
                 "schema": {
@@ -6485,7 +6713,9 @@
     },
     "/v2/logs/{id}": {
       "get": {
-        "tags": ["http-logs-controller"],
+        "tags": [
+          "http-logs-controller"
+        ],
         "summary": "Retrieves the full record of a particular request",
         "description": "Must have DASHBOARD_ADMIN privilege to access. This detailed info includes the request/response bodies (if present)",
         "operationId": "getHttpLogDetails",
@@ -6526,7 +6756,9 @@
     },
     "/v2/logs": {
       "get": {
-        "tags": ["http-logs-controller"],
+        "tags": [
+          "http-logs-controller"
+        ],
         "summary": "Retrieves a subset of the server http trace logs from a specified date",
         "description": "Must have DASHBOARD_ADMIN privilege to access.  Date time given is in the format 'yyyy-MM-ddTHH:mm:ss' and should be in UTC time. This date time parameter is required.  This is also a pageable interface (using page and size query params).",
         "operationId": "getHttpLogs",
@@ -6661,7 +6893,9 @@
     },
     "/v2/logfile/{fileName}": {
       "get": {
-        "tags": ["logfile-controller"],
+        "tags": [
+          "logfile-controller"
+        ],
         "summary": "Retrieves a logfile for download",
         "description": "Retrieves a logfile for download",
         "operationId": "getLogfile",
@@ -6676,13 +6910,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "File not found",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6697,18 +6930,19 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           },
-          "404": {
-            "description": "File not found",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
@@ -6722,11 +6956,23 @@
     },
     "/v2/logfile": {
       "get": {
-        "tags": ["logfile-controller"],
+        "tags": [
+          "logfile-controller"
+        ],
         "summary": "Retrieves all logfiles info",
         "description": "Retrieves all logfiles available for download",
         "operationId": "getLogfileInfo",
         "responses": {
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -6739,23 +6985,15 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/dashboard-users/self": {
       "get": {
-        "tags": ["dashboard-user-controller"],
+        "tags": [
+          "dashboard-user-controller"
+        ],
         "summary": "Retrieves the currently authorized dashboard user",
         "description": "Retrieves the authorized dashboard user",
         "operationId": "getSelfDashboardUser",
@@ -6785,7 +7023,9 @@
     },
     "/v2/app-source/spec/{appId}": {
       "get": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Gets a copy of the openapispec file for the app source",
         "operationId": "getSpecFile",
         "parameters": [
@@ -6801,6 +7041,16 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "App Source or API Specification file not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -6831,23 +7081,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "App Source or API Specification file not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/app-source/spec/endpoint-priv/{endpointPrivId}": {
       "get": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Gets a copy of the openapispec file for the app source related to the endpoint",
         "operationId": "getSpecFileByEndpointPriv",
         "parameters": [
@@ -6863,6 +7105,16 @@
           }
         ],
         "responses": {
+          "404": {
+            "description": "App Source or API Specification file not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -6893,23 +7145,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "App Source or API Specification file not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/scratch/{appId}/jsondb/{table}/delete/{id}": {
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "operationId": "deleteById",
         "parameters": [
           {
@@ -6954,7 +7198,9 @@
     },
     "/v2/document-space/spaces/{name}": {
       "delete": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Deletes a Document Space",
         "description": "Deletes a Document Space",
         "operationId": "deleteSpace",
@@ -6969,16 +7215,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request - Bad space name",
             "content": {
@@ -6998,13 +7234,25 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/document-space/files/{space}/{keyName}": {
       "delete": {
-        "tags": ["document-space-controller"],
+        "tags": [
+          "document-space-controller"
+        ],
         "summary": "Deletes from a Document Space",
         "description": "Deletes file from a space",
         "operationId": "delete",
@@ -7027,12 +7275,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Not Found - space not found, file not found",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7047,12 +7295,12 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found - space not found, file not found",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "type": "object"
                 }
               }
             }
@@ -7062,7 +7310,9 @@
     },
     "/v2/scratch/{appId}/key/{key}": {
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Deletes a key-value pair for a given App Id",
         "description": "SCRATCH_WRITE privileges are required for the requester for the given App Id",
         "operationId": "deleteKeyValuePair",
@@ -7098,8 +7348,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed request body",
+          "403": {
+            "description": "Write / Update action forbidden - no WRITE privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -7108,8 +7358,8 @@
               }
             }
           },
-          "403": {
-            "description": "Write / Update action forbidden - no WRITE privileges",
+          "400": {
+            "description": "Malformed request body",
             "content": {
               "*/*": {
                 "schema": {
@@ -7133,7 +7383,9 @@
     },
     "/v2/scratch/apps/{id}/user/{appPrivIdEntry}": {
       "delete": {
-        "tags": ["scratch-storage-controller"],
+        "tags": [
+          "scratch-storage-controller"
+        ],
         "summary": "Removes a user privilege from this app's data",
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "removeUserPriv",
@@ -7160,6 +7412,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Malformed request body / app name already exists or appId is malformed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "App Priv Removed OK",
             "content": {
@@ -7170,8 +7432,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed request body / app name already exists or appId is malformed",
+          "404": {
+            "description": "Application ID not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -7189,23 +7451,15 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Application ID not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
           }
         }
       }
     },
     "/v2/organization/{id}/parent": {
       "delete": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Deletes a parent from a subordinate organization",
         "description": "Deletes/clears out the parent org with no org",
         "operationId": "deleteOrgParent",
@@ -7222,22 +7476,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
@@ -7257,7 +7511,9 @@
     },
     "/v2/organization/{id}/leader": {
       "delete": {
-        "tags": ["organization-controller"],
+        "tags": [
+          "organization-controller"
+        ],
         "summary": "Deletes a leader from an organization",
         "description": "Deletes/clears out the leader position with no one",
         "operationId": "deleteOrgLeader",
@@ -7274,22 +7530,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
@@ -7309,7 +7565,9 @@
     },
     "/v2/app-source/app-clients/{appId}/{privId}": {
       "delete": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Deletes an app source's endpoint to app client privilege relationship",
         "description": "Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.",
         "operationId": "removeClientToEndPointPriv",
@@ -7336,18 +7594,18 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Privilege Removed OK",
+          "400": {
+            "description": "An Id is malformed",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/AppSourceDetailsDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "An Id is malformed",
+          "404": {
+            "description": "App Source/End Point/App Client not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -7366,12 +7624,12 @@
               }
             }
           },
-          "404": {
-            "description": "App Source/End Point/App Client not found",
+          "200": {
+            "description": "Privilege Removed OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/AppSourceDetailsDto"
                 }
               }
             }
@@ -7381,7 +7639,9 @@
     },
     "/v2/app-source/app-clients/all/{id}": {
       "delete": {
-        "tags": ["app-source-controller"],
+        "tags": [
+          "app-source-controller"
+        ],
         "summary": "Deletes ALL app client privileges from provided App Source.  No App Clients will be able to use this app source's endpoints.",
         "description": "Requester has to have DASHBOARD_ADMIN rights or be APP_SOURCE_ADMIN of given App Id.",
         "operationId": "removeAllAppClientPrivs",
@@ -7398,12 +7658,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "All App Client Privileges Removed OK",
+          "404": {
+            "description": "App Source not found",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/AppSourceDetailsDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7428,12 +7688,12 @@
               }
             }
           },
-          "404": {
-            "description": "App Source not found",
+          "200": {
+            "description": "All App Client Privileges Removed OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/AppSourceDetailsDto"
                 }
               }
             }
@@ -7445,7 +7705,9 @@
   "components": {
     "schemas": {
       "ScratchStorageUserDto": {
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object",
         "properties": {
           "email": {
@@ -7459,7 +7721,13 @@
         }
       },
       "ExceptionResponse": {
-        "required": ["error", "path", "reason", "status", "timestamp"],
+        "required": [
+          "error",
+          "path",
+          "reason",
+          "status",
+          "timestamp"
+        ],
         "type": "object",
         "properties": {
           "timestamp": {
@@ -7519,7 +7787,9 @@
         "nullable": true
       },
       "PrivilegeDto": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7545,7 +7815,9 @@
         }
       },
       "ScratchStorageAppRegistryDto": {
-        "required": ["appName"],
+        "required": [
+          "appName"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7742,7 +8014,15 @@
           },
           "branch": {
             "type": "string",
-            "enum": ["OTHER", "USA", "USAF", "USMC", "USN", "USSF", "USCG"]
+            "enum": [
+              "OTHER",
+              "USA",
+              "USAF",
+              "USMC",
+              "USN",
+              "USSF",
+              "USCG"
+            ]
           },
           "phone": {
             "type": "string",
@@ -7832,7 +8112,9 @@
         ]
       },
       "Flight": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -7850,7 +8132,9 @@
         ]
       },
       "Group": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -7869,7 +8153,9 @@
       },
       "OrganizationDto": {
         "title": "Organization",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -7934,7 +8220,15 @@
           },
           "branchType": {
             "type": "string",
-            "enum": ["OTHER", "USA", "USAF", "USMC", "USN", "USSF", "USCG"]
+            "enum": [
+              "OTHER",
+              "USA",
+              "USAF",
+              "USMC",
+              "USN",
+              "USSF",
+              "USCG"
+            ]
           }
         },
         "discriminator": {
@@ -7950,7 +8244,9 @@
         }
       },
       "OtherUsaf": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -7959,7 +8255,9 @@
         ]
       },
       "Squadron": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -7977,7 +8275,9 @@
         ]
       },
       "Wing": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -8015,7 +8315,10 @@
         "description": "Admin To Remove Email"
       },
       "AppClientUserPrivDto": {
-        "required": ["appClientUser", "appEndpoint"],
+        "required": [
+          "appClientUser",
+          "appEndpoint"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -8040,7 +8343,10 @@
         }
       },
       "AppEndpointDto": {
-        "required": ["path", "requestType"],
+        "required": [
+          "path",
+          "requestType"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -8059,7 +8365,9 @@
         }
       },
       "AppSourceDetailsDto": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -8116,7 +8424,9 @@
         }
       },
       "AppClientUserDto": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -8200,7 +8510,9 @@
         }
       },
       "PubSubLedgerEntryDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8220,7 +8532,9 @@
         }
       },
       "PersonDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8232,12 +8546,18 @@
         }
       },
       "PersonFindDto": {
-        "required": ["findType", "value"],
+        "required": [
+          "findType",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "findType": {
             "type": "string",
-            "enum": ["EMAIL", "DODID"]
+            "enum": [
+              "EMAIL",
+              "DODID"
+            ]
           },
           "value": {
             "type": "string"
@@ -8246,7 +8566,9 @@
         "description": "The information to find a person by"
       },
       "FilterCondition": {
-        "required": ["operator"],
+        "required": [
+          "operator"
+        ],
         "type": "object",
         "properties": {
           "operator": {
@@ -8280,13 +8602,19 @@
         "description": "The list of conditions that must be fulfilled"
       },
       "FilterCriteria": {
-        "required": ["conditions", "field"],
+        "required": [
+          "conditions",
+          "field"
+        ],
         "type": "object",
         "properties": {
           "relationType": {
             "type": "string",
             "description": "The relationship between the conditions. Will default to use AND if none provided. Has no effect if only one condition is given",
-            "enum": ["OR", "AND"]
+            "enum": [
+              "OR",
+              "AND"
+            ]
           },
           "field": {
             "type": "string",
@@ -8302,7 +8630,9 @@
         }
       },
       "FilterDto": {
-        "required": ["filterCriteria"],
+        "required": [
+          "filterCriteria"
+        ],
         "type": "object",
         "properties": {
           "filterCriteria": {
@@ -8356,7 +8686,10 @@
         }
       },
       "PersonDtoPaginationResponseWrapper": {
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8371,7 +8704,9 @@
         }
       },
       "OrganizationDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8383,7 +8718,10 @@
         }
       },
       "OrganizationDtoPaginationResponseWrapper": {
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8445,7 +8783,10 @@
         }
       },
       "EventRequestLogDtoPaginationResponseWrapper": {
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8460,7 +8801,9 @@
         }
       },
       "DocumentSpaceInfoDto": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -8469,7 +8812,10 @@
         }
       },
       "SubscriberDto": {
-        "required": ["appClientUser", "subscribedEvent"],
+        "required": [
+          "appClientUser",
+          "subscribedEvent"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -8502,7 +8848,10 @@
         }
       },
       "ScratchStorageEntryDto": {
-        "required": ["appId", "key"],
+        "required": [
+          "appId",
+          "key"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -8564,7 +8913,14 @@
         "properties": {
           "op": {
             "type": "string",
-            "enum": ["add", "remove", "replace", "copy", "move", "test"]
+            "enum": [
+              "add",
+              "remove",
+              "replace",
+              "copy",
+              "move",
+              "test"
+            ]
           },
           "path": {
             "type": "string"
@@ -8582,7 +8938,14 @@
         "properties": {
           "op": {
             "type": "string",
-            "enum": ["add", "remove", "replace", "copy", "move", "test"]
+            "enum": [
+              "add",
+              "remove",
+              "replace",
+              "copy",
+              "move",
+              "test"
+            ]
           },
           "path": {
             "type": "string"
@@ -8597,7 +8960,14 @@
         "properties": {
           "op": {
             "type": "string",
-            "enum": ["add", "remove", "replace", "copy", "move", "test"]
+            "enum": [
+              "add",
+              "remove",
+              "replace",
+              "copy",
+              "move",
+              "test"
+            ]
           },
           "path": {
             "type": "string"
@@ -8612,7 +8982,14 @@
         "properties": {
           "op": {
             "type": "string",
-            "enum": ["add", "remove", "replace", "copy", "move", "test"]
+            "enum": [
+              "add",
+              "remove",
+              "replace",
+              "copy",
+              "move",
+              "test"
+            ]
           },
           "path": {
             "type": "string"
@@ -8626,7 +9003,9 @@
         }
       },
       "ScratchValuePatchJsonDto": {
-        "required": ["jsonPath"],
+        "required": [
+          "jsonPath"
+        ],
         "type": "object",
         "properties": {
           "jsonPath": {
@@ -8645,7 +9024,10 @@
         "description": "Object specifying the json path to execute and the new value"
       },
       "ScratchStorageAppUserPrivDto": {
-        "required": ["email", "privilegeId"],
+        "required": [
+          "email",
+          "privilegeId"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -8664,7 +9046,9 @@
         "description": "Application User-Priv Object"
       },
       "SubscriberDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8676,7 +9060,9 @@
         }
       },
       "EventInfoDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8688,7 +9074,9 @@
         }
       },
       "ScratchStorageEntryDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8700,7 +9088,9 @@
         }
       },
       "ScratchStorageUserDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8712,7 +9102,9 @@
         }
       },
       "PrivilegeDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8724,7 +9116,9 @@
         }
       },
       "ScratchStorageAppRegistryDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8736,7 +9130,10 @@
         }
       },
       "GenericStringArrayResponseWrapper": {
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8796,7 +9193,10 @@
         }
       },
       "ServiceMetricDto": {
-        "required": ["name", "responseCount"],
+        "required": [
+          "name",
+          "responseCount"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -8813,12 +9213,19 @@
         }
       },
       "UniqueVisitorCountDto": {
-        "required": ["requestCount", "uniqueCount", "visitorType"],
+        "required": [
+          "requestCount",
+          "uniqueCount",
+          "visitorType"
+        ],
         "type": "object",
         "properties": {
           "visitorType": {
             "type": "string",
-            "enum": ["DASHBOARD_USER", "APP_CLIENT"]
+            "enum": [
+              "DASHBOARD_USER",
+              "APP_CLIENT"
+            ]
           },
           "uniqueCount": {
             "type": "integer",
@@ -8831,7 +9238,9 @@
         }
       },
       "KpiSummaryDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8843,7 +9252,9 @@
         }
       },
       "DocumentSpaceInfoDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -8855,7 +9266,13 @@
         }
       },
       "DocumentDto": {
-        "required": ["key", "path", "uploadedBy", "uploadedDate"],
+        "required": [
+          "key",
+          "path",
+          "size",
+          "uploadedBy",
+          "uploadedDate"
+        ],
         "type": "object",
         "properties": {
           "key": {
@@ -8863,6 +9280,11 @@
           },
           "path": {
             "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size in bytes",
+            "format": "int64"
           },
           "uploadedDate": {
             "type": "string",
@@ -8874,7 +9296,11 @@
         }
       },
       "S3PaginationDto": {
-        "required": ["documents", "size", "totalElements"],
+        "required": [
+          "documents",
+          "size",
+          "totalElements"
+        ],
         "type": "object",
         "properties": {
           "documents": {
@@ -9017,7 +9443,9 @@
         }
       },
       "DashboardUserDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -9029,7 +9457,9 @@
         }
       },
       "AppSourceDto": {
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -9051,7 +9481,9 @@
         }
       },
       "AppSourceDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -9063,7 +9495,9 @@
         }
       },
       "AppClientSummaryDtoResponseWrapper": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -9075,7 +9509,9 @@
         }
       },
       "AppClientUserDtoResponseWrapped": {
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -9140,12 +9576,23 @@
           },
           "branchType": {
             "type": "string",
-            "enum": ["OTHER", "USA", "USAF", "USMC", "USN", "USSF", "USCG"]
+            "enum": [
+              "OTHER",
+              "USA",
+              "USAF",
+              "USMC",
+              "USN",
+              "USSF",
+              "USCG"
+            ]
           }
         }
       },
       "EndpointMetricDto": {
-        "required": ["path", "requestType"],
+        "required": [
+          "path",
+          "requestType"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -9190,7 +9637,10 @@
         }
       },
       "AppEndpointCountMetricDto": {
-        "required": ["path", "requestType"],
+        "required": [
+          "path",
+          "requestType"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -9361,7 +9811,10 @@
         }
       },
       "HttpLogDtoPaginationResponseWrapper": {
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "type": "object",
         "properties": {
           "data": {

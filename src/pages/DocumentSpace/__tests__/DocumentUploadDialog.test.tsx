@@ -28,6 +28,7 @@ describe('Document Upload Tests', () => {
     const mock = jest.fn();
     const page = render(<MemoryRouter>
       <DocumentUploadDialog 
+        space="testspace"
         onFinish={mock} 
       />
     </MemoryRouter>);

@@ -851,6 +851,10 @@
         "path": {
           "type": "string"
         },
+        "size": {
+          "description": "Size in bytes",
+          "type": "number"
+        },
         "uploadedBy": {
           "type": "string"
         },
@@ -861,6 +865,7 @@
       "required": [
         "key",
         "path",
+        "size",
         "uploadedDate",
         "uploadedBy"
       ],
@@ -1427,14 +1432,6 @@
         },
         "userName": {
           "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "InlineObject": {
-      "additionalProperties": false,
-      "properties": {
-        "file": {
         }
       },
       "type": "object"
@@ -2314,6 +2311,12 @@
       "description": "Object specifying the json path to execute and the new value",
       "properties": {
         "jsonPath": {
+          "type": "string"
+        },
+        "newEntry": {
+          "type": "boolean"
+        },
+        "newFieldName": {
           "type": "string"
         },
         "value": {

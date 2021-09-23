@@ -1,11 +1,6 @@
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto } from '../../../openapi';
-import DocumentSpaceService from '../../../state/document-space/document-space-service';
-import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import DeleteDocumentDialog from '../DocumentDelete';
-import DocumentUploadDialog from '../DocumentUploadDialog';
 
 jest.mock('../../../state/document-space/document-space-state');
 
