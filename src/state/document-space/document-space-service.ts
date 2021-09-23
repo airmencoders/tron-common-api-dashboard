@@ -107,11 +107,15 @@ export default class DocumentSpaceService {
 
   createRelativeFilesDownloadUrl(space: string, documents: DocumentDto[]) {
     const fileKeysParam = documents.map(document => document.key).join(',');
-    return `${Config.API_URL_V2}document-space/files/${space}/${fileKeysParam}`;
+    return `${Config.API_URL_V2}document-space/files/${space}/download?files=${fileKeysParam}`;
   }
 
   createRelativeDownloadFileUrl(space: string, key: string): string {
-    return `${Config.API_URL_V2}document-space/file/${space}/${key}`;
+    return `${Config.API_URL_V2}document-space/file/${space}/download?file=${key}`;
+  }
+
+  createRelativeDownloadAllFilesUrl(space: string): string {
+    return `${Config.API_URL_V2}document-space/files/${space}/download/all`;
   }
 
   async deleteFile(space: string, file: any): Promise<void> {
