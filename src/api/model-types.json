@@ -1431,14 +1431,6 @@
       },
       "type": "object"
     },
-    "InlineObject": {
-      "additionalProperties": false,
-      "properties": {
-        "file": {
-        }
-      },
-      "type": "object"
-    },
     "JsonPatchObjectArrayValue": {
       "additionalProperties": false,
       "properties": {
@@ -2137,6 +2129,57 @@
       ],
       "type": "string"
     },
+    "RankCategorizedDto": {
+      "additionalProperties": false,
+      "properties": {
+        "civilService": {
+          "items": {
+            "$ref": "model-types.json#/definitions/Rank"
+          },
+          "type": "array"
+        },
+        "enlisted": {
+          "items": {
+            "$ref": "model-types.json#/definitions/Rank"
+          },
+          "type": "array"
+        },
+        "officer": {
+          "items": {
+            "$ref": "model-types.json#/definitions/Rank"
+          },
+          "type": "array"
+        },
+        "other": {
+          "items": {
+            "$ref": "model-types.json#/definitions/Rank"
+          },
+          "type": "array"
+        },
+        "warrantOfficer": {
+          "items": {
+            "$ref": "model-types.json#/definitions/Rank"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "RankResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/Rank"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "ResponseDto": {
       "additionalProperties": false,
       "properties": {
@@ -2314,6 +2357,12 @@
       "description": "Object specifying the json path to execute and the new value",
       "properties": {
         "jsonPath": {
+          "type": "string"
+        },
+        "newEntry": {
+          "type": "boolean"
+        },
+        "newFieldName": {
           "type": "string"
         },
         "value": {
