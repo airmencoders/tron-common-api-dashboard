@@ -117,7 +117,6 @@ export default class DocumentSpaceService {
     const token = axios.CancelToken.source();
     const promise = this.documentSpaceApi.upload(space, file, { cancelToken: token.token, onUploadProgress: function(progressEvent: any) {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      console.log(percentCompleted);
       progressCallback(percentCompleted);
     }});
 
