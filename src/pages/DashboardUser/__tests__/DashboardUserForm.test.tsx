@@ -66,10 +66,6 @@ describe('Test Dashboard User Form', () => {
     fireEvent.click(adminCheckbox);
     expect(adminCheckbox).toBeChecked();
 
-    const userCheckbox = pageRender.getByLabelText('Dashboard User');
-    fireEvent.click(userCheckbox);
-    expect(userCheckbox).toBeChecked();
-
     fireEvent.click(pageRender.getByText(/Update/i));
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
@@ -94,7 +90,7 @@ describe('Test Dashboard User Form', () => {
     const newData = {
       ...data
     }
-    newData.privileges?.push({name: PrivilegeType.DASHBOARD_ADMIN}, {name: PrivilegeType.DASHBOARD_USER});
+    newData.privileges?.push({name: PrivilegeType.DASHBOARD_ADMIN});
 
     const pageRender = render(
       <DashboardUserForm
@@ -121,11 +117,6 @@ describe('Test Dashboard User Form', () => {
     fireEvent.click(adminCheckbox);
     expect(adminCheckbox).not.toBeChecked();
 
-    const userCheckbox = pageRender.getByLabelText('Dashboard User');
-    fireEvent.click(userCheckbox);
-    expect(userCheckbox).not.toBeChecked();
-
-    expect(pageRender.getByText(new RegExp(validationErrors.atLeastOnePrivilege)));
   });
 
   it('Success message', () => {

@@ -330,8 +330,11 @@ it('should allow to choose leader', async () => {
 
   // ack the dialog selection to set the leader
   fireEvent.click(okBtn);
-
-  expect(form.getByDisplayValue(`${testPerson.firstName} ${testPerson.lastName}`)).toBeInTheDocument();
+  await waitFor(
+      () => {
+        expect(form.getByDisplayValue(`${testPerson.firstName} ${testPerson.lastName}`)).toBeInTheDocument();
+      }
+  )
 });
 
 

@@ -424,7 +424,6 @@ export interface ScratchStorageUser {
 export interface DashboardUser {
   email: string;
   admin?: boolean;
-  user?: boolean;
 }
 
 export interface Subscriber {
