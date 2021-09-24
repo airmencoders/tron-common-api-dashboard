@@ -13,14 +13,14 @@ export interface PageFormatProps {
 
 function PageFormat(props: any) {
   return (
-      <div className={`page-format ${props.className}`}>
-        <div className="page-format__nav-menu default-panel-padding">
+      <div className={`page-format ${props.className ?? ''}`}>
+        <div className="page-format__nav-menu">
           <Sidebar items={routes} />
-        </div>
-        <div className="page-format__page-body-container">
-          <div className="page-format__top-nav">
+          <div className="nav-menu__user-info">
             <HeaderUserInfoContainer />
           </div>
+        </div>
+        <div className="page-format__page-body-container">
           <div className="page-format__page-body">
             <div className="page-body__title-section">
               <PageTitle title={props.pageTitle} />

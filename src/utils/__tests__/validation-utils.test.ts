@@ -1,4 +1,4 @@
-import { getNullableFieldsFromSchema } from '../validation-utils';
+import { getNullableFieldsFromSchema, validateDocSpaceName } from '../validation-utils';
 
 describe('Validation Util Tests', () => {
   it('should extract all nullable string fields from JSON schema', () => {
@@ -32,5 +32,18 @@ describe('Validation Util Tests', () => {
     const actualNullableFields = new Set(['address', 'lastName']);
 
     expect(nullableFields).toEqual(actualNullableFields);
+  });
+
+  it('should validate space names', () => {
+    expect(validateDocSpaceName('Test')).toBeFalsy();
+    expect(validateDocSpaceName('')).toBeFalsy();
+    expect(validateDocSpaceName('test/folder')).toBeFalsy();
+    expect(validateDocSpaceName('.metadata')).toBeFalsy();
+
+    expect(validateDocSpaceName('test')).toBeTruthy();
+    expect(validateDocSpaceName('test-folder')).toBeTruthy();
+    expect(validateDocSpaceName('test-folder123.tron')).toBeTruthy();
+    expect(validateDocSpaceName('89.metadata')).toBeTruthy();
+    
   });
 });

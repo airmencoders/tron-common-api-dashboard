@@ -88,6 +88,61 @@ export const DashboardControllerApiAxiosParamCreator = function (configuration?:
             };
         },
         /**
+         * Get a list of App Clients that have accessed personnel records between two dates with their request count. Will only include App Clients that have made successful requests to access personnel records (http status between 200 and 300.)
+         * @summary Get a list of App Clients that have accessed personnel records
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientsAccessingPersonnelRecords: async (startDate: string, endDate?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'startDate' is not null or undefined
+            if (startDate === null || startDate === undefined) {
+                throw new RequiredError('startDate','Required parameter startDate was null or undefined when calling getAppClientsAccessingPersonnelRecords.');
+            }
+            const localVarPath = `/v2/dashboard/app-client-personnel-accessors`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (startDate !== undefined) {
+                localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
+                    (startDate as any).toISOString().substr(0,10) :
+                    startDate;
+            }
+
+            if (endDate !== undefined) {
+                localVarQueryParameter['endDate'] = (endDate as any instanceof Date) ?
+                    (endDate as any).toISOString().substr(0,10) :
+                    endDate;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get a list of App Sources along with their respective error request counts between two dates. Will only include successful requests (http status between 200 and 300)
          * @summary Get a list of App Sources along with their respective error request count.
          * @param {string} startDate Earliest date to include in UTC.
@@ -222,6 +277,21 @@ export const DashboardControllerApiFp = function(configuration?: Configuration) 
             };
         },
         /**
+         * Get a list of App Clients that have accessed personnel records between two dates with their request count. Will only include App Clients that have made successful requests to access personnel records (http status between 200 and 300.)
+         * @summary Get a list of App Clients that have accessed personnel records
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAppClientsAccessingPersonnelRecords(startDate: string, endDate?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EntityAccessorResponseDto>> {
+            const localVarAxiosArgs = await DashboardControllerApiAxiosParamCreator(configuration).getAppClientsAccessingPersonnelRecords(startDate, endDate, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Get a list of App Sources along with their respective error request counts between two dates. Will only include successful requests (http status between 200 and 300)
          * @summary Get a list of App Sources along with their respective error request count.
          * @param {string} startDate Earliest date to include in UTC.
@@ -272,6 +342,17 @@ export const DashboardControllerApiFactory = function (configuration?: Configura
             return DashboardControllerApiFp(configuration).getAppClientsAccessingOrganizations(startDate, endDate, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get a list of App Clients that have accessed personnel records between two dates with their request count. Will only include App Clients that have made successful requests to access personnel records (http status between 200 and 300.)
+         * @summary Get a list of App Clients that have accessed personnel records
+         * @param {string} startDate Earliest date to include in UTC.
+         * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientsAccessingPersonnelRecords(startDate: string, endDate?: string, options?: any): AxiosPromise<EntityAccessorResponseDto> {
+            return DashboardControllerApiFp(configuration).getAppClientsAccessingPersonnelRecords(startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get a list of App Sources along with their respective error request counts between two dates. Will only include successful requests (http status between 200 and 300)
          * @summary Get a list of App Sources along with their respective error request count.
          * @param {string} startDate Earliest date to include in UTC.
@@ -312,6 +393,17 @@ export interface DashboardControllerApiInterface {
      * @memberof DashboardControllerApiInterface
      */
     getAppClientsAccessingOrganizations(startDate: string, endDate?: string, options?: any): AxiosPromise<EntityAccessorResponseDto>;
+
+    /**
+     * Get a list of App Clients that have accessed personnel records between two dates with their request count. Will only include App Clients that have made successful requests to access personnel records (http status between 200 and 300.)
+     * @summary Get a list of App Clients that have accessed personnel records
+     * @param {string} startDate Earliest date to include in UTC.
+     * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardControllerApiInterface
+     */
+    getAppClientsAccessingPersonnelRecords(startDate: string, endDate?: string, options?: any): AxiosPromise<EntityAccessorResponseDto>;
 
     /**
      * Get a list of App Sources along with their respective error request counts between two dates. Will only include successful requests (http status between 200 and 300)
@@ -355,6 +447,19 @@ export class DashboardControllerApi extends BaseAPI implements DashboardControll
      */
     public getAppClientsAccessingOrganizations(startDate: string, endDate?: string, options?: any) {
         return DashboardControllerApiFp(this.configuration).getAppClientsAccessingOrganizations(startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a list of App Clients that have accessed personnel records between two dates with their request count. Will only include App Clients that have made successful requests to access personnel records (http status between 200 and 300.)
+     * @summary Get a list of App Clients that have accessed personnel records
+     * @param {string} startDate Earliest date to include in UTC.
+     * @param {string} [endDate] Latest date to include in UTC. Will default to the current date if not provided.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardControllerApi
+     */
+    public getAppClientsAccessingPersonnelRecords(startDate: string, endDate?: string, options?: any) {
+        return DashboardControllerApiFp(this.configuration).getAppClientsAccessingPersonnelRecords(startDate, endDate, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

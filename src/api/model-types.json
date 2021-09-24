@@ -842,6 +842,57 @@
       ],
       "type": "object"
     },
+    "DocumentDto": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "uploadedBy": {
+          "type": "string"
+        },
+        "uploadedDate": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "path",
+        "uploadedDate",
+        "uploadedBy"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceInfoDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceInfoDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "EndpointCountMetricDto": {
       "additionalProperties": false,
       "properties": {
@@ -1376,6 +1427,14 @@
         },
         "userName": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "InlineObject": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
         }
       },
       "type": "object"
@@ -2039,6 +2098,15 @@
       ],
       "type": "object"
     },
+    "QueryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "Rank": {
       "additionalProperties": false,
       "properties": {
@@ -2079,6 +2147,37 @@
           "type": "number"
         }
       },
+      "type": "object"
+    },
+    "S3PaginationDto": {
+      "additionalProperties": false,
+      "properties": {
+        "currentContinuationToken": {
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentDto"
+          },
+          "type": "array"
+        },
+        "nextContinuationToken": {
+          "type": "string"
+        },
+        "size": {
+          "description": "The size of the page",
+          "type": "number"
+        },
+        "totalElements": {
+          "description": "The size of the returned elements of this page",
+          "type": "number"
+        }
+      },
+      "required": [
+        "documents",
+        "size",
+        "totalElements"
+      ],
       "type": "object"
     },
     "Sailor": {
