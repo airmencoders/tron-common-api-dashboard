@@ -7,7 +7,7 @@ import './MiniChart.scss';
 const headerHeight = 100;
 const minChartHeight = 20;
 
-function MiniChart(props: MiniChartProps) {
+function MiniChart(props: MiniChartProps<any>) {
 
   const chartHeight = useMemo(() => {
     return props.height > headerHeight + minChartHeight ? props.height - headerHeight : props.height / 2;

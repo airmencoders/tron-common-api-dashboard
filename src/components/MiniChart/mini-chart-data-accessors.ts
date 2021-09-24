@@ -1,4 +1,4 @@
 
-export interface MiniChartDataAccessors {
-  [seriesKey: string]: (d: any) => any;
+export interface MiniChartDataAccessors<T> {
+  [seriesKey: string]: (d: T) => number | Date;
 }
