@@ -187,3 +187,22 @@ export function getNullableFieldsFromSchema<T>(schema: Record<string, SchemaFiel
 
   return nullableStringFields;
 }
+
+/**
+ * Validates a document space name according to AWS's S3 bucket naming rules 
+ * and the Common API rules
+ * @param name 
+ * @returns 
+ */
+export function validateDocSpaceName(name: string): boolean {
+  if (!name) return false; // null check
+  if (/\s+/.test(name)) return false; // whitespace check
+  if (name.length < 3 || name.length > 63) return false; // length constraints
+  if (/[A-Z]+/.test(name)) return false; // no upper case letters
+  if (!/^[a-z0-9]/.test(name) || !/[a-z0-9]$/.test(name)) return false; // must start and end with letter or number
+  if (/[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3}\.[0-9]{,3}/.test(name)) return false; // cant be an IP address shape
+  if (name.startsWith("xn--")) return false; // cant start with this
+  if (name.endsWith("-s3alias")) return false; // cant end with this
+  if (name.indexOf("/") !== -1) return false; // no slashes
+  return true;
+}

@@ -138,6 +138,12 @@ export class GridFilter {
       case 'endsWith':
         return FilterConditionOperatorEnum.EndsWith;
 
+      case 'greaterThan':
+        return FilterConditionOperatorEnum.GreaterThan;
+
+      case 'lessThan':
+        return FilterConditionOperatorEnum.LessThan;
+
       default:
         throw new Error(`${operator} is not supported`);
     }

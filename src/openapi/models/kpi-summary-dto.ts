@@ -13,6 +13,7 @@
  */
 
 
+import { ServiceMetricDto } from './service-metric-dto';
 import { UniqueVisitorCountDto } from './unique-visitor-count-dto';
 
 /**
@@ -56,7 +57,13 @@ export interface KpiSummaryDto {
      * @type {Array<UniqueVisitorCountDto>}
      * @memberof KpiSummaryDto
      */
-    uniqueVisitorCounts?: Array<UniqueVisitorCountDto>;
+    uniqueVisitorCounts: Array<UniqueVisitorCountDto>;
+    /**
+     * 
+     * @type {Array<ServiceMetricDto>}
+     * @memberof KpiSummaryDto
+     */
+    serviceMetrics: Array<ServiceMetricDto>;
 }
 
 

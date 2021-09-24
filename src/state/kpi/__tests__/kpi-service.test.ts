@@ -34,7 +34,8 @@ describe('KPI Service Tests', () => {
           uniqueCount: 4,
           requestCount: 476
         }
-      ]
+      ],
+      serviceMetrics: []
     };
   });
 

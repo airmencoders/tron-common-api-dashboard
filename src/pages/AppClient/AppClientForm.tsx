@@ -27,6 +27,7 @@ import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validateSubscriberAddress, validationErrors } from '../../utils/validation-utils';
 import AppSourceEndpointInfo from './AppSourceEndpointInfo';
 import './AppClientPage.scss';
+import EventRequestLog from './EventRequestLog/EventRequestLog';
 
 interface DeveloperEmail {
   email: string;
@@ -379,6 +380,10 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
             id: 'org-accordian'
         }]}
       />
+
+      {props.formActionType === FormActionType.UPDATE && props.data?.id &&
+        <EventRequestLog id={props.data?.id} />
+      }
 
       <FormGroup
           labelName="developer"

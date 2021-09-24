@@ -1,13 +1,14 @@
 import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto } from '../../../openapi';
 import { AgGridFilterConversionError } from '../../../utils/Exception/AgGridFilterConversionError';
 import { GridFilter } from '../grid-filter';
+import { GridFilterOperatorType } from '../grid-filter-operator-type';
 
 describe('Grid Filter tests', () => {
   it('Should throw error on non-supported Ag Grid filter type', () => {
     const gridFilter: GridFilter = new GridFilter({
       "firstName": {
         "filterType": "text",
-        "type": "greaterThan",
+        "type": "unsupportedOperation" as GridFilterOperatorType,
         "filter": "d"
       }
     });

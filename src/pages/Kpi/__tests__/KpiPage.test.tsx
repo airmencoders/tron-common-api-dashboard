@@ -46,7 +46,8 @@ describe('Test Kpi Page', () => {
               uniqueCount: 4,
               requestCount: 476
             }
-          ]
+          ],
+          serviceMetrics: []
         })), 1000)
       );
     });
@@ -145,7 +146,8 @@ describe('Test Kpi Page', () => {
               uniqueCount: 4,
               requestCount: 476
             }
-          ]
+          ],
+          serviceMetrics: []
         })
       );
     });
@@ -183,7 +185,8 @@ describe('Test Kpi Page', () => {
                   uniqueCount: 4,
                   requestCount: 476
                 }
-              ]
+              ],
+              serviceMetrics: []
             }
           ]
         })

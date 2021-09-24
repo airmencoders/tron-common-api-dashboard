@@ -697,6 +697,42 @@
       ],
       "type": "object"
     },
+    "AppSourceErrorResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appSourceUsage": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppSourceErrorUsageDto"
+          },
+          "type": "array"
+        },
+        "endDate": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSourceErrorUsageDto": {
+      "additionalProperties": false,
+      "properties": {
+        "errorResponses": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ResponseDto"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "totalErrorResponses": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
     "AppSourceMetricDto": {
       "additionalProperties": false,
       "properties": {
@@ -710,6 +746,36 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSourceUsageDto": {
+      "additionalProperties": false,
+      "properties": {
+        "incomingRequestCount": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "AppSourceUsageResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appSourceUsage": {
+          "items": {
+            "$ref": "model-types.json#/definitions/AppSourceUsageDto"
+          },
+          "type": "array"
+        },
+        "endDate": {
+          "type": "string"
+        },
+        "startDate": {
           "type": "string"
         }
       },
@@ -776,6 +842,57 @@
       ],
       "type": "object"
     },
+    "DocumentDto": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "uploadedBy": {
+          "type": "string"
+        },
+        "uploadedDate": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "path",
+        "uploadedDate",
+        "uploadedBy"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceInfoDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceInfoDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "EndpointCountMetricDto": {
       "additionalProperties": false,
       "properties": {
@@ -819,6 +936,36 @@
       ],
       "type": "object"
     },
+    "EntityAccessorDto": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "recordAccessCount": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "EntityAccessorResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "endDate": {
+          "type": "string"
+        },
+        "entityAccessors": {
+          "items": {
+            "$ref": "model-types.json#/definitions/EntityAccessorDto"
+          },
+          "type": "array"
+        },
+        "startDate": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "EventInfoDto": {
       "additionalProperties": false,
       "properties": {
@@ -856,6 +1003,62 @@
       },
       "required": [
         "data"
+      ],
+      "type": "object"
+    },
+    "EventRequestLogDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientUser": {
+          "$ref": "model-types.json#/definitions/AppClientSummaryDto"
+        },
+        "eventCount": {
+          "type": "number"
+        },
+        "eventType": {
+          "$ref": "model-types.json#/definitions/EventRequestLogDtoEventTypeEnum"
+        },
+        "lastAttempted": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "wasSuccessful": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "EventRequestLogDtoEventTypeEnum": {
+      "enum": [
+        "PERSON_CHANGE",
+        "PERSON_DELETE",
+        "ORGANIZATION_CHANGE",
+        "ORGANIZATION_DELETE",
+        "PERSON_ORG_ADD",
+        "PERSON_ORG_REMOVE",
+        "SUB_ORG_ADD",
+        "SUB_ORG_REMOVE"
+      ],
+      "type": "string"
+    },
+    "EventRequestLogDtoPaginationResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/EventRequestLogDto"
+          },
+          "type": "array"
+        },
+        "pagination": {
+          "$ref": "model-types.json#/definitions/Pagination"
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
       ],
       "type": "object"
     },
@@ -1004,6 +1207,7 @@
           ]
         },
         "members": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -1028,6 +1232,7 @@
           ]
         },
         "subordinateOrganizations": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -1086,6 +1291,7 @@
           ]
         },
         "members": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -1110,6 +1316,7 @@
           ]
         },
         "subordinateOrganizations": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -1220,6 +1427,14 @@
         },
         "userName": {
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "InlineObject": {
+      "additionalProperties": false,
+      "properties": {
+        "file": {
         }
       },
       "type": "object"
@@ -1349,6 +1564,12 @@
         "endDate": {
           "type": "string"
         },
+        "serviceMetrics": {
+          "items": {
+            "$ref": "model-types.json#/definitions/ServiceMetricDto"
+          },
+          "type": "array"
+        },
         "startDate": {
           "type": "string"
         },
@@ -1363,7 +1584,9 @@
         "startDate",
         "endDate",
         "appSourceCount",
-        "appClientToAppSourceRequestCount"
+        "appClientToAppSourceRequestCount",
+        "uniqueVisitorCounts",
+        "serviceMetrics"
       ],
       "type": "object"
     },
@@ -1434,6 +1657,7 @@
           ]
         },
         "members": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -1452,6 +1676,7 @@
           ]
         },
         "subordinateOrganizations": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -1873,6 +2098,15 @@
       ],
       "type": "object"
     },
+    "QueryDto": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "Rank": {
       "additionalProperties": false,
       "properties": {
@@ -1902,6 +2136,49 @@
         "USCG"
       ],
       "type": "string"
+    },
+    "ResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "number"
+        },
+        "statusCode": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "S3PaginationDto": {
+      "additionalProperties": false,
+      "properties": {
+        "currentContinuationToken": {
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentDto"
+          },
+          "type": "array"
+        },
+        "nextContinuationToken": {
+          "type": "string"
+        },
+        "size": {
+          "description": "The size of the page",
+          "type": "number"
+        },
+        "totalElements": {
+          "description": "The size of the returned elements of this page",
+          "type": "number"
+        }
+      },
+      "required": [
+        "documents",
+        "size",
+        "totalElements"
+      ],
+      "type": "object"
     },
     "Sailor": {
       "$ref": "model-types.json#/definitions/PersonDto"
@@ -2048,6 +2325,25 @@
       ],
       "type": "object"
     },
+    "ServiceMetricDto": {
+      "additionalProperties": false,
+      "properties": {
+        "averageLatency": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "responseCount": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "responseCount"
+      ],
+      "type": "object"
+    },
     "Soldier": {
       "$ref": "model-types.json#/definitions/PersonDto"
     },
@@ -2070,6 +2366,7 @@
           ]
         },
         "members": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -2094,6 +2391,7 @@
           ]
         },
         "subordinateOrganizations": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -2281,6 +2579,7 @@
           ]
         },
         "members": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },
@@ -2305,6 +2604,7 @@
           ]
         },
         "subordinateOrganizations": {
+          "description": "Field cannot be modified through JSON Patch",
           "items": {
             "type": "string"
           },

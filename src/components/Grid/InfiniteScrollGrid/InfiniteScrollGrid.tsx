@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { InfiniteScrollGridProps } from './InfiniteScrollGridProps';
 import { GridProps } from '../GridProps';
 import Grid from '../Grid';
+import { GridApi } from 'ag-grid-community';
 
 function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
+  const gridApi = useRef<GridApi | undefined>(undefined);
+
+  function onGridReady(api?: GridApi) {
+    gridApi.current = api;
+  }
+
+  useEffect(() => {
+    if (!props.updateDatasource) {
+      return;
+    }
+
+    const datasource = props.datasource;
+    if (datasource) {
+      gridApi.current?.setDatasource(datasource);
+    }
+
+    props.updateDatasourceCallback?.();
+  }, [props.datasource]);
+
   return (
     <Grid
       columns={props.columns}
@@ -25,6 +45,8 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
       onRowSelected={props.onRowSelected}
       scrollToTop={props.scrollToTop}
       scrollToTopCallback={props.scrollToTopCallback}
+      suppressCellSelection={props.suppressCellSelection}
+      onGridReady={onGridReady}
     />
   );
 }
