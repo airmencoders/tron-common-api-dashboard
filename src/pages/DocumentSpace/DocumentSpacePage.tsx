@@ -265,6 +265,15 @@ function DocumentSpacePage() {
                 </Button>
               </a>
 
+              <a href={documentSpaceService.createRelativeDownloadAllFilesUrl(pageState.selectedSpace.value)}>
+                <Button
+                  data-testid="download-all-files__btn"
+                  type="button"
+                >
+                  Download All Files (zip)
+                </Button>
+              </a>
+
               <DocumentUploadDialog
                 space={pageState.selectedSpace.get()}
                 onFinish={() => pageState.shouldUpdateDatasource.set(true)}

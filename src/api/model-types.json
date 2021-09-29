@@ -1431,14 +1431,6 @@
       },
       "type": "object"
     },
-    "InlineObject": {
-      "additionalProperties": false,
-      "properties": {
-        "file": {
-        }
-      },
-      "type": "object"
-    },
     "JsonPatchObjectArrayValue": {
       "additionalProperties": false,
       "properties": {
@@ -2314,6 +2306,12 @@
       "description": "Object specifying the json path to execute and the new value",
       "properties": {
         "jsonPath": {
+          "type": "string"
+        },
+        "newEntry": {
+          "type": "boolean"
+        },
+        "newFieldName": {
           "type": "string"
         },
         "value": {

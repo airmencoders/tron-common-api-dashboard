@@ -355,7 +355,7 @@ describe('Test Document Space Service', () => {
 
     const url = documentSpaceService.createRelativeFilesDownloadUrl(space, documents);
 
-    expect(url.endsWith(`/document-space/files/${space}/${documents.map(document => document.key).join(',')}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/files/${space}/download?files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
   });
 
   it('should create relative download url for a single file download', () => {
@@ -364,6 +364,14 @@ describe('Test Document Space Service', () => {
 
     const url = documentSpaceService.createRelativeDownloadFileUrl(space, fileKey);
 
-    expect(url.endsWith(`/document-space/file/${space}/${fileKey}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/file/${space}/download?file=${fileKey}`)).toBeTruthy();
+  });
+
+  it('should create relative download url to download entire space', () => {
+    const space = 'testspace';
+
+    const url = documentSpaceService.createRelativeDownloadAllFilesUrl(space);
+
+    expect(url.endsWith(`/document-space/files/${space}/download/all`)).toBeTruthy();
   });
 });
