@@ -28,7 +28,7 @@ export const AppVersionControllerApiAxiosParamCreator = function (configuration?
     return {
         /**
          * The version is the first 8-characters of the SHA-1 commit hash of the master branch that this version was compiled from
-         * @summary Retrieves current running application version
+         * @summary Retrieves current running application version, along with the enclave level and environment this instance is running in
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -74,7 +74,7 @@ export const AppVersionControllerApiFp = function(configuration?: Configuration)
     return {
         /**
          * The version is the first 8-characters of the SHA-1 commit hash of the master branch that this version was compiled from
-         * @summary Retrieves current running application version
+         * @summary Retrieves current running application version, along with the enclave level and environment this instance is running in
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -96,7 +96,7 @@ export const AppVersionControllerApiFactory = function (configuration?: Configur
     return {
         /**
          * The version is the first 8-characters of the SHA-1 commit hash of the master branch that this version was compiled from
-         * @summary Retrieves current running application version
+         * @summary Retrieves current running application version, along with the enclave level and environment this instance is running in
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -114,7 +114,7 @@ export const AppVersionControllerApiFactory = function (configuration?: Configur
 export interface AppVersionControllerApiInterface {
     /**
      * The version is the first 8-characters of the SHA-1 commit hash of the master branch that this version was compiled from
-     * @summary Retrieves current running application version
+     * @summary Retrieves current running application version, along with the enclave level and environment this instance is running in
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AppVersionControllerApiInterface
@@ -132,7 +132,7 @@ export interface AppVersionControllerApiInterface {
 export class AppVersionControllerApi extends BaseAPI implements AppVersionControllerApiInterface {
     /**
      * The version is the first 8-characters of the SHA-1 commit hash of the master branch that this version was compiled from
-     * @summary Retrieves current running application version
+     * @summary Retrieves current running application version, along with the enclave level and environment this instance is running in
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AppVersionControllerApi

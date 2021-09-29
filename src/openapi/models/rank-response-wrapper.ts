@@ -13,31 +13,20 @@
  */
 
 
+import { Rank } from './rank';
 
 /**
  * 
  * @export
- * @interface AppVersionInfoDto
+ * @interface RankResponseWrapper
  */
-export interface AppVersionInfoDto {
+export interface RankResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof AppVersionInfoDto
+     * @type {Array<Rank>}
+     * @memberof RankResponseWrapper
      */
-    version?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppVersionInfoDto
-     */
-    enclave?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AppVersionInfoDto
-     */
-    environment?: string;
+    data: Array<Rank>;
 }
 
 

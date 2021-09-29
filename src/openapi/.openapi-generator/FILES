@@ -101,6 +101,8 @@ models/privilege-id-pair.ts
 models/pub-sub-ledger-entry-dto-response-wrapper.ts
 models/pub-sub-ledger-entry-dto.ts
 models/query-dto.ts
+models/rank-categorized-dto.ts
+models/rank-response-wrapper.ts
 models/rank.ts
 models/response-dto.ts
 models/s3-pagination-dto.ts
