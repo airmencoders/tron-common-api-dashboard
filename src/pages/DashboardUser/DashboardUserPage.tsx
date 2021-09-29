@@ -25,15 +25,7 @@ const columns: GridColumn[] = [
     field: 'hasDashboardAdmin',
     sortable: true,
     filter: true,
-    headerName: 'Dashboard Admin',
-    headerClass: 'header-center',
-    cellRenderer: PrivilegeCellRenderer
-  }),
-  new GridColumn({
-    field: 'hasDashboardUser',
-    sortable: true,
-    filter: true,
-    headerName: 'Dashboard User',
+    headerName: 'Admin',
     headerClass: 'header-center',
     cellRenderer: PrivilegeCellRenderer
   }),

@@ -6,7 +6,6 @@ import { Touched } from "@hookstate/touched";
 import Checkbox from "../../components/forms/Checkbox/Checkbox";
 import Form from "../../components/forms/Form/Form";
 import TextInput from "../../components/forms/TextInput/TextInput";
-import TextInputInline from "../../components/forms/TextInput/TextInputInline";
 import { CreateUpdateFormProps } from '../../components/DataCrudFormPage/CreateUpdateFormProps';
 import { DashboardUserFlat } from '../../state/dashboard-user/dashboard-user-flat';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
@@ -14,7 +13,6 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
-import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
 import {DashboardUserDto} from '../../openapi/models';
 import {PrivilegeType} from '../../state/privilege/privilege-type';
 import {useDashboardUserState} from '../../state/dashboard-user/dashboard-user-state';
@@ -26,7 +24,6 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserDto>) {
     id: props.data?.id || "",
     email: props.data?.email || "",
     hasDashboardAdmin: props.data?.privileges?.some(priv => priv.name === PrivilegeType.DASHBOARD_ADMIN) || false,
-    hasDashboardUser: props.data?.privileges?.some(priv => priv.name === PrivilegeType.DASHBOARD_USER) || false,
   });
 
   formState.attach(Validation);
@@ -37,19 +34,8 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserDto>) {
   Validation(formState.email).validate(validateRequiredString, validationErrors.requiredText, 'error');
   Validation(formState.email).validate(validateStringLength, validationErrors.generateStringLengthError(), 'error');
 
-  Validation(formState.hasDashboardAdmin).validate(
-    () => validateCheckboxPrivileges([formState.hasDashboardAdmin.get(), formState.hasDashboardUser.get()]),
-    validationErrors.atLeastOnePrivilege,
-    'error'
-  );
-  Validation(formState.hasDashboardUser).validate(
-    () => validateCheckboxPrivileges([formState.hasDashboardAdmin.get(), formState.hasDashboardUser.get()]),
-    validationErrors.atLeastOnePrivilege,
-    'error'
-  );
-
   function isFormModified() {
-    return Initial(formState.email).modified() || Initial(formState.hasDashboardAdmin).modified() || Initial(formState.hasDashboardUser).modified();
+    return Initial(formState.email).modified() || Initial(formState.hasDashboardAdmin).modified();
   }
 
   function isFormDisabled() {
@@ -61,8 +47,7 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserDto>) {
     const updatedForm = formState.get();
     const updatedDto = dashboardUserService.convertToDto(updatedForm);
     const existingPrivs = props.data?.privileges ?? [];
-    const filteredExistingPrivs = existingPrivs.filter(priv => priv.name !== PrivilegeType.DASHBOARD_USER &&
-        priv.name !== PrivilegeType.DASHBOARD_ADMIN);
+    const filteredExistingPrivs = existingPrivs.filter(priv => priv.name !== PrivilegeType.DASHBOARD_ADMIN);
     const privs = combineArraysByKey([filteredExistingPrivs, updatedDto?.privileges],
         (priv) => priv.name, false);
     updatedDto.privileges = privs;
@@ -70,17 +55,11 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserDto>) {
   }
 
   function isPermissionsError(): boolean {
-    return (Touched(formState.hasDashboardAdmin).touched() || Touched(formState.hasDashboardUser).touched()) && (Validation(formState.hasDashboardAdmin).invalid() || Validation(formState.hasDashboardUser).invalid());
+    return Touched(formState.hasDashboardAdmin).touched() && Validation(formState.hasDashboardAdmin).invalid();
   }
 
   function getPermissionsErrors(): string[] {
-    const userError = Validation(formState.hasDashboardUser).errors().map(validationError => validationError.message);
-    const adminError = Validation(formState.hasDashboardAdmin).errors().map(validationError => validationError.message);
-
-    if (userError.length > 0)
-      return userError;
-    else
-      return adminError;
+    return Validation(formState.hasDashboardAdmin).errors().map(validationError => validationError.message);
   }
 
   return (
@@ -135,14 +114,6 @@ function DashboardUserForm(props: CreateUpdateFormProps<DashboardUserDto>) {
           disabled={isFormDisabled()}
         />
 
-        <Checkbox
-          id="dashboard_user"
-          name="dashboard_user"
-          label={<>Dashboard User</>}
-          checked={formState.hasDashboardUser.get()}
-          onChange={(event) => formState.hasDashboardUser.set(event.target.checked)}
-          disabled={isFormDisabled()}
-        />
       </FormGroup>
 
       <SuccessErrorMessage

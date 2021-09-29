@@ -1,6 +1,6 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse, CancelToken } from 'axios';
 import Config from '../../api/config';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -113,10 +113,18 @@ export default class DocumentSpaceService {
     await this.documentSpaceApi._delete(space, file);
   }
 
-  async uploadFile(space: string, file: any): Promise<void> {
-    await this.documentSpaceApi.upload(space, file);
-  }
+  uploadFile(space: string, file: any, progressCallback: (percent: number) => void): CancellableDataRequest<AxiosResponse<{ [key: string]: string}>> {
+    const token = axios.CancelToken.source();
+    const promise = this.documentSpaceApi.upload(space, file, { cancelToken: token.token, onUploadProgress: function(progressEvent: any) {
+      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      progressCallback(percentCompleted);
+    }});
 
+    return {
+      promise: promise as Promise<AxiosResponse<{ [key: string]: string }>>,
+      cancelTokenSource: token
+    };
+  }
   get isDocumentSpacesStatePromised(): boolean {
     return this.documentSpacesState.promised;
   }

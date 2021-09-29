@@ -12,7 +12,7 @@ function createDashboardUserAndFillForm(data: DashboardUser) {
 }
 
 function fillDashboardUserForm(data: DashboardUser) {
-  const { email, admin, user } = data;
+  const { email, admin } = data;
 
   cy.get('#email').clear().type(email).should('have.value', email);
 
@@ -20,12 +20,6 @@ function fillDashboardUserForm(data: DashboardUser) {
     cy.get('#dashboard_admin').check({ force: true }).should('be.checked');
   } else {
     cy.get('#dashboard_admin').uncheck({ force: true }).should('not.be.checked');
-  }
-
-  if (user) {
-    cy.get('#dashboard_user').check({ force: true }).should('be.checked');
-  } else {
-    cy.get('#dashboard_user').uncheck({ force: true }).should('not.be.checked');
   }
 }
 
@@ -63,8 +57,7 @@ describe('Dashboard Users Tests', () => {
 
     const dashboardUser: DashboardUser = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
-      admin: true,
-      user: true
+      admin: true
     };
 
     createDashboardUserAndFilterExists(dashboardUser);
@@ -80,8 +73,7 @@ describe('Dashboard Users Tests', () => {
 
     const dashboardUser: DashboardUser = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
-      admin: true,
-      user: true
+      admin: true
     };
 
     createDashboardUserAndSuccess(dashboardUser);
@@ -92,7 +84,7 @@ describe('Dashboard Users Tests', () => {
     cy.get('#email').should('have.value', dashboardUser.email);
 
     // Edit dashboard user
-    cy.get('#dashboard_user').should('be.checked').uncheck({ force: true });
+    cy.get('#dashboard_admin').should('be.checked').uncheck({ force: true });
 
     // Save
     DataCrudFormPageUtil.submitDataCrudFormUpdate();

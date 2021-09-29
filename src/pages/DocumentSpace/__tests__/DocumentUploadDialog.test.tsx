@@ -1,9 +1,11 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render, waitFor } from '@testing-library/react';
+import axios, { AxiosResponse } from 'axios';
 import { MemoryRouter } from 'react-router-dom';
 import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto } from '../../../openapi';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import DocumentUploadDialog from '../DocumentUploadDialog';
 
 jest.mock('../../../state/document-space/document-space-state');
@@ -23,12 +25,14 @@ describe('Document Upload Tests', () => {
   });
 
   it('should render and fire appropriate events', async () => {
-    const uploadMock = jest.spyOn(documentSpaceService, 'uploadFile').mockReturnValue(Promise.resolve());
+    const response = createAxiosSuccessResponse<{[key:string]:string}>({ message: 'good'});
+    const uploadMock = jest.spyOn(documentSpaceService, 'uploadFile').mockReturnValue({ promise: Promise.resolve(response), 
+      cancelTokenSource: axios.CancelToken.source() });
 
     const mock = jest.fn();
     const page = render(<MemoryRouter>
       <DocumentUploadDialog 
-        space="testspace"
+        space='test'
         onFinish={mock} 
       />
     </MemoryRouter>);
@@ -47,3 +51,7 @@ describe('Document Upload Tests', () => {
     expect(uploadMock).toHaveBeenCalledTimes(1);
   });
 })
+
+function CancellableDataRequest<T>(): import("../../../utils/cancellable-data-request").CancellableDataRequest<import("axios").AxiosResponse<{ [key: string]: string; }>> {
+  throw new Error('Function not implemented.');
+}
