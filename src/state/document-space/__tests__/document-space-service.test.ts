@@ -349,6 +349,15 @@ describe('Test Document Space Service', () => {
     expect(response.name).toEqual('test');
   });
 
+
+  it('should create relative download url for multi file download', () => {
+    const space = 'testspace';
+
+    const url = documentSpaceService.createRelativeFilesDownloadUrl(space, documents);
+
+    expect(url.endsWith(`/document-space/files/${space}/${documents.map(document => document.key).join(',')}`)).toBeTruthy();
+  });
+
   it('should create relative download url for a single file download', () => {
     const space = 'testspace';
     const fileKey = 'testfile.key';

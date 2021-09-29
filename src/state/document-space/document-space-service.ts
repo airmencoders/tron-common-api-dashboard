@@ -105,6 +105,11 @@ export default class DocumentSpaceService {
     }
   }
 
+  createRelativeFilesDownloadUrl(space: string, documents: DocumentDto[]) {
+    const fileKeysParam = documents.map(document => document.key).join(',');
+    return `${Config.API_URL_V2}document-space/files/${space}/${fileKeysParam}`;
+  }
+
   createRelativeDownloadFileUrl(space: string, key: string): string {
     return `${Config.API_URL_V2}document-space/file/${space}/${key}`;
   }
