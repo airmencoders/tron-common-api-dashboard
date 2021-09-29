@@ -349,12 +349,29 @@ describe('Test Document Space Service', () => {
     expect(response.name).toEqual('test');
   });
 
+
+  it('should create relative download url for multi file download', () => {
+    const space = 'testspace';
+
+    const url = documentSpaceService.createRelativeFilesDownloadUrl(space, documents);
+
+    expect(url.endsWith(`/document-space/files/${space}/download?files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
+  });
+
   it('should create relative download url for a single file download', () => {
     const space = 'testspace';
     const fileKey = 'testfile.key';
 
     const url = documentSpaceService.createRelativeDownloadFileUrl(space, fileKey);
 
-    expect(url.endsWith(`/document-space/file/${space}/${fileKey}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/file/${space}/download?file=${fileKey}`)).toBeTruthy();
+  });
+
+  it('should create relative download url to download entire space', () => {
+    const space = 'testspace';
+
+    const url = documentSpaceService.createRelativeDownloadAllFilesUrl(space);
+
+    expect(url.endsWith(`/document-space/files/${space}/download/all`)).toBeTruthy();
   });
 });

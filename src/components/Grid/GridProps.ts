@@ -1,4 +1,5 @@
 import { GridApi, RowClickedEvent } from 'ag-grid-community';
+import { GridSelectionType } from './grid-selection-type';
 import GridColumn from './GridColumn';
 
 export interface GridProps {
@@ -40,7 +41,7 @@ export interface GridProps {
   /**
    * Returns the data of the row and the event that occurred (selected or unselected)
    */
-  onRowSelected?: (data: any, selectionEvent: 'selected' | 'unselected') => void;
+  onRowSelected?: (data: any, selectionEvent: GridSelectionType) => void;
 
   rowModelType?: string;
 

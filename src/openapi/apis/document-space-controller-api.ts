@@ -176,25 +176,19 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * Download a single file from a Document Space
-         * @summary Download from a Document Space
+         * Downloads all files from a space as a zip file
+         * @summary Download all files from a Document Space
          * @param {string} space 
-         * @param {string} keyName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        downloadFile: async (space: string, keyName: string, options: any = {}): Promise<RequestArgs> => {
+        downloadAllFilesInSpace: async (space: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'space' is not null or undefined
             if (space === null || space === undefined) {
-                throw new RequiredError('space','Required parameter space was null or undefined when calling downloadFile.');
+                throw new RequiredError('space','Required parameter space was null or undefined when calling downloadAllFilesInSpace.');
             }
-            // verify required parameter 'keyName' is not null or undefined
-            if (keyName === null || keyName === undefined) {
-                throw new RequiredError('keyName','Required parameter keyName was null or undefined when calling downloadFile.');
-            }
-            const localVarPath = `/v2/document-space/file/{space}/{keyName}`
-                .replace(`{${"space"}}`, encodeURIComponent(String(space)))
-                .replace(`{${"keyName"}}`, encodeURIComponent(String(keyName)));
+            const localVarPath = `/v2/document-space/files/{space}/download/all`
+                .replace(`{${"space"}}`, encodeURIComponent(String(space)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -225,25 +219,24 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * Downloads multiple files from a space as a zip file
-         * @summary Download multiple files from a Document Space
+         * Download a single file from a Document Space
+         * @summary Download from a Document Space
          * @param {string} space 
-         * @param {Set<string>} keyNames 
+         * @param {string} file 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        downloadFiles: async (space: string, keyNames: Set<string>, options: any = {}): Promise<RequestArgs> => {
+        downloadFile: async (space: string, file: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'space' is not null or undefined
             if (space === null || space === undefined) {
-                throw new RequiredError('space','Required parameter space was null or undefined when calling downloadFiles.');
+                throw new RequiredError('space','Required parameter space was null or undefined when calling downloadFile.');
             }
-            // verify required parameter 'keyNames' is not null or undefined
-            if (keyNames === null || keyNames === undefined) {
-                throw new RequiredError('keyNames','Required parameter keyNames was null or undefined when calling downloadFiles.');
+            // verify required parameter 'file' is not null or undefined
+            if (file === null || file === undefined) {
+                throw new RequiredError('file','Required parameter file was null or undefined when calling downloadFile.');
             }
-            const localVarPath = `/v2/document-space/files/{space}/{keyNames}`
-                .replace(`{${"space"}}`, encodeURIComponent(String(space)))
-                .replace(`{${"keyNames"}}`, encodeURIComponent(String(keyNames)));
+            const localVarPath = `/v2/document-space/file/{space}/download`
+                .replace(`{${"space"}}`, encodeURIComponent(String(space)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -254,6 +247,62 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (file !== undefined) {
+                localVarQueryParameter['file'] = file;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Downloads multiple files from a space as a zip file
+         * @summary Download multiple files from a Document Space
+         * @param {string} space 
+         * @param {Set<string>} files 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        downloadFiles: async (space: string, files: Set<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'space' is not null or undefined
+            if (space === null || space === undefined) {
+                throw new RequiredError('space','Required parameter space was null or undefined when calling downloadFiles.');
+            }
+            // verify required parameter 'files' is not null or undefined
+            if (files === null || files === undefined) {
+                throw new RequiredError('files','Required parameter files was null or undefined when calling downloadFiles.');
+            }
+            const localVarPath = `/v2/document-space/files/{space}/download`
+                .replace(`{${"space"}}`, encodeURIComponent(String(space)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (files) {
+                localVarQueryParameter['files'] = files;
+            }
 
 
     
@@ -468,15 +517,29 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-         * Download a single file from a Document Space
-         * @summary Download from a Document Space
+         * Downloads all files from a space as a zip file
+         * @summary Download all files from a Document Space
          * @param {string} space 
-         * @param {string} keyName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async downloadFile(space: string, keyName: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).downloadFile(space, keyName, options);
+        async downloadAllFilesInSpace(space: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).downloadAllFilesInSpace(space, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Download a single file from a Document Space
+         * @summary Download from a Document Space
+         * @param {string} space 
+         * @param {string} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async downloadFile(space: string, file: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).downloadFile(space, file, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -486,12 +549,12 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          * Downloads multiple files from a space as a zip file
          * @summary Download multiple files from a Document Space
          * @param {string} space 
-         * @param {Set<string>} keyNames 
+         * @param {Set<string>} files 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async downloadFiles(space: string, keyNames: Set<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).downloadFiles(space, keyNames, options);
+        async downloadFiles(space: string, files: Set<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).downloadFiles(space, files, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -582,26 +645,36 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).deleteSpace(name, options).then((request) => request(axios, basePath));
         },
         /**
-         * Download a single file from a Document Space
-         * @summary Download from a Document Space
+         * Downloads all files from a space as a zip file
+         * @summary Download all files from a Document Space
          * @param {string} space 
-         * @param {string} keyName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        downloadFile(space: string, keyName: string, options?: any): AxiosPromise<any> {
-            return DocumentSpaceControllerApiFp(configuration).downloadFile(space, keyName, options).then((request) => request(axios, basePath));
+        downloadAllFilesInSpace(space: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).downloadAllFilesInSpace(space, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Download a single file from a Document Space
+         * @summary Download from a Document Space
+         * @param {string} space 
+         * @param {string} file 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        downloadFile(space: string, file: string, options?: any): AxiosPromise<any> {
+            return DocumentSpaceControllerApiFp(configuration).downloadFile(space, file, options).then((request) => request(axios, basePath));
         },
         /**
          * Downloads multiple files from a space as a zip file
          * @summary Download multiple files from a Document Space
          * @param {string} space 
-         * @param {Set<string>} keyNames 
+         * @param {Set<string>} files 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        downloadFiles(space: string, keyNames: Set<string>, options?: any): AxiosPromise<object> {
-            return DocumentSpaceControllerApiFp(configuration).downloadFiles(space, keyNames, options).then((request) => request(axios, basePath));
+        downloadFiles(space: string, files: Set<string>, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).downloadFiles(space, files, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -676,26 +749,36 @@ export interface DocumentSpaceControllerApiInterface {
     deleteSpace(name: string, options?: any): AxiosPromise<object>;
 
     /**
-     * Download a single file from a Document Space
-     * @summary Download from a Document Space
+     * Downloads all files from a space as a zip file
+     * @summary Download all files from a Document Space
      * @param {string} space 
-     * @param {string} keyName 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    downloadFile(space: string, keyName: string, options?: any): AxiosPromise<any>;
+    downloadAllFilesInSpace(space: string, options?: any): AxiosPromise<object>;
+
+    /**
+     * Download a single file from a Document Space
+     * @summary Download from a Document Space
+     * @param {string} space 
+     * @param {string} file 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    downloadFile(space: string, file: string, options?: any): AxiosPromise<any>;
 
     /**
      * Downloads multiple files from a space as a zip file
      * @summary Download multiple files from a Document Space
      * @param {string} space 
-     * @param {Set<string>} keyNames 
+     * @param {Set<string>} files 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    downloadFiles(space: string, keyNames: Set<string>, options?: any): AxiosPromise<object>;
+    downloadFiles(space: string, files: Set<string>, options?: any): AxiosPromise<object>;
 
     /**
      * 
@@ -776,29 +859,41 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-     * Download a single file from a Document Space
-     * @summary Download from a Document Space
+     * Downloads all files from a space as a zip file
+     * @summary Download all files from a Document Space
      * @param {string} space 
-     * @param {string} keyName 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApi
      */
-    public downloadFile(space: string, keyName: string, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).downloadFile(space, keyName, options).then((request) => request(this.axios, this.basePath));
+    public downloadAllFilesInSpace(space: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).downloadAllFilesInSpace(space, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Download a single file from a Document Space
+     * @summary Download from a Document Space
+     * @param {string} space 
+     * @param {string} file 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public downloadFile(space: string, file: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).downloadFile(space, file, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * Downloads multiple files from a space as a zip file
      * @summary Download multiple files from a Document Space
      * @param {string} space 
-     * @param {Set<string>} keyNames 
+     * @param {Set<string>} files 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApi
      */
-    public downloadFiles(space: string, keyNames: Set<string>, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).downloadFiles(space, keyNames, options).then((request) => request(this.axios, this.basePath));
+    public downloadFiles(space: string, files: Set<string>, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).downloadFiles(space, files, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
