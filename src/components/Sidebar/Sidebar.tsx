@@ -8,9 +8,13 @@ import { useAuthorizedUserState } from '../../state/authorized-user/authorized-u
 import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
 import SidebarContainer from './SidebarContainer';
 import { useHookstate } from '@hookstate/core';
+import { Tag, Tooltip } from '@trussworks/react-uswds';
+import { useAppVersionState } from '../../state/app-info/app-info-state';
+import { AppVersionInfoDto } from '../../openapi';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   const authorizedUserState = useAuthorizedUserState();
+  const appInfoService = useAppVersionState();
   const location = useLocation();
   const [openedMenu, setOpenedMenu] = useState('');
   const activeItem = useHookstate('');
@@ -35,6 +39,10 @@ function Sidebar({ items }: { items: RouteItem[] }) {
     }
   }, [location]);
 
+  useEffect(() => {
+    appInfoService.fetchVersion();
+  }, []);
+
   const handleMenuToggleClicked = (id: string) => {
     // don't toggle just open
     setOpenedMenu(id);
@@ -51,6 +59,11 @@ function Sidebar({ items }: { items: RouteItem[] }) {
             className="d-inline-block align-top mr-4"
           />
         </Link>
+        <div className="sidebar__tags-container">
+          <Tag className="sidebar__tags">
+            { `${appInfoService.state.enclave.get()?.toUpperCase() ?? ''}` }
+          </Tag>
+        </div>
       </div>
       <nav className="sidebar__nav">
         {items.map((item) => {

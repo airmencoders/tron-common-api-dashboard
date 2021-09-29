@@ -5,7 +5,24 @@
     text-align: center;
     img {
       margin-top: calculateRem(28px);
-      margin-bottom: calculateRem(50px);
+      margin-bottom: calculateRem(10px);
     }
+  }
+
+  &__tags-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-bottom: calculateRem(10px);
+  }
+
+  &__tags {
+    font-size: calculateRem(10px);
+    border-radius: 8px;
+    background-color: color($theme-color-secondary-light);
+    padding-top: calculateRem(2px);
+    padding-bottom: calculateRem(2px);
+    padding-left: calculateRem(10px);
+    padding-right: calculateRem(10px);
   }
 }

@@ -20,6 +20,10 @@ import { Configuration } from '../configuration';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
 import { Rank } from '../models';
+// @ts-ignore
+import { RankCategorizedDto } from '../models';
+// @ts-ignore
+import { RankResponseWrapper } from '../models';
 /**
  * RankControllerApi - axios parameter creator
  * @export
@@ -155,6 +159,49 @@ export const RankControllerApiAxiosParamCreator = function (configuration?: Conf
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Retrieves all ranks for a particular branch and categorizes them by Pay Grade
+         * @summary Retrieves all ranks for a particular branch
+         * @param {string} branch 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRanksByBranchCategorizedByPayGrade: async (branch: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'branch' is not null or undefined
+            if (branch === null || branch === undefined) {
+                throw new RequiredError('branch','Required parameter branch was null or undefined when calling getRanksByBranchCategorizedByPayGrade.');
+            }
+            const localVarPath = `/v2/rank/{branch}/categorized`
+                .replace(`{${"branch"}}`, encodeURIComponent(String(branch)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -186,7 +233,7 @@ export const RankControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRanks(branch: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Rank>>> {
+        async getRanks(branch: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RankResponseWrapper>> {
             const localVarAxiosArgs = await RankControllerApiAxiosParamCreator(configuration).getRanks(branch, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
@@ -199,8 +246,22 @@ export const RankControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRanks1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Rank>>> {
+        async getRanks1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RankResponseWrapper>> {
             const localVarAxiosArgs = await RankControllerApiAxiosParamCreator(configuration).getRanks1(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Retrieves all ranks for a particular branch and categorizes them by Pay Grade
+         * @summary Retrieves all ranks for a particular branch
+         * @param {string} branch 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRanksByBranchCategorizedByPayGrade(branch: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RankCategorizedDto>> {
+            const localVarAxiosArgs = await RankControllerApiAxiosParamCreator(configuration).getRanksByBranchCategorizedByPayGrade(branch, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -233,7 +294,7 @@ export const RankControllerApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRanks(branch: string, options?: any): AxiosPromise<Array<Rank>> {
+        getRanks(branch: string, options?: any): AxiosPromise<RankResponseWrapper> {
             return RankControllerApiFp(configuration).getRanks(branch, options).then((request) => request(axios, basePath));
         },
         /**
@@ -242,8 +303,18 @@ export const RankControllerApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRanks1(options?: any): AxiosPromise<Array<Rank>> {
+        getRanks1(options?: any): AxiosPromise<RankResponseWrapper> {
             return RankControllerApiFp(configuration).getRanks1(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves all ranks for a particular branch and categorizes them by Pay Grade
+         * @summary Retrieves all ranks for a particular branch
+         * @param {string} branch 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRanksByBranchCategorizedByPayGrade(branch: string, options?: any): AxiosPromise<RankCategorizedDto> {
+            return RankControllerApiFp(configuration).getRanksByBranchCategorizedByPayGrade(branch, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -273,7 +344,7 @@ export interface RankControllerApiInterface {
      * @throws {RequiredError}
      * @memberof RankControllerApiInterface
      */
-    getRanks(branch: string, options?: any): AxiosPromise<Array<Rank>>;
+    getRanks(branch: string, options?: any): AxiosPromise<RankResponseWrapper>;
 
     /**
      * Retrieves all ranks
@@ -282,7 +353,17 @@ export interface RankControllerApiInterface {
      * @throws {RequiredError}
      * @memberof RankControllerApiInterface
      */
-    getRanks1(options?: any): AxiosPromise<Array<Rank>>;
+    getRanks1(options?: any): AxiosPromise<RankResponseWrapper>;
+
+    /**
+     * Retrieves all ranks for a particular branch and categorizes them by Pay Grade
+     * @summary Retrieves all ranks for a particular branch
+     * @param {string} branch 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RankControllerApiInterface
+     */
+    getRanksByBranchCategorizedByPayGrade(branch: string, options?: any): AxiosPromise<RankCategorizedDto>;
 
 }
 
@@ -327,5 +408,17 @@ export class RankControllerApi extends BaseAPI implements RankControllerApiInter
      */
     public getRanks1(options?: any) {
         return RankControllerApiFp(this.configuration).getRanks1(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves all ranks for a particular branch and categorizes them by Pay Grade
+     * @summary Retrieves all ranks for a particular branch
+     * @param {string} branch 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RankControllerApi
+     */
+    public getRanksByBranchCategorizedByPayGrade(branch: string, options?: any) {
+        return RankControllerApiFp(this.configuration).getRanksByBranchCategorizedByPayGrade(branch, options).then((request) => request(this.axios, this.basePath));
     }
 }
