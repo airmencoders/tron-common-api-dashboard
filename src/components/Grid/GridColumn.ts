@@ -1,7 +1,7 @@
 import { GridFilterParams } from './grid-filter-params';
 import { GridColumnParams } from "./GridColumnParams";
 import {GridColumnPinnedOption} from './grid-column-pinned-option';
-import { ValueGetterParams } from 'ag-grid-community';
+import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 
 export default class GridColumn {
   constructor(params: Partial<GridColumnParams>) {
@@ -21,7 +21,8 @@ export default class GridColumn {
       pinned = undefined,
       initialWidth = undefined,
       filterParams = undefined,
-      valueGetter = undefined
+      valueGetter = undefined,
+      valueFormatter = undefined
     } = params;
 
     this._field = field;
@@ -40,6 +41,7 @@ export default class GridColumn {
     this._pinned = pinned;
     this._initialWidth = initialWidth;
     this._valueGetter = valueGetter;
+    this._valueFormatter = valueFormatter;
   }
 
   private _field: string;
@@ -58,6 +60,7 @@ export default class GridColumn {
   private _pinned: GridColumnPinnedOption;
   private _initialWidth: number | undefined;
   private _valueGetter?: (params: ValueGetterParams) => any;
+  private _valueFormatter?: (params: ValueFormatterParams) => any;
 
   get field(): string {
     return this._field;
@@ -121,6 +124,10 @@ export default class GridColumn {
 
   get valueGetter(): ((params: ValueGetterParams) => any) | undefined {
     return this._valueGetter;
+  }
+
+  get valueFormatter(): ((params: ValueFormatterParams) => any) | undefined {
+    return this._valueFormatter;
   }
 
   static get defaultValueGetter() {

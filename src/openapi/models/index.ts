@@ -74,6 +74,8 @@ export * from './pub-sub-ledger-entry-dto';
 export * from './pub-sub-ledger-entry-dto-response-wrapper';
 export * from './query-dto';
 export * from './rank';
+export * from './rank-categorized-dto';
+export * from './rank-response-wrapper';
 export * from './response-dto';
 export * from './s3-pagination-dto';
 export * from './sailor';

@@ -148,6 +148,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                       initialWidth={col.intialWidth}
                       filterParams={col.filterParams}
                       valueGetter={col.valueGetter}
+                      valueFormatter={col.valueFormatter}
                   />
                 ))
               }
