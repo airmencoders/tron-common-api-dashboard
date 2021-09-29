@@ -784,6 +784,12 @@
     "AppVersionInfoDto": {
       "additionalProperties": false,
       "properties": {
+        "enclave": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string"
+        },
         "version": {
           "type": "string"
         }
@@ -851,6 +857,10 @@
         "path": {
           "type": "string"
         },
+        "size": {
+          "description": "Size in bytes",
+          "type": "number"
+        },
         "uploadedBy": {
           "type": "string"
         },
@@ -861,6 +871,7 @@
       "required": [
         "key",
         "path",
+        "size",
         "uploadedDate",
         "uploadedBy"
       ],

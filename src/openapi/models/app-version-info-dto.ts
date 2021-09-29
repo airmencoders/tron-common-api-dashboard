@@ -26,6 +26,18 @@ export interface AppVersionInfoDto {
      * @memberof AppVersionInfoDto
      */
     version?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppVersionInfoDto
+     */
+    enclave?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppVersionInfoDto
+     */
+    environment?: string;
 }
 
 
