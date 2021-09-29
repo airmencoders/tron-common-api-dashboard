@@ -57,7 +57,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
           if (authorizedUserState.authorizedUserHasAnyPrivilege(item.requiredPrivileges)){
             if (item.childRoutes != null && item.childRoutes.length > 0) {
               return (
-                <SidebarContainer containsNestedItems isActive={openedMenu === item.name}>
+                <SidebarContainer key={item.name} containsNestedItems isActive={openedMenu === item.name}>
                   <NestedSidebarNav key={item.name}
                     id={item.name}
                     title={item.name}
@@ -78,7 +78,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
             }
             else {
               return (
-                <SidebarContainer isActive={activeItem.value === item.name}>
+                <SidebarContainer key={item.name} isActive={activeItem.value === item.name}>
                   <SidebarItem key={item.name} path={item.path} name={item.name} icon={item.icon} />
                 </SidebarContainer>
               )

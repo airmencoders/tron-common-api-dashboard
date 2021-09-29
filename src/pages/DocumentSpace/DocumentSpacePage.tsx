@@ -1,4 +1,4 @@
-import { useHookstate } from '@hookstate/core';
+import { none, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import React, { ChangeEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
@@ -6,9 +6,11 @@ import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinit
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
+import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
+import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
@@ -27,6 +29,8 @@ const documentDtoColumns: GridColumn[] = [
     field: 'key',
     headerName: 'Name',
     resizable: true,
+    cellRenderer: LoadingCellRenderer,
+    checkboxSelection: true
   }),
   new GridColumn({
     field: 'uploadedDate',
@@ -73,9 +77,14 @@ interface DocumentSpacePageState {
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
   fileToDelete: string;
+  selectedFiles: DocumentDto[];
 }
 
 const selectedSpaceDefaultValue = 'Select a Space';
+
+function getDocumentUniqueKey(data: DocumentDto): string {
+  return data.key;
+}
 
 function DocumentSpacePage() {
   const pageState = useHookstate<DocumentSpacePageState>({
@@ -89,6 +98,7 @@ function DocumentSpacePage() {
     showUploadDialog: false,
     showDeleteDialog: false,
     fileToDelete: '',
+    selectedFiles: []
   });
 
   const documentSpaceService = useDocumentSpaceState();
@@ -196,6 +206,15 @@ function DocumentSpacePage() {
     closeDeleteDialog();
   }
 
+  function onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
+    const selectedFiles = pageState.selectedFiles;
+    if (selectionEvent === 'selected') {
+      selectedFiles[selectedFiles.length].set(data);
+    } else {
+      selectedFiles.find(document => document.key.value === data.key)?.set(none);
+    }
+  }
+
   const isDocumentSpacesLoading =
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
@@ -245,15 +264,33 @@ function DocumentSpacePage() {
               Add New Space
             </Button>
           </div>
-          {pageState.selectedSpace.get() &&
-            pageState.selectedSpace.get() !== selectedSpaceDefaultValue ? (
-            <DocumentUploadDialog
-              space={pageState.selectedSpace.get()}
-              onFinish={() => pageState.shouldUpdateDatasource.set(true)}
-            />
-          ) : (
-            <div></div>
-          )}
+          {isSelectedSpaceValid() &&
+            <div>
+              <a href={pageState.selectedFiles.value.length > 0 ? documentSpaceService.createRelativeFilesDownloadUrl(pageState.selectedSpace.value, pageState.selectedFiles.value) : undefined}>
+                <Button
+                  data-testid="download-selected-files__btn"
+                  type="button"
+                  disabled={pageState.selectedFiles.value.length === 0}
+                >
+                  Download Selected Files (zip)
+                </Button>
+              </a>
+
+              <a href={documentSpaceService.createRelativeDownloadAllFilesUrl(pageState.selectedSpace.value)}>
+                <Button
+                  data-testid="download-all-files__btn"
+                  type="button"
+                >
+                  Download All Files (zip)
+                </Button>
+              </a>
+
+              <DocumentUploadDialog
+                space={pageState.selectedSpace.get()}
+                onFinish={() => pageState.shouldUpdateDatasource.set(true)}
+              />
+            </div>
+          }
         </div>
       </FormGroup>
 
@@ -269,6 +306,9 @@ function DocumentSpacePage() {
           suppressCellSelection
           updateDatasource={pageState.shouldUpdateDatasource.value}
           updateDatasourceCallback={onDatasourceUpdateCallback}
+          getRowNodeId={getDocumentUniqueKey}
+          onRowSelected={onDocumentRowSelected}
+          rowSelection="multiple"
         />
       )}
 

@@ -26,6 +26,7 @@ import { failsHookstateValidation, generateStringErrorMessages, validateEmail, v
 import AppSourceEndpointEditor from './AppSourceEndpointEditor';
 import './AppSourceForm.scss';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
+import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 
 interface AdminEmail {
   email: string;
@@ -218,7 +219,7 @@ function AppSourceForm(props: CreateUpdateFormProps<AppSourceDetailsDto>) {
     endpointModifyState.isOpen.set(true);
   }
 
-  function onRowSelected(data: AppEndpointDto, selectionEvent: 'selected' | 'unselected') {
+  function onRowSelected(data: AppEndpointDto, selectionEvent: GridSelectionType) {
     if (selectionEvent === 'selected') {
       endpointModifyState.bulkSelected[endpointModifyState.bulkSelected.length].set(data);
     } else {
