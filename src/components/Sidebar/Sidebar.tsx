@@ -1,20 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import SidebarItem from './SidebarItem';
-import { RouteItem, RoutePath } from '../../routes';
-import Logo from '../../logo.png';
-import './Sidebar.scss';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
-import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
-import SidebarContainer from './SidebarContainer';
 import { useHookstate } from '@hookstate/core';
-import { Tag, Tooltip } from '@trussworks/react-uswds';
-import { useAppVersionState } from '../../state/app-info/app-info-state';
-import { AppVersionInfoDto } from '../../openapi';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import Logo from '../../logo.png';
+import { RouteItem, RoutePath } from '../../routes';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import AppInfoTag from '../AppInfoTag/AppInfoTag';
+import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
+import './Sidebar.scss';
+import SidebarContainer from './SidebarContainer';
+import SidebarItem from './SidebarItem';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   const authorizedUserState = useAuthorizedUserState();
-  const appInfoService = useAppVersionState();
   const location = useLocation();
   const [openedMenu, setOpenedMenu] = useState('');
   const activeItem = useHookstate('');
@@ -39,10 +36,6 @@ function Sidebar({ items }: { items: RouteItem[] }) {
     }
   }, [location]);
 
-  useEffect(() => {
-    appInfoService.fetchVersion();
-  }, []);
-
   const handleMenuToggleClicked = (id: string) => {
     // don't toggle just open
     setOpenedMenu(id);
@@ -59,11 +52,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
             className="d-inline-block align-top mr-4"
           />
         </Link>
-        <div className="sidebar__tags-container">
-          <Tag className="sidebar__tags">
-            { `${appInfoService.state.enclave.get()?.toUpperCase() ?? ''}` }
-          </Tag>
-        </div>
+        <AppInfoTag />
       </div>
       <nav className="sidebar__nav">
         {items.map((item) => {

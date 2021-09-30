@@ -1,0 +1,60 @@
+@import '../../styles/base';
+
+.enclave {
+  background-color: color($theme-color-secondary-light);
+  color: #fff;
+  width: 20%;
+  padding-left: calculateRem(5px);
+  padding-top: calculateRem(2px);
+  padding-bottom: calculateRem(2px);
+  padding-right: calculateRem(2px);
+  font-weight: bold;
+  font-size: calculateRem(10px);
+
+  &__il2 {
+    @extend .enclave;
+    background-color: #007a33;
+  }
+
+  &__il4 {
+    @extend .enclave;
+    background-color: #502b85;
+  }
+}
+.environ {
+  background-color: color($theme-color-secondary-light);
+  padding-left: calculateRem(2px);
+  padding-top: calculateRem(2px);
+  padding-bottom: calculateRem(2px);
+  padding-right: calculateRem(5px);
+  font-weight: bold;
+  font-size: calculateRem(10px);
+  width: 80%;
+
+  &__staging {
+    @extend .environ;
+    background-color: color($theme-color-secondary-light);
+  }
+
+  &__prod {
+    @extend .environ;
+    background-color: color($theme-color-secondary-light);
+  }
+}
+
+.sidebar {
+  &__tags-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    margin-bottom: calculateRem(10px);
+  }
+
+  &__apptag {
+    font-size: calculateRem(10px);
+    border-radius: 4px;
+    padding-top: 0px;
+    padding-left: calculateRem(10px);
+    padding-right: calculateRem(10px);
+  }
+}
