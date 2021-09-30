@@ -1,63 +1,47 @@
 import { useHookstate } from '@hookstate/core';
 import { Tag } from '@trussworks/react-uswds';
 import React, { useEffect } from 'react';
+import { Spinner } from 'react-bootstrap';
 import { useAppVersionState } from '../../state/app-info/app-info-state';
 import './AppInfoTag.scss';
 
 export default function AppInfoTag() {
   const appInfoService = useAppVersionState();
   const [tipClass, setTipClass] = React.useState('sidebar__tags-tip-hidden');
-  const [enclave, setEnclave] = React.useState<string>('');
-  const [env, setEnv] = React.useState<string>('');
 
   useEffect(() => {
-    appInfoService.fetchVersion().then(() => getClassName());
+    appInfoService.fetchVersion();
   }, []);
-
-  function getClassName() {
-    if (appInfoService.state.enclave.get()?.toUpperCase() === 'IL4') {
-      setEnclave('il4');
-    } else if (appInfoService.state.enclave.get()?.toUpperCase() === 'IL2') {
-      setEnclave('il2');
-    } else {
-      setEnclave('???');
-    }
-
-    if (
-      appInfoService.state.environment.get()?.toUpperCase() === 'PRODUCTION'
-    ) {
-      setEnv('prod');
-    } else if (
-      appInfoService.state.environment.get()?.toUpperCase() === 'STAGING'
-    ) {
-      setEnv('staging');
-    } else {
-      setEnv('---');
-    }
+  
+  if (appInfoService.state.promised) {
+    return (
+      <div className="sidebar__tags-container">
+        <Spinner animation="border" />
+      </div>
+    );
   }
 
   return (
-    <div className="sidebar__tags-container"
-    onMouseOver={() => setTipClass('sidebar__tags-tip-show')}
-    onMouseLeave={() => setTipClass('sidebar__tags-tip-hidden')}>
+    <div
+      className="sidebar__tags-container"
+      onMouseOver={() => setTipClass('sidebar__tags-tip-show')}
+      onMouseLeave={() => setTipClass('sidebar__tags-tip-hidden')}
+    >
       <Tag className="sidebar__apptag">
         {
           <>
-            <span className={`enclave__${enclave}`}>{`${
+            <span className={`enclave__${appInfoService.state.enclave.get()?.toLowerCase()}`}>{`${
               appInfoService.state.enclave.get()?.toUpperCase() ?? ''
             } `}</span>
-            <span className={`environ__${env}`}>{` ${
+            <span className={`environ__${appInfoService.state.environment.get()?.toLowerCase()}`}>{` ${
               appInfoService.state.environment.get()?.toUpperCase() ?? ''
             } `}</span>
-                  <div
-        className={tipClass}
-      >
-        {`App Ver: ${appInfoService.state.version.get() ?? 'Unknown'}`}
-      </div>
+            <div className={tipClass}>
+              {`App Ver: ${appInfoService.state.version.get() ?? 'Unknown'}`}
+            </div>
           </>
         }
       </Tag>
-
     </div>
   );
 }
