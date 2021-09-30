@@ -1,8 +1,8 @@
 import React from 'react';
-import HeaderUserInfo, { UserEditorState } from '../HeaderUserInfo';
-import { render, waitFor, screen, fireEvent, act } from '@testing-library/react';
-import { PersonDto, PersonDtoBranchEnum, Rank, RankBranchTypeEnum, UserInfoDto } from '../../../openapi/models';
-import { createState, State, StateMethodsDestroy, useHookstate } from '@hookstate/core';
+import { UserEditorState } from '../HeaderUserInfo';
+import { render, waitFor, screen, fireEvent } from '@testing-library/react';
+import { PersonDto, PersonDtoBranchEnum, Rank, RankBranchTypeEnum } from '../../../openapi/models';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { PersonControllerApi, PersonControllerApiInterface, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
 import { RankStateModel } from '../../../state/person/rank-state-model';
 import { usePersonState } from '../../../state/person/person-state';
@@ -12,20 +12,6 @@ import HeaderUserEditor from '../HeaderUserEditor';
 jest.mock('../../../state/person/person-state');
 
 describe('Test HeaderUserInfo', () => {
-  const person: PersonDto = {
-    email: 'test@user.com',
-    firstName: 'Test',
-    lastName: 'User',
-    middleName: 'TestMiddleName',
-    title: 'TestTitle',
-    address: 'TestAddress',
-    phone: '9998888888',
-    dutyPhone: '1112223333',
-    dutyTitle: 'TestDutyTitle',
-    branch: PersonDtoBranchEnum.Other,
-    rank: 'CIV'
-  };
-
   let personState: State<PersonDto[]> & StateMethodsDestroy;
   let personApi: PersonControllerApiInterface;
   let rankState: State<RankStateModel> & StateMethodsDestroy;
@@ -76,7 +62,7 @@ describe('Test HeaderUserInfo', () => {
   afterEach(() => {
     personState.destroy();
     rankState.destroy();
-    userEditorState.destroy
+    userEditorState.destroy();
   });
 
   it('renders HeaderUserEditor', async () => {
@@ -223,7 +209,9 @@ describe('Test HeaderUserInfo', () => {
 
     rankApi.getRanks1 = jest.fn(() => {
       return Promise.resolve({
-        data: ranks,
+        data: {
+          data: ranks
+        },
         status: 200,
         statusText: 'OK',
         config: {},

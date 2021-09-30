@@ -1,5 +1,5 @@
 import { none, useHookstate } from '@hookstate/core';
-import { IDatasource } from 'ag-grid-community';
+import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import React, { ChangeEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
@@ -17,6 +17,7 @@ import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { DocumentDto, DocumentSpaceInfoDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { formatBytesToString } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
@@ -40,6 +41,16 @@ const documentDtoColumns: GridColumn[] = [
     field: 'uploadedBy',
     headerName: 'Updated By',
     resizable: true,
+  }),
+  new GridColumn({
+    field: 'size',
+    headerName: 'Size',
+    resizable: true,
+    valueFormatter: function (params: ValueFormatterParams) {
+      if (params.value != null) {
+        return formatBytesToString(params.value);
+      }
+    }
   }),
   new GridColumn({
     valueGetter: GridColumn.defaultValueGetter,
