@@ -17,6 +17,12 @@ const server = setupServer(
   rest.get('/api/v2/userinfo', (req, res, ctx) => {
     return res(ctx.json({}))
   }),
+  rest.get('/api/v2/userinfo/existing-person', (req, res, ctx) => {
+    return res(ctx.json({}))
+  }),
+  rest.get('/api/v2/version', (req, res, ctx) => {
+    return res(ctx.json({ version: 'sdfsf', enclave: 'il2', environment: 'staging' }))
+  }),
   rest.get('/api/v2/privilege', (req, res, ctx) => {
     return res(ctx.json({
       "data": [
