@@ -48,6 +48,7 @@
     width: 100%;
     justify-content: space-evenly;
     margin-bottom: calculateRem(10px);
+    position: relative;
   }
 
   &__apptag {
@@ -56,5 +57,27 @@
     padding-top: 0px;
     padding-left: calculateRem(10px);
     padding-right: calculateRem(10px);
+  }
+
+  &__tags-tip {
+    background-color:black;
+    box-shadow:1px 1px 3px gray;
+    border-radius: 4px;
+    position: absolute;
+    padding: 5px;
+    color: white;
+    left: center;
+    top: 20px;
+    z-index: 500;
+    
+    &-hidden {
+      @extend .sidebar__tags-tip;
+      display: none;
+    }
+
+    &-show {
+      @extend .sidebar__tags-tip;
+      display: block;
+    }
   }
 }
