@@ -81,7 +81,7 @@ describe('Test Kpi Page', () => {
     expect(endDateElem).toBeInTheDocument();
 
     let date = new Date();
-    date.setDate(date.getUTCDate() + 1);
+    date.setDate(date.getDate() + 1);
     const dateInFutureString = formatDateToEnCa(date);
     fireEvent.change(startDateElem, { target: { value: dateInFutureString } });
     expect(page.getByText(/Start Date cannot be in the future/i)).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('Test Kpi Page', () => {
     expect(endDateElem).toBeInTheDocument();
 
     let date = new Date();
-    date.setDate(date.getUTCDate() + 1);
+    date.setDate(date.getDate() + 1);
     const dateInFutureString = formatDateToEnCa(date);
     fireEvent.change(startDateElem, { target: { value: dateInFutureString } });
     expect(page.getByText(/Start Date cannot be in the future/i)).toBeInTheDocument();

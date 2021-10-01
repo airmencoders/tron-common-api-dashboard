@@ -19,7 +19,7 @@ interface UploadState {
 }
 
 export interface DocumentUploadProps {
-  space: string;
+  documentSpaceId: string;
   onFinish: () => void;
 }
 
@@ -68,7 +68,7 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
             progress: 0,
           });
           const response = documentSpaceService.uploadFile(
-            props.space,
+            props.documentSpaceId,
             files[i],
             updateProgress
           );
