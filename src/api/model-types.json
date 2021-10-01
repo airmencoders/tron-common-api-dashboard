@@ -877,9 +877,12 @@
       ],
       "type": "object"
     },
-    "DocumentSpaceInfoDto": {
+    "DocumentSpaceRequestDto": {
       "additionalProperties": false,
       "properties": {
+        "id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         }
@@ -889,12 +892,28 @@
       ],
       "type": "object"
     },
-    "DocumentSpaceInfoDtoResponseWrapper": {
+    "DocumentSpaceResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceResponseDtoResponseWrapper": {
       "additionalProperties": false,
       "properties": {
         "data": {
           "items": {
-            "$ref": "model-types.json#/definitions/DocumentSpaceInfoDto"
+            "$ref": "model-types.json#/definitions/DocumentSpaceResponseDto"
           },
           "type": "array"
         }

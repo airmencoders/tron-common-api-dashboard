@@ -1,9 +1,9 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { MemoryRouter } from 'react-router-dom';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto, DocumentSpaceInfoDtoResponseWrapper } from '../../../openapi';
+import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpaceResponseDtoResponseWrapper } from '../../../openapi';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
@@ -11,23 +11,25 @@ import DocumentSpacePage from '../DocumentSpacePage';
 
 jest.mock('../../../state/document-space/document-space-state');
 describe('Test Document Space Page', () => {
-  const documentSpaces: DocumentSpaceInfoDto[] = [
+  const documentSpaces: DocumentSpaceResponseDto[] = [
     {
-      name: 'space1'
+      id: '412ea028-1fc5-41e0-b48a-c6ef090704d3',
+      name: 'space1',
     },
     {
-      name: 'space2'
+      id: '52909027-69f6-4d0c-83da-293bc2d9d2f8',
+      name: 'space2',
     }
   ];
 
-  const getSpacesResponse: AxiosResponse<DocumentSpaceInfoDtoResponseWrapper> = createAxiosSuccessResponse({ data: documentSpaces });
+  const getSpacesResponse: AxiosResponse<DocumentSpaceResponseDtoResponseWrapper> = createAxiosSuccessResponse({ data: documentSpaces });
 
-  let documentSpacesState: State<DocumentSpaceInfoDto[]> & StateMethodsDestroy;
+  let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
   beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceInfoDto[]>([]);
+    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
@@ -45,7 +47,7 @@ describe('Test Document Space Page', () => {
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeDisabled();
-    expect(documentSpacesSelect).toHaveValue('Loading...');
+    expect(documentSpacesSelect).toHaveValue('loading');
 
   });
 
@@ -61,14 +63,20 @@ describe('Test Document Space Page', () => {
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeDisabled();
-    expect(documentSpacesSelect).toHaveValue('Could not load Document Spaces');
+    expect(documentSpacesSelect).toHaveValue('error');
   });
 
-  it('should show Document Spaces options select when retrieving Document Spaces succeeds', () => {
+  it('should show Document Spaces options select with first item in state when state is not promised or errored', () => {
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
     jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockImplementation(() => {
+      return {
+        promise: Promise.resolve(documentSpaces),
+        cancelTokenSource: axios.CancelToken.source()
+      }
+    });
 
     const page = render(
       <MemoryRouter>
@@ -78,30 +86,15 @@ describe('Test Document Space Page', () => {
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeEnabled();
-    expect(documentSpacesSelect).toHaveValue('Select a Space');
+    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].id);
   });
 
-  it('should load Ag Grid when a valid Document Space is selected', async () => {
+  it('should have Add New Space button', () => {
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
     jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
 
-    const page = render(
-      <MemoryRouter>
-        <DocumentSpacePage />
-      </MemoryRouter>
-    );
-
-    const documentSpacesSelect = page.getByLabelText('Spaces');
-    expect(documentSpacesSelect).toBeEnabled();
-    expect(documentSpacesSelect).toHaveValue('Select a Space');
-
-    userEvent.selectOptions(documentSpacesSelect, documentSpaces[0].name);
-    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].name);
-  });
-
-  it('should have Add New Space button', async () => {
     const page = render(
       <MemoryRouter>
         <DocumentSpacePage />
@@ -109,14 +102,11 @@ describe('Test Document Space Page', () => {
     );
 
     const addBtn = page.getByText('Add New Space');
-    await waitFor(() => expect(addBtn).toBeVisible());
+    expect(addBtn).toBeVisible();
   });
 
-  it('should have Not Show Upload Files unless a space is selected', async () => {
-    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+  it('should not show Upload Files button while spaces are loading (no space selected)', () => {
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
 
     const page = render(
       <MemoryRouter>
@@ -124,13 +114,30 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(page.queryByText('Upload Files')).rejects.not.toBeDefined);
+    expect(page.queryByText('Upload Files')).not.toBeInTheDocument();
+  });
+
+  it('should allow to change space', async () => {
+    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
+      promise: Promise.resolve(documentSpaces),
+      cancelTokenSource: axios.CancelToken.source()
+    });
+
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpacePage />
+      </MemoryRouter>
+    );
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeEnabled();
-    userEvent.selectOptions(documentSpacesSelect, documentSpaces[0].name);
-    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].name);
+    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].id);
 
-    await waitFor(() => expect(page.getByText('Upload Files')).toBeVisible());
+    userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
+    await waitFor(() => expect(documentSpacesSelect).toHaveValue(documentSpaces[1].id));
   });
-})
+});

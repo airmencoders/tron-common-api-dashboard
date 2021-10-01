@@ -1,19 +1,19 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import axios, { AxiosError, AxiosResponse, CancelToken } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import Config from '../../api/config';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto, S3PaginationDto } from '../../openapi';
+import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceRequestDto, DocumentSpaceResponseDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 export default class DocumentSpaceService {
   constructor(
     public documentSpaceApi: DocumentSpaceControllerApiInterface,
-    public documentSpacesState: State<DocumentSpaceInfoDto[]>) { }
+    public documentSpacesState: State<DocumentSpaceResponseDto[]>) { }
 
   private paginationPageToTokenMap = new Map<number, string | undefined>([[0, undefined]]);
 
@@ -71,7 +71,7 @@ export default class DocumentSpaceService {
     return datasource;
   }
 
-  fetchAndStoreSpaces(): CancellableDataRequest<DocumentSpaceInfoDto[]> {
+  fetchAndStoreSpaces(): CancellableDataRequest<DocumentSpaceResponseDto[]> {
     const cancellableRequest = makeCancellableDataRequestToken(this.documentSpaceApi.getSpaces.bind(this.documentSpaceApi));
 
     const spacesRequest = cancellableRequest.axiosPromise()
@@ -94,7 +94,7 @@ export default class DocumentSpaceService {
     };
   }
 
-  async createDocumentSpace(dto: DocumentSpaceInfoDto): Promise<DocumentSpaceInfoDto> {
+  async createDocumentSpace(dto: DocumentSpaceRequestDto): Promise<DocumentSpaceResponseDto> {
     try {
       const spaceDto = await this.documentSpaceApi.createSpace(dto);
       this.documentSpacesState[this.documentSpacesState.length].set(spaceDto.data);
@@ -105,17 +105,17 @@ export default class DocumentSpaceService {
     }
   }
 
-  createRelativeFilesDownloadUrl(space: string, documents: DocumentDto[]) {
+  createRelativeFilesDownloadUrl(id: string, documents: DocumentDto[]) {
     const fileKeysParam = documents.map(document => document.key).join(',');
-    return `${Config.API_URL_V2}document-space/files/${space}/download?files=${fileKeysParam}`;
+    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download?files=${fileKeysParam}`;
   }
 
-  createRelativeDownloadFileUrl(space: string, key: string): string {
-    return `${Config.API_URL_V2}document-space/file/${space}/download?file=${key}`;
+  createRelativeDownloadFileUrl(id: string, key: string): string {
+    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/single?file=${key}`;
   }
 
-  createRelativeDownloadAllFilesUrl(space: string): string {
-    return `${Config.API_URL_V2}document-space/files/${space}/download/all`;
+  createRelativeDownloadAllFilesUrl(id: string): string {
+    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/all`;
   }
 
   async deleteFile(space: string, file: any): Promise<void> {
@@ -150,7 +150,7 @@ export default class DocumentSpaceService {
     return false;
   }
 
-  get documentSpaces(): DocumentSpaceInfoDto[] {
+  get documentSpaces(): DocumentSpaceResponseDto[] {
     if (this.isDocumentSpacesStatePromised || this.isDocumentSpacesStateErrored) {
       return [];
     }

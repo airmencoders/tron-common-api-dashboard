@@ -1,8 +1,8 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render, waitFor } from '@testing-library/react';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { MemoryRouter } from 'react-router-dom';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto } from '../../../openapi';
+import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, } from '../../../openapi';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
@@ -12,12 +12,12 @@ jest.mock('../../../state/document-space/document-space-state');
 
 describe('Document Upload Tests', () => {
 
-  let documentSpacesState: State<DocumentSpaceInfoDto[]> & StateMethodsDestroy;
+  let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
   beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceInfoDto[]>([]);
+    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
@@ -32,7 +32,7 @@ describe('Document Upload Tests', () => {
     const mock = jest.fn();
     const page = render(<MemoryRouter>
       <DocumentUploadDialog 
-        space='test'
+        documentSpaceId='test'
         onFinish={mock} 
       />
     </MemoryRouter>);

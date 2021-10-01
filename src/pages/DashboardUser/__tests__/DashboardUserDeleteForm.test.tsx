@@ -20,8 +20,7 @@ describe('Test Dashboard Delete User Form', () => {
     data = {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       email: "test@email.com",
-      hasDashboardAdmin: false,
-      hasDashboardUser: false
+      hasDashboardAdmin: false
     }
   });
 

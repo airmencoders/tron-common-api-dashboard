@@ -1,16 +1,16 @@
 import { createState, State, useState } from '@hookstate/core';
-import { Configuration, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceInfoDto } from '../../openapi';
+import { Configuration, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto } from '../../openapi';
 import Config from '../../api/config';
 import DocumentSpaceService from './document-space-service';
 
-const spacesState = createState<DocumentSpaceInfoDto[]>(new Array<DocumentSpaceInfoDto>());
+const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const documentSpaceControllerApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
   new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
 );
 
 export const wrapState = (
   documentSpaceApi: DocumentSpaceControllerApiInterface,
-  documentSpacesState: State<DocumentSpaceInfoDto[]>) => {
+  documentSpacesState: State<DocumentSpaceResponseDto[]>) => {
   return new DocumentSpaceService(
     documentSpaceApi,
     documentSpacesState

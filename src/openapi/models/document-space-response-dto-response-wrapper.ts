@@ -13,19 +13,20 @@
  */
 
 
+import { DocumentSpaceResponseDto } from './document-space-response-dto';
 
 /**
  * 
  * @export
- * @interface DocumentSpaceInfoDto
+ * @interface DocumentSpaceResponseDtoResponseWrapper
  */
-export interface DocumentSpaceInfoDto {
+export interface DocumentSpaceResponseDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof DocumentSpaceInfoDto
+     * @type {Array<DocumentSpaceResponseDto>}
+     * @memberof DocumentSpaceResponseDtoResponseWrapper
      */
-    name: string;
+    data: Array<DocumentSpaceResponseDto>;
 }
 
 

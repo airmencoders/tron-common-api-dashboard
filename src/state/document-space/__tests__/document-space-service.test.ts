@@ -6,8 +6,8 @@ import {
   DocumentDto,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
-  DocumentSpaceInfoDto,
-  DocumentSpaceInfoDtoResponseWrapper,
+  DocumentSpaceResponseDto,
+  DocumentSpaceResponseDtoResponseWrapper,
   S3PaginationDto,
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
@@ -53,27 +53,29 @@ describe('Test Document Space Service', () => {
     }
   );
 
-  const documentSpaces: DocumentSpaceInfoDto[] = [
+  const documentSpaces: DocumentSpaceResponseDto[] = [
     {
+      id: '412ea028-1fc5-41e0-b48a-c6ef090704d3',
       name: 'space1',
     },
     {
+      id: '52909027-69f6-4d0c-83da-293bc2d9d2f8',
       name: 'space2',
-    },
+    }
   ];
 
-  const getSpacesResponse: AxiosResponse<DocumentSpaceInfoDtoResponseWrapper> = createAxiosSuccessResponse(
+  const getSpacesResponse: AxiosResponse<DocumentSpaceResponseDtoResponseWrapper> = createAxiosSuccessResponse(
     {
       data: documentSpaces,
     }
   );
 
-  let documentSpacesState: State<DocumentSpaceInfoDto[]>;
+  let documentSpacesState: State<DocumentSpaceResponseDto[]>;
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
   beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceInfoDto[]>([]);
+    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(
       documentSpaceApi,
@@ -340,7 +342,7 @@ describe('Test Document Space Service', () => {
   it('should allow creation of space', async () => {
     const mock = jest.spyOn(documentSpaceApi, 'createSpace').mockReturnValue(
       Promise.resolve(
-        createAxiosSuccessResponse<DocumentSpaceInfoDto>({ name: 'test' })
+        createAxiosSuccessResponse<DocumentSpaceResponseDto>({ id: '52909027-69f6-4d0c-83da-293bc2d9d2f8', name: 'test' })
       )
     );
 
@@ -353,27 +355,27 @@ describe('Test Document Space Service', () => {
 
 
   it('should create relative download url for multi file download', () => {
-    const space = 'testspace';
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
 
-    const url = documentSpaceService.createRelativeFilesDownloadUrl(space, documents);
+    const url = documentSpaceService.createRelativeFilesDownloadUrl(documentSpaceId, documents);
 
-    expect(url.endsWith(`/document-space/files/${space}/download?files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download?files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
   });
 
   it('should create relative download url for a single file download', () => {
-    const space = 'testspace';
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
     const fileKey = 'testfile.key';
 
-    const url = documentSpaceService.createRelativeDownloadFileUrl(space, fileKey);
+    const url = documentSpaceService.createRelativeDownloadFileUrl(documentSpaceId, fileKey);
 
-    expect(url.endsWith(`/document-space/file/${space}/download?file=${fileKey}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download/single?file=${fileKey}`)).toBeTruthy();
   });
 
   it('should create relative download url to download entire space', () => {
-    const space = 'testspace';
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
 
-    const url = documentSpaceService.createRelativeDownloadAllFilesUrl(space);
+    const url = documentSpaceService.createRelativeDownloadAllFilesUrl(documentSpaceId);
 
-    expect(url.endsWith(`/document-space/files/${space}/download/all`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download/all`)).toBeTruthy();
   });
 });
