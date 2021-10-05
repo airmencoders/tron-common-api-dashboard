@@ -1,12 +1,12 @@
 /// <reference types="Cypress" />
 
-import { host, logfileActuatorApi, pastLogfileApi } from '../support';
+import { host, logfileActuatorApi, pastLogfileApi , adminJwt, ssoXfcc } from "../support";
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('Logfile & Audit Log Tests', () => {
   // Log files are not available running under docker qa env
   // it('Should show logfile page & should show at least current logfile', () => {
-  //   cy.visit(host);
+  //   UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
   //
   //   cy.intercept({
   //     method: 'GET',
@@ -32,7 +32,7 @@ describe('Logfile & Audit Log Tests', () => {
   // });
 
   it('Should show Audit Log page & filter', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
     UtilityFunctions.clickOnPageNav(Page.AUDIT_LOG);
   });
 });

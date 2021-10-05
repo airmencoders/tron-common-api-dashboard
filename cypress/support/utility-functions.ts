@@ -2,6 +2,15 @@ import crypto from 'crypto';
 import {PrivilegeDto, PrivilegeDtoResponseWrapper} from '../../src/openapi';
 
 export default class UtilityFunctions {
+
+  static visitSite(url: string, {headers}: any) {
+    cy.intercept(/\/api\/.*/, (req) => {
+      req.headers = headers;
+    });
+
+    cy.visit(url);
+  }
+
   /**
    * Find a toast message with the given message
    * @param message the message to find

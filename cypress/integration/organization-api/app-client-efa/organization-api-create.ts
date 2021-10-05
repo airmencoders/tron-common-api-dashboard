@@ -1,5 +1,5 @@
 import { OrganizationDto, OrganizationDtoResponseWrapper } from '../../../../src/openapi';
-import { appClientHostOrganizationUrl } from '../../../support';
+import { appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -20,6 +20,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'POST',
         body: OrgSetupFunctions.generateBaseOrg(),
         failOnStatusCode: false
@@ -33,6 +34,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'POST',
         body: OrgSetupFunctions.generateBaseOrg()
       }).then(response => {
@@ -49,6 +51,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/organizations`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'POST',
         body: [OrgSetupFunctions.generateBaseOrg()],
         failOnStatusCode: false
@@ -74,6 +77,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
 
       cy.request<OrganizationDtoResponseWrapper>({
         url: `${appClientHostOrganizationUrl}/organizations`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'POST',
         body: orgsToCreate,
       }).then(response => {

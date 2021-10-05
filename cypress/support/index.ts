@@ -16,6 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import './cleanup-helper';
+import { prepForTest } from './cleanup-helper';
 
 export const host = Cypress.env('INTEGRATION_TEST_HOST');
 export const apiHost = Cypress.env('ADMIN_API_HOST') ?? 'http://localhost:9000';
@@ -42,5 +43,7 @@ export const appClientHostOrganizationUrl = `${appClientApiHost}${orgApiBase}`;
 
 export const agGridFilterDebounce = 500;
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+export const adminJwt = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJpc3RpbyIsImVtYWlsIjoiY3plbGxAcmV2YWNvbW0uY29tIn0.dGDXR4GqMrxrh8333XZd4ZStYiOklnvaJUEdw_JLpWI";
+export const ssoXfcc = "By=spiffe://cluster/ns/istio-system/sa/defaultFAKE_H=12345Subject=\"\";URI=spiffe://cluster.local/ns/istio-system/sa/default";
+export const nonAdminJwt = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJpc3RpbyIsImVtYWlsIjoiampAZ21haWwuY29tIn0.gu1JGAknS8uQHSVpqV7l2RWxDWSIE9rCCCDXZ-9LqmM";
+export const appClientTesterXfcc = "By=spiffe://cluster/ns/app-client-tester/sa/defaultFAKE_H=12345Subject=\"\";URI=spiffe://cluster.local/ns/app-client-tester/sa/default"; 

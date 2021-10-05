@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { appClientHostOrganizationUrl, organizationUrl } from '../../support';
+import { adminJwt, appClientHostOrganizationUrl, organizationUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -39,6 +39,7 @@ describe('Organization API Subordinate DELETE', () => {
       .then(response => {
         cy.request<OrganizationDto>({
           url: `${organizationUrl}/${response.body.id}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           method: 'PUT',
           body: {
             ...response.body,
@@ -54,6 +55,7 @@ describe('Organization API Subordinate DELETE', () => {
     // Send request to delete only orgA
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: [orgA.id]
     }).then(response => {
@@ -65,6 +67,7 @@ describe('Organization API Subordinate DELETE', () => {
     // Just ensure orgC only has orgB
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -75,6 +78,7 @@ describe('Organization API Subordinate DELETE', () => {
     // Ensure orgA no longer has parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -84,6 +88,7 @@ describe('Organization API Subordinate DELETE', () => {
     // Ensure orgB still has parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgB.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -94,6 +99,7 @@ describe('Organization API Subordinate DELETE', () => {
   it('should fail delete sub organizations with no body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -131,6 +137,7 @@ describe('Organization API Subordinate DELETE', () => {
     // This should fail because passing in non-existant suborg id
     cy.request({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: [orgB.id, orgA.id, UtilityFunctions.uuidv4()],
       failOnStatusCode: false
@@ -141,6 +148,7 @@ describe('Organization API Subordinate DELETE', () => {
     // Ensure orgC still has orgA, orgB as suborgs
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -150,6 +158,7 @@ describe('Organization API Subordinate DELETE', () => {
     // orgA should still have orgC as parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -159,6 +168,7 @@ describe('Organization API Subordinate DELETE', () => {
     // orgB should still have orgC as parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgB.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -169,6 +179,7 @@ describe('Organization API Subordinate DELETE', () => {
   it('should fail delete sub organizations with no body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -179,6 +190,7 @@ describe('Organization API Subordinate DELETE', () => {
   it('should fail delete sub organizations with bad id path parameter', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/badUUID/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -202,6 +214,7 @@ describe('Organization API Subordinate DELETE', () => {
       .then(response => {
         cy.request<OrganizationDto>({
           url: `${organizationUrl}/${response.body.id}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           method: 'PUT',
           body: {
             ...response.body,
@@ -216,6 +229,7 @@ describe('Organization API Subordinate DELETE', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: [UtilityFunctions.uuidv4()],
       failOnStatusCode: false
@@ -227,6 +241,7 @@ describe('Organization API Subordinate DELETE', () => {
   it('should fail delete sub organizations with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: {
 

@@ -1,4 +1,4 @@
-import { organizationUrl } from '..';
+import { adminJwt, organizationUrl, ssoXfcc } from '..';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum } from '../../../src/openapi';
 import UtilityFunctions from '../utility-functions';
 
@@ -32,6 +32,7 @@ export default class OrgSetupFunctions {
     return cy.request<OrganizationDto>({
       url: `${organizationUrl}`,
       method: 'POST',
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       body: {
         ...this.generateBaseOrg(),
         ...org
@@ -40,6 +41,14 @@ export default class OrgSetupFunctions {
       expect(response.status).to.eq(201);
 
       return response;
+    });
+  }
+
+  static deleteOrganization(id: string) {
+    return cy.request({
+      url: `${organizationUrl}/${id}`,
+      method: 'DELETE',
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
     });
   }
 }

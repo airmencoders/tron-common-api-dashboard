@@ -1,4 +1,4 @@
-import { appClientHostOrganizationUrl } from '../../../support';
+import { appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -19,6 +19,7 @@ describe('ORGANIZATION_DELETE EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         failOnStatusCode: false
       }).then(response => {
@@ -37,6 +38,7 @@ describe('ORGANIZATION_DELETE EFA privilege', () => {
 
           cy.request({
             url: `${appClientHostOrganizationUrl}/${createdOrgId}`,
+            headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
             method: 'DELETE',
             failOnStatusCode: false
           }).then(response => {

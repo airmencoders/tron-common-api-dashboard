@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import {apiHost, appClientApiHost, personApiBase} from '../support';
+import {apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
+import { cleanup } from '../support/cleanup-helper';
 
 describe('Person Delete API', () => {
 
@@ -12,12 +13,14 @@ describe('Person Delete API', () => {
               .request({
                 method: 'POST',
                 url: `${apiHost}${personApiBase}`,
+                headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 body: {}
               })
               .then((resp) => {
                 return cy.request({
                   method: 'DELETE',
                   url: `${appClientApiHost}${personApiBase}/${resp.body.id}`,
+                  headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
                   failOnStatusCode: false
                 })
               })

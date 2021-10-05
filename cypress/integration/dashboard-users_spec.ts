@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import { dashboardUserApiBase, host } from '../support';
+import { dashboardUserApiBase, host , adminJwt, ssoXfcc } from "../support";
 import DataCrudFormPageUtil, { DashboardUser, DashboardUserGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
@@ -51,7 +51,7 @@ function filterColumnWithSearchValueNoRequest(colId: string, searchValue: string
 
 describe('Dashboard Users Tests', () => {
   it('Should allow Dashboard User creation & deletion', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.DASHBOARD_USER);
 
@@ -67,7 +67,7 @@ describe('Dashboard Users Tests', () => {
   });
 
   it('Should allow Dashboard User edit', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.DASHBOARD_USER);
 

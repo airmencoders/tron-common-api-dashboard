@@ -1,5 +1,5 @@
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../../src/openapi';
-import { appClientHostOrganizationUrl, organizationUrl, personUrl } from '../../../support';
+import { adminJwt, appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt, organizationUrl, personUrl, ssoXfcc } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete, personIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -21,6 +21,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PUT',
         body: {
           name: 'new'
@@ -60,6 +61,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Should get back denied fields for name, leader, parentOrganization, orgType, branchType
       cy.request({
         url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PUT',
         body: {
           ...orgToCreate,
@@ -87,6 +89,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Get the new entity again just to make sure
       cy.request({
         url: `${organizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const updatedOrg = response.body;
@@ -99,6 +102,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Make sure orgForParent does not contain orgToCreate as child
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${orgForParent.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const org = response.body;
@@ -109,6 +113,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Make sure personForLeader does not contain organizationLeaderships or organizationMemberships
       cy.request({
         url: `${personUrl}/${personForLeader.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true,
@@ -165,6 +170,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       }
       cy.request({
         url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PUT',
         body: {
           ...replacedOrg
@@ -180,6 +186,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure a GET request for the org also returns correctly
       cy.request({
         url: `${organizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const org = response.body;
@@ -224,6 +231,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to replace the org
       cy.request({
         url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PUT',
         body: {
           ...orgToCreate,
@@ -242,6 +250,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure a GET request for the org also returns correctly
       cy.request({
         url: `${organizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const org = response.body;
@@ -256,6 +265,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Make sure orgForSubordinate contains orgForCreate as parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${orgForSubordinate.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const org = response.body;
@@ -266,6 +276,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Make sure personForMember actually has orgToCreate as organizationMemberships
       cy.request({
         url: `${personUrl}/${personForMember.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -306,6 +317,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to replace the org
       cy.request({
         url: `${appClientHostOrganizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PUT',
         body: {
           ...orgToCreate,
@@ -321,6 +333,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure a GET request for the org also returns correctly
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${orgToCreate.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const org = response.body;
@@ -332,6 +345,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure the subordinate org does not have a parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${orgForSubordinate.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         const org = response.body;
@@ -342,6 +356,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure the person for member does not belong to the organization
       cy.request({
         url: `${personUrl}/${personForMember.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -359,6 +374,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}/leader`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         failOnStatusCode: false
       }).then(response => {
@@ -393,6 +409,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete leader
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${orgA.id}/leader`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         failOnStatusCode: false
       }).then(response => {
@@ -427,6 +444,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure createdPerson has orgA under organizationLeaderships
       cy.request({
         url: `${personUrl}/${createdPerson.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           leaderships: true
@@ -439,6 +457,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete leader
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${orgA.id}/leader`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -448,6 +467,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure createPerson no longer has orgA in organizationLeaderships
       cy.request({
         url: `${personUrl}/${createdPerson.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           leaderships: true
@@ -460,6 +480,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Ensure orgA no longer has a leader
       cy.request({
         url: `${organizationUrl}/${orgA.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -474,6 +495,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}/parent`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         failOnStatusCode: false
       }).then(response => {
@@ -508,6 +530,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete parent
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${subOrg.id}/parent`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         failOnStatusCode: false
       }).then(response => {
@@ -517,6 +540,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // subOrg should still have parentOrg as parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${subOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -526,6 +550,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // parentOrg should still have subOrg in subordinateOrganizations
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${parentOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -560,6 +585,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete parent
       cy.request<OrganizationDto>({
         url: `${appClientHostOrganizationUrl}/${subOrg.id}/parent`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -569,6 +595,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // subOrg should not have parentOrg as parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${subOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -578,6 +605,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // parentOrg should not have subOrg in subordinateOrganizations
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${parentOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -592,6 +620,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}/members`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         body: [],
         failOnStatusCode: false
@@ -627,6 +656,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to delete members
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         body: [createdPerson.id],
         failOnStatusCode: false
@@ -637,6 +667,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Org should still have members
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -646,6 +677,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Person should still be a part of org
       cy.request({
         url: `${personUrl}/${createdPerson.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -683,6 +715,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // try to delete
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         body: [createdPerson.id]
       }).then(response => {
@@ -693,6 +726,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Org should no longer have members
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -702,6 +736,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Person should not be a part of org
       cy.request({
         url: `${personUrl}/${createdPerson.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -719,6 +754,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}/members`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [],
         failOnStatusCode: false
@@ -748,6 +784,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to assign member
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [createdPerson.id],
         failOnStatusCode: false
@@ -758,6 +795,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Org should no not have members
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -767,6 +805,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Person should not be a part of org
       cy.request({
         url: `${personUrl}/${createdPerson.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -798,6 +837,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Try to assign member
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/members`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [createdPerson.id]
       }).then(response => {
@@ -808,6 +848,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Org should have members
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -817,6 +858,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Person should be a part of org
       cy.request({
         url: `${personUrl}/${createdPerson.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -834,6 +876,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [],
         failOnStatusCode: false
@@ -862,6 +905,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // try to add subordinate
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [createdSubOrg.id],
         failOnStatusCode: false
@@ -872,6 +916,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Org should not have any subordinates
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -881,6 +926,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // sub org should not have a parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdSubOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -915,6 +961,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // try to add a, b subordinates
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [createdSubOrgA.id, createdSubOrgB.id]
       }).then(response => {
@@ -925,6 +972,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // Org should have a, b subordinates
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -934,6 +982,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // sub org a should have a parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdSubOrgA.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -943,6 +992,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // sub org b should have a parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdSubOrgB.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -957,6 +1007,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'PATCH',
         body: [],
         failOnStatusCode: false
@@ -989,6 +1040,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // try to delete subordinates
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'DELETE',
         body: [createdSubOrg.id],
         failOnStatusCode: false
@@ -999,6 +1051,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // sub org should still have parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdSubOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -1008,6 +1061,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // parent org should still have suborg
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -1039,6 +1093,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // try to delete
       cy.request({
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}/subordinates`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'DELETE',
         body: [createdSubOrg.id]
       }).then(response => {
@@ -1049,6 +1104,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // sub org should no longer have parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdSubOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -1058,6 +1114,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // parent org should not have suborg
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${createdOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -1072,6 +1129,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
 
       cy.request({
         url: `${appClientHostOrganizationUrl}`,
+        headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
         method: 'POST',
         body: OrgSetupFunctions.generateBaseOrg(),
         failOnStatusCode: false
@@ -1094,6 +1152,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       personIdsToDelete.add(createdLeaderId);
       cy.request<PersonDto>({
         url: `${personUrl}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'POST',
         body: {
           id: createdLeaderId,
@@ -1123,7 +1182,8 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}`,
         method: 'PATCH',
         headers: {
-          "Content-Type": "application/json-patch+json"
+          "Content-Type": "application/json-patch+json",
+          "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc
         },
         body: [
           { op: 'replace', path: '/leader', value: patchOrgDetails.leader },
@@ -1149,6 +1209,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // ensure leader does not have organizationLeadership
       cy.request({
         url: `${personUrl}/${patchOrgDetails.leader}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           leaderships: true
@@ -1161,6 +1222,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // ensure parent org does not have subordinate
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${patchOrgDetails.parentOrganization}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -1174,7 +1236,8 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
         url: `${appClientHostOrganizationUrl}/${createdOrg.id}`,
         method: 'PATCH',
         headers: {
-          "Content-Type": "application/json-patch+json"
+          "Content-Type": "application/json-patch+json",
+          "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc
         },
         body: [
           { op: 'replace', path: '/leader', value: patchOrgDetails.leader },
@@ -1195,6 +1258,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // ensure leader has organizationLeadership
       cy.request({
         url: `${personUrl}/${patchOrgDetails.leader}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           leaderships: true
@@ -1207,6 +1271,7 @@ describe('ORGANIZATION_EDIT EFA privilege', () => {
       // ensure parent org has subordinate
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${patchOrgDetails.parentOrganization}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);

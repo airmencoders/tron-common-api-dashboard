@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { adminJwt, organizationUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -35,6 +35,7 @@ describe('Organization API Filter', () => {
     // Filter for A
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}/filter`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       failOnStatusCode: false,
       body: {
@@ -82,6 +83,7 @@ describe('Organization API Filter', () => {
     // Filter for A or B w/ pagination, desc
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}/filter`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       failOnStatusCode: false,
       qs: {
@@ -103,6 +105,7 @@ describe('Organization API Filter', () => {
     // Filter for A or B w/ pagination, asc
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}/filter`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       failOnStatusCode: false,
       qs: {

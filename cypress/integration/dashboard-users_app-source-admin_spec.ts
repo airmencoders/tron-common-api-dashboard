@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import {apiBase, host} from '../support';
+import {apiBase, host, adminJwt, ssoXfcc } from "../support";
 import UtilityFunctions, {Page} from '../support/utility-functions';
 import DataCrudFormPageUtil, {
   AppClient,
@@ -13,7 +13,7 @@ describe('Dashboard Users - App Source Admin Tests', () => {
   it('Should create a Dashboard User for App Source Admin add', () => {
     const adminEmail = `${UtilityFunctions.generateRandomString()}@email.com`;
 
-    cy.visit(`${host}`);
+    UtilityFunctions.visitSite(`${host}`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
     const appSourceName = 'puckboard';

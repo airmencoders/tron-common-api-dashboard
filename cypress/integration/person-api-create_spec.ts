@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 
-import {apiHost, personApiBase} from '../support';
+import {apiHost, personApiBase, adminJwt, ssoXfcc } from "../support";
+import { cleanup } from "../support/cleanup-helper";
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Create API', () => {
@@ -10,12 +11,14 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {}
         })
         .then((response) => {
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         })
   });
@@ -25,6 +28,7 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             branch: 'INVALID'
           },
@@ -40,6 +44,7 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             branch: 'USAF',
             rank: 'INVALID'
@@ -56,6 +61,7 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             dodid: '0'
           },
@@ -72,6 +78,7 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             branch: 'INVALID'
           },
@@ -88,6 +95,7 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             phone: 'INVALID'
           },
@@ -103,6 +111,7 @@ describe('Person Create API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             dutyPhone: 'INVALID'
           },
@@ -132,6 +141,7 @@ describe('Person Create API', () => {
           .request({
             method: 'POST',
             url: `${apiHost}${personApiBase}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body,
             failOnStatusCode: false
           })

@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { appClientHostOrganizationUrl, organizationUrl, personUrl } from '../../support';
+import { adminJwt, appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt, organizationUrl, personUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -32,6 +32,7 @@ describe('Organization API Member DELETE', () => {
       .then(response => {
         cy.request<OrganizationDto>({
           url: `${organizationUrl}/${response.body.id}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           method: 'PUT',
           body: {
             ...response.body,
@@ -47,6 +48,7 @@ describe('Organization API Member DELETE', () => {
     // Delete personA from orgA
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: [personA.id]
     }).then(response => {
@@ -57,6 +59,7 @@ describe('Organization API Member DELETE', () => {
     // Ensure orgA still no longer has personA
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -66,6 +69,7 @@ describe('Organization API Member DELETE', () => {
     // Ensure personA does not have memberships to orgA
     cy.request({
       url: `${personUrl}/${personA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         memberships: true
@@ -99,10 +103,12 @@ describe('Organization API Member DELETE', () => {
     // Add person as member
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${response.body.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'PUT',
         body: {
           ...response.body,
@@ -118,6 +124,7 @@ describe('Organization API Member DELETE', () => {
     // This should return 403, no permission
     cy.request({
       url: `${appClientHostOrganizationUrl}/${orgA.id}/members`,
+      headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
       method: 'DELETE',
       body: [personA.id],
       failOnStatusCode: false
@@ -128,6 +135,7 @@ describe('Organization API Member DELETE', () => {
     // orgA should still have personA as member
     cy.request({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -137,6 +145,7 @@ describe('Organization API Member DELETE', () => {
     // personA should still have primaryOrganizationId set to orgA
     cy.request({
       url: `${personUrl}/${personA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -147,6 +156,7 @@ describe('Organization API Member DELETE', () => {
   it('should fail delete members with no body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -157,6 +167,7 @@ describe('Organization API Member DELETE', () => {
   it('should fail delete members with bad id path parameter', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/badUUID/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -174,6 +185,7 @@ describe('Organization API Member DELETE', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: [UtilityFunctions.uuidv4()],
       failOnStatusCode: false
@@ -185,6 +197,7 @@ describe('Organization API Member DELETE', () => {
   it('should fail delete members with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       body: {
 

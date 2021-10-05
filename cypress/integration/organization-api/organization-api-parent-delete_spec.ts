@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { adminJwt, organizationUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -31,6 +31,7 @@ describe('Organization API Parent DELETE', () => {
       .then(response => {
         cy.request<OrganizationDto>({
           url: `${organizationUrl}/${response.body.id}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           method: 'PUT',
           body: {
             ...response.body,
@@ -45,6 +46,7 @@ describe('Organization API Parent DELETE', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgB.id}/parent`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -54,6 +56,7 @@ describe('Organization API Parent DELETE', () => {
     // Ensure parent has truly been deleted
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgB.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -63,6 +66,7 @@ describe('Organization API Parent DELETE', () => {
     // ensure parent does not have subordinate orgs
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -73,6 +77,7 @@ describe('Organization API Parent DELETE', () => {
   it('should fail delete parent with org id that does not exist', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/parent`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -83,6 +88,7 @@ describe('Organization API Parent DELETE', () => {
   it('should fail delete parent with bad format UUID org id', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/badUUID/parent`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {

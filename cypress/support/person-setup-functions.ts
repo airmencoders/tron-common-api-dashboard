@@ -1,7 +1,7 @@
 /// <reference types="Cypress"/>
 
 import Chainable = Cypress.Chainable;
-import {apiHost, personApiBase} from './index';
+import {adminJwt, apiHost, personApiBase, personUrl, ssoXfcc} from './index';
 import {Person} from './data-crud-form-functions';
 import UtilityFunctions from './utility-functions';
 import { PersonDto, PersonDtoBranchEnum } from '../../src/openapi';
@@ -48,6 +48,7 @@ export default class PersonSetupFunctions {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}/find`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             findType: 'EMAIL',
             value: userFields.email ?? PersonSetupFunctions.USER_EMAIL,
@@ -59,7 +60,8 @@ export default class PersonSetupFunctions {
             return cy
                 .request({
                   method: 'DELETE',
-                  url: `${apiHost}${personApiBase}/${resp.body.id}`
+                  url: `${apiHost}${personApiBase}/${resp.body.id}`,
+                  headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 });
           }
           return cy.wrap({});
@@ -67,6 +69,7 @@ export default class PersonSetupFunctions {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}/find`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             findType: 'DODID',
             value: userFields.dodid ?? PersonSetupFunctions.USER_DODID,
@@ -78,7 +81,8 @@ export default class PersonSetupFunctions {
             return cy
                 .request({
                   method: 'DELETE',
-                  url: `${apiHost}${personApiBase}/${resp.body.id}`
+                  url: `${apiHost}${personApiBase}/${resp.body.id}`,
+                  headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 });
           }
           return cy.wrap({});
@@ -88,6 +92,7 @@ export default class PersonSetupFunctions {
             .request<PersonDto>({
                 method: 'POST',
                 url: `${apiHost}${personApiBase}`,
+                headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 body: {
                   ...userFields,
                 },
@@ -127,6 +132,7 @@ export default class PersonSetupFunctions {
   static createPerson(person?: Partial<PersonDto>) {
     return cy.request<PersonDto>({
       url: `${apiHost}${personApiBase}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: {
         ...this.generateBasePerson(),
@@ -136,6 +142,14 @@ export default class PersonSetupFunctions {
       expect(response.status).to.eq(201);
 
       return response;
+    });
+  }
+
+  static deletePerson(id: string) {
+    return cy.request({
+      url: `${personUrl}/${id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+      method: 'DELETE',
     });
   }
 }

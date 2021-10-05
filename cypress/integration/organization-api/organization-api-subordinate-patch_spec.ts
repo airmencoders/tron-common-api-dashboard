@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { appClientHostOrganizationUrl, organizationUrl } from '../../support';
+import { adminJwt, appClientHostOrganizationUrl, organizationUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -41,6 +41,7 @@ describe('Organization API Subordinate PATCH', () => {
     // PATCH to add subordinate orgs
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: [orgA.id, orgB.id]
     }).then(response => {
@@ -51,6 +52,7 @@ describe('Organization API Subordinate PATCH', () => {
     // Just ensure orgC does infact have both children
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgC.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -60,6 +62,7 @@ describe('Organization API Subordinate PATCH', () => {
     // Check that orgA and orgB also have their parent set to orgC
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -68,6 +71,7 @@ describe('Organization API Subordinate PATCH', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgB.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -112,6 +116,7 @@ describe('Organization API Subordinate PATCH', () => {
     // This should fail because createdSubOrg has a parent already
     cy.request({
       url: `${organizationUrl}/${createdOrg.id}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: [subOrgNoParent.id, createdSubOrg.id],
       failOnStatusCode: false
@@ -122,6 +127,7 @@ describe('Organization API Subordinate PATCH', () => {
     // Ensure createdOrg does NOT have any children
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -131,6 +137,7 @@ describe('Organization API Subordinate PATCH', () => {
     // createdSubOrg should still have initialParentOrg as parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdSubOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -140,6 +147,7 @@ describe('Organization API Subordinate PATCH', () => {
     // and initialParentOrg should still have createdSubOrg as subordinate
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${initialParentOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -149,6 +157,7 @@ describe('Organization API Subordinate PATCH', () => {
     // subOrgNoParent should still have no parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${subOrgNoParent.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -159,6 +168,7 @@ describe('Organization API Subordinate PATCH', () => {
   it('should fail PATCH sub organizations with no body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       failOnStatusCode: false
     }).then(response => {
@@ -169,6 +179,7 @@ describe('Organization API Subordinate PATCH', () => {
   it('should fail PATCH sub organizations with bad id path parameter', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/badUUID/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       failOnStatusCode: false
     }).then(response => {
@@ -186,6 +197,7 @@ describe('Organization API Subordinate PATCH', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: [UtilityFunctions.uuidv4()],
       failOnStatusCode: false
@@ -197,6 +209,7 @@ describe('Organization API Subordinate PATCH', () => {
   it('should fail PATCH sub organizations with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/subordinates`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: {
 

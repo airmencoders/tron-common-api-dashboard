@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl, personUrl } from '../../support';
+import { adminJwt, organizationUrl, personUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import PersonSetupFunctions from '../../support/person-setup-functions';
@@ -51,6 +51,7 @@ describe('Organization API Creation', () => {
     // Leader should have organization leaderships
     cy.request({
       url: `${personUrl}/${createdLeaderPerson.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         leaderships: true
@@ -63,6 +64,7 @@ describe('Organization API Creation', () => {
     // Member should have organization memberships
     cy.request({
       url: `${personUrl}/${createdMemberPerson.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         memberships: true
@@ -75,6 +77,7 @@ describe('Organization API Creation', () => {
     // Parent org should have subordinate organizations
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdParentOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -84,6 +87,7 @@ describe('Organization API Creation', () => {
     // Sub org should have parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdSubOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -95,6 +99,7 @@ describe('Organization API Creation', () => {
     cy.request<OrganizationDto>({
       url: organizationUrl,
       method: 'POST',
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       body: OrgSetupFunctions.generateBaseOrg()
     }).then(response => {
       orgIdsToDelete.add(response.body.id);
@@ -112,6 +117,7 @@ describe('Organization API Creation', () => {
           name: response.name,
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(409);
@@ -130,6 +136,7 @@ describe('Organization API Creation', () => {
         id,
         orgType: 'bad org type'
       },
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       failOnStatusCode: false
     }).then(response => {
       expect(response.status).to.eq(400);
@@ -142,6 +149,7 @@ describe('Organization API Creation', () => {
     cy.request<OrganizationDto>({
       url: organizationUrl,
       method: 'POST',
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       body: {
         ...OrgSetupFunctions.generateBaseOrg(),
         branchType: 'bad branch type',
@@ -160,6 +168,7 @@ describe('Organization API Creation', () => {
     fieldsWithCharacterLimit.forEach(field => {
       cy.request<OrganizationDto>({
         url: organizationUrl,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'POST',
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
@@ -186,6 +195,7 @@ describe('Organization API Creation', () => {
           [field]: UtilityFunctions.randomStringOfLength(256),
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(400);
@@ -209,7 +219,8 @@ describe('Organization API Creation', () => {
           body: {
             ...OrgSetupFunctions.generateBaseOrg(),
             leader: personId
-          }
+          },
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         }).then(response => {
           orgIdsToDelete.add(response.body.id);
           expect(response.status).to.eq(201);
@@ -220,6 +231,7 @@ describe('Organization API Creation', () => {
           // ensure leader has organizationLeadership
           cy.request({
             url: `${personUrl}/${personId}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             method: 'GET',
             qs: {
               leaderships: true
@@ -243,6 +255,7 @@ describe('Organization API Creation', () => {
           leader: 'bad uuid',
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(400);
@@ -260,6 +273,7 @@ describe('Organization API Creation', () => {
           leader: UtilityFunctions.uuidv4(),
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(404);
@@ -287,6 +301,7 @@ describe('Organization API Creation', () => {
       // Ensure org has member
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${org.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -296,6 +311,7 @@ describe('Organization API Creation', () => {
       // ensure member has organizationMemberships
       cy.request({
         url: `${personUrl}/${member.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET',
         qs: {
           memberships: true
@@ -317,6 +333,7 @@ describe('Organization API Creation', () => {
           members: ['bad uuid'],
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(400);
@@ -334,6 +351,7 @@ describe('Organization API Creation', () => {
           members: [UtilityFunctions.uuidv4()],
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(404);
@@ -360,6 +378,7 @@ describe('Organization API Creation', () => {
       // Ensure org has parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${org.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -369,6 +388,7 @@ describe('Organization API Creation', () => {
       // ensure parent has subordinate
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${parentOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -387,6 +407,7 @@ describe('Organization API Creation', () => {
           parentOrganization: 'bad uuid',
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(400);
@@ -404,6 +425,7 @@ describe('Organization API Creation', () => {
           parentOrganization: UtilityFunctions.uuidv4(),
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(404);
@@ -430,6 +452,7 @@ describe('Organization API Creation', () => {
       // Ensure org has subordinate
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${org.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -439,6 +462,7 @@ describe('Organization API Creation', () => {
       // ensure sub org has parent
       cy.request<OrganizationDto>({
         url: `${organizationUrl}/${subOrg.id}`,
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         method: 'GET'
       }).then(response => {
         expect(response.status).to.eq(200);
@@ -457,6 +481,7 @@ describe('Organization API Creation', () => {
           subordinateOrganizations: ['bad uuid'],
           id
         },
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         failOnStatusCode: false
       }).then(response => {
         expect(response.status).to.eq(400);
@@ -469,6 +494,7 @@ describe('Organization API Creation', () => {
       cy.request<OrganizationDto>({
         url: organizationUrl,
         method: 'POST',
+        headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         body: {
           ...OrgSetupFunctions.generateBaseOrg(),
           subordinateOrganizations: [UtilityFunctions.uuidv4()],

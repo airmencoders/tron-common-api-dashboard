@@ -1,6 +1,7 @@
 ///<reference types="Cypress" />
 
-import {apiHost, personApiBase} from '../support';
+import {apiHost, personApiBase, adminJwt, ssoXfcc } from "../support";
+import { cleanup } from "../support/cleanup-helper";
 
 describe('Person API JWT Body', () => {
 
@@ -10,6 +11,7 @@ describe('Person API JWT Body', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}/find`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             findType: 'EMAIL',
             value: userEmail,
@@ -21,6 +23,7 @@ describe('Person API JWT Body', () => {
             return cy.request({
                   method: 'DELETE',
                   url: `${apiHost}${personApiBase}/${resp.body.id}`,
+                  headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 });
           }
           return;
@@ -28,6 +31,7 @@ describe('Person API JWT Body', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}/person-jwt`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             affiliation: 'US Air Force',
             rank: 'E-3',
