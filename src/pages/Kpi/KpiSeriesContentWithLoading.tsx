@@ -39,7 +39,7 @@ function KpiSeriesContent() {
   const latencySeries: Array<number | undefined> = [];
   const latencySeriesMini: Array<KpiMiniData> = [];
   let latencySeriesTotal = 0;
-  const kpis = kpiService.state.value as KpiSummaryDto[];
+  const kpis = kpiService.state.promised ? null : kpiService.state.value as KpiSummaryDto[];
 
   const miniCharts: Record<string, { data: Array<KpiMiniData>, title: string, total: number }> = {};
   if (kpis != null) {

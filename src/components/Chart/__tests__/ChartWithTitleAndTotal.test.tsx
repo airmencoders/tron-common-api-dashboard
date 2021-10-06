@@ -28,7 +28,7 @@ describe('Test Chart With Title and total', () => {
           }}
           labels={[]}
           className="chart-classname"
-        />
+          total={20}/>
       </MemoryRouter>
     );
 
@@ -47,7 +47,7 @@ describe('Test Chart With Title and total', () => {
           }}
           labels={[]}
           hideTotal
-        />
+          total={20}/>
       </MemoryRouter>
     );
 
@@ -65,7 +65,7 @@ describe('Test Chart With Title and total', () => {
             data: [10, 10]
           }}
           labels={[]}
-          calculateAverage
+          total={10}
         />
       </MemoryRouter>
     );
