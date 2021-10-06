@@ -2,6 +2,10 @@
 @import "../../styles/base";
 
 .kpi-content {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 0 16px 40px;
   &__date-picker {
     display: flex;
     flex-direction: row;
@@ -12,6 +16,20 @@
     &__date-picker {
       flex-direction: column;
       row-gap: units(2);
+    }
+  }
+
+  .kpi-series-mini-charts {
+    &__row {
+      display: flex;
+      overflow-x: scroll;
+
+      .kpi-mini-chart {
+        margin-left: 6px;
+        &:first-child {
+          margin-left: 0;
+        }
+      }
     }
   }
 }

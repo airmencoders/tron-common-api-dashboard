@@ -2,18 +2,26 @@
 @import "../../styles/mixins";
 
 .chart-with-total {
-  display: flex;
-  flex-direction: row;
+  //display: flex;
+  //flex-direction: row;
   padding: $default-panel-padding-x;
   border: 1px solid #ccc;
   border-radius: 2px;
 
+  &__title {
+    font-weight: bold;
+    font-size: calculateRem(12px);
+    line-height: calculateRem(14px);
+  }
+
   &__total {
     width: 30%;
+    font-size: calculateRem(12px);
+    padding-left: 10px;
   }
 
   &__chart-container {
-    width: 70%;
+    width: 100%;
     max-height: 300px;
   }
 

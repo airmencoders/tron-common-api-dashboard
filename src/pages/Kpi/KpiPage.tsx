@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useHookstate } from '@hookstate/core';
 import { CancelTokenSource } from 'axios';
 import PageFormat from '../../components/PageFormat/PageFormat';
@@ -10,25 +10,52 @@ import './KpiPage.scss';
 import { KpiType } from './kpi-type';
 import KpiSeriesContentWithLoading from './KpiSeriesContentWithLoading';
 import KpiDatePicker from './KpiDatePicker';
+import {useKpiPageState} from './kpi-page-state';
+import {
+  addWeeksToDate,
+  formatDateToEnCa,
+  getEndOfWeek,
+  getFirstDayOfWeek,
+  getStartOfDay,
+  parseIsoDate
+} from '../../utils/date-utils';
+import {KpiChartTitles} from './kpi-chart-titles';
 
-interface KpiPageState {
-  kpiType?: KpiType;
-  cancelTokenSource?: CancelTokenSource;
-}
 
 function KpiPage() {
   const kpiService = useKpiState();
-  const pageState = useHookstate<KpiPageState>({
-    kpiType: undefined,
-    cancelTokenSource: undefined
-  });
+  const pageState = useKpiPageState();
 
   useEffect(() => {
+    const startEndDate = setDefaultDateRange();
+    pageState.startDate.set(startEndDate.startDate);
+    pageState.endDate.set(startEndDate.endDate);
+    fetchKpiSeries(startEndDate.startDate, startEndDate.endDate);
     return function cleanup() {
       pageState.cancelTokenSource.value?.cancel();
       kpiService.resetState();
     }
   }, []);
+
+  useEffect(() => {
+    if (pageState.selectedTab.get() == null) {
+      pageState.selectedTab.set(KpiChartTitles.TOTAL_REQUESTS)
+    }
+  }, [pageState.startDate, pageState.endDate])
+
+  function setDefaultDateRange(): {startDate: string, endDate: string} {
+    const todayIso = formatDateToEnCa(Date.now());
+    const today = parseIsoDate(todayIso);
+    const firstDayOfThisWeekIso = formatDateToEnCa(getFirstDayOfWeek(today, 1));
+    const firstDayOfThisWeek = parseIsoDate(firstDayOfThisWeekIso);
+    const startDate = addWeeksToDate(firstDayOfThisWeek, -3);
+    const endDate = getStartOfDay(getEndOfWeek(firstDayOfThisWeek, 1));
+
+    return {
+      startDate: formatDateToEnCa(startDate),
+      endDate: formatDateToEnCa(endDate)
+    };
+  }
 
   function fetchKpiSummary(startDate: string, endDate: string): void {
     const cancellablePromise = kpiService.fetchAndStoreData(startDate, endDate);
@@ -56,11 +83,6 @@ function KpiPage() {
     <PageFormat pageTitle="KPIs">
       <div className="kpi-content">
         <div className="kpi-content__date-picker">
-          <KpiDatePicker
-            kpiType={KpiType.SUMMARY}
-            onClickCallBack={fetchKpiSummary}
-          />
-
           <KpiDatePicker
             kpiType={KpiType.SERIES}
             onClickCallBack={fetchKpiSeries}

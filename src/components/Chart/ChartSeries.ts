@@ -1,4 +1,4 @@
 export interface ChartSeries {
   name?: string;
-  data: Array<number | undefined>;
+  data: Array<number | {x: number, y: number} | undefined>;
 }

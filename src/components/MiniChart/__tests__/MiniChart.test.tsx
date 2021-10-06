@@ -4,7 +4,7 @@ import MiniChart from '../MiniChart';
 import {MiniChartProps} from '../MiniChartProps';
 import {scaleLinear} from '@visx/scale';
 
-const miniChartProps: MiniChartProps<Record<string, number>> = {
+const miniChartProps: MiniChartProps<Record<string, number>, Record<string, number>> = {
   title: 'Title',
   seriesOrder: ['series1', 'series2'],
   diffValue: '+4.2%',

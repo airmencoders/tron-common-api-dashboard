@@ -13,6 +13,8 @@
 
     .actions {
       &__form {
+        display: flex;
+        max-width: none;
         .form {
           &__date-range {
             display: flex;
@@ -20,12 +22,19 @@
             &> *:not(:last-child) {
               margin-right: units(2);
             }
-    
+
             @include breakpoint-below(tablet) {
               flex-direction: column;
               &> *:not(:last-child) {
                 margin-right: 0;
               }
+            }
+          }
+          &__submit {
+            padding-left: units(2);
+            button {
+              position: relative;
+              top: 28px;
             }
           }
         }
