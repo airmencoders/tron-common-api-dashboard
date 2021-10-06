@@ -15,7 +15,11 @@ export default class AppInfoService {
   }
 
   async fetchVersion(): Promise<void> {
-    const requestPromise = await this.appVersionApi.getVersion();
-    this.state.set(requestPromise.data);
+    if (this.state.enclave.get() === '') {
+      const requestPromise = await this.appVersionApi.getVersion();
+      if (this.validate(requestPromise.data)) {
+        this.state.set(requestPromise.data);
+      }
+    }
   }
 }
