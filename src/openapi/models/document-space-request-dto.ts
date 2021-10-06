@@ -17,39 +17,21 @@
 /**
  * 
  * @export
- * @interface DocumentDto
+ * @interface DocumentSpaceRequestDto
  */
-export interface DocumentDto {
+export interface DocumentSpaceRequestDto {
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof DocumentSpaceRequestDto
      */
-    key: string;
+    id?: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof DocumentSpaceRequestDto
      */
-    path: string;
-    /**
-     * Size in bytes
-     * @type {number}
-     * @memberof DocumentDto
-     */
-    size: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof DocumentDto
-     */
-    uploadedDate: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DocumentDto
-     */
-    uploadedBy: string;
+    name: string;
 }
 
 

@@ -56,14 +56,12 @@ describe('Test Dashboard User Page', () => {
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd8",
       email: "test@email.com",
-      hasDashboardAdmin: true,
-      hasDashboardUser: true
+      hasDashboardAdmin: true
     },
     {
       id: "dd05272f-aeb8-4c58-89a8-e5c0b2f48dd9",
       email: "test1@email.com",
-      hasDashboardAdmin: false,
-      hasDashboardUser: false
+      hasDashboardAdmin: false
     }
   ];
 

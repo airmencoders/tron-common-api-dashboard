@@ -1,6 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { AxiosResponse } from 'axios';
-import { FilterConditionOperatorEnum, FilterDto, PersonControllerApi, PersonControllerApiInterface, PersonDto, PersonDtoPaginationResponseWrapper, Rank, RankBranchTypeEnum, RankControllerApi, RankControllerApiInterface } from '../../../openapi';
+import { FilterConditionOperatorEnum, FilterDto, PersonControllerApi, PersonControllerApiInterface, PersonDto, PersonDtoPaginationResponseWrapper, RankBranchTypeEnum, RankControllerApi, RankControllerApiInterface, RankResponseWrapper } from '../../../openapi';
 import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
 import { prepareDataCrudErrorResponse } from '../../data-service/data-service-utils';
 import PersonService from '../person-service';
@@ -371,8 +371,10 @@ describe('Test Person Service', () => {
         branchType: RankBranchTypeEnum.Usaf
       }
     ];
-    const rankResponse: AxiosResponse<Rank[]> = {
-      data: ranks,
+    const rankResponse: AxiosResponse<RankResponseWrapper> = {
+      data: {
+        data: ranks
+      },
       status: 200,
       statusText: 'OK',
       headers: {},

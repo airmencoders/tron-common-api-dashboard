@@ -7,6 +7,7 @@ import './Grid.scss';
 import { GridProps } from './GridProps';
 import { agGridDefaults } from './GridUtils/grid-utils';
 import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGridProps';
+import { GridSelectionType } from './grid-selection-type';
 
 function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -147,6 +148,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                       initialWidth={col.intialWidth}
                       filterParams={col.filterParams}
                       valueGetter={col.valueGetter}
+                      valueFormatter={col.valueFormatter}
                   />
                 ))
               }

@@ -195,7 +195,7 @@ export default class PersonService extends AbstractDataService<PersonDto, Person
 
     const updatedRanksPromise = this.rankApi.getRanks(branch)
         .then(resp => {
-          return resp.data;
+          return resp.data.data;
         });
 
     this.rankState.set((existingRanks) => {

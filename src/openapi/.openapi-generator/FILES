@@ -53,8 +53,9 @@ models/count-metric-dto.ts
 models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
 models/document-dto.ts
-models/document-space-info-dto-response-wrapper.ts
-models/document-space-info-dto.ts
+models/document-space-request-dto.ts
+models/document-space-response-dto-response-wrapper.ts
+models/document-space-response-dto.ts
 models/endpoint-count-metric-dto.ts
 models/endpoint-metric-dto.ts
 models/entity-accessor-dto.ts
@@ -101,6 +102,8 @@ models/privilege-id-pair.ts
 models/pub-sub-ledger-entry-dto-response-wrapper.ts
 models/pub-sub-ledger-entry-dto.ts
 models/query-dto.ts
+models/rank-categorized-dto.ts
+models/rank-response-wrapper.ts
 models/rank.ts
 models/response-dto.ts
 models/s3-pagination-dto.ts

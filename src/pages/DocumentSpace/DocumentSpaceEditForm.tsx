@@ -9,13 +9,13 @@ import Label from '../../components/forms/Label/Label';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from '../../components/forms/TextInput/TextInput';
-import { DocumentSpaceInfoDto } from '../../openapi/models/document-space-info-dto';
+import { DocumentSpaceRequestDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { validateDocSpaceName } from '../../utils/validation-utils';
 
 export interface DocumentSpaceEditFormProps {
-  documentSpace?: DocumentSpaceInfoDto;
-  onSubmit: (dto: DocumentSpaceInfoDto) => void;
+  documentSpace?: DocumentSpaceRequestDto;
+  onSubmit: (dto: DocumentSpaceRequestDto) => void;
   onCancel: () => void;
   isFormSubmitting: boolean;
   formActionType: FormActionType;
@@ -27,7 +27,7 @@ export interface DocumentSpaceEditFormProps {
 export default function DocumentSpaceEditForm(
   props: DocumentSpaceEditFormProps
 ) {
-  const formState = useHookstate<DocumentSpaceInfoDto>(
+  const formState = useHookstate<DocumentSpaceRequestDto>(
     props.documentSpace ?? { name: '' }
   );
 

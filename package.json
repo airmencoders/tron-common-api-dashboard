@@ -57,7 +57,7 @@
     "build": "react-scripts build",
     "test": "npx react-scripts test",
     "eject": "react-scripts eject",
-    "test:unit": "npm install && react-scripts test --coverage --watchAll=false",
+    "test:unit": "npm install && react-scripts test --coverage --watchAll=false --runInBand",
     "cypress:open": "npx cypress open --env INTEGRATION_TEST_HOST=http://localhost:3000",
     "test:e2e-local": "npx cypress run --env INTEGRATION_TEST_HOST=http://localhost:3000",
     "test:e2e-ci": "npx cypress run --env INTEGRATION_TEST_HOST=https://tron-common-api.staging.dso.mil/ configFile=pipeline",

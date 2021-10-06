@@ -1,5 +1,4 @@
 import { startOfWeek, isBefore, isFuture, isEqual, isThisISOWeek, addWeeks, endOfWeek, parseISO, startOfDay } from 'date-fns';
-import format from 'date-fns/format';
 
 /**
  * Gets the first day of the week, given a date object

@@ -1,20 +1,25 @@
-import { useHookstate } from '@hookstate/core';
-import { IDatasource } from 'ag-grid-community';
-import React, { ChangeEvent, useEffect } from 'react';
+import { none, useHookstate } from '@hookstate/core';
+import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import React, { ChangeEvent, useEffect, useRef } from 'react';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
+import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
+import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import { DocumentDto, DocumentSpaceInfoDto } from '../../openapi';
+import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import { DocumentDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { formatBytesToString } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
@@ -26,6 +31,8 @@ const documentDtoColumns: GridColumn[] = [
     field: 'key',
     headerName: 'Name',
     resizable: true,
+    cellRenderer: LoadingCellRenderer,
+    checkboxSelection: true
   }),
   new GridColumn({
     field: 'uploadedDate',
@@ -36,6 +43,16 @@ const documentDtoColumns: GridColumn[] = [
     field: 'uploadedBy',
     headerName: 'Updated By',
     resizable: true,
+  }),
+  new GridColumn({
+    field: 'size',
+    headerName: 'Size',
+    resizable: true,
+    valueFormatter: function (params: ValueFormatterParams) {
+      if (params.value != null) {
+        return formatBytesToString(params.value);
+      }
+    }
   }),
   new GridColumn({
     valueGetter: GridColumn.defaultValueGetter,
@@ -56,15 +73,18 @@ interface DocumentSpacePageState {
   isSubmitting: boolean;
   errorMessage: string;
   showErrorMessage: boolean;
-  selectedSpace: string;
+  selectedSpace?: DocumentSpaceResponseDto;
   shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
   fileToDelete: string;
+  selectedFiles: DocumentDto[];
 }
 
-const selectedSpaceDefaultValue = 'Select a Space';
+function getDocumentUniqueKey(data: DocumentDto): string {
+  return data.key;
+}
 
 function DocumentSpacePage() {
   const pageState = useHookstate<DocumentSpacePageState>({
@@ -72,20 +92,41 @@ function DocumentSpacePage() {
     isSubmitting: false,
     showErrorMessage: false,
     errorMessage: '',
-    selectedSpace: '',
+    selectedSpace: undefined,
     shouldUpdateDatasource: false,
     datasource: undefined,
     showUploadDialog: false,
     showDeleteDialog: false,
     fileToDelete: '',
+    selectedFiles: []
   });
 
   const documentSpaceService = useDocumentSpaceState();
 
+  const mountedRef = useRef(false);
+
   useEffect(() => {
+    mountedRef.current = true;
+
     const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
 
+    async function setInitialSpaceOnLoad() {
+      try {
+        const data = await spacesCancellableRequest.promise;
+
+        if (data && data.length > 0) {
+          setStateOnDocumentSpaceChange(data[0]);
+        }
+      } catch (err) {
+        createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
+      }
+    }
+
+    setInitialSpaceOnLoad();
+
     return function cleanup() {
+      mountedRef.current = false;
+
       if (spacesCancellableRequest != null) {
         spacesCancellableRequest.cancelTokenSource.cancel();
       }
@@ -94,67 +135,80 @@ function DocumentSpacePage() {
     };
   }, []);
 
-  function onDocumentSpaceSelectionChange(
-    event: ChangeEvent<HTMLSelectElement>
-  ): void {
-    pageState.merge({
-      selectedSpace: event.target.value,
+  function mergePageState(mergeState: Partial<DocumentSpacePageState>): void {
+    if (mountedRef.current) {
+      pageState.merge(mergeState);
+    }
+  }
+
+  function setStateOnDocumentSpaceChange(documentSpace: DocumentSpaceResponseDto): void {
+    mergePageState({
+      selectedSpace: documentSpace,
       shouldUpdateDatasource: true,
       datasource: documentSpaceService.createDatasource(
-        event.target.value,
+        documentSpace.id,
         infiniteScrollOptions
       )
     });
+  }
+
+  function onDocumentSpaceSelectionChange(
+    event: ChangeEvent<HTMLSelectElement>
+  ): void {
+    const selectedDocumentSpace = documentSpaceService.documentSpaces.find(documentSpace => documentSpace.id === event.target.value);
+
+    if (selectedDocumentSpace == null) {
+      createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
+      return;
+    }
+
+    setStateOnDocumentSpaceChange(selectedDocumentSpace);
   }
 
   function onDatasourceUpdateCallback() {
     pageState.shouldUpdateDatasource.set(false);
   }
 
-  function isSelectedSpaceValid(): boolean {
-    const selectedSpace = pageState.selectedSpace.value;
-
-    return (
-      selectedSpace?.trim() !== '' &&
-      selectedSpace !== selectedSpaceDefaultValue
-    );
-  }
-
-  function getSpaceValues(): DocumentSpaceInfoDto[] {
+  function getSpaceOptions() {
     if (isDocumentSpacesLoading) {
-      return [{ name: 'Loading...' }];
+      return (
+        <option value="loading">
+          Loading...
+        </option>
+      )
     }
 
     if (isDocumentSpacesErrored) {
-      return [{ name: 'Could not load Document Spaces' }];
+      return (
+        <option value="error">
+          Could not load Document Spaces
+        </option>
+      )
     }
 
-    if (isSelectedSpaceValid()) {
-      return documentSpaceService.documentSpaces;
-    }
-
-    return [
-      { name: selectedSpaceDefaultValue },
-      ...documentSpaceService.documentSpaces,
-    ];
+    return documentSpaceService.documentSpaces.map((item) =>
+      <option key={item.id} value={item.id}>
+        {item.name}
+      </option>
+    );
   }
 
-  function submitDocumentSpace(space: DocumentSpaceInfoDto) {
+  function submitDocumentSpace(space: DocumentSpaceRequestDto) {
     pageState.merge({ isSubmitting: true });
     documentSpaceService
       .createDocumentSpace(space)
       .then((s) => {
-        pageState.merge({
+        mergePageState({
           drawerOpen: false,
           isSubmitting: false,
           showErrorMessage: false,
-          selectedSpace: s.name,
+          selectedSpace: s,
           shouldUpdateDatasource: true,
-          datasource: documentSpaceService.createDatasource(s.name, infiniteScrollOptions)
+          datasource: documentSpaceService.createDatasource(s.id, infiniteScrollOptions)
         });
       })
       .catch((message) =>
-        pageState.merge({
+        mergePageState({
           isSubmitting: false,
           errorMessage: message,
           showErrorMessage: true,
@@ -175,14 +229,29 @@ function DocumentSpacePage() {
   }
 
   async function deleteFile(): Promise<void> {
+    const selectedSpace = pageState.selectedSpace.value;
+
+    if (selectedSpace == null) {
+      return;
+    }
+
     await documentSpaceService.deleteFile(
-      pageState.selectedSpace.get(),
+      selectedSpace.id,
       pageState.fileToDelete.get()
     );
     pageState.merge({
       shouldUpdateDatasource: true,
     });
     closeDeleteDialog();
+  }
+
+  function onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
+    const selectedFiles = pageState.selectedFiles;
+    if (selectionEvent === 'selected') {
+      selectedFiles[selectedFiles.length].set(data);
+    } else {
+      selectedFiles.find(document => document.key.value === data.key)?.set(none);
+    }
   }
 
   const isDocumentSpacesLoading =
@@ -213,17 +282,11 @@ function DocumentSpacePage() {
             <Select
               id="document-space"
               name="document-space"
-              value={pageState.selectedSpace.get()}
+              value={pageState.selectedSpace.value?.id}
               disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
               onChange={onDocumentSpaceSelectionChange}
             >
-              {getSpaceValues().map((item) => {
-                return (
-                  <option key={item.name} value={item.name}>
-                    {item.name}
-                  </option>
-                );
-              })}
+              {getSpaceOptions()}
             </Select>
             <Button
               data-testid="add-doc-space__btn"
@@ -234,19 +297,37 @@ function DocumentSpacePage() {
               Add New Space
             </Button>
           </div>
-          {pageState.selectedSpace.get() &&
-            pageState.selectedSpace.get() !== selectedSpaceDefaultValue ? (
-            <DocumentUploadDialog
-              space={pageState.selectedSpace.get()}
-              onFinish={() => pageState.shouldUpdateDatasource.set(true)}
-            />
-          ) : (
-            <div></div>
-          )}
+          {pageState.selectedSpace.value != null &&
+            <div>
+              <a href={pageState.selectedFiles.value.length > 0 ? documentSpaceService.createRelativeFilesDownloadUrl(pageState.selectedSpace.value.id, pageState.selectedFiles.value) : undefined}>
+                <Button
+                  data-testid="download-selected-files__btn"
+                  type="button"
+                  disabled={pageState.selectedFiles.value.length === 0}
+                >
+                  Download Selected Files (zip)
+                </Button>
+              </a>
+
+              <a href={documentSpaceService.createRelativeDownloadAllFilesUrl(pageState.selectedSpace.value.id)}>
+                <Button
+                  data-testid="download-all-files__btn"
+                  type="button"
+                >
+                  Download All Files (zip)
+                </Button>
+              </a>
+
+              <DocumentUploadDialog
+                documentSpaceId={pageState.selectedSpace.value.id}
+                onFinish={() => pageState.shouldUpdateDatasource.set(true)}
+              />
+            </div>
+          }
         </div>
       </FormGroup>
 
-      {isSelectedSpaceValid() && pageState.datasource.value && (
+      {pageState.selectedSpace.value != null && pageState.datasource.value && (
         <InfiniteScrollGrid
           columns={documentDtoColumnsWithDelete}
           datasource={pageState.datasource.value}
@@ -258,6 +339,9 @@ function DocumentSpacePage() {
           suppressCellSelection
           updateDatasource={pageState.shouldUpdateDatasource.value}
           updateDatasourceCallback={onDatasourceUpdateCallback}
+          getRowNodeId={getDocumentUniqueKey}
+          onRowSelected={onDocumentRowSelected}
+          rowSelection="multiple"
         />
       )}
 
