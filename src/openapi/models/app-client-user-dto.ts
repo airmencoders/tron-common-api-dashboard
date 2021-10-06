@@ -13,6 +13,7 @@
  */
 
 
+import { DocumentSpacePrivilegeDto } from './document-space-privilege-dto';
 import { PrivilegeDto } from './privilege-dto';
 
 /**
@@ -33,6 +34,12 @@ export interface AppClientUserDto {
      * @memberof AppClientUserDto
      */
     privileges?: Array<PrivilegeDto>;
+    /**
+     * 
+     * @type {Array<DocumentSpacePrivilegeDto>}
+     * @memberof AppClientUserDto
+     */
+    documentSpacePrivileges?: Array<DocumentSpacePrivilegeDto>;
     /**
      * 
      * @type {Array<string>}

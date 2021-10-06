@@ -392,6 +392,12 @@
         "clusterUrl": {
           "type": "string"
         },
+        "documentSpacePrivileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
+        },
         "id": {
           "type": "string"
         },
@@ -418,6 +424,12 @@
         },
         "clusterUrl": {
           "type": "string"
+        },
+        "documentSpacePrivileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
         },
         "id": {
           "type": "string"
@@ -876,6 +888,56 @@
         "uploadedBy"
       ],
       "type": "object"
+    },
+    "DocumentSpaceDashboardMemberDto": {
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceDashboardMemberDtoPrivilegesEnum"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "DocumentSpaceDashboardMemberDtoPrivilegesEnum": {
+      "enum": [
+        "READ",
+        "WRITE",
+        "MEMBERSHIP"
+      ],
+      "type": "string"
+    },
+    "DocumentSpacePrivilegeDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDtoTypeEnum"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "DocumentSpacePrivilegeDtoTypeEnum": {
+      "enum": [
+        "READ",
+        "WRITE",
+        "MEMBERSHIP"
+      ],
+      "type": "string"
     },
     "DocumentSpaceRequestDto": {
       "additionalProperties": false,

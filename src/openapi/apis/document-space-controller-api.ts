@@ -19,6 +19,8 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { DocumentSpaceDashboardMemberDto } from '../models';
+// @ts-ignore
 import { DocumentSpaceRequestDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceResponseDto } from '../models';
@@ -36,7 +38,7 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
     return {
         /**
          * Deletes file from a space
-         * @summary Deletes from a Document Space
+         * @summary Deletes a file from a Document Space
          * @param {string} id 
          * @param {string} file 
          * @param {*} [options] Override http request option.
@@ -80,6 +82,63 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Adds a user to a Document Space with specified privileges
+         * @summary Adds a user to a Document Space
+         * @param {string} id 
+         * @param {DocumentSpaceDashboardMemberDto} documentSpaceDashboardMemberDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addUserToDocumentSpace: async (id: string, documentSpaceDashboardMemberDto: DocumentSpaceDashboardMemberDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addUserToDocumentSpace.');
+            }
+            // verify required parameter 'documentSpaceDashboardMemberDto' is not null or undefined
+            if (documentSpaceDashboardMemberDto === null || documentSpaceDashboardMemberDto === undefined) {
+                throw new RequiredError('documentSpaceDashboardMemberDto','Required parameter documentSpaceDashboardMemberDto was null or undefined when calling addUserToDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/users`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof documentSpaceDashboardMemberDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(documentSpaceDashboardMemberDto !== undefined ? documentSpaceDashboardMemberDto : {})
+                : (documentSpaceDashboardMemberDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -480,7 +539,7 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
     return {
         /**
          * Deletes file from a space
-         * @summary Deletes from a Document Space
+         * @summary Deletes a file from a Document Space
          * @param {string} id 
          * @param {string} file 
          * @param {*} [options] Override http request option.
@@ -488,6 +547,21 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          */
         async _delete(id: string, file: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
             const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration)._delete(id, file, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * Adds a user to a Document Space with specified privileges
+         * @summary Adds a user to a Document Space
+         * @param {string} id 
+         * @param {DocumentSpaceDashboardMemberDto} documentSpaceDashboardMemberDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addUserToDocumentSpace(id: string, documentSpaceDashboardMemberDto: DocumentSpaceDashboardMemberDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).addUserToDocumentSpace(id, documentSpaceDashboardMemberDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -620,7 +694,7 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
     return {
         /**
          * Deletes file from a space
-         * @summary Deletes from a Document Space
+         * @summary Deletes a file from a Document Space
          * @param {string} id 
          * @param {string} file 
          * @param {*} [options] Override http request option.
@@ -628,6 +702,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          */
         _delete(id: string, file: string, options?: any): AxiosPromise<object> {
             return DocumentSpaceControllerApiFp(configuration)._delete(id, file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Adds a user to a Document Space with specified privileges
+         * @summary Adds a user to a Document Space
+         * @param {string} id 
+         * @param {DocumentSpaceDashboardMemberDto} documentSpaceDashboardMemberDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addUserToDocumentSpace(id: string, documentSpaceDashboardMemberDto: DocumentSpaceDashboardMemberDto, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).addUserToDocumentSpace(id, documentSpaceDashboardMemberDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Creates a Document Space
@@ -724,7 +809,7 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
 export interface DocumentSpaceControllerApiInterface {
     /**
      * Deletes file from a space
-     * @summary Deletes from a Document Space
+     * @summary Deletes a file from a Document Space
      * @param {string} id 
      * @param {string} file 
      * @param {*} [options] Override http request option.
@@ -732,6 +817,17 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     _delete(id: string, file: string, options?: any): AxiosPromise<object>;
+
+    /**
+     * Adds a user to a Document Space with specified privileges
+     * @summary Adds a user to a Document Space
+     * @param {string} id 
+     * @param {DocumentSpaceDashboardMemberDto} documentSpaceDashboardMemberDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    addUserToDocumentSpace(id: string, documentSpaceDashboardMemberDto: DocumentSpaceDashboardMemberDto, options?: any): AxiosPromise<object>;
 
     /**
      * Creates a Document Space
@@ -828,7 +924,7 @@ export interface DocumentSpaceControllerApiInterface {
 export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpaceControllerApiInterface {
     /**
      * Deletes file from a space
-     * @summary Deletes from a Document Space
+     * @summary Deletes a file from a Document Space
      * @param {string} id 
      * @param {string} file 
      * @param {*} [options] Override http request option.
@@ -837,6 +933,19 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public _delete(id: string, file: string, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration)._delete(id, file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Adds a user to a Document Space with specified privileges
+     * @summary Adds a user to a Document Space
+     * @param {string} id 
+     * @param {DocumentSpaceDashboardMemberDto} documentSpaceDashboardMemberDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public addUserToDocumentSpace(id: string, documentSpaceDashboardMemberDto: DocumentSpaceDashboardMemberDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).addUserToDocumentSpace(id, documentSpaceDashboardMemberDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
