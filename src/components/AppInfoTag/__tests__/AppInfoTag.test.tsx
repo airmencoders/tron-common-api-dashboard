@@ -32,7 +32,6 @@ describe('App Info Tag Tests', () => {
     const page = render(<AppInfoTag />);
 
     await waitFor(() => expect(page.getByTestId('tag')).toBeVisible());
-    await waitFor(() => expect(page.getByText('IL2')).toBeVisible());
-    await waitFor(() => expect(page.getByText('STAGING')).toBeVisible());
+    await waitFor(() => expect(page.getByText('IL2 STAGING')).toBeVisible());
   });
 });
