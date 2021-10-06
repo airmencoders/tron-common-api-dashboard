@@ -3,7 +3,7 @@
 import {apiHost, appClientApiHost, appClientDashboardApiHost, personApiBase, userInfoApiBase, adminJwt, ssoXfcc, nonAdminJwt } from "../support";
 import UtilityFunctions from '../support/utility-functions';
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import { cleanup } from "../support/cleanup-helper";
+import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 
 describe('Person can update self from dashboard', () => {
   const userBaseUrl = appClientApiHost;
@@ -37,7 +37,7 @@ describe('Person can update self from dashboard', () => {
           method: 'POST',
           url: `${adminBaseUrl}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {
+          body: {firstName: UtilityFunctions.generateRandomString(),
             email: updatePersonEmail
           },
           failOnStatusCode: false

@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 
 import {apiHost, orgApiBase, personApiBase, adminJwt, ssoXfcc } from "../support";
-import { cleanup } from "../support/cleanup-helper";
+import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Put API', () => {
@@ -12,7 +12,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {}
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`}
         })
         .then((response) => {
           return cy.request({
@@ -45,7 +45,8 @@ describe('Person Put API', () => {
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
-            firstName: 'FirstName'
+            firstName: 'FirstName',
+            email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           }
         })
         .then((response) => {
@@ -92,7 +93,8 @@ describe('Person Put API', () => {
             url: `${apiHost}${personApiBase}`,
             headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
-              id: uuid
+              id: uuid,
+              firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
             },
             failOnStatusCode: false
           })
@@ -131,6 +133,7 @@ describe('Person Put API', () => {
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
+            firstName: UtilityFunctions.generateRandomString(),
             email: `${UtilityFunctions.generateRandomString()}@email.com`
           }
         })
@@ -192,7 +195,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {},
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`},
           failOnStatusCode: false
         })
         .then((response) => {
@@ -227,7 +230,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {},
+          body: { firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com` },
           failOnStatusCode: false
         })
         .then((response) => {
@@ -238,7 +241,9 @@ describe('Person Put API', () => {
             body: {
               id: response.body.id,
               branch: 'USAF',
-              rank: 'INVALID'
+              rank: 'INVALID',
+              firstName: UtilityFunctions.generateRandomString(), 
+              email: `${UtilityFunctions.generateRandomString()}@testemail.com`
             },
             failOnStatusCode: false
           })
@@ -260,7 +265,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {},
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`},
           failOnStatusCode: false
         })
         .then((response) => {
@@ -297,7 +302,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           },
           failOnStatusCode: false
         })
@@ -326,7 +331,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           },
           failOnStatusCode: false
         })
@@ -354,7 +359,7 @@ describe('Person Put API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           },
           failOnStatusCode: false
         })

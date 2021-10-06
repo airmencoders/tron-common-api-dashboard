@@ -33,12 +33,11 @@ describe('Person API List', function () {
         .then((resp) => {
 
           // ensure asc works
-          expect(resp.body.data
-            .filter(item => item.firstName === firstFirstName
-            || item.firstName === lastFirstName)[0].firstName).to.equal(firstFirstName);
-          expect(resp.body.data
-            .filter(item => item.firstName === firstFirstName
-            || item.firstName === lastFirstName)[1].firstName).to.equal(lastFirstName);
+          const firstNames = resp.body.data
+            .filter(item => item.firstName && (item.firstName === firstFirstName || item.firstName === lastFirstName))
+            .map(item => item.firstName);
+
+          expect(firstNames.indexOf(firstFirstName) < firstNames.indexOf(lastFirstName)).to.be.true;
         })
         .then(() => {
           return cy
@@ -56,12 +55,11 @@ describe('Person API List', function () {
         })
         .then((resp) => {
           // ensure desc works
-          expect(resp.body.data
-            .filter(item => item.firstName === firstFirstName
-            || item.firstName === lastFirstName)[1].firstName).to.equal(firstFirstName);
-          expect(resp.body.data
-            .filter(item => item.firstName === firstFirstName
-            || item.firstName === lastFirstName)[0].firstName).to.equal(lastFirstName);
+          const firstNames = resp.body.data
+          .filter(item => item.firstName && (item.firstName === firstFirstName || item.firstName === lastFirstName))
+          .map(item => item.firstName);
+
+        expect(firstNames.indexOf(lastFirstName) < firstNames.indexOf(firstFirstName)).to.be.true;
         })
         .then(() => {
           return cy
@@ -79,7 +77,7 @@ describe('Person API List', function () {
               })
         })
         .then((resp) => {
-          if (resp.body.data[0]) {
+          if (resp.body.data[0] && resp.body.data[0].firstName) {
             expect(resp.body.data[0].firstName).not.to.oneOf([firstFirstName, '']);
           } else{
             expect(resp.body.data[0]).to.be.undefined;

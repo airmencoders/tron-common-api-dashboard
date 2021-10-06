@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 
 import {apiHost, personApiBase, adminJwt, ssoXfcc } from "../support";
-import { cleanup } from "../support/cleanup-helper";
+import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Create API', () => {
@@ -12,7 +12,7 @@ describe('Person Create API', () => {
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-          body: {}
+          body: { firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com` }
         })
         .then((response) => {
           cy.request({
@@ -47,7 +47,9 @@ describe('Person Create API', () => {
           headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             branch: 'USAF',
-            rank: 'INVALID'
+            rank: 'INVALID',
+            firstName: UtilityFunctions.generateRandomString(),
+            email: `${UtilityFunctions.generateRandomString()}@test12.com`,
           },
           failOnStatusCode: false
         })

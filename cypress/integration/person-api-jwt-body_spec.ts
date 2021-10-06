@@ -1,7 +1,7 @@
 ///<reference types="Cypress" />
 
 import {apiHost, personApiBase, adminJwt, ssoXfcc } from "../support";
-import { cleanup } from "../support/cleanup-helper";
+import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 
 describe('Person API JWT Body', () => {
 

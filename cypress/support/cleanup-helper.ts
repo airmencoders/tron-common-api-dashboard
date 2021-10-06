@@ -50,6 +50,10 @@ export function prepForTest() {
           field: 'email',
           conditions: [
             {
+              operator: 'EQUALS',
+              value: 'cypress.test@test.com'
+            },
+            {
               operator: 'STARTS_WITH',
               value: '0.',
             },
@@ -94,6 +98,10 @@ export function prepForTest() {
             relationType: 'OR',
             field: 'firstName',
             conditions: [
+              {
+                operator: 'STARTS_WITH',
+                value: '0.',
+              },
               {
                 operator: 'EQUALS',
                 value: 'aaaaaaaaaaaaa',

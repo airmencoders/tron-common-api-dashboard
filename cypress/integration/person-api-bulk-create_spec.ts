@@ -4,6 +4,7 @@ import AppClientSetupFunctions from '../support/app-client-setup-functions';
 import {apiHost, personApiBase, adminJwt, ssoXfcc } from "../support";
 import {PersonDto} from '../../src/openapi';
 import { cleanup } from '../support/cleanup-helper';
+import UtilityFunctions from '../support/utility-functions';
 
 describe('Person API Bulk Create', () => {
 
@@ -15,7 +16,8 @@ describe('Person API Bulk Create', () => {
                 method: 'POST',
                 url: `${apiHost}${personApiBase}/persons`,
                 headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-                body: [{}, {}],
+                body: [{ email: `${UtilityFunctions.generateRandomString()}@test11.com`, firstName: UtilityFunctions.generateRandomString()},
+                 {email: `${UtilityFunctions.generateRandomString()}@test11.com`, firstName: UtilityFunctions.generateRandomString()}],
                 failOnStatusCode: false
               })
               .then((resp) => {

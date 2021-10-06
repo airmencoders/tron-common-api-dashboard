@@ -2,7 +2,8 @@
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
 import {apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
-import { cleanup } from '../support/cleanup-helper';
+import { cleanup, personIdsToDelete } from '../support/cleanup-helper';
+import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Delete API', () => {
 
@@ -14,7 +15,7 @@ describe('Person Delete API', () => {
                 method: 'POST',
                 url: `${apiHost}${personApiBase}`,
                 headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
-                body: {}
+                body: { firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com` }
               })
               .then((resp) => {
                 return cy.request({
