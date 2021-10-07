@@ -1,14 +1,23 @@
 /// <reference types="Cypress" />
 
-import {host, orgApiBase} from '../support';
+import {host, orgApiBase, adminJwt, ssoXfcc } from "../support";
+import { cleanup } from "../support/cleanup-helper";
 import DataCrudFormPageUtil, { Person, PersonGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('Person Tests', () => {
   const dataTypeName = 'Person';
 
+  beforeEach(() => {
+    cleanup();
+  });
+
+  after(() => {
+    cleanup();
+  });
+
   it('Should allow Person creation & deletion', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.PERSON);
 
@@ -33,7 +42,7 @@ describe('Person Tests', () => {
   });
 
   it('Should error when trying to add Person with same email', () => {
-    cy.visit(`${host}/person`);
+    UtilityFunctions.visitSite(`${host}/person`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const person: Person = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,
@@ -55,7 +64,7 @@ describe('Person Tests', () => {
   });
 
   it('Should allow edit', () => {
-    cy.visit(`${host}/person`);
+    UtilityFunctions.visitSite(`${host}/person`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const person: Person = {
       email: `${UtilityFunctions.generateRandomString()}@email.com`,

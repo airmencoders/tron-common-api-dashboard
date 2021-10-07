@@ -16,6 +16,8 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import './cleanup-helper';
+import jwt from 'jwt-simple';
+import { prepForTest } from './cleanup-helper';
 
 export const host = Cypress.env('INTEGRATION_TEST_HOST');
 export const apiHost = Cypress.env('ADMIN_API_HOST') ?? 'http://localhost:9000';
@@ -42,5 +44,16 @@ export const appClientHostOrganizationUrl = `${appClientApiHost}${orgApiBase}`;
 
 export const agGridFilterDebounce = 500;
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+const word = 'jwtToken';
+const type = 'HS256';
+
+export const adminJwt = "Bearer " + jwt.encode({
+  "iss": "istio",
+  "email": "czell@revacomm.com"
+}, word, type);
+export const ssoXfcc = "By=spiffe://cluster/ns/istio-system/sa/defaultFAKE_H=12345Subject=\"\";URI=spiffe://cluster.local/ns/istio-system/sa/default";
+export const nonAdminJwt = "Bearer " + jwt.encode({
+  "iss": "istio",
+  "email": "jj@gmail.com"
+}, word, type);
+export const appClientTesterXfcc = "By=spiffe://cluster/ns/app-client-tester/sa/defaultFAKE_H=12345Subject=\"\";URI=spiffe://cluster.local/ns/app-client-tester/sa/default"; 

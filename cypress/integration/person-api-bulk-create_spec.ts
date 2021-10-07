@@ -1,8 +1,10 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import {apiHost, personApiBase} from '../support';
+import {apiHost, personApiBase, adminJwt, ssoXfcc } from "../support";
 import {PersonDto} from '../../src/openapi';
+import { cleanup } from '../support/cleanup-helper';
+import UtilityFunctions from '../support/utility-functions';
 
 describe('Person API Bulk Create', () => {
 
@@ -13,7 +15,9 @@ describe('Person API Bulk Create', () => {
               .request({
                 method: 'POST',
                 url: `${apiHost}${personApiBase}/persons`,
-                body: [{}, {}],
+                headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+                body: [{ email: `${UtilityFunctions.generateRandomString()}@test11.com`, firstName: UtilityFunctions.generateRandomString()},
+                 {email: `${UtilityFunctions.generateRandomString()}@test11.com`, firstName: UtilityFunctions.generateRandomString()}],
                 failOnStatusCode: false
               })
               .then((resp) => {
@@ -23,6 +27,7 @@ describe('Person API Bulk Create', () => {
                   cy.request({
                     method: 'DELETE',
                     url: `${apiHost}${personApiBase}/${created.id}`,
+                    headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                     failOnStatusCode: false
                   })
                   .then((resp) => {
@@ -40,6 +45,7 @@ describe('Person API Bulk Create', () => {
               .request({
                 method: 'POST',
                 url: `${apiHost}${personApiBase}/persons`,
+                headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 body: [{ 'firstName': 'createdWithBulk'}, {'badField': 'bad'} ],
                 failOnStatusCode: false
               })
@@ -56,6 +62,7 @@ describe('Person API Bulk Create', () => {
               .request({
                 method: 'POST',
                 url: `${apiHost}${personApiBase}/persons`,
+                headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                 body: [{ 'badField': 'bad'}, {'badField': 'bad'} ],
                 failOnStatusCode: false
               })
@@ -67,6 +74,7 @@ describe('Person API Bulk Create', () => {
                     cy.request({
                       method: 'DELETE',
                       url: `${apiHost}${personApiBase}/${created.id}`,
+                      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
                       failOnStatusCode: false
                     })
                         .then((resp) => {

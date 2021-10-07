@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { adminJwt, organizationUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../support/cleanup-helper';
@@ -27,6 +27,7 @@ describe('Organization API Metadata', () => {
     // Create org with metadata
     cy.request({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: orgToCreate
     }).then(response => {
@@ -37,6 +38,7 @@ describe('Organization API Metadata', () => {
     // ensure metadata actually exists
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -46,6 +48,7 @@ describe('Organization API Metadata', () => {
     // Try to remove PAS metadata
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PUT',
       body: {
         ...orgToCreate,
@@ -59,6 +62,7 @@ describe('Organization API Metadata', () => {
     // ensure metadata actually deleted
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -68,6 +72,7 @@ describe('Organization API Metadata', () => {
     // Try to update to add PAS metadata
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PUT',
       body: {
         ...orgToCreate,
@@ -81,6 +86,7 @@ describe('Organization API Metadata', () => {
     // ensure metadata actually updated
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -90,6 +96,7 @@ describe('Organization API Metadata', () => {
     // Try to update an existing PAS metadata value
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PUT',
       body: {
         ...orgToCreate,
@@ -103,6 +110,7 @@ describe('Organization API Metadata', () => {
     // ensure metadata actually updated
     cy.request({
       url: `${organizationUrl}/${orgToCreate.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);

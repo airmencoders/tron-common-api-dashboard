@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl } from '../../support';
+import { adminJwt, organizationUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { FilterConditionOperatorEnum, FilterCriteriaRelationTypeEnum, FilterDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, OrganizationDtoPaginationResponseWrapper } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -27,6 +27,7 @@ describe('Organization API List', () => {
 
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -45,6 +46,7 @@ describe('Organization API List', () => {
 
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         type: OrganizationDtoOrgTypeEnum.Division
@@ -68,6 +70,7 @@ describe('Organization API List', () => {
 
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         branch: OrganizationDtoBranchTypeEnum.Uscg
@@ -91,6 +94,7 @@ describe('Organization API List', () => {
 
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         search: orgA.name
@@ -126,6 +130,7 @@ describe('Organization API List', () => {
 
     cy.request({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         search: orgA.name,
@@ -163,6 +168,7 @@ describe('Organization API List', () => {
       .then(response => {
         cy.request({
           url: `${organizationUrl}/${response.body.id}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           method: 'PUT',
           body: {
             ...response.body,
@@ -179,6 +185,7 @@ describe('Organization API List', () => {
 
     cy.request({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         search: orgToSearch.name,
@@ -217,6 +224,7 @@ describe('Organization API List', () => {
 
     cy.request<OrganizationDtoPaginationResponseWrapper>({
       url: `${organizationUrl}/filter`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       failOnStatusCode: false,
       qs: {

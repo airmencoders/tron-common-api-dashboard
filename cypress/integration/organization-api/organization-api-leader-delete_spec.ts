@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl, personUrl } from '../../support';
+import { adminJwt, organizationUrl, personUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -31,6 +31,7 @@ describe('Organization API Leader DELETE', () => {
       .then(response => {
         cy.request<OrganizationDto>({
           url: `${organizationUrl}/${response.body.id}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           method: 'PUT',
           body: {
             ...response.body,
@@ -45,6 +46,7 @@ describe('Organization API Leader DELETE', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/leader`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -54,6 +56,7 @@ describe('Organization API Leader DELETE', () => {
     // Ensure leader has truly been deleted
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -63,6 +66,7 @@ describe('Organization API Leader DELETE', () => {
     // Ensure person no longer has organization leaderships
     cy.request({
       url: `${personUrl}/${personA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         leaderships: true
@@ -76,6 +80,7 @@ describe('Organization API Leader DELETE', () => {
   it('should fail delete leader with org id that does not exist', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/leader`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {
@@ -86,6 +91,7 @@ describe('Organization API Leader DELETE', () => {
   it('should fail delete leader with bad format UUID org id', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/badUUID/leader`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'DELETE',
       failOnStatusCode: false
     }).then(response => {

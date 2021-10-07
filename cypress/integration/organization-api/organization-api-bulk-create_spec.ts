@@ -4,7 +4,7 @@ import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto, OrganizationDtoResponseWrapper } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../support/cleanup-helper';
-import { organizationUrl } from '../../support';
+import { adminJwt, organizationUrl, ssoXfcc } from '../../support';
 
 describe('Organization API Bulk Creation', () => {
   beforeEach(() => {
@@ -23,6 +23,7 @@ describe('Organization API Bulk Creation', () => {
 
     cy.request<OrganizationDtoResponseWrapper>({
       url: `${organizationUrl}/organizations`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: orgsToCreate
     }).then(response => {
@@ -45,6 +46,7 @@ describe('Organization API Bulk Creation', () => {
      */
     cy.request<OrganizationDtoResponseWrapper>({
       url: `${organizationUrl}/organizations`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: orgsToCreate,
       failOnStatusCode: false
@@ -69,6 +71,7 @@ describe('Organization API Bulk Creation', () => {
 
     cy.request<OrganizationDtoResponseWrapper>({
       url: `${organizationUrl}/organizations`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: orgsToCreate,
       failOnStatusCode: false

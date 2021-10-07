@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import { apiBase, host, scratchAppApiBase } from '../support';
+import { apiBase, host, scratchAppApiBase , adminJwt, ssoXfcc } from "../support";
 import DataCrudFormPageUtil, { DigitizeAppsGridColId, ScratchStorageApp, ScratchStorageGridColId, ScratchStorageUser } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
@@ -75,7 +75,7 @@ function createFormRequestsToInterceptOnRowClick(): string[] {
 
 describe('Scratch Storage Tests', () => {
   it('Should allow Scratch Storage creation & deletion', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.SCRATCH_STORAGE);
 
@@ -97,7 +97,7 @@ describe('Scratch Storage Tests', () => {
       path: `${apiBase}/userinfo`
     }).as('getUserInfo');
 
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const scratchApp: ScratchStorageApp = {
       name: UtilityFunctions.generateRandomString(),
@@ -165,7 +165,7 @@ describe('Scratch Storage Tests', () => {
     UtilityFunctions.clickOnPageNav(Page.MY_DIGITIZE_APPS);
     filterColumnWithSearchValueNoRequest(DigitizeAppsGridColId.APP_NAME, scratchApp.name);
     DataCrudFormPageUtil.getRowWithColIdContainingValue(DigitizeAppsGridColId.APP_NAME, scratchApp.name);
-
+    
     // Delete it
     UtilityFunctions.clickOnPageNav(Page.SCRATCH_STORAGE);
     deleteRowWithColIdContainingValue(ScratchStorageGridColId.APP_NAME, scratchApp.name);

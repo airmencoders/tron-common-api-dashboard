@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import {appClientApiHost, personApiBase} from '../support';
+import {appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
 import PersonSetupFunctions from '../support/person-setup-functions';
+import { cleanup } from '../support/cleanup-helper';
 
 interface FieldTest {
   fieldName: string,
@@ -165,6 +166,7 @@ describe("Person API Filter", () => {
               .request({
                 method: 'POST',
                 url: `${appClientApiHost}${personApiBase}/filter`,
+                headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
                 qs: {
                   size: fieldTest.size ?? 20, // default
                   sort: fieldTest.sort ? `${fieldTest.fieldName},${fieldTest.sort}` : undefined,

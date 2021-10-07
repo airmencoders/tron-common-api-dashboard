@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { appClientHostOrganizationUrl, organizationUrl, personUrl } from '../../support';
+import { adminJwt, appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt, organizationUrl, personUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -39,6 +39,7 @@ describe('Organization API Member PATCH', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: [personA.id, personB.id]
     }).then(response => {
@@ -49,6 +50,7 @@ describe('Organization API Member PATCH', () => {
     // Ensure orgA does have personA and personB
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -58,6 +60,7 @@ describe('Organization API Member PATCH', () => {
     // Ensure personA has membership to orgA
     cy.request({
       url: `${personUrl}/${personA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         memberships: true
@@ -70,6 +73,7 @@ describe('Organization API Member PATCH', () => {
     // Ensure personB has membership to orgA
     cy.request({
       url: `${personUrl}/${personB.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         memberships: true
@@ -103,6 +107,7 @@ describe('Organization API Member PATCH', () => {
     // This should return 403, no permission
     cy.request({
       url: `${appClientHostOrganizationUrl}/${orgA.id}/members`,
+      headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
       method: 'PATCH',
       body: [personA.id],
       qs: {
@@ -116,6 +121,7 @@ describe('Organization API Member PATCH', () => {
     // orgA should not have personA
     cy.request({
       url: `${organizationUrl}/${orgA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -125,6 +131,7 @@ describe('Organization API Member PATCH', () => {
     // personA should not have primaryOrganizationId set
     cy.request({
       url: `${personUrl}/${personA.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -135,6 +142,7 @@ describe('Organization API Member PATCH', () => {
   it('should fail PATCH members with no body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       failOnStatusCode: false
     }).then(response => {
@@ -145,6 +153,7 @@ describe('Organization API Member PATCH', () => {
   it('should fail PATCH members with bad id path parameter', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/badUUID/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       failOnStatusCode: false
     }).then(response => {
@@ -162,6 +171,7 @@ describe('Organization API Member PATCH', () => {
 
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${orgA.id}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: [UtilityFunctions.uuidv4()],
       failOnStatusCode: false
@@ -173,6 +183,7 @@ describe('Organization API Member PATCH', () => {
   it('should fail PATCH members with empty json body', () => {
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${UtilityFunctions.uuidv4()}/members`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PATCH',
       body: {
 

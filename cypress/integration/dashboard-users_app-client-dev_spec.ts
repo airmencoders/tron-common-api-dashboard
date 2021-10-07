@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import {apiBase, host} from '../support';
+import {apiBase, host, adminJwt, ssoXfcc } from "../support";
 import UtilityFunctions, {Page} from '../support/utility-functions';
 import DataCrudFormPageUtil, {
   AppClient,
@@ -11,7 +11,7 @@ import DataCrudFormPageUtil, {
 describe('Dashboard Users - App Client Dev Tests', () => {
 
   it('Should create a Dashboard User for App Client Dev add', () => {
-    cy.visit(`${host}/app-clients`);
+    UtilityFunctions.visitSite(`${host}/app-clients`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const appClient: AppClient = {
       name: UtilityFunctions.generateRandomString()

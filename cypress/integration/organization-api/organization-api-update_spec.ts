@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl, personUrl } from '../../support';
+import { adminJwt, organizationUrl, personUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum, PersonDto } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -45,7 +45,8 @@ describe('Organization API Update', () => {
       url: `${organizationUrl}/${createdPatchOrg.id}`,
       method: 'PATCH',
       headers: {
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
       },
       body: [
         { op: 'replace', path: '/leader', value: createdPatchOrgNew.leader },
@@ -66,6 +67,7 @@ describe('Organization API Update', () => {
     // Ensure Parent org has subordinate
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdPatchOrgNew.parentOrganization}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -75,6 +77,7 @@ describe('Organization API Update', () => {
     // Ensure Leader has organization leaderships
     cy.request({
       url: `${personUrl}/${createdPatchOrgNew.leader}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         leaderships: true
@@ -97,7 +100,8 @@ describe('Organization API Update', () => {
       url: `${organizationUrl}/${createdPatchOrg.id}`,
       method: 'PATCH',
       headers: {
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
       },
       body: [
         { op: 'replace', path: '/leader', value: createdPatchOrgUndo.leader },
@@ -118,6 +122,7 @@ describe('Organization API Update', () => {
     // Ensure the patch actually went through
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdPatchOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -135,6 +140,7 @@ describe('Organization API Update', () => {
     orgIdsToDelete.add(createdPatchOrgId);
     cy.request({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: {
         ...OrgSetupFunctions.generateBaseOrg(),
@@ -149,7 +155,8 @@ describe('Organization API Update', () => {
       url: `${organizationUrl}/${createdPatchOrgId}`,
       method: 'PATCH',
       headers: {
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
       },
       body: [
         { op: 'replace', path: '/name', value: UtilityFunctions.randomStringOfLength(256) },
@@ -166,6 +173,7 @@ describe('Organization API Update', () => {
     orgIdsToDelete.add(createdPatchOrgId);
     cy.request({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: {
         ...OrgSetupFunctions.generateBaseOrg(),
@@ -180,7 +188,8 @@ describe('Organization API Update', () => {
         url: `${organizationUrl}/${createdPatchOrgId}`,
         method: 'PATCH',
         headers: {
-          "Content-Type": "application/json-patch+json"
+          "Content-Type": "application/json-patch+json",
+          "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
         },
         body: [
           { op: 'replace', path: `/${field}`, value: 'bad param' },
@@ -198,6 +207,7 @@ describe('Organization API Update', () => {
     orgIdsToDelete.add(createdPatchOrgId);
     cy.request({
       url: `${organizationUrl}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'POST',
       body: {
         ...OrgSetupFunctions.generateBaseOrg(),
@@ -211,7 +221,8 @@ describe('Organization API Update', () => {
       url: `${organizationUrl}/${createdPatchOrgId}`,
       method: 'PATCH',
       headers: {
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
       },
       body: [
         { op: 'replace', path: '/badFieldPath', value: 'bad param' },
@@ -233,7 +244,8 @@ describe('Organization API Update', () => {
       url: `${organizationUrl}/${createdOrg.id}`,
       method: 'PATCH',
       headers: {
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
       },
       body: [
         { op: 'add', path: '/subordinateOrganizations/-', value: UtilityFunctions.uuidv4() }
@@ -249,7 +261,8 @@ describe('Organization API Update', () => {
       url: `${organizationUrl}/${createdOrg.id}`,
       method: 'PATCH',
       headers: {
-        "Content-Type": "application/json-patch+json"
+        "Content-Type": "application/json-patch+json",
+        "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
       },
       body: [
         { op: 'add', path: '/members/-', value: UtilityFunctions.uuidv4() }

@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import {apiHost, appClientApiBase, privilegeApiBase} from '../support';
+import {adminJwt, apiHost, appClientApiBase, privilegeApiBase, ssoXfcc} from '../support';
 
 import UtilityFunctions from './utility-functions';
 import Chainable = Cypress.Chainable;
@@ -19,6 +19,7 @@ export default class AppClientSetupFunctions {
         .request({
           method: 'GET',
           url: `${apiHost}${appClientApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         })
         .then(resp => {
           const existingAppClient = resp.body?.data?.filter((appClient: AppClientUserDto) =>
@@ -26,7 +27,8 @@ export default class AppClientSetupFunctions {
           if (existingAppClient != null) {
             return cy.request({
               method: 'DELETE',
-              url: `${apiHost}${appClientApiBase}/${existingAppClient.id}`
+              url: `${apiHost}${appClientApiBase}/${existingAppClient.id}`,
+              headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             });
           }
           return;
@@ -34,6 +36,7 @@ export default class AppClientSetupFunctions {
         .request({
           method: 'GET',
           url: `${apiHost}${privilegeApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
         })
         .then((resp) => {
           return UtilityFunctions.findPrivilegeFromResponse(privileges, resp.body);
@@ -42,6 +45,7 @@ export default class AppClientSetupFunctions {
           return cy.request({
             method: 'POST',
             url: `${apiHost}${appClientApiBase}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               "privileges": privDtos,
               "appClientDeveloperEmails": [
@@ -63,6 +67,7 @@ export default class AppClientSetupFunctions {
         .request({
           method: 'DELETE',
           url: `${apiHost}${appClientApiBase}/${appClientId}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           failOnStatusCode: false
         });
   }

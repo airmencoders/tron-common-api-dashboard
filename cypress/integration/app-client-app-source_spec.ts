@@ -1,12 +1,12 @@
 /// <reference types="Cypress" />
 
-import { apiBase, host } from '../support';
+import { apiBase, host , adminJwt, ssoXfcc } from "../support";
 import DataCrudFormPageUtil, { AppClient, AppClientGridColId, AppSourceEmailGridColId, AppSourceEndpointGridColId, AppSourceGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('App Source / App Client Tests', () => {
   it('Should allow App Client creation & deletion', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "Authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
 
@@ -21,7 +21,7 @@ describe('App Source / App Client Tests', () => {
   });
 
   it('Should be able to add Developer to App Client', () => {
-    cy.visit(`${host}/app-clients`);
+    UtilityFunctions.visitSite(`${host}/app-clients`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const appClient: AppClient = {
       name: UtilityFunctions.generateRandomString()
@@ -60,7 +60,7 @@ describe('App Source / App Client Tests', () => {
   });
 
   it('Should give App Client entity permissions', () => {
-    cy.visit(`${host}/app-clients`);
+    UtilityFunctions.visitSite(`${host}/app-clients`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const appClient: AppClient = {
       name: UtilityFunctions.generateRandomString()
@@ -102,7 +102,7 @@ describe('App Source / App Client Tests', () => {
   });
 
   it('Should allow App Source endpoint permission to be given/revoked to/from App Client', () => {
-    cy.visit(`${host}/app-clients`);
+    UtilityFunctions.visitSite(`${host}/app-clients`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const appClient: AppClient = {
       name: UtilityFunctions.generateRandomString()
@@ -185,7 +185,7 @@ describe('App Source / App Client Tests', () => {
     const adminEmail = `${UtilityFunctions.generateRandomString()}@email.com`;
 
     beforeEach(() => {
-      cy.visit(`${host}`);
+      UtilityFunctions.visitSite(`${host}`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
       UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
       const appSourceName = 'puckboard';
@@ -226,7 +226,7 @@ describe('App Source / App Client Tests', () => {
   });
 
   it('Should be able to toggle Rate Limiting and change requests/minutes', () => {
-    cy.visit(`${host}`);
+    UtilityFunctions.visitSite(`${host}`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
     const appSourceName = 'puckboard';

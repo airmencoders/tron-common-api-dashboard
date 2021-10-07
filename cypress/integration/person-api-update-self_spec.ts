@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 
-import {apiHost, appClientApiHost, appClientDashboardApiHost, personApiBase, userInfoApiBase} from '../support';
+import {apiHost, appClientApiHost, appClientDashboardApiHost, personApiBase, userInfoApiBase, adminJwt, ssoXfcc, nonAdminJwt } from "../support";
 import UtilityFunctions from '../support/utility-functions';
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
+import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 
 describe('Person can update self from dashboard', () => {
   const userBaseUrl = appClientApiHost;
@@ -15,6 +16,7 @@ describe('Person can update self from dashboard', () => {
         .request({
           method: 'POST',
           url: `${adminBaseUrl}${personApiBase}/find`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
             findType: 'EMAIL',
             value: updatePersonEmail
@@ -25,7 +27,8 @@ describe('Person can update self from dashboard', () => {
           if (resp.status === 200) {
             return cy.request({
               method: 'DELETE',
-              url: `${adminBaseUrl}${personApiBase}/${resp.body.id}`
+              url: `${adminBaseUrl}${personApiBase}/${resp.body.id}`,
+              headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             });
           }
           return;
@@ -33,7 +36,8 @@ describe('Person can update self from dashboard', () => {
         .request({
           method: 'POST',
           url: `${adminBaseUrl}${personApiBase}`,
-          body: {
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(),
             email: updatePersonEmail
           },
           failOnStatusCode: false
@@ -42,13 +46,15 @@ describe('Person can update self from dashboard', () => {
           return cy
               .request({
                 method: 'GET',
-                url: `${appClientDashboardApiHost}${userInfoApiBase}/existing-person`
+                url: `${appClientDashboardApiHost}${userInfoApiBase}/existing-person`,
+                headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": ssoXfcc }
               })
               .then((resp) => {
                 return cy
                     .request({
                       method: 'PUT',
                       url: `${appClientDashboardApiHost}${personApiBase}/self`,
+                      headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": ssoXfcc },
                       body: {
                         ... resp.body,
                         firstName: 'NewFirst'

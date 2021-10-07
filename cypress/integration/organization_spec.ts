@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import { host, orgApiBase } from '../support';
+import { host, orgApiBase , adminJwt, ssoXfcc } from "../support";
 import DataCrudFormPageUtil, { Organization, OrganizationGridColId, PersonGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
@@ -44,11 +44,11 @@ function createOrganizationAndFilterExists(org: Organization) {
   });
 }
 
-describe('Organization Tests', () => {
+describe.skip('Organization Tests', () => {
   const dataTypeName = 'Organization';
 
   it('Should allow Organization creation & deletion', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.ORGANIZATION);
 
@@ -65,7 +65,7 @@ describe('Organization Tests', () => {
   });
 
   it('Should error when trying to add Organization with same name', () => {
-    cy.visit(`${host}/organization`);
+    UtilityFunctions.visitSite(`${host}/organization`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const orgToCreate = {
       name: UtilityFunctions.generateRandomString(),
@@ -85,7 +85,7 @@ describe('Organization Tests', () => {
   });
 
   it('Should allow to edit organization', () => {
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     // Go to person page first and create a person
     UtilityFunctions.clickOnPageNav(Page.PERSON);

@@ -1,6 +1,6 @@
 ///<reference types="Cypress" />
 
-import { organizationUrl, personUrl } from '../../support';
+import { adminJwt, organizationUrl, personUrl, ssoXfcc } from '../../support';
 import UtilityFunctions from '../../support/utility-functions';
 import { OrganizationDto, OrganizationDtoBranchTypeEnum, OrganizationDtoOrgTypeEnum } from '../../../src/openapi';
 import OrgSetupFunctions from '../../support/organization/organization-setup-functions';
@@ -63,6 +63,7 @@ describe('Organization API Replace', () => {
     }
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${baseOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'PUT',
       body: {
         ...baseOrg,
@@ -82,6 +83,7 @@ describe('Organization API Replace', () => {
     // Ensure sub org has parent
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${createdSubOrg.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -91,6 +93,7 @@ describe('Organization API Replace', () => {
     // Ensure Parent org has subordinate
     cy.request<OrganizationDto>({
       url: `${organizationUrl}/${replacedOrg.parentOrganization}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET'
     }).then(response => {
       expect(response.status).to.eq(200);
@@ -100,6 +103,7 @@ describe('Organization API Replace', () => {
     // Ensure Leader has organization leaderships
     cy.request({
       url: `${personUrl}/${replacedOrg.leader}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         leaderships: true
@@ -112,6 +116,7 @@ describe('Organization API Replace', () => {
     // Ensure Member has organization membership
     cy.request({
       url: `${personUrl}/${createdMemberPerson.id}`,
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       method: 'GET',
       qs: {
         memberships: true

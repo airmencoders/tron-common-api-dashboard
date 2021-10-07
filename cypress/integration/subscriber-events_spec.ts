@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-import { host, subscriptionsApiBase } from '../support';
+import { host, subscriptionsApiBase , adminJwt, ssoXfcc } from "../support";
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
 import DataCrudFormPageUtil, { SubscribeEvent, Subscriber, SubscriberGridColId } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
@@ -52,7 +52,7 @@ describe('Subscriber Events Tests', () => {
     // Create an App Client first
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ', 'PERSON_CREATE', 'PERSON_EDIT', 'PERSON_DELETE']);
 
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     // Create subscription
     UtilityFunctions.clickOnPageNav(Page.PUB_SUB);
@@ -74,7 +74,7 @@ describe('Subscriber Events Tests', () => {
     // Create an App Client first
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ', 'PERSON_CREATE', 'PERSON_EDIT', 'PERSON_DELETE']);
 
-    cy.visit(host);
+    UtilityFunctions.visitSite(host, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     UtilityFunctions.clickOnPageNav(Page.PUB_SUB);
 

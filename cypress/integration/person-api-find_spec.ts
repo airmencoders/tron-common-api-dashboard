@@ -1,8 +1,10 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import {apiHost, appClientApiHost, personApiBase} from '../support';
+import {apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
 import PersonSetupFunctions from '../support/person-setup-functions';
+import { cleanup } from '../support/cleanup-helper';
+import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Find API', () => {
 
@@ -10,6 +12,8 @@ describe('Person Find API', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ'])
         .then((resp) => {
           return PersonSetupFunctions.addTestUser({
+            firstName: UtilityFunctions.generateRandomString(),
+            lastName: UtilityFunctions.generateRandomString(),
             email: PersonSetupFunctions.USER_EMAIL
           });
         })
@@ -18,6 +22,7 @@ describe('Person Find API', () => {
               .request({
                 method: 'POST',
                 url: `${appClientApiHost}${personApiBase}/find`,
+                headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
                 body: {
                   findType: 'EMAIL',
                   value: PersonSetupFunctions.USER_EMAIL
@@ -34,6 +39,9 @@ describe('Person Find API', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ'])
         .then((resp) => {
           return PersonSetupFunctions.addTestUser({
+            firstName: UtilityFunctions.generateRandomString(),
+            lastName: UtilityFunctions.generateRandomString(),
+            email: `${UtilityFunctions.generateRandomString()}@testp1.mil`,
             dodid: PersonSetupFunctions.USER_DODID
           });
         })
@@ -42,6 +50,7 @@ describe('Person Find API', () => {
               .request({
                 method: 'POST',
                 url: `${appClientApiHost}${personApiBase}/find`,
+                headers: { "authorization": nonAdminJwt, "x-forwarded-client-cert": appClientTesterXfcc },
                 body: {
                   findType: 'DODID',
                   value: PersonSetupFunctions.USER_DODID

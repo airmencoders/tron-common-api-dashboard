@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 
-import {apiHost, orgApiBase, personApiBase} from '../support';
+import {apiHost, orgApiBase, personApiBase, adminJwt, ssoXfcc } from "../support";
+import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Put API', () => {
@@ -10,14 +11,16 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {}
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`}
         })
         .then((response) => {
           return cy.request({
             method: 'PATCH',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
             headers: {
-              "Content-Type": "application/json-patch+json"
+              "Content-Type": "application/json-patch+json",
+              "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
             },
             body:
             [
@@ -29,7 +32,8 @@ describe('Person Put API', () => {
           expect(response?.body?.firstName).to.equal('First Name');
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         })
   });
@@ -39,8 +43,10 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
-            firstName: 'FirstName'
+            firstName: 'FirstName',
+            email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           }
         })
         .then((response) => {
@@ -48,7 +54,8 @@ describe('Person Put API', () => {
             method: 'PATCH',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
             headers: {
-              "Content-Type": "application/json-patch+json"
+              "Content-Type": "application/json-patch+json",
+              "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
             },
             body:
             [
@@ -60,7 +67,8 @@ describe('Person Put API', () => {
           expect(response?.body?.firstName).to.be.null;
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         });
   });
@@ -83,8 +91,10 @@ describe('Person Put API', () => {
           .request({
             method: 'POST',
             url: `${apiHost}${personApiBase}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
-              id: uuid
+              id: uuid,
+              firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
             },
             failOnStatusCode: false
           })
@@ -93,7 +103,8 @@ describe('Person Put API', () => {
               method: 'PATCH',
               url: `${apiHost}${personApiBase}/${response.body.id}`,
               headers: {
-                "Content-Type": "application/json-patch+json"
+                "Content-Type": "application/json-patch+json",
+                "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
               },
               body: [{
                 op: 'replace', path: `/${field}`, value: newValue
@@ -108,7 +119,8 @@ describe('Person Put API', () => {
           .then((response) => {
             cy.request({
               method: 'DELETE',
-              url: `${apiHost}${personApiBase}/${uuid}`
+              url: `${apiHost}${personApiBase}/${uuid}`,
+              headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             })
           })
     });
@@ -119,7 +131,9 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           body: {
+            firstName: UtilityFunctions.generateRandomString(),
             email: `${UtilityFunctions.generateRandomString()}@email.com`
           }
         })
@@ -127,6 +141,7 @@ describe('Person Put API', () => {
           return cy.request({
             method: 'POST',
             url: `${apiHost}${orgApiBase}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               name: UtilityFunctions.generateRandomString(),
               orgType: 'SQUADRON',
@@ -147,7 +162,8 @@ describe('Person Put API', () => {
             method: 'PATCH',
             url: `${apiHost}${personApiBase}/${entities.person.id}`,
             headers: {
-              "Content-Type": "application/json-patch+json"
+              "Content-Type": "application/json-patch+json",
+              "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc
             },
             body:
                 [
@@ -162,11 +178,13 @@ describe('Person Put API', () => {
         .then((entities) => {
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${orgApiBase}/${entities.org.id}`
+            url: `${apiHost}${orgApiBase}/${entities.org.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
           .request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${entities.person.id}`
+            url: `${apiHost}${personApiBase}/${entities.person.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         });
   });
@@ -176,13 +194,15 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {},
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`},
           failOnStatusCode: false
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               id: response.body.id,
               branch: 'INVALID'
@@ -199,7 +219,8 @@ describe('Person Put API', () => {
           const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${requestBody.id}`
+            url: `${apiHost}${personApiBase}/${requestBody.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         })
   });
@@ -208,17 +229,21 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {},
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: { firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com` },
           failOnStatusCode: false
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               id: response.body.id,
               branch: 'USAF',
-              rank: 'INVALID'
+              rank: 'INVALID',
+              firstName: UtilityFunctions.generateRandomString(), 
+              email: `${UtilityFunctions.generateRandomString()}@testemail.com`
             },
             failOnStatusCode: false
           })
@@ -227,7 +252,8 @@ describe('Person Put API', () => {
           expect(response.body.rank).equal('Unk');
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${response.body.id}`
+            url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         });
 
@@ -238,13 +264,15 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {},
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`},
           failOnStatusCode: false
         })
         .then((response) => {
           return cy.request({
             method: 'PUT',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               id: response.body.id,
               dodid: '0'
@@ -261,7 +289,8 @@ describe('Person Put API', () => {
           const requestBody = JSON.parse(response.allRequestResponses[0]?.['Request Body']);
           cy.request({
             method: 'DELETE',
-            url: `${apiHost}${personApiBase}/${requestBody.id}`
+            url: `${apiHost}${personApiBase}/${requestBody.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
           })
         })
 
@@ -272,7 +301,8 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           },
           failOnStatusCode: false
         })
@@ -280,6 +310,7 @@ describe('Person Put API', () => {
           return cy.request({
             method: 'PUT',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               id: response.body.id,
               branch: 'INVALID'
@@ -299,7 +330,8 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           },
           failOnStatusCode: false
         })
@@ -307,6 +339,7 @@ describe('Person Put API', () => {
           return cy.request({
             method: 'PUT',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               id: response.body.id,
               phone: 'INVALID'
@@ -325,7 +358,8 @@ describe('Person Put API', () => {
         .request({
           method: 'POST',
           url: `${apiHost}${personApiBase}`,
-          body: {
+          headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
+          body: {firstName: UtilityFunctions.generateRandomString(), email: `${UtilityFunctions.generateRandomString()}@testemail.com`
           },
           failOnStatusCode: false
         })
@@ -333,6 +367,7 @@ describe('Person Put API', () => {
           return cy.request({
             method: 'PUT',
             url: `${apiHost}${personApiBase}/${response.body.id}`,
+            headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
             body: {
               id: response.body.id,
               dutyPhone: 'INVALID'
