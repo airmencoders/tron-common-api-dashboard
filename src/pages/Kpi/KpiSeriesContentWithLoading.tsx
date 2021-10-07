@@ -22,7 +22,7 @@ function KpiSeriesContent() {
 
   const kpis = useMemo(() => {
     return kpiService.state.promised ? null : kpiService.state.attach(Downgraded).value as KpiSummaryDto[];
-  }, [kpiService.state.value]);
+  }, [kpiService.state]);
 
   useEffect(() => {
     if (kpis == null) {
