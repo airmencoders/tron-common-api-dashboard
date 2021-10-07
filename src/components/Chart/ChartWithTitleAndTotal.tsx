@@ -4,17 +4,22 @@ import ReactApexChart from 'react-apexcharts';
 import { ChartWithTitleAndTotalProps } from './ChartWithTitleAndTotalProps';
 import './ChartWithTitleAndTotal.scss';
 import ChartIcon from '../../icons/ChartIcon';
+import {setSignificantDigits} from '../../utils/number-utils';
 
-function getDefaultOptions(labels: string[]) {
+function getDefaultOptions() {
   return {
     xaxis: {
-      // categories: labels
       type: 'datetime',
     },
     yaxis: {
       tickAmount: 3,
       axisBorder: {
         show: true
+      },
+      labels: {
+        formatter(val: number, opts?: any): string {
+          return setSignificantDigits(val, 2).toString(10);
+        }
       }
     },
     markers: {
@@ -50,20 +55,6 @@ function getDefaultOptions(labels: string[]) {
     stroke: {
       width: 2
     },
-    // dataLabels: {
-    //   enabled: true,
-    //   textAnchor: 'start',
-    //   style: {
-    //     colors: ['#333']
-    //   },
-    //   formatter: function (val) {
-    //     if (val == null) {
-    //       return 'No Data';
-    //     }
-    //
-    //     return val;
-    //   }
-    // },
     noData: {
       text: 'No Data',
       align: 'center',
@@ -74,15 +65,9 @@ function getDefaultOptions(labels: string[]) {
   } as ApexOptions;
 }
 
-function ChartWithTitleAndTotal({ title, total, series, options, labels, calculateAverage, hideTotal, className, ...props }: ChartWithTitleAndTotalProps & HTMLProps<HTMLDivElement>) {
-  // const total = series.data.reduce<number>((prev, curr) => {
-  //   const currVal = curr ?? 0;
-  //   return prev + currVal;
-  // }, 0);
+function ChartWithTitleAndTotal({ title, total, series, options, calculateAverage, hideTotal, className, ...props }: ChartWithTitleAndTotalProps & HTMLProps<HTMLDivElement>) {
 
-  const chartOptions = useMemo(() => {
-    return getDefaultOptions(labels ?? []);
-  }, [labels]);
+  const chartOptions = getDefaultOptions();
 
   return (
     <div className={`chart-with-total${className ? ' ' + className : ''}`} {...props}>
@@ -91,7 +76,9 @@ function ChartWithTitleAndTotal({ title, total, series, options, labels, calcula
         {!hideTotal && series.data.length > 0 &&
           <>
             <span><ChartIcon size={1} /></span>
-            <span className="chart-with-total__total">{calculateAverage ? (total / series.data.length).toFixed(2) : total}</span>
+            <span className="chart-with-total__total">
+              { setSignificantDigits(total, 2) }
+            </span>
           </>
         }
       </div>

@@ -31,17 +31,14 @@ function KpiPage() {
     pageState.startDate.set(startEndDate.startDate);
     pageState.endDate.set(startEndDate.endDate);
     fetchKpiSeries(startEndDate.startDate, startEndDate.endDate);
+    if (pageState.selectedTab.get() == null) {
+      pageState.selectedTab.set(KpiChartTitles.TOTAL_REQUESTS)
+    }
     return function cleanup() {
       pageState.cancelTokenSource.value?.cancel();
       kpiService.resetState();
     }
   }, []);
-
-  useEffect(() => {
-    if (pageState.selectedTab.get() == null) {
-      pageState.selectedTab.set(KpiChartTitles.TOTAL_REQUESTS)
-    }
-  }, [pageState.startDate, pageState.endDate])
 
   function setDefaultDateRange(): {startDate: string, endDate: string} {
     const todayIso = formatDateToEnCa(Date.now());

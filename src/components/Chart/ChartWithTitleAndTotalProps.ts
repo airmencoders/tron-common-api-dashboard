@@ -6,7 +6,6 @@ export interface ChartWithTitleAndTotalProps {
   total: number;
   title: string;
   options?: ApexOptions;
-  labels?: string[];
   calculateAverage?: boolean;
   hideTotal?: boolean;
 }
