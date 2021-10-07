@@ -16,11 +16,11 @@ function KpiMiniChart(props: KpiMiniChartProps) {
       if (chartProps.yAccessors == null) {
         return 0;
       }
-      const yAccessors = Object.values(chartProps.yAccessors);
-      if (yAccessors == null) {
+      const yAccessorValues = Object.values(chartProps.yAccessors);
+      if (yAccessorValues == null) {
         return 0;
       }
-      const values: number[] = yAccessors.map(yAccessor => yAccessor(d) as number);
+      const values: number[] = yAccessorValues.map(yAccessor => yAccessor(d) as number);
       const maxValue = Math.max(...values);
       return maxValue + maxValue * topPaddingPercent;
     }) as number]

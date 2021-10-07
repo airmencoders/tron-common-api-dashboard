@@ -17,9 +17,6 @@ function KpiSeriesContent() {
   const kpiPageState = useKpiPageState();
   const [miniCharts, setMiniChart] = useState<ChartDataMap | undefined>(undefined);
 
-  const dateLabels: string[] = [];
-
-
   const kpis = useMemo(() => {
     return kpiService.state.promised ? null : kpiService.state.attach(Downgraded).value as KpiSummaryDto[];
   }, [kpiService.state]);
@@ -52,8 +49,6 @@ function KpiSeriesContent() {
 
     copiedKpis.forEach(kpi => {
       const dateValue = new Date(kpi.endDate);
-
-      dateLabels.push(kpi.endDate);
 
       clientToSourceSeriesMini.push({date: dateValue, primaryValue: kpi.appClientToAppSourceRequestCount});
       clientToSourceTotal += kpi.appClientToAppSourceRequestCount;
