@@ -2,6 +2,8 @@ import { useHookstate } from '@hookstate/core';
 import { Tag } from '@trussworks/react-uswds';
 import React, { useEffect } from 'react';
 import { Spinner } from 'react-bootstrap';
+import ProductionIcon from '../../icons/ProductionIcon';
+import StagingIcon from '../../icons/StagingIcon';
 import { useAppVersionState } from '../../state/app-info/app-info-state';
 import './AppInfoTag.scss';
 
@@ -12,13 +14,39 @@ export default function AppInfoTag() {
   useEffect(() => {
     appInfoService.fetchVersion();
   }, []);
-  
+
   if (appInfoService.state.promised) {
     return (
       <div className="sidebar__tags-container">
         <Spinner animation="border" />
       </div>
     );
+  }
+
+  function getLabelContent() {
+    if (appInfoService.state.environment.get()?.match(/staging/i)) {
+      return (
+        <>
+          <StagingIcon />
+          <span className="sidebar__apptag--staging">{`${
+            appInfoService.state.enclave.get()?.toUpperCase() ?? ''
+          } STAGING`}</span>
+        </>
+      );
+    } else if (appInfoService.state.environment.get()?.match(/production/i)) {
+      return (
+        <>
+          <ProductionIcon />
+          <span className="sidebar__apptag--production">{`${
+            appInfoService.state.enclave.get()?.toUpperCase() ?? ''
+          } PRODUCTION`}</span>
+        </>
+      );
+    } else {
+      return (<span className="sidebar__apptag--production">{`${
+        appInfoService.state.enclave.get()?.toUpperCase() ?? ''
+      } ENV`}</span>);
+    }
   }
 
   return (
@@ -30,12 +58,7 @@ export default function AppInfoTag() {
       <Tag className="sidebar__apptag">
         {
           <>
-            <span className={`enclave__${appInfoService.state.enclave.get()?.toLowerCase()}`}>{`${
-              appInfoService.state.enclave.get()?.toUpperCase() ?? ''
-            } `}</span>
-            <span className={`environ__${appInfoService.state.environment.get()?.toLowerCase()}`}>{` ${
-              appInfoService.state.environment.get()?.toUpperCase() ?? ''
-            } `}</span>
+            {getLabelContent()}
             <div className={tipClass}>
               {`App Ver: ${appInfoService.state.version.get() ?? 'Unknown'}`}
             </div>

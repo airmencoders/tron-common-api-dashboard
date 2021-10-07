@@ -4,7 +4,7 @@ import Config from '../../api/config';
 import AppInfoService from './app-info-service';
 
 
-const appInfoState = createState<AppVersionInfoDto>({} as AppVersionInfoDto);
+const appInfoState = createState<AppVersionInfoDto>({ enclave: '', environment: '', version: '' } as AppVersionInfoDto);
 const appInfoApi = new AppVersionControllerApi(new Configuration({
   basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
 }));

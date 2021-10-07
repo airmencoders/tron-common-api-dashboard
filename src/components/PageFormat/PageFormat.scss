@@ -5,9 +5,17 @@
 
   &__nav-menu {
     flex: 0 0 220px;
-    background: rgba(28, 62, 107, 1);
+    background: #1C3E6B;
     min-height: 100vh;
     position: sticky;
+
+    &-il2 {
+      background: #0A4638; 
+    }
+
+    &-il4 {
+      background: #1C3E6B;
+    }
 
     .nav-menu {
       &__user-info {
