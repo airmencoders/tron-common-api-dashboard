@@ -1,11 +1,11 @@
 import {ChartScale} from './chart-scale';
 import {MiniChartDataAccessors} from './mini-chart-data-accessors';
 
-export interface MiniChartProps<T> {
+export interface MiniChartProps<T extends R, R> {
   seriesOrder: Array<string>;
-  diffValue: string;
+  diffValue?: string;
   isActive: boolean;
-  aggregateValues: { [seriesKey: string]: number };
+  aggregateValues: R;
   title: string,
   width: number,
   height: number,
@@ -14,6 +14,6 @@ export interface MiniChartProps<T> {
   yAccessors: MiniChartDataAccessors<T>,
   seriesColors: { [seriesKey: string]: string },
   seriesLabelColors: { [seriesKey: string]: string },
-  yScaleCreate: (props: MiniChartProps<T>, chartHeight: number) => ChartScale,
-  xScaleCreate: (props: MiniChartProps<T>) => ChartScale,
+  yScaleCreate: (props: MiniChartProps<T, R>, chartHeight: number) => ChartScale,
+  xScaleCreate: (props: MiniChartProps<T, R>) => ChartScale,
 }

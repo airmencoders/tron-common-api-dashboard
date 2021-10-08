@@ -87,7 +87,7 @@ describe('Test Kpi Series Content', () => {
       </MemoryRouter>
     );
 
-    expect(page.getByText(/KPI Series Data/i)).toBeInTheDocument();
+    expect(page.getByText(/Total Requests/i)).toBeInTheDocument();
   });
 
   it('Should render nothing if state is not set', async () => {

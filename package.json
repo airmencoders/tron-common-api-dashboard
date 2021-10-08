@@ -117,6 +117,9 @@
       "!<rootDir>/src/index.tsx",
       "!<rootDir>/src/openapi/**/*",
       "!<rootDir>/src/stories/**/*"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!d3-(array|format))/"
     ]
   },
   "resolutions": {

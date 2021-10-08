@@ -3,11 +3,12 @@ import {MiniChartProps} from './MiniChartProps';
 import {LinePath} from '@visx/shape';
 import {Group} from '@visx/group';
 import './MiniChart.scss';
+import {setSignificantDigits} from '../../utils/number-utils';
 
 const headerHeight = 100;
 const minChartHeight = 20;
 
-function MiniChart(props: MiniChartProps<any>) {
+function MiniChart(props: MiniChartProps<any, any>) {
 
   const chartHeight = useMemo(() => {
     return props.height > headerHeight + minChartHeight ? props.height - headerHeight : props.height / 2;
@@ -42,7 +43,8 @@ function MiniChart(props: MiniChartProps<any>) {
             {
               yAccessorKeys.map((yKey, i) => (
                   <span key={yKey}>
-                    <span style={{color: props.seriesLabelColors[yKey]}}>{ props.aggregateValues[yKey] }</span>
+                    <span style={{color: props.seriesLabelColors[yKey]}}>{
+                      props.aggregateValues[yKey] != null ? setSignificantDigits(props.aggregateValues[yKey], 2) : 'NA'}</span>
                     {
                       i < yAccessorKeys.length - 1 &&
                       <span className="header__value-separator"> | </span>
@@ -66,7 +68,6 @@ function MiniChart(props: MiniChartProps<any>) {
                         x={d => xScale(props.xAccessor(d)) as number}
                         y={d => yScale(props.yAccessors[yAccessorKey](d)) as number}
                         data={props.data}
-                        fill={'rgba(0, 0, 0, 0)'}
                         stroke={props.seriesColors[yAccessorKey]}
                         strokeWidth={2}
                     />

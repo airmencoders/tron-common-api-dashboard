@@ -58,41 +58,11 @@ describe('Test Kpi Page', () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(page.getByText(/Get KPI Summary/i));
+    fireEvent.click(page.getByText(/KPIs/i));
     expect(page.getByText('Loading...')).toBeDefined();
 
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
-  });
-
-  it('Test Summary Date validation', () => {
-    jest.spyOn(useKpiState(), 'isPromised', 'get').mockReturnValue(false);
-    jest.spyOn(useKpiState(), 'error', 'get').mockReturnValue(undefined);
-
-    const page = render(
-      <MemoryRouter>
-        <KpiPage />
-      </MemoryRouter>
-    );
-
-    const startDateElem = page.getByLabelText('Summary From (UTC)');
-    const endDateElem = page.getByLabelText('Summary To (UTC)');
-    expect(startDateElem).toBeInTheDocument();
-    expect(endDateElem).toBeInTheDocument();
-
-    let date = new Date();
-    date.setDate(date.getDate() + 1);
-    const dateInFutureString = formatDateToEnCa(date);
-    fireEvent.change(startDateElem, { target: { value: dateInFutureString } });
-    expect(page.getByText(/Start Date cannot be in the future/i)).toBeInTheDocument();
-
-    date = new Date();
-    let endDate = new Date(date);
-    date.setDate(date.getDate() - 5);
-    endDate.setDate(endDate.getDate() - 10);
-    fireEvent.change(startDateElem, { target: { value: formatDateToEnCa(date) } });
-    fireEvent.change(endDateElem, { target: { value: formatDateToEnCa(endDate) } });
-    expect(page.getByText(/Start Date must be equal to or before End Date/i)).toBeInTheDocument();
   });
 
   it('Test Series Date validation', () => {
@@ -125,43 +95,7 @@ describe('Test Kpi Page', () => {
     expect(page.getByText(/Start Date cannot be in the future or within the current week/i)).toBeInTheDocument();
   });
 
-  it('Fetch Summary data button click handler', () => {
-    const apiCall = jest.spyOn(kpiApi, 'getKpiSummary').mockImplementation(() => {
 
-      return Promise.resolve(
-        createAxiosSuccessResponse({
-          startDate: formatDateToEnCa(new Date(2021, 6, 19)),
-          endDate: formatDateToEnCa(new Date(2021, 6, 25)),
-          averageLatencyForSuccessfulRequests: 28,
-          appSourceCount: 6,
-          appClientToAppSourceRequestCount: 10,
-          uniqueVisitorCounts: [
-            {
-              visitorType: UniqueVisitorCountDtoVisitorTypeEnum.AppClient,
-              uniqueCount: 6,
-              requestCount: 48108
-            },
-            {
-              visitorType: UniqueVisitorCountDtoVisitorTypeEnum.DashboardUser,
-              uniqueCount: 4,
-              requestCount: 476
-            }
-          ],
-          serviceMetrics: []
-        })
-      );
-    });
-
-    const page = render(
-      <MemoryRouter>
-        <KpiPage />
-      </MemoryRouter>
-    );
-
-    fireEvent.click(page.getByText(/Get KPI Summary/i));
-
-    expect(apiCall).toHaveBeenCalledTimes(1);
-  });
 
   it('Fetch Series data button click handler', () => {
     const apiCall = jest.spyOn(kpiApi, 'getKpiSeries').mockImplementation(() => {
@@ -201,6 +135,6 @@ describe('Test Kpi Page', () => {
 
     fireEvent.click(page.getByText(/Get KPI Series/i));
 
-    expect(apiCall).toHaveBeenCalledTimes(1);
+    expect(apiCall).toHaveBeenCalledTimes(2);
   });
 })

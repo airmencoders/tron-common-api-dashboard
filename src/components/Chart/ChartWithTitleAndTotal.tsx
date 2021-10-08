@@ -3,11 +3,48 @@ import { HTMLProps, useMemo } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { ChartWithTitleAndTotalProps } from './ChartWithTitleAndTotalProps';
 import './ChartWithTitleAndTotal.scss';
+import ChartIcon from '../../icons/ChartIcon';
+import {setSignificantDigits} from '../../utils/number-utils';
 
-function getDefaultOptions(labels: string[]) {
+function getDefaultOptions() {
   return {
     xaxis: {
-      categories: labels
+      type: 'datetime',
+    },
+    yaxis: {
+      tickAmount: 3,
+      axisBorder: {
+        show: true
+      },
+      labels: {
+        formatter(val: number, opts?: any): string {
+          return setSignificantDigits(val, 2).toString(10);
+        }
+      }
+    },
+    markers: {
+      strokeColors: '#3262e8',
+      colors: ['#fff'],
+      fillOpacity: 1,
+      size: 5
+    },
+    grid: {
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      },
+      padding: {
+        top: 0,
+        right: 10,
+        bottom: 0,
+        left: 10
+      },
     },
     plotOptions: {
       bar: {
@@ -15,19 +52,8 @@ function getDefaultOptions(labels: string[]) {
         horizontal: false
       }
     },
-    dataLabels: {
-      enabled: true,
-      textAnchor: 'start',
-      style: {
-        colors: ['#333']
-      },
-      formatter: function (val) {
-        if (val == null) {
-          return 'No Data';
-        }
-
-        return val;
-      }
+    stroke: {
+      width: 2
     },
     noData: {
       text: 'No Data',
@@ -39,22 +65,21 @@ function getDefaultOptions(labels: string[]) {
   } as ApexOptions;
 }
 
-function ChartWithTitleAndTotal({ title, series, options, labels, calculateAverage, hideTotal, className, ...props }: ChartWithTitleAndTotalProps & HTMLProps<HTMLDivElement>) {
-  const total = series.data.reduce<number>((prev, curr) => {
-    const currVal = curr ?? 0;
-    return prev + currVal;
-  }, 0);
+function ChartWithTitleAndTotal({ title, total, series, options, calculateAverage, hideTotal, className, ...props }: ChartWithTitleAndTotalProps & HTMLProps<HTMLDivElement>) {
 
-  const chartOptions = useMemo(() => {
-    return getDefaultOptions(labels);
-  }, [labels]);
+  const chartOptions = getDefaultOptions();
 
   return (
     <div className={`chart-with-total${className ? ' ' + className : ''}`} {...props}>
       <div className="chart-with-total__total">
-        <h5>{title}</h5>
+        <h5 className="chart-with-total__title">{title}</h5>
         {!hideTotal && series.data.length > 0 &&
-          <h3>{calculateAverage ? (total / series.data.length).toFixed(2) : total}</h3>
+          <>
+            <span><ChartIcon size={1} /></span>
+            <span className="chart-with-total__total">
+              { setSignificantDigits(total, 2) }
+            </span>
+          </>
         }
       </div>
       <div className="chart-with-total__chart-container">

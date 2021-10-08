@@ -4,6 +4,8 @@
   border-radius: 4px;
   border: 1px solid #E5E5E5;
   overflow: hidden;
+  position: relative;
+  background-color: #ffffff;
   &--active {
    border: 1px solid #5F96EA;
     .header__title {
@@ -33,11 +35,16 @@
         height: 40px;
         padding: $header-padding;
         font-size: calculateRem(14px);
+        width: 80%;
+        line-height: calculateRem(16px);
       }
       &__value {
         padding-left: $header-padding;
+        padding-top: calculateRem(20px);
         color: #3262E8;
-        font-size: calculateRem(14px);
+        span {
+          font-size: calculateRem(14px);
+        }
       }
 
       &__value-separator {

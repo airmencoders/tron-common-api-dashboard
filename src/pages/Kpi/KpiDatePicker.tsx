@@ -1,25 +1,28 @@
-import { useHookstate } from '@hookstate/core';
-import { Validation } from '@hookstate/validation';
-import { useEffect } from 'react';
+import {Validation} from '@hookstate/validation';
+import {useEffect} from 'react';
 import Button from '../../components/Button/Button';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import { addWeeksToDate, formatDateToEnCa, getEndOfWeek, getFirstDayOfWeek, getStartOfDay, isDateBefore, isDateEqual, isDateFuture, isDateInThisWeek, parseIsoDate } from '../../utils/date-utils';
-import { generateStringErrorMessages } from '../../utils/validation-utils';
-import { KpiType } from './kpi-type';
-import { KpiDatePickerProps } from './KpiDatePickerProps';
+import {
+  addWeeksToDate,
+  formatDateToEnCa,
+  getEndOfWeek,
+  getFirstDayOfWeek,
+  getStartOfDay,
+  isDateBefore,
+  isDateEqual,
+  isDateFuture,
+  isDateInThisWeek,
+  parseIsoDate
+} from '../../utils/date-utils';
+import {generateStringErrorMessages} from '../../utils/validation-utils';
+import {KpiType} from './kpi-type';
+import {KpiDatePickerProps} from './KpiDatePickerProps';
 import './KpiDatePicker.scss';
-
-interface KpiPageState {
-  startDate: string;
-  endDate: string;
-}
+import {useKpiPageState} from './kpi-page-state';
 
 function KpiDatePicker(props: KpiDatePickerProps) {
-  const pageState = useHookstate<KpiPageState>({
-    startDate: '',
-    endDate: '',
-  });
+  const pageState = useKpiPageState();
 
   useEffect(() => {
     const todayIso = formatDateToEnCa(Date.now());
@@ -110,13 +113,15 @@ function KpiDatePicker(props: KpiDatePickerProps) {
           </div>
         </div>
 
-        <Button
-          type="button"
-          disabled={Validation(pageState).invalid()}
-          onClick={() => props.onClickCallBack(pageState.startDate.value, pageState.endDate.value)}
-        >
-          {props.kpiType === KpiType.SUMMARY ? "Get KPI Summary" : "Get KPI Series"}
-        </Button>
+        <div className="form__submit">
+          <Button
+            type="button"
+            disabled={Validation(pageState).invalid()}
+            onClick={() => props.onClickCallBack(pageState.startDate.value, pageState.endDate.value)}
+          >
+            {props.kpiType === KpiType.SUMMARY ? "Get KPI Summary" : "Get KPI Series"}
+          </Button>
+        </div>
       </Form>
     </div>
   );
