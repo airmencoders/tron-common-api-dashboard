@@ -889,7 +889,7 @@
       ],
       "type": "object"
     },
-    "DocumentSpaceDashboardMemberDto": {
+    "DocumentSpaceDashboardMemberRequestDto": {
       "additionalProperties": false,
       "properties": {
         "email": {
@@ -897,14 +897,18 @@
         },
         "privileges": {
           "items": {
-            "$ref": "model-types.json#/definitions/DocumentSpaceDashboardMemberDtoPrivilegesEnum"
+            "$ref": "model-types.json#/definitions/DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum"
           },
           "type": "array"
         }
       },
+      "required": [
+        "email",
+        "privileges"
+      ],
       "type": "object"
     },
-    "DocumentSpaceDashboardMemberDtoPrivilegesEnum": {
+    "DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum": {
       "enum": [
         "READ",
         "WRITE",
@@ -912,13 +916,48 @@
       ],
       "type": "string"
     },
+    "DocumentSpaceDashboardMemberResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "privileges"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceDashboardMemberResponseDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceDashboardMemberResponseDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "DocumentSpacePrivilegeDto": {
       "additionalProperties": false,
       "properties": {
         "id": {
-          "type": "string"
-        },
-        "name": {
           "type": "string"
         },
         "type": {
@@ -927,7 +966,7 @@
       },
       "required": [
         "id",
-        "name"
+        "type"
       ],
       "type": "object"
     },

@@ -17,28 +17,28 @@
 /**
  * 
  * @export
- * @interface DocumentSpaceDashboardMemberDto
+ * @interface DocumentSpaceDashboardMemberRequestDto
  */
-export interface DocumentSpaceDashboardMemberDto {
+export interface DocumentSpaceDashboardMemberRequestDto {
     /**
      * 
      * @type {string}
-     * @memberof DocumentSpaceDashboardMemberDto
+     * @memberof DocumentSpaceDashboardMemberRequestDto
      */
-    email?: string;
+    email: string;
     /**
      * 
      * @type {Array<string>}
-     * @memberof DocumentSpaceDashboardMemberDto
+     * @memberof DocumentSpaceDashboardMemberRequestDto
      */
-    privileges?: Array<DocumentSpaceDashboardMemberDtoPrivilegesEnum>;
+    privileges: Array<DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum>;
 }
 
 /**
     * @export
     * @enum {string}
     */
-export enum DocumentSpaceDashboardMemberDtoPrivilegesEnum {
+export enum DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum {
     Read = 'READ',
     Write = 'WRITE',
     Membership = 'MEMBERSHIP'

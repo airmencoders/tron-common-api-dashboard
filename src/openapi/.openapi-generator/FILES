@@ -53,7 +53,9 @@ models/count-metric-dto.ts
 models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
 models/document-dto.ts
-models/document-space-dashboard-member-dto.ts
+models/document-space-dashboard-member-request-dto.ts
+models/document-space-dashboard-member-response-dto-response-wrapper.ts
+models/document-space-dashboard-member-response-dto.ts
 models/document-space-privilege-dto.ts
 models/document-space-request-dto.ts
 models/document-space-response-dto-response-wrapper.ts

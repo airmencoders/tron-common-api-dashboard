@@ -13,36 +13,32 @@
  */
 
 
+import { DocumentSpacePrivilegeDto } from './document-space-privilege-dto';
 
 /**
  * 
  * @export
- * @interface DocumentSpacePrivilegeDto
+ * @interface DocumentSpaceDashboardMemberResponseDto
  */
-export interface DocumentSpacePrivilegeDto {
+export interface DocumentSpaceDashboardMemberResponseDto {
     /**
      * 
      * @type {string}
-     * @memberof DocumentSpacePrivilegeDto
+     * @memberof DocumentSpaceDashboardMemberResponseDto
      */
     id: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentSpacePrivilegeDto
+     * @memberof DocumentSpaceDashboardMemberResponseDto
      */
-    type: DocumentSpacePrivilegeDtoTypeEnum;
+    email: string;
+    /**
+     * 
+     * @type {Array<DocumentSpacePrivilegeDto>}
+     * @memberof DocumentSpaceDashboardMemberResponseDto
+     */
+    privileges: Array<DocumentSpacePrivilegeDto>;
 }
-
-/**
-    * @export
-    * @enum {string}
-    */
-export enum DocumentSpacePrivilegeDtoTypeEnum {
-    Read = 'READ',
-    Write = 'WRITE',
-    Membership = 'MEMBERSHIP'
-}
-
 
 
