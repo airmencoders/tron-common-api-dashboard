@@ -5,8 +5,7 @@ export interface SubmitActionsProps {
   submitButtonLabel?: string;
   cancelButtonLabel?: string;
   formActionType: FormActionType;
-  onCancel: (event: FormEvent<HTMLFormElement>) => void;
-  onSubmit: <T>(event: FormEvent<HTMLFormElement>, data:T) => void;
+  onCancel?: (event: FormEvent<HTMLFormElement>) => void;
   isFormValid: boolean;
   isFormModified: boolean;
   isFormSubmitting: boolean;

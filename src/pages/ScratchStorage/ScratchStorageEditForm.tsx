@@ -424,7 +424,6 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
             props.successAction == null &&
             <SubmitActions formActionType={props.formActionType}
                            onCancel={props.onClose}
-                           onSubmit={submitForm}
                            isFormValid={Validation(formState).valid()}
                            isFormModified={isFormModified()}
                            isFormSubmitting={props.isSubmitting}

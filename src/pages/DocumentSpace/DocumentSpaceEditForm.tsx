@@ -86,7 +86,6 @@ export default function DocumentSpaceEditForm(
         <SubmitActions
           formActionType={FormActionType.ADD}
           onCancel={props.onCancel}
-          onSubmit={submitForm}
           isFormValid={Validation(formState).valid()}
           isFormModified={isFormModified()}
           isFormSubmitting={props.isFormSubmitting}
