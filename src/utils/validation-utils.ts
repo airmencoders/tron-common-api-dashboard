@@ -141,7 +141,7 @@ export function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
 
 /**
  * Compares the two objects to see if any fields contain values
- * that do not match.
+ * that do not match. This will perform deep equality checks.
  * 
  * @param original The first object
  * @param toCheck The second object
@@ -157,7 +157,7 @@ export function isFormModified<T>(original: T, toCheck: T): boolean {
 }
 
 /**
- * Compares two objects to see if they do not match
+ * Compares two objects to see if they do not match. This will perform a deep equality check.
  * @param original the first object
  * @param toCheck the second object
  * @returns true if {@link original} does not equal {@link toCheck}, false otherwise
