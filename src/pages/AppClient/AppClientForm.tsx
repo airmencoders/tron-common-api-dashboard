@@ -454,7 +454,6 @@ function AppClientForm(props: CreateUpdateFormProps<AppClientFlat>) {
         <SubmitActions
           formActionType={props.formActionType}
           onCancel={props.onClose}
-          onSubmit={submitForm}
           isFormValid={Validation(formState).valid()}
           isFormModified={isFormModified()}
           isFormSubmitting={props.isSubmitting}

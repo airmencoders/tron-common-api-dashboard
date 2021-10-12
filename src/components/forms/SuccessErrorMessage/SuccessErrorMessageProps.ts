@@ -5,5 +5,5 @@ export interface SuccessErrorMessageProps {
   showSuccessMessage: boolean;
   showErrorMessage: boolean;
   showCloseButton: boolean;
-  onCloseClicked: (event: MouseEvent) => void;
+  onCloseClicked?: (event: MouseEvent) => void;
 }

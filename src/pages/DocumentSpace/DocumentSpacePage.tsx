@@ -16,6 +16,7 @@ import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import PeopleIcon from '../../icons/PeopleIcon';
 import { DocumentDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
@@ -25,6 +26,7 @@ import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
+import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -80,6 +82,9 @@ interface DocumentSpacePageState {
   showDeleteDialog: boolean;
   fileToDelete: string;
   selectedFiles: DocumentDto[];
+  membershipsState: {
+    isOpen: boolean;
+  }
 }
 
 function getDocumentUniqueKey(data: DocumentDto): string {
@@ -98,7 +103,10 @@ function DocumentSpacePage() {
     showUploadDialog: false,
     showDeleteDialog: false,
     fileToDelete: '',
-    selectedFiles: []
+    selectedFiles: [],
+    membershipsState: {
+      isOpen: false
+    }
   });
 
   const documentSpaceService = useDocumentSpaceState();
@@ -322,6 +330,10 @@ function DocumentSpacePage() {
                 documentSpaceId={pageState.selectedSpace.value.id}
                 onFinish={() => pageState.shouldUpdateDatasource.set(true)}
               />
+
+            <Button type="button" unstyled disableMobileFullWidth onClick={() => pageState.membershipsState.isOpen.set(true)}>
+              <PeopleIcon size={1.5} iconTitle="Manage Users" />
+            </Button>
             </div>
           }
         </div>
@@ -368,6 +380,15 @@ function DocumentSpacePage() {
         onSubmit={deleteFile}
         file={pageState.fileToDelete.get()}
       />
+
+      {pageState.selectedSpace.value &&
+        <DocumentSpaceMemberships
+          documentSpaceId={pageState.selectedSpace.value.id}
+          isOpen={pageState.membershipsState.isOpen.value}
+          onSubmit={() => pageState.membershipsState.isOpen.set(false)}
+        />
+      }
+
     </PageFormat>
   );
 }

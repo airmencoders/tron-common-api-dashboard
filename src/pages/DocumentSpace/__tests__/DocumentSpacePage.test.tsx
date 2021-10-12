@@ -4,8 +4,9 @@ import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
 import { MemoryRouter } from 'react-router-dom';
 import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpaceResponseDtoResponseWrapper } from '../../../openapi';
+import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
-import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { documentSpaceMembershipService, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import DocumentSpacePage from '../DocumentSpacePage';
 
@@ -28,12 +29,17 @@ describe('Test Document Space Page', () => {
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
+  let membershipService: DocumentSpaceMembershipService;
+
   beforeEach(() => {
     documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
+    membershipService = new DocumentSpaceMembershipService(documentSpaceApi);
+
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
+    (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
   });
 
   it('should show loading select when first retrieving Document Spaces', () => {
@@ -139,5 +145,39 @@ describe('Test Document Space Page', () => {
 
     userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
     await waitFor(() => expect(documentSpacesSelect).toHaveValue(documentSpaces[1].id));
+  });
+
+  it('should open/close Document Space Memberships modal', () => {
+    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
+      promise: Promise.resolve(documentSpaces),
+      cancelTokenSource: axios.CancelToken.source()
+    });
+
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpacePage />
+      </MemoryRouter>
+    );
+
+    const documentSpacesSelect = page.getByLabelText('Spaces');
+    expect(documentSpacesSelect).toBeEnabled();
+    userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
+
+    const membersButton = page.getByTitle('Manage Users');
+    expect(membersButton).toBeInTheDocument();
+
+    // Open the modal
+    userEvent.click(membersButton);
+    expect(page.getByText('Member Management')).toBeInTheDocument();
+
+    // close the modal
+    const closeButton = page.getByText('Close');
+    expect(closeButton).toBeInTheDocument();
+    userEvent.click(closeButton);
+    expect(page.queryByText('Member Management')).not.toBeInTheDocument();
   });
 });

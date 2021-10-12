@@ -14,6 +14,7 @@
 
 
 import { AppEndpointClientInfoDto } from './app-endpoint-client-info-dto';
+import { DocumentSpacePrivilegeDto } from './document-space-privilege-dto';
 import { PrivilegeDto } from './privilege-dto';
 
 /**
@@ -40,6 +41,12 @@ export interface AppClientUserDetailsDto {
      * @memberof AppClientUserDetailsDto
      */
     privileges?: Array<PrivilegeDto>;
+    /**
+     * 
+     * @type {Array<DocumentSpacePrivilegeDto>}
+     * @memberof AppClientUserDetailsDto
+     */
+    documentSpacePrivileges?: Array<DocumentSpacePrivilegeDto>;
     /**
      * 
      * @type {Array<AppEndpointClientInfoDto>}

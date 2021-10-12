@@ -2,6 +2,7 @@ import { createState, State, useState } from '@hookstate/core';
 import { Configuration, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto } from '../../openapi';
 import Config from '../../api/config';
 import DocumentSpaceService from './document-space-service';
+import DocumentSpaceMembershipService from './document-space-membership-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const documentSpaceControllerApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
@@ -21,3 +22,5 @@ export const useDocumentSpaceState = () => wrapState(
   documentSpaceControllerApi,
   useState(spacesState)
 );
+
+export const documentSpaceMembershipService = () => new DocumentSpaceMembershipService(documentSpaceControllerApi);

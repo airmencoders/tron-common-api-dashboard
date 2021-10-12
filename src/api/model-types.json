@@ -392,6 +392,12 @@
         "clusterUrl": {
           "type": "string"
         },
+        "documentSpacePrivileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
+        },
         "id": {
           "type": "string"
         },
@@ -418,6 +424,12 @@
         },
         "clusterUrl": {
           "type": "string"
+        },
+        "documentSpacePrivileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
         },
         "id": {
           "type": "string"
@@ -876,6 +888,95 @@
         "uploadedBy"
       ],
       "type": "object"
+    },
+    "DocumentSpaceDashboardMemberRequestDto": {
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "email",
+        "privileges"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum": {
+      "enum": [
+        "READ",
+        "WRITE",
+        "MEMBERSHIP"
+      ],
+      "type": "string"
+    },
+    "DocumentSpaceDashboardMemberResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "privileges"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceDashboardMemberResponseDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceDashboardMemberResponseDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
+    "DocumentSpacePrivilegeDto": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDtoTypeEnum"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "type": "object"
+    },
+    "DocumentSpacePrivilegeDtoTypeEnum": {
+      "enum": [
+        "READ",
+        "WRITE",
+        "MEMBERSHIP"
+      ],
+      "type": "string"
     },
     "DocumentSpaceRequestDto": {
       "additionalProperties": false,

@@ -297,7 +297,6 @@ function PersonEditForm(props: CreateUpdateFormProps<PersonDto>) {
           props.successAction == null &&
           <SubmitActions formActionType={props.formActionType}
             onCancel={props.onClose}
-            onSubmit={submitForm}
             isFormValid={Validation(formState).valid()}
             isFormModified={isFormModified()}
             isFormSubmitting={props.isSubmitting}

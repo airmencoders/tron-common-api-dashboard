@@ -1,6 +1,7 @@
 import { State } from '@hookstate/core';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
+import isEqual from 'fast-deep-equal';
 
 /**
  * 
@@ -140,7 +141,7 @@ export function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
 
 /**
  * Compares the two objects to see if any fields contain values
- * that do not match.
+ * that do not match. This will perform deep equality checks.
  * 
  * @param original The first object
  * @param toCheck The second object
@@ -151,8 +152,18 @@ export function isFormModified<T>(original: T, toCheck: T): boolean {
     return true;
 
   return Object.keys(original).some(key => {
-    return getProperty(original, key as keyof T) !== getProperty(toCheck, key as keyof T);
+    return isFormFieldModified(getProperty(original, key as keyof T), getProperty(toCheck, key as keyof T));
   });
+}
+
+/**
+ * Compares two objects to see if they do not match. This will perform a deep equality check.
+ * @param original the first object
+ * @param toCheck the second object
+ * @returns true if {@link original} does not equal {@link toCheck}, false otherwise
+ */
+export function isFormFieldModified<T>(original: T, toCheck: T): boolean {
+  return !isEqual(original, toCheck);
 }
 
 const nullableStringTypes = ['null', 'string'];
