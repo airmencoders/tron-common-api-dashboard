@@ -873,6 +873,9 @@
           "description": "Size in bytes",
           "type": "number"
         },
+        "spaceId": {
+          "type": "string"
+        },
         "uploadedBy": {
           "type": "string"
         },
@@ -883,6 +886,7 @@
       "required": [
         "key",
         "path",
+        "spaceId",
         "size",
         "uploadedDate",
         "uploadedBy"

@@ -537,6 +537,63 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Removes a user from a Document Space and their privileges
+         * @summary Removes a user from a Document Space
+         * @param {string} id 
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeUserFromDocumentSpace: async (id: string, body: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removeUserFromDocumentSpace.');
+            }
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling removeUserFromDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/users`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof body !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(body !== undefined ? body : {})
+                : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Uploads a file to a Document Space
          * @summary Uploads a file to a Document Space
          * @param {string} id 
@@ -746,6 +803,21 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Removes a user from a Document Space and their privileges
+         * @summary Removes a user from a Document Space
+         * @param {string} id 
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeUserFromDocumentSpace(id: string, body: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).removeUserFromDocumentSpace(id, body, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Uploads a file to a Document Space
          * @summary Uploads a file to a Document Space
          * @param {string} id 
@@ -878,6 +950,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).listObjects(id, continuation, limit, options).then((request) => request(axios, basePath));
         },
         /**
+         * Removes a user from a Document Space and their privileges
+         * @summary Removes a user from a Document Space
+         * @param {string} id 
+         * @param {string} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeUserFromDocumentSpace(id: string, body: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).removeUserFromDocumentSpace(id, body, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Uploads a file to a Document Space
          * @summary Uploads a file to a Document Space
          * @param {string} id 
@@ -1004,6 +1087,17 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     listObjects(id: string, continuation?: string, limit?: number, options?: any): AxiosPromise<S3PaginationDto>;
+
+    /**
+     * Removes a user from a Document Space and their privileges
+     * @summary Removes a user from a Document Space
+     * @param {string} id 
+     * @param {string} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    removeUserFromDocumentSpace(id: string, body: string, options?: any): AxiosPromise<object>;
 
     /**
      * Uploads a file to a Document Space
@@ -1151,6 +1245,19 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public listObjects(id: string, continuation?: string, limit?: number, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).listObjects(id, continuation, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Removes a user from a Document Space and their privileges
+     * @summary Removes a user from a Document Space
+     * @param {string} id 
+     * @param {string} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public removeUserFromDocumentSpace(id: string, body: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).removeUserFromDocumentSpace(id, body, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
