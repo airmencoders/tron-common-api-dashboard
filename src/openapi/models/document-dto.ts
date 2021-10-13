@@ -33,6 +33,12 @@ export interface DocumentDto {
      */
     path: string;
     /**
+     * 
+     * @type {string}
+     * @memberof DocumentDto
+     */
+    spaceId: string;
+    /**
      * Size in bytes
      * @type {number}
      * @memberof DocumentDto
