@@ -7,6 +7,7 @@ describe('Document Download Cell Renderer Test', () => {
     data: {
       key: 'Test File.txt',
       path: 'testspace',
+      spaceId: 'testspace',
       uploadedBy: '',
       uploadedDate: '2021-09-17T20:20:51.102Z'
     }
