@@ -71,7 +71,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
       membershipState.member.merge({
         email: '',
         privileges: []
-      })
+      });
       membershipState.formState.merge({
         successMessage: 'Successfully added member to Document Space',
         showSuccessMessage: true,
