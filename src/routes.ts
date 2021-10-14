@@ -78,7 +78,7 @@ export const routes: RouteItem[] = [
     {
         path: '#',
         name: 'Records',
-        requiredPrivileges: [PrivilegeType.DASHBOARD_USER],
+        requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN, PrivilegeType.APP_CLIENT_DEVELOPER],
         childRoutes: [
             {
                 path: RoutePath.PERSON,
@@ -153,6 +153,7 @@ export const routes: RouteItem[] = [
         path: '#',
         name: 'Document Space',
         requiredPrivileges: [
+            PrivilegeType.DOCUMENT_SPACE_USER,
             PrivilegeType.DASHBOARD_ADMIN
         ],
         childRoutes: [
@@ -160,7 +161,10 @@ export const routes: RouteItem[] = [
                 path: RoutePath.DOCUMENT_SPACE_SPACES,
                 name: 'Spaces',
                 component: DocumentSpacePage,
-                requiredPrivileges: [PrivilegeType.DASHBOARD_ADMIN]
+                requiredPrivileges: [
+                    PrivilegeType.DOCUMENT_SPACE_USER,
+                    PrivilegeType.DASHBOARD_ADMIN
+                ]
             }
         ]
     },

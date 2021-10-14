@@ -1,4 +1,4 @@
-import { none, useHookstate } from '@hookstate/core';
+import { none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import React, { ChangeEvent, useEffect, useRef } from 'react';
 import Button from '../../components/Button/Button';
@@ -17,7 +17,7 @@ import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import PeopleIcon from '../../icons/PeopleIcon';
-import { DocumentDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
+import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatBytesToString } from '../../utils/file-utils';
@@ -27,6 +27,9 @@ import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
 import DocumentSpaceMemberships from './DocumentSpaceMemberships';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -84,6 +87,10 @@ interface DocumentSpacePageState {
   selectedFiles: DocumentDto[];
   membershipsState: {
     isOpen: boolean;
+  },
+  privilegeState: {
+    privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>,
+    isLoading: boolean
   }
 }
 
@@ -106,10 +113,21 @@ function DocumentSpacePage() {
     selectedFiles: [],
     membershipsState: {
       isOpen: false
+    },
+    privilegeState: {
+      privileges: {
+        READ: false,
+        WRITE: false,
+        MEMBERSHIP: false
+      },
+      isLoading: false
     }
   });
 
   const documentSpaceService = useDocumentSpaceState();
+  const authorizedUserService = useAuthorizedUserState();
+
+  const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
 
   const mountedRef = useRef(false);
 
@@ -143,21 +161,71 @@ function DocumentSpacePage() {
     };
   }, []);
 
-  function mergePageState(mergeState: Partial<DocumentSpacePageState>): void {
+  function mergePageState(partialState: Partial<DocumentSpacePageState>): void {
     if (mountedRef.current) {
-      pageState.merge(mergeState);
+      mergeState<DocumentSpacePageState>(pageState, partialState);
     }
   }
 
-  function setStateOnDocumentSpaceChange(documentSpace: DocumentSpaceResponseDto): void {
-    mergePageState({
-      selectedSpace: documentSpace,
-      shouldUpdateDatasource: true,
-      datasource: documentSpaceService.createDatasource(
-        documentSpace.id,
-        infiniteScrollOptions
-      )
-    });
+  function mergeState<T>(state: State<T>, partialState: SetPartialStateAction<T>): void {
+    if (mountedRef.current) {
+      state.merge(partialState);
+    }
+  }
+
+  async function setStateOnDocumentSpaceChange(documentSpace: DocumentSpaceResponseDto) {
+    let privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> = {
+      READ: false,
+      WRITE: false,
+      MEMBERSHIP: false
+    };
+
+    try {
+      // Don't need to load privileges if current user is Dashboard Admin,
+      // since they currently have access to everything Document Space related
+      if (!isAdmin) {
+        mergeState(pageState.privilegeState, {
+          isLoading: true
+        });
+
+        privileges = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpace(documentSpace.id);
+      }
+
+      mergePageState({
+        selectedSpace: documentSpace,
+        shouldUpdateDatasource: true,
+        datasource: documentSpaceService.createDatasource(
+          documentSpace.id,
+          infiniteScrollOptions
+        ),
+        privilegeState: {
+          privileges,
+          isLoading: false
+        }
+      });
+    } catch (err) {
+      const preparedError = prepareRequestError(err);
+
+      if (!mountedRef.current) {
+        return;
+      }
+
+      if (preparedError.status === 403) {
+        createTextToast(ToastType.ERROR, 'Not authorized for the selected Document Space');
+      } else {
+        createTextToast(ToastType.ERROR, 'Could not load privileges for the selected Document Space');
+      }
+
+      mergePageState({
+        selectedSpace: undefined,
+        datasource: undefined,
+        shouldUpdateDatasource: false,
+        privilegeState: {
+          privileges,
+          isLoading: false
+        }
+      });
+    }
   }
 
   function onDocumentSpaceSelectionChange(
@@ -262,25 +330,30 @@ function DocumentSpacePage() {
     }
   }
 
+  function isAuthorizedForAction(actionType: DocumentSpacePrivilegeDtoTypeEnum) {
+    return isAdmin || pageState.privilegeState.privileges.value[actionType];
+  }
+
   const isDocumentSpacesLoading =
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  const documentDtoColumnsWithDelete = [
-    ...documentDtoColumns,
-    new GridColumn({
-      valueGetter: GridColumn.defaultValueGetter,
-      headerName: 'Delete',
-      headerClass: 'header-center',
-      cellRenderer: DeleteCellRenderer,
-      cellRendererParams: {
-        onClick: (doc: DocumentDto) => {
-          pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+  const documentDtoColumnsWithConditionalDelete = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
+    [
+      ...documentDtoColumns,
+      new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
+        headerName: 'Delete',
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: {
+          onClick: (doc: DocumentDto) => {
+            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+          },
         },
-      },
-    })
-  ];
+      })
+    ] : documentDtoColumns;
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -296,17 +369,21 @@ function DocumentSpacePage() {
             >
               {getSpaceOptions()}
             </Select>
-            <Button
-              data-testid="add-doc-space__btn"
-              type="button"
-              onClick={() => pageState.merge({ drawerOpen: true })}
-              disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
-            >
-              Add New Space
-            </Button>
+            {isAdmin && !pageState.privilegeState.isLoading.value &&
+              <Button
+                data-testid="add-doc-space__btn"
+                type="button"
+                onClick={() => pageState.merge({ drawerOpen: true })}
+                disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
+              >
+                Add New Space
+              </Button>
+            }
           </div>
-          {pageState.selectedSpace.value != null &&
+          {pageState.selectedSpace.value != null && !pageState.privilegeState.isLoading.value &&
             <div>
+            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) &&
+              <>
               <a href={pageState.selectedFiles.value.length > 0 ? documentSpaceService.createRelativeFilesDownloadUrl(pageState.selectedSpace.value.id, pageState.selectedFiles.value) : undefined}>
                 <Button
                   data-testid="download-selected-files__btn"
@@ -325,23 +402,29 @@ function DocumentSpacePage() {
                   Download All Files (zip)
                 </Button>
               </a>
+              </>
+            }
 
+            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
               <DocumentUploadDialog
                 documentSpaceId={pageState.selectedSpace.value.id}
                 onFinish={() => pageState.shouldUpdateDatasource.set(true)}
               />
+            }
 
-            <Button type="button" unstyled disableMobileFullWidth onClick={() => pageState.membershipsState.isOpen.set(true)}>
-              <PeopleIcon size={1.5} iconTitle="Manage Users" />
-            </Button>
+            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) &&
+              <Button type="button" unstyled disableMobileFullWidth onClick={() => pageState.membershipsState.isOpen.set(true)}>
+                <PeopleIcon size={1.5} iconTitle="Manage Users" />
+              </Button>
+            }
             </div>
           }
         </div>
       </FormGroup>
 
-      {pageState.selectedSpace.value != null && pageState.datasource.value && (
+      {pageState.selectedSpace.value != null && pageState.datasource.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
         <InfiniteScrollGrid
-          columns={documentDtoColumnsWithDelete}
+          columns={documentDtoColumnsWithConditionalDelete}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
@@ -381,7 +464,7 @@ function DocumentSpacePage() {
         file={pageState.fileToDelete.get()}
       />
 
-      {pageState.selectedSpace.value &&
+      {pageState.selectedSpace.value && !pageState.privilegeState.isLoading.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) &&
         <DocumentSpaceMemberships
           documentSpaceId={pageState.selectedSpace.value.id}
           isOpen={pageState.membershipsState.isOpen.value}
