@@ -216,7 +216,8 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      await expect(page.findByText('Could not load privileges for the selected Document Space')).resolves.toBeInTheDocument();
+      const toasts = await page.findAllByText('Could not load privileges for the selected Document Space');
+      expect(toasts.length).toBeGreaterThanOrEqual(1);
 
       // No actions should be available, and no grid
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
@@ -246,7 +247,8 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      await expect(page.findByText('Not authorized for the selected Document Space')).resolves.toBeInTheDocument();
+      const toasts = await page.findAllByText('Not authorized for the selected Document Space');
+      expect(toasts.length).toBeGreaterThanOrEqual(1);
 
       // No actions should be available, and no grid
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
