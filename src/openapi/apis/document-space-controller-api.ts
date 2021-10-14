@@ -150,6 +150,58 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Adds multiple users via a csv to a Document Space with specified privileges. Returns a list of any errors encountered.
+         * @summary Adds multiple users to a Document Space
+         * @param {string} id 
+         * @param {any} [file] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchAddUserToDocumentSpace: async (id: string, file?: any, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling batchAddUserToDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/batchUsers`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Creates a Document Space
          * @summary Creates a Document Space
          * @param {DocumentSpaceRequestDto} documentSpaceRequestDto 
@@ -730,6 +782,21 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Adds multiple users via a csv to a Document Space with specified privileges. Returns a list of any errors encountered.
+         * @summary Adds multiple users to a Document Space
+         * @param {string} id 
+         * @param {any} [file] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async batchAddUserToDocumentSpace(id: string, file?: any, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).batchAddUserToDocumentSpace(id, file, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Creates a Document Space
          * @summary Creates a Document Space
          * @param {DocumentSpaceRequestDto} documentSpaceRequestDto 
@@ -923,6 +990,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).addUserToDocumentSpace(id, documentSpaceDashboardMemberRequestDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Adds multiple users via a csv to a Document Space with specified privileges. Returns a list of any errors encountered.
+         * @summary Adds multiple users to a Document Space
+         * @param {string} id 
+         * @param {any} [file] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        batchAddUserToDocumentSpace(id: string, file?: any, options?: any): AxiosPromise<Array<string>> {
+            return DocumentSpaceControllerApiFp(configuration).batchAddUserToDocumentSpace(id, file, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Creates a Document Space
          * @summary Creates a Document Space
          * @param {DocumentSpaceRequestDto} documentSpaceRequestDto 
@@ -1070,6 +1148,17 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     addUserToDocumentSpace(id: string, documentSpaceDashboardMemberRequestDto: DocumentSpaceDashboardMemberRequestDto, options?: any): AxiosPromise<object>;
+
+    /**
+     * Adds multiple users via a csv to a Document Space with specified privileges. Returns a list of any errors encountered.
+     * @summary Adds multiple users to a Document Space
+     * @param {string} id 
+     * @param {any} [file] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    batchAddUserToDocumentSpace(id: string, file?: any, options?: any): AxiosPromise<Array<string>>;
 
     /**
      * Creates a Document Space
@@ -1222,6 +1311,19 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public addUserToDocumentSpace(id: string, documentSpaceDashboardMemberRequestDto: DocumentSpaceDashboardMemberRequestDto, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).addUserToDocumentSpace(id, documentSpaceDashboardMemberRequestDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Adds multiple users via a csv to a Document Space with specified privileges. Returns a list of any errors encountered.
+     * @summary Adds multiple users to a Document Space
+     * @param {string} id 
+     * @param {any} [file] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public batchAddUserToDocumentSpace(id: string, file?: any, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).batchAddUserToDocumentSpace(id, file, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -17,9 +17,6 @@ interface DocumentSpaceMembershipsState {
   datasourceState: {
     datasource?: IDatasource,
     shouldUpdateDatasource: boolean
-  },
-  infiniteCacheState: {
-    shouldUpdateInfiniteCache: boolean
   }
 }
 
@@ -47,9 +44,6 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     datasourceState: {
       datasource: undefined,
       shouldUpdateDatasource: false
-    },
-    infiniteCacheState: {
-      shouldUpdateInfiniteCache: false
     }
   });
 
@@ -66,16 +60,8 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     });
   }
 
-  function onInfiniteCacheUpdateCallback(): void {
-    pageState.infiniteCacheState.merge({
-      shouldUpdateInfiniteCache: false
-    });
-  }
-
   function onMemberChangeCallback(): void {
-    pageState.infiniteCacheState.merge({
-      shouldUpdateInfiniteCache: true
-    });
+    pageState.datasourceState.shouldUpdateDatasource.set(true);
   }
 
   return (
@@ -108,8 +94,6 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
             updateDatasource={pageState.datasourceState.shouldUpdateDatasource.value}
             updateDatasourceCallback={onDatasourceUpdateCallback}
             getRowNodeId={getDashboardMemberUniqueKey}
-            updateInfiniteCache={pageState.infiniteCacheState.shouldUpdateInfiniteCache.value}
-            updateInfiniteCacheCallback={onInfiniteCacheUpdateCallback}
           />
         </div>
       }
