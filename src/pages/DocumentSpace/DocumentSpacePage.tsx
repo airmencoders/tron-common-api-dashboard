@@ -339,20 +339,21 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  const documentDtoColumnsWithDelete = [
-    ...documentDtoColumns,
-    new GridColumn({
-      valueGetter: GridColumn.defaultValueGetter,
-      headerName: 'Delete',
-      headerClass: 'header-center',
-      cellRenderer: DeleteCellRenderer,
-      cellRendererParams: {
-        onClick: (doc: DocumentDto) => {
-          pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+  const documentDtoColumnsWithConditionalDelete = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
+    [
+      ...documentDtoColumns,
+      new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
+        headerName: 'Delete',
+        headerClass: 'header-center',
+        cellRenderer: DeleteCellRenderer,
+        cellRendererParams: {
+          onClick: (doc: DocumentDto) => {
+            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+          },
         },
-      },
-    })
-  ];
+      })
+    ] : documentDtoColumns;
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -423,7 +424,7 @@ function DocumentSpacePage() {
 
       {pageState.selectedSpace.value != null && pageState.datasource.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
         <InfiniteScrollGrid
-          columns={documentDtoColumnsWithDelete}
+          columns={documentDtoColumnsWithConditionalDelete}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
