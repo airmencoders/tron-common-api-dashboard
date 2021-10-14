@@ -970,6 +970,21 @@
       ],
       "type": "object"
     },
+    "DocumentSpacePrivilegeDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpacePrivilegeDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "DocumentSpacePrivilegeDtoTypeEnum": {
       "enum": [
         "READ",

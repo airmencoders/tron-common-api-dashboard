@@ -30,6 +30,7 @@ export * from './document-space-dashboard-member-request-dto';
 export * from './document-space-dashboard-member-response-dto';
 export * from './document-space-dashboard-member-response-dto-response-wrapper';
 export * from './document-space-privilege-dto';
+export * from './document-space-privilege-dto-response-wrapper';
 export * from './document-space-request-dto';
 export * from './document-space-response-dto';
 export * from './document-space-response-dto-response-wrapper';

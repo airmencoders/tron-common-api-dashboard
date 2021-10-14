@@ -6,6 +6,8 @@ import {
   DocumentDto,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
+  DocumentSpacePrivilegeDtoResponseWrapper,
+  DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
   DocumentSpaceResponseDtoResponseWrapper,
   S3PaginationDto,
@@ -377,5 +379,34 @@ describe('Test Document Space Service', () => {
     const url = documentSpaceService.createRelativeDownloadAllFilesUrl(documentSpaceId);
 
     expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download/all`)).toBeTruthy();
+  });
+
+  it('should retrieve all privileges for a dashboard user of a document space', async () => {
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
+
+    const mock = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<DocumentSpacePrivilegeDtoResponseWrapper>({
+          data: [
+            {
+              id: 'privilege-id-1',
+              type: DocumentSpacePrivilegeDtoTypeEnum.Read
+            },
+            {
+              id: 'privilege-id-2',
+              type: DocumentSpacePrivilegeDtoTypeEnum.Write
+            }
+          ]
+        })
+      )
+    );
+
+    const response = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpace(documentSpaceId);
+    expect(mock).toHaveBeenCalled();
+    expect(response).toEqual({
+      [DocumentSpacePrivilegeDtoTypeEnum.Read]: true,
+      [DocumentSpacePrivilegeDtoTypeEnum.Write]: true,
+      [DocumentSpacePrivilegeDtoTypeEnum.Membership]: false
+    });
   });
 });

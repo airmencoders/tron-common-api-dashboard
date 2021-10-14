@@ -6,7 +6,7 @@ import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinit
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceRequestDto, DocumentSpaceResponseDto, S3PaginationDto } from '../../openapi';
+import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
@@ -103,6 +103,14 @@ export default class DocumentSpaceService {
     catch (e) {
       return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
     }
+  }
+
+  async getDashboardUserPrivilegesForDocumentSpace(documentSpaceId: string) {
+    const privileges = (await this.documentSpaceApi.getSelfDashboardUserPrivilegesForDocumentSpace(documentSpaceId)).data.data;
+    return Object.values(DocumentSpacePrivilegeDtoTypeEnum).reduce<Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>((prev, curr) => {
+      prev[curr] = privileges.find(privilege => privilege.type === curr) ? true : false;
+      return prev;
+    }, { READ: false, WRITE: false, MEMBERSHIP: false });
   }
 
   createRelativeFilesDownloadUrl(id: string, documents: DocumentDto[]) {
