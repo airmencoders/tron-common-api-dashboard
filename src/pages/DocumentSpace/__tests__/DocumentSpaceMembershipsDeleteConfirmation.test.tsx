@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
+import DocumentSpaceMembershipsDeleteConfirmation from '../DocumentSpaceMembershipsDeleteConfirmation';
 
 describe('Test Document Space Memberships Delete Confirmation', () => {
   let onMemberDeleteConfirmation: jest.Mock;
