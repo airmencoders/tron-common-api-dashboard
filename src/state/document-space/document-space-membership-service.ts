@@ -67,7 +67,13 @@ export default class DocumentSpaceMembershipService {
     return datasource;
   }
 
-  async addDocumentSpaceMember(documentSpaceId: string, dashboardMemberDto: DocumentSpaceDashboardMemberRequestDto) {
+  addDocumentSpaceMember(documentSpaceId: string, dashboardMemberDto: DocumentSpaceDashboardMemberRequestDto) {
     return this.documentSpaceApi.addUserToDocumentSpace(documentSpaceId, dashboardMemberDto);
+  }
+
+  removeDocumentSpaceDashboardMembers(documentSpaceId: string, dashboardMemberDtos: DocumentSpaceDashboardMemberResponseDto[]) {
+    const emails = dashboardMemberDtos.map(memberDto => memberDto.email);
+
+    return this.documentSpaceApi.removeUserFromDocumentSpace(documentSpaceId, emails);
   }
 }

@@ -15,7 +15,6 @@ function Modal(props: ModalProps) {
                     style={{
                       overlay: {
                         backgroundColor: 'rgba(0,0,0,.25)',
-                        zIndex: 10000,
                         display: 'flex',
                       },
                       content: {

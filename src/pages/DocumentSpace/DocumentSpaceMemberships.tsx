@@ -1,6 +1,6 @@
-import { useHookstate } from '@hookstate/core';
+import { none, useHookstate } from '@hookstate/core';
 import { IDatasource } from 'ag-grid-community';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -12,11 +12,25 @@ import { DocumentSpaceDashboardMemberResponseDto } from '../../openapi';
 import { documentSpaceMembershipService } from '../../state/document-space/document-space-state';
 import DocumentSpaceMembershipsForm from './DocumentSpaceMembershipsForm';
 import { DocumentSpaceMembershipsProps } from './DocumentSpaceMembershipsProps';
+import Button from '../../components/Button/Button';
+import RemoveIcon from '../../icons/RemoveIcon';
+import { GridSelectionType } from '../../components/Grid/grid-selection-type';
+import './DocumentSpaceMemberships.scss';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
 
 interface DocumentSpaceMembershipsState {
   datasourceState: {
     datasource?: IDatasource,
     shouldUpdateDatasource: boolean
+  },
+  membersState: {
+    selected: DocumentSpaceDashboardMemberResponseDto[],
+    deletionState: {
+      isConfirmationOpen: boolean
+    }
   }
 }
 
@@ -44,13 +58,43 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     datasourceState: {
       datasource: undefined,
       shouldUpdateDatasource: false
+    },
+    membersState: {
+      selected: [],
+      deletionState: {
+        isConfirmationOpen: false
+      }
     }
   });
 
+  const mountedRef = useRef(false);
+
   useEffect(() => {
-    pageState.datasourceState.set({
-      datasource: membershipService.createMembersDatasource(props.documentSpaceId, infiniteScrollOptions),
-      shouldUpdateDatasource: true
+    mountedRef.current = true;
+
+    return function cleanup() {
+      mountedRef.current = false;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!props.isOpen) {
+      resetMemberState();
+    }
+  }, [props.isOpen]);
+
+  useEffect(() => {
+    pageState.merge({
+      datasourceState: {
+        datasource: membershipService.createMembersDatasource(props.documentSpaceId, infiniteScrollOptions),
+        shouldUpdateDatasource: true
+      },
+      membersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false
+        }
+      }
     });
   }, [props.documentSpaceId]);
 
@@ -62,6 +106,44 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
 
   function onMemberChangeCallback(): void {
     pageState.datasourceState.shouldUpdateDatasource.set(true);
+  }
+
+  async function onMemberDeleteConfirmation() {
+    try {
+      await membershipService.removeDocumentSpaceDashboardMembers(props.documentSpaceId, pageState.membersState.selected.value);
+
+      // Refresh the member list
+      // Clean up state
+      if (mountedRef.current) {
+        onMemberChangeCallback();
+        createTextToast(ToastType.SUCCESS, `Deleted (${pageState.membersState.selected.value.length}) Document Space Dashboard Users`);
+
+        resetMemberState();
+      }
+    } catch (err) {
+      const preparedError = prepareRequestError(err);
+
+      if (mountedRef.current) {
+        createTextToast(ToastType.ERROR, preparedError.message);
+      }
+    }
+  }
+
+  function resetMemberState() {
+    pageState.membersState.merge({
+      selected: [],
+      deletionState: {
+        isConfirmationOpen: false
+      }
+    });
+  }
+
+  function onMemberSelectionChange(data: DocumentSpaceDashboardMemberResponseDto, selectionEvent: GridSelectionType): void {
+    if (selectionEvent === 'selected') {
+      pageState.membersState.selected.merge([data]);
+    } else {
+      pageState.membersState.selected.find(member => member.value.id === data.id)?.set(none);
+    }
   }
 
   return (
@@ -82,8 +164,23 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
         onMemberChangeCallback={onMemberChangeCallback}
       />
       {pageState.datasourceState.datasource.value &&
-        <div className="">
-          <h4>Members</h4>
+        <div className="document-space-members">
+          <div className="document-space-members__header">
+            <h4 className="header__title">Members</h4>
+            <div className="header__actions">
+              <Button
+                disableMobileFullWidth
+                type={'button'}
+                disabled={pageState.membersState.selected.value.length === 0}
+                onClick={() => pageState.membersState.deletionState.isConfirmationOpen.set(true)}
+                unstyled
+                transparentOnDisabled
+                className="actions__remove-button"
+              >
+                <RemoveIcon iconTitle="Remove Selected Members" disabled={pageState.membersState.selected.value.length === 0} size={1.5} />
+              </Button>
+            </div>
+          </div>
           <InfiniteScrollGrid
             columns={membershipColumns}
             datasource={pageState.datasourceState.datasource.value}
@@ -94,10 +191,18 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
             updateDatasource={pageState.datasourceState.shouldUpdateDatasource.value}
             updateDatasourceCallback={onDatasourceUpdateCallback}
             getRowNodeId={getDashboardMemberUniqueKey}
+            rowSelection="multiple"
+            onRowSelected={onMemberSelectionChange}
           />
         </div>
       }
 
+      <DocumentSpaceMembershipsDeleteConfirmation
+        onMemberDeleteConfirmationSubmit={onMemberDeleteConfirmation}
+        onCancel={() => pageState.membersState.deletionState.isConfirmationOpen.set(false)}
+        show={pageState.membersState.deletionState.isConfirmationOpen.value}
+        selectedMemberCount={pageState.membersState.selected.value.length}
+      />
     </Modal>
   );
 }

@@ -177,4 +177,24 @@ describe('Test Document Space Membership Service', () => {
 
     await waitFor(() => expect(addMemberApiSpy).toHaveBeenCalledTimes(1));
   });
+
+  it('should remove members', async () => {
+    const response = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse({}));
+    });
+    const removeMemberApiSpy = jest.spyOn(documentSpaceApi, 'removeUserFromDocumentSpace').mockImplementation(response);
+
+    membershipService.removeDocumentSpaceDashboardMembers(documentSpaceId, [{
+      id: 'test-user-id',
+      email: 'test@dev.com',
+      privileges: [
+        {
+          id: 'test-privilege-id',
+          type: DocumentSpacePrivilegeDtoTypeEnum.Read
+        }
+      ]
+    }]);
+
+    await waitFor(() => expect(removeMemberApiSpy).toHaveBeenCalledTimes(1));
+  });
 });
