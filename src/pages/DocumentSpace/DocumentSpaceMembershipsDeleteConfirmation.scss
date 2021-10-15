@@ -1,0 +1,12 @@
+.member-delete-confirm {
+  display: flex;
+  align-items: center;
+
+  &__warning-icon {
+    float: left;
+  }
+
+  &__message {
+    margin: 0 0 0 1rem;
+  }
+}

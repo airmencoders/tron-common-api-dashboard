@@ -1,0 +1,23 @@
+@import "../../styles/mixins";
+
+.document-space-members {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @include breakpoint-below(mobile) {
+      flex-direction: column;
+      justify-content: unset;
+      align-items: unset;
+    }
+
+    margin: 1rem 0 0.5rem 0;
+
+    .header {
+      &__title {
+        margin: 0;
+      }
+    }
+  }
+}

@@ -30,6 +30,7 @@ describe('Test Document Space Service', () => {
 
   const documents: DocumentDto[] = [
     {
+      spaceId: '90f4d33b-b761-4a29-bcdd-1bf8fe46831c',
       key: 'file.txt',
       path: spaceName,
       size: 1000,
@@ -37,6 +38,7 @@ describe('Test Document Space Service', () => {
       uploadedDate: '2021-09-17T14:09:10.154Z',
     },
     {
+      spaceId: '407bf847-5ac7-485c-842f-c9efaf8a6b5d',
       key: 'file2.txt',
       path: spaceName,
       size: 20000,

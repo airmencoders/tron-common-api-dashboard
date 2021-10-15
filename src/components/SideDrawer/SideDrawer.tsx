@@ -23,7 +23,7 @@ function SideDrawer(props: SideDrawerProps) {
   return (
     <>
       <BackdropOverlay show={props.isOpen} />
-      <div className={props.isOpen ? `${componentClassName} default-panel-padding open` : `${componentClassName}`}
+      <div className={props.isOpen ? `${componentClassName} default-panel-padding open` : `${componentClassName} default-panel-padding`}
            data-testid="side-drawer">
         <div className="side-drawer__header">
           <h4 className="header__title">{props.title}</h4>
