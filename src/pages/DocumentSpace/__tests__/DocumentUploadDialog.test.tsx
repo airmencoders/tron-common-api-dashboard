@@ -33,6 +33,7 @@ describe('Document Upload Tests', () => {
     const page = render(<MemoryRouter>
       <DocumentUploadDialog 
         documentSpaceId='test'
+        currentPath={''}
         onFinish={mock} 
       />
     </MemoryRouter>);

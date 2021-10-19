@@ -17,7 +17,7 @@ export default class DocumentSpaceService {
 
   private paginationPageToTokenMap = new Map<number, string | undefined>([[0, undefined]]);
 
-  createDatasource(spaceName: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
+  createDatasource(spaceName: string, path: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
     const datasource: IDatasource = {
       getRows: async (params: IGetRowsParams) => {
         try {
@@ -25,7 +25,7 @@ export default class DocumentSpaceService {
           const page = Math.floor(params.startRow / limit);
           const continuationToken = this.paginationPageToTokenMap.get(page);
 
-          const data: S3PaginationDto = (await this.documentSpaceApi.listObjects(spaceName, continuationToken, limit)).data;
+          const data: S3PaginationDto = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
 
           this.paginationPageToTokenMap.set(page + 1, data.nextContinuationToken);
 
@@ -94,6 +94,16 @@ export default class DocumentSpaceService {
     };
   }
 
+  async createNewFolder(space: string, path: string, name: string): Promise<void> {
+    try {
+      await this.documentSpaceApi.createFolder(space, { path: path, folderName: name });
+      return Promise.resolve();
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
+  }
+
   async createDocumentSpace(dto: DocumentSpaceRequestDto): Promise<DocumentSpaceResponseDto> {
     try {
       const spaceDto = await this.documentSpaceApi.createSpace(dto);
@@ -126,13 +136,19 @@ export default class DocumentSpaceService {
     return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/all`;
   }
 
-  async deleteFile(space: string, file: any): Promise<void> {
-    await this.documentSpaceApi._delete(space, file);
+  async deleteIems(space: string, path: string, items: string[]): Promise<void> {
+    try {
+    await this.documentSpaceApi.deleteItems(space, { currentPath: path, itemsToDelete: [...items] });
+    return Promise.resolve();
+  }
+  catch (e) {
+    return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+  }
   }
 
-  uploadFile(space: string, file: any, progressCallback: (percent: number) => void): CancellableDataRequest<AxiosResponse<{ [key: string]: string}>> {
+  uploadFile(space: string, path: string, file: any, progressCallback: (percent: number) => void): CancellableDataRequest<AxiosResponse<{ [key: string]: string}>> {
     const token = axios.CancelToken.source();
-    const promise = this.documentSpaceApi.upload(space, file, { cancelToken: token.token, onUploadProgress: function(progressEvent: any) {
+    const promise = this.documentSpaceApi.upload(space, path, file, { cancelToken: token.token, onUploadProgress: function(progressEvent: any) {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
       progressCallback(percentCompleted);
     }});

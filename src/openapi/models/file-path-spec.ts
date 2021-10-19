@@ -17,51 +17,51 @@
 /**
  * 
  * @export
- * @interface DocumentDto
+ * @interface FilePathSpec
  */
-export interface DocumentDto {
+export interface FilePathSpec {
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof FilePathSpec
      */
-    key: string;
+    parentFolderId?: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof FilePathSpec
      */
-    path: string;
+    fullPathSpec?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof FilePathSpec
+     */
+    uuidList?: Array<string>;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof FilePathSpec
      */
-    spaceId: string;
-    /**
-     * Size in bytes
-     * @type {number}
-     * @memberof DocumentDto
-     */
-    size: number;
+    documentSpaceId: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof FilePathSpec
      */
-    uploadedDate: string;
+    itemId: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof FilePathSpec
      */
-    uploadedBy: string;
+    itemName: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof DocumentDto
+     * @type {string}
+     * @memberof FilePathSpec
      */
-    folder?: boolean;
+    docSpaceQualifiedPath?: string;
 }
 
 

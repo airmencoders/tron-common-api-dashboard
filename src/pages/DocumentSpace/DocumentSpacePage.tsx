@@ -1,16 +1,17 @@
 import { none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import React, { ChangeEvent, useEffect, useRef } from 'react';
+import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
+import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
-import LoadingCellRenderer from '../../components/LoadingCellRenderer/LoadingCellRenderer';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
@@ -18,25 +19,26 @@ import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import PeopleIcon from '../../icons/PeopleIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { formatBytesToString } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
+import DocumentSpaceCreateEditFolderForm from './DocumentSpaceCreateEditFolderForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
+import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
-import DocumentSpaceMemberships from './DocumentSpaceMemberships';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
     field: 'key',
     headerName: 'Name',
     resizable: true,
-    cellRenderer: LoadingCellRenderer,
+    cellRenderer: DocSpaceItemRenderer,
     checkboxSelection: true
   }),
   new GridColumn({
@@ -91,7 +93,10 @@ interface DocumentSpacePageState {
   privilegeState: {
     privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>,
     isLoading: boolean
-  }
+  },
+  newFolderPrompt: boolean;
+  path: string;
+  showDeleteSelectedDialog: boolean;
 }
 
 function getDocumentUniqueKey(data: DocumentDto): string {
@@ -121,7 +126,10 @@ function DocumentSpacePage() {
         MEMBERSHIP: false
       },
       isLoading: false
-    }
+    },
+    newFolderPrompt: false,
+    path: '',
+    showDeleteSelectedDialog: false,
   });
 
   const documentSpaceService = useDocumentSpaceState();
@@ -196,12 +204,14 @@ function DocumentSpacePage() {
         shouldUpdateDatasource: true,
         datasource: documentSpaceService.createDatasource(
           documentSpace.id,
+          pageState.get().path,
           infiniteScrollOptions
         ),
         privilegeState: {
           privileges,
           isLoading: false
-        }
+        },
+        path: '',
       });
     } catch (err) {
       const preparedError = prepareRequestError(err);
@@ -269,18 +279,40 @@ function DocumentSpacePage() {
     );
   }
 
+  function submitFolderName(name: string) {
+    pageState.merge({ isSubmitting: true });
+    if (pageState.selectedSpace.value?.id === undefined) return;
+    documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id, pageState.get().path, name)
+      .then(() => {
+        mergePageState({
+          newFolderPrompt: false,
+          isSubmitting: false,
+          showErrorMessage: false,
+          shouldUpdateDatasource: true
+        });
+      })
+      .catch(message => {
+        mergePageState({
+          isSubmitting: false,
+          errorMessage: message,
+          showErrorMessage: true,
+        });
+      });
+    mergeState(pageState.newFolderPrompt, false);
+  }
+
   function submitDocumentSpace(space: DocumentSpaceRequestDto) {
     pageState.merge({ isSubmitting: true });
     documentSpaceService
       .createDocumentSpace(space)
-      .then((s) => {
+      .then((docSpace) => {
         mergePageState({
           drawerOpen: false,
           isSubmitting: false,
           showErrorMessage: false,
-          selectedSpace: s,
+          selectedSpace: docSpace,
           shouldUpdateDatasource: true,
-          datasource: documentSpaceService.createDatasource(s.id, infiniteScrollOptions)
+          datasource: documentSpaceService.createDatasource(docSpace.id, pageState.get().path, infiniteScrollOptions)
         });
       })
       .catch((message) =>
@@ -301,7 +333,7 @@ function DocumentSpacePage() {
   }
 
   function closeDeleteDialog(): void {
-    pageState.merge({ showDeleteDialog: false });
+    pageState.merge({ showDeleteDialog: false, showDeleteSelectedDialog: false });
   }
 
   async function deleteFile(): Promise<void> {
@@ -311,9 +343,10 @@ function DocumentSpacePage() {
       return;
     }
 
-    await documentSpaceService.deleteFile(
+    await documentSpaceService.deleteIems(
       selectedSpace.id,
-      pageState.fileToDelete.get()
+      pageState.get().path,
+      pageState.get().selectedFiles.map(item => item.key)
     );
     pageState.merge({
       shouldUpdateDatasource: true,
@@ -339,21 +372,49 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  const documentDtoColumnsWithConditionalDelete = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
-    [
-      ...documentDtoColumns,
-      new GridColumn({
-        valueGetter: GridColumn.defaultValueGetter,
-        headerName: 'Delete',
-        headerClass: 'header-center',
-        cellRenderer: DeleteCellRenderer,
-        cellRendererParams: {
-          onClick: (doc: DocumentDto) => {
-            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+  const documentDtoColumnsWithConditionalDelete = () => {
+    const columns = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
+      [
+        ...documentDtoColumns,
+        new GridColumn({
+          valueGetter: GridColumn.defaultValueGetter,
+          headerName: 'Delete',
+          headerClass: 'header-center',
+          cellRenderer: DeleteCellRenderer,
+          cellRendererParams: {
+            onClick: (doc: DocumentDto) => {
+              pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+            },
           },
-        },
-      })
-    ] : documentDtoColumns;
+        })
+      ] 
+      : documentDtoColumns;
+
+    // modify the first column to have a DocSpaceItemRenderer
+    columns[0] = new GridColumn({
+      field: 'key',
+      headerName: 'Name',
+      resizable: true,
+      cellRenderer: DocSpaceItemRenderer,
+      checkboxSelection: true,
+      cellRendererParams: { 
+        onClick: (folder: string) => {
+          const newPath = pageState.get().path + '/' + folder;
+          pageState.merge({
+            path: newPath,
+            shouldUpdateDatasource: true,
+            datasource: documentSpaceService.createDatasource(
+              pageState.get().selectedSpace?.id ?? '',
+              newPath,
+              infiniteScrollOptions
+            ),
+          })
+        }
+      }
+    });
+
+    return columns;
+}
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -408,12 +469,35 @@ function DocumentSpacePage() {
             {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
               <DocumentUploadDialog
                 documentSpaceId={pageState.selectedSpace.value.id}
+                currentPath={pageState.get().path}
                 onFinish={() => pageState.shouldUpdateDatasource.set(true)}
               />
             }
 
+            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
+              <Button type='button' data-testid='add-new-folder-button' disableMobileFullWidth onClick={() => pageState.newFolderPrompt.set(true)}>
+                New Folder
+              </Button>
+            }
+
+            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
+              <Button 
+                type='button'
+                disabled={pageState.get().selectedFiles.length === 0}
+                data-testid='delete-selected-items'
+                disableMobileFullWidth
+                onClick={() => pageState.showDeleteSelectedDialog.set(true)}
+              >
+                Delete Selected
+              </Button>
+            } 
+
             {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) &&
-              <Button type="button" unstyled disableMobileFullWidth onClick={() => pageState.membershipsState.isOpen.set(true)}>
+              <Button type="button" 
+                unstyled 
+                disableMobileFullWidth 
+                onClick={() => pageState.membershipsState.isOpen.set(true)}
+              >
                 <PeopleIcon size={1.5} iconTitle="Manage Users" />
               </Button>
             }
@@ -421,10 +505,19 @@ function DocumentSpacePage() {
           }
         </div>
       </FormGroup>
-
+      <BreadCrumbTrail 
+        path={pageState.get().path} 
+        onNavigate={(path) => mergePageState({ 
+          path: path,
+          shouldUpdateDatasource: true,
+          datasource: documentSpaceService.createDatasource(
+            pageState.get().selectedSpace?.id ?? '',
+            path,
+            infiniteScrollOptions)})}
+      />
       {pageState.selectedSpace.value != null && pageState.datasource.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
         <InfiniteScrollGrid
-          columns={documentDtoColumnsWithConditionalDelete}
+          columns={documentDtoColumnsWithConditionalDelete()}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
@@ -457,11 +550,36 @@ function DocumentSpacePage() {
           errorMessage={pageState.errorMessage.get()}
         />
       </SideDrawer>
+      <SideDrawer
+        isLoading={false}
+        title="Add New Folder"
+        isOpen={pageState.newFolderPrompt.get()}
+        onCloseHandler={() => mergeState(pageState.newFolderPrompt, false)}
+        size={SideDrawerSize.NORMAL}
+      >
+        <DocumentSpaceCreateEditFolderForm 
+          onCancel={() => pageState.newFolderPrompt.set(false)}
+          onSubmit={submitFolderName}
+          isFormSubmitting={pageState.isSubmitting.get()}
+          formActionType={FormActionType.ADD}
+          onCloseErrorMsg={closeErrorMsg}
+          showErrorMessage={pageState.showErrorMessage.get()}
+          errorMessage={pageState.errorMessage.get()}
+        />
+      </SideDrawer>
+
       <DeleteDocumentDialog
         show={pageState.showDeleteDialog.get()}
         onCancel={closeDeleteDialog}
         onSubmit={deleteFile}
         file={pageState.fileToDelete.get()}
+      />
+
+      <DeleteDocumentDialog
+        show={pageState.showDeleteSelectedDialog.get()}
+        onCancel={closeDeleteDialog}
+        onSubmit={deleteFile}
+        file={null}
       />
 
       {pageState.selectedSpace.value && !pageState.privilegeState.isLoading.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) &&

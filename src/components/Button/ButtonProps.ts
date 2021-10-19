@@ -1,6 +1,7 @@
 import React from "react";
 
 export interface ButtonProps {
+  id?: string;
   type: 'button' | 'submit' | 'reset';
   children: React.ReactNode;
   secondary?: boolean;

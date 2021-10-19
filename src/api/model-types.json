@@ -863,6 +863,9 @@
     "DocumentDto": {
       "additionalProperties": false,
       "properties": {
+        "folder": {
+          "type": "boolean"
+        },
         "key": {
           "type": "string"
         },
@@ -890,6 +893,22 @@
         "size",
         "uploadedDate",
         "uploadedBy"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceCreateFolderDto": {
+      "additionalProperties": false,
+      "properties": {
+        "folderName": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "folderName"
       ],
       "type": "object"
     },
@@ -958,6 +977,33 @@
       ],
       "type": "object"
     },
+    "DocumentSpaceDeleteItemsDto": {
+      "additionalProperties": false,
+      "properties": {
+        "currentPath": {
+          "type": "string"
+        },
+        "itemsToDelete": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "DocumentSpacePathDto": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
     "DocumentSpacePrivilegeDto": {
       "additionalProperties": false,
       "properties": {
@@ -996,6 +1042,22 @@
         "MEMBERSHIP"
       ],
       "type": "string"
+    },
+    "DocumentSpaceRenameFolderDto": {
+      "additionalProperties": false,
+      "properties": {
+        "existingFolderPath": {
+          "type": "string"
+        },
+        "newName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "existingFolderPath",
+        "newName"
+      ],
+      "type": "object"
     },
     "DocumentSpaceRequestDto": {
       "additionalProperties": false,
@@ -1251,6 +1313,41 @@
         "error",
         "reason",
         "path"
+      ],
+      "type": "object"
+    },
+    "FilePathSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "docSpaceQualifiedPath": {
+          "type": "string"
+        },
+        "documentSpaceId": {
+          "type": "string"
+        },
+        "fullPathSpec": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "itemName": {
+          "type": "string"
+        },
+        "parentFolderId": {
+          "type": "string"
+        },
+        "uuidList": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "documentSpaceId",
+        "itemId",
+        "itemName"
       ],
       "type": "object"
     },
