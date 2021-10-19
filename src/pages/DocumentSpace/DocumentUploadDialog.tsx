@@ -55,6 +55,7 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
   }
 
   async function handleFileSelection(files: FileList): Promise<void> {
+    console.log(files)
     if (files && files.length > 0) {
       uploadState.merge({
         showDialog: true,

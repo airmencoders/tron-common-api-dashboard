@@ -1,0 +1,12 @@
+.menu-container {
+  position: relative;
+}
+
+.drop-down-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 40px;
+  width: fit-content;
+  z-index: 1000;
+}

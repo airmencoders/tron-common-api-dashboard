@@ -6,6 +6,7 @@ import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
+import DropDown from '../../components/DropDown/DropDown';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
@@ -17,7 +18,10 @@ import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import AddMaterialIcon from '../../icons/AddMaterialIcon';
+import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import PeopleIcon from '../../icons/PeopleIcon';
+import RemoveIcon from '../../icons/RemoveIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
@@ -430,108 +434,151 @@ function DocumentSpacePage() {
             >
               {getSpaceOptions()}
             </Select>
-            {isAdmin && !pageState.privilegeState.isLoading.value &&
+            {isAdmin && !pageState.privilegeState.isLoading.value && (
               <Button
                 data-testid="add-doc-space__btn"
                 type="button"
                 onClick={() => pageState.merge({ drawerOpen: true })}
                 disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
               >
-                Add New Space
+                Add New Space{' '}<AddMaterialIcon size={1.25} />
               </Button>
-            }
-          </div>
-          {pageState.selectedSpace.value != null && !pageState.privilegeState.isLoading.value &&
-            <div>
-            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) &&
-              <>
-              <a href={pageState.selectedFiles.value.length > 0 ? documentSpaceService.createRelativeFilesDownloadUrl(pageState.selectedSpace.value.id, pageState.selectedFiles.value) : undefined}>
-                <Button
-                  data-testid="download-selected-files__btn"
-                  type="button"
-                  disabled={pageState.selectedFiles.value.length === 0}
-                >
-                  Download Selected Files (zip)
-                </Button>
-              </a>
-
-              <a href={documentSpaceService.createRelativeDownloadAllFilesUrl(pageState.selectedSpace.value.id)}>
-                <Button
-                  data-testid="download-all-files__btn"
-                  type="button"
-                >
-                  Download All Files (zip)
-                </Button>
-              </a>
-              </>
-            }
-
-            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
-              <DocumentUploadDialog
-                documentSpaceId={pageState.selectedSpace.value.id}
-                currentPath={pageState.get().path}
-                onFinish={() => pageState.shouldUpdateDatasource.set(true)}
-              />
-            }
-
-            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
-              <Button type='button' data-testid='add-new-folder-button' disableMobileFullWidth onClick={() => pageState.newFolderPrompt.set(true)}>
-                New Folder
-              </Button>
-            }
-
-            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) &&
-              <Button 
-                type='button'
-                disabled={pageState.get().selectedFiles.length === 0}
-                data-testid='delete-selected-items'
-                disableMobileFullWidth
-                onClick={() => pageState.showDeleteSelectedDialog.set(true)}
-              >
-                Delete Selected
-              </Button>
-            } 
-
-            {isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) &&
-              <Button type="button" 
-                unstyled 
-                disableMobileFullWidth 
-                onClick={() => pageState.membershipsState.isOpen.set(true)}
-              >
-                <PeopleIcon size={1.5} iconTitle="Manage Users" />
-              </Button>
-            }
-            </div>
-          }
+            )}
+          </div>          
         </div>
       </FormGroup>
-      <BreadCrumbTrail 
-        path={pageState.get().path} 
-        onNavigate={(path) => mergePageState({ 
-          path: path,
-          shouldUpdateDatasource: true,
-          datasource: documentSpaceService.createDatasource(
-            pageState.get().selectedSpace?.id ?? '',
-            path,
-            infiniteScrollOptions)})}
+      <div className='breadcrumb-area'>
+      <BreadCrumbTrail
+        path={pageState.get().path}
+        onNavigate={(path) =>
+          mergePageState({
+            path: path,
+            selectedFiles: [],
+            shouldUpdateDatasource: true,
+            datasource: documentSpaceService.createDatasource(
+              pageState.get().selectedSpace?.id ?? '',
+              path,
+              infiniteScrollOptions
+            ),
+          })
+        }
       />
-      {pageState.selectedSpace.value != null && pageState.datasource.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
-        <InfiniteScrollGrid
-          columns={documentDtoColumnsWithConditionalDelete()}
-          datasource={pageState.datasource.value}
-          cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
-          maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
-          maxConcurrentDatasourceRequests={
-            infiniteScrollOptions.maxConcurrentDatasourceRequests
-          }
-          suppressCellSelection
-          updateDatasource={pageState.shouldUpdateDatasource.value}
-          updateDatasourceCallback={onDatasourceUpdateCallback}
-          getRowNodeId={getDocumentUniqueKey}
-          onRowSelected={onDocumentRowSelected}
-          rowSelection="multiple"
-        />
-      )}
+      <div>
+      {pageState.selectedSpace.value != null &&
+            !pageState.privilegeState.isLoading.value && (
+              <div className='content-controls'>
+                {isAuthorizedForAction(
+                  DocumentSpacePrivilegeDtoTypeEnum.Write
+                ) && (
+                  <DropDown data-testid='add-new-items' anchorContent={<AddMaterialIcon size={1} />}>
+                    <Button
+                      type="button"
+                      icon
+                      data-testid="add-new-folder-button"
+                      disableMobileFullWidth
+                      onClick={() => pageState.newFolderPrompt.set(true)}
+                    >
+                      Add New Folder 
+                    </Button>
+                    <DocumentUploadDialog
+                      documentSpaceId={pageState.selectedSpace.value.id}
+                      currentPath={pageState.get().path}
+                      onFinish={() => pageState.shouldUpdateDatasource.set(true)}
+                    />
+                  </DropDown>
+                )}
+
+
+                {isAuthorizedForAction(
+                  DocumentSpacePrivilegeDtoTypeEnum.Write
+                ) && (
+                  <Button
+                    type="button"
+                    icon
+                    disabled={pageState.get().selectedFiles.length === 0}
+                    data-testid="delete-selected-items"
+                    disableMobileFullWidth
+                    onClick={() => pageState.showDeleteSelectedDialog.set(true)}
+                  >
+                    <RemoveIcon className='icon-color' size={1.25} />
+                  </Button>
+                )}
+
+                {isAuthorizedForAction(
+                  DocumentSpacePrivilegeDtoTypeEnum.Read
+                ) && (
+                  <DropDown anchorContent={<DownloadMaterialIcon size={1.25} />}>
+                    <a
+                      href={
+                        pageState.selectedFiles.value.length > 0
+                          ? documentSpaceService.createRelativeFilesDownloadUrl(
+                              pageState.selectedSpace.value.id,
+                              pageState.selectedFiles.value
+                            )
+                          : undefined
+                      }
+                    >
+                      <Button
+                        data-testid="download-selected-files__btn"
+                        icon
+                        type="button"
+                        disabled={pageState.selectedFiles.value.length === 0}
+                      >
+                        Download Selected
+                      </Button>
+                    </a>
+                  
+                    <a
+                      href={documentSpaceService.createRelativeDownloadAllFilesUrl(
+                        pageState.selectedSpace.value.id
+                      )}
+                    >
+                      <Button
+                        data-testid="download-all-files__btn"
+                        type="button"
+                      >
+                        Download All Files (zip)
+                      </Button>
+                    </a>
+                  </DropDown>
+                )}
+
+
+                {isAuthorizedForAction(
+                  DocumentSpacePrivilegeDtoTypeEnum.Membership
+                ) && (
+                  <Button
+                    type="button"
+                    unstyled
+                    disableMobileFullWidth
+                    onClick={() => pageState.membershipsState.isOpen.set(true)}
+                  >
+                    <PeopleIcon size={1.5} iconTitle="Manage Users" />
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+      </div>
+      {pageState.selectedSpace.value != null &&
+        pageState.datasource.value &&
+        isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
+          <InfiniteScrollGrid
+            columns={documentDtoColumnsWithConditionalDelete()}
+            datasource={pageState.datasource.value}
+            cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
+            maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
+            maxConcurrentDatasourceRequests={
+              infiniteScrollOptions.maxConcurrentDatasourceRequests
+            }
+            suppressCellSelection
+            updateDatasource={pageState.shouldUpdateDatasource.value}
+            updateDatasourceCallback={onDatasourceUpdateCallback}
+            getRowNodeId={getDocumentUniqueKey}
+            onRowSelected={onDocumentRowSelected}
+            rowSelection="multiple"
+          />
+        )}
 
       <SideDrawer
         isLoading={false}
@@ -557,7 +604,7 @@ function DocumentSpacePage() {
         onCloseHandler={() => mergeState(pageState.newFolderPrompt, false)}
         size={SideDrawerSize.NORMAL}
       >
-        <DocumentSpaceCreateEditFolderForm 
+        <DocumentSpaceCreateEditFolderForm
           onCancel={() => pageState.newFolderPrompt.set(false)}
           onSubmit={submitFolderName}
           isFormSubmitting={pageState.isSubmitting.get()}
@@ -582,14 +629,15 @@ function DocumentSpacePage() {
         file={null}
       />
 
-      {pageState.selectedSpace.value && !pageState.privilegeState.isLoading.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) &&
-        <DocumentSpaceMemberships
-          documentSpaceId={pageState.selectedSpace.value.id}
-          isOpen={pageState.membershipsState.isOpen.value}
-          onSubmit={() => pageState.membershipsState.isOpen.set(false)}
-        />
-      }
-
+      {pageState.selectedSpace.value &&
+        !pageState.privilegeState.isLoading.value &&
+        isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
+          <DocumentSpaceMemberships
+            documentSpaceId={pageState.selectedSpace.value.id}
+            isOpen={pageState.membershipsState.isOpen.value}
+            onSubmit={() => pageState.membershipsState.isOpen.set(false)}
+          />
+        )}
     </PageFormat>
   );
 }

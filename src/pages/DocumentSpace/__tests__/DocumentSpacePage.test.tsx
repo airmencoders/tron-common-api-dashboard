@@ -1,5 +1,5 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
 import { MemoryRouter } from 'react-router-dom';
@@ -425,6 +425,7 @@ describe('Test Document Space Page', () => {
         </MemoryRouter>
       );
 
+      fireEvent.click(page.getByTestId('add-new-items'));
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
       expect(page.getByText('Upload Files')).toBeInTheDocument();
     });
