@@ -20,6 +20,7 @@ import RecordIcon from './icons/RecordIcon';
 import AppsIcon from './icons/AppsIcon';
 import DigitizeIcon from './icons/DigitizeIcon';
 import SystemIcon from './icons/SystemIcon';
+import PuzzleIcon from './icons/PuzzleIcon';
 
 export interface RouteItem {
     path: string;
@@ -166,7 +167,8 @@ export const routes: RouteItem[] = [
                     PrivilegeType.DASHBOARD_ADMIN
                 ]
             }
-        ]
+        ],
+        icon: PuzzleIcon
     },
     {
         path: '#',
