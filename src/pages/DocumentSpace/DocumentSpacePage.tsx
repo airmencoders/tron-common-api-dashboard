@@ -30,6 +30,8 @@ import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
+import DocumentRowActionCellRenderer
+  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -342,16 +344,22 @@ function DocumentSpacePage() {
   const documentDtoColumnsWithConditionalDelete = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
     [
       ...documentDtoColumns,
+      // new GridColumn({
+      //   valueGetter: GridColumn.defaultValueGetter,
+      //   headerName: 'Delete',
+      //   headerClass: 'header-center',
+      //   cellRenderer: DeleteCellRenderer,
+      //   cellRendererParams: {
+      //     onClick: (doc: DocumentDto) => {
+      //       pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
+      //     },
+      //   },
+      // })
       new GridColumn({
         valueGetter: GridColumn.defaultValueGetter,
-        headerName: 'Delete',
+        headerName: 'More',
         headerClass: 'header-center',
-        cellRenderer: DeleteCellRenderer,
-        cellRendererParams: {
-          onClick: (doc: DocumentDto) => {
-            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
-          },
-        },
+        cellRenderer: DocumentRowActionCellRenderer,
       })
     ] : documentDtoColumns;
 
