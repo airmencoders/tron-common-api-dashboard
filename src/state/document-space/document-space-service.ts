@@ -23,8 +23,6 @@ export default class DocumentSpaceService {
         try {
           const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
           const page = Math.floor(params.startRow / limit);
-          const continuationToken = this.paginationPageToTokenMap.get(page);
-
           const data: S3PaginationDto = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
 
           this.paginationPageToTokenMap.set(page + 1, data.nextContinuationToken);
