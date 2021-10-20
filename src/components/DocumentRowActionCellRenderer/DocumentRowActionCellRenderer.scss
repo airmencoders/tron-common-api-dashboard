@@ -1,0 +1,32 @@
+@import "../../styles/base";
+
+.document-row-action-cell-renderer {
+  &__icon {
+    margin: auto;
+    width: calculateRem(40px);
+    text-align: center;
+    cursor: pointer;
+  }
+  &__popper {
+    .popup {
+      padding: 10px 0;
+    }
+    &.popup:before {
+      display: none;
+    }
+    .popper {
+      &__item {
+        padding: .5rem 1rem;
+        &:hover {
+          background-color: $highlight-color-confirm;
+          cursor: pointer;
+        }
+      }
+      &__title {
+        padding-left: .70rem;
+        position: relative;
+        top: 1px;
+      }
+    }
+  }
+}

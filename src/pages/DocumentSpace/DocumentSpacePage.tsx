@@ -30,6 +30,8 @@ import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
+import DocumentRowActionCellRenderer
+  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -344,14 +346,16 @@ function DocumentSpacePage() {
       ...documentDtoColumns,
       new GridColumn({
         valueGetter: GridColumn.defaultValueGetter,
-        headerName: 'Delete',
+        headerName: 'More',
         headerClass: 'header-center',
-        cellRenderer: DeleteCellRenderer,
+        cellRenderer: DocumentRowActionCellRenderer,
         cellRendererParams: {
-          onClick: (doc: DocumentDto) => {
-            pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
-          },
-        },
+          actions: {
+            delete: (doc: DocumentDto) => {
+              pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true })
+            }
+          }
+        }
       })
     ] : documentDtoColumns;
 

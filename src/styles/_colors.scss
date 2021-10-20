@@ -26,6 +26,20 @@ $link-color: $main-brand-color;
 $font-color-normal: color('gray-cool-80');
 $font-color-lighter: color('gray-cool-50');
 
+$font-color-primary: #1b1c22;
+$font-color-secondary: #5f96ea;
+$font-color-tertiary: #515b68;
+
+$background-color-primary: #ffffff;
+$background-color-secondary: #e5e5e5;
+$background-color-tertiary: #c2c4cb;
+
+$status-color-confirm: #429649;
+$status-color-pending: #ebb057;
+$status-color-error: #eb5757;
+
+$highlight-color-confirm: #bbd3f6;
+
 $success: color($theme-color-success);
 $error: color($theme-color-error);
 $disabled: #c9c9c9;
