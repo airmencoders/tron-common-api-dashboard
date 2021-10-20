@@ -1,12 +1,13 @@
 import { IconProps } from './IconProps';
 
-export default function DownloadMaterialIcon(props: IconProps) {
+export default function UploadMaterialIcon(props: IconProps) {
   return (
     <svg
       width="18"
       height="18"
       viewBox="0 0 20 24"
       fill="none"
+      transform="scale(1 -1)"
       xmlns="http://www.w3.org/2000/svg"
     >
       <title>{ props.iconTitle != null ? props.iconTitle : 'add'}</title>

@@ -36,6 +36,7 @@ export interface DocumentUploadProps {
   currentPath: string;
   onFinish: () => void;
   buttonStyle?: ButtonStyle;
+  value?: string | React.ReactNode;
 }
 
 export default function DocumentUploadDialog(props: DocumentUploadProps) {
@@ -69,7 +70,6 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
   }
 
   async function handleFileSelection(files: FileList): Promise<void> {
-    console.log(files)
     if (files && files.length > 0) {
       uploadState.merge({
         showDialog: true,
@@ -126,7 +126,7 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
         type="button"
         {...props.buttonStyle}
       >
-        Upload Files
+        {props.value ?? 'Upload Files'}
       </Button>
       <Modal
         show={uploadState.showDialog.get()}

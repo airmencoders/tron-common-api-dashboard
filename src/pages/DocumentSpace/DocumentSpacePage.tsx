@@ -4,8 +4,8 @@ import React, { ChangeEvent, useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
-import DeleteCellRenderer from '../../components/DeleteCellRenderer/DeleteCellRenderer';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
+import DocumentRowActionCellRenderer from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import DropDown from '../../components/DropDown/DropDown';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
@@ -22,6 +22,7 @@ import AddMaterialIcon from '../../icons/AddMaterialIcon';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import PeopleIcon from '../../icons/PeopleIcon';
 import RemoveIcon from '../../icons/RemoveIcon';
+import UploadMaterialIcon from '../../icons/UploadMaterialIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
@@ -354,6 +355,12 @@ function DocumentSpacePage() {
     );
     pageState.merge({
       shouldUpdateDatasource: true,
+      selectedFiles: [],
+      datasource: documentSpaceService.createDatasource(
+        pageState.get().selectedSpace?.id ?? '',
+        pageState.get().path,
+        infiniteScrollOptions
+      ),
     });
     closeDeleteDialog();
   }
@@ -382,14 +389,16 @@ function DocumentSpacePage() {
         ...documentDtoColumns,
         new GridColumn({
           valueGetter: GridColumn.defaultValueGetter,
-          headerName: 'Delete',
+          headerName: 'More',
           headerClass: 'header-center',
-          cellRenderer: DeleteCellRenderer,
+          cellRenderer: DocumentRowActionCellRenderer,
           cellRendererParams: {
-            onClick: (doc: DocumentDto) => {
-              pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
-            },
-          },
+            actions: {
+              delete: (doc: DocumentDto) => {
+                pageState.merge({ selectedFiles: [doc], showDeleteDialog: true })
+              }
+            }
+          }
         })
       ] 
       : documentDtoColumns;
@@ -467,34 +476,34 @@ function DocumentSpacePage() {
           {pageState.selectedSpace.value != null &&
             !pageState.privilegeState.isLoading.value && (
               <div className="content-controls">
+                
+
+              { pageState.selectedSpace.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) 
+                && <div data-testid="upload-new-file">
+                    <DocumentUploadDialog
+                      documentSpaceId={pageState.selectedSpace.value.id}
+                      currentPath={pageState.get().path}
+                      onFinish={() => 
+                        pageState.merge({ shouldUpdateDatasource: true, })
+                      }
+                      buttonStyle={{ icon: true, className: 'rotate-icon'}}
+                      
+                      value={<UploadMaterialIcon size={1} iconTitle="Upload Files" />}
+                    />
+                  </div>               
+                }
+
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Write
                 ) && (
                   <DropDown
+                    id="add-new-items"
                     data-testid="add-new-items"
                     anchorContent={<AddMaterialIcon size={1} iconTitle="Add Items" />}
-                  >
-                    <div className="drop-down-menu-item" data-testid="add-new-folder-button">
-                      <Button
-                        type="button"
-                        unstyled
-                        onClick={() => pageState.newFolderPrompt.set(true)}
-                      >
-                        Add New Folder
-                      </Button>
-                    </div>
-                    <hr />
-                    <div className="drop-down-menu-item" data-testid="upload-new-file">
-                      <DocumentUploadDialog
-                        documentSpaceId={pageState.selectedSpace.value.id}
-                        currentPath={pageState.get().path}
-                        onFinish={() =>
-                          pageState.shouldUpdateDatasource.set(true)
-                        }
-                        buttonStyle={{ unstyled: true }}
-                      />
-                    </div>
-                  </DropDown>
+                    items={[
+                      { displayName: 'Add New Folder', action: () => pageState.merge({ newFolderPrompt: true }) }
+                    ]}
+                  />
                 )}
 
                 {isAuthorizedForAction(
@@ -516,46 +525,24 @@ function DocumentSpacePage() {
                   DocumentSpacePrivilegeDtoTypeEnum.Read
                 ) && (
                   <DropDown
+                    id="download-items"
+                    data-testid="download-items"
                     anchorContent={<DownloadMaterialIcon size={1.25} iconTitle="Download Items" />}
-                  >
-                    <div className="drop-down-menu-item">
-                      <a
-                        href={
-                          pageState.selectedFiles.value.length > 0
-                            ? documentSpaceService.createRelativeFilesDownloadUrl(
-                                pageState.selectedSpace.value.id,
-                                pageState.selectedFiles.value
-                              )
-                            : undefined
-                        }
-                      >
-                        <Button
-                          data-testid="download-selected-files__btn"
-                          unstyled
-                          type="button"
-                          disabled={pageState.selectedFiles.value.length === 0}
-                        >
-                          Download Selected
-                        </Button>
-                      </a>
-                    </div>
-                    <hr />
-                    <div className="drop-down-menu-item">
-                      <a
-                        href={documentSpaceService.createRelativeDownloadAllFilesUrl(
-                          pageState.selectedSpace.value.id
-                        )}
-                      >
-                        <Button
-                          unstyled
-                          data-testid="download-all-files__btn"
-                          type="button"
-                        >
-                          Download All Files (zip)
-                        </Button>
-                      </a>
-                    </div>
-                  </DropDown>
+                    items={[
+                      { displayName: 'Download Selected', 
+                        action: () => window.open((pageState.selectedFiles.value.length > 0 && pageState.selectedSpace.value)
+                          ? documentSpaceService.createRelativeFilesDownloadUrl(
+                              pageState.selectedSpace.value.id,
+                              pageState.selectedFiles.value
+                            )
+                          : undefined) 
+                      },
+                      { displayName: 'Download All Files (zip)', 
+                        action: () => pageState.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+                          pageState.selectedSpace.value.id))
+                      }
+                    ]}
+                  />                    
                 )}
 
                 {isAuthorizedForAction(
@@ -633,7 +620,7 @@ function DocumentSpacePage() {
         show={pageState.showDeleteDialog.get()}
         onCancel={closeDeleteDialog}
         onSubmit={deleteFile}
-        file={pageState.fileToDelete.get()}
+        file={pageState.selectedFiles.get().map(item => item.key.toString()).join(',')}
       />
 
       <DeleteDocumentDialog

@@ -118,7 +118,7 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
-    expect(page.queryByTestId("add-new-items")).not.toBeInTheDocument();
+    expect(page.queryByTitle("Upload Files")).not.toBeInTheDocument();
   });
 
   it('should allow to change space', async () => {
@@ -223,6 +223,7 @@ describe('Test Document Space Page', () => {
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
       expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
       expect(page.queryByTitle('Add Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
       expect(page.queryByTitle('Manager Users')).not.toBeInTheDocument();
       // find by a column header in grid
       expect(page.queryByText('Name')).not.toBeInTheDocument();
@@ -253,6 +254,7 @@ describe('Test Document Space Page', () => {
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
       expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
       expect(page.queryByTitle('Add Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
       expect(page.queryByTitle('Manager Users')).not.toBeInTheDocument();
       // find by a column header in grid
       expect(page.queryByText('Name')).not.toBeInTheDocument();
@@ -421,10 +423,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      expect(page.getByTitle('Add Items')).toBeInTheDocument();
-      fireEvent.click(page.getByTitle('Add Items'));
-      await waitFor(() => expect(page.getByTestId('upload-new-file')).toBeVisible());
-
+      expect(page.getByTitle('Upload Files')).toBeInTheDocument();
     });
 
     it('should show Upload Files button with DASHBOARD_ADMIN privilege', async () => {
@@ -437,9 +436,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(fetchAndStoreSpacesSpy).toHaveBeenCalledTimes(1));
-      expect(page.getByTitle('Add Items')).toBeInTheDocument();
-      fireEvent.click(page.getByTitle('Add Items'));
-      await waitFor(() => expect(page.getByTestId('upload-new-file')).toBeVisible());
+      expect(page.getByTitle('Upload Files')).toBeInTheDocument();
     });
 
     it('should not show Upload Files button when not WRITE privilege', async () => {
@@ -456,7 +453,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      expect(page.queryByTitle('Add Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
     });
   });
 });

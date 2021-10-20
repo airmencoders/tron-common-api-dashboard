@@ -59,28 +59,3 @@
 .icon-color {
   color:#fff !important;
 }
-
-.drop-down-menu-item {
-  text-decoration: none;
-  font-weight: 500;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  width: 100%;
-  margin-top: 0.5rem;
-  align-content: center;
-  align-items: center;
-  
-  button {
-    text-decoration: none;
-  }
-
-  .usa-button:disabled {
-    background-color: #fff;
-    color: #e5e5e5;
-  }
-}
-
-.drop-down-menu-item :hover {
-  text-decoration: none;
-}

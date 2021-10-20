@@ -1,6 +1,7 @@
 import React, {useEffect, useMemo} from 'react';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'semantic-ui-css/semantic.min.css'; //For semantic-ui
 import {Route, Switch} from 'react-router-dom';
 import {RouteItem, RoutePath, routes} from './routes';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
