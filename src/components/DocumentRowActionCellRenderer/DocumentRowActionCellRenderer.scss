@@ -11,7 +11,7 @@
     .popup {
       padding: 10px 0;
     }
-    .popup:before {
+    &.popup:before {
       display: none;
     }
     .popper {

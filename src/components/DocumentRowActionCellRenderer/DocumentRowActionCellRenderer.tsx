@@ -1,7 +1,6 @@
-import React, {ReactElement, ReactNode, useMemo} from 'react';
-import {Card, Image, Popup, Rating} from 'semantic-ui-react';
+import React, {useMemo} from 'react';
+import {Popup} from 'semantic-ui-react';
 import EllipsesIcon from '../../icons/EllipsesIcon';
-import Button from '../Button/Button';
 import './DocumentRowActionCellRenderer.scss';
 import StarIcon from '../../icons/StarIcon';
 import {IconProps} from '../../icons/IconProps';
@@ -49,8 +48,9 @@ function DocumentRowActionCellRenderer(props: DocumentRowActionCellRendererProps
             on="click"
             offset={[0, -30]}
             position="bottom right"
+            className={'document-row-action-cell-renderer__popper'}
         >
-          <Popup.Content className={'document-row-action-cell-renderer__popper'}>
+          <Popup.Content>
             {
               popupItems?.length > 0 &&
               popupItems.map(popupItem => (
