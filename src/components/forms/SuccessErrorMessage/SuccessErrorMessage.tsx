@@ -19,8 +19,9 @@ function SuccessErrorMessage(props: SuccessErrorMessageProps) {
                 }
               </div> :
               <>
+                {props.showErrorMessage && typeof(props.errorMessage) === 'object' && props.errorMessage.map((message, index)=>(<p key={index} className="success-container__validation-error">* {message}</p>))}
                 {
-                  props.showErrorMessage && <p className="success-container__validation-error">* {props.errorMessage}</p>
+                  props.showErrorMessage && typeof(props.errorMessage) === 'string' && <p className="success-container__validation-error">* {props.errorMessage}</p>
                 }
               </>
         }

@@ -893,6 +893,22 @@
       ],
       "type": "object"
     },
+    "DocumentSpaceCreateFolderDto": {
+      "additionalProperties": false,
+      "properties": {
+        "folderName": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "folderName"
+      ],
+      "type": "object"
+    },
     "DocumentSpaceDashboardMemberRequestDto": {
       "additionalProperties": false,
       "properties": {
@@ -958,6 +974,42 @@
       ],
       "type": "object"
     },
+    "DocumentSpaceFileSystemEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "documentSpaceId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "itemName": {
+          "type": "string"
+        },
+        "parentEntryId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "itemName"
+      ],
+      "type": "object"
+    },
+    "DocumentSpacePathDto": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
     "DocumentSpacePrivilegeDto": {
       "additionalProperties": false,
       "properties": {
@@ -996,6 +1048,22 @@
         "MEMBERSHIP"
       ],
       "type": "string"
+    },
+    "DocumentSpaceRenameFolderDto": {
+      "additionalProperties": false,
+      "properties": {
+        "existingFolderPath": {
+          "type": "string"
+        },
+        "newName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "existingFolderPath",
+        "newName"
+      ],
+      "type": "object"
     },
     "DocumentSpaceRequestDto": {
       "additionalProperties": false,
@@ -1251,6 +1319,88 @@
         "error",
         "reason",
         "path"
+      ],
+      "type": "object"
+    },
+    "FilePathSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "docSpaceQualifiedPath": {
+          "type": "string"
+        },
+        "documentSpaceId": {
+          "type": "string"
+        },
+        "fullPathSpec": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "itemName": {
+          "type": "string"
+        },
+        "parentFolderId": {
+          "type": "string"
+        },
+        "uuidList": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "documentSpaceId",
+        "itemId",
+        "itemName"
+      ],
+      "type": "object"
+    },
+    "FilePathSpecWithContents": {
+      "additionalProperties": false,
+      "properties": {
+        "docSpaceQualifiedPath": {
+          "type": "string"
+        },
+        "documentSpaceId": {
+          "type": "string"
+        },
+        "files": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "fullPathSpec": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "itemName": {
+          "type": "string"
+        },
+        "parentFolderId": {
+          "type": "string"
+        },
+        "subFolderElements": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceFileSystemEntry"
+          },
+          "type": "array"
+        },
+        "uuidList": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "documentSpaceId",
+        "itemId",
+        "itemName"
       ],
       "type": "object"
     },

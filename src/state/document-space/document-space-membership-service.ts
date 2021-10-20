@@ -1,10 +1,14 @@
-import { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
-import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentSpaceControllerApiInterface, DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberResponseDto } from '../../openapi';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import {IDatasource, IGetRowsParams} from 'ag-grid-community';
+import {InfiniteScrollOptions} from '../../components/DataCrudFormPage/infinite-scroll-options';
+import {convertAgGridSortToQueryParams, generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
+import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
+import {createFailedDataFetchToast, createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
+import {
+  DocumentSpaceControllerApiInterface,
+  DocumentSpaceDashboardMemberRequestDto,
+  DocumentSpaceDashboardMemberResponseDto
+} from '../../openapi';
+import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
 
 export default class DocumentSpaceMembershipService {
   constructor(
@@ -75,5 +79,9 @@ export default class DocumentSpaceMembershipService {
     const emails = dashboardMemberDtos.map(memberDto => memberDto.email);
 
     return this.documentSpaceApi.removeUserFromDocumentSpace(documentSpaceId, emails);
+  }
+
+  batchAddUserToDocumentSpace(id: string, file?: any) {
+    return this.documentSpaceApi.batchAddUserToDocumentSpace(id, file);
   }
 }
