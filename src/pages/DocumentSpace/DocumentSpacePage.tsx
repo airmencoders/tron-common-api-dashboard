@@ -344,22 +344,18 @@ function DocumentSpacePage() {
   const documentDtoColumnsWithConditionalDelete = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
     [
       ...documentDtoColumns,
-      // new GridColumn({
-      //   valueGetter: GridColumn.defaultValueGetter,
-      //   headerName: 'Delete',
-      //   headerClass: 'header-center',
-      //   cellRenderer: DeleteCellRenderer,
-      //   cellRendererParams: {
-      //     onClick: (doc: DocumentDto) => {
-      //       pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true });
-      //     },
-      //   },
-      // })
       new GridColumn({
         valueGetter: GridColumn.defaultValueGetter,
         headerName: 'More',
         headerClass: 'header-center',
         cellRenderer: DocumentRowActionCellRenderer,
+        cellRendererParams: {
+          actions: {
+            delete: (doc: DocumentDto) => {
+              pageState.merge({ fileToDelete: doc.key, showDeleteDialog: true })
+            }
+          }
+        }
       })
     ] : documentDtoColumns;
 
