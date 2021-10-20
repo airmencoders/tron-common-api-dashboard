@@ -53,11 +53,15 @@ models/count-metric-dto.ts
 models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
 models/document-dto.ts
+models/document-space-create-folder-dto.ts
 models/document-space-dashboard-member-request-dto.ts
 models/document-space-dashboard-member-response-dto-response-wrapper.ts
 models/document-space-dashboard-member-response-dto.ts
+models/document-space-file-system-entry.ts
+models/document-space-path-dto.ts
 models/document-space-privilege-dto-response-wrapper.ts
 models/document-space-privilege-dto.ts
+models/document-space-rename-folder-dto.ts
 models/document-space-request-dto.ts
 models/document-space-response-dto-response-wrapper.ts
 models/document-space-response-dto.ts
@@ -70,6 +74,8 @@ models/event-info-dto.ts
 models/event-request-log-dto-pagination-response-wrapper.ts
 models/event-request-log-dto.ts
 models/exception-response.ts
+models/file-path-spec-with-contents.ts
+models/file-path-spec.ts
 models/filter-condition.ts
 models/filter-criteria.ts
 models/filter-dto.ts
