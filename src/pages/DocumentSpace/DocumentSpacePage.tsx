@@ -441,53 +441,61 @@ function DocumentSpacePage() {
                 onClick={() => pageState.merge({ drawerOpen: true })}
                 disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
               >
-                Add New Space{' '}<AddMaterialIcon size={1.25} />
+                Add New Space <AddMaterialIcon size={1.25} />
               </Button>
             )}
-          </div>          
+          </div>
         </div>
       </FormGroup>
-      <div className='breadcrumb-area'>
-      <BreadCrumbTrail
-        path={pageState.get().path}
-        onNavigate={(path) =>
-          mergePageState({
-            path: path,
-            selectedFiles: [],
-            shouldUpdateDatasource: true,
-            datasource: documentSpaceService.createDatasource(
-              pageState.get().selectedSpace?.id ?? '',
-              path,
-              infiniteScrollOptions
-            ),
-          })
-        }
-      />
-      <div>
-      {pageState.selectedSpace.value != null &&
+      <div className="breadcrumb-area">
+        <BreadCrumbTrail
+          path={pageState.get().path}
+          onNavigate={(path) =>
+            mergePageState({
+              path: path,
+              selectedFiles: [],
+              shouldUpdateDatasource: true,
+              datasource: documentSpaceService.createDatasource(
+                pageState.get().selectedSpace?.id ?? '',
+                path,
+                infiniteScrollOptions
+              ),
+            })
+          }
+        />
+        <div>
+          {pageState.selectedSpace.value != null &&
             !pageState.privilegeState.isLoading.value && (
-              <div className='content-controls'>
+              <div className="content-controls">
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Write
                 ) && (
-                  <DropDown data-testid='add-new-items' anchorContent={<AddMaterialIcon size={1} />}>
-                    <Button
-                      type="button"
-                      icon
-                      data-testid="add-new-folder-button"
-                      disableMobileFullWidth
-                      onClick={() => pageState.newFolderPrompt.set(true)}
-                    >
-                      Add New Folder 
-                    </Button>
-                    <DocumentUploadDialog
-                      documentSpaceId={pageState.selectedSpace.value.id}
-                      currentPath={pageState.get().path}
-                      onFinish={() => pageState.shouldUpdateDatasource.set(true)}
-                    />
+                  <DropDown
+                    data-testid="add-new-items"
+                    anchorContent={<AddMaterialIcon size={1} iconTitle="Add Items" />}
+                  >
+                    <div className="drop-down-menu-item" data-testid="add-new-folder-button">
+                      <Button
+                        type="button"
+                        unstyled
+                        onClick={() => pageState.newFolderPrompt.set(true)}
+                      >
+                        Add New Folder
+                      </Button>
+                    </div>
+                    <hr />
+                    <div className="drop-down-menu-item" data-testid="upload-new-file">
+                      <DocumentUploadDialog
+                        documentSpaceId={pageState.selectedSpace.value.id}
+                        currentPath={pageState.get().path}
+                        onFinish={() =>
+                          pageState.shouldUpdateDatasource.set(true)
+                        }
+                        buttonStyle={{ unstyled: true }}
+                      />
+                    </div>
                   </DropDown>
                 )}
-
 
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Write
@@ -500,49 +508,55 @@ function DocumentSpacePage() {
                     disableMobileFullWidth
                     onClick={() => pageState.showDeleteSelectedDialog.set(true)}
                   >
-                    <RemoveIcon className='icon-color' size={1.25} />
+                    <RemoveIcon className="icon-color" size={1.25} />
                   </Button>
                 )}
 
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Read
                 ) && (
-                  <DropDown anchorContent={<DownloadMaterialIcon size={1.25} />}>
-                    <a
-                      href={
-                        pageState.selectedFiles.value.length > 0
-                          ? documentSpaceService.createRelativeFilesDownloadUrl(
-                              pageState.selectedSpace.value.id,
-                              pageState.selectedFiles.value
-                            )
-                          : undefined
-                      }
-                    >
-                      <Button
-                        data-testid="download-selected-files__btn"
-                        icon
-                        type="button"
-                        disabled={pageState.selectedFiles.value.length === 0}
+                  <DropDown
+                    anchorContent={<DownloadMaterialIcon size={1.25} iconTitle="Download Items" />}
+                  >
+                    <div className="drop-down-menu-item">
+                      <a
+                        href={
+                          pageState.selectedFiles.value.length > 0
+                            ? documentSpaceService.createRelativeFilesDownloadUrl(
+                                pageState.selectedSpace.value.id,
+                                pageState.selectedFiles.value
+                              )
+                            : undefined
+                        }
                       >
-                        Download Selected
-                      </Button>
-                    </a>
-                  
-                    <a
-                      href={documentSpaceService.createRelativeDownloadAllFilesUrl(
-                        pageState.selectedSpace.value.id
-                      )}
-                    >
-                      <Button
-                        data-testid="download-all-files__btn"
-                        type="button"
+                        <Button
+                          data-testid="download-selected-files__btn"
+                          unstyled
+                          type="button"
+                          disabled={pageState.selectedFiles.value.length === 0}
+                        >
+                          Download Selected
+                        </Button>
+                      </a>
+                    </div>
+                    <hr />
+                    <div className="drop-down-menu-item">
+                      <a
+                        href={documentSpaceService.createRelativeDownloadAllFilesUrl(
+                          pageState.selectedSpace.value.id
+                        )}
                       >
-                        Download All Files (zip)
-                      </Button>
-                    </a>
+                        <Button
+                          unstyled
+                          data-testid="download-all-files__btn"
+                          type="button"
+                        >
+                          Download All Files (zip)
+                        </Button>
+                      </a>
+                    </div>
                   </DropDown>
                 )}
-
 
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Membership
@@ -558,7 +572,7 @@ function DocumentSpacePage() {
                 )}
               </div>
             )}
-          </div>
+        </div>
       </div>
       {pageState.selectedSpace.value != null &&
         pageState.datasource.value &&

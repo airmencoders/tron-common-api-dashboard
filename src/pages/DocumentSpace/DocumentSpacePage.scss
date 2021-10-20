@@ -41,12 +41,46 @@
   width: 100%;
   justify-content: space-between;
   margin: 0.5rem;
+  align-content: center;
+  align-items: center;
 }
 
 .content-controls {
   display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.75rem;
 }
 
+// overrides the icon color for
+//  trashcan which is red but we want white
 .icon-color {
   color:#fff !important;
+}
+
+.drop-down-menu-item {
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 0.5rem;
+  align-content: center;
+  align-items: center;
+  
+  button {
+    text-decoration: none;
+  }
+
+  .usa-button:disabled {
+    background-color: #fff;
+    color: #e5e5e5;
+  }
+}
+
+.drop-down-menu-item :hover {
+  text-decoration: none;
 }
