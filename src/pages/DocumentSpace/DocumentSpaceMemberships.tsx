@@ -1,24 +1,27 @@
-import { none, useHookstate } from '@hookstate/core';
-import { IDatasource } from 'ag-grid-community';
-import React, { useEffect, useRef } from 'react';
-import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
+import {none, useHookstate} from '@hookstate/core';
+import {IDatasource} from 'ag-grid-community';
+import React, {useEffect, useRef} from 'react';
+import {InfiniteScrollOptions} from '../../components/DataCrudFormPage/infinite-scroll-options';
 import GridColumn from '../../components/Grid/GridColumn';
-import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
+import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import Modal from '../../components/Modal/Modal';
 import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
 import ModalTitle from '../../components/Modal/ModalTitle';
-import { DocumentSpaceDashboardMemberResponseDto } from '../../openapi';
-import { documentSpaceMembershipService } from '../../state/document-space/document-space-state';
+import {DocumentSpaceDashboardMemberResponseDto} from '../../openapi';
+import {documentSpaceMembershipService} from '../../state/document-space/document-space-state';
 import DocumentSpaceMembershipsForm from './DocumentSpaceMembershipsForm';
-import { DocumentSpaceMembershipsProps } from './DocumentSpaceMembershipsProps';
+import {DocumentSpaceMembershipsProps} from './DocumentSpaceMembershipsProps';
+import BatchUserUploadDialog from "./BatchUserUploadDialog";
+import SuccessErrorMessage from "../../components/forms/SuccessErrorMessage/SuccessErrorMessage";
+import {SuccessErrorMessageProps} from "../../components/forms/SuccessErrorMessage/SuccessErrorMessageProps";
 import Button from '../../components/Button/Button';
 import RemoveIcon from '../../icons/RemoveIcon';
-import { GridSelectionType } from '../../components/Grid/grid-selection-type';
+import {GridSelectionType} from '../../components/Grid/grid-selection-type';
 import './DocumentSpaceMemberships.scss';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
+import {createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
+import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
 import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
 
 interface DocumentSpaceMembershipsState {
@@ -32,6 +35,10 @@ interface DocumentSpaceMembershipsState {
       isConfirmationOpen: boolean
     }
   }
+}
+
+export interface BatchUploadState {
+  successErrorState: SuccessErrorMessageProps ;
 }
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -54,6 +61,9 @@ function getDashboardMemberUniqueKey(data: DocumentSpaceDashboardMemberResponseD
 
 function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
   const membershipService = documentSpaceMembershipService();
+  const batchUploadState = useHookstate<BatchUploadState>({
+    successErrorState:{successMessage: 'Successfully added members to Document Space', errorMessage: '', showSuccessMessage: false  , showErrorMessage: false, showCloseButton: true}
+  })
   const pageState = useHookstate<DocumentSpaceMembershipsState>({
     datasourceState: {
       datasource: undefined,
@@ -80,6 +90,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
   useEffect(() => {
     if (!props.isOpen) {
       resetMemberState();
+      resetBatchUploadState();
     }
   }, [props.isOpen]);
 
@@ -138,6 +149,16 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     });
   }
 
+  function resetBatchUploadState() {
+    batchUploadState.successErrorState.merge({
+      successMessage: 'Successfully added members to Document Space',
+      errorMessage: '',
+      showSuccessMessage: false,
+      showErrorMessage: false,
+      showCloseButton: true
+    });
+  }
+
   function onMemberSelectionChange(data: DocumentSpaceDashboardMemberResponseDto, selectionEvent: GridSelectionType): void {
     if (selectionEvent === 'selected') {
       pageState.membersState.selected.merge([data]);
@@ -148,7 +169,15 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
 
   return (
     <Modal
-      headerComponent={<ModalTitle title="Member Management" />}
+      headerComponent={
+        <div style={{display:'flex', alignItems:'center'}}>
+          <ModalTitle title="Member Management" />
+          <BatchUserUploadDialog
+            documentSpaceId={props.documentSpaceId}
+            batchUploadState={batchUploadState}
+            onFinish={onMemberChangeCallback}
+          />
+      </div>}
       footerComponent={<ModalFooterSubmit
         hideCancel
         onSubmit={props.onSubmit}
@@ -159,6 +188,13 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
       width="50%"
       height="auto"
     >
+      <SuccessErrorMessage
+        errorMessage={batchUploadState.successErrorState.errorMessage.value}
+        showErrorMessage={batchUploadState.successErrorState.showErrorMessage.value}
+        showSuccessMessage={batchUploadState.successErrorState.showSuccessMessage.value}
+        successMessage={batchUploadState.successErrorState.successMessage?.value}
+        showCloseButton={batchUploadState.successErrorState.showCloseButton.value}
+      />
       <DocumentSpaceMembershipsForm
         documentSpaceId={props.documentSpaceId}
         onMemberChangeCallback={onMemberChangeCallback}

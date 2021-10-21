@@ -30,7 +30,11 @@ export * from './document-space-create-folder-dto';
 export * from './document-space-dashboard-member-request-dto';
 export * from './document-space-dashboard-member-response-dto';
 export * from './document-space-dashboard-member-response-dto-response-wrapper';
+<<<<<<< HEAD
 export * from './document-space-delete-items-dto';
+=======
+export * from './document-space-file-system-entry';
+>>>>>>> origin/master
 export * from './document-space-path-dto';
 export * from './document-space-privilege-dto';
 export * from './document-space-privilege-dto-response-wrapper';
@@ -48,6 +52,10 @@ export * from './event-request-log-dto';
 export * from './event-request-log-dto-pagination-response-wrapper';
 export * from './exception-response';
 export * from './file-path-spec';
+<<<<<<< HEAD
+=======
+export * from './file-path-spec-with-contents';
+>>>>>>> origin/master
 export * from './filter-condition';
 export * from './filter-criteria';
 export * from './filter-dto';
