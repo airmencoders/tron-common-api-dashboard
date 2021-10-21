@@ -209,7 +209,7 @@ function DocumentSpacePage() {
         shouldUpdateDatasource: true,
         datasource: documentSpaceService.createDatasource(
           documentSpace.id,
-          pageState.get().path,
+          '',
           infiniteScrollOptions
         ),
         privilegeState: {
@@ -317,7 +317,8 @@ function DocumentSpacePage() {
           showErrorMessage: false,
           selectedSpace: docSpace,
           shouldUpdateDatasource: true,
-          datasource: documentSpaceService.createDatasource(docSpace.id, pageState.get().path, infiniteScrollOptions)
+          path: '',
+          datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
         });
       })
       .catch((message) =>
