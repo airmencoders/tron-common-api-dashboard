@@ -217,3 +217,13 @@ export function validateDocSpaceName(name: string): boolean {
   if (name.indexOf("/") !== -1) return false; // no slashes
   return true;
 }
+
+/**
+ * Validates a folder name
+ * @param name 
+ * @returns 
+ */
+ export function validateFolderName(name: string): boolean {
+  if (!name) return false; // null check
+  return /^[A-Za-z0-9.-]+$/.test(name);
+}

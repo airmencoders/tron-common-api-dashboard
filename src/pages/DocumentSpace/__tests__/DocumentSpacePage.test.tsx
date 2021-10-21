@@ -1,5 +1,5 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
 import { MemoryRouter } from 'react-router-dom';
@@ -118,7 +118,7 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
-    expect(page.queryByText('Upload Files')).not.toBeInTheDocument();
+    expect(page.queryByTitle("Upload Files")).not.toBeInTheDocument();
   });
 
   it('should allow to change space', async () => {
@@ -221,9 +221,9 @@ describe('Test Document Space Page', () => {
 
       // No actions should be available, and no grid
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
-      expect(page.queryByText('Download Selected Files (zip)')).not.toBeInTheDocument();
-      expect(page.queryByText('Download All Files (zip)')).not.toBeInTheDocument();
-      expect(page.queryByText('Upload Files')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Add Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
       expect(page.queryByTitle('Manager Users')).not.toBeInTheDocument();
       // find by a column header in grid
       expect(page.queryByText('Name')).not.toBeInTheDocument();
@@ -252,9 +252,9 @@ describe('Test Document Space Page', () => {
 
       // No actions should be available, and no grid
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
-      expect(page.queryByText('Download Selected Files (zip)')).not.toBeInTheDocument();
-      expect(page.queryByText('Download All Files (zip)')).not.toBeInTheDocument();
-      expect(page.queryByText('Upload Files')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Add Items')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
       expect(page.queryByTitle('Manager Users')).not.toBeInTheDocument();
       // find by a column header in grid
       expect(page.queryByText('Name')).not.toBeInTheDocument();
@@ -369,8 +369,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      expect(page.getByText('Download Selected Files (zip)')).toBeInTheDocument();
-      expect(page.getByText('Download All Files (zip)')).toBeInTheDocument();
+      expect(page.getByTitle('Download Items')).toBeInTheDocument();
       // Test the grid is rendered by trying to find one of the column headers
       expect(page.getByText('Name')).toBeInTheDocument();
     });
@@ -386,8 +385,7 @@ describe('Test Document Space Page', () => {
 
       await waitFor(() => expect(fetchAndStoreSpacesSpy).toHaveBeenCalledTimes(1));
 
-      expect(page.getByText('Download Selected Files (zip)')).toBeInTheDocument();
-      expect(page.getByText('Download All Files (zip)')).toBeInTheDocument();
+      expect(page.getByTitle('Download Items')).toBeInTheDocument();
       // Test the grid is rendered by trying to find one of the column headers
       expect(page.getByText('Name')).toBeInTheDocument();
     });
@@ -406,8 +404,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      expect(page.queryByText('Download Selected Files (zip)')).not.toBeInTheDocument();
-      expect(page.queryByText('Download All Files (zip)')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
       // Test the grid is rendered by trying to find one of the column headers
       expect(page.queryByText('Name')).not.toBeInTheDocument();
     });
@@ -426,7 +423,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      expect(page.getByText('Upload Files')).toBeInTheDocument();
+      expect(page.getByTitle('Upload Files')).toBeInTheDocument();
     });
 
     it('should show Upload Files button with DASHBOARD_ADMIN privilege', async () => {
@@ -439,8 +436,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(fetchAndStoreSpacesSpy).toHaveBeenCalledTimes(1));
-
-      expect(page.getByText('Upload Files')).toBeInTheDocument();
+      expect(page.getByTitle('Upload Files')).toBeInTheDocument();
     });
 
     it('should not show Upload Files button when not WRITE privilege', async () => {
@@ -457,7 +453,7 @@ describe('Test Document Space Page', () => {
       );
 
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
-      expect(page.queryByText('Upload Files')).not.toBeInTheDocument();
+      expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
     });
   });
 });

@@ -12,6 +12,7 @@ function Button(props: ButtonProps) {
       className={`${props.className ?? ''}${disableMobileFullWidth ? ' usa-button--disable-mobile-full-width' : ''}
                   ${transparentOnDisabled ? ' usa-button--disable-transparent' : ''}
                   ${transparentBackground ? ' usa-button--no-bg-button' : ''}
+                  ${rest.inverse ? ' usa-button--inverse' : ''}
                   ${rest.unstyled ? ' usa-button--no-styling': ''}`
                 }
     />

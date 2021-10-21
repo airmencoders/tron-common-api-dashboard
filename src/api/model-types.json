@@ -863,6 +863,9 @@
     "DocumentDto": {
       "additionalProperties": false,
       "properties": {
+        "folder": {
+          "type": "boolean"
+        },
         "key": {
           "type": "string"
         },
@@ -974,28 +977,19 @@
       ],
       "type": "object"
     },
-    "DocumentSpaceFileSystemEntry": {
+    "DocumentSpaceDeleteItemsDto": {
       "additionalProperties": false,
       "properties": {
-        "documentSpaceId": {
+        "currentPath": {
           "type": "string"
         },
-        "id": {
-          "type": "string"
-        },
-        "itemId": {
-          "type": "string"
-        },
-        "itemName": {
-          "type": "string"
-        },
-        "parentEntryId": {
-          "type": "string"
+        "itemsToDelete": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
-      "required": [
-        "itemName"
-      ],
       "type": "object"
     },
     "DocumentSpacePathDto": {
@@ -1342,53 +1336,6 @@
         },
         "parentFolderId": {
           "type": "string"
-        },
-        "uuidList": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "documentSpaceId",
-        "itemId",
-        "itemName"
-      ],
-      "type": "object"
-    },
-    "FilePathSpecWithContents": {
-      "additionalProperties": false,
-      "properties": {
-        "docSpaceQualifiedPath": {
-          "type": "string"
-        },
-        "documentSpaceId": {
-          "type": "string"
-        },
-        "files": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "fullPathSpec": {
-          "type": "string"
-        },
-        "itemId": {
-          "type": "string"
-        },
-        "itemName": {
-          "type": "string"
-        },
-        "parentFolderId": {
-          "type": "string"
-        },
-        "subFolderElements": {
-          "items": {
-            "$ref": "model-types.json#/definitions/DocumentSpaceFileSystemEntry"
-          },
-          "type": "array"
         },
         "uuidList": {
           "items": {

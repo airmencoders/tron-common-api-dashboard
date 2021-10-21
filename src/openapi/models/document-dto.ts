@@ -56,6 +56,12 @@ export interface DocumentDto {
      * @memberof DocumentDto
      */
     uploadedBy: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DocumentDto
+     */
+    folder?: boolean;
 }
 
 

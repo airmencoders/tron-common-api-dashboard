@@ -5,12 +5,12 @@ import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/
 import {
   DocumentDto,
   DocumentSpaceControllerApi,
-  DocumentSpaceControllerApiInterface,
+  DocumentSpaceControllerApiInterface, DocumentSpaceDeleteItemsDto,
   DocumentSpacePrivilegeDtoResponseWrapper,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
-  DocumentSpaceResponseDtoResponseWrapper,
-  S3PaginationDto,
+  DocumentSpaceResponseDtoResponseWrapper, FilePathSpec, GenericStringArrayResponseWrapper,
+  S3PaginationDto
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
 import { RequestError } from '../../../utils/ErrorHandling/request-error';
@@ -88,11 +88,11 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create datasource and fetch documents', (done) => {
-    documentSpaceApi.listObjects = jest.fn(() => {
+    documentSpaceApi.dumpContentsAtPath = jest.fn(() => {
       return Promise.resolve(listObjectsResponse);
     });
 
-    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'listObjects');
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'dumpContentsAtPath');
 
     const onSuccess = jest.fn((data, lastRow) => {
       try {
@@ -107,6 +107,7 @@ describe('Test Document Space Service', () => {
     const onFail = jest.fn();
     const datasource = documentSpaceService.createDatasource(
       spaceName,
+      "",
       infiniteScrollOptions
     );
     datasource.getRows({
@@ -125,11 +126,11 @@ describe('Test Document Space Service', () => {
   it('should create datasource and fail on server error response', (done) => {
     const badRequestError = createGenericAxiosRequestErrorResponse(500);
 
-    documentSpaceApi.listObjects = jest.fn(() => {
+    documentSpaceApi.dumpContentsAtPath = jest.fn(() => {
       return Promise.reject(badRequestError);
     });
 
-    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'listObjects');
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'dumpContentsAtPath');
 
     const onSuccess = jest.fn();
     const onFail = jest.fn(() => {
@@ -141,6 +142,7 @@ describe('Test Document Space Service', () => {
     });
     const datasource = documentSpaceService.createDatasource(
       spaceName,
+      "",
       infiniteScrollOptions
     );
     datasource.getRows({
@@ -157,11 +159,11 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create datasource and fail on catch all', (done) => {
-    documentSpaceApi.listObjects = jest.fn(() => {
+    documentSpaceApi.dumpContentsAtPath = jest.fn(() => {
       return Promise.reject(new Error('Catch all exception'));
     });
 
-    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'listObjects');
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'dumpContentsAtPath');
 
     const onSuccess = jest.fn();
     const onFail = jest.fn(() => {
@@ -173,6 +175,7 @@ describe('Test Document Space Service', () => {
     });
     const datasource = documentSpaceService.createDatasource(
       spaceName,
+      "",
       infiniteScrollOptions
     );
     datasource.getRows({
@@ -305,18 +308,29 @@ describe('Test Document Space Service', () => {
       )
     );
 
-    await documentSpaceService.uploadFile('test', 'file contents', () => {}).promise;
+    await documentSpaceService.uploadFile('test', "", 'file contents', () => {}).promise;
     expect(mock).toHaveBeenCalled();
   });
 
   it('should handle file delete', async () => {
-    const mock = jest.spyOn(documentSpaceApi, '_delete').mockReturnValue(
+    const mock = jest.spyOn(documentSpaceApi, 'deleteItems').mockReturnValue(
       Promise.resolve(
-        createAxiosSuccessResponse<object>({ 'file': 'test' })
+        createAxiosSuccessResponse<GenericStringArrayResponseWrapper>({ data: [], pagination: {} } as GenericStringArrayResponseWrapper)
       )
     );
 
-    await documentSpaceService.deleteFile('test', 'file');
+    await documentSpaceService.deleteIems('test', "", ['file']);
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should allow folder creation', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'createFolder').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<FilePathSpec>({ documentSpaceId: '', itemId: '', itemName: ''} as FilePathSpec)
+      )
+    );
+
+    await documentSpaceService.createNewFolder('test', "", 'folder');
     expect(mock).toHaveBeenCalled();
   });
 

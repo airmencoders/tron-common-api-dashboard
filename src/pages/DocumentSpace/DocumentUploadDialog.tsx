@@ -18,9 +18,25 @@ interface UploadState {
   cancelToken: CancelTokenSource | undefined;
 }
 
+interface ButtonStyle {
+  icon?: boolean;
+  secondary?: boolean;
+  base?: boolean;
+  accent?: boolean;
+  outline?: boolean;
+  inverse?: boolean;
+  disabled?: boolean;
+  onClick?: (event?: any) => void;
+  className?: string;
+  unstyled?: boolean;
+}
+
 export interface DocumentUploadProps {
   documentSpaceId: string;
+  currentPath: string;
   onFinish: () => void;
+  buttonStyle?: ButtonStyle;
+  value?: string | React.ReactNode;
 }
 
 export default function DocumentUploadDialog(props: DocumentUploadProps) {
@@ -69,6 +85,7 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
           });
           const response = documentSpaceService.uploadFile(
             props.documentSpaceId,
+            props.currentPath,
             files[i],
             updateProgress
           );
@@ -107,8 +124,9 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
         data-testid="upload-file__btn"
         onClick={uploadFiles}
         type="button"
+        {...props.buttonStyle}
       >
-        Upload Files
+        {props.value ?? 'Upload Files'}
       </Button>
       <Modal
         show={uploadState.showDialog.get()}
