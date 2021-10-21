@@ -48,10 +48,6 @@ export * from './event-request-log-dto';
 export * from './event-request-log-dto-pagination-response-wrapper';
 export * from './exception-response';
 export * from './file-path-spec';
-<<<<<<< HEAD
-=======
-export * from './file-path-spec-with-contents';
->>>>>>> origin/master
 export * from './filter-condition';
 export * from './filter-criteria';
 export * from './filter-dto';
