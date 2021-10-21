@@ -30,11 +30,7 @@ export * from './document-space-create-folder-dto';
 export * from './document-space-dashboard-member-request-dto';
 export * from './document-space-dashboard-member-response-dto';
 export * from './document-space-dashboard-member-response-dto-response-wrapper';
-<<<<<<< HEAD
 export * from './document-space-delete-items-dto';
-=======
-export * from './document-space-file-system-entry';
->>>>>>> origin/master
 export * from './document-space-path-dto';
 export * from './document-space-privilege-dto';
 export * from './document-space-privilege-dto-response-wrapper';
