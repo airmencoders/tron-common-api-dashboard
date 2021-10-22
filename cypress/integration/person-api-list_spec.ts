@@ -5,7 +5,7 @@ import {apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt
 import PersonSetupFunctions from '../support/person-setup-functions';
 import { cleanup } from '../support/cleanup-helper';
 
-describe('Person API List', function () {
+describe.skip('Person API List', function () {
   it('Should List Personnel', () => {
     const firstFirstName = 'aaaaaaaaaaaaa';
     const lastFirstName = 'zzzzzzzzzzzzzz';

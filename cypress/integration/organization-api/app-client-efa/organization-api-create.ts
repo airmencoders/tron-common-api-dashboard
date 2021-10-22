@@ -29,7 +29,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
       });
     });
 
-    it('should allow with ORGANIZATION_CREATE privilege with 201', () => {
+    it.skip('should allow with ORGANIZATION_CREATE privilege with 201', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_CREATE']);
 
       cy.request({
@@ -60,7 +60,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
       });
     });
 
-    it('should allow with ORGANIZATION_CREATE privilege with 201', () => {
+    it.skip('should allow with ORGANIZATION_CREATE privilege with 201', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_CREATE']);
 
       const orgsToCreate: OrganizationDto[] = [];

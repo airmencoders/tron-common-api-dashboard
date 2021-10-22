@@ -18,7 +18,7 @@ interface FieldTest {
   leaderships?: boolean
 }
 
-describe("Person API Filter", () => {
+describe.skip("Person API Filter", () => {
 
   it('Should allow an authorized App Client to obtain a list of users matching a firstName filter condition', () => {
     const firstName1 = 'firstName1';
