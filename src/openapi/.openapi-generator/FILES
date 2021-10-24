@@ -74,10 +74,6 @@ models/event-info-dto.ts
 models/event-request-log-dto-pagination-response-wrapper.ts
 models/event-request-log-dto.ts
 models/exception-response.ts
-<<<<<<< HEAD
-=======
-models/file-path-spec-with-contents.ts
->>>>>>> origin/master
 models/file-path-spec.ts
 models/filter-condition.ts
 models/filter-criteria.ts

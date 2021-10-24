@@ -384,7 +384,6 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-<<<<<<< HEAD
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
@@ -442,8 +441,6 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-=======
->>>>>>> origin/master
          * Deletes a Document Space
          * @summary Deletes a Document Space
          * @param {string} id 
@@ -1153,7 +1150,6 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-<<<<<<< HEAD
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
@@ -1169,8 +1165,6 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-=======
->>>>>>> origin/master
          * Deletes a Document Space
          * @summary Deletes a Document Space
          * @param {string} id 
@@ -1427,7 +1421,6 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).deleteFolder(id, documentSpacePathDto, options).then((request) => request(axios, basePath));
         },
         /**
-<<<<<<< HEAD
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
@@ -1439,8 +1432,6 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).deleteItems(id, documentSpaceDeleteItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
-=======
->>>>>>> origin/master
          * Deletes a Document Space
          * @summary Deletes a Document Space
          * @param {string} id 
@@ -1649,7 +1640,6 @@ export interface DocumentSpaceControllerApiInterface {
     deleteFolder(id: string, documentSpacePathDto: DocumentSpacePathDto, options?: any): AxiosPromise<DocumentSpaceCreateFolderDto>;
 
     /**
-<<<<<<< HEAD
      * Deletes selected files/folder from a Document Space
      * @summary Deletes selected item(s) from a Document Space
      * @param {string} id 
@@ -1661,8 +1651,6 @@ export interface DocumentSpaceControllerApiInterface {
     deleteItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): AxiosPromise<GenericStringArrayResponseWrapper>;
 
     /**
-=======
->>>>>>> origin/master
      * Deletes a Document Space
      * @summary Deletes a Document Space
      * @param {string} id 
@@ -1883,7 +1871,6 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-<<<<<<< HEAD
      * Deletes selected files/folder from a Document Space
      * @summary Deletes selected item(s) from a Document Space
      * @param {string} id 
@@ -1897,8 +1884,6 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-=======
->>>>>>> origin/master
      * Deletes a Document Space
      * @summary Deletes a Document Space
      * @param {string} id 
