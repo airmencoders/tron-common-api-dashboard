@@ -8,6 +8,7 @@ apis/app-version-controller-api.ts
 apis/dashboard-controller-api.ts
 apis/dashboard-user-controller-api.ts
 apis/document-space-controller-api.ts
+apis/document-space-web-dav-controller-api.ts
 apis/event-request-log-controller-api.ts
 apis/http-logs-controller-api.ts
 apis/kpi-controller-api.ts
@@ -74,10 +75,6 @@ models/event-info-dto.ts
 models/event-request-log-dto-pagination-response-wrapper.ts
 models/event-request-log-dto.ts
 models/exception-response.ts
-<<<<<<< HEAD
-=======
-models/file-path-spec-with-contents.ts
->>>>>>> origin/master
 models/file-path-spec.ts
 models/filter-condition.ts
 models/filter-criteria.ts
