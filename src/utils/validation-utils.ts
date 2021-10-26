@@ -4,27 +4,27 @@ import { Validation } from '@hookstate/validation';
 import isEqual from 'fast-deep-equal';
 
 /**
- * 
+ *
  * @param text the text to test against the regex
  * @returns true if null or passes regex
  */
 export function validPhone(text: string | undefined | null): boolean {
     return !text || /^(?:\([2-9]\d{2}\) ?|[2-9]\d{2}(?:-?| ?))[2-9]\d{2}[- ]?\d{4}$/.test(text);
-} 
+}
 
 /**
- * 
+ *
  * @param text the text to test against the regex
  * @returns true if null or is digits with length between 5 and 10
  */
 export function validDoDId(text: string | undefined | null): boolean {
   return !text || /^\d{5,10}$/.test(text);
-} 
+}
 
 const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 /**
  * Tests for a valid email.
- * 
+ *
  * @param email the email to validate
  * @returns true if validation passed or {@link email} is null/undefined or {@link email} length === 0, false otherwise
  */
@@ -43,10 +43,10 @@ export function validateSubscriberAddress(url: string | undefined): boolean {
 
 /**
  * Tests a required string. The string will be trimmed of whitespace.
- * 
+ *
  * The string must not be null or undefined.
  * The string must not be blank or empty.
- * 
+ *
  * @param value the value to validate
  * @returns true if validation passed, false otherwise
  */
@@ -65,7 +65,7 @@ export function validateRequiredString(value: string | null | undefined): boolea
 
 /**
  * Validates that a string's length meets length constraints. String will be trimmed when validating length constraints.
- * 
+ *
  * @param value the string to validate
  * @param minLength the min length of the string. Defaults to 1 (inclusive)
  * @param maxLength the max length of the string. Defaults to 255 (inclusive)
@@ -89,7 +89,7 @@ export function validateStringLength(value: string | null | undefined, minLength
 
 /**
  * Checks that at least one value is marked as true
- * 
+ *
  * @param value array of booleans representing checkbox state
  * @returns true if at least one value is marked true
  */
@@ -101,7 +101,7 @@ export function validateCheckboxPrivileges(values: boolean[]): boolean {
  * Generates an array of string error messages from hookstate validation.
  * Hookstate Validation plugin must be attached to the state otherwise
  * a Hookstate exception will be thrown.
- * 
+ *
  * @param state the Hookstate value to generate errors off
  * @returns array of string errors
  */
@@ -113,7 +113,7 @@ export function generateStringErrorMessages<T>(state: State<T>): string[] {
  * Checks if a Hookstate state fails validation and has been touched.
  * Uses Hookstate Touched and Validation plugins. Initial, Touched, and Validation plugins
  * must be attached to the state otherwise a Hookstate exception will be thrown.
- * 
+ *
  * @param state the Hookstate value to check validation
  * @returns true if touched and fails validation, false otherwise
  */
@@ -124,7 +124,6 @@ export function failsHookstateValidation<T>(state: State<T>): boolean {
 export const validationErrors = {
   requiredText: 'Cannot be blank or empty.',
   invalidEmail: 'Email is not valid.',
-  atLeastOnePrivilege: 'At least one privilege must be set.',
   invalidPhone: 'Phone Number is not valid.',
   invalidDodid: 'DoD ID is invalid.',
   generateStringLengthError(minLength = 1, maxLength = 255): string {
@@ -142,7 +141,7 @@ export function getProperty<T, K extends keyof T>(o: T, propertyName: K): T[K] {
 /**
  * Compares the two objects to see if any fields contain values
  * that do not match. This will perform deep equality checks.
- * 
+ *
  * @param original The first object
  * @param toCheck The second object
  * @returns true if some property of {@link original} does not match the associated property of {@link toCheck} or if either is null or undefined
@@ -175,8 +174,8 @@ interface SchemaFieldFormat {
  * Extracts the string fields that are nullable from a JSON Schema.
  * A field must have the types 'null' and 'string' to be considered
  * a nullable field.
- * 
- * 
+ *
+ *
  * @param schema schema to extract nullable string fields from
  */
 export function getNullableFieldsFromSchema<T>(schema: Record<string, SchemaFieldFormat>): Set<keyof T> {
@@ -200,10 +199,10 @@ export function getNullableFieldsFromSchema<T>(schema: Record<string, SchemaFiel
 }
 
 /**
- * Validates a document space name according to AWS's S3 bucket naming rules 
+ * Validates a document space name according to AWS's S3 bucket naming rules
  * and the Common API rules
- * @param name 
- * @returns 
+ * @param name
+ * @returns
  */
 export function validateDocSpaceName(name: string): boolean {
   if (!name) return false; // null check
@@ -220,8 +219,8 @@ export function validateDocSpaceName(name: string): boolean {
 
 /**
  * Validates a folder name
- * @param name 
- * @returns 
+ * @param name
+ * @returns
  */
  export function validateFolderName(name: string): boolean {
   if (!name) return false; // null check

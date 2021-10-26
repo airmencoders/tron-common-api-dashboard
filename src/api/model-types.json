@@ -933,7 +933,6 @@
     },
     "DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum": {
       "enum": [
-        "READ",
         "WRITE",
         "MEMBERSHIP"
       ],
