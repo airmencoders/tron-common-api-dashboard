@@ -6,7 +6,7 @@ import OrgSetupFunctions from '../../../support/organization/organization-setup-
 import PersonSetupFunctions from '../../../support/person-setup-functions';
 import UtilityFunctions from '../../../support/utility-functions';
 
-describe('ORGANIZATION_EDIT EFA privilege', () => {
+describe.skip('ORGANIZATION_EDIT EFA privilege', () => {
   beforeEach(() => {
     cleanup();
   });
