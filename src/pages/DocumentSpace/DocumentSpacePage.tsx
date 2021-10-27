@@ -47,13 +47,13 @@ const documentDtoColumns: GridColumn[] = [
     checkboxSelection: true
   }),
   new GridColumn({
-    field: 'uploadedDate',
+    field: 'lastModifiedDate',
     headerName: 'Last Modified',
     resizable: true,
   }),
   new GridColumn({
-    field: 'uploadedBy',
-    headerName: 'Updated By',
+    field: 'lastModifiedBy',
+    headerName: 'Last Modified By',
     resizable: true,
   }),
   new GridColumn({
@@ -62,7 +62,7 @@ const documentDtoColumns: GridColumn[] = [
     resizable: true,
     valueFormatter: function (params: ValueFormatterParams) {
       if (params.value != null) {
-        return formatBytesToString(params.value);
+        return params.value ? formatBytesToString(params.value) : '';
       }
     }
   }),

@@ -384,7 +384,6 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-<<<<<<< HEAD
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
@@ -442,8 +441,6 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-=======
->>>>>>> origin/master
          * Deletes a Document Space
          * @summary Deletes a Document Space
          * @param {string} id 
@@ -883,6 +880,49 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * 
+         * @summary Sets the default Document Space privileges of the requesting user
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchSelfDocumentSpaceDefault: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling patchSelfDocumentSpaceDefault.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/user/default`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Removes Dashboard Users from a Document Space and their privileges
          * @summary Removes one or more Dashboard User members from a Document Space
          * @param {string} id 
@@ -1153,7 +1193,6 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-<<<<<<< HEAD
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
@@ -1169,8 +1208,6 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-=======
->>>>>>> origin/master
          * Deletes a Document Space
          * @summary Deletes a Document Space
          * @param {string} id 
@@ -1306,6 +1343,20 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * 
+         * @summary Sets the default Document Space privileges of the requesting user
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async patchSelfDocumentSpaceDefault(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentSpacePrivilegeDtoResponseWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).patchSelfDocumentSpaceDefault(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Removes Dashboard Users from a Document Space and their privileges
          * @summary Removes one or more Dashboard User members from a Document Space
          * @param {string} id 
@@ -1427,7 +1478,6 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).deleteFolder(id, documentSpacePathDto, options).then((request) => request(axios, basePath));
         },
         /**
-<<<<<<< HEAD
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
@@ -1439,8 +1489,6 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).deleteItems(id, documentSpaceDeleteItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
-=======
->>>>>>> origin/master
          * Deletes a Document Space
          * @summary Deletes a Document Space
          * @param {string} id 
@@ -1538,6 +1586,16 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          */
         listObjects(id: string, continuation?: string, limit?: number, options?: any): AxiosPromise<S3PaginationDto> {
             return DocumentSpaceControllerApiFp(configuration).listObjects(id, continuation, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Sets the default Document Space privileges of the requesting user
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<DocumentSpacePrivilegeDtoResponseWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).patchSelfDocumentSpaceDefault(id, options).then((request) => request(axios, basePath));
         },
         /**
          * Removes Dashboard Users from a Document Space and their privileges
@@ -1649,7 +1707,6 @@ export interface DocumentSpaceControllerApiInterface {
     deleteFolder(id: string, documentSpacePathDto: DocumentSpacePathDto, options?: any): AxiosPromise<DocumentSpaceCreateFolderDto>;
 
     /**
-<<<<<<< HEAD
      * Deletes selected files/folder from a Document Space
      * @summary Deletes selected item(s) from a Document Space
      * @param {string} id 
@@ -1661,8 +1718,6 @@ export interface DocumentSpaceControllerApiInterface {
     deleteItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): AxiosPromise<GenericStringArrayResponseWrapper>;
 
     /**
-=======
->>>>>>> origin/master
      * Deletes a Document Space
      * @summary Deletes a Document Space
      * @param {string} id 
@@ -1760,6 +1815,16 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     listObjects(id: string, continuation?: string, limit?: number, options?: any): AxiosPromise<S3PaginationDto>;
+
+    /**
+     * 
+     * @summary Sets the default Document Space privileges of the requesting user
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<DocumentSpacePrivilegeDtoResponseWrapper>;
 
     /**
      * Removes Dashboard Users from a Document Space and their privileges
@@ -1883,7 +1948,6 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-<<<<<<< HEAD
      * Deletes selected files/folder from a Document Space
      * @summary Deletes selected item(s) from a Document Space
      * @param {string} id 
@@ -1897,8 +1961,6 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-=======
->>>>>>> origin/master
      * Deletes a Document Space
      * @summary Deletes a Document Space
      * @param {string} id 
@@ -2013,6 +2075,18 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public listObjects(id: string, continuation?: string, limit?: number, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).listObjects(id, continuation, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Sets the default Document Space privileges of the requesting user
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public patchSelfDocumentSpaceDefault(id: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).patchSelfDocumentSpaceDefault(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

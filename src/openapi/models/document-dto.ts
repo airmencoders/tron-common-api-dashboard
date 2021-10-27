@@ -49,13 +49,13 @@ export interface DocumentDto {
      * @type {string}
      * @memberof DocumentDto
      */
-    uploadedDate: string;
+    lastModifiedDate: string;
     /**
      * 
      * @type {string}
      * @memberof DocumentDto
      */
-    uploadedBy: string;
+    lastModifiedBy: string;
     /**
      * 
      * @type {boolean}
