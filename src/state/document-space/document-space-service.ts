@@ -121,13 +121,13 @@ export default class DocumentSpaceService {
     }, { READ: false, WRITE: false, MEMBERSHIP: false });
   }
 
-  createRelativeFilesDownloadUrl(id: string, documents: DocumentDto[]) {
+  createRelativeFilesDownloadUrl(id: string, path: string, documents: DocumentDto[]) {
     const fileKeysParam = documents.map(document => document.key).join(',');
-    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download?files=${fileKeysParam}`;
+    return `${Config.API_URL_V2}` + (`document-space/spaces/${id}/files/download?path=${path}&files=${fileKeysParam}`).replace(/[\/]+/g, '/');
   }
 
-  createRelativeDownloadFileUrl(id: string, key: string): string {
-    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/single?file=${key}`;
+  createRelativeDownloadFileUrl(id: string, path: string, key: string): string {
+    return `${Config.API_URL_V2}` + (`document-space/space/${id}/${path}/${key}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
   }
 
   createRelativeDownloadAllFilesUrl(id: string): string {
