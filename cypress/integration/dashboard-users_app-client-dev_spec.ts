@@ -10,7 +10,7 @@ import DataCrudFormPageUtil, {
 
 describe('Dashboard Users - App Client Dev Tests', () => {
 
-  it('Should create a Dashboard User for App Client Dev add', () => {
+  it.skip('Should create a Dashboard User for App Client Dev add', () => {
     UtilityFunctions.visitSite(`${host}/app-clients`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const appClient: AppClient = {
