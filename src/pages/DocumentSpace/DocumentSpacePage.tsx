@@ -166,7 +166,7 @@ function DocumentSpacePage() {
           if (queryParams.get(spaceIdQueryKey) != null) {
             loadDocSpaceFromLocation(location, data);
           } else {
-            setStateOnDocumentSpaceChange(data[0]);
+            setStateOnDocumentSpaceAndPathChange(data[0], '');
           }
         }
       } catch (err) {
@@ -199,7 +199,9 @@ function DocumentSpacePage() {
         createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
         return;
       }
-      setStateOnDocumentSpaceChange(selectedDocumentSpace);
+      const path = queryParams.get(pathQueryKey) ?? '';
+
+      setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
     }
   }
 
@@ -215,7 +217,7 @@ function DocumentSpacePage() {
     }
   }
 
-  async function setStateOnDocumentSpaceChange(documentSpace: DocumentSpaceResponseDto) {
+  async function setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
     let privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> = {
       READ: false,
       WRITE: false,
@@ -238,14 +240,14 @@ function DocumentSpacePage() {
         shouldUpdateDatasource: true,
         datasource: documentSpaceService.createDatasource(
           documentSpace.id,
-          '',
+          path,
           infiniteScrollOptions
         ),
         privilegeState: {
           privileges,
           isLoading: false
         },
-        path: '',
+        path,
       });
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
@@ -285,6 +287,7 @@ function DocumentSpacePage() {
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
         queryParams.set(spaceIdQueryKey, documentSpaceId);
+        queryParams.delete(pathQueryKey);
         history.push({search: queryParams.toString()});
       }
     }
@@ -449,17 +452,9 @@ function DocumentSpacePage() {
         onClick: (folder: string) => {
           const newPath = pageState.get().path + '/' + folder;
           const queryParams = new URLSearchParams(location.search);
+          queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);
           history.push({search: queryParams.toString()});
-          pageState.merge({
-            path: newPath,
-            shouldUpdateDatasource: true,
-            datasource: documentSpaceService.createDatasource(
-              pageState.get().selectedSpace?.id ?? '',
-              newPath,
-              infiniteScrollOptions
-            ),
-          })
         }
       }
     });
@@ -497,18 +492,16 @@ function DocumentSpacePage() {
       <div className="breadcrumb-area">
         <BreadCrumbTrail
           path={pageState.get().path}
-          onNavigate={(path) =>
-            mergePageState({
-              path: path,
-              selectedFiles: [],
-              shouldUpdateDatasource: true,
-              datasource: documentSpaceService.createDatasource(
-                pageState.get().selectedSpace?.id ?? '',
-                path,
-                infiniteScrollOptions
-              ),
-            })
-          }
+          onNavigate={(newPath) => {
+            const queryParams = new URLSearchParams(location.search);
+            queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+            if (newPath !== '') {
+              queryParams.set(pathQueryKey, newPath);
+            } else {
+              queryParams.delete(pathQueryKey);
+            }
+            history.push({search: queryParams.toString()});
+          }}
         />
         <div>
           {pageState.selectedSpace.value != null &&
