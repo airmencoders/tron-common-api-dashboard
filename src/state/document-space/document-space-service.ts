@@ -191,4 +191,15 @@ export default class DocumentSpaceService {
   resetPaginationMap(): void {
     this.paginationPageToTokenMap = new Map([[0, undefined]]);
   }
+
+
+  async patchDefaultDocumentSpace(spaceId: string): Promise<string> {
+    try {
+      await this.documentSpaceApi.patchSelfDocumentSpaceDefault(spaceId);
+      return Promise.resolve(spaceId);
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
+  }
 }
