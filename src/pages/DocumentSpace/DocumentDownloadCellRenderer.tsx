@@ -14,7 +14,7 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
 
   return (
     <div>
-      {fileKey && space && path && (
+      {fileKey && space && (
         <div className="document-download-cell-renderer">
           <a
             href={
