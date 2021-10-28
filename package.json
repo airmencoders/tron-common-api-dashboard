@@ -131,6 +131,7 @@
     "tar": "6.1.7",
     "path-parse": "1.0.7",
     "axios": "0.21.4",
-    "ansi-regex": "5.0.1"
+    "ansi-regex": "5.0.1",
+    "shell-quote": "1.7.3"
   }
 }
