@@ -9,4 +9,5 @@ export interface SubmitActionsProps {
   isFormValid: boolean;
   isFormModified: boolean;
   isFormSubmitting: boolean;
+  variant?: number;
 }

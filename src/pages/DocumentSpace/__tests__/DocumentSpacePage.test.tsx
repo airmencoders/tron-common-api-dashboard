@@ -109,6 +109,28 @@ describe('Test Document Space Page', () => {
     expect(documentSpacesSelect).toHaveValue(documentSpaces[0].id);
   });
 
+  it('should show DocumentSpaceMySettingButton when the user has at least one document space', () => {
+    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockImplementation(() => {
+      return {
+        promise: Promise.resolve(documentSpaces),
+        cancelTokenSource: axios.CancelToken.source()
+      }
+    });
+
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpacePage />
+      </MemoryRouter>
+    );
+
+    const documentSpacesSelect = page.getByTestId('doc-space-my-settings__btn');
+    expect(documentSpacesSelect).toBeInTheDocument()
+  });
+
   it('should not show Upload Files button while spaces are loading (no space selected)', () => {
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
 
