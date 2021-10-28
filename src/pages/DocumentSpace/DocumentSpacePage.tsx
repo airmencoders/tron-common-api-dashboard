@@ -564,6 +564,7 @@ function DocumentSpacePage() {
                         action: () => window.open((pageState.selectedFiles.value.length > 0 && pageState.selectedSpace.value)
                           ? documentSpaceService.createRelativeFilesDownloadUrl(
                               pageState.selectedSpace.value.id,
+                              pageState.get().path,
                               pageState.selectedFiles.value
                             )
                           : undefined)

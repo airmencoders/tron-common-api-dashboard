@@ -6,7 +6,7 @@ import PersonSetupFunctions from '../support/person-setup-functions';
 import { cleanup } from '../support/cleanup-helper';
 import UtilityFunctions from '../support/utility-functions';
 
-describe('Person Find API', () => {
+describe.skip('Person Find API', () => {
 
   it('Should allow an authorized app client to find a person record by email', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_READ'])

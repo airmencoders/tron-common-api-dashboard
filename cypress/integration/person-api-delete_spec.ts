@@ -7,7 +7,7 @@ import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Delete API', () => {
 
-  it('Should allow an authorized App Client to Delete a Person', () => {
+  it.skip('Should allow an authorized App Client to Delete a Person', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_DELETE'])
         .then((appClientId: string) => {
           return cy
