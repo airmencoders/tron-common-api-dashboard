@@ -228,5 +228,5 @@ export function validateDocSpaceName(name: string): boolean {
   if (name.trim() === '') return false; // blank check
   return /^[A-Za-z0-9-._()\s]+$/.test(name) 
     && (name.match(/(\.)/g) || []).length <= 1  // no more than 1 dots
-    && !(/\s+[.]|[.]\s+/.test(name));  // no spaces before extension .. or after
+    && !(/\s[.]|[.]\s/.test(name));  // no spaces before extension .. or after
 }
