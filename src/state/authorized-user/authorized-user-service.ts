@@ -67,4 +67,10 @@ export default class AuthorizedUserService {
   get error(): any | undefined {
     return this.state.promised ? undefined : this.state.error;
   }
+
+  setDocumentSpaceDefaultId(spaceId: string) {
+    if(!!this.authorizedUser){
+      this.state.merge({defaultDocumentSpaceId: spaceId})
+    }
+  }
 }

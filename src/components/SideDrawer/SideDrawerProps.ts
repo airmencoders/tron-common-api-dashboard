@@ -1,4 +1,5 @@
 import {SideDrawerSize} from './side-drawer-size';
+import React from "react";
 
 export interface SideDrawerProps {
   title: string;
@@ -6,5 +7,7 @@ export interface SideDrawerProps {
   onCloseHandler: () => void;
   children: React.ReactNode | React.ReactNode[];
   isLoading: boolean;
-  size?: SideDrawerSize
+  size?: SideDrawerSize;
+  titleStyle?: React.CSSProperties;
+  preTitleNode?: React.ReactNode;
 }

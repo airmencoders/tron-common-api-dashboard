@@ -1,35 +1,40 @@
-import { none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
-import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
-import React, { ChangeEvent, useEffect, useRef } from 'react';
+import {none, SetPartialStateAction, State, useHookstate} from '@hookstate/core';
+import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
+import React, {ChangeEvent, useEffect, useRef} from 'react';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
-import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
+import {InfiniteScrollOptions} from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentRowActionCellRenderer
+  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import DropDown from '../../components/DropDown/DropDown';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
-import { GridSelectionType } from '../../components/Grid/grid-selection-type';
+import {GridSelectionType} from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
-import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
+import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
+import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
+import {createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
-import PeopleIcon from '../../icons/PeopleIcon';
 import RemoveIcon from '../../icons/RemoveIcon';
 import UploadMaterialIcon from '../../icons/UploadMaterialIcon';
-import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
-import { FormActionType } from '../../state/crud-page/form-action-type';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { formatBytesToString } from '../../utils/file-utils';
+import {
+  DocumentDto,
+  DocumentSpacePrivilegeDtoTypeEnum,
+  DocumentSpaceRequestDto,
+  DocumentSpaceResponseDto
+} from '../../openapi';
+import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
+import {FormActionType} from '../../state/crud-page/form-action-type';
+import {useDocumentSpaceState} from '../../state/document-space/document-space-state';
+import {PrivilegeType} from '../../state/privilege/privilege-type';
+import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
+import {formatBytesToString} from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditFolderForm from './DocumentSpaceCreateEditFolderForm';
@@ -37,6 +42,10 @@ import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
+import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
+import PeopleIcon2 from "../../icons/PeopleIcon2";
+import UserIcon from "../../icons/UserIcon";
+import UserIconCircle from "../../icons/UserIconCircle";
 import {useLocation} from 'react-router-dom';
 import {useHistory} from 'react-router';
 
@@ -104,6 +113,8 @@ interface DocumentSpacePageState {
   newFolderPrompt: boolean;
   path: string;
   showDeleteSelectedDialog: boolean;
+  isDefaultDocumentSpaceSettingsOpen: boolean;
+  sideDrawerSize: SideDrawerSize;
 }
 
 function getDocumentUniqueKey(data: DocumentDto): string {
@@ -140,6 +151,8 @@ function DocumentSpacePage() {
     newFolderPrompt: false,
     path: '',
     showDeleteSelectedDialog: false,
+    isDefaultDocumentSpaceSettingsOpen: false,
+    sideDrawerSize: SideDrawerSize.NORMAL,
   });
 
   const location = useLocation();
@@ -166,7 +179,13 @@ function DocumentSpacePage() {
           if (queryParams.get(spaceIdQueryKey) != null) {
             loadDocSpaceFromLocation(location, data);
           } else {
-            setStateOnDocumentSpaceAndPathChange(data[0], '');
+            const defaultDocumentSpaceId = authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
+            const defaultDocumentSpace = data.find(d=>d.id === defaultDocumentSpaceId);
+            if (defaultDocumentSpace != null) {
+              setStateOnDocumentSpaceAndPathChange(defaultDocumentSpace, '');
+            } else {
+              setStateOnDocumentSpaceAndPathChange(data[0], '');
+            }
           }
         }
       } catch (err) {
@@ -321,6 +340,14 @@ function DocumentSpacePage() {
     );
   }
 
+  function setPageStateOnException(message: string) {
+    mergePageState({
+      isSubmitting: false,
+      errorMessage: message,
+      showErrorMessage: true,
+    })
+  }
+
   function submitFolderName(name: string) {
     pageState.merge({ isSubmitting: true });
     if (pageState.selectedSpace.value?.id === undefined) return;
@@ -333,13 +360,8 @@ function DocumentSpacePage() {
           shouldUpdateDatasource: true
         });
       })
-      .catch(message => {
-        mergePageState({
-          isSubmitting: false,
-          errorMessage: message,
-          showErrorMessage: true,
-        });
-      });
+      .catch(message => setPageStateOnException(message));
+
     mergeState(pageState.newFolderPrompt, false);
   }
 
@@ -358,17 +380,32 @@ function DocumentSpacePage() {
           datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
         });
       })
-      .catch((message) =>
-        mergePageState({
-          isSubmitting: false,
-          errorMessage: message,
-          showErrorMessage: true,
-        })
-      );
+      .catch((message) => setPageStateOnException(message));
   }
 
   function closeDrawer(): void {
     pageState.merge({ drawerOpen: false });
+  }
+
+  function closeMySettingsDrawer(): void {
+    pageState.merge({ isDefaultDocumentSpaceSettingsOpen: false });
+  }
+
+  function submitDefaultDocumentSpace(spaceId: string) {
+    pageState.merge({ isSubmitting: true });
+    documentSpaceService
+      .patchDefaultDocumentSpace(spaceId)
+      .then((docSpaceId) => {
+
+        authorizedUserService.setDocumentSpaceDefaultId(docSpaceId);
+        mergePageState({
+          isDefaultDocumentSpaceSettingsOpen: false,
+          isSubmitting: false,
+          showErrorMessage: false,
+          path: '',
+        });
+      })
+      .catch((message) => setPageStateOnException(message));
   }
 
   function closeErrorMsg(): void {
@@ -421,7 +458,7 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  const documentDtoColumnsWithConditionalDelete = () => {
+  function documentDtoColumnsWithConditionalDelete () {
     const columns = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
       [
         ...documentDtoColumns,
@@ -484,6 +521,20 @@ function DocumentSpacePage() {
                 disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
               >
                 Add New Space <AddMaterialIcon size={1.25} />
+              </Button>
+
+            )}
+
+            {documentSpaceService.documentSpaces.length && (
+              <Button
+                data-testid="doc-space-my-settings__btn"
+                type="button"
+                style={{position:'absolute', right: 20}}
+                unstyled
+                disableMobileFullWidth
+                onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
+              >
+                <UserIcon size={0}/>
               </Button>
             )}
           </div>
@@ -586,7 +637,7 @@ function DocumentSpacePage() {
                     disableMobileFullWidth
                     onClick={() => pageState.membershipsState.isOpen.set(true)}
                   >
-                    <PeopleIcon size={1.5} iconTitle="Manage Users" />
+                    <PeopleIcon2 size={1.5} iconTitle="Manage Users" />
                   </Button>
                 )}
               </div>
@@ -618,7 +669,7 @@ function DocumentSpacePage() {
         title="Add New Document Space"
         isOpen={pageState.drawerOpen.get()}
         onCloseHandler={closeDrawer}
-        size={SideDrawerSize.NORMAL}
+        size={pageState.sideDrawerSize.get()}
       >
         <DocumentSpaceEditForm
           onCancel={closeDrawer}
@@ -635,7 +686,7 @@ function DocumentSpacePage() {
         title="Add New Folder"
         isOpen={pageState.newFolderPrompt.get()}
         onCloseHandler={() => mergeState(pageState.newFolderPrompt, false)}
-        size={SideDrawerSize.NORMAL}
+        size={pageState.sideDrawerSize.get()}
       >
         <DocumentSpaceCreateEditFolderForm
           onCancel={() => pageState.newFolderPrompt.set(false)}
@@ -646,6 +697,28 @@ function DocumentSpacePage() {
           showErrorMessage={pageState.showErrorMessage.get()}
           errorMessage={pageState.errorMessage.get()}
         />
+      </SideDrawer>
+      <SideDrawer
+        isLoading={false}
+        title="My Settings"
+        isOpen={pageState.isDefaultDocumentSpaceSettingsOpen.get()}
+        onCloseHandler={closeMySettingsDrawer}
+        size={SideDrawerSize.WIDE}
+        titleStyle={{color:'#5F96EA', marginTop:-2}}
+        preTitleNode={
+          <div style={{padding:'4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14}}>
+            <UserIconCircle size={0}/>
+          </div>
+        }
+      >
+        <DocumentSpaceMySettingsForm
+          onCancel={closeMySettingsDrawer}
+          onSubmit={submitDefaultDocumentSpace}
+          isFormSubmitting={pageState.isSubmitting.get()}
+          formActionType={FormActionType.SAVE}
+          documentSpaces={documentSpaceService.documentSpaces}
+          authorizedUserService={authorizedUserService}
+          />
       </SideDrawer>
 
       <DeleteDocumentDialog
