@@ -174,7 +174,7 @@ function DocumentSpacePage() {
       try {
         const data = await spacesCancellableRequest.promise;
 
-        if (data && data.length > 0) {
+        if (data?.length > 0) {
           const queryParams = new URLSearchParams(location.search);
           if (queryParams.get(spaceIdQueryKey) != null) {
             loadDocSpaceFromLocation(location, data);
