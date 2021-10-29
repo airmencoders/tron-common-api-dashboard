@@ -219,8 +219,10 @@ function DocumentSpacePage() {
         return;
       }
       const path = queryParams.get(pathQueryKey) ?? '';
-
-      setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
+      if (selectedDocumentSpace.id !== pageState.get().selectedSpace?.id ||
+          path !== pageState.get().path) {
+        setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
+      }
     }
   }
 
@@ -253,7 +255,6 @@ function DocumentSpacePage() {
 
         privileges = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpace(documentSpace.id);
       }
-
       mergePageState({
         selectedSpace: documentSpace,
         shouldUpdateDatasource: true,
@@ -271,7 +272,7 @@ function DocumentSpacePage() {
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
         queryParams.set(spaceIdQueryKey, documentSpace.id);
-        history.push({search: queryParams.toString()})
+        history.replace({search: queryParams.toString()});
       }
     } catch (err) {
       const preparedError = prepareRequestError(err);
