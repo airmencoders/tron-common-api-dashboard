@@ -34,16 +34,16 @@ describe('Test Document Space Service', () => {
       key: 'file.txt',
       path: spaceName,
       size: 1000,
-      uploadedBy: '',
-      uploadedDate: '2021-09-17T14:09:10.154Z',
+      lastModifiedBy: '',
+      lastModifiedDate: '2021-09-17T14:09:10.154Z',
     },
     {
       spaceId: '407bf847-5ac7-485c-842f-c9efaf8a6b5d',
       key: 'file2.txt',
       path: spaceName,
       size: 20000,
-      uploadedBy: '',
-      uploadedDate: '2021-09-17T15:09:10.154Z',
+      lastModifiedBy: '',
+      lastModifiedDate: '2021-09-17T15:09:10.154Z',
     },
   ];
 

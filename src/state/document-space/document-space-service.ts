@@ -44,7 +44,7 @@ export default class DocumentSpaceService {
 
           /**
            * Don't error out the state here. If the request fails for some reason, just show nothing.
-           * 
+           *
            * Call the success callback as a hack to prevent
            * ag grid from showing an infinite loading state on failure.
            */
@@ -116,7 +116,7 @@ export default class DocumentSpaceService {
   async getDashboardUserPrivilegesForDocumentSpace(documentSpaceId: string) {
     const privileges = (await this.documentSpaceApi.getSelfDashboardUserPrivilegesForDocumentSpace(documentSpaceId)).data.data;
     return Object.values(DocumentSpacePrivilegeDtoTypeEnum).reduce<Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>((prev, curr) => {
-      prev[curr] = privileges.find(privilege => privilege.type === curr) ? true : false;
+      prev[curr] = privileges?.find(privilege => privilege.type === curr) ? true : false;
       return prev;
     }, { READ: false, WRITE: false, MEMBERSHIP: false });
   }

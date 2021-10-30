@@ -46,6 +46,8 @@ import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import PeopleIcon2 from "../../icons/PeopleIcon2";
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
+import {useLocation} from 'react-router-dom';
+import {useHistory} from 'react-router';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -119,6 +121,9 @@ function getDocumentUniqueKey(data: DocumentDto): string {
   return data.key;
 }
 
+const spaceIdQueryKey = 'spaceId';
+const pathQueryKey = 'path';
+
 function DocumentSpacePage() {
   const pageState = useHookstate<DocumentSpacePageState>({
     drawerOpen: false,
@@ -150,6 +155,9 @@ function DocumentSpacePage() {
     sideDrawerSize: SideDrawerSize.NORMAL,
   });
 
+  const location = useLocation();
+  const history = useHistory();
+
   const documentSpaceService = useDocumentSpaceState();
   const authorizedUserService = useAuthorizedUserState();
 
@@ -166,13 +174,18 @@ function DocumentSpacePage() {
       try {
         const data = await spacesCancellableRequest.promise;
 
-        if (data && data.length > 0) {
-          const defaultDocumentSpaceId = authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-          const defaultDocumentSpace = data.find(d=>d.id === defaultDocumentSpaceId)
-          if( defaultDocumentSpace !== undefined){
-            setStateOnDocumentSpaceChange(defaultDocumentSpace);
-          }else{
-            setStateOnDocumentSpaceChange(data[0]);
+        if (data?.length > 0) {
+          const queryParams = new URLSearchParams(location.search);
+          if (queryParams.get(spaceIdQueryKey) != null) {
+            loadDocSpaceFromLocation(location, data);
+          } else {
+            const defaultDocumentSpaceId = authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
+            const defaultDocumentSpace = data.find(d=>d.id === defaultDocumentSpaceId);
+            if (defaultDocumentSpace != null) {
+              setStateOnDocumentSpaceAndPathChange(defaultDocumentSpace, '');
+            } else {
+              setStateOnDocumentSpaceAndPathChange(data[0], '');
+            }
           }
         }
       } catch (err) {
@@ -193,6 +206,26 @@ function DocumentSpacePage() {
     };
   }, []);
 
+  useEffect(() => {
+    loadDocSpaceFromLocation(location, documentSpaceService.documentSpaces);
+  }, [location.search]);
+
+  function loadDocSpaceFromLocation(locationService: any, documentSpaceList: Array<DocumentSpaceResponseDto>) {
+    const queryParams = new URLSearchParams(locationService.search);
+    if (queryParams.get(spaceIdQueryKey) != null && documentSpaceList.length > 0) {
+      const selectedDocumentSpace = documentSpaceList.find(documentSpace => documentSpace.id === queryParams.get('spaceId'));
+      if (selectedDocumentSpace == null) {
+        createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
+        return;
+      }
+      const path = queryParams.get(pathQueryKey) ?? '';
+      if (selectedDocumentSpace.id !== pageState.get().selectedSpace?.id ||
+          path !== pageState.get().path) {
+        setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
+      }
+    }
+  }
+
   function mergePageState(partialState: Partial<DocumentSpacePageState>): void {
     if (mountedRef.current) {
       mergeState<DocumentSpacePageState>(pageState, partialState);
@@ -205,7 +238,7 @@ function DocumentSpacePage() {
     }
   }
 
-  async function setStateOnDocumentSpaceChange(documentSpace: DocumentSpaceResponseDto) {
+  async function setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
     let privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> = {
       READ: false,
       WRITE: false,
@@ -222,21 +255,25 @@ function DocumentSpacePage() {
 
         privileges = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpace(documentSpace.id);
       }
-
       mergePageState({
         selectedSpace: documentSpace,
         shouldUpdateDatasource: true,
         datasource: documentSpaceService.createDatasource(
           documentSpace.id,
-          '',
+          path,
           infiniteScrollOptions
         ),
         privilegeState: {
           privileges,
           isLoading: false
         },
-        path: '',
+        path,
       });
+      const queryParams = new URLSearchParams(location.search);
+      if (queryParams.get(spaceIdQueryKey) == null) {
+        queryParams.set(spaceIdQueryKey, documentSpace.id);
+        history.replace({search: queryParams.toString()});
+      }
     } catch (err) {
       const preparedError = prepareRequestError(err);
 
@@ -265,14 +302,15 @@ function DocumentSpacePage() {
   function onDocumentSpaceSelectionChange(
     event: ChangeEvent<HTMLSelectElement>
   ): void {
-    const selectedDocumentSpace = documentSpaceService.documentSpaces.find(documentSpace => documentSpace.id === event.target.value);
-
-    if (selectedDocumentSpace == null) {
-      createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
-      return;
+    const documentSpaceId = event.target.value;
+    if (documentSpaceId != null) {
+      const queryParams = new URLSearchParams(location.search);
+      if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
+        queryParams.set(spaceIdQueryKey, documentSpaceId);
+        queryParams.delete(pathQueryKey);
+        history.push({search: queryParams.toString()});
+      }
     }
-
-    setStateOnDocumentSpaceChange(selectedDocumentSpace);
   }
 
   function onDatasourceUpdateCallback() {
@@ -438,7 +476,7 @@ function DocumentSpacePage() {
             }
           }
         })
-      ] 
+      ]
       : documentDtoColumns;
 
     // modify the first column to have a DocSpaceItemRenderer
@@ -448,18 +486,13 @@ function DocumentSpacePage() {
       resizable: true,
       cellRenderer: DocSpaceItemRenderer,
       checkboxSelection: true,
-      cellRendererParams: { 
+      cellRendererParams: {
         onClick: (folder: string) => {
           const newPath = pageState.get().path + '/' + folder;
-          pageState.merge({
-            path: newPath,
-            shouldUpdateDatasource: true,
-            datasource: documentSpaceService.createDatasource(
-              pageState.get().selectedSpace?.id ?? '',
-              newPath,
-              infiniteScrollOptions
-            ),
-          })
+          const queryParams = new URLSearchParams(location.search);
+          queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+          queryParams.set(pathQueryKey, newPath);
+          history.push({search: queryParams.toString()});
         }
       }
     });
@@ -511,38 +544,36 @@ function DocumentSpacePage() {
       <div className="breadcrumb-area">
         <BreadCrumbTrail
           path={pageState.get().path}
-          onNavigate={(path) =>
-            mergePageState({
-              path: path,
-              selectedFiles: [],
-              shouldUpdateDatasource: true,
-              datasource: documentSpaceService.createDatasource(
-                pageState.get().selectedSpace?.id ?? '',
-                path,
-                infiniteScrollOptions
-              ),
-            })
-          }
+          onNavigate={(newPath) => {
+            const queryParams = new URLSearchParams(location.search);
+            queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+            if (newPath !== '') {
+              queryParams.set(pathQueryKey, newPath);
+            } else {
+              queryParams.delete(pathQueryKey);
+            }
+            history.push({search: queryParams.toString()});
+          }}
         />
         <div>
           {pageState.selectedSpace.value != null &&
             !pageState.privilegeState.isLoading.value && (
               <div className="content-controls">
-                
 
-              { pageState.selectedSpace.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write) 
+
+              { pageState.selectedSpace.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
                 && <div data-testid="upload-new-file">
                     <DocumentUploadDialog
                       documentSpaceId={pageState.selectedSpace.value.id}
                       currentPath={pageState.get().path}
-                      onFinish={() => 
+                      onFinish={() =>
                         pageState.merge({ shouldUpdateDatasource: true, })
                       }
                       buttonStyle={{ icon: true, className: 'rotate-icon'}}
-                      
+
                       value={<UploadMaterialIcon size={1} iconTitle="Upload Files" />}
                     />
-                  </div>               
+                  </div>
                 }
 
                 {isAuthorizedForAction(
@@ -581,21 +612,21 @@ function DocumentSpacePage() {
                     data-testid="download-items"
                     anchorContent={<DownloadMaterialIcon size={1.25} iconTitle="Download Items" />}
                     items={[
-                      { displayName: 'Download Selected', 
+                      { displayName: 'Download Selected',
                         action: () => window.open((pageState.selectedFiles.value.length > 0 && pageState.selectedSpace.value)
                           ? documentSpaceService.createRelativeFilesDownloadUrl(
                               pageState.selectedSpace.value.id,
                               pageState.get().path,
                               pageState.selectedFiles.value
                             )
-                          : undefined) 
+                          : undefined)
                       },
-                      { displayName: 'Download All Files (zip)', 
+                      { displayName: 'Download All Files (zip)',
                         action: () => pageState.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
                           pageState.selectedSpace.value.id))
                       }
                     ]}
-                  />                    
+                  />
                 )}
 
                 {isAuthorizedForAction(
