@@ -869,6 +869,12 @@
         "key": {
           "type": "string"
         },
+        "lastModifiedBy": {
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "type": "string"
+        },
         "path": {
           "type": "string"
         },
@@ -878,12 +884,6 @@
         },
         "spaceId": {
           "type": "string"
-        },
-        "uploadedBy": {
-          "type": "string"
-        },
-        "uploadedDate": {
-          "type": "string"
         }
       },
       "required": [
@@ -891,8 +891,8 @@
         "path",
         "spaceId",
         "size",
-        "uploadedDate",
-        "uploadedBy"
+        "lastModifiedDate",
+        "lastModifiedBy"
       ],
       "type": "object"
     },
