@@ -7,20 +7,42 @@ import './DocumentDownloadCellRenderer.scss';
 function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
   const documentSpaceService = useDocumentSpaceState();
 
+  const path = props.node?.data?.path;
   const fileKey = props.node?.data?.key;
   const space = props.node?.data?.spaceId;
+  const isFolder = props.node?.data?.folder;
 
   return (
     <div>
-      {fileKey && space &&
+      {fileKey && space && (
         <div className="document-download-cell-renderer">
-          <a href={documentSpaceService.createRelativeDownloadFileUrl(space, fileKey)}>
-            <Button type="button" unstyled className="document-download-cell-renderer__btn" disableMobileFullWidth transparentBackground>
+          <a
+            href={
+              isFolder
+                ? documentSpaceService.createRelativeFilesDownloadUrl(
+                    space,
+                    path,
+                    [props.node?.data]
+                  )
+                : documentSpaceService.createRelativeDownloadFileUrl(
+                    space,
+                    path,
+                    fileKey
+                  )
+            }
+          >
+            <Button
+              type="button"
+              unstyled
+              className="document-download-cell-renderer__btn"
+              disableMobileFullWidth
+              transparentBackground
+            >
               <DownloadIcon iconTitle={`Download ${fileKey}`} size={1.25} />
             </Button>
           </a>
         </div>
-      }
+      )}
     </div>
   );
 }

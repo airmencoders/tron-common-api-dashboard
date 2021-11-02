@@ -1,10 +1,18 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
-import { MemoryRouter } from 'react-router-dom';
+import {MemoryRouter, Route} from 'react-router-dom';
 import { ToastContainer } from '../../../components/Toast/ToastContainer/ToastContainer';
-import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpaceResponseDtoResponseWrapper } from '../../../openapi';
+import {
+  DashboardUserControllerApi,
+  DashboardUserDto,
+  DocumentSpaceControllerApi,
+  DocumentSpaceControllerApiInterface,
+  DocumentSpaceResponseDto,
+  DocumentSpaceResponseDtoResponseWrapper,
+  S3PaginationDto
+} from '../../../openapi';
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
 import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
@@ -107,6 +115,28 @@ describe('Test Document Space Page', () => {
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeEnabled();
     expect(documentSpacesSelect).toHaveValue(documentSpaces[0].id);
+  });
+
+  it('should show DocumentSpaceMySettingButton when the user has at least one document space', () => {
+    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
+    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockImplementation(() => {
+      return {
+        promise: Promise.resolve(documentSpaces),
+        cancelTokenSource: axios.CancelToken.source()
+      }
+    });
+
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpacePage />
+      </MemoryRouter>
+    );
+
+    const documentSpacesSelect = page.getByTestId('doc-space-my-settings__btn');
+    expect(documentSpacesSelect).toBeInTheDocument()
   });
 
   it('should not show Upload Files button while spaces are loading (no space selected)', () => {
@@ -455,5 +485,44 @@ describe('Test Document Space Page', () => {
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
       expect(page.queryByTitle('Upload Files')).not.toBeInTheDocument();
     });
+
+    it('should update the url when navigating to another space', async () => {
+      jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+      jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
+      jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
+      jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+      jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockImplementation(() => {
+        return {
+          promise: Promise.resolve(documentSpaces),
+          cancelTokenSource: axios.CancelToken.source()
+        }
+      });
+
+      let testHistory: any;
+      let testLocation: any;
+      const page = render(
+        <MemoryRouter>
+          <DocumentSpacePage />
+          <Route
+            path="*"
+            render={({history, location}) => {
+              testHistory = history;
+              testLocation = location;
+              return null;
+            }}
+          />
+        </MemoryRouter>
+      );
+      const documentSpacesSelect = page.getByLabelText('Spaces');
+      expect(documentSpacesSelect).toBeEnabled();
+      await waitFor(() => expect(page.queryAllByText(documentSpaces[0].name)).toBeTruthy())
+      act(() => {
+        userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
+      });
+
+      const queryParams = new URLSearchParams(testLocation?.search);
+      expect(queryParams.get('spaceId')).toEqual(documentSpaces[1].id);
+    });
+
   });
 });

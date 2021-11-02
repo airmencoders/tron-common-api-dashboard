@@ -5,7 +5,7 @@ import { cleanup, orgIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
 import UtilityFunctions from '../../../support/utility-functions';
 
-describe('ORGANIZATION_READ EFA privilege', () => {
+describe.skip('ORGANIZATION_READ EFA privilege', () => {
   beforeEach(() => {
     cleanup();
   });

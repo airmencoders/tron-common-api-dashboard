@@ -34,16 +34,16 @@ describe('Test Document Space Service', () => {
       key: 'file.txt',
       path: spaceName,
       size: 1000,
-      uploadedBy: '',
-      uploadedDate: '2021-09-17T14:09:10.154Z',
+      lastModifiedBy: '',
+      lastModifiedDate: '2021-09-17T14:09:10.154Z',
     },
     {
       spaceId: '407bf847-5ac7-485c-842f-c9efaf8a6b5d',
       key: 'file2.txt',
       path: spaceName,
       size: 20000,
-      uploadedBy: '',
-      uploadedDate: '2021-09-17T15:09:10.154Z',
+      lastModifiedBy: '',
+      lastModifiedDate: '2021-09-17T15:09:10.154Z',
     },
   ];
 
@@ -374,18 +374,18 @@ describe('Test Document Space Service', () => {
   it('should create relative download url for multi file download', () => {
     const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
 
-    const url = documentSpaceService.createRelativeFilesDownloadUrl(documentSpaceId, documents);
+    const url = documentSpaceService.createRelativeFilesDownloadUrl(documentSpaceId, '/', documents);
 
-    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download?files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download?path=/&files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
   });
 
   it('should create relative download url for a single file download', () => {
     const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
     const fileKey = 'testfile.key';
 
-    const url = documentSpaceService.createRelativeDownloadFileUrl(documentSpaceId, fileKey);
+    const url = documentSpaceService.createRelativeDownloadFileUrl(documentSpaceId, '/', fileKey);
 
-    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download/single?file=${fileKey}`)).toBeTruthy();
+    expect(url.endsWith(`/document-space/space/${documentSpaceId}/${fileKey}`)).toBeTruthy();
   });
 
   it('should create relative download url to download entire space', () => {

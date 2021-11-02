@@ -7,10 +7,14 @@ import {FormActionType} from '../../../state/crud-page/form-action-type';
 import './SubmitActions.scss';
 
 function SubmitActions(props: SubmitActionsProps) {
+  const variant = props.variant ? props.variant : 1;
   return (
       <div className="submit-actions button-container">
-        {props.onCancel && 
+        {props.onCancel && variant === 1 &&
           <Button type="button" onClick={props.onCancel} transparentBackground unstyled>Cancel</Button>
+        }
+        {props.onCancel && variant === 2 &&
+          <Button type="button" onClick={props.onCancel} outline style={{backgroundColor: "#fff", color: '#5F96EA', boxShadow: 'none', border: '1px solid #E5E5E5'}}>Cancel</Button>
         }
         <Button
             type="submit"
@@ -24,7 +28,8 @@ function SubmitActions(props: SubmitActionsProps) {
               </Spinner>
               :
               props.formActionType === FormActionType.ADD && <>Add</> ||
-              props.formActionType === FormActionType.UPDATE && <>Update</>
+              props.formActionType === FormActionType.UPDATE && <>Update</> ||
+              props.formActionType === FormActionType.SAVE && <>Save</>
           }
         </Button>
       </div>

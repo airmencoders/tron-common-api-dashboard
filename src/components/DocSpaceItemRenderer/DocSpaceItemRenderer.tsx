@@ -18,7 +18,7 @@ function DocSpaceItemRenderer(props: any) {
   return (
     <div
       className="loading-cell-renderer"
-      data-testid="docspace-item-cell-renderer"
+      data-testid={`docspace-item-cell-renderer__${data.key}`}
     >
       {data.folder ? <FolderIcon /> : null}
       {'  '}

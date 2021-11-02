@@ -44,7 +44,7 @@ export default class DocumentSpaceService {
 
           /**
            * Don't error out the state here. If the request fails for some reason, just show nothing.
-           * 
+           *
            * Call the success callback as a hack to prevent
            * ag grid from showing an infinite loading state on failure.
            */
@@ -116,18 +116,18 @@ export default class DocumentSpaceService {
   async getDashboardUserPrivilegesForDocumentSpace(documentSpaceId: string) {
     const privileges = (await this.documentSpaceApi.getSelfDashboardUserPrivilegesForDocumentSpace(documentSpaceId)).data.data;
     return Object.values(DocumentSpacePrivilegeDtoTypeEnum).reduce<Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>((prev, curr) => {
-      prev[curr] = privileges.find(privilege => privilege.type === curr) ? true : false;
+      prev[curr] = privileges?.find(privilege => privilege.type === curr) ? true : false;
       return prev;
     }, { READ: false, WRITE: false, MEMBERSHIP: false });
   }
 
-  createRelativeFilesDownloadUrl(id: string, documents: DocumentDto[]) {
+  createRelativeFilesDownloadUrl(id: string, path: string, documents: DocumentDto[]) {
     const fileKeysParam = documents.map(document => document.key).join(',');
-    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download?files=${fileKeysParam}`;
+    return `${Config.API_URL_V2}` + (`document-space/spaces/${id}/files/download?path=${path}&files=${fileKeysParam}`).replace(/[\/]+/g, '/');
   }
 
-  createRelativeDownloadFileUrl(id: string, key: string): string {
-    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/single?file=${key}`;
+  createRelativeDownloadFileUrl(id: string, path: string, key: string): string {
+    return `${Config.API_URL_V2}` + (`document-space/space/${id}/${path}/${key}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
   }
 
   createRelativeDownloadAllFilesUrl(id: string): string {
@@ -190,5 +190,16 @@ export default class DocumentSpaceService {
 
   resetPaginationMap(): void {
     this.paginationPageToTokenMap = new Map([[0, undefined]]);
+  }
+
+
+  async patchDefaultDocumentSpace(spaceId: string): Promise<string> {
+    try {
+      await this.documentSpaceApi.patchSelfDocumentSpaceDefault(spaceId);
+      return Promise.resolve(spaceId);
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
   }
 }

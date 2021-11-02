@@ -2,5 +2,6 @@
 export enum FormActionType {
   UPDATE,
   ADD,
-  DELETE
+  DELETE,
+  SAVE
 }

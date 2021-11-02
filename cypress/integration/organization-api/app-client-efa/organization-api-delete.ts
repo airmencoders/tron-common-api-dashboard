@@ -27,7 +27,7 @@ describe('ORGANIZATION_DELETE EFA privilege', () => {
       });
     });
 
-    it('should allow with ORGANIZATION_DELETE privilege with 204', () => {
+    it.skip('should allow with ORGANIZATION_DELETE privilege with 204', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_DELETE']);
 
       OrgSetupFunctions.createOrganization()

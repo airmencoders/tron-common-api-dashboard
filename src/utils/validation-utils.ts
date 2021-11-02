@@ -218,11 +218,14 @@ export function validateDocSpaceName(name: string): boolean {
 }
 
 /**
- * Validates a folder name
+ * Validates a folder/file name
  * @param name
  * @returns
  */
  export function validateFolderName(name: string): boolean {
   if (!name) return false; // null check
-  return /^[A-Za-z0-9.-]+$/.test(name);
+  if (name.trim() === '') return false; // blank check
+  return /^[A-Za-z0-9-._()\s]+$/.test(name)
+    && (name.match(/(\.)/g) || []).length <= 1  // no more than 1 dots
+    && !(/\s[.]|[.]\s/.test(name));  // no spaces before extension .. or after
 }

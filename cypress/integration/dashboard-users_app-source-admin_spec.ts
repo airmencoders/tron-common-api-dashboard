@@ -10,7 +10,7 @@ import DataCrudFormPageUtil, {
 
 describe('Dashboard Users - App Source Admin Tests', () => {
 
-  it('Should create a Dashboard User for App Source Admin add', () => {
+  it.skip('Should create a Dashboard User for App Source Admin add', () => {
     const adminEmail = `${UtilityFunctions.generateRandomString()}@email.com`;
 
     UtilityFunctions.visitSite(`${host}`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
