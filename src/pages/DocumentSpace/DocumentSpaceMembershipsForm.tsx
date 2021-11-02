@@ -59,8 +59,6 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
   Validation(membershipState.member.email).validate(validateEmail, validationErrors.invalidEmail, 'error');
   Validation(membershipState.member.email).validate(validateRequiredString, validationErrors.requiredText, 'error');
 
-  Validation(membershipState.member.privileges).validate(privileges => privileges.length > 0, validationErrors.atLeastOnePrivilege, 'error');
-
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 

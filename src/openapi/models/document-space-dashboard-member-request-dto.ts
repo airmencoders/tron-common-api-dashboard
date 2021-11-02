@@ -39,7 +39,6 @@ export interface DocumentSpaceDashboardMemberRequestDto {
     * @enum {string}
     */
 export enum DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum {
-    Read = 'READ',
     Write = 'WRITE',
     Membership = 'MEMBERSHIP'
 }

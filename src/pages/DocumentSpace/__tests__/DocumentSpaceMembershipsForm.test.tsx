@@ -56,26 +56,6 @@ describe('Document Space Membership Form Test', () => {
     expect(page.getByText(/Cannot be blank or empty/)).toBeInTheDocument();
   });
 
-  it('should show privileges validation', () => {
-    const page = render(
-      <DocumentSpaceMembershipsForm
-        documentSpaceId={documentSpaceId}
-        onMemberChangeCallback={onMemberChangeCallback}
-      />
-    );
-
-    expect(page.queryByText('Add Member')).toBeInTheDocument();
-
-    const readPrivilegeCheckbox = page.getByLabelText('READ');
-    expect(readPrivilegeCheckbox).toBeInTheDocument();
-
-    // Required field validation
-    // Check and then uncheck it
-    userEvent.click(readPrivilegeCheckbox);
-    userEvent.click(readPrivilegeCheckbox);
-    expect(page.getByText(/At least one privilege must be set/)).toBeInTheDocument();
-  });
-
   it('should send request when adding new user and show success toast on success', async () => {
     const page = render(
       <>
@@ -105,7 +85,7 @@ describe('Document Space Membership Form Test', () => {
     expect(emailField).toBeInTheDocument();
     userEvent.type(emailField, 'test@email.com');
 
-    const readPrivilegeCheckbox = page.getByLabelText('READ');
+    const readPrivilegeCheckbox = page.getByLabelText('WRITE');
     expect(readPrivilegeCheckbox).toBeInTheDocument();
     userEvent.click(readPrivilegeCheckbox);
 
@@ -151,9 +131,9 @@ describe('Document Space Membership Form Test', () => {
     expect(emailField).toBeInTheDocument();
     userEvent.type(emailField, 'test@email.com');
 
-    const readPrivilegeCheckbox = page.getByLabelText('READ');
-    expect(readPrivilegeCheckbox).toBeInTheDocument();
-    userEvent.click(readPrivilegeCheckbox);
+    const writePrivilegeCheckbox = page.getByLabelText('WRITE');
+    expect(writePrivilegeCheckbox).toBeInTheDocument();
+    userEvent.click(writePrivilegeCheckbox);
 
     const addBtn = page.getByText('Add');
     expect(addBtn).toBeEnabled();
