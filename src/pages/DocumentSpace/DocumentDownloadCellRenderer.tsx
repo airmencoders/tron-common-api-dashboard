@@ -27,7 +27,8 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
                 : documentSpaceService.createRelativeDownloadFileUrl(
                     space,
                     path,
-                    fileKey
+                    fileKey,
+                    true
                   )
             }
           >

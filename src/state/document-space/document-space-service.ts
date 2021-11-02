@@ -126,8 +126,9 @@ export default class DocumentSpaceService {
     return `${Config.API_URL_V2}` + (`document-space/spaces/${id}/files/download?path=${path}&files=${fileKeysParam}`).replace(/[\/]+/g, '/');
   }
 
-  createRelativeDownloadFileUrl(id: string, path: string, key: string): string {
-    return `${Config.API_URL_V2}` + (`document-space/space/${id}/${path}/${key}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
+  createRelativeDownloadFileUrl(id: string, path: string, key: string, asDownload = false): string {
+    const downloadLink =  `${Config.API_URL_V2}` + (`document-space/space/${id}/${path}/${key}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
+    return asDownload ? downloadLink + '?download=true' : downloadLink;
   }
 
   createRelativeDownloadAllFilesUrl(id: string): string {
