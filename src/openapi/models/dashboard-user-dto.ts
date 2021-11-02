@@ -39,6 +39,12 @@ export interface DashboardUserDto {
      * @memberof DashboardUserDto
      */
     privileges?: Array<PrivilegeDto>;
+    /**
+     * 
+     * @type {string}
+     * @memberof DashboardUserDto
+     */
+    defaultDocumentSpaceId?: string;
 }
 
 
