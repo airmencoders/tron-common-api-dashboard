@@ -5,6 +5,8 @@ import { useAppVersionState } from '../../state/app-info/app-info-state';
 import PageTitle from '../PageTitle/PageTitle';
 import Sidebar from '../Sidebar/Sidebar';
 import './PageFormat.scss';
+import CloseNavIcon from '../../icons/CloseNavIcon';
+import Button from '../Button/Button';
 
 
 export interface PageFormatProps {
@@ -38,6 +40,9 @@ function PageFormat(props: any) {
           <div className="nav-menu__user-info">
             <HeaderUserInfoContainer />
           </div>
+          <Button type="button" className="nav-menu__collapse-toggle" transparentBackground>
+            <CloseNavIcon size={1} />
+          </Button>
         </div>
         <div className="page-format__page-body-container">
           <div className="page-format__page-body">

@@ -10,7 +10,7 @@
     position: sticky;
 
     &-il2 {
-      background: #0A4638; 
+      background: #0A4638;
     }
 
     &-il4 {
@@ -23,6 +23,11 @@
         bottom: 0;
         padding-left: calculateRem(15px);
         padding-bottom: calculateRem(23px);
+      }
+      &__collapse-toggle {
+        position: absolute;
+        bottom: calculateRem(27px);
+        right: 0px;
       }
     }
   }
