@@ -7,6 +7,7 @@ import Sidebar from '../Sidebar/Sidebar';
 import './PageFormat.scss';
 import CloseNavIcon from '../../icons/CloseNavIcon';
 import Button from '../Button/Button';
+import {useLocalStorage, writeStorage} from '@rehooks/local-storage';
 
 
 export interface PageFormatProps {
@@ -16,6 +17,7 @@ export interface PageFormatProps {
 
 function PageFormat(props: any) {
   const appInfoService = useAppVersionState();
+  const [isNavCollapsed] = useLocalStorage<boolean>('isNavCollapsed', false);
 
   function getBackgroundClass() {
     if (appInfoService.state.enclave?.get()?.match(/il4/i)) {
@@ -29,18 +31,26 @@ function PageFormat(props: any) {
     }
   }
 
+  function toggleNavMenuCollapse() {
+    writeStorage('isNavCollapsed', !isNavCollapsed);
+  }
+
   useEffect(() => {
     appInfoService.fetchVersion();
   }, []);
 
   return (
       <div className={`page-format ${props.className ?? ''}`}>
-        <div className={`page-format__nav-menu ${getBackgroundClass()}`}>
+        <div className={`page-format__nav-menu ${getBackgroundClass()} ${isNavCollapsed ? '--collapsed' : ''}`}>
           <Sidebar items={routes} />
           <div className="nav-menu__user-info">
             <HeaderUserInfoContainer />
           </div>
-          <Button type="button" className="nav-menu__collapse-toggle" transparentBackground>
+          <Button type="button"
+                  className="nav-menu__collapse-toggle"
+                  onClick={toggleNavMenuCollapse}
+                  transparentBackground
+          >
             <CloseNavIcon size={1} />
           </Button>
         </div>
