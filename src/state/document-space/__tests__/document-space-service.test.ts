@@ -165,7 +165,6 @@ describe('Test Document Space Service', () => {
     });
 
     const apiRequestSpy = jest.spyOn(documentSpaceApi, 'dumpContentsAtPath');
-
     const onSuccess = jest.fn();
     const onFail = jest.fn(() => {
       try {

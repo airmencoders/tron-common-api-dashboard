@@ -84,9 +84,9 @@ describe('Document Space Membership Test', () => {
     expect(emailField).toBeInTheDocument();
     userEvent.type(emailField, 'test@email.com');
 
-    const readPrivilegeCheckbox = page.getByLabelText('READ');
-    expect(readPrivilegeCheckbox).toBeInTheDocument();
-    userEvent.click(readPrivilegeCheckbox);
+    const writePrivilegeCheckbox = page.getByLabelText('WRITE');
+    expect(writePrivilegeCheckbox).toBeInTheDocument();
+    userEvent.click(writePrivilegeCheckbox);
 
     const addBtn = page.getByText('Add');
     expect(addBtn).toBeEnabled();
