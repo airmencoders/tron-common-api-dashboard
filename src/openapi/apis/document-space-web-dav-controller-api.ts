@@ -110,11 +110,7 @@ export const DocumentSpaceWebDavControllerApiAxiosParamCreator = function (confi
                 baseOptions = configuration.baseOptions;
             }
 
-<<<<<<< HEAD
-            const localVarRequestOptions = { method: 'HEAD', ...baseOptions, ...options};
-=======
             const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
->>>>>>> origin/master
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -222,11 +218,7 @@ export const DocumentSpaceWebDavControllerApiAxiosParamCreator = function (confi
                 baseOptions = configuration.baseOptions;
             }
 
-<<<<<<< HEAD
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-=======
             const localVarRequestOptions = { method: 'HEAD', ...baseOptions, ...options};
->>>>>>> origin/master
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -262,11 +254,7 @@ export const DocumentSpaceWebDavControllerApiAxiosParamCreator = function (confi
                 baseOptions = configuration.baseOptions;
             }
 
-<<<<<<< HEAD
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-=======
             const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
->>>>>>> origin/master
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
