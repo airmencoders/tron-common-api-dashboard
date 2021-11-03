@@ -67,7 +67,6 @@ const infiniteScrollOptions: InfiniteScrollOptions = {
 };
 
 interface DocumentSpaceRecentsPageState {
-  shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
   fileToDelete: string;
   selectedFile?: RecentDocumentDto;
@@ -97,7 +96,6 @@ function DocumentSpaceRecentsPage() {
   const authorizedUserService = useAuthorizedUserState();
 
   const pageState = useHookstate<DocumentSpaceRecentsPageState>({
-    shouldUpdateDatasource: false,
     datasource: undefined,
     fileToDelete: '',
     selectedFile: undefined,
@@ -164,7 +162,6 @@ function DocumentSpaceRecentsPage() {
         return;
       }
 
-      console.log("thrown here")
       createTextToast(ToastType.ERROR, 'Could not load privileges for authorized Document Spaces. Actions will be limited', { autoClose: false });
 
       mergePageState({

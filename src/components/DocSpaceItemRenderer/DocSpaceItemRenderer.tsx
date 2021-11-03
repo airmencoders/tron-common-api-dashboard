@@ -39,7 +39,7 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
           data-testid="docspace-row-item"
           onClick={() => {
             if (data.folder) {
-              props?.onClick(data.key);
+              props.onClick(data.key);
             }
           }}
         >
