@@ -470,8 +470,13 @@ function DocumentSpacePage() {
           cellRenderer: DocumentRowActionCellRenderer,
           cellRendererParams: {
             actions: {
-              delete: (doc: DocumentDto) => {
-                pageState.merge({ selectedFiles: [doc], showDeleteDialog: true })
+              delete: {
+                action: (doc: DocumentDto) => {
+                  pageState.merge({ selectedFiles: [doc], showDeleteDialog: true })
+                },
+                isAuthorized: () => {
+                  return true;
+                }
               }
             }
           }

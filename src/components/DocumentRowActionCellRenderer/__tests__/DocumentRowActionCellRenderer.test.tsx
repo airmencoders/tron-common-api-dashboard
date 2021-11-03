@@ -5,7 +5,7 @@ import DocumentRowActionCellRenderer from '../DocumentRowActionCellRenderer';
 describe('Row Action Cell Renderer', () => {
   it('Renders correctly', async () => {
     const page = render(
-        <DocumentRowActionCellRenderer node={{ data: 'data' }} actions={{delete: () => {}}} />
+        <DocumentRowActionCellRenderer node={{ data: 'data' }} actions={{delete: {action: () => {}, isAuthorized: () => true}}} />
     );
 
     expect(page.getByTestId('document-row-action-cell-renderer')).toBeTruthy();
@@ -16,7 +16,7 @@ describe('Row Action Cell Renderer', () => {
 
     await act(async() => {
       const page = render(
-          <DocumentRowActionCellRenderer actions={{delete: onClick}} node={{ data: 'data' }} />
+          <DocumentRowActionCellRenderer actions={{delete: {action: onClick, isAuthorized: () => true}}} node={{ data: 'data' }} />
       );
       await act(async ()=> {
         fireEvent.click(page.getByTitle("more"));
