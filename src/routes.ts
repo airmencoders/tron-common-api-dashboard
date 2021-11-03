@@ -21,6 +21,7 @@ import AppsIcon from './icons/AppsIcon';
 import DigitizeIcon from './icons/DigitizeIcon';
 import SystemIcon from './icons/SystemIcon';
 import PuzzleIcon from './icons/PuzzleIcon';
+import DocumentSpaceArchivedItemsPage from "./pages/DocumentSpace/DocumentSpaceArchivedItemsPage";
 
 export interface RouteItem {
     path: string;
@@ -50,7 +51,8 @@ export enum RoutePath {
     API_TEST = '/app-api/:apiId',
     KPI = '/kpi',
     DOCUMENT_SPACE = '/document-space',
-    DOCUMENT_SPACE_SPACES = '/document-space/spaces'
+    DOCUMENT_SPACE_SPACES = '/document-space/spaces',
+    DOCUMENT_SPACE_ARCHIVED = '/document-space/archived',
 }
 
 export const routes: RouteItem[] = [
@@ -166,7 +168,16 @@ export const routes: RouteItem[] = [
                     PrivilegeType.DOCUMENT_SPACE_USER,
                     PrivilegeType.DASHBOARD_ADMIN
                 ]
-            }
+            },
+            {
+              path: RoutePath.DOCUMENT_SPACE_ARCHIVED,
+              name: 'Archived Files',
+              component: DocumentSpaceArchivedItemsPage,
+              requiredPrivileges: [
+                  PrivilegeType.DOCUMENT_SPACE_USER,
+                  PrivilegeType.DASHBOARD_ADMIN
+              ]
+          }
         ],
         icon: PuzzleIcon
     },

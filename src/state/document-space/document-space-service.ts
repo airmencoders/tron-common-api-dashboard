@@ -10,6 +10,11 @@ import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivileg
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
+export enum ArchivedStatus {
+  ARCHIVED,
+  NOT_ARCHIVED
+}
+
 export default class DocumentSpaceService {
   constructor(
     public documentSpaceApi: DocumentSpaceControllerApiInterface,
@@ -17,13 +22,27 @@ export default class DocumentSpaceService {
 
   private paginationPageToTokenMap = new Map<number, string | undefined>([[0, undefined]]);
 
-  createDatasource(spaceName: string, path: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
+  createDatasource(spaceName: string, 
+    path: string, 
+    infiniteScrollOptions: InfiniteScrollOptions, 
+    status: ArchivedStatus = ArchivedStatus.NOT_ARCHIVED): IDatasource {
+
     const datasource: IDatasource = {
       getRows: async (params: IGetRowsParams) => {
         try {
           const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
           const page = Math.floor(params.startRow / limit);
-          const data: S3PaginationDto = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
+          let data: S3PaginationDto;
+          
+          if (status === ArchivedStatus.NOT_ARCHIVED) {
+            data = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
+          }
+          else if (status === ArchivedStatus.ARCHIVED) {
+            data = (await this.documentSpaceApi.getAllArchivedFilesForAuthUser()).data;
+          }
+          else {
+            throw new Error('Illegal Archived Status value');
+          }
 
           this.paginationPageToTokenMap.set(page + 1, data.nextContinuationToken);
 
@@ -134,14 +153,34 @@ export default class DocumentSpaceService {
     return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/all`;
   }
 
-  async deleteIems(space: string, path: string, items: string[]): Promise<void> {
+  async deleteItems(space: string, path: string, items: string[]): Promise<void> {
     try {
-    await this.documentSpaceApi.deleteItems(space, { currentPath: path, itemsToDelete: [...items] });
-    return Promise.resolve();
+      await this.documentSpaceApi.deleteItems(space, { currentPath: path, itemsToDelete: [...items] });
+      return Promise.resolve();
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
   }
-  catch (e) {
-    return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+
+  async archiveItems(space: string, path: string, items: string[]): Promise<void> {
+    try {
+      await this.documentSpaceApi.archiveItems(space, { currentPath: path, itemsToArchive: [...items] });
+      return Promise.resolve();
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
   }
+
+  async unArchiveItems(space: string, items: string[]): Promise<void> {
+    try {
+      await this.documentSpaceApi.unArchiveItems(space, { itemsToUnArchive: [...items]} );
+      return Promise.resolve();
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
   }
 
   uploadFile(space: string, path: string, file: any, progressCallback: (percent: number) => void): CancellableDataRequest<AxiosResponse<{ [key: string]: string}>> {

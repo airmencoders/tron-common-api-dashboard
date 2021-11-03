@@ -48,6 +48,11 @@ import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import {useLocation} from 'react-router-dom';
 import {useHistory} from 'react-router';
+import CircleMinusIcon from '../../icons/CircleMinusIcon';
+import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
+import EditIcon from '../../icons/EditIcon';
+import StarIcon from '../../icons/StarIcon';
+import UploadIcon from '../../icons/UploadIcon';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -413,22 +418,29 @@ function DocumentSpacePage() {
     pageState.merge({ showErrorMessage: false });
   }
 
-  function closeDeleteDialog(): void {
+  function closeRemoveDialog(): void {
     pageState.merge({ showDeleteDialog: false, showDeleteSelectedDialog: false });
   }
 
-  async function deleteFile(): Promise<void> {
+  async function archiveFile(): Promise<void> {
     const selectedSpace = pageState.selectedSpace.value;
 
     if (selectedSpace == null) {
       return;
     }
 
-    await documentSpaceService.deleteIems(
-      selectedSpace.id,
-      pageState.get().path,
-      pageState.get().selectedFiles.map(item => item.key)
-    );
+    try {
+      await documentSpaceService.archiveItems(
+        selectedSpace.id,
+        pageState.get().path,
+        pageState.get().selectedFiles.map(item => item.key)
+      );
+      createTextToast(ToastType.SUCCESS, 'File Archived');
+    }
+    catch (e) {
+      createTextToast(ToastType.ERROR, 'Could not archive files - ' + (e as Error).toString());
+    }
+
     pageState.merge({
       shouldUpdateDatasource: true,
       selectedFiles: [],
@@ -438,7 +450,7 @@ function DocumentSpacePage() {
         infiniteScrollOptions
       ),
     });
-    closeDeleteDialog();
+    closeRemoveDialog();
   }
 
   function onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
@@ -469,12 +481,18 @@ function DocumentSpacePage() {
           headerClass: 'header-center',
           cellRenderer: DocumentRowActionCellRenderer,
           cellRendererParams: {
-            actions: {
-              delete: (doc: DocumentDto) => {
-                pageState.merge({ selectedFiles: [doc], showDeleteDialog: true })
-              }
-            }
-          }
+            menuItems: [
+              { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites') },
+              { title: 'Go to file', icon: CircleRightArrowIcon, onClick: () => console.log('go to file') },
+              {
+                title: 'Remove',
+                icon: CircleMinusIcon,
+                onClick: (doc: DocumentDto) => pageState.merge({ selectedFiles: [doc], showDeleteDialog: true }),
+              },
+              { title: 'Rename', icon: EditIcon, onClick: () => console.log('rename') },
+              { title: 'Upload new version', icon: UploadIcon, onClick: () => console.log('upload') },
+            ],
+          },
         })
       ]
       : documentDtoColumns;
@@ -724,15 +742,15 @@ function DocumentSpacePage() {
 
       <DeleteDocumentDialog
         show={pageState.showDeleteDialog.get()}
-        onCancel={closeDeleteDialog}
-        onSubmit={deleteFile}
+        onCancel={closeRemoveDialog}
+        onSubmit={archiveFile}
         file={pageState.selectedFiles.get().map(item => item.key.toString()).join(',')}
       />
 
       <DeleteDocumentDialog
         show={pageState.showDeleteSelectedDialog.get()}
-        onCancel={closeDeleteDialog}
-        onSubmit={deleteFile}
+        onCancel={closeRemoveDialog}
+        onSubmit={archiveFile}
         file={null}
       />
 

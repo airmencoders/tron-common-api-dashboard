@@ -29,3 +29,13 @@ export function createAxiosSuccessResponse<T>(data: T): AxiosResponse<T> {
     headers: {}
   };
 }
+
+export function createAxiosNoContentResponse(): AxiosResponse<{}> {
+  return {
+    data: {},
+    status: 204,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+}

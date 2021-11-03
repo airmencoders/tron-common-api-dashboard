@@ -887,6 +887,9 @@
         },
         "spaceId": {
           "type": "string"
+        },
+        "spaceName": {
+          "type": "string"
         }
       },
       "required": [
@@ -897,6 +900,21 @@
         "lastModifiedDate",
         "lastModifiedBy"
       ],
+      "type": "object"
+    },
+    "DocumentSpaceArchiveItemsDto": {
+      "additionalProperties": false,
+      "properties": {
+        "currentPath": {
+          "type": "string"
+        },
+        "itemsToArchive": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "DocumentSpaceCreateFolderDto": {
@@ -936,7 +954,6 @@
     },
     "DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum": {
       "enum": [
-        "READ",
         "WRITE",
         "MEMBERSHIP"
       ],
@@ -993,18 +1010,6 @@
           "type": "array"
         }
       },
-      "type": "object"
-    },
-    "DocumentSpacePathDto": {
-      "additionalProperties": false,
-      "properties": {
-        "path": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "path"
-      ],
       "type": "object"
     },
     "DocumentSpacePrivilegeDto": {
@@ -1106,6 +1111,18 @@
       "required": [
         "data"
       ],
+      "type": "object"
+    },
+    "DocumentSpaceUnArchiveItemsDto": {
+      "additionalProperties": false,
+      "properties": {
+        "itemsToUnArchive": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "EndpointCountMetricDto": {

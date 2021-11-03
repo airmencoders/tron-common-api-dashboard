@@ -17,31 +17,21 @@
 /**
  * 
  * @export
- * @interface DocumentSpaceDashboardMemberRequestDto
+ * @interface DocumentSpaceArchiveItemsDto
  */
-export interface DocumentSpaceDashboardMemberRequestDto {
+export interface DocumentSpaceArchiveItemsDto {
     /**
      * 
      * @type {string}
-     * @memberof DocumentSpaceDashboardMemberRequestDto
+     * @memberof DocumentSpaceArchiveItemsDto
      */
-    email: string;
+    currentPath?: string;
     /**
      * 
      * @type {Array<string>}
-     * @memberof DocumentSpaceDashboardMemberRequestDto
+     * @memberof DocumentSpaceArchiveItemsDto
      */
-    privileges: Array<DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum>;
+    itemsToArchive?: Array<string>;
 }
-
-/**
-    * @export
-    * @enum {string}
-    */
-export enum DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum {
-    Write = 'WRITE',
-    Membership = 'MEMBERSHIP'
-}
-
 
 
