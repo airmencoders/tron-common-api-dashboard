@@ -17,15 +17,15 @@
 /**
  * 
  * @export
- * @interface DocumentSpacePathDto
+ * @interface DocumentSpaceUnArchiveItemsDto
  */
-export interface DocumentSpacePathDto {
+export interface DocumentSpaceUnArchiveItemsDto {
     /**
      * 
-     * @type {string}
-     * @memberof DocumentSpacePathDto
+     * @type {Array<string>}
+     * @memberof DocumentSpaceUnArchiveItemsDto
      */
-    path: string;
+    itemsToUnArchive?: Array<string>;
 }
 
 
