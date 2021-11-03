@@ -21,7 +21,7 @@ import AppsIcon from './icons/AppsIcon';
 import DigitizeIcon from './icons/DigitizeIcon';
 import SystemIcon from './icons/SystemIcon';
 import PuzzleIcon from './icons/PuzzleIcon';
-import DocumentSpaceRecentsPage from './pages/DocumentSpace/DocumentSpaceRecentsPage';
+import DocumentSpaceRecentsPage from './pages/DocumentSpace/Recents/DocumentSpaceRecentsPage';
 
 export interface RouteItem {
     path: string;

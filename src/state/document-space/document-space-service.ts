@@ -167,6 +167,12 @@ export default class DocumentSpaceService {
     return this.convertDocumentSpacePrivilegesToRecord(privileges);
   }
 
+  /**
+   * Gets all the privileges for a dashboard user for all of their authorized document spaces.
+   * This will always resolve, even if some or all of the requests failed
+   * @param documentSpaceIds the document space ids that the user is authorized for
+   * @returns the privileges of the user, separated by each document space
+   */
   async getDashboardUserPrivilegesForDocumentSpaces(documentSpaceIds: Set<string>): Promise<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>> {
     // Contains requests made to get privileges for each document space
     const requests: Promise<{ id: string, privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> }>[] = [];
@@ -221,33 +227,15 @@ export default class DocumentSpaceService {
     return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/all`;
   }
 
-  createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string): string {
-    return `${Config.API_URL_V2}` + (`document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
+  createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string, asDownload = false): string {
+    return `${Config.API_URL_V2}` + (`document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}${asDownload ? '?download=true' : ''}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
   }
-
-  // deleteFileBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string): CancellableDataRequest<void> {
-  //   const cancellableRequest = makeCancellableDataRequestToken(this.documentSpaceApi.deleteFileBySpaceAndParent.bind(this.documentSpaceApi, documentSpaceId, parentFolderId, filename));
-  //   const deleteRequest = cancellableRequest.axiosPromise()
-  //     .then(response => response.data)
-  //     .catch(error => {
-  //       if (isDataRequestCancelError(error)) {
-  //         return;
-  //       }
-
-  //       return Promise.reject(prepareRequestError(error));
-  //     });
-
-  //   return {
-  //     promise: deleteRequest,
-  //     cancelTokenSource: cancellableRequest.cancelTokenSource
-  //   };
-  // }
 
   async deleteFileBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string) {
     try {
       return await this.documentSpaceApi.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename);
     } catch (error) {
-      return prepareRequestError(error);
+      return Promise.reject(prepareRequestError(error));
     }
   }
 

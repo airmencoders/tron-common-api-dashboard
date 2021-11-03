@@ -1,6 +1,7 @@
 import React from 'react';
-import {act, fireEvent, render} from '@testing-library/react';
+import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import DocumentRowActionCellRenderer from '../DocumentRowActionCellRenderer';
+import userEvent from '@testing-library/user-event';
 
 describe('Row Action Cell Renderer', () => {
   it('Renders correctly', async () => {
@@ -27,5 +28,31 @@ describe('Row Action Cell Renderer', () => {
 
 
     expect(onClick.mock.calls.length).toBe(1);
+  });
+
+  it('Should render action that is authorized', async () => {
+    const { getByTitle, findByTitle } = render(
+      <DocumentRowActionCellRenderer
+        node={{ data: 'data' }}
+        actions={{ delete: { action: () => { }, isAuthorized: () => true } }}
+      />
+    );
+
+    const moreAction = getByTitle('more');
+    userEvent.click(moreAction);
+    await waitFor(() => expect(findByTitle('Remove')).resolves.toBeInTheDocument());
+  });
+
+  it('Should not render action that is not authorized', async () => {
+    const { getByTitle, queryByTitle } = render(
+      <DocumentRowActionCellRenderer
+        node={{ data: 'data' }}
+        actions={{ delete: { action: () => { }, isAuthorized: () => false } }}
+      />
+    );
+
+    const moreAction = getByTitle('more');
+    userEvent.click(moreAction);
+    await waitFor(() => expect(queryByTitle('Remove')).not.toBeInTheDocument());
   });
 });

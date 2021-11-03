@@ -8,7 +8,6 @@ import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import EditIcon from '../../icons/EditIcon';
 import UploadIcon from '../../icons/UploadIcon';
-import {DocumentDto} from '../../openapi';
 
 interface PopupMenuItem {
   title: string;

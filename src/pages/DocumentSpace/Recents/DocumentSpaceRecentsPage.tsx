@@ -1,40 +1,40 @@
 import { SetPartialStateAction, State, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
-import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
-import Button from '../../components/Button/Button';
-import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
-import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
+import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
+import Button from '../../../components/Button/Button';
+import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer
-  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
-import GridColumn from '../../components/Grid/GridColumn';
-import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
-import PageFormat from '../../components/PageFormat/PageFormat';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import RemoveIcon from '../../icons/RemoveIcon';
+  from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import GridColumn from '../../../components/Grid/GridColumn';
+import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
+import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
+import PageFormat from '../../../components/PageFormat/PageFormat';
+import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
+import RemoveIcon from '../../../icons/RemoveIcon';
 import {
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
   RecentDocumentDto,
-} from '../../openapi';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
-import './DocumentSpacePage.scss';
+} from '../../../openapi';
+import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
+import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
+import '../DocumentSpacePage.scss';
 import { format } from 'date-fns';
-import { CancellableDataRequest } from '../../utils/cancellable-data-request';
+import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRenderer';
-import DeleteDocumentDialog from './DocumentDelete';
-import Spinner from '../../components/Spinner/Spinner';
+import DeleteDocumentDialog from '../DocumentDelete';
+import Spinner from '../../../components/Spinner/Spinner';
+import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
 
-const documentDtoColumns: GridColumn[] = [
+const recentDocumentDtoColumns: GridColumn[] = [
   new GridColumn({
     field: 'key',
     headerName: 'Name',
     resizable: true,
-    cellRenderer: DocSpaceItemRenderer,
+    cellRenderer: RecentDocumentCellRenderer,
     checkboxSelection: true
   }),
   new GridColumn({
@@ -72,6 +72,16 @@ interface DocumentSpaceRecentsPageState {
   fileToDelete: string;
   selectedFile?: RecentDocumentDto;
   privilegeState: {
+    /**
+     * Will take the form of:
+     * {
+     *    [documentSpaceId]: {
+     *      READ: false,
+     *      WRITE: false,
+     *      MEMBERSHIP: false
+     *    }
+     * }
+     */
     privileges: Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>,
     isLoading: boolean
   };
@@ -107,14 +117,15 @@ function DocumentSpaceRecentsPage() {
 
     let spacesCancellableRequest: CancellableDataRequest<DocumentSpaceResponseDto[]>;
 
+    // Don't need to load privileges if current user is Dashboard Admin,
+    // since they currently have access to everything Document Space related
     if (!isAdmin) {
       spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-      spacesCancellableRequest.promise.then(response => async () => {
-        await getPrivilegesForEachDocumentSpace(response);
-        mergePageState({
+      spacesCancellableRequest.promise
+        .then(response => getPrivilegesForEachDocumentSpace(response))
+        .then(() => mergePageState({
           datasource: documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions)
-        });
-      });
+        }));
     } else {
       mergePageState({
         datasource: documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions)
@@ -133,12 +144,6 @@ function DocumentSpaceRecentsPage() {
   }, []);
 
   async function getPrivilegesForEachDocumentSpace(documentSpaces: DocumentSpaceResponseDto[]) {
-    // Don't need to load privileges if current user is Dashboard Admin,
-    // since they currently have access to everything Document Space related
-    if (isAdmin) {
-      return;
-    }
-
     let privileges: Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>> = {};
 
     mergeState(pageState.privilegeState, {
@@ -159,7 +164,8 @@ function DocumentSpaceRecentsPage() {
         return;
       }
 
-      createTextToast(ToastType.ERROR, 'Could not load privileges for authorized Document Spaces. Actions will be limited');
+      console.log("thrown here")
+      createTextToast(ToastType.ERROR, 'Could not load privileges for authorized Document Spaces. Actions will be limited', { autoClose: false });
 
       mergePageState({
         privilegeState: {
@@ -174,7 +180,7 @@ function DocumentSpaceRecentsPage() {
     const file = pageState.selectedFile.value;
 
     if (file == null) {
-      return;
+      throw new Error('File cannot be null for File Deletion');
     }
 
     try {
@@ -209,7 +215,7 @@ function DocumentSpaceRecentsPage() {
 
   function documentDtoColumnsWithConditionalDelete() {
     return [
-      ...documentDtoColumns,
+      ...recentDocumentDtoColumns,
       new GridColumn({
         valueGetter: GridColumn.defaultValueGetter,
         headerName: 'More',
