@@ -28,6 +28,11 @@ import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRend
 import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
+import StarIcon from '../../../icons/StarIcon';
+import CircleRightArrowIcon from '../../../icons/CircleRightArrowIcon';
+import CircleMinusIcon from '../../../icons/CircleMinusIcon';
+import EditIcon from '../../../icons/EditIcon';
+import UploadIcon from '../../../icons/UploadIcon';
 
 const recentDocumentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -68,7 +73,7 @@ const infiniteScrollOptions: InfiniteScrollOptions = {
 
 interface DocumentSpaceRecentsPageState {
   datasource?: IDatasource;
-  fileToDelete: string;
+  shouldUpdateInfiniteCache: boolean;
   selectedFile?: RecentDocumentDto;
   privilegeState: {
     /**
@@ -97,7 +102,7 @@ function DocumentSpaceRecentsPage() {
 
   const pageState = useHookstate<DocumentSpaceRecentsPageState>({
     datasource: undefined,
-    fileToDelete: '',
+    shouldUpdateInfiniteCache: false,
     selectedFile: undefined,
     privilegeState: {
       privileges: {},
@@ -173,17 +178,23 @@ function DocumentSpaceRecentsPage() {
     }
   }
 
-  async function deleteFile() {
+  async function deleteArchiveFile() {
     const file = pageState.selectedFile.value;
 
     if (file == null) {
-      throw new Error('File cannot be null for File Deletion');
+      throw new Error('File cannot be null for File Archive Deletion');
     }
 
     try {
-      await documentSpaceService.deleteFileBySpaceAndParent(file.documentSpace.id, file.parentFolderId, file.key);
+      await documentSpaceService.deleteArchiveItemBySpaceAndParent(file.documentSpace.id, file.parentFolderId, file.key);
     } catch (error) {
       createTextToast(ToastType.ERROR, 'Could not delete requested file: ' + file.key);
+    } finally {
+      mergePageState({
+        selectedFile: undefined,
+        showDeleteDialog: false,
+        shouldUpdateInfiniteCache: true
+      });
     }
   }
 
@@ -210,6 +221,12 @@ function DocumentSpaceRecentsPage() {
     return privilegesForDocumentSpace && privilegesForDocumentSpace[actionType];
   }
 
+  function shouldUpdateInfiniteCacheCallback() {
+    mergePageState({
+      shouldUpdateInfiniteCache: false
+    });
+  }
+
   function documentDtoColumnsWithConditionalDelete() {
     return [
       ...recentDocumentDtoColumns,
@@ -219,16 +236,22 @@ function DocumentSpaceRecentsPage() {
         headerClass: 'header-center',
         cellRenderer: DocumentRowActionCellRenderer,
         cellRendererParams: {
-          actions: {
-            delete: {
-              action: (doc: RecentDocumentDto) => {
-                pageState.merge({ selectedFile: doc, showDeleteDialog: true })
+          menuItems: [
+            { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites'), isAuthorized: () => true },
+            { title: 'Go to file', icon: CircleRightArrowIcon, onClick: () => console.log('go to file'), isAuthorized: () => true },
+            {
+              title: 'Remove',
+              icon: CircleMinusIcon,
+              onClick: (doc: RecentDocumentDto) => {
+                mergePageState({ selectedFile: doc, showDeleteDialog: true })
               },
               isAuthorized: (data: RecentDocumentDto) => {
                 return data && isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
               }
-            }
-          }
+            },
+            { title: 'Rename', icon: EditIcon, onClick: () => console.log('rename'), isAuthorized: () => true },
+            { title: 'Upload new version', icon: UploadIcon, onClick: () => console.log('upload'), isAuthorized: () => true },
+          ],
         }
       })
     ];
@@ -274,13 +297,15 @@ function DocumentSpaceRecentsPage() {
               getRowNodeId={getDocumentUniqueKey}
               rowSelection="single"
               onSelectionChanged={onSelectionChanged}
+              updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
+              updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
             />
           }
 
           <DeleteDocumentDialog
             show={pageState.showDeleteDialog.get()}
             onCancel={() => pageState.showDeleteDialog.set(false)}
-            onSubmit={deleteFile}
+            onSubmit={deleteArchiveFile}
             file={pageState.selectedFile.value?.key ?? null}
           />
         </>

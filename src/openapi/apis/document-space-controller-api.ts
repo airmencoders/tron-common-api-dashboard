@@ -329,6 +329,61 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Archive a single file/folder from a Document Space by parent folder id and item name
+         * @summary Archive a file/folder from a Document Space
+         * @param {string} id 
+         * @param {string} parentFolderId 
+         * @param {string} filename 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteArchiveItemBySpaceAndParent: async (id: string, parentFolderId: string, filename: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteArchiveItemBySpaceAndParent.');
+            }
+            // verify required parameter 'parentFolderId' is not null or undefined
+            if (parentFolderId === null || parentFolderId === undefined) {
+                throw new RequiredError('parentFolderId','Required parameter parentFolderId was null or undefined when calling deleteArchiveItemBySpaceAndParent.');
+            }
+            // verify required parameter 'filename' is not null or undefined
+            if (filename === null || filename === undefined) {
+                throw new RequiredError('filename','Required parameter filename was null or undefined when calling deleteArchiveItemBySpaceAndParent.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/folder/{parentFolderId}/file/{filename}/archive`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"parentFolderId"}}`, encodeURIComponent(String(parentFolderId)))
+                .replace(`{${"filename"}}`, encodeURIComponent(String(filename)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Deletes selected files/folder from a Document Space that are already archived
          * @summary Deletes item(s) that are already in the archived state
          * @param {string} id 
@@ -1474,6 +1529,22 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Archive a single file/folder from a Document Space by parent folder id and item name
+         * @summary Archive a file/folder from a Document Space
+         * @param {string} id 
+         * @param {string} parentFolderId 
+         * @param {string} filename 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteArchiveItemBySpaceAndParent(id, parentFolderId, filename, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Deletes selected files/folder from a Document Space that are already archived
          * @summary Deletes item(s) that are already in the archived state
          * @param {string} id 
@@ -1852,6 +1923,18 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).createSpace(documentSpaceRequestDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Archive a single file/folder from a Document Space by parent folder id and item name
+         * @summary Archive a file/folder from a Document Space
+         * @param {string} id 
+         * @param {string} parentFolderId 
+         * @param {string} filename 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any): AxiosPromise<void> {
+            return DocumentSpaceControllerApiFp(configuration).deleteArchiveItemBySpaceAndParent(id, parentFolderId, filename, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Deletes selected files/folder from a Document Space that are already archived
          * @summary Deletes item(s) that are already in the archived state
          * @param {string} id 
@@ -2144,6 +2227,18 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     createSpace(documentSpaceRequestDto: DocumentSpaceRequestDto, options?: any): AxiosPromise<DocumentSpaceResponseDto>;
+
+    /**
+     * Archive a single file/folder from a Document Space by parent folder id and item name
+     * @summary Archive a file/folder from a Document Space
+     * @param {string} id 
+     * @param {string} parentFolderId 
+     * @param {string} filename 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any): AxiosPromise<void>;
 
     /**
      * Deletes selected files/folder from a Document Space that are already archived
@@ -2447,6 +2542,20 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public createSpace(documentSpaceRequestDto: DocumentSpaceRequestDto, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).createSpace(documentSpaceRequestDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Archive a single file/folder from a Document Space by parent folder id and item name
+     * @summary Archive a file/folder from a Document Space
+     * @param {string} id 
+     * @param {string} parentFolderId 
+     * @param {string} filename 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).deleteArchiveItemBySpaceAndParent(id, parentFolderId, filename, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

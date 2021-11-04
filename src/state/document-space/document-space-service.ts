@@ -8,7 +8,7 @@ import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/gri
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
-import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken, CancellableAxiosDataRequest } from '../../utils/cancellable-data-request';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
 export enum ArchivedStatus {
@@ -253,6 +253,14 @@ export default class DocumentSpaceService {
   async deleteFileBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string) {
     try {
       return await this.documentSpaceApi.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error));
+    }
+  }
+
+  async deleteArchiveItemBySpaceAndParent(documentSpaceId: string, parentFolderId: string, name: string) {
+    try {
+      return await this.documentSpaceApi.deleteArchiveItemBySpaceAndParent(documentSpaceId, parentFolderId, name);
     } catch (error) {
       return Promise.reject(prepareRequestError(error));
     }

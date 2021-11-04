@@ -476,6 +476,21 @@ describe('Test Document Space Service', () => {
     expect(mock).toHaveBeenCalled();
   });
 
+  it('should allow file archive deletion by Document Space and Parent', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'deleteArchiveItemBySpaceAndParent').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<void>(void (0))
+      )
+    );
+
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
+    const parentFolderId = '00000000-0000-0000-0000-000000000000';
+    const filename = 'testfile.txt';
+
+    await documentSpaceService.deleteArchiveItemBySpaceAndParent(documentSpaceId, parentFolderId, filename);
+    expect(mock).toHaveBeenCalled();
+  });
+
   it('should get a prepared error when deleting file by Document Space and Parent', async () => {
     const axiosError = createGenericAxiosRequestErrorResponse(400);
     const mock = jest.spyOn(documentSpaceApi, 'deleteFileBySpaceAndParent').mockRejectedValue(axiosError);
