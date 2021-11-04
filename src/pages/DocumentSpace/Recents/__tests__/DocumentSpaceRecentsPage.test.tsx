@@ -6,9 +6,8 @@ import { ToastContainer } from '../../../../components/Toast/ToastContainer/Toas
 import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../../state/authorized-user/authorized-user-state';
-import DocumentSpaceMembershipService from '../../../../state/document-space/document-space-membership-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
-import { documentSpaceMembershipService, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
+import { useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import DocumentSpaceRecentsPage from '../DocumentSpaceRecentsPage';
 
 jest.mock('../../../../state/document-space/document-space-state');
@@ -30,8 +29,6 @@ describe('Document Space Recents Page Tests', () => {
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
-  let membershipService: DocumentSpaceMembershipService;
-
   let authorizedUserState: State<DashboardUserDto | undefined> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
@@ -41,15 +38,12 @@ describe('Document Space Recents Page Tests', () => {
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
-    membershipService = new DocumentSpaceMembershipService(documentSpaceApi);
-
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
     dashboardUserApi = new DashboardUserControllerApi();
     authorizedUserService = new AuthorizedUserService(authorizedUserState, dashboardUserApi);
 
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
-    (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
   });
 
   afterEach(() => {

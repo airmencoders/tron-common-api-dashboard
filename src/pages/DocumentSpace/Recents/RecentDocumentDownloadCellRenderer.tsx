@@ -8,8 +8,6 @@ function RecentDocumentDownloadCellRenderer(props: Partial<ICellRendererParams>)
 
   const recentDocument = props.value as RecentDocumentDto;
 
-  console.log(recentDocument)
-
   return (
     <>
       {recentDocument &&
