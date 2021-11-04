@@ -9,6 +9,13 @@ describe('Bread Crumb Tests', () => {
     const mock = jest.fn();
     const page = render(<BreadCrumbTrail path={""} onNavigate={mock} />);
     const rootElement = page.getByTestId('path_element_root');
+    expect(rootElement).toBeInTheDocument();
+  });
+
+  it('should allow clickable root element when multiple path elements exist', async () => {
+    const mock = jest.fn();
+    const page = render(<BreadCrumbTrail path={"/testFolder"} onNavigate={mock} />);
+    const rootElement = page.getByTestId('path_element_root');
     await waitFor(() => expect(rootElement).toBeTruthy());
     fireEvent.click(rootElement);
     await waitFor(() => expect(mock).toHaveBeenCalled());

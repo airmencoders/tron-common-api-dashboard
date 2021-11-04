@@ -117,6 +117,8 @@ models/query-dto.ts
 models/rank-categorized-dto.ts
 models/rank-response-wrapper.ts
 models/rank.ts
+models/recent-document-dto-response-wrapper.ts
+models/recent-document-dto.ts
 models/response-dto.ts
 models/s3-pagination-dto.ts
 models/sailor.ts

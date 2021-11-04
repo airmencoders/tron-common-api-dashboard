@@ -21,6 +21,7 @@ import AppsIcon from './icons/AppsIcon';
 import DigitizeIcon from './icons/DigitizeIcon';
 import SystemIcon from './icons/SystemIcon';
 import PuzzleIcon from './icons/PuzzleIcon';
+import DocumentSpaceRecentsPage from './pages/DocumentSpace/Recents/DocumentSpaceRecentsPage';
 import DocumentSpaceArchivedItemsPage from "./pages/DocumentSpace/DocumentSpaceArchivedItemsPage";
 
 export interface RouteItem {
@@ -52,6 +53,7 @@ export enum RoutePath {
     KPI = '/kpi',
     DOCUMENT_SPACE = '/document-space',
     DOCUMENT_SPACE_SPACES = '/document-space/spaces',
+    DOCUMENT_SPACE_RECENTS = '/document-space/recents',
     DOCUMENT_SPACE_ARCHIVED = '/document-space/archived',
 }
 
@@ -170,6 +172,15 @@ export const routes: RouteItem[] = [
                 ]
             },
             {
+                path: RoutePath.DOCUMENT_SPACE_RECENTS,
+                name: 'Recents',
+                component: DocumentSpaceRecentsPage,
+                requiredPrivileges: [
+                    PrivilegeType.DOCUMENT_SPACE_USER,
+                    PrivilegeType.DASHBOARD_ADMIN
+                ]
+            },
+            {
               path: RoutePath.DOCUMENT_SPACE_ARCHIVED,
               name: 'Archived Files',
               component: DocumentSpaceArchivedItemsPage,
@@ -177,7 +188,7 @@ export const routes: RouteItem[] = [
                   PrivilegeType.DOCUMENT_SPACE_USER,
                   PrivilegeType.DASHBOARD_ADMIN
               ]
-          }
+            }
         ],
         icon: PuzzleIcon
     },
