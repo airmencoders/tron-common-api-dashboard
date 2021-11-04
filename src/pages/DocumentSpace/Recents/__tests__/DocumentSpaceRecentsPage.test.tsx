@@ -104,14 +104,14 @@ describe('Document Space Recents Page Tests', () => {
 
   it('should show limited functionality toast if failed to get privileges', async () => {
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
-    const loadingState = jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValueOnce(true);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValueOnce(true);
     const fetchAndStoreSpaces = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
     });
     const getPrivileges = jest.spyOn(documentSpaceService, 'getDashboardUserPrivilegesForDocumentSpaces').mockReturnValue(Promise.reject(new Error('no privileges')));
 
-    const { getByText, rerender } = render(
+    const page = render(
       <MemoryRouter>
         <DocumentSpaceRecentsPage />
         <ToastContainer />
@@ -121,17 +121,8 @@ describe('Document Space Recents Page Tests', () => {
     await waitFor(() => expect(fetchAndStoreSpaces).toHaveBeenCalled());
     await waitFor(() => expect(getPrivileges).toHaveBeenCalled());
 
-    // rerender the page after loading everything in and loading is false
-    loadingState.mockReturnValueOnce(false);
-    rerender(
-      <MemoryRouter>
-        <DocumentSpaceRecentsPage />
-        <ToastContainer />
-      </MemoryRouter>
-    );
-
     // Test for toast showing limited functionality
-    expect(getByText(/Could not load privileges for authorized Document Spaces/)).toBeInTheDocument();
+    await expect(page.findByText(/Could not load privileges for authorized Document Spaces/)).resolves.toBeInTheDocument();
   });
 
   it('should show spinner while loading', async () => {
