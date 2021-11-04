@@ -104,7 +104,7 @@ describe('Document Space Recents Page Tests', () => {
 
   it('should show limited functionality toast if failed to get privileges', async () => {
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
-    const loadingState = jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
+    const loadingState = jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValueOnce(true);
     const fetchAndStoreSpaces = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
@@ -114,13 +114,7 @@ describe('Document Space Recents Page Tests', () => {
     const { getByText, rerender } = render(
       <MemoryRouter>
         <DocumentSpaceRecentsPage />
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-        />
+        <ToastContainer />
       </MemoryRouter>
     );
 
@@ -128,17 +122,11 @@ describe('Document Space Recents Page Tests', () => {
     await waitFor(() => expect(getPrivileges).toHaveBeenCalled());
 
     // rerender the page after loading everything in and loading is false
-    loadingState.mockReturnValue(false);
+    loadingState.mockReturnValueOnce(false);
     rerender(
       <MemoryRouter>
         <DocumentSpaceRecentsPage />
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-        />
+        <ToastContainer />
       </MemoryRouter>
     );
 
