@@ -1,8 +1,8 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
-import {MemoryRouter, Route} from 'react-router-dom';
+import { MemoryRouter, Route } from 'react-router-dom';
 import { ToastContainer } from '../../../components/Toast/ToastContainer/ToastContainer';
 import {
   DashboardUserControllerApi,
@@ -10,8 +10,7 @@ import {
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
   DocumentSpaceResponseDto,
-  DocumentSpaceResponseDtoResponseWrapper,
-  S3PaginationDto
+  DocumentSpaceResponseDtoResponseWrapper
 } from '../../../openapi';
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';

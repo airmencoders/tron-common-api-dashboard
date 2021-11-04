@@ -15,11 +15,12 @@ import {
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
 import { RequestError } from '../../../utils/ErrorHandling/request-error';
 import {
+  createAxiosNoContentResponse,
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse,
 } from '../../../utils/TestUtils/test-utils';
-import DocumentSpaceService from '../document-space-service';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
+import DocumentSpaceService, { ArchivedStatus } from '../document-space-service';
 
 describe('Test Document Space Service', () => {
   const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -122,6 +123,39 @@ describe('Test Document Space Service', () => {
     });
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should create datasource for archived items', (done) => {
+    documentSpaceApi.getAllArchivedFilesForAuthUser = jest.fn(() => {
+      return Promise.resolve(listObjectsResponse);
+    });
+
+    const onSuccess = jest.fn((data, lastRow) => {
+      try {
+        expect(data).toEqual(
+          expect.arrayContaining(listObjectsResponse.data.documents)
+        );
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+    const onFail = jest.fn();
+    const datasource = documentSpaceService.createDatasource(
+      spaceName,
+      "",
+      infiniteScrollOptions,
+      ArchivedStatus.ARCHIVED
+    );
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
   });
 
   it('should create datasource and fail on server error response', (done) => {
@@ -319,7 +353,7 @@ describe('Test Document Space Service', () => {
       )
     );
 
-    await documentSpaceService.deleteIems('test', "", ['file']);
+    await documentSpaceService.deleteItems('test', "", ['file']);
     expect(mock).toHaveBeenCalled();
   });
 
@@ -331,6 +365,22 @@ describe('Test Document Space Service', () => {
     );
 
     await documentSpaceService.createNewFolder('test', "", 'folder');
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should allow archiving', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'archiveItems').mockReturnValue(
+      Promise.resolve(createAxiosNoContentResponse()));
+
+    await documentSpaceService.archiveItems('test', '/', ['folder']);
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should allow unarchiving', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'unArchiveItems').mockReturnValue(
+      Promise.resolve(createAxiosNoContentResponse()));
+
+    await documentSpaceService.unArchiveItems('test', ['folder']);
     expect(mock).toHaveBeenCalled();
   });
 

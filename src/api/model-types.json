@@ -902,21 +902,6 @@
       ],
       "type": "object"
     },
-    "DocumentDtoResponseWrapper": {
-      "additionalProperties": false,
-      "properties": {
-        "data": {
-          "items": {
-            "$ref": "model-types.json#/definitions/DocumentDto"
-          },
-          "type": "array"
-        }
-      },
-      "required": [
-        "data"
-      ],
-      "type": "object"
-    },
     "DocumentSpaceArchiveItemsDto": {
       "additionalProperties": false,
       "properties": {

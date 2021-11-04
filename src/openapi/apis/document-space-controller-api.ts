@@ -19,8 +19,6 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { DocumentDtoResponseWrapper } from '../models';
-// @ts-ignore
 import { DocumentSpaceArchiveItemsDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceCreateFolderDto } from '../models';
@@ -634,8 +632,8 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * Download a single file (folder now allowed) from a Document Space by parent folder id and filename
-         * @summary Download a filefrom a Document Space
+         * Download a single file (folders not allowed) from a Document Space by parent folder id and filename
+         * @summary Download a file from a Document Space
          * @param {string} id 
          * @param {string} parentFolderId 
          * @param {string} filename 
@@ -968,54 +966,6 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
 
             if (sort) {
                 localVarQueryParameter['sort'] = sort;
-            }
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Retrieves files from a space that the authenticated user has recently uploaded
-         * @param {string} id 
-         * @param {number} [size] the amount of entries to retrieve
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser: async (id: string, size?: number, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser.');
-            }
-            const localVarPath = `/v2/document-space/spaces/{id}/files/recently-uploaded`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (size !== undefined) {
-                localVarQueryParameter['size'] = size;
             }
 
 
@@ -1613,8 +1563,8 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-         * Download a single file (folder now allowed) from a Document Space by parent folder id and filename
-         * @summary Download a filefrom a Document Space
+         * Download a single file (folders not allowed) from a Document Space by parent folder id and filename
+         * @summary Download a file from a Document Space
          * @param {string} id 
          * @param {string} parentFolderId 
          * @param {string} filename 
@@ -1715,21 +1665,6 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          */
         async getRecentlyUploadedFilesByAuthenticatedUser(page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RecentDocumentDtoResponseWrapper>> {
             const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getRecentlyUploadedFilesByAuthenticatedUser(page, size, sort, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
-         * @summary Retrieves files from a space that the authenticated user has recently uploaded
-         * @param {string} id 
-         * @param {number} [size] the amount of entries to retrieve
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id: string, size?: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentDtoResponseWrapper>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id, size, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1982,8 +1917,8 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).downloadFile(id, download, options).then((request) => request(axios, basePath));
         },
         /**
-         * Download a single file (folder now allowed) from a Document Space by parent folder id and filename
-         * @summary Download a filefrom a Document Space
+         * Download a single file (folders not allowed) from a Document Space by parent folder id and filename
+         * @summary Download a file from a Document Space
          * @param {string} id 
          * @param {string} parentFolderId 
          * @param {string} filename 
@@ -2060,17 +1995,6 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          */
         getRecentlyUploadedFilesByAuthenticatedUser(page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<RecentDocumentDtoResponseWrapper> {
             return DocumentSpaceControllerApiFp(configuration).getRecentlyUploadedFilesByAuthenticatedUser(page, size, sort, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Retrieves files from a space that the authenticated user has recently uploaded
-         * @param {string} id 
-         * @param {number} [size] the amount of entries to retrieve
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id: string, size?: number, options?: any): AxiosPromise<DocumentDtoResponseWrapper> {
-            return DocumentSpaceControllerApiFp(configuration).getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id, size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2287,8 +2211,8 @@ export interface DocumentSpaceControllerApiInterface {
     downloadFile(id: string, download?: boolean, options?: any): AxiosPromise<any>;
 
     /**
-     * Download a single file (folder now allowed) from a Document Space by parent folder id and filename
-     * @summary Download a filefrom a Document Space
+     * Download a single file (folders not allowed) from a Document Space by parent folder id and filename
+     * @summary Download a file from a Document Space
      * @param {string} id 
      * @param {string} parentFolderId 
      * @param {string} filename 
@@ -2365,17 +2289,6 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     getRecentlyUploadedFilesByAuthenticatedUser(page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<RecentDocumentDtoResponseWrapper>;
-
-    /**
-     * 
-     * @summary Retrieves files from a space that the authenticated user has recently uploaded
-     * @param {string} id 
-     * @param {number} [size] the amount of entries to retrieve
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DocumentSpaceControllerApiInterface
-     */
-    getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id: string, size?: number, options?: any): AxiosPromise<DocumentDtoResponseWrapper>;
 
     /**
      * 
@@ -2614,8 +2527,8 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-     * Download a single file (folder now allowed) from a Document Space by parent folder id and filename
-     * @summary Download a filefrom a Document Space
+     * Download a single file (folders not allowed) from a Document Space by parent folder id and filename
+     * @summary Download a file from a Document Space
      * @param {string} id 
      * @param {string} parentFolderId 
      * @param {string} filename 
@@ -2705,19 +2618,6 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public getRecentlyUploadedFilesByAuthenticatedUser(page?: number, size?: number, sort?: Array<string>, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).getRecentlyUploadedFilesByAuthenticatedUser(page, size, sort, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Retrieves files from a space that the authenticated user has recently uploaded
-     * @param {string} id 
-     * @param {number} [size] the amount of entries to retrieve
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DocumentSpaceControllerApi
-     */
-    public getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id: string, size?: number, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).getRecentlyUploadedFilesByDocumentSpaceAndAuthenticatedUser(id, size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

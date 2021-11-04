@@ -26,7 +26,6 @@ export * from './count-metric-dto';
 export * from './dashboard-user-dto';
 export * from './dashboard-user-dto-response-wrapper';
 export * from './document-dto';
-export * from './document-dto-response-wrapper';
 export * from './document-space-archive-items-dto';
 export * from './document-space-create-folder-dto';
 export * from './document-space-dashboard-member-request-dto';
