@@ -53,7 +53,6 @@ models/coast-guardsman.ts
 models/count-metric-dto.ts
 models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
-models/document-dto-response-wrapper.ts
 models/document-dto.ts
 models/document-space-archive-items-dto.ts
 models/document-space-create-folder-dto.ts
