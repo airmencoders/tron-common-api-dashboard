@@ -1,12 +1,13 @@
 import { createState, State, useState } from "@hookstate/core";
 import Config from "../../api/config";
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 import {Configuration, SubscriberDto} from "../../openapi";
 import { SubscriberControllerApi, SubscriberControllerApiInterface } from "../../openapi/apis/subscriber-controller-api";
 import PubSubService, { PubSubCollection } from "./pubsub-service";
 
 const subscriberState = createState<PubSubCollection[]>(new Array<PubSubCollection>());  // this subscriber's consolidated representation
 const subscribersData = createState<SubscriberDto[]>(new Array<SubscriberDto>());  // api's raw subscriptions for a given app client
-const pubSubApi: SubscriberControllerApiInterface = new SubscriberControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }));
+const pubSubApi: SubscriberControllerApiInterface = new SubscriberControllerApi(new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance);
 
 export const wrapState = (state: State<PubSubCollection[]>, api: SubscriberControllerApiInterface, data: State<SubscriberDto[]>) => {
       return new PubSubService(state, api, data);

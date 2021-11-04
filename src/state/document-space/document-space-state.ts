@@ -3,10 +3,11 @@ import { Configuration, DocumentSpaceControllerApi, DocumentSpaceControllerApiIn
 import Config from '../../api/config';
 import DocumentSpaceService from './document-space-service';
 import DocumentSpaceMembershipService from './document-space-membership-service';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const documentSpaceControllerApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
-  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 export const wrapState = (

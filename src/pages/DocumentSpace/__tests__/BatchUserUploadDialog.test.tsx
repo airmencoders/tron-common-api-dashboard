@@ -1,31 +1,17 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import BatchUserUploadDialog from "../BatchUserUploadDialog";
-import {createState, State, StateMethodsDestroy} from "@hookstate/core";
+import {createState} from "@hookstate/core";
 import {BatchUploadState} from "../DocumentSpaceMemberships";
-import mockAxios from "axios";
-import {
-  DocumentSpaceControllerApi,
-  DocumentSpaceControllerApiInterface,
-  DocumentSpaceResponseDto
-} from "../../../openapi";
-import DocumentSpaceMembershipService from "../../../state/document-space/document-space-membership-service";
 import {createAxiosSuccessResponse} from "../../../utils/TestUtils/test-utils";
+import { openapiAxiosInstance } from '../../../api/openapi-axios';
+import axios from 'axios';
 
-
-jest.mock('axios')
+jest.mock('../../../api/openapi-axios');
 
 describe('Document Delete Tests', () => {
-  let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
-  let documentSpaceApi: DocumentSpaceControllerApiInterface;
-  let documentSpaceMembershipService: DocumentSpaceMembershipService;
-
-  beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
-    documentSpaceApi = new DocumentSpaceControllerApi();
-
-    documentSpaceMembershipService = new DocumentSpaceMembershipService(documentSpaceApi);
-
+  beforeAll(() => {
+    (openapiAxiosInstance as unknown as jest.Mock).mockReturnValue(axios.create());
   });
 
   it('should render and fire appropriate events', async () => {
@@ -36,7 +22,7 @@ describe('Document Delete Tests', () => {
     const response = createAxiosSuccessResponse<Array<string>>(['a', 'b', 'c']);
 
     let requestMade = false;
-    (mockAxios.request as jest.Mock).mockImplementation((obj) => {
+    (openapiAxiosInstance.request as jest.Mock).mockImplementation((obj) => {
         if (obj.url.includes('/api/v2/document-space/spaces/testId123/batchUsers')) {
           requestMade = true;
           return Promise.resolve(response);

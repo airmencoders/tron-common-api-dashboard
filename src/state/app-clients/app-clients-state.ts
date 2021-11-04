@@ -4,11 +4,12 @@ import Config from '../../api/config';
 import { Configuration, PrivilegeDto } from '../../openapi';
 import { AppClientControllerApi, AppClientControllerApiInterface } from '../../openapi/apis/app-client-controller-api';
 import AppClientsService from './app-clients-service';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 
 const appClientsState = createState<AppClientFlat[]>(new Array<AppClientFlat>());
 const appClientsPrivileges = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
 const appClientsApi: AppClientControllerApiInterface = new AppClientControllerApi(
-  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 export const wrapState = (state: State<AppClientFlat[]>, appClientApi: AppClientControllerApiInterface, privilegesState: State<PrivilegeDto[]>): AppClientsService => {

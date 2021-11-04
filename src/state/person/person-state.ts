@@ -9,16 +9,17 @@ import {
 import Config from '../../api/config';
 import PersonService from './person-service';
 import {RankStateModel} from './rank-state-model';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 
 const personState = createState<PersonDto[]>(new Array<PersonDto>());
 const rankState = createState<RankStateModel>({});
 
 const personApi: PersonControllerApiInterface = new PersonControllerApi(
-    new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 const rankApi: RankControllerApiInterface = new RankControllerApi(
-    new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 export const wrapState = (state: State<PersonDto[]>, _personApi: PersonControllerApiInterface,

@@ -3,11 +3,12 @@ import { Configuration, ScratchStorageControllerApi, ScratchStorageControllerApi
 import Config from '../../api/config';
 import MyDigitizeAppsService from './my-digitize-apps-service';
 import { ScratchStorageAppFlat } from './scratch-storage-app-flat';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 
 const myDigitizeAppsState = createState<ScratchStorageAppFlat[]>(new Array<ScratchStorageAppFlat>());
 
 const scratchStorageControllerApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
-  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 export const wrapDigitizeAppsState = (state: State<ScratchStorageAppFlat[]>, scratchStorageApi: ScratchStorageControllerApiInterface) => {

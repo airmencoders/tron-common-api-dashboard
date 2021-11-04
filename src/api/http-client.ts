@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { axiosAuthErrorResponseInterceptor, axiosAuthSuccessResponseInterceptor } from './openapi-axios';
 
 abstract class HttpClient {
     protected readonly instance: AxiosInstance;
@@ -7,6 +8,12 @@ abstract class HttpClient {
         this.instance = axios.create({
             baseURL,
         });
+
+        this.instance.interceptors.response.use(axiosAuthSuccessResponseInterceptor, axiosAuthErrorResponseInterceptor);
+    }
+
+    get axiosInstance(): AxiosInstance {
+        return this.instance;
     }
 }
 

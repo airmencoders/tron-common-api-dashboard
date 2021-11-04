@@ -1,11 +1,12 @@
 import { createState, State, useState } from '@hookstate/core';
 import Config from '../../api/config';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 import { Configuration, KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto } from '../../openapi';
 import KpiService from './kpi-service';
 
 const kpiState = createState<KpiSummaryDto | KpiSummaryDto[] | undefined>(undefined);
 const kpiApi: KpiControllerApiInterface = new KpiControllerApi(
-  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 export const wrapKpiState = (state: State<KpiSummaryDto | KpiSummaryDto[] | undefined>, appClientApi: KpiControllerApiInterface): KpiService => {

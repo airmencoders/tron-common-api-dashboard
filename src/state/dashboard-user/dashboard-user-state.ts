@@ -4,6 +4,7 @@ import Config from '../../api/config';
 import { DashboardUserControllerApi, DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import DashboardUserService from './dashboard-user-service';
 import { DashboardUserFlat } from './dashboard-user-flat';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 
 
 const dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardUserFlat>());
@@ -11,7 +12,7 @@ const dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardU
 const dashboardUserDtoCache = createState<Record<string, DashboardUserDto>>({});
 const dashboardUserControllerApi = new DashboardUserControllerApi(new Configuration({
   basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
-}));
+}), '', openapiAxiosInstance);
 
 export const wrapDashboardUserState = (state: State<DashboardUserFlat[]>,
                                        dashboardUserApi: DashboardUserControllerApiInterface,

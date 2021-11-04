@@ -1,5 +1,6 @@
 import { createState, State, useState } from '@hookstate/core';
 import Config from '../../api/config';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 import { AppClientCountMetricDto, Configuration, MetricsControllerApi, MetricsControllerApiInterface } from '../../openapi';
 import AppClientUserMetricService from './app-client-user-metric-service';
 
@@ -8,7 +9,7 @@ import AppClientUserMetricService from './app-client-user-metric-service';
 const appClientMetricState = createState<AppClientCountMetricDto>({});
 const metricsControllerApi = new MetricsControllerApi(new Configuration({
   basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
-}));
+}), '', openapiAxiosInstance);
 
 export const wrapAppClientMetricState = (state: State<AppClientCountMetricDto>, metricsApi: MetricsControllerApiInterface): AppClientUserMetricService => {
   return new AppClientUserMetricService(state, metricsApi);

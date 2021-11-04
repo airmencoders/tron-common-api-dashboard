@@ -4,6 +4,7 @@ import Config from '../../api/config';
 import ScratchStorageService from './scratch-storage-service';
 import { PrivilegeDto, ScratchStorageAppRegistryDto, ScratchStorageEntryDto } from '../../openapi/models';
 import { ScratchStorageFlat } from './scratch-storage-flat';
+import { openapiAxiosInstance } from '../../api/openapi-axios';
 
 const scratchStorageState = createState<ScratchStorageAppRegistryDto[]>(new Array<ScratchStorageAppRegistryDto>());
 const scratchStoragePrivilegesState = createState<PrivilegeDto[]>(new Array<PrivilegeDto>());
@@ -14,7 +15,7 @@ const scratchStorageKeysToDeleteState = createState<string[]>(new Array<string>(
 const selectedScratchStorageGlobalState = createState<ScratchStorageFlat>({} as ScratchStorageFlat);
 
 const scratchStorageControllerApi: ScratchStorageControllerApiInterface = new ScratchStorageControllerApi(
-    new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX }), '', openapiAxiosInstance
 );
 
 export const wrapState = (
