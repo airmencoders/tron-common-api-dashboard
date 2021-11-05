@@ -47,6 +47,7 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
       scrollToTopCallback={props.scrollToTopCallback}
       suppressCellSelection={props.suppressCellSelection}
       onGridReady={onGridReady}
+      onSelectionChanged={props.onSelectionChanged}
     />
   );
 }

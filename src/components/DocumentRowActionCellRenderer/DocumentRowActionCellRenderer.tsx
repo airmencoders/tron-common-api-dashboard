@@ -2,23 +2,23 @@ import React, { useMemo } from 'react';
 import { Popup } from 'semantic-ui-react';
 import EllipsesIcon from '../../icons/EllipsesIcon';
 import { IconProps } from '../../icons/IconProps';
-import { DocumentDto } from '../../openapi';
 import './DocumentRowActionCellRenderer.scss';
 
-export interface PopupMenuItem {
+export interface PopupMenuItem<T> {
   title: string;
   icon: React.FC<IconProps>;
-  onClick: (doc: DocumentDto) => void;
+  isAuthorized: (data: T) => boolean;
+  onClick: (doc: T) => void;
 }
 
-interface DocumentRowActionCellRendererProps {
-  node: { data: any; };
-  menuItems: PopupMenuItem[];
+interface DocumentRowActionCellRendererProps<T> {
+  node: { data: T; };
+  menuItems: PopupMenuItem<T>[];
 }
 
-function DocumentRowActionCellRenderer(props: DocumentRowActionCellRendererProps) {
+function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererProps<T>) {
 
-  const popupItems = useMemo<Array<PopupMenuItem>>(() => {
+  const popupItems = useMemo<Array<PopupMenuItem<T>>>(() => {
     return props.menuItems
   }, []);
 
@@ -38,12 +38,16 @@ function DocumentRowActionCellRenderer(props: DocumentRowActionCellRendererProps
           <Popup.Content>
             {
               popupItems?.length > 0 &&
-              popupItems.map(popupItem => (
-                  <div className="popper__item" key={popupItem.title} onClick={() => popupItem.onClick(props.node.data)}>
-                    <popupItem.icon className="popper__icon" size={1} iconTitle={popupItem.title} />
-                    <span className="popper__title">{popupItem.title}</span>
-                  </div>
-              ))
+              popupItems.map(popupItem => {
+                if (popupItem.isAuthorized(props.node.data)) {
+                  return (
+                    <div className="popper__item" key={popupItem.title} onClick={() => popupItem.onClick(props.node.data)}>
+                      <popupItem.icon className="popper__icon" size={1} iconTitle={popupItem.title} />
+                      <span className="popper__title">{popupItem.title}</span>
+                    </div>
+                  )
+                }
+              })
             }
           </Popup.Content>
         </Popup>

@@ -1,8 +1,7 @@
 import { ICellRendererParams } from 'ag-grid-community';
-import DownloadIcon from '../../icons/DownloadIcon';
-import Button from '../../components/Button/Button';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import './DocumentDownloadCellRenderer.scss';
+import GridDownloadButton from '../../components/documentspace/GridDownloadButton/GridDownloadButton';
 
 function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
   const documentSpaceService = useDocumentSpaceState();
@@ -16,8 +15,8 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
     <div>
       {fileKey && space && (
         <div className="document-download-cell-renderer">
-          <a
-            href={
+          <GridDownloadButton
+            link={
               isFolder
                 ? documentSpaceService.createRelativeFilesDownloadUrl(
                     space,
@@ -31,17 +30,8 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
                     true
                   )
             }
-          >
-            <Button
-              type="button"
-              unstyled
-              className="document-download-cell-renderer__btn"
-              disableMobileFullWidth
-              transparentBackground
-            >
-              <DownloadIcon iconTitle={`Download ${fileKey}`} size={1.25} />
-            </Button>
-          </a>
+            title={fileKey}
+          />
         </div>
       )}
     </div>
