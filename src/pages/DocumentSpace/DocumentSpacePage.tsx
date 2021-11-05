@@ -506,7 +506,7 @@ function DocumentSpacePage() {
               { 
                 title: 'Add to favorites', 
                 icon: StarIcon, 
-                shouldShow: (doc: DocumentDto) => !doc.folder,
+                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
                 onClick: () => console.log('add to favorites'),
                 
@@ -514,14 +514,14 @@ function DocumentSpacePage() {
               { 
                 title: 'Go to file', 
                 icon: CircleRightArrowIcon, 
-                shouldShow: (doc: DocumentDto) => !doc.folder,
+                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
                 onClick: () => console.log('go to file') 
               },
               { 
                 title: 'Upload new version', 
                 icon: UploadIcon, 
-                shouldShow: (doc: DocumentDto) => !doc.folder,
+                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
                 onClick: () => console.log('upload') 
               },
@@ -534,14 +534,14 @@ function DocumentSpacePage() {
               { 
                 title: 'Rename Folder', 
                 icon: EditIcon, 
-                shouldShow: (doc: DocumentDto) => doc.folder,
+                shouldShow: (doc: DocumentDto) => doc && doc.folder,
                 isAuthorized: () => true,
                 onClick: (doc: DocumentDto) => mergeState(pageState, { clickedItemName: doc.key, editFolderPrompt: true, })
               },
               { 
                 title: 'Rename File', 
                 icon: EditIcon, 
-                shouldShow: (doc: DocumentDto) => doc.folder,
+                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
                 onClick: () => console.log('rename file') 
               },
