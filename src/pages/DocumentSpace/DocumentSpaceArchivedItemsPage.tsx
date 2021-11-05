@@ -13,7 +13,7 @@ import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
-import { DocumentDto, DocumentSpaceDeleteItemsDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
+import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
@@ -189,7 +189,7 @@ export default function DocumentSpaceArchivedItemsPage() {
   }
 
   function documentDtoColumnsWithMoreActions() {
-    const columns = isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
+    return isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
       ? [
           ...documentDtoColumns,
           new GridColumn({
@@ -199,19 +199,18 @@ export default function DocumentSpaceArchivedItemsPage() {
             cellRenderer: DocumentRowActionCellRenderer,
             cellRendererParams: {
               menuItems: [
-                { title: 'Restore', icon: CircleRightArrowIcon, onClick: () => restoreItems() },
+                { title: 'Restore', icon: CircleRightArrowIcon, onClick: () => restoreItems(), isAuthorized: () => true },
                 {
                   title: 'Permanently Delete',
                   icon: CircleMinusIcon,
                   onClick: () => pageState.merge({ showDeleteDialog: true }),
+                  isAuthorized: () => true
                 },
               ],
             },
           }),
         ]
       : documentDtoColumns;
-
-    return columns;
   }
 
   return (

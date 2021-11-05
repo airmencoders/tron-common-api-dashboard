@@ -5,7 +5,7 @@ import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/
 import {
   DocumentDto,
   DocumentSpaceControllerApi,
-  DocumentSpaceControllerApiInterface, DocumentSpaceDeleteItemsDto,
+  DocumentSpaceControllerApiInterface,
   DocumentSpacePrivilegeDtoResponseWrapper,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRenameFolderDto,
@@ -20,6 +20,7 @@ import {
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse,
 } from '../../../utils/TestUtils/test-utils';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import DocumentSpaceService, { ArchivedStatus } from '../document-space-service';
 
 describe('Test Document Space Service', () => {
@@ -460,6 +461,63 @@ describe('Test Document Space Service', () => {
     expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download/all`)).toBeTruthy();
   });
 
+  it('should create relative download url by Document Space and Parent', () => {
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
+    const parentFolderId = '00000000-0000-0000-0000-000000000000';
+    const filename = 'testfile.txt';
+
+    // Test for preview link
+    let url = documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId, parentFolderId, filename);
+    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}`)).toBeTruthy();
+
+    // Test for direct download link
+    url = documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId, parentFolderId, filename, true);
+    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}?download=true`)).toBeTruthy();
+  });
+
+  it('should allow file deletion by Document Space and Parent', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'deleteFileBySpaceAndParent').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<void>(void (0))
+      )
+    );
+
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
+    const parentFolderId = '00000000-0000-0000-0000-000000000000';
+    const filename = 'testfile.txt';
+
+    await documentSpaceService.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename);
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should allow file archive deletion by Document Space and Parent', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'deleteArchiveItemBySpaceAndParent').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<void>(void (0))
+      )
+    );
+
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
+    const parentFolderId = '00000000-0000-0000-0000-000000000000';
+    const filename = 'testfile.txt';
+
+    await documentSpaceService.deleteArchiveItemBySpaceAndParent(documentSpaceId, parentFolderId, filename);
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should get a prepared error when deleting file by Document Space and Parent', async () => {
+    const axiosError = createGenericAxiosRequestErrorResponse(400);
+    const mock = jest.spyOn(documentSpaceApi, 'deleteFileBySpaceAndParent').mockRejectedValue(axiosError);
+
+    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
+    const parentFolderId = '00000000-0000-0000-0000-000000000000';
+    const filename = 'testfile.txt';
+    const expectedError = prepareRequestError(axiosError);
+
+    await expect(documentSpaceService.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename)).rejects.toEqual(expectedError);
+    expect(mock).toHaveBeenCalled();
+  });
+
   it('should retrieve all privileges for a dashboard user of a document space', async () => {
     const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
 
@@ -487,5 +545,50 @@ describe('Test Document Space Service', () => {
       [DocumentSpacePrivilegeDtoTypeEnum.Write]: true,
       [DocumentSpacePrivilegeDtoTypeEnum.Membership]: false
     });
+  });
+
+  it('should retrieve all privileges for a dashboard user pertaining to all document spaces they have access to', async () => {
+    const documentSpaceIds = [
+      '412ea028-1fc5-41e0-b48a-c6ef090704d3',
+      '412ea028-1fc5-41e0-b48a-c6ef090704d4'
+    ];
+
+    const mock = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace')
+      .mockReturnValueOnce(
+        Promise.resolve(
+          createAxiosSuccessResponse<DocumentSpacePrivilegeDtoResponseWrapper>({
+            data: [
+              {
+                id: 'privilege-id-1',
+                type: DocumentSpacePrivilegeDtoTypeEnum.Read
+              }
+            ]
+          })
+        )
+      )
+      .mockReturnValueOnce(
+        Promise.resolve(
+          createAxiosSuccessResponse<DocumentSpacePrivilegeDtoResponseWrapper>({
+            data: [
+              {
+                id: 'privilege-id-1',
+                type: DocumentSpacePrivilegeDtoTypeEnum.Read
+              },
+              {
+                id: 'privilege-id-2',
+                type: DocumentSpacePrivilegeDtoTypeEnum.Write
+              }
+            ]
+          })
+        )
+      );
+
+    const response = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpaces(new Set(documentSpaceIds));
+    expect(mock).toHaveBeenCalledTimes(2);
+
+    const result: Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>> = {};
+    result[documentSpaceIds[0]] = { READ: true, WRITE: false, MEMBERSHIP: false };
+    result[documentSpaceIds[1]] = { READ: true, WRITE: true, MEMBERSHIP: false };
+    expect(response).toEqual(result);
   });
 });

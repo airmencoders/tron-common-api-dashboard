@@ -2447,6 +2447,49 @@
       ],
       "type": "object"
     },
+    "RecentDocumentDto": {
+      "additionalProperties": false,
+      "properties": {
+        "documentSpace": {
+          "$ref": "model-types.json#/definitions/DocumentSpaceResponseDto"
+        },
+        "id": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "type": "string"
+        },
+        "parentFolderId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "key",
+        "parentFolderId",
+        "lastModifiedDate",
+        "documentSpace"
+      ],
+      "type": "object"
+    },
+    "RecentDocumentDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/RecentDocumentDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "ResponseDto": {
       "additionalProperties": false,
       "properties": {

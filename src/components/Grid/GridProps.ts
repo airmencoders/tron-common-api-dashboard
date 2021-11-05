@@ -51,4 +51,11 @@ export interface GridProps {
   scrollToTopCallback?: () => void;
 
   immutableData?: boolean;
+
+  /**
+   * Used only when {@link rowSelection} is set to 'single'
+   * Will pass the data of the selected row or undefined
+   * when unselected.
+   */
+  onSelectionChanged?: (data?: any) => void;
 }

@@ -1,33 +1,26 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Popup } from 'semantic-ui-react';
 import EllipsesIcon from '../../icons/EllipsesIcon';
 import { IconProps } from '../../icons/IconProps';
-import { DocumentDto } from '../../openapi';
 import './DocumentRowActionCellRenderer.scss';
 
-export interface PopupMenuItem {
+export interface PopupMenuItem<T> {
   title: string;
   icon: React.FC<IconProps>;
-  shouldShowFor?: ItemType;
-  onClick: (doc: DocumentDto) => void;
+  shouldShow?: (data: T) => boolean;
+  isAuthorized: (data: T) => boolean;
+  onClick: (doc: T) => void;
 }
 
-export enum ItemType {
-  FILE,
-  FOLDER,
-  BOTH
+interface DocumentRowActionCellRendererProps<T> {
+  node: { data: T; };
+  menuItems: PopupMenuItem<T>[];
 }
 
-interface DocumentRowActionCellRendererProps {
-  node: { data: any; };
-  menuItems: PopupMenuItem[];
-}
+function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererProps<T>) {
 
-function DocumentRowActionCellRenderer(props: DocumentRowActionCellRendererProps) {
-
-  const [open, setOpen] = useState(false);
-
-  const popupItems = useMemo<Array<PopupMenuItem>>(() => {
+  const [open, setOpen] = React.useState(false);
+  const popupItems = useMemo<Array<PopupMenuItem<T>>>(() => {
     return props.menuItems
   }, []);
 
@@ -53,11 +46,10 @@ function DocumentRowActionCellRenderer(props: DocumentRowActionCellRendererProps
               popupItems?.length > 0 &&
               popupItems
                 .filter(popupItem => {
-                  return popupItem.shouldShowFor == undefined 
-                    || popupItem.shouldShowFor === ItemType.BOTH
-                    || (popupItem.shouldShowFor === ItemType.FILE && !props.node.data?.folder)
-                    || (popupItem.shouldShowFor === ItemType.FOLDER && props.node.data?.folder)
+                  return popupItem.shouldShow == undefined 
+                    || popupItem.shouldShow(props.node.data)
                 })
+                .filter(popupItem => popupItem.isAuthorized(props.node.data))
                 .map(popupItem => (
                   <div className="popper__item" key={popupItem.title} onClick={() => {
                       setOpen(false);

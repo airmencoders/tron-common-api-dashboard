@@ -88,6 +88,8 @@ export * from './query-dto';
 export * from './rank';
 export * from './rank-categorized-dto';
 export * from './rank-response-wrapper';
+export * from './recent-document-dto';
+export * from './recent-document-dto-response-wrapper';
 export * from './response-dto';
 export * from './s3-pagination-dto';
 export * from './sailor';

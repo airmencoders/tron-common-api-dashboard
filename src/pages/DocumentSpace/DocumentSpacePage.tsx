@@ -1,58 +1,57 @@
-import {none, SetPartialStateAction, State, useHookstate} from '@hookstate/core';
-import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
-import React, {ChangeEvent, useEffect, useRef} from 'react';
+import { none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
+import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import React, { ChangeEvent, useEffect, useRef } from 'react';
+import { useHistory } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
-import {InfiniteScrollOptions} from '../../components/DataCrudFormPage/infinite-scroll-options';
+import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer
-, { ItemType }  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentRowActionCellRenderer, { PopupMenuItem } from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import DropDown from '../../components/DropDown/DropDown';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
-import {GridSelectionType} from '../../components/Grid/grid-selection-type';
+import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
-import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
+import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
+import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
-import {createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
+import CircleMinusIcon from '../../icons/CircleMinusIcon';
+import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
+import EditIcon from '../../icons/EditIcon';
+import PeopleIcon2 from "../../icons/PeopleIcon2";
 import RemoveIcon from '../../icons/RemoveIcon';
+import StarIcon from '../../icons/StarIcon';
+import UploadIcon from '../../icons/UploadIcon';
 import UploadMaterialIcon from '../../icons/UploadMaterialIcon';
+import UserIcon from "../../icons/UserIcon";
+import UserIconCircle from "../../icons/UserIconCircle";
 import {
   DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto
 } from '../../openapi';
-import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
-import {FormActionType} from '../../state/crud-page/form-action-type';
-import {useDocumentSpaceState} from '../../state/document-space/document-space-state';
-import {PrivilegeType} from '../../state/privilege/privilege-type';
-import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
-import {formatBytesToString} from '../../utils/file-utils';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { formatBytesToString } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditFolderForm from './DocumentSpaceCreateEditFolderForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './DocumentSpaceMemberships';
+import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
-import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
-import PeopleIcon2 from "../../icons/PeopleIcon2";
-import UserIcon from "../../icons/UserIcon";
-import UserIconCircle from "../../icons/UserIconCircle";
-import {useLocation} from 'react-router-dom';
-import {useHistory} from 'react-router';
-import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
-import EditIcon from '../../icons/EditIcon';
-import StarIcon from '../../icons/StarIcon';
-import UploadIcon from '../../icons/UploadIcon';
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -188,7 +187,7 @@ function DocumentSpacePage() {
             loadDocSpaceFromLocation(location, data);
           } else {
             const defaultDocumentSpaceId = authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-            const defaultDocumentSpace = data.find(d=>d.id === defaultDocumentSpaceId);
+            const defaultDocumentSpace = data.find(d => d.id === defaultDocumentSpaceId);
             if (defaultDocumentSpace != null) {
               setStateOnDocumentSpaceAndPathChange(defaultDocumentSpace, '');
             } else {
@@ -228,7 +227,7 @@ function DocumentSpacePage() {
       }
       const path = queryParams.get(pathQueryKey) ?? '';
       if (selectedDocumentSpace.id !== pageState.get().selectedSpace?.id ||
-          path !== pageState.get().path) {
+        path !== pageState.get().path) {
         setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
       }
     }
@@ -280,7 +279,7 @@ function DocumentSpacePage() {
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
         queryParams.set(spaceIdQueryKey, documentSpace.id);
-        history.replace({search: queryParams.toString()});
+        history.replace({ search: queryParams.toString() });
       }
     } catch (err) {
       const preparedError = prepareRequestError(err);
@@ -316,7 +315,7 @@ function DocumentSpacePage() {
       if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
         queryParams.set(spaceIdQueryKey, documentSpaceId);
         queryParams.delete(pathQueryKey);
-        history.push({search: queryParams.toString()});
+        history.push({ search: queryParams.toString() });
       }
     }
   }
@@ -493,7 +492,7 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  function documentDtoColumnsWithConditionalDelete () {
+  function documentDtoColumnsWithConditionalDelete() {
     const columns = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
       [
         ...documentDtoColumns,
@@ -507,40 +506,46 @@ function DocumentSpacePage() {
               { 
                 title: 'Add to favorites', 
                 icon: StarIcon, 
-                shouldShowFor: ItemType.FILE,
-                onClick: () => console.log('add to favorites') 
+                shouldShow: (doc: DocumentDto) => !doc.folder,
+                isAuthorized: () => true,
+                onClick: () => console.log('add to favorites'),
+                
               },
               { 
                 title: 'Go to file', 
                 icon: CircleRightArrowIcon, 
-                shouldShowFor: ItemType.FILE,
+                shouldShow: (doc: DocumentDto) => !doc.folder,
+                isAuthorized: () => true,
                 onClick: () => console.log('go to file') 
               },
               { 
                 title: 'Upload new version', 
                 icon: UploadIcon, 
-                shouldShowFor: ItemType.FILE,
+                shouldShow: (doc: DocumentDto) => !doc.folder,
+                isAuthorized: () => true,
                 onClick: () => console.log('upload') 
               },
               {
                 title: 'Remove',
                 icon: CircleMinusIcon,
-                shouldShowFor: ItemType.BOTH,
+                isAuthorized: () => true,
                 onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFiles: [doc], showDeleteDialog: true }),
               },
               { 
                 title: 'Rename Folder', 
                 icon: EditIcon, 
-                shouldShowFor: ItemType.FOLDER,
+                shouldShow: (doc: DocumentDto) => doc.folder,
+                isAuthorized: () => true,
                 onClick: (doc: DocumentDto) => mergeState(pageState, { clickedItemName: doc.key, editFolderPrompt: true, })
               },
               { 
                 title: 'Rename File', 
                 icon: EditIcon, 
-                shouldShowFor: ItemType.FILE,
+                shouldShow: (doc: DocumentDto) => doc.folder,
+                isAuthorized: () => true,
                 onClick: () => console.log('rename file') 
               },
-            ],
+            ] as PopupMenuItem<DocumentDto>[],
           },
         })
       ]
@@ -559,13 +564,13 @@ function DocumentSpacePage() {
           const queryParams = new URLSearchParams(location.search);
           queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);
-          history.push({search: queryParams.toString()});
+          history.push({ search: queryParams.toString() });
         }
       }
     });
 
     return columns;
-}
+  }
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -597,12 +602,12 @@ function DocumentSpacePage() {
               <Button
                 data-testid="doc-space-my-settings__btn"
                 type="button"
-                style={{position:'absolute', right: 20}}
+                style={{ position: 'absolute', right: 20 }}
                 unstyled
                 disableMobileFullWidth
                 onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
               >
-                <UserIcon size={0}/>
+                <UserIcon size={0} />
               </Button>
             )}
           </div>
@@ -619,7 +624,7 @@ function DocumentSpacePage() {
             } else {
               queryParams.delete(pathQueryKey);
             }
-            history.push({search: queryParams.toString()});
+            history.push({ search: queryParams.toString() });
           }}
         />
         <div>
@@ -628,15 +633,15 @@ function DocumentSpacePage() {
               <div className="content-controls">
 
 
-              { pageState.selectedSpace.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
-                && <div data-testid="upload-new-file">
+                {pageState.selectedSpace.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
+                  && <div data-testid="upload-new-file">
                     <DocumentUploadDialog
                       documentSpaceId={pageState.selectedSpace.value.id}
                       currentPath={pageState.get().path}
                       onFinish={() =>
                         pageState.merge({ shouldUpdateDatasource: true, })
                       }
-                      buttonStyle={{ icon: true, className: 'rotate-icon'}}
+                      buttonStyle={{ icon: true, className: 'rotate-icon' }}
 
                       value={<UploadMaterialIcon size={1} iconTitle="Upload Files" />}
                     />
@@ -659,55 +664,57 @@ function DocumentSpacePage() {
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Write
                 ) && (
-                  <Button
-                    type="button"
-                    icon
-                    disabled={pageState.get().selectedFiles.length === 0}
-                    data-testid="delete-selected-items"
-                    disableMobileFullWidth
-                    onClick={() => pageState.showDeleteSelectedDialog.set(true)}
-                  >
-                    <RemoveIcon className="icon-color" size={1.25} />
-                  </Button>
-                )}
+                    <Button
+                      type="button"
+                      icon
+                      disabled={pageState.get().selectedFiles.length === 0}
+                      data-testid="delete-selected-items"
+                      disableMobileFullWidth
+                      onClick={() => pageState.showDeleteSelectedDialog.set(true)}
+                    >
+                      <RemoveIcon className="icon-color" size={1.25} />
+                    </Button>
+                  )}
 
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Read
                 ) && (
-                  <DropDown
-                    id="download-items"
-                    data-testid="download-items"
-                    anchorContent={<DownloadMaterialIcon size={1.25} iconTitle="Download Items" />}
-                    items={[
-                      { displayName: 'Download Selected',
-                        action: () => window.open((pageState.selectedFiles.value.length > 0 && pageState.selectedSpace.value)
-                          ? documentSpaceService.createRelativeFilesDownloadUrl(
+                    <DropDown
+                      id="download-items"
+                      data-testid="download-items"
+                      anchorContent={<DownloadMaterialIcon size={1.25} iconTitle="Download Items" />}
+                      items={[
+                        {
+                          displayName: 'Download Selected',
+                          action: () => window.open((pageState.selectedFiles.value.length > 0 && pageState.selectedSpace.value)
+                            ? documentSpaceService.createRelativeFilesDownloadUrl(
                               pageState.selectedSpace.value.id,
                               pageState.get().path,
                               pageState.selectedFiles.value
                             )
-                          : undefined)
-                      },
-                      { displayName: 'Download All Files (zip)',
-                        action: () => pageState.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
-                          pageState.selectedSpace.value.id))
-                      }
-                    ]}
-                  />
-                )}
+                            : undefined)
+                        },
+                        {
+                          displayName: 'Download All Files (zip)',
+                          action: () => pageState.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+                            pageState.selectedSpace.value.id))
+                        }
+                      ]}
+                    />
+                  )}
 
                 {isAuthorizedForAction(
                   DocumentSpacePrivilegeDtoTypeEnum.Membership
                 ) && (
-                  <Button
-                    type="button"
-                    unstyled
-                    disableMobileFullWidth
-                    onClick={() => pageState.membershipsState.isOpen.set(true)}
-                  >
-                    <PeopleIcon2 size={1.5} iconTitle="Manage Users" />
-                  </Button>
-                )}
+                    <Button
+                      type="button"
+                      unstyled
+                      disableMobileFullWidth
+                      onClick={() => pageState.membershipsState.isOpen.set(true)}
+                    >
+                      <PeopleIcon2 size={1.5} iconTitle="Manage Users" />
+                    </Button>
+                  )}
               </div>
             )}
         </div>
@@ -773,10 +780,10 @@ function DocumentSpacePage() {
         isOpen={pageState.isDefaultDocumentSpaceSettingsOpen.get()}
         onCloseHandler={closeMySettingsDrawer}
         size={SideDrawerSize.WIDE}
-        titleStyle={{color:'#5F96EA', marginTop:-2}}
+        titleStyle={{ color: '#5F96EA', marginTop: -2 }}
         preTitleNode={
-          <div style={{padding:'4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14}}>
-            <UserIconCircle size={0}/>
+          <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>
+            <UserIconCircle size={0} />
           </div>
         }
       >
@@ -787,7 +794,7 @@ function DocumentSpacePage() {
           formActionType={FormActionType.SAVE}
           documentSpaces={documentSpaceService.documentSpaces}
           authorizedUserService={authorizedUserService}
-          />
+        />
       </SideDrawer>
 
       <DeleteDocumentDialog
