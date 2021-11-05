@@ -171,7 +171,7 @@ describe('Test Document Space Membership Service', () => {
     membershipService.addDocumentSpaceMember(documentSpaceId, {
       email: 'test@dev.com',
       privileges: [
-        DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Read
+        DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
       ]
     });
 

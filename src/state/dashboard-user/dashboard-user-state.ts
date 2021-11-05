@@ -1,18 +1,18 @@
 import { createState, State, useState } from '@hookstate/core';
-import {Configuration, DashboardUserDto} from '../../openapi';
-import Config from '../../api/config';
+import { DashboardUserDto } from '../../openapi';
 import { DashboardUserControllerApi, DashboardUserControllerApiInterface } from '../../openapi/apis/dashboard-user-controller-api';
 import DashboardUserService from './dashboard-user-service';
 import { DashboardUserFlat } from './dashboard-user-flat';
-import { openapiAxiosInstance } from '../../api/openapi-axios';
-
+import { globalOpenapiConfig } from '../../api/openapi-config';
 
 const dashboardUserState = createState<DashboardUserFlat[]>(new Array<DashboardUserFlat>());
 // cache of dashboard user dtos and ids
 const dashboardUserDtoCache = createState<Record<string, DashboardUserDto>>({});
-const dashboardUserControllerApi = new DashboardUserControllerApi(new Configuration({
-  basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
-}), '', openapiAxiosInstance);
+const dashboardUserControllerApi = new DashboardUserControllerApi(
+  globalOpenapiConfig.configuration,
+  globalOpenapiConfig.basePath,
+  globalOpenapiConfig.axios
+);
 
 export const wrapDashboardUserState = (state: State<DashboardUserFlat[]>,
                                        dashboardUserApi: DashboardUserControllerApiInterface,

@@ -1,14 +1,15 @@
-import { Configuration, EventRequestLogControllerApi, EventRequestLogControllerApiInterface } from '../../openapi';
-import Config from '../../api/config';
+import { EventRequestLogControllerApi, EventRequestLogControllerApiInterface } from '../../openapi';
 import EventRequestLogService from './event-request-log-service';
-import { openapiAxiosInstance } from '../../api/openapi-axios';
+import { globalOpenapiConfig } from '../../api/openapi-config';
 
 export const wrapState = (eventRequestLogApi: EventRequestLogControllerApiInterface): EventRequestLogService => {
   return new EventRequestLogService(eventRequestLogApi);
 }
 
-const api = new EventRequestLogControllerApi(new Configuration({
-  basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX
-}), '', openapiAxiosInstance);
+const api = new EventRequestLogControllerApi(
+  globalOpenapiConfig.configuration,
+  globalOpenapiConfig.basePath,
+  globalOpenapiConfig.axios
+);
 
 export const useEventRequestLogState = (): EventRequestLogService => wrapState(api);

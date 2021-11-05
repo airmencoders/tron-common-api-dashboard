@@ -1,14 +1,7 @@
 import { render } from '@testing-library/react';
-import axios from 'axios';
-import { openapiAxiosInstance } from '../../../api/openapi-axios';
 import ApiSpecCellRenderer from '../ApiSpecCellRenderer';
 
-jest.mock('../../../api/openapi-axios');
 describe('API Spec Cell Renderer', () => {
-  beforeAll(() => {
-    (openapiAxiosInstance as unknown as jest.Mock).mockReturnValue(axios.create());
-  });
-
   it('Renders correctly', async () => {
     const page = render(
       <ApiSpecCellRenderer showAsText={false}/>
