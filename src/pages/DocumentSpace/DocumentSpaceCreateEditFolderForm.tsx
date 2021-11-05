@@ -24,7 +24,6 @@ export interface DocumentSpaceCreateEditFolderFormProps {
 
 export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCreateEditFolderFormProps) {
   const formState = useHookstate<string>(props.folderName ?? '');
-
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
@@ -41,9 +40,7 @@ export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCr
 
   const submitForm = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (props.formActionType === FormActionType.ADD) {
-      props.onSubmit(formState.get());
-    }
+    props.onSubmit(formState.get());
   };
 
   return (
@@ -51,7 +48,7 @@ export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCr
       <FormGroup
         labelName="folder-name"
         labelText={props.formActionType === FormActionType.ADD ? 'New Folder Name' : 'Rename Folder'}
-        isError={!Validation(formState).valid()}
+        isError={!Validation(formState).valid() && Touched(formState).touched()}
         errorMessages={Validation(formState)
           .errors()
           .map((validationError) => validationError.message)}
@@ -62,7 +59,7 @@ export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCr
           data-testid="foldername-name-field"
           type="text"
           onChange={(event) => formState.set(event.target.value)}
-          defaultValue={formState.get() ?? ''}
+          value={formState.get() ?? ''}
         />
         <SuccessErrorMessage
           errorMessage={props?.errorMessage ?? ''}
@@ -72,7 +69,7 @@ export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCr
           onCloseClicked={props.onCloseErrorMsg}
         />
         <SubmitActions
-          formActionType={FormActionType.ADD}
+          formActionType={props.formActionType}
           onCancel={props.onCancel}
           isFormValid={Validation(formState).valid()}
           isFormModified={isFormModified()}
