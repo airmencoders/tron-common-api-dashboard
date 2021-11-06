@@ -20,7 +20,7 @@ import RecordIcon from './icons/RecordIcon';
 import AppsIcon from './icons/AppsIcon';
 import DigitizeIcon from './icons/DigitizeIcon';
 import SystemIcon from './icons/SystemIcon';
-import PuzzleIcon from './icons/PuzzleIcon';
+import DocSpaceIcon from './icons/DocSpaceIcon';
 
 export interface RouteItem {
     path: string;
@@ -168,7 +168,7 @@ export const routes: RouteItem[] = [
                 ]
             }
         ],
-        icon: PuzzleIcon
+        icon: DocSpaceIcon
     },
     {
         path: '#',

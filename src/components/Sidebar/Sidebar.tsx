@@ -9,11 +9,15 @@ import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
 import './Sidebar.scss';
 import SidebarContainer from './SidebarContainer';
 import SidebarItem from './SidebarItem';
+import {useNavCollapsed} from '../../hooks/PagePreferenceHooks';
+import {Popup} from 'semantic-ui-react';
+import Button from '../Button/Button';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   const authorizedUserState = useAuthorizedUserState();
   const location = useLocation();
   const [openedMenu, setOpenedMenu] = useState('');
+  const [isNavCollapsed, setIsNavCollapsed] = useNavCollapsed();
   const activeItem = useHookstate('');
 
   useEffect(() => {
@@ -55,38 +59,74 @@ function Sidebar({ items }: { items: RouteItem[] }) {
         <AppInfoTag />
       </div>
       <nav className="sidebar__nav">
-        {items.map((item) => {
-          if (authorizedUserState.authorizedUserHasAnyPrivilege(item.requiredPrivileges)){
-            if (item.childRoutes != null && item.childRoutes.length > 0) {
+        {
+          items.map(({name, childRoutes, icon: Icon, requiredPrivileges, path}) => {
+          if (authorizedUserState.authorizedUserHasAnyPrivilege(requiredPrivileges)){
+            if (childRoutes != null && childRoutes.length > 0) {
               return (
-                <SidebarContainer key={item.name} containsNestedItems isActive={openedMenu === item.name}>
-                  <NestedSidebarNav key={item.name}
-                    id={item.name}
-                    title={item.name}
-                    isOpened={openedMenu === item.name}
-                    onToggleClicked={handleMenuToggleClicked}
-                    icon={item.icon}
-                  >
-                    {
-                      item.childRoutes.map((child) => {
-                        if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
-                          return <SidebarItem key={child.name} path={child.path} name={child.name} showActiveBorder />
-                        }
-                      })
-                    }
-                  </NestedSidebarNav>
+                <SidebarContainer key={name} containsNestedItems isActive={openedMenu === name}>
+                  {
+                    isNavCollapsed ?
+                        <Popup
+                            trigger={
+                              <div className="sidebar-container__icon-wrapper">
+                                {
+                                  Icon &&
+                                  <Icon size={1.25} iconTitle={name} className="container__icon" />
+                                }
+
+                              </div>
+                            }
+                            on="click"
+                            position="right center"
+                            wide
+                        >
+                          <Popup.Content
+                              className="sidebar__items--collapsed"
+                          >
+                            {
+                              childRoutes.map((child) => {
+                                if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
+                                  return <SidebarItem key={child.name} path={child.path} name={child.name}
+                                                      showActiveBorder/>
+                                }
+                              })
+                            }
+                          </Popup.Content>
+                        </Popup> :
+
+                        <NestedSidebarNav key={name}
+                                          id={name}
+                                          title={name}
+                                          isOpened={openedMenu === name}
+                                          onToggleClicked={handleMenuToggleClicked}
+                                          icon={Icon}
+                        >
+                          {
+                            childRoutes.map((child) => {
+                              if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
+                                return <SidebarItem key={child.name} path={child.path} name={child.name}
+                                                    showActiveBorder/>
+                              }
+                            })
+                          }
+                        </NestedSidebarNav>
+                  }
+
                 </SidebarContainer>
               );
             }
             else {
               return (
-                <SidebarContainer key={item.name} isActive={activeItem.value === item.name}>
-                  <SidebarItem key={item.name} path={item.path} name={item.name} icon={item.icon} />
+                <SidebarContainer key={name} isActive={activeItem.value === name}>
+                  <SidebarItem key={name} path={path} name={name} icon={Icon} />
                 </SidebarContainer>
               )
             }
           }
-        })}
+        }
+        )
+        }
       </nav>
     </div>
   );

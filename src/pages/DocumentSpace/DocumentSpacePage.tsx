@@ -55,12 +55,14 @@ const documentDtoColumns: GridColumn[] = [
     headerName: 'Name',
     resizable: true,
     cellRenderer: DocSpaceItemRenderer,
-    checkboxSelection: true
+    checkboxSelection: true,
+    initialWidth: 400,
   }),
   new GridColumn({
     field: 'lastModifiedDate',
     headerName: 'Last Modified',
     resizable: true,
+    initialWidth: 500,
   }),
   new GridColumn({
     field: 'lastModifiedBy',
@@ -486,6 +488,7 @@ function DocumentSpacePage() {
       resizable: true,
       cellRenderer: DocSpaceItemRenderer,
       checkboxSelection: true,
+      initialWidth: 400,
       cellRendererParams: {
         onClick: (folder: string) => {
           const newPath = pageState.get().path + '/' + folder;

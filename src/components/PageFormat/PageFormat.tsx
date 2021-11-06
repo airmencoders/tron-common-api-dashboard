@@ -8,7 +8,9 @@ import './PageFormat.scss';
 import CloseNavIcon from '../../icons/CloseNavIcon';
 import Button from '../Button/Button';
 import {useLocalStorage, writeStorage} from '@rehooks/local-storage';
-
+import OpenNavIcon from '../../icons/OpenNavIcon';
+import {useNavCollapsed} from '../../hooks/PagePreferenceHooks';
+import {useWindowSize, WindowSize} from '../../hooks/PageResizeHook';
 
 export interface PageFormatProps {
   pageTitle: string;
@@ -17,7 +19,8 @@ export interface PageFormatProps {
 
 function PageFormat(props: any) {
   const appInfoService = useAppVersionState();
-  const [isNavCollapsed] = useLocalStorage<boolean>('isNavCollapsed', false);
+  const [isNavCollapsed, setIsNavCollapsed] = useNavCollapsed();
+  const windowSize: WindowSize = useWindowSize();
 
   function getBackgroundClass() {
     if (appInfoService.state.enclave?.get()?.match(/il4/i)) {
@@ -32,16 +35,21 @@ function PageFormat(props: any) {
   }
 
   function toggleNavMenuCollapse() {
-    writeStorage('isNavCollapsed', !isNavCollapsed);
+    setIsNavCollapsed(!isNavCollapsed);
   }
 
   useEffect(() => {
     appInfoService.fetchVersion();
   }, []);
-
+  console.log(windowSize);
   return (
       <div className={`page-format ${props.className ?? ''}`}>
-        <div className={`page-format__nav-menu ${getBackgroundClass()} ${isNavCollapsed ? '--collapsed' : ''}`}>
+        <div className={`page-format__nav-menu ${getBackgroundClass()} 
+                        ${isNavCollapsed ? 'page-format__nav-menu--collapsed' : ''}`}
+             style={{
+               minHeight: `${windowSize?.height}px`
+             }}
+        >
           <Sidebar items={routes} />
           <div className="nav-menu__user-info">
             <HeaderUserInfoContainer />
@@ -51,11 +59,19 @@ function PageFormat(props: any) {
                   onClick={toggleNavMenuCollapse}
                   transparentBackground
           >
-            <CloseNavIcon size={1} />
+            {
+              isNavCollapsed ?
+                  <OpenNavIcon size={1} /> :
+                  <CloseNavIcon size={1} />
+            }
           </Button>
         </div>
         <div className="page-format__page-body-container">
-          <div className="page-format__page-body">
+          <div className="page-format__page-body"
+               style={{
+                 height: `${windowSize?.height}px`
+               }}
+          >
             <div className="page-body__title-section">
               <PageTitle title={props.pageTitle} />
             </div>

@@ -9,9 +9,17 @@
 
   &--active-nested {
     background-color: rgba($color: $light-shade, $alpha: 0.1);
+    .page-format__nav-menu--collapsed & {
+      border-right: calculateRem(5px) solid $light-accent;
+      .svg-icon {
+        stroke: $light-accent;
+        color: $light-accent;
+      }
+    }
   }
 
   padding-left: calculateRem(22px);
   padding-top: calculateRem(16px);
   padding-bottom: calculateRem(16px);
+
 }

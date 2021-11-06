@@ -8,4 +8,25 @@
       margin-bottom: calculateRem(10px);
     }
   }
+
+  &__items {
+    &--collapsed {
+      .container__icon {
+        display: none;
+      }
+      .container__name {
+        color: $font-color-tertiary;
+      }
+      .sidebar-item--active .sidebar-item__container > * {
+        color: $font-color-primary;
+      }
+      .sidebar-item--active-border .sidebar-item__container {
+        border: none;
+      }
+      .sidebar-item__container {
+        padding-top: calculateRem(6px);
+        padding-bottom: calculateRem(6px);
+      }
+    }
+  }
 }
