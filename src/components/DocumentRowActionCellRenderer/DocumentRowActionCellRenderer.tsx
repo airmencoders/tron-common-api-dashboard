@@ -27,7 +27,7 @@ function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererPr
         <Popup
             trigger={
               <div className="document-row-action-cell-renderer__icon" data-testid="more_action">
-                <EllipsesIcon size={1} iconTitle="more" />
+                <EllipsesIcon style="primary" fill size={1} iconTitle="more" />
               </div>
             }
             on="click"

@@ -30,17 +30,17 @@ export function getIconColorClassname(iconStyleType?: IconStyleType, disabled?: 
  * @param defaultClassname the default classname to use
  * @returns the classname
  */
-export function getSvgIconColorClassname(iconStyleType?: IconStyleType, disabled?: boolean, defaultClassname = 'svg-icon-color'): string {
+export function getSvgIconColorClassname(iconStyleType?: IconStyleType, disabled?: boolean, fill?: boolean, defaultClassname = 'svg-icon-color'): string {
   if (disabled) {
-    return 'svg-icon-disabled';
+    return `svg-icon-disabled${fill ? ' svg-icon-disabled--fill' : ''}`;
   }
 
   if (iconStyleType == null || iconStyleType === 'default') {
-    return defaultClassname;
+    return `${defaultClassname}${fill ? (' ' + defaultClassname.concat('--fill')) : ''}`;
   }
 
   if (iconStyleType === 'primary') {
-    return 'svg-icon-primary';
+    return `svg-icon-primary${fill ? ' svg-icon-primary--fill' : ''}`;
   }
 
   return defaultClassname;
