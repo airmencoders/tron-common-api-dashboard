@@ -10,27 +10,28 @@ import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/Succ
 import TextInput from '../../components/forms/TextInput/TextInput';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { validateFolderName } from '../../utils/validation-utils';
+import { CreateEditOperationType } from './DocumentSpacePage';
 
-export interface DocumentSpaceCreateEditFolderFormProps {
-  folderName?: string;
+export interface DocumentSpaceCreateEditFormProps {
+  opType: CreateEditOperationType;
+  elementName?: string;
   onSubmit: (dto: string) => void;
   onCancel: () => void;
   isFormSubmitting: boolean;
-  formActionType: FormActionType;
   errorMessage?: string;
   showErrorMessage?: boolean;
   onCloseErrorMsg: () => void;
 }
 
-export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCreateEditFolderFormProps) {
-  const formState = useHookstate<string>(props.folderName ?? '');
+export default function DocumentSpaceCreateEditForm(props: DocumentSpaceCreateEditFormProps) {
+  const formState = useHookstate<string>(props.elementName ?? '');
   formState.attach(Validation);
   formState.attach(Initial);
   formState.attach(Touched);
 
   Validation(formState).validate(
     (name) => validateFolderName(name ?? ''),
-    'Invalid Folder Name',
+    'Invalid Element Name',
     'error'
   );
 
@@ -43,20 +44,33 @@ export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCr
     props.onSubmit(formState.get());
   };
 
+  function resolveLabelText() {
+    switch (props.opType) {
+      case CreateEditOperationType.CREATE_FOLDER:
+        return 'New Folder Name';
+      case CreateEditOperationType.EDIT_FOLDERNAME:
+        return 'Rename Folder';
+      case CreateEditOperationType.EDIT_FILENAME:
+        return 'Rename File';
+      default:
+        return 'Unknown Operation';
+    }
+  }
+
   return (
     <Form onSubmit={submitForm}>
       <FormGroup
-        labelName="folder-name"
-        labelText={props.formActionType === FormActionType.ADD ? 'New Folder Name' : 'Rename Folder'}
+        labelName="element-name"
+        labelText={resolveLabelText()}
         isError={!Validation(formState).valid() && Touched(formState).touched()}
         errorMessages={Validation(formState)
           .errors()
           .map((validationError) => validationError.message)}
       >
         <TextInput
-          id="folder-name__input"
-          name="folder-name__input"
-          data-testid="foldername-name-field"
+          id="element-name__input"
+          name="element-name__input"
+          data-testid="element-name-field"
           type="text"
           onChange={(event) => formState.set(event.target.value)}
           value={formState.get() ?? ''}
@@ -69,7 +83,10 @@ export default function DocumentSpaceCreateEditFolderForm(props: DocumentSpaceCr
           onCloseClicked={props.onCloseErrorMsg}
         />
         <SubmitActions
-          formActionType={props.formActionType}
+          formActionType={props.opType === CreateEditOperationType.CREATE_FOLDER 
+            ? FormActionType.ADD 
+            : FormActionType.UPDATE
+          }
           onCancel={props.onCancel}
           isFormValid={Validation(formState).valid()}
           isFormModified={isFormModified()}
