@@ -8,6 +8,7 @@ import {
   DocumentSpaceControllerApiInterface,
   DocumentSpacePrivilegeDtoResponseWrapper,
   DocumentSpacePrivilegeDtoTypeEnum,
+  DocumentSpaceRenameFolderDto,
   DocumentSpaceResponseDto,
   DocumentSpaceResponseDtoResponseWrapper, FilePathSpec, GenericStringArrayResponseWrapper,
   S3PaginationDto
@@ -365,6 +366,19 @@ describe('Test Document Space Service', () => {
     );
 
     await documentSpaceService.createNewFolder('test', "", 'folder');
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should allow folder rename', async () => {
+    const mock = jest
+      .spyOn(documentSpaceApi, 'renameFolder')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosSuccessResponse<DocumentSpaceRenameFolderDto>({ newName: 'blah', existingFolderPath: '/' })
+        )
+      );
+
+    await documentSpaceService.renameFolder('test', '/some', 'folder');
     expect(mock).toHaveBeenCalled();
   });
 
