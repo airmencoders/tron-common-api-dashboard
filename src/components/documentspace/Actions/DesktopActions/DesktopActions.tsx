@@ -2,7 +2,6 @@ import { createRef } from 'react';
 import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
 import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
-import './DesktopActions.scss';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import { DesktopActionsProps } from './DesktopActionsProps';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';

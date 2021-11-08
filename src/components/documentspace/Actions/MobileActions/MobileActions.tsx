@@ -5,7 +5,6 @@ import EllipsesIcon from '../../../../icons/EllipsesIcon';
 import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
 import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
-import './MobileActions.scss';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import PeopleIcon from '../../../../icons/PeopleIcon';
 import { ActionsProps } from '../ActionsProps';
