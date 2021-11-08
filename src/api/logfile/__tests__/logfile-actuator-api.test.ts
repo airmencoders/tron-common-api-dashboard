@@ -1,7 +1,19 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import LogfileActuatorApi from '../logfile-actuator-api';
 
-jest.mock('axios');
+jest.mock('axios', () => {
+  return {
+    create: () => {
+      return {
+        interceptors: {
+          request: { eject: jest.fn(), use: jest.fn() },
+          response: { eject: jest.fn(), use: jest.fn() },
+        },
+        get: jest.fn()
+      }
+    }
+  }
+});
 
 describe('Test Logfile Actuator API', () => {
   const responseData: string = 'Test Data';
@@ -15,12 +27,12 @@ describe('Test Logfile Actuator API', () => {
 
   it('getLogfile', async () => {
     try {
-      (axios.create as jest.Mock).mockImplementation(() => axios);
-      (axios.get as jest.Mock).mockImplementation(() => {
+      const api = new LogfileActuatorApi();
+      (api.axiosInstance.get as jest.Mock).mockImplementation(() => {
         return axiosRes;
       });
 
-      const apiResponse = await new LogfileActuatorApi().getLogfile();
+      const apiResponse = await api.getLogfile();
       expect(apiResponse).toBe(axiosRes);
     }
     catch (e) {
@@ -30,12 +42,12 @@ describe('Test Logfile Actuator API', () => {
 
   it('getLogfileStart', async () => {
     try {
-      (axios.create as jest.Mock).mockImplementation(() => axios);
-      (axios.get as jest.Mock).mockImplementation(() => {
+      const api = new LogfileActuatorApi();
+      (api.axiosInstance.get as jest.Mock).mockImplementation(() => {
         return axiosRes;
       });
 
-      const apiResponse = await new LogfileActuatorApi().getLogfileStart(200);
+      const apiResponse = await api.getLogfileStart(200);
       expect(apiResponse).toBe(axiosRes);
     }
     catch (e) {

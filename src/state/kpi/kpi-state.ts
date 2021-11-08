@@ -1,11 +1,13 @@
 import { createState, State, useState } from '@hookstate/core';
-import Config from '../../api/config';
-import { Configuration, KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto } from '../../openapi';
+import { KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto } from '../../openapi';
 import KpiService from './kpi-service';
+import { globalOpenapiConfig } from '../../api/openapi-config';
 
 const kpiState = createState<KpiSummaryDto | KpiSummaryDto[] | undefined>(undefined);
 const kpiApi: KpiControllerApiInterface = new KpiControllerApi(
-  new Configuration({ basePath: Config.API_BASE_URL + Config.API_PATH_PREFIX })
+  globalOpenapiConfig.configuration,
+  globalOpenapiConfig.basePath,
+  globalOpenapiConfig.axios
 );
 
 export const wrapKpiState = (state: State<KpiSummaryDto | KpiSummaryDto[] | undefined>, appClientApi: KpiControllerApiInterface): KpiService => {

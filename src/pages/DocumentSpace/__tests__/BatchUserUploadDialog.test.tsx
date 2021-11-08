@@ -1,31 +1,23 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
-import BatchUserUploadDialog from "../BatchUserUploadDialog";
-import {createState, State, StateMethodsDestroy} from "@hookstate/core";
-import {BatchUploadState} from "../DocumentSpaceMemberships";
-import mockAxios from "axios";
-import {
-  DocumentSpaceControllerApi,
-  DocumentSpaceControllerApiInterface,
-  DocumentSpaceResponseDto
-} from "../../../openapi";
-import DocumentSpaceMembershipService from "../../../state/document-space/document-space-membership-service";
-import {createAxiosSuccessResponse} from "../../../utils/TestUtils/test-utils";
+import BatchUserUploadDialog from '../BatchUserUploadDialog';
+import {createState} from '@hookstate/core';
+import {BatchUploadState} from '../DocumentSpaceMemberships';
+import {createAxiosSuccessResponse} from '../../../utils/TestUtils/test-utils';
+import {DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface} from '../../../openapi';
+import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
+import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
 
-
-jest.mock('axios')
-
+jest.mock('../../../state/document-space/document-space-state');
 describe('Document Delete Tests', () => {
-  let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
-  let documentSpaceMembershipService: DocumentSpaceMembershipService;
+  let membershipService: DocumentSpaceMembershipService;
 
   beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
+    membershipService = new DocumentSpaceMembershipService(documentSpaceApi);
 
-    documentSpaceMembershipService = new DocumentSpaceMembershipService(documentSpaceApi);
-
+    (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
   });
 
   it('should render and fire appropriate events', async () => {
@@ -35,14 +27,7 @@ describe('Document Delete Tests', () => {
     const batchUploadState = createState<BatchUploadState>({successErrorState:{successMessage: 'Successfully added members to Document Space', errorMessage: '', showSuccessMessage: false  , showErrorMessage: false, showCloseButton: true}})
     const response = createAxiosSuccessResponse<Array<string>>(['a', 'b', 'c']);
 
-    let requestMade = false;
-    (mockAxios.request as jest.Mock).mockImplementation((obj) => {
-        if (obj.url.includes('/api/v2/document-space/spaces/testId123/batchUsers')) {
-          requestMade = true;
-          return Promise.resolve(response);
-        }
-      }
-    );
+    const serviceSpy = jest.spyOn(membershipService, 'batchAddUserToDocumentSpace').mockReturnValue(Promise.resolve(response));
 
     const {getByTestId} = render(<MemoryRouter>
       <BatchUserUploadDialog batchUploadState={batchUploadState} documentSpaceId={testSpaceID} onFinish={mockOnFinish}/>
@@ -57,7 +42,7 @@ describe('Document Delete Tests', () => {
       })
     );
 
-    expect(mockOnFinish).toHaveBeenCalled();
-    expect(requestMade).toBeTruthy();
+    await waitFor(() => expect(serviceSpy).toHaveBeenCalled());
+    await waitFor(() => expect(mockOnFinish).toHaveBeenCalled());
   });
 })

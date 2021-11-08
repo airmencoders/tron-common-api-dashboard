@@ -74,6 +74,12 @@ export interface UserInfoDto {
      * @memberof UserInfoDto
      */
     affiliation?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserInfoDto
+     */
+    expireTime?: number;
 }
 
 
