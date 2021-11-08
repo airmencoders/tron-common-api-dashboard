@@ -6,7 +6,7 @@ export default function DownloadMaterialIcon(props: IconProps & SvgIconProps) {
   return (
     <svg
       viewBox="0 0 20 24"
-      className={`svg-icon ellipses-icon ` +
+      className={`svg-icon download-material-icon ` +
         `${getSvgIconColorClassname(props.style, props.disabled, props.fill)} ` +
         `${props.className ?? ''}`
       }

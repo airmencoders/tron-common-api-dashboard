@@ -92,7 +92,7 @@ const infiniteScrollOptions: InfiniteScrollOptions = {
   limit: 100,
 };
 
-export interface DocumentSpacePageState {
+interface DocumentSpacePageState {
   drawerOpen: boolean;
   isSubmitting: boolean;
   errorMessage: string;

@@ -6,7 +6,7 @@ export default function AddMaterialIcon(props: IconProps & SvgIconProps) {
   return (
     <svg
       viewBox="0 0 18 18"
-      className={`svg-icon ellipses-icon ` +
+      className={`svg-icon add-material-icon ` +
         `${getSvgIconColorClassname(props.style, props.disabled, props.fill)} ` +
         `${props.className ?? ''}`
       }
