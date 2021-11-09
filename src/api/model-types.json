@@ -2874,6 +2874,9 @@
         "email": {
           "type": "string"
         },
+        "expireTime": {
+          "type": "number"
+        },
         "familyName": {
           "type": "string"
         },
