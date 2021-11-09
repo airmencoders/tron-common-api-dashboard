@@ -1,0 +1,23 @@
+.document-space-popup-actions {
+  .popup {
+    &:before {
+      display: none;
+    }
+    padding: 10px 0;
+  }
+  
+  .popper {
+    &__item {
+      padding: .5rem 1rem;
+      &:hover {
+        background-color: $highlight-color-confirm;
+        cursor: pointer;
+      }
+    }
+    &__title {
+      padding-left: .70rem;
+      position: relative;
+      top: 1px;
+    }
+  }
+}

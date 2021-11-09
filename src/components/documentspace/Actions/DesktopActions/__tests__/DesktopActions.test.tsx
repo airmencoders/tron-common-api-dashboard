@@ -6,6 +6,7 @@ import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInte
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../../state/document-space/document-space-state';
 import DocumentSpaceService from '../../../../../state/document-space/document-space-service';
 import DocumentSpacePrivilegeService from '../../../../../state/document-space/document-space-privilege-service';
+import { CreateEditOperationType } from '../../../../../pages/DocumentSpace/DocumentSpacePage';
 
 jest.mock('../../../../../state/document-space/document-space-state');
 describe('Desktop Actions Test', () => {
@@ -14,7 +15,7 @@ describe('Desktop Actions Test', () => {
   let selectedSpace: State<DocumentSpaceResponseDto | undefined> & StateMethodsDestroy;
   let path: State<string> & StateMethodsDestroy;
   let shouldUpdateDatasource: State<boolean> & StateMethodsDestroy;
-  let newFolderPrompt: State<boolean> & StateMethodsDestroy;
+  let createEditElementOpType: State<CreateEditOperationType> & StateMethodsDestroy;
   let membershipsState: State<{ isOpen: boolean }> & StateMethodsDestroy;
 
   let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
@@ -33,7 +34,7 @@ describe('Desktop Actions Test', () => {
     });
     path = createState<string>('');
     shouldUpdateDatasource = createState<boolean>(false);
-    newFolderPrompt = createState<boolean>(false);
+    createEditElementOpType = createState<CreateEditOperationType>(CreateEditOperationType.NONE);
     membershipsState = createState<{ isOpen: boolean }>({ isOpen: false });
 
     documentSpacePrivilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -55,7 +56,7 @@ describe('Desktop Actions Test', () => {
     selectedSpace.destroy();
     path.destroy();
     shouldUpdateDatasource.destroy();
-    newFolderPrompt.destroy();
+    createEditElementOpType.destroy();
     membershipsState.destroy();
 
     jest.resetAllMocks();
@@ -74,7 +75,7 @@ describe('Desktop Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );
@@ -101,7 +102,7 @@ describe('Desktop Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );
@@ -128,7 +129,7 @@ describe('Desktop Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );
@@ -152,7 +153,7 @@ describe('Desktop Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );

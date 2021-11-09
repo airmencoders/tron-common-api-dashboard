@@ -10,6 +10,7 @@ import PeopleIcon2 from '../../../../icons/PeopleIcon2';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
+import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
 
 function DesktopActions(props: DesktopActionsProps) {
   const documentSpaceService = useDocumentSpaceState();
@@ -48,7 +49,7 @@ function DesktopActions(props: DesktopActionsProps) {
             data-testid="add-new-items"
             anchorContent={<AddMaterialIcon fill size={1} iconTitle="Add Items" />}
             items={[
-              { displayName: 'Add New Folder', action: () => props.newFolderPrompt.set(true) }
+              { displayName: 'Add New Folder', action: () => props.createEditElementOpType.set(CreateEditOperationType.CREATE_FOLDER) }
             ]}
           />
 

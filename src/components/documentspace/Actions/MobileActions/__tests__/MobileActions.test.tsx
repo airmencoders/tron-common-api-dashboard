@@ -6,13 +6,14 @@ import { useDocumentSpacePrivilegesState } from '../../../../../state/document-s
 import DocumentSpacePrivilegeService from '../../../../../state/document-space/document-space-privilege-service';
 import MobileActions from '../MobileActions';
 import userEvent from '@testing-library/user-event';
+import { CreateEditOperationType } from '../../../../../pages/DocumentSpace/DocumentSpacePage';
 
 jest.mock('../../../../../state/document-space/document-space-state');
 describe('Mobile Actions Test', () => {
   let selectedSpace: State<DocumentSpaceResponseDto | undefined> & StateMethodsDestroy;
   let path: State<string> & StateMethodsDestroy;
   let shouldUpdateDatasource: State<boolean> & StateMethodsDestroy;
-  let newFolderPrompt: State<boolean> & StateMethodsDestroy;
+  let createEditElementOpType: State<CreateEditOperationType> & StateMethodsDestroy;
   let membershipsState: State<{ isOpen: boolean }> & StateMethodsDestroy;
 
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
@@ -27,7 +28,7 @@ describe('Mobile Actions Test', () => {
     });
     path = createState<string>('');
     shouldUpdateDatasource = createState<boolean>(false);
-    newFolderPrompt = createState<boolean>(false);
+    createEditElementOpType = createState<CreateEditOperationType>(CreateEditOperationType.NONE);
     membershipsState = createState<{ isOpen: boolean }>({ isOpen: false });
 
     documentSpacePrivilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -43,7 +44,7 @@ describe('Mobile Actions Test', () => {
     selectedSpace.destroy();
     path.destroy();
     shouldUpdateDatasource.destroy();
-    newFolderPrompt.destroy();
+    createEditElementOpType.destroy();
     membershipsState.destroy();
 
     jest.resetAllMocks();
@@ -67,7 +68,7 @@ describe('Mobile Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );
@@ -80,7 +81,7 @@ describe('Mobile Actions Test', () => {
     expect(element.getByTitle('Add Items')).toBeInTheDocument();
     const newFolder = element.getByTitle('Add Items');
     userEvent.click(newFolder);
-    expect(newFolderPrompt.value).toBeTruthy();
+    expect(createEditElementOpType.value).toEqual(CreateEditOperationType.CREATE_FOLDER);
 
     userEvent.click(actionsButton);
 
@@ -106,7 +107,7 @@ describe('Mobile Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );
@@ -132,7 +133,7 @@ describe('Mobile Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );
@@ -158,7 +159,7 @@ describe('Mobile Actions Test', () => {
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
-        newFolderPrompt={newFolderPrompt}
+        createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
       />
     );

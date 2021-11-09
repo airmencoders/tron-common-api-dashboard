@@ -10,6 +10,7 @@ import PeopleIcon from '../../../../icons/PeopleIcon';
 import { ActionsProps } from '../ActionsProps';
 import { useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
+import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
 
 interface MoreActionsState {
   popupOpen: boolean;
@@ -56,7 +57,7 @@ function MobileActions(props: ActionsProps) {
         }
         on="click"
         position="bottom right"
-        className={"document-space-actions__popper"}
+        className={"document-space-actions__popper document-space-popup-actions"}
         open={state.popupOpen.value}
         onOpen={() => state.popupOpen.set(true)}
         onClose={() => state.popupOpen.set(false)}
@@ -69,7 +70,7 @@ function MobileActions(props: ActionsProps) {
                 <span className="popper__title item__title">Upload File</span>
               </div>
 
-              <div className="popper__item" onClick={() => closePopupWithAction(() => props.newFolderPrompt.set(true))}>
+              <div className="popper__item" onClick={() => closePopupWithAction(() => props.createEditElementOpType.set(CreateEditOperationType.CREATE_FOLDER))}>
                 <AddMaterialIcon style="primary" fill className="popper__icon" size={1} iconTitle="Add Items" />
                 <span className="popper__title item__title">New Folder</span>
               </div>

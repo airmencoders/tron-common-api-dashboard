@@ -35,7 +35,7 @@ function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererPr
             on="click"
             offset={[0, -30]}
             position="bottom right"
-            className={'document-row-action-cell-renderer__popper'}
+            className={'document-row-action-cell-renderer__popper document-space-popup-actions'}
             closeOnDocumentClick
             onClose={() => setOpen(false)}
             open={open}

@@ -7,7 +7,6 @@ import DocumentSpaceService from '../../../../state/document-space/document-spac
 import { useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
 import FileUpload from '../FileUpload';
-import Button from '../../../Button/Button';
 import { createRef } from 'react';
 
 jest.mock('../../../../state/document-space/document-space-state');
