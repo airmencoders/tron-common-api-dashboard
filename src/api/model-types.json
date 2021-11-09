@@ -1051,6 +1051,26 @@
       ],
       "type": "string"
     },
+    "DocumentSpaceRenameFileDto": {
+      "additionalProperties": false,
+      "properties": {
+        "existingFilename": {
+          "type": "string"
+        },
+        "filePath": {
+          "type": "string"
+        },
+        "newName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "filePath",
+        "existingFilename",
+        "newName"
+      ],
+      "type": "object"
+    },
     "DocumentSpaceRenameFolderDto": {
       "additionalProperties": false,
       "properties": {
@@ -2853,6 +2873,9 @@
         },
         "email": {
           "type": "string"
+        },
+        "expireTime": {
+          "type": "number"
         },
         "familyName": {
           "type": "string"

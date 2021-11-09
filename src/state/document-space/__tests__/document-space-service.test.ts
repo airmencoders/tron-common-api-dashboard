@@ -7,20 +7,19 @@ import {
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
   DocumentSpacePrivilegeDtoResponseWrapper,
-  DocumentSpacePrivilegeDtoTypeEnum,
-  DocumentSpaceRenameFolderDto,
+  DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFolderDto,
   DocumentSpaceResponseDto,
   DocumentSpaceResponseDtoResponseWrapper, FilePathSpec, GenericStringArrayResponseWrapper,
   S3PaginationDto
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import { RequestError } from '../../../utils/ErrorHandling/request-error';
 import {
   createAxiosNoContentResponse,
   createAxiosSuccessResponse,
-  createGenericAxiosRequestErrorResponse,
+  createGenericAxiosRequestErrorResponse
 } from '../../../utils/TestUtils/test-utils';
-import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import DocumentSpaceService, { ArchivedStatus } from '../document-space-service';
 
 describe('Test Document Space Service', () => {
@@ -379,6 +378,19 @@ describe('Test Document Space Service', () => {
       );
 
     await documentSpaceService.renameFolder('test', '/some', 'folder');
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should allow file rename', async () => {
+    const mock = jest
+      .spyOn(documentSpaceApi, 'renameFile')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosNoContentResponse()
+        )
+      );
+
+    await documentSpaceService.renameFile('space', 'space', 'file1', 'file2');
     expect(mock).toHaveBeenCalled();
   });
 

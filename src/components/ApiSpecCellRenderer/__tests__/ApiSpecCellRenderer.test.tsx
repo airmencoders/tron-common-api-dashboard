@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react';
 import ApiSpecCellRenderer from '../ApiSpecCellRenderer';
 
-jest.mock('axios');
 describe('API Spec Cell Renderer', () => {
   it('Renders correctly', async () => {
     const page = render(

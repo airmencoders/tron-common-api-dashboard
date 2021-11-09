@@ -62,6 +62,7 @@ models/document-space-dashboard-member-response-dto.ts
 models/document-space-delete-items-dto.ts
 models/document-space-privilege-dto-response-wrapper.ts
 models/document-space-privilege-dto.ts
+models/document-space-rename-file-dto.ts
 models/document-space-rename-folder-dto.ts
 models/document-space-request-dto.ts
 models/document-space-response-dto-response-wrapper.ts

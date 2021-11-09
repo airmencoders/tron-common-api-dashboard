@@ -7,6 +7,14 @@ import {MockedRequest, RequestParams, ResponseComposition, rest, RestContext} fr
 import { setupServer } from 'msw/node';
 import {DefaultRequestBodyType} from 'msw/lib/types/utils/handlers/requestHandler';
 import { PrivilegeType } from './state/privilege/privilege-type';
+import { Configuration } from './openapi';
+
+const mockOpenapiConfig = jest.fn();
+jest.mock('./api/openapi-config', () => ({
+  get globalOpenapiConfig() {
+    return mockOpenapiConfig;
+  }
+}));
 
 function returnDefaultResponse(req: MockedRequest<DefaultRequestBodyType, RequestParams>,res: ResponseComposition<any>, ctx: RestContext) {
   console.log(`${req.method} - ${req.url.href}`);
@@ -113,6 +121,13 @@ const server = setupServer(
   rest.delete('*', returnDefaultResponse)
 )
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+  mockOpenapiConfig.mockReturnValue({
+    configuration: new Configuration(),
+    basePath: '',
+    axios: undefined
+  });
+  server.listen();
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());

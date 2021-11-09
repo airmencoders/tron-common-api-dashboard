@@ -34,6 +34,7 @@ export * from './document-space-dashboard-member-response-dto-response-wrapper';
 export * from './document-space-delete-items-dto';
 export * from './document-space-privilege-dto';
 export * from './document-space-privilege-dto-response-wrapper';
+export * from './document-space-rename-file-dto';
 export * from './document-space-rename-folder-dto';
 export * from './document-space-request-dto';
 export * from './document-space-response-dto';

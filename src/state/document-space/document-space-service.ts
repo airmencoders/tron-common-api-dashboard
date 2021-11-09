@@ -7,7 +7,7 @@ import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinit
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
+import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 
@@ -218,6 +218,16 @@ export default class DocumentSpaceService {
   async deleteItems(space: string, path: string, items: string[]): Promise<void> {
     try {
       await this.documentSpaceApi.deleteItems(space, { currentPath: path, itemsToDelete: [...items] });
+      return Promise.resolve();
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
+  }
+
+  async renameFile(space: string, filePath: string, existingFilename: string, newName: string): Promise<void> {
+    try {
+      await this.documentSpaceApi.renameFile(space, { filePath, existingFilename, newName } as DocumentSpaceRenameFileDto);
       return Promise.resolve();
     }
     catch (e) {

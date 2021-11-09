@@ -34,7 +34,7 @@ import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-ut
 import { formatBytesToString } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
-import DocumentSpaceCreateEditFolderForm from './DocumentSpaceCreateEditFolderForm';
+import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
@@ -46,8 +46,28 @@ import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import EditIcon from '../../icons/EditIcon';
 import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
-import Actions from '../../components/documentspace/Actions/MobileActions/MobileActions';
 import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
+import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
+
+export enum CreateEditOperationType {
+  NONE,
+  CREATE_FOLDER,
+  EDIT_FOLDERNAME,
+  EDIT_FILENAME
+}
+
+function getCreateEditTitle(type: CreateEditOperationType) {
+  switch (type) {
+    case CreateEditOperationType.CREATE_FOLDER:
+      return "New Folder";
+    case CreateEditOperationType.EDIT_FOLDERNAME:
+      return "Edit Folder Name";
+    case CreateEditOperationType.EDIT_FILENAME:
+      return "Edit File Name";
+    default:
+      return "Unknown";
+  }
+}
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -106,8 +126,7 @@ interface DocumentSpacePageState {
   membershipsState: {
     isOpen: boolean;
   },
-  newFolderPrompt: boolean;
-  editFolderPrompt: boolean;
+  createEditElementOpType: CreateEditOperationType;
   clickedItemName?: string;
   path: string;
   showDeleteSelectedDialog: boolean;
@@ -138,8 +157,7 @@ function DocumentSpacePage() {
     membershipsState: {
       isOpen: false
     },
-    newFolderPrompt: false,
-    editFolderPrompt: false,
+    createEditElementOpType: CreateEditOperationType.NONE,
     path: '',
     showDeleteSelectedDialog: false,
     isDefaultDocumentSpaceSettingsOpen: false,
@@ -324,39 +342,60 @@ function DocumentSpacePage() {
     })
   }
 
-  function submitFolderName(name: string) {
+  function submitElementName(name: string) {
     pageState.merge({ isSubmitting: true });
     if (pageState.selectedSpace.value?.id === undefined) return;
 
-    if (pageState.editFolderPrompt.get()) {
-      documentSpaceService.renameFolder(pageState.selectedSpace.value?.id, pageState.get().path + "/" + pageState.clickedItemName.get(), name)
-        .then(() => {
-          mergePageState({
-            newFolderPrompt: false,
-            editFolderPrompt: false,
-            isSubmitting: false,
-            showErrorMessage: false,
-            shouldUpdateDatasource: true,
-            clickedItemName: undefined,
-          });
-          createTextToast(ToastType.SUCCESS, "Folder renamed");
-        })
-        .catch(message => setPageStateOnException(message));
-    }
-    else {
-      documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id, pageState.get().path, name)
-      .then(() => {
-        mergePageState({
-          newFolderPrompt: false,
-          editFolderPrompt: false,
-          isSubmitting: false,
-          showErrorMessage: false,
-          shouldUpdateDatasource: true,
-          clickedItemName: undefined,
-        });
-        createTextToast(ToastType.SUCCESS, "Folder created");
-      })
-      .catch(message => setPageStateOnException(message));
+    switch (pageState.createEditElementOpType.get()) {
+      case CreateEditOperationType.EDIT_FOLDERNAME:
+        documentSpaceService.renameFolder(pageState.selectedSpace.value?.id, 
+          pageState.get().path + "/" + pageState.clickedItemName.get(), 
+          name)
+          .then(() => {
+            mergePageState({
+              createEditElementOpType: CreateEditOperationType.NONE,
+              isSubmitting: false,
+              showErrorMessage: false,
+              shouldUpdateDatasource: true,
+              clickedItemName: undefined,
+            });
+            createTextToast(ToastType.SUCCESS, "Folder renamed");
+          })
+          .catch(message => setPageStateOnException(message));
+        break;
+      case CreateEditOperationType.CREATE_FOLDER:
+        documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id, 
+          pageState.get().path, name)
+          .then(() => {
+            mergePageState({
+              createEditElementOpType: CreateEditOperationType.NONE,
+              isSubmitting: false,
+              showErrorMessage: false,
+              shouldUpdateDatasource: true,
+            });
+            createTextToast(ToastType.SUCCESS, "Folder created");
+          })
+          .catch(message => setPageStateOnException(message));
+        break;
+      case CreateEditOperationType.EDIT_FILENAME:
+        documentSpaceService.renameFile(pageState.selectedSpace.value?.id, 
+          pageState.get().path, 
+          pageState.clickedItemName.get() ?? '',  // blank if undefined, will allow to fail out..
+          name)
+          .then(() => {
+            mergePageState({
+              createEditElementOpType: CreateEditOperationType.NONE,
+              isSubmitting: false,
+              showErrorMessage: false,
+              shouldUpdateDatasource: true,
+              clickedItemName: undefined,
+            });
+            createTextToast(ToastType.SUCCESS, "File renamed");
+          })
+          .catch(message => setPageStateOnException(message));
+        break;
+      default:
+        break;
     }
   }
 
@@ -500,14 +539,20 @@ function DocumentSpacePage() {
                 icon: EditIcon, 
                 shouldShow: (doc: DocumentDto) => doc && doc.folder,
                 isAuthorized: () => true,
-                onClick: (doc: DocumentDto) => mergeState(pageState, { clickedItemName: doc.key, editFolderPrompt: true, })
+                onClick: (doc: DocumentDto) => mergeState(pageState, { 
+                  clickedItemName: doc.key, 
+                  createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
+                })
               },
               { 
                 title: 'Rename File', 
                 icon: EditIcon, 
                 shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
-                onClick: () => console.log('rename file') 
+                onClick: (doc: DocumentDto) => mergeState(pageState, { 
+                  clickedItemName: doc.key, 
+                  createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
+                })
               },
             ] as PopupMenuItem<DocumentDto>[],
           },
@@ -594,18 +639,18 @@ function DocumentSpacePage() {
           {pageState.selectedSpace.value != null &&
             !documentSpacePrivilegesService.isPromised && (
               <div className="content-controls">
-                <Actions
+                <MobileActions
                   selectedSpace={pageState.selectedSpace}
                   path={pageState.nested('path')}
                   shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-                  newFolderPrompt={pageState.newFolderPrompt}
+                  createEditElementOpType={pageState.createEditElementOpType}
                   membershipsState={pageState.membershipsState}
                 />
                 <DesktopActions
                   selectedSpace={pageState.selectedSpace}
                   path={pageState.nested('path')}
                   shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-                  newFolderPrompt={pageState.newFolderPrompt}
+                  createEditElementOpType={pageState.createEditElementOpType}
                   membershipsState={pageState.membershipsState}
                   selectedFiles={pageState.selectedFiles}
                   showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
@@ -641,7 +686,7 @@ function DocumentSpacePage() {
         onCloseHandler={closeDrawer}
         size={pageState.sideDrawerSize.get()}
       >
-        <DocumentSpaceEditForm
+        {pageState.drawerOpen.get() && <DocumentSpaceEditForm
           onCancel={closeDrawer}
           onSubmit={submitDocumentSpace}
           isFormSubmitting={pageState.isSubmitting.get()}
@@ -649,26 +694,30 @@ function DocumentSpacePage() {
           onCloseErrorMsg={closeErrorMsg}
           showErrorMessage={pageState.showErrorMessage.get()}
           errorMessage={pageState.errorMessage.get()}
-        />
+        />}
       </SideDrawer>
-      {(pageState.newFolderPrompt.get() || pageState.editFolderPrompt.get()) && <SideDrawer
+      <SideDrawer
         isLoading={false}
-        title={ pageState.editFolderPrompt.get() ? "Rename Folder" : "Add New Folder"}
-        isOpen={pageState.newFolderPrompt.get() || pageState.editFolderPrompt.get()}
-        onCloseHandler={() => mergeState(pageState, { newFolderPrompt: false, editFolderPrompt: false })}
+        title={getCreateEditTitle(pageState.createEditElementOpType.get())}
+        isOpen={pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE}
+        onCloseHandler={() => mergeState(pageState, { createEditElementOpType: CreateEditOperationType.NONE })}
         size={pageState.sideDrawerSize.get()}
       >
-        <DocumentSpaceCreateEditFolderForm
-          onCancel={() => mergeState(pageState, { newFolderPrompt: false, editFolderPrompt: false, })}
-          onSubmit={submitFolderName}
+        {(pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE) && <DocumentSpaceCreateEditForm
+          onCancel={() => mergeState(pageState, { 
+            showErrorMessage: false, 
+            createEditElementOpType: CreateEditOperationType.NONE,
+            clickedItemName: undefined,
+          })}
+          onSubmit={submitElementName}
           isFormSubmitting={pageState.isSubmitting.get()}
-          formActionType={pageState.editFolderPrompt.get() ? FormActionType.UPDATE : FormActionType.ADD}
           onCloseErrorMsg={closeErrorMsg}
           showErrorMessage={pageState.showErrorMessage.get()}
           errorMessage={pageState.errorMessage.get()}
-          folderName={pageState.editFolderPrompt.get() ? pageState.clickedItemName.get() ?? '' : undefined}
-        />
-      </SideDrawer>}
+          elementName={pageState.clickedItemName.get() ?? ''}
+          opType={pageState.createEditElementOpType.get()}
+        />}
+      </SideDrawer>
       <SideDrawer
         isLoading={false}
         title="My Settings"
