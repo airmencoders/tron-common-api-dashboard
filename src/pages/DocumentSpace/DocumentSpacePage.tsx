@@ -60,6 +60,19 @@ export enum CreateEditOperationType {
   EDIT_FILENAME
 }
 
+function getCreateEditTitle(type: CreateEditOperationType) {
+  switch (type) {
+    case CreateEditOperationType.CREATE_FOLDER:
+      return "New Folder";
+    case CreateEditOperationType.EDIT_FOLDERNAME:
+      return "Edit Folder Name";
+    case CreateEditOperationType.EDIT_FILENAME:
+      return "Edit File Name";
+    default:
+      return "Unknown";
+  }
+}
+
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
     field: 'key',
@@ -780,7 +793,7 @@ function DocumentSpacePage() {
         onCloseHandler={closeDrawer}
         size={pageState.sideDrawerSize.get()}
       >
-        <DocumentSpaceEditForm
+        {pageState.drawerOpen.get() && <DocumentSpaceEditForm
           onCancel={closeDrawer}
           onSubmit={submitDocumentSpace}
           isFormSubmitting={pageState.isSubmitting.get()}
@@ -788,17 +801,21 @@ function DocumentSpacePage() {
           onCloseErrorMsg={closeErrorMsg}
           showErrorMessage={pageState.showErrorMessage.get()}
           errorMessage={pageState.errorMessage.get()}
-        />
+        />}
       </SideDrawer>
-      {(pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE) && <SideDrawer
+      <SideDrawer
         isLoading={false}
-        title='Create/Edit Element'
+        title={getCreateEditTitle(pageState.createEditElementOpType.get())}
         isOpen={pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE}
         onCloseHandler={() => mergeState(pageState, { createEditElementOpType: CreateEditOperationType.NONE })}
         size={pageState.sideDrawerSize.get()}
       >
-        <DocumentSpaceCreateEditForm
-          onCancel={() => mergeState(pageState, { createEditElementOpType: CreateEditOperationType.NONE })}
+        {(pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE) && <DocumentSpaceCreateEditForm
+          onCancel={() => mergeState(pageState, { 
+            showErrorMessage: false, 
+            createEditElementOpType: CreateEditOperationType.NONE,
+            clickedItemName: undefined,
+          })}
           onSubmit={submitElementName}
           isFormSubmitting={pageState.isSubmitting.get()}
           onCloseErrorMsg={closeErrorMsg}
@@ -806,8 +823,8 @@ function DocumentSpacePage() {
           errorMessage={pageState.errorMessage.get()}
           elementName={pageState.clickedItemName.get() ?? ''}
           opType={pageState.createEditElementOpType.get()}
-        />
-      </SideDrawer>}
+        />}
+      </SideDrawer>
       <SideDrawer
         isLoading={false}
         title="My Settings"

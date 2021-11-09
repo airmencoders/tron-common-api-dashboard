@@ -23,6 +23,18 @@ export interface DocumentSpaceCreateEditFormProps {
   onCloseErrorMsg: () => void;
 }
 
+function getElementType(type: CreateEditOperationType) {
+  switch (type) {
+    case CreateEditOperationType.CREATE_FOLDER:
+    case CreateEditOperationType.EDIT_FOLDERNAME:
+      return "Folder";
+    case CreateEditOperationType.EDIT_FILENAME:
+      return "File";
+    default:
+      return "Unknown";
+  }
+}
+
 export default function DocumentSpaceCreateEditForm(props: DocumentSpaceCreateEditFormProps) {
   const formState = useHookstate<string>(props.elementName ?? '');
   formState.attach(Validation);
@@ -31,7 +43,7 @@ export default function DocumentSpaceCreateEditForm(props: DocumentSpaceCreateEd
 
   Validation(formState).validate(
     (name) => validateFolderName(name ?? ''),
-    'Invalid Element Name',
+    `Invalid ${getElementType(props.opType)} Name`,
     'error'
   );
 
