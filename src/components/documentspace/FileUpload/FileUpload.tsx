@@ -1,13 +1,13 @@
 import { useHookstate } from '@hookstate/core';
 import { CancelTokenSource } from 'axios';
-import React from 'react';
-import Button from '../../components/Button/Button';
-import Modal from '../../components/Modal/Modal';
-import ModalTitle from '../../components/Modal/ModalTitle';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import './DocumentUploadDialog.scss';
+import React, { forwardRef } from 'react';
+import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { ToastType } from '../../Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../Toast/ToastUtils/ToastUtils';
+import Modal from '../../../components/Modal/Modal';
+import ModalTitle from '../../../components/Modal/ModalTitle';
+import Button from '../../../components/Button/Button'
+import './FileUpload.scss';
 
 interface UploadState {
   showDialog: boolean;
@@ -18,28 +18,14 @@ interface UploadState {
   cancelToken: CancelTokenSource | undefined;
 }
 
-interface ButtonStyle {
-  icon?: boolean;
-  secondary?: boolean;
-  base?: boolean;
-  accent?: boolean;
-  outline?: boolean;
-  inverse?: boolean;
-  disabled?: boolean;
-  onClick?: (event?: any) => void;
-  className?: string;
-  unstyled?: boolean;
-}
-
-export interface DocumentUploadProps {
+export interface FileUploadProps {
   documentSpaceId: string;
   currentPath: string;
   onFinish: () => void;
-  buttonStyle?: ButtonStyle;
   value?: string | React.ReactNode;
 }
 
-export default function DocumentUploadDialog(props: DocumentUploadProps) {
+const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) => {
   const documentSpaceService = useDocumentSpaceState();
   const uploadState = useHookstate<UploadState>({
     showDialog: false,
@@ -49,19 +35,9 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
     progress: 0,
     cancelToken: undefined,
   });
-  const inputFileRef = React.useRef<HTMLInputElement>(null);
-
-  function uploadFiles(): void {
-    if (inputFileRef && inputFileRef.current) {
-      (inputFileRef.current as HTMLInputElement).click();
-    }
-  }
 
   function onCancelUpload(): void {
-    if (uploadState.cancelToken.get()) {
-      uploadState.cancelToken.get()?.cancel();
-    }
-
+    uploadState.cancelToken.value?.cancel();
     uploadState.merge({ showDialog: false });
   }
 
@@ -102,7 +78,6 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
         showDialog: false,
       });
 
-      if (inputFileRef && inputFileRef.current) inputFileRef.current.value = '';
       props.onFinish();
     } else {
       uploadState.merge({
@@ -110,24 +85,18 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
       });
     }
   }
+
   return (
-    <div>
+    <>
       <input
         data-testid="file-uploader-input"
         type="file"
         onChange={(e) => handleFileSelection(e.target.files ?? new FileList())}
-        ref={inputFileRef}
+        ref={ref}
         multiple
         style={{ display: 'none' }}
       />
-      <Button
-        data-testid="upload-file__btn"
-        onClick={uploadFiles}
-        type="button"
-        {...props.buttonStyle}
-      >
-        {props.value ?? 'Upload Files'}
-      </Button>
+
       <Modal
         show={uploadState.showDialog.get()}
         headerComponent={<ModalTitle title="Uploading Files" />}
@@ -154,6 +123,8 @@ export default function DocumentUploadDialog(props: DocumentUploadProps) {
           <progress className='upload-progress' value={uploadState.progress.get()}></progress>
         </div>
       </Modal>
-    </div>
-  );
-}
+    </>
+  )
+});
+
+export default FileUpload;

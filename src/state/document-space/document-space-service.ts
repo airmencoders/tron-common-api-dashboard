@@ -181,57 +181,6 @@ export default class DocumentSpaceService {
     }
   }
 
-  async getDashboardUserPrivilegesForDocumentSpace(documentSpaceId: string) {
-    const privileges = (await this.documentSpaceApi.getSelfDashboardUserPrivilegesForDocumentSpace(documentSpaceId)).data.data;
-    return this.convertDocumentSpacePrivilegesToRecord(privileges);
-  }
-
-  /**
-   * Gets all the privileges for a dashboard user for all of their authorized document spaces.
-   * This will always resolve, even if some or all of the requests failed
-   * @param documentSpaceIds the document space ids that the user is authorized for
-   * @returns the privileges of the user, separated by each document space
-   */
-  async getDashboardUserPrivilegesForDocumentSpaces(documentSpaceIds: Set<string>): Promise<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>> {
-    // Contains requests made to get privileges for each document space
-    const requests: Promise<{ id: string, privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> }>[] = [];
-
-    // Maps the index of a request to the document space id
-    const requestToDocumentSpaceIdMap: Map<number, string> = new Map();
-
-    documentSpaceIds.forEach(id => {
-      requests.push(
-        this.documentSpaceApi.getSelfDashboardUserPrivilegesForDocumentSpace(id)
-          .then(response => {
-            return {
-              id,
-              privileges: this.convertDocumentSpacePrivilegesToRecord(response.data.data)
-            }
-          })
-      );
-      requestToDocumentSpaceIdMap.set(requests.length - 1, id);
-    });
-
-    const data = await Promise.allSettled(requests);
-    const privileges: Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>> = {};
-
-    data.forEach((privilegePromise, idx) => {
-      const id = requestToDocumentSpaceIdMap.get(idx);
-      if (id != null && privilegePromise.status === 'fulfilled') {
-        privileges[privilegePromise.value.id] = privilegePromise.value.privileges;
-      }
-    });
-
-    return privileges;
-  }
-
-  convertDocumentSpacePrivilegesToRecord(privileges: DocumentSpacePrivilegeDto[]): Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> {
-    return Object.values(DocumentSpacePrivilegeDtoTypeEnum).reduce<Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>((prev, curr) => {
-      prev[curr] = privileges?.find(privilege => privilege.type === curr) ? true : false;
-      return prev;
-    }, { READ: false, WRITE: false, MEMBERSHIP: false });
-  }
-
   createRelativeFilesDownloadUrl(id: string, path: string, documents: DocumentDto[]) {
     const fileKeysParam = documents.map(document => document.key).join(',');
     return `${Config.API_URL_V2}` + (`document-space/spaces/${id}/files/download?path=${path}&files=${fileKeysParam}`).replace(/[\/]+/g, '/');

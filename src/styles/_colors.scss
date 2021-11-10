@@ -78,6 +78,10 @@ $add-action-green: color('green-30v');
 }
 
 .svg-icon-color {
+  &--fill {
+    fill: $light-shade;
+  }
+
   stroke: $light-shade;
 }
 
@@ -86,5 +90,9 @@ $add-action-green: color('green-30v');
 }
 
 .svg-icon-primary {
-  stroke: color($theme-color-primary);
+  &--fill {
+    fill: $font-color-secondary;
+  }
+
+  stroke: $font-color-secondary;
 }

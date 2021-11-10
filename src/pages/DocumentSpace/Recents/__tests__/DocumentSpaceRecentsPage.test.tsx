@@ -6,8 +6,9 @@ import { ToastContainer } from '../../../../components/Toast/ToastContainer/Toas
 import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../../state/authorized-user/authorized-user-state';
+import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
-import { useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
+import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import DocumentSpaceRecentsPage from '../DocumentSpaceRecentsPage';
 
 jest.mock('../../../../state/document-space/document-space-state');
@@ -29,6 +30,9 @@ describe('Document Space Recents Page Tests', () => {
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
+  let documentSpacePrivilegeState: State<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>;
+  let documentSpacePrivilegeService: DocumentSpacePrivilegeService;
+
   let authorizedUserState: State<DashboardUserDto | undefined> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
@@ -38,12 +42,19 @@ describe('Document Space Recents Page Tests', () => {
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
+    documentSpacePrivilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
+    documentSpacePrivilegeService = new DocumentSpacePrivilegeService(
+      documentSpaceApi,
+      documentSpacePrivilegeState
+    );
+
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
     dashboardUserApi = new DashboardUserControllerApi();
     authorizedUserService = new AuthorizedUserService(authorizedUserState, dashboardUserApi);
 
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
+    (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
   });
 
   afterEach(() => {
@@ -54,7 +65,7 @@ describe('Document Space Recents Page Tests', () => {
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
     const fetchAndStoreSpaces = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
-    const getPrivileges = jest.spyOn(documentSpaceService, 'getDashboardUserPrivilegesForDocumentSpaces');
+    const getPrivileges = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacesPrivileges');
 
     const { getByText } = render(
       <MemoryRouter>
@@ -79,7 +90,10 @@ describe('Document Space Recents Page Tests', () => {
 
     const privileges: Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>> = {};
     privileges[documentSpaces[0].id] = { READ: true, WRITE: false, MEMBERSHIP: false };
-    const getPrivileges = jest.spyOn(documentSpaceService, 'getDashboardUserPrivilegesForDocumentSpaces').mockReturnValue(Promise.resolve(privileges));
+    const getPrivileges = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacesPrivileges').mockReturnValue({
+      promise: Promise.resolve(privileges),
+      cancelTokenSource: axios.CancelToken.source()
+    });
 
     const { getByText, rerender } = render(
       <MemoryRouter>
@@ -109,7 +123,10 @@ describe('Document Space Recents Page Tests', () => {
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
     });
-    const getPrivileges = jest.spyOn(documentSpaceService, 'getDashboardUserPrivilegesForDocumentSpaces').mockReturnValue(Promise.reject(new Error('no privileges')));
+    const getPrivileges = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacesPrivileges').mockReturnValue({
+      promise: Promise.reject(new Error('no privileges')),
+      cancelTokenSource: axios.CancelToken.source()
+    });
 
     const page = render(
       <MemoryRouter>
@@ -132,7 +149,10 @@ describe('Document Space Recents Page Tests', () => {
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
     });
-    const getPrivileges = jest.spyOn(documentSpaceService, 'getDashboardUserPrivilegesForDocumentSpaces').mockReturnValue(Promise.reject(new Error('no privileges')));
+    const getPrivileges = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacesPrivileges').mockReturnValue({
+      promise: Promise.reject(new Error('no privileges')),
+      cancelTokenSource: axios.CancelToken.source()
+    });
 
     const { getByText } = render(
       <MemoryRouter>
