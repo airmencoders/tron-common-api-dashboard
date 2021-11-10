@@ -7,8 +7,7 @@ import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer, { PopupMenuItem } from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
-import DropDown from '../../components/DropDown/DropDown';
+import DocumentRowActionCellRenderer, { PopupMenuItem }  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import Select from '../../components/forms/Select/Select';
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
@@ -21,17 +20,6 @@ import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
-import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
-import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
-import EditIcon from '../../icons/EditIcon';
-import PeopleIcon2 from "../../icons/PeopleIcon2";
-import RemoveIcon from '../../icons/RemoveIcon';
-import StarIcon from '../../icons/StarIcon';
-import UploadIcon from '../../icons/UploadIcon';
-import UploadMaterialIcon from '../../icons/UploadMaterialIcon';
-import UserIcon from "../../icons/UserIcon";
-import UserIconCircle from "../../icons/UserIconCircle";
 import {
   DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
@@ -40,18 +28,46 @@ import {
 } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { formatBytesToString } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
-import DocumentSpaceCreateEditFolderForm from './DocumentSpaceCreateEditFolderForm';
+import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
-import DocumentUploadDialog from './DocumentUploadDialog';
+import UserIcon from "../../icons/UserIcon";
+import UserIconCircle from "../../icons/UserIconCircle";
+import CircleMinusIcon from '../../icons/CircleMinusIcon';
+import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
+import EditIcon from '../../icons/EditIcon';
+import StarIcon from '../../icons/StarIcon';
+import UploadIcon from '../../icons/UploadIcon';
+import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
+import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
+
+export enum CreateEditOperationType {
+  NONE,
+  CREATE_FOLDER,
+  EDIT_FOLDERNAME,
+  EDIT_FILENAME
+}
+
+function getCreateEditTitle(type: CreateEditOperationType) {
+  switch (type) {
+    case CreateEditOperationType.CREATE_FOLDER:
+      return "New Folder";
+    case CreateEditOperationType.EDIT_FOLDERNAME:
+      return "Edit Folder Name";
+    case CreateEditOperationType.EDIT_FILENAME:
+      return "Edit File Name";
+    default:
+      return "Unknown";
+  }
+}
 
 const documentDtoColumns: GridColumn[] = [
   new GridColumn({
@@ -112,12 +128,7 @@ interface DocumentSpacePageState {
   membershipsState: {
     isOpen: boolean;
   },
-  privilegeState: {
-    privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>,
-    isLoading: boolean
-  },
-  newFolderPrompt: boolean;
-  editFolderPrompt: boolean;
+  createEditElementOpType: CreateEditOperationType;
   clickedItemName?: string;
   path: string;
   showDeleteSelectedDialog: boolean;
@@ -148,16 +159,7 @@ function DocumentSpacePage() {
     membershipsState: {
       isOpen: false
     },
-    privilegeState: {
-      privileges: {
-        READ: false,
-        WRITE: false,
-        MEMBERSHIP: false
-      },
-      isLoading: false
-    },
-    newFolderPrompt: false,
-    editFolderPrompt: false,
+    createEditElementOpType: CreateEditOperationType.NONE,
     path: '',
     showDeleteSelectedDialog: false,
     isDefaultDocumentSpaceSettingsOpen: false,
@@ -168,6 +170,7 @@ function DocumentSpacePage() {
   const history = useHistory();
 
   const documentSpaceService = useDocumentSpaceState();
+  const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const authorizedUserService = useAuthorizedUserState();
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
@@ -212,6 +215,7 @@ function DocumentSpacePage() {
       }
 
       documentSpaceService.resetState();
+      documentSpacePrivilegesService.resetState();
     };
   }, []);
 
@@ -248,21 +252,11 @@ function DocumentSpacePage() {
   }
 
   async function setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
-    let privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> = {
-      READ: false,
-      WRITE: false,
-      MEMBERSHIP: false
-    };
-
     try {
       // Don't need to load privileges if current user is Dashboard Admin,
       // since they currently have access to everything Document Space related
       if (!isAdmin) {
-        mergeState(pageState.privilegeState, {
-          isLoading: true
-        });
-
-        privileges = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpace(documentSpace.id);
+        await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
       }
       mergePageState({
         selectedSpace: documentSpace,
@@ -272,10 +266,6 @@ function DocumentSpacePage() {
           path,
           infiniteScrollOptions
         ),
-        privilegeState: {
-          privileges,
-          isLoading: false
-        },
         path,
       });
       const queryParams = new URLSearchParams(location.search);
@@ -299,11 +289,7 @@ function DocumentSpacePage() {
       mergePageState({
         selectedSpace: undefined,
         datasource: undefined,
-        shouldUpdateDatasource: false,
-        privilegeState: {
-          privileges,
-          isLoading: false
-        }
+        shouldUpdateDatasource: false
       });
     }
   }
@@ -358,39 +344,60 @@ function DocumentSpacePage() {
     })
   }
 
-  function submitFolderName(name: string) {
+  function submitElementName(name: string) {
     pageState.merge({ isSubmitting: true });
     if (pageState.selectedSpace.value?.id === undefined) return;
 
-    if (pageState.editFolderPrompt.get()) {
-      documentSpaceService.renameFolder(pageState.selectedSpace.value?.id, pageState.get().path + "/" + pageState.clickedItemName.get(), name)
-        .then(() => {
-          mergePageState({
-            newFolderPrompt: false,
-            editFolderPrompt: false,
-            isSubmitting: false,
-            showErrorMessage: false,
-            shouldUpdateDatasource: true,
-            clickedItemName: undefined,
-          });
-          createTextToast(ToastType.SUCCESS, "Folder renamed");
-        })
-        .catch(message => setPageStateOnException(message));
-    }
-    else {
-      documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id, pageState.get().path, name)
-      .then(() => {
-        mergePageState({
-          newFolderPrompt: false,
-          editFolderPrompt: false,
-          isSubmitting: false,
-          showErrorMessage: false,
-          shouldUpdateDatasource: true,
-          clickedItemName: undefined,
-        });
-        createTextToast(ToastType.SUCCESS, "Folder created");
-      })
-      .catch(message => setPageStateOnException(message));
+    switch (pageState.createEditElementOpType.get()) {
+      case CreateEditOperationType.EDIT_FOLDERNAME:
+        documentSpaceService.renameFolder(pageState.selectedSpace.value?.id, 
+          pageState.get().path + "/" + pageState.clickedItemName.get(), 
+          name)
+          .then(() => {
+            mergePageState({
+              createEditElementOpType: CreateEditOperationType.NONE,
+              isSubmitting: false,
+              showErrorMessage: false,
+              shouldUpdateDatasource: true,
+              clickedItemName: undefined,
+            });
+            createTextToast(ToastType.SUCCESS, "Folder renamed");
+          })
+          .catch(message => setPageStateOnException(message));
+        break;
+      case CreateEditOperationType.CREATE_FOLDER:
+        documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id, 
+          pageState.get().path, name)
+          .then(() => {
+            mergePageState({
+              createEditElementOpType: CreateEditOperationType.NONE,
+              isSubmitting: false,
+              showErrorMessage: false,
+              shouldUpdateDatasource: true,
+            });
+            createTextToast(ToastType.SUCCESS, "Folder created");
+          })
+          .catch(message => setPageStateOnException(message));
+        break;
+      case CreateEditOperationType.EDIT_FILENAME:
+        documentSpaceService.renameFile(pageState.selectedSpace.value?.id, 
+          pageState.get().path, 
+          pageState.clickedItemName.get() ?? '',  // blank if undefined, will allow to fail out..
+          name)
+          .then(() => {
+            mergePageState({
+              createEditElementOpType: CreateEditOperationType.NONE,
+              isSubmitting: false,
+              showErrorMessage: false,
+              shouldUpdateDatasource: true,
+              clickedItemName: undefined,
+            });
+            createTextToast(ToastType.SUCCESS, "File renamed");
+          })
+          .catch(message => setPageStateOnException(message));
+        break;
+      default:
+        break;
     }
   }
 
@@ -485,17 +492,13 @@ function DocumentSpacePage() {
     }
   }
 
-  function isAuthorizedForAction(actionType: DocumentSpacePrivilegeDtoTypeEnum) {
-    return isAdmin || pageState.privilegeState.privileges.value[actionType];
-  }
-
   const isDocumentSpacesLoading =
     documentSpaceService.isDocumentSpacesStatePromised;
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
   function documentDtoColumnsWithConditionalDelete() {
-    const columns = (isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
+    const columns = (pageState.selectedSpace.value && documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
       [
         ...documentDtoColumns,
         new GridColumn({
@@ -538,14 +541,20 @@ function DocumentSpacePage() {
                 icon: EditIcon, 
                 shouldShow: (doc: DocumentDto) => doc && doc.folder,
                 isAuthorized: () => true,
-                onClick: (doc: DocumentDto) => mergeState(pageState, { clickedItemName: doc.key, editFolderPrompt: true, })
+                onClick: (doc: DocumentDto) => mergeState(pageState, { 
+                  clickedItemName: doc.key, 
+                  createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
+                })
               },
               { 
                 title: 'Rename File', 
                 icon: EditIcon, 
                 shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
-                onClick: () => console.log('rename file') 
+                onClick: (doc: DocumentDto) => mergeState(pageState, { 
+                  clickedItemName: doc.key, 
+                  createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
+                })
               },
             ] as PopupMenuItem<DocumentDto>[],
           },
@@ -589,16 +598,15 @@ function DocumentSpacePage() {
             >
               {getSpaceOptions()}
             </Select>
-            {isAdmin && !pageState.privilegeState.isLoading.value && (
+            {isAdmin && !documentSpacePrivilegesService.isPromised && (
               <Button
                 data-testid="add-doc-space__btn"
                 type="button"
                 onClick={() => pageState.merge({ drawerOpen: true })}
                 disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
               >
-                Add New Space <AddMaterialIcon size={1.25} />
+                Add New Space <AddMaterialIcon fill size={1} />
               </Button>
-
             )}
 
             {documentSpaceService.documentSpaces.length && (
@@ -632,99 +640,31 @@ function DocumentSpacePage() {
         />
         <div>
           {pageState.selectedSpace.value != null &&
-            !pageState.privilegeState.isLoading.value && (
+            !documentSpacePrivilegesService.isPromised && (
               <div className="content-controls">
-
-
-                {pageState.selectedSpace.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
-                  && <div data-testid="upload-new-file">
-                    <DocumentUploadDialog
-                      documentSpaceId={pageState.selectedSpace.value.id}
-                      currentPath={pageState.get().path}
-                      onFinish={() =>
-                        pageState.merge({ shouldUpdateDatasource: true, })
-                      }
-                      buttonStyle={{ icon: true, className: 'rotate-icon' }}
-
-                      value={<UploadMaterialIcon size={1} iconTitle="Upload Files" />}
-                    />
-                  </div>
-                }
-
-                {isAuthorizedForAction(
-                  DocumentSpacePrivilegeDtoTypeEnum.Write
-                ) && (
-                  <DropDown
-                    id="add-new-items"
-                    data-testid="add-new-items"
-                    anchorContent={<AddMaterialIcon size={1} iconTitle="Add Items" />}
-                    items={[
-                      { displayName: 'Add New Folder', action: () => pageState.merge({ newFolderPrompt: true, editFolderPrompt: false }) }
-                    ]}
-                  />
-                )}
-
-                {isAuthorizedForAction(
-                  DocumentSpacePrivilegeDtoTypeEnum.Write
-                ) && (
-                    <Button
-                      type="button"
-                      icon
-                      disabled={pageState.get().selectedFiles.length === 0}
-                      data-testid="delete-selected-items"
-                      disableMobileFullWidth
-                      onClick={() => pageState.showDeleteSelectedDialog.set(true)}
-                    >
-                      <RemoveIcon className="icon-color" size={1.25} />
-                    </Button>
-                  )}
-
-                {isAuthorizedForAction(
-                  DocumentSpacePrivilegeDtoTypeEnum.Read
-                ) && (
-                    <DropDown
-                      id="download-items"
-                      data-testid="download-items"
-                      anchorContent={<DownloadMaterialIcon size={1.25} iconTitle="Download Items" />}
-                      items={[
-                        {
-                          displayName: 'Download Selected',
-                          action: () => window.open((pageState.selectedFiles.value.length > 0 && pageState.selectedSpace.value)
-                            ? documentSpaceService.createRelativeFilesDownloadUrl(
-                              pageState.selectedSpace.value.id,
-                              pageState.get().path,
-                              pageState.selectedFiles.value
-                            )
-                            : undefined)
-                        },
-                        {
-                          displayName: 'Download All Files (zip)',
-                          action: () => pageState.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
-                            pageState.selectedSpace.value.id))
-                        }
-                      ]}
-                    />
-                  )}
-
-                {isAuthorizedForAction(
-                  DocumentSpacePrivilegeDtoTypeEnum.Membership
-                ) && (
-                    <Button
-                      type="button"
-                      unstyled
-                      disableMobileFullWidth
-                      onClick={() => pageState.membershipsState.isOpen.set(true)}
-                    >
-                      <PeopleIcon2 size={1.5} iconTitle="Manage Users" />
-                    </Button>
-                  )}
+                <MobileActions
+                  selectedSpace={pageState.selectedSpace}
+                  path={pageState.nested('path')}
+                  shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+                  createEditElementOpType={pageState.createEditElementOpType}
+                  membershipsState={pageState.membershipsState}
+                />
+                <DesktopActions
+                  selectedSpace={pageState.selectedSpace}
+                  path={pageState.nested('path')}
+                  shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+                  createEditElementOpType={pageState.createEditElementOpType}
+                  membershipsState={pageState.membershipsState}
+                  selectedFiles={pageState.selectedFiles}
+                  showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
+                />
               </div>
             )}
         </div>
       </div>
       {pageState.selectedSpace.value != null &&
         pageState.datasource.value &&
-        isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
+        documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Read) && (
           <InfiniteScrollGrid
             columns={documentDtoColumnsWithConditionalDelete()}
             datasource={pageState.datasource.value}
@@ -749,7 +689,7 @@ function DocumentSpacePage() {
         onCloseHandler={closeDrawer}
         size={pageState.sideDrawerSize.get()}
       >
-        <DocumentSpaceEditForm
+        {pageState.drawerOpen.get() && <DocumentSpaceEditForm
           onCancel={closeDrawer}
           onSubmit={submitDocumentSpace}
           isFormSubmitting={pageState.isSubmitting.get()}
@@ -757,26 +697,30 @@ function DocumentSpacePage() {
           onCloseErrorMsg={closeErrorMsg}
           showErrorMessage={pageState.showErrorMessage.get()}
           errorMessage={pageState.errorMessage.get()}
-        />
+        />}
       </SideDrawer>
-      {(pageState.newFolderPrompt.get() || pageState.editFolderPrompt.get()) && <SideDrawer
+      <SideDrawer
         isLoading={false}
-        title={ pageState.editFolderPrompt.get() ? "Rename Folder" : "Add New Folder"}
-        isOpen={pageState.newFolderPrompt.get() || pageState.editFolderPrompt.get()}
-        onCloseHandler={() => mergeState(pageState, { newFolderPrompt: false, editFolderPrompt: false })}
+        title={getCreateEditTitle(pageState.createEditElementOpType.get())}
+        isOpen={pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE}
+        onCloseHandler={() => mergeState(pageState, { createEditElementOpType: CreateEditOperationType.NONE })}
         size={pageState.sideDrawerSize.get()}
       >
-        <DocumentSpaceCreateEditFolderForm
-          onCancel={() => mergeState(pageState, { newFolderPrompt: false, editFolderPrompt: false, })}
-          onSubmit={submitFolderName}
+        {(pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE) && <DocumentSpaceCreateEditForm
+          onCancel={() => mergeState(pageState, { 
+            showErrorMessage: false, 
+            createEditElementOpType: CreateEditOperationType.NONE,
+            clickedItemName: undefined,
+          })}
+          onSubmit={submitElementName}
           isFormSubmitting={pageState.isSubmitting.get()}
-          formActionType={pageState.editFolderPrompt.get() ? FormActionType.UPDATE : FormActionType.ADD}
           onCloseErrorMsg={closeErrorMsg}
           showErrorMessage={pageState.showErrorMessage.get()}
           errorMessage={pageState.errorMessage.get()}
-          folderName={pageState.editFolderPrompt.get() ? pageState.clickedItemName.get() ?? '' : undefined}
-        />
-      </SideDrawer>}
+          elementName={pageState.clickedItemName.get() ?? ''}
+          opType={pageState.createEditElementOpType.get()}
+        />}
+      </SideDrawer>
       <SideDrawer
         isLoading={false}
         title="My Settings"
@@ -815,8 +759,8 @@ function DocumentSpacePage() {
       />
 
       {pageState.selectedSpace.value &&
-        !pageState.privilegeState.isLoading.value &&
-        isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
+        !documentSpacePrivilegesService.isPromised &&
+        documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
           <DocumentSpaceMemberships
             documentSpaceId={pageState.selectedSpace.value.id}
             isOpen={pageState.membershipsState.isOpen.value}

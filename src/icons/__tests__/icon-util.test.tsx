@@ -29,15 +29,15 @@ describe('Icon Util Test', () => {
 
     test('Should get default classname when style type is null or default', () => {
       expect(getSvgIconColorClassname(undefined, false)).toEqual('svg-icon-color');
-      expect(getSvgIconColorClassname('default', false, 'svg-icon-color')).toEqual('svg-icon-color');
+      expect(getSvgIconColorClassname('default', false, false, 'svg-icon-color')).toEqual('svg-icon-color');
     });
 
     test('Should get primary classname when style type is primary', () => {
-      expect(getSvgIconColorClassname('primary', false, 'svg-icon-primary')).toEqual('svg-icon-primary');
+      expect(getSvgIconColorClassname('primary', false, false, 'svg-icon-primary')).toEqual('svg-icon-primary');
     })
 
     test('Should get defaultClassname if match no condition', () => {
-      expect(getSvgIconColorClassname('bad' as IconStyleType, false, 'svg-icon-color')).toEqual('svg-icon-color');
+      expect(getSvgIconColorClassname('bad' as IconStyleType, false, false, 'svg-icon-color')).toEqual('svg-icon-color');
       expect(getSvgIconColorClassname('bad' as IconStyleType, false)).toEqual('svg-icon-color');
     });
   });

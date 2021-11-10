@@ -19,7 +19,7 @@ function SidebarItemWithChildren(props: SidebarItemWithChildrenProps) {
                   trigger={<div><SidebarCollapsedItem name={props.item.name} currentOpenedMenu={props.openedMenu}
                                                       icon={props.item.icon ?? PuzzleIcon}/></div>}
                   on="click"
-                  className="sidebar__nav-popup"
+                  className="sidebar__nav-popup document-space-popup-actions"
                   position="right center"
                   offset={[(props.item.childRoutes?.length ?? 0 * 9), -6]}
                   wide

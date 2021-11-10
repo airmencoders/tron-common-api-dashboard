@@ -1,8 +1,20 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import LogfileApi from '../logfile-api';
 import { LogfileDto } from '../logfile-dto';
 
-jest.mock('axios');
+jest.mock('axios', () => {
+  return {
+    create: () => {
+      return {
+        interceptors: {
+          request: { eject: jest.fn(), use: jest.fn() },
+          response: { eject: jest.fn(), use: jest.fn() },
+        },
+        get: jest.fn()
+      }
+    }
+  }
+});
 
 describe('Test Logfile API', () => {
   const responseData: Array<LogfileDto> = [
@@ -25,12 +37,12 @@ describe('Test Logfile API', () => {
   };
 
   it('getLogfile', async () => {
-    (axios.create as jest.Mock).mockImplementation(() => axios);
-    (axios.get as jest.Mock).mockImplementation(() => {
+    const api = new LogfileApi();
+    (api.axiosInstance.get as jest.Mock).mockImplementation(() => {
       return axiosRes;
     });
 
-    const apiResponse = await new LogfileApi().getLogfiles();
+    const apiResponse = await api.getLogfiles();
     expect(apiResponse).toBe(axiosRes);
   });
 });

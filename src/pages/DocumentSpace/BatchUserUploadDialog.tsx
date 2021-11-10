@@ -1,7 +1,6 @@
 import React from 'react';
 import Button from '../../components/Button/Button';
-import {documentSpaceMembershipService} from '../../state/document-space/document-space-state';
-import './DocumentUploadDialog.scss';
+import { documentSpaceMembershipService } from '../../state/document-space/document-space-state';
 import {State} from "@hookstate/core";
 import {BatchUploadState} from "./DocumentSpaceMemberships";
 import {createTextToast} from "../../components/Toast/ToastUtils/ToastUtils";

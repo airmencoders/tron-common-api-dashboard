@@ -7,20 +7,19 @@ import {
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
   DocumentSpacePrivilegeDtoResponseWrapper,
-  DocumentSpacePrivilegeDtoTypeEnum,
-  DocumentSpaceRenameFolderDto,
+  DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFolderDto,
   DocumentSpaceResponseDto,
   DocumentSpaceResponseDtoResponseWrapper, FilePathSpec, GenericStringArrayResponseWrapper,
   S3PaginationDto
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import { RequestError } from '../../../utils/ErrorHandling/request-error';
 import {
   createAxiosNoContentResponse,
   createAxiosSuccessResponse,
-  createGenericAxiosRequestErrorResponse,
+  createGenericAxiosRequestErrorResponse
 } from '../../../utils/TestUtils/test-utils';
-import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import DocumentSpaceService, { ArchivedStatus } from '../document-space-service';
 
 describe('Test Document Space Service', () => {
@@ -382,6 +381,19 @@ describe('Test Document Space Service', () => {
     expect(mock).toHaveBeenCalled();
   });
 
+  it('should allow file rename', async () => {
+    const mock = jest
+      .spyOn(documentSpaceApi, 'renameFile')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosNoContentResponse()
+        )
+      );
+
+    await documentSpaceService.renameFile('space', 'space', 'file1', 'file2');
+    expect(mock).toHaveBeenCalled();
+  });
+
   it('should allow archiving', async () => {
     const mock = jest.spyOn(documentSpaceApi, 'archiveItems').mockReturnValue(
       Promise.resolve(createAxiosNoContentResponse()));
@@ -516,79 +528,5 @@ describe('Test Document Space Service', () => {
 
     await expect(documentSpaceService.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename)).rejects.toEqual(expectedError);
     expect(mock).toHaveBeenCalled();
-  });
-
-  it('should retrieve all privileges for a dashboard user of a document space', async () => {
-    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
-
-    const mock = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace').mockReturnValue(
-      Promise.resolve(
-        createAxiosSuccessResponse<DocumentSpacePrivilegeDtoResponseWrapper>({
-          data: [
-            {
-              id: 'privilege-id-1',
-              type: DocumentSpacePrivilegeDtoTypeEnum.Read
-            },
-            {
-              id: 'privilege-id-2',
-              type: DocumentSpacePrivilegeDtoTypeEnum.Write
-            }
-          ]
-        })
-      )
-    );
-
-    const response = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpace(documentSpaceId);
-    expect(mock).toHaveBeenCalled();
-    expect(response).toEqual({
-      [DocumentSpacePrivilegeDtoTypeEnum.Read]: true,
-      [DocumentSpacePrivilegeDtoTypeEnum.Write]: true,
-      [DocumentSpacePrivilegeDtoTypeEnum.Membership]: false
-    });
-  });
-
-  it('should retrieve all privileges for a dashboard user pertaining to all document spaces they have access to', async () => {
-    const documentSpaceIds = [
-      '412ea028-1fc5-41e0-b48a-c6ef090704d3',
-      '412ea028-1fc5-41e0-b48a-c6ef090704d4'
-    ];
-
-    const mock = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace')
-      .mockReturnValueOnce(
-        Promise.resolve(
-          createAxiosSuccessResponse<DocumentSpacePrivilegeDtoResponseWrapper>({
-            data: [
-              {
-                id: 'privilege-id-1',
-                type: DocumentSpacePrivilegeDtoTypeEnum.Read
-              }
-            ]
-          })
-        )
-      )
-      .mockReturnValueOnce(
-        Promise.resolve(
-          createAxiosSuccessResponse<DocumentSpacePrivilegeDtoResponseWrapper>({
-            data: [
-              {
-                id: 'privilege-id-1',
-                type: DocumentSpacePrivilegeDtoTypeEnum.Read
-              },
-              {
-                id: 'privilege-id-2',
-                type: DocumentSpacePrivilegeDtoTypeEnum.Write
-              }
-            ]
-          })
-        )
-      );
-
-    const response = await documentSpaceService.getDashboardUserPrivilegesForDocumentSpaces(new Set(documentSpaceIds));
-    expect(mock).toHaveBeenCalledTimes(2);
-
-    const result: Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>> = {};
-    result[documentSpaceIds[0]] = { READ: true, WRITE: false, MEMBERSHIP: false };
-    result[documentSpaceIds[1]] = { READ: true, WRITE: true, MEMBERSHIP: false };
-    expect(response).toEqual(result);
   });
 });

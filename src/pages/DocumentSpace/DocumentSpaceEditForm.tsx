@@ -24,9 +24,7 @@ export interface DocumentSpaceEditFormProps {
   onCloseErrorMsg: () => void;
 }
 
-export default function DocumentSpaceEditForm(
-  props: DocumentSpaceEditFormProps
-) {
+export default function DocumentSpaceEditForm(props: DocumentSpaceEditFormProps) {
   const formState = useHookstate<DocumentSpaceRequestDto>(
     props.documentSpace ?? { name: '' }
   );
@@ -57,7 +55,7 @@ export default function DocumentSpaceEditForm(
       <FormGroup
         labelName="new-document-space"
         labelText="Document Space Details"
-        isError={!Validation(formState).valid()}
+        isError={!Validation(formState).valid() && Touched(formState).touched()}
         errorMessages={Validation(formState.name)
           .errors()
           .map((validationError) => validationError.message)}
@@ -74,7 +72,7 @@ export default function DocumentSpaceEditForm(
           data-testid="new-space-name-field"
           type="text"
           onChange={(event) => formState.name.set(event.target.value)}
-          defaultValue={formState.name.get() ?? ''}
+          value={formState.name.get() ?? ''}
         />
         <SuccessErrorMessage
           errorMessage={props?.errorMessage ?? ''}
