@@ -7,9 +7,19 @@ import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
 import {SidebarItemWithChildrenProps} from './SidebarItemWithChildrenProps';
 import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
 import PuzzleIcon from '../../icons/PuzzleIcon';
+import {RouteItem} from '../../routes';
 
 function SidebarItemWithChildren(props: SidebarItemWithChildrenProps) {
   const authorizedUserState = useAuthorizedUserState();
+
+  function createSidebarItems(childRoutes: RouteItem[]): (JSX.Element | undefined)[] {
+    return childRoutes?.map((child) => {
+      if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
+        return <SidebarItem key={child.name} path={child.path} name={child.name}
+                            showActiveBorder/>
+      }
+    })
+  }
 
   return (
       <div className="sidebar-item-with-children">
@@ -28,12 +38,8 @@ function SidebarItemWithChildren(props: SidebarItemWithChildrenProps) {
                     className="sidebar__items--collapsed"
                 >
                   {
-                    props.item.childRoutes?.map((child) => {
-                      if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
-                        return <SidebarItem key={child.name} path={child.path} name={child.name}
-                                            showActiveBorder/>
-                      }
-                    })
+                    props.item?.childRoutes &&
+                    createSidebarItems(props.item.childRoutes)
                   }
                 </Popup.Content>
               </Popup> :
@@ -47,12 +53,8 @@ function SidebarItemWithChildren(props: SidebarItemWithChildrenProps) {
                                   icon={props.item.icon}
                 >
                   {
-                    props.item.childRoutes?.map((child) => {
-                      if (authorizedUserState.authorizedUserHasAnyPrivilege(child.requiredPrivileges)) {
-                        return <SidebarItem key={child.name} path={child.path} name={child.name}
-                                            showActiveBorder/>
-                      }
-                    })
+                    props.item?.childRoutes &&
+                    createSidebarItems(props.item.childRoutes)
                   }
                 </NestedSidebarNav>
               </SidebarContainer>

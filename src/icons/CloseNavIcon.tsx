@@ -1,12 +1,13 @@
 import React from 'react';
 import {IconProps} from './IconProps';
 import {getSvgIconColorClassname} from './icon-util';
+import {SvgIconProps} from './SvgIconProps';
 
-function CloseNavIcon(props: IconProps) {
+function CloseNavIcon(props: IconProps & SvgIconProps) {
   return (
       <svg
            className={`svg-icon close-nav-icon` +
-             `${getSvgIconColorClassname(props.style, props.disabled)} ` +
+             `${getSvgIconColorClassname(props.style, props.disabled, props.fill)} ` +
              `${props.className ?? ''}`
            }
            width={props.size * 11} height={props.size * 18}

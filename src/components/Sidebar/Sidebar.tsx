@@ -5,20 +5,17 @@ import Logo from '../../logo.png';
 import { RouteItem, RoutePath } from '../../routes';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import AppInfoTag from '../AppInfoTag/AppInfoTag';
-import NestedSidebarNav from '../NestedSidebarNav/NestedSidebarNav';
 import './Sidebar.scss';
 import SidebarContainer from './SidebarContainer';
 import SidebarItem from './SidebarItem';
-import {Popup} from 'semantic-ui-react';
 import {useNavCollapsed} from '../../hooks/PagePreferenceHooks';
-import SidebarCollapsedItem from './SidebarCollapsedItem';
 import SidebarItemWithChildren from './SidebarItemWithChildren';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   const authorizedUserState = useAuthorizedUserState();
   const location = useLocation();
   const [openedMenu, setOpenedMenu] = useState('');
-  const [isNavCollapsed, setIsNavCollapsed] = useNavCollapsed();
+  const [isNavCollapsed] = useNavCollapsed();
   const activeItem = useHookstate('');
 
   useEffect(() => {
