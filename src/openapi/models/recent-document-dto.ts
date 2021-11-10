@@ -13,61 +13,44 @@
  */
 
 
+import { DocumentSpaceResponseDto } from './document-space-response-dto';
 
 /**
  * 
  * @export
- * @interface DocumentDto
+ * @interface RecentDocumentDto
  */
-export interface DocumentDto {
+export interface RecentDocumentDto {
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof RecentDocumentDto
+     */
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecentDocumentDto
      */
     key: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
+     * @memberof RecentDocumentDto
      */
-    path: string;
+    parentFolderId: string;
     /**
      * 
      * @type {string}
-     * @memberof DocumentDto
-     */
-    spaceId: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DocumentDto
-     */
-    spaceName?: string;
-    /**
-     * Size in bytes
-     * @type {number}
-     * @memberof DocumentDto
-     */
-    size: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof DocumentDto
+     * @memberof RecentDocumentDto
      */
     lastModifiedDate: string;
     /**
      * 
-     * @type {string}
-     * @memberof DocumentDto
+     * @type {DocumentSpaceResponseDto}
+     * @memberof RecentDocumentDto
      */
-    lastModifiedBy: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DocumentDto
-     */
-    folder?: boolean;
+    documentSpace: DocumentSpaceResponseDto;
 }
 
 

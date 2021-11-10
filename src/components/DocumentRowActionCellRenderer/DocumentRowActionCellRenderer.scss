@@ -8,7 +8,7 @@
     cursor: pointer;
   }
   &__popper {
-    .popup {
+    &.popup {
       padding: 10px 0;
     }
     &.popup:before {

@@ -6,13 +6,8 @@
   &__nav-menu {
     flex: 0 0 220px;
     background: #1C3E6B;
-    //min-height: 100vh;
     position: sticky;
     transition: flex 100ms ease-in-out;
-    //.mobile & {
-    //  min-height: 100%;
-    //  height: calc(100vh - 80px);
-    //}
     &-il2 {
       background: #0A4638;
     }
@@ -55,13 +50,8 @@
   }
 
   &__page-body {
-    //height: 100vh;
     display: flex;
     flex-direction: column;
-    //.mobile & {
-    //  min-height: 100%;
-    //  height: calc(100vh - 80px);
-    //}
   }
   .page-body {
     &__title-section {

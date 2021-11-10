@@ -13,19 +13,20 @@
  */
 
 
+import { RecentDocumentDto } from './recent-document-dto';
 
 /**
  * 
  * @export
- * @interface DocumentSpacePathDto
+ * @interface RecentDocumentDtoResponseWrapper
  */
-export interface DocumentSpacePathDto {
+export interface RecentDocumentDtoResponseWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof DocumentSpacePathDto
+     * @type {Array<RecentDocumentDto>}
+     * @memberof RecentDocumentDtoResponseWrapper
      */
-    path: string;
+    data: Array<RecentDocumentDto>;
 }
 
 

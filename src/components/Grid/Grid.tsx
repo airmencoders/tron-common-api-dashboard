@@ -1,6 +1,6 @@
 import { useHookstate } from '@hookstate/core';
 import { GridApi } from 'ag-grid-community';
-import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent } from 'ag-grid-community/dist/lib/events';
+import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent, SelectionChangedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
 import './Grid.scss';
@@ -99,6 +99,20 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     props.onRowSelected?.(data, isSelected ? 'selected' : 'unselected');
   }
 
+  function onSelectionChanged(event: SelectionChangedEvent) {
+    if (props.rowSelection !== 'single') {
+      return;
+    }
+    
+    const data = event.api.getSelectedNodes();
+
+    if (data.length > 0) {
+      props.onSelectionChanged?.(data[0].data);
+    } else {
+      props.onSelectionChanged?.();
+    }
+  }
+
   return (
       <div className={`grid-component ${props.className}`}
            style={{ width: '100%', height: props.height ?? '60vh'}}
@@ -127,6 +141,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                 getRowNodeId={props.getRowNodeId}
                 immutableData={props.immutableData}
                 suppressCellSelection={props.suppressCellSelection}
+                onSelectionChanged={onSelectionChanged}
             >
               {
                 props.columns.map(col => (

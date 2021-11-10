@@ -41,7 +41,6 @@ function PageFormat(props: any) {
   useEffect(() => {
     appInfoService.fetchVersion();
   }, []);
-  console.log(windowSize);
   return (
       <div className={`page-format ${props.className ?? ''}`}>
         <div className={`page-format__nav-menu ${getBackgroundClass()} 

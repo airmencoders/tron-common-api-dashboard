@@ -8,6 +8,7 @@ import './BreadCrumbTrail.scss';
 export interface BreadCrumbTrailProps {
   path: string;
   onNavigate: (path: string) => void;
+  rootName?: string;
 }
 
 export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
@@ -50,14 +51,17 @@ export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
     <div className='breadcrumb-bar'>
       <div className='breadcrumb-root-item'>
         <FolderIcon />
-        <Button type='button'
-          id='path_element_root'
-          data-testid='path_element_root'
-          unstyled
-          onClick={() => props.onNavigate('')}
-        >
-          <span className='breadcrumb-bar-link'>My Folders</span>
-        </Button>
+        {pathState.value.length > 0 || lastElement.value ?
+          <Button type='button'
+            id='path_element_root'
+            data-testid='path_element_root'
+            unstyled
+            onClick={() => props.onNavigate('')}
+          >
+            <span className='breadcrumb-bar-link'>{props.rootName ?? 'My Folders'}</span>
+          </Button> :
+          <span data-testid='path_element_root' className='breadcrumb-bar--root-only'>{props.rootName ?? 'My Folders'}</span>
+        }
       </div>
       {
         pathState.get()
