@@ -6,11 +6,10 @@
   &__nav-menu {
     flex: 0 0 220px;
     background: #1C3E6B;
-    min-height: 100vh;
     position: sticky;
-
+    transition: flex 100ms ease-in-out;
     &-il2 {
-      background: #0A4638; 
+      background: #0A4638;
     }
 
     &-il4 {
@@ -24,6 +23,24 @@
         padding-left: calculateRem(15px);
         padding-bottom: calculateRem(23px);
       }
+      &__collapse-toggle {
+        position: absolute;
+        bottom: calculateRem(27px);
+        right: 0px;
+      }
+    }
+    &--collapsed {
+      flex: 0 0 60px;
+      overflow: hidden;
+
+      .sidebar {
+        &__logo-section {
+          visibility: hidden;
+        }
+      }
+      .nav-menu__user-info {
+        display: none;
+      }
     }
   }
   &__page-body-container {
@@ -33,7 +50,6 @@
   }
 
   &__page-body {
-    height: 100vh;
     display: flex;
     flex-direction: column;
   }

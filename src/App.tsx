@@ -14,6 +14,7 @@ import {NotAuthorizedPage} from './pages/NotAuthorized/NotAuthorizedPage';
 import {ToastContainer} from './components/Toast/ToastContainer/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import ApiTestPage from './pages/ApiTest/ApiTestPage';
+import { isMobile } from 'react-device-detect';
 
 function App() {
   const authorizedUserState = useAuthorizedUserState();
@@ -23,7 +24,7 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className={`App ${isMobile ? 'mobile' : ''}`}>
       <AppWithLoading isLoading={authorizedUserState.isPromised} />
 
       <ToastContainer
