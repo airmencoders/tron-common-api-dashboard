@@ -177,7 +177,7 @@ function DocumentSpacePage() {
     path: '',
     showDeleteSelectedDialog: false,
     isDefaultDocumentSpaceSettingsOpen: false,
-    sideDrawerSize: SideDrawerSize.NORMAL,
+    sideDrawerSize: SideDrawerSize.WIDE,
   });
 
   const location = useLocation();

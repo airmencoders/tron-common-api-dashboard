@@ -8,7 +8,7 @@ import {DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface} from '.
 import DocumentSpaceMembershipService from '../../../../state/document-space/document-space-membership-service';
 import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
 
-jest.mock('../../../state/document-space/document-space-state');
+jest.mock('../../../../state/document-space/document-space-state');
 describe('Document Delete Tests', () => {
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let membershipService: DocumentSpaceMembershipService;

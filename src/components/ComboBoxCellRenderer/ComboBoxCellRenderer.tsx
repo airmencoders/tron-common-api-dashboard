@@ -29,6 +29,7 @@ function ComboxBoxCellRenderer(props: Partial<ICellRendererParams> & ComboBoxCel
         id={`combobox-${props.node?.data?.id}`}
         name={`combobox-${props.node?.data?.id}`}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleSelectionChange(event.currentTarget.value)}
+        data-testid={`combobox-chooser`}
         defaultValue={props.selectedItem(data)}
       >
         {props.items.map((item) => (

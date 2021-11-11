@@ -7,7 +7,7 @@ import { documentSpaceMembershipService } from '../../../../state/document-space
 import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceMembershipsForm from '../DocumentSpaceMembershipsForm';
 
-jest.mock('../../../state/document-space/document-space-state');
+jest.mock('../../../../state/document-space/document-space-state');
 
 describe('Document Space Membership Form Test', () => {
   const documentSpaceId = 'b8529a48-a61c-45a7-b0d1-2eb5d429d3bf';
@@ -32,7 +32,7 @@ describe('Document Space Membership Form Test', () => {
       />
     );
 
-    expect(page.queryByText('Add Member')).toBeInTheDocument();
+    expect(page.queryByText('Add New Member')).toBeInTheDocument();
   });
 
   it('should show email validation', () => {
@@ -43,7 +43,7 @@ describe('Document Space Membership Form Test', () => {
       />
     );
 
-    expect(page.queryByText('Add Member')).toBeInTheDocument();
+    expect(page.queryByText('Add New Member')).toBeInTheDocument();
     const emailField = page.getByLabelText('Email');
     expect(emailField).toBeInTheDocument();
 
@@ -79,13 +79,13 @@ describe('Document Space Membership Form Test', () => {
     });
     const addMemberSpy = jest.spyOn(membershipService, 'addDocumentSpaceMember').mockImplementation(response);
 
-    expect(page.queryByText('Add Member')).toBeInTheDocument();
+    expect(page.queryByText('Add New Member')).toBeInTheDocument();
 
     const emailField = page.getByLabelText('Email');
     expect(emailField).toBeInTheDocument();
     userEvent.type(emailField, 'test@email.com');
 
-    const readPrivilegeCheckbox = page.getByLabelText('WRITE');
+    const readPrivilegeCheckbox = page.getByLabelText('Editor');
     expect(readPrivilegeCheckbox).toBeInTheDocument();
     userEvent.click(readPrivilegeCheckbox);
 
@@ -125,13 +125,13 @@ describe('Document Space Membership Form Test', () => {
     });
     const addMemberSpy = jest.spyOn(membershipService, 'addDocumentSpaceMember').mockImplementation(response);
 
-    expect(page.queryByText('Add Member')).toBeInTheDocument();
+    expect(page.queryByText('Add New Member')).toBeInTheDocument();
 
     const emailField = page.getByLabelText('Email');
     expect(emailField).toBeInTheDocument();
     userEvent.type(emailField, 'test@email.com');
 
-    const writePrivilegeCheckbox = page.getByLabelText('WRITE');
+    const writePrivilegeCheckbox = page.getByLabelText('Editor');
     expect(writePrivilegeCheckbox).toBeInTheDocument();
     userEvent.click(writePrivilegeCheckbox);
 

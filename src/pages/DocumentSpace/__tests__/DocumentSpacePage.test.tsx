@@ -174,7 +174,7 @@ describe('Test Document Space Page', () => {
     await waitFor(() => expect(documentSpacesSelect).toHaveValue(documentSpaces[1].id));
   });
 
-  it('should open/close Document Space Memberships modal', async () => {
+  it('should open/close Document Space Memberships side drawer', async () => {
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
@@ -204,15 +204,14 @@ describe('Test Document Space Page', () => {
     const membersButton = page.getByTitle('Manage Users');
     expect(membersButton).toBeInTheDocument();
 
-    // Open the modal
+    // Open the panel
     userEvent.click(membersButton);
-    expect(page.getByText('Member Management')).toBeInTheDocument();
+    await waitFor(() => expect(page.getByText('Add Member')).toBeVisible());
 
-    // close the modal
+    // close the panel
     const closeButton = page.getByText('Close');
     expect(closeButton).toBeInTheDocument();
     userEvent.click(closeButton);
-    expect(page.queryByText('Member Management')).not.toBeInTheDocument();
   });
 
   describe('Test error behaviors for document space privilege retrieval', () => {

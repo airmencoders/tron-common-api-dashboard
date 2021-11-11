@@ -1,6 +1,7 @@
 import { none, useHookstate } from '@hookstate/core';
 import { IDatasource } from 'ag-grid-community';
 import React, { FormEvent, useEffect, useRef } from 'react';
+import { NumberTypeNodeParser } from 'ts-json-schema-generator';
 import Button from '../../../components/Button/Button';
 import ComboBoxCellRenderer, {
   ComboBoxCellRendererProps
@@ -50,15 +51,16 @@ interface DocumentSpaceMembershipsState {
     showUpdateFailMessage: boolean;
     showUpdateSuccessMessage: boolean;
   };
+  selectedTab: number;
 }
 
 export interface BatchUploadState {
   successErrorState: SuccessErrorMessageProps;
 }
 
-const ADMIN_PRIV_NAME = 'Admin';
-const EDITOR_PRIV_NAME = 'Editor';
-const VIEWER_PRIV_NAME = 'Viewer';
+export const ADMIN_PRIV_NAME = 'Admin';
+export const EDITOR_PRIV_NAME = 'Editor';
+export const VIEWER_PRIV_NAME = 'Viewer';
 
 // converts backend priv names to friendlier names for UI/users per mocks
 export function resolvePrivName(privName: string): string {
@@ -72,6 +74,7 @@ export function resolvePrivName(privName: string): string {
 }
 
 // converts friendly priv names from the UI to the needed one(s) for the backend
+//  it also gives any of the "free" implicit ones that come with a higher privilege (e.g. ADMIN gives EDITOR AND VIEWER)
 export function unResolvePrivName(privName: string): DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum[] {
   if (privName === ADMIN_PRIV_NAME) {
     return [ DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write ];
@@ -91,6 +94,7 @@ const membershipColumns: GridColumn[] = [
   new GridColumn({
     field: 'email',
     headerName: 'Email',
+    checkboxSelection: true,
     resizable: true,
     sortable: true,
   }),
@@ -128,13 +132,14 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
       showUpdateFailMessage: false,
       showUpdateSuccessMessage: false,
     },
+    selectedTab: 0
   });
 
   const mountedRef = useRef(false);
 
   useEffect(() => {
     mountedRef.current = true;
-
+    pageState.merge({ selectedTab : 0 });
     return function cleanup() {
       mountedRef.current = false;
     };
@@ -143,6 +148,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
   useEffect(() => {
     resetMemberState();
     resetBatchUploadState();
+    pageState.merge({ selectedTab : 0 });
   }, [props.isOpen]);
 
   useEffect(() => {
@@ -316,6 +322,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     ];
   }
 
+
   return (
     <SideDrawer
       size={SideDrawerSize.NORMAL}
@@ -338,8 +345,10 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
       onCloseHandler={props.onCloseHandler}
     >
       <TabBar
+        selectedIndex={pageState.selectedTab.get()}
         items={[
           {
+            onClick: () => pageState.selectedTab.set(0),
             text: 'Add Member',
             content: (
               <React.Fragment>
@@ -359,66 +368,70 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
             ),
           },
           {
+            onClick: () => pageState.selectedTab.set(1),
             text: 'Manage Members',
             content: (
                 pageState.datasourceState.datasource.value && (
                   <Form onSubmit={saveMembers} className="edit-members-form">
-                  <div className="document-space-members">                           
-                    <div className="document-space-members__header">
-                      <h4 className="header__title">Members</h4>
-                      <div className="header__actions">
-                        <Button
-                          disableMobileFullWidth
-                          type={'button'}
-                          disabled={pageState.membersState.selected.value.length === 0}
-                          onClick={() => pageState.membersState.deletionState.isConfirmationOpen.set(true)}
-                          unstyled
-                          transparentOnDisabled
-                          className="actions__remove-button"
-                        >
-                          <RemoveIcon
-                            iconTitle="Remove Selected Members"
-                            disabled={pageState.membersState.selected.value.length === 0}
-                            size={1.5}
-                          />
-                        </Button>
+                    <div className="document-space-members">                           
+                      <div className="document-space-members__header">
+                        <h4 className="header__title">Assigned Members</h4>
+                        {
+                          pageState.membersState.selected.length > 0 && <div className="header__actions">
+                            <Button
+                              disableMobileFullWidth
+                              type={'button'}
+                              disabled={pageState.membersState.selected.value.length === 0}
+                              onClick={() => pageState.membersState.deletionState.isConfirmationOpen.set(true)}
+                              unstyled
+                              transparentOnDisabled
+                              className="actions__remove-button"
+                            >
+                              <RemoveIcon
+                                iconTitle="Remove Selected Members"
+                                disabled={pageState.membersState.selected.value.length === 0}
+                                size={1.5}                              
+                              />
+                              Remove Selected
+                            </Button>
+                          </div>
+                        } 
                       </div>
+                      <InfiniteScrollGrid
+                        columns={renderMembershipColumns()}
+                        datasource={pageState.datasourceState.datasource.value}
+                        cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
+                        maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
+                        maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
+                        suppressCellSelection
+                        updateDatasource={pageState.datasourceState.shouldUpdateDatasource.value}
+                        updateDatasourceCallback={onDatasourceUpdateCallback}
+                        getRowNodeId={getDashboardMemberUniqueKey}
+                        rowSelection="multiple"
+                        onRowSelected={onMemberSelectionChange}
+                      />
+                      <SuccessErrorMessage
+                        errorMessage={pageState.membersState.memberUpdateFailMessage.value}
+                        showErrorMessage={pageState.membersState.showUpdateFailMessage.value}
+                        showSuccessMessage={pageState.membersState.showUpdateSuccessMessage.value}
+                        successMessage={pageState.membersState.memberUpdateSuccessMessage.value}
+                        showCloseButton={true}
+                      />
+                      <SubmitActions
+                        onCancel={props.onCloseHandler}
+                        cancelButtonLabel="Close"
+                        formActionType={FormActionType.UPDATE}
+                        isFormValid={true}
+                        isFormModified={pageState.membersState.membersToUpdate.length > 0}
+                        isFormSubmitting={pageState.membersState.submitting.value}
+                      />
                     </div>
-                    <InfiniteScrollGrid
-                      columns={renderMembershipColumns()}
-                      datasource={pageState.datasourceState.datasource.value}
-                      cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
-                      maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
-                      maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
-                      suppressCellSelection
-                      updateDatasource={pageState.datasourceState.shouldUpdateDatasource.value}
-                      updateDatasourceCallback={onDatasourceUpdateCallback}
-                      getRowNodeId={getDashboardMemberUniqueKey}
-                      rowSelection="multiple"
-                      onRowSelected={onMemberSelectionChange}
+                    <DocumentSpaceMembershipsDeleteConfirmation
+                      onMemberDeleteConfirmationSubmit={onMemberDeleteConfirmation}
+                      onCancel={() => pageState.membersState.deletionState.isConfirmationOpen.set(false)}
+                      show={pageState.membersState.deletionState.isConfirmationOpen.value}
+                      selectedMemberCount={pageState.membersState.selected.value.length}
                     />
-                    <SuccessErrorMessage
-                      errorMessage={pageState.membersState.memberUpdateFailMessage.value}
-                      showErrorMessage={pageState.membersState.showUpdateFailMessage.value}
-                      showSuccessMessage={pageState.membersState.showUpdateSuccessMessage.value}
-                      successMessage={pageState.membersState.memberUpdateSuccessMessage.value}
-                      showCloseButton={true}
-                    />
-                    <SubmitActions
-                      onCancel={props.onCloseHandler}
-                      cancelButtonLabel="Close"
-                      formActionType={FormActionType.UPDATE}
-                      isFormValid={true}
-                      isFormModified={pageState.membersState.membersToUpdate.length > 0}
-                      isFormSubmitting={pageState.membersState.submitting.value}
-                    />
-                  </div>
-                  <DocumentSpaceMembershipsDeleteConfirmation
-                    onMemberDeleteConfirmationSubmit={onMemberDeleteConfirmation}
-                    onCancel={() => pageState.membersState.deletionState.isConfirmationOpen.set(false)}
-                    show={pageState.membersState.deletionState.isConfirmationOpen.value}
-                    selectedMemberCount={pageState.membersState.selected.value.length}
-                  />
                 </Form>)
             ),
           },
