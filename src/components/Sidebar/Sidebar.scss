@@ -1,11 +1,56 @@
 @import "../../styles/base";
 
 .sidebar {
+  &-container {
+    &:hover {
+      cursor: pointer;
+    }
+  }
   &__logo-section {
     text-align: center;
     img {
       margin-top: calculateRem(28px);
       margin-bottom: calculateRem(10px);
+    }
+  }
+
+  &__nav-popup.popup.ui {
+    margin-left: 5px;
+    &:before {
+      display: none;
+    }
+    .sidebar-item {
+      &__container {
+        padding: 8px 10px;
+        &:hover {
+          background-color: $highlight-color-confirm;
+        }
+        .container__name {
+          color: $font-color-primary;
+          font-size: calculateRem(16px);
+        }
+      }
+    }
+  }
+
+  &__items {
+    &--collapsed {
+      .container__icon {
+        display: none;
+      }
+      .container__name {
+        color: $font-color-tertiary;
+      }
+      .sidebar-item--active .sidebar-item__container > * {
+        color: $font-color-primary;
+      }
+      .sidebar-item--active-border .sidebar-item__container {
+        border: none;
+      }
+      .sidebar-item__container {
+        padding-top: calculateRem(6px);
+        padding-bottom: calculateRem(6px);
+      }
     }
   }
 }

@@ -20,7 +20,7 @@ import RecordIcon from './icons/RecordIcon';
 import AppsIcon from './icons/AppsIcon';
 import DigitizeIcon from './icons/DigitizeIcon';
 import SystemIcon from './icons/SystemIcon';
-import PuzzleIcon from './icons/PuzzleIcon';
+import DocSpaceIcon from './icons/DocSpaceIcon';
 import DocumentSpaceRecentsPage from './pages/DocumentSpace/Recents/DocumentSpaceRecentsPage';
 import DocumentSpaceArchivedItemsPage from "./pages/DocumentSpace/DocumentSpaceArchivedItemsPage";
 
@@ -190,7 +190,7 @@ export const routes: RouteItem[] = [
               ]
             }
         ],
-        icon: PuzzleIcon
+        icon: DocSpaceIcon
     },
     {
         path: '#',
