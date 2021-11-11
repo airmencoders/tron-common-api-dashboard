@@ -48,7 +48,7 @@ import DeleteDocumentDialog from './DocumentDelete';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
-import DocumentSpaceMemberships from './DocumentSpaceMemberships';
+import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
 import DocumentUploadDialog from './DocumentUploadDialog';
@@ -869,6 +869,7 @@ function DocumentSpacePage() {
             documentSpaceId={pageState.selectedSpace.value.id}
             isOpen={pageState.membershipsState.isOpen.value}
             onSubmit={() => pageState.membershipsState.isOpen.set(false)}
+            onCloseHandler={() => pageState.membershipsState.isOpen.set(false)}
           />
         )}
     </PageFormat>

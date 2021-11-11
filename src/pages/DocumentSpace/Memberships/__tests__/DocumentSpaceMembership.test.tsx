@@ -1,9 +1,9 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from '../../../openapi';
-import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
-import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
-import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
+import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from '../../../../openapi';
+import DocumentSpaceMembershipService from '../../../../state/document-space/document-space-membership-service';
+import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
+import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceMemberships from '../DocumentSpaceMemberships';
 
 jest.mock('../../../state/document-space/document-space-state');
@@ -28,6 +28,7 @@ describe('Document Space Membership Test', () => {
         documentSpaceId={documentSpaceId}
         onSubmit={onSubmit}
         isOpen={false}
+        onCloseHandler={jest.fn()}
       />
     );
 
@@ -42,6 +43,7 @@ describe('Document Space Membership Test', () => {
         documentSpaceId={documentSpaceId}
         onSubmit={onSubmit}
         isOpen={true}
+        onCloseHandler={jest.fn()}
       />
     );
 
@@ -55,6 +57,7 @@ describe('Document Space Membership Test', () => {
         documentSpaceId={documentSpaceId}
         onSubmit={onSubmit}
         isOpen={true}
+        onCloseHandler={jest.fn()}
       />
     );
 
@@ -70,6 +73,7 @@ describe('Document Space Membership Test', () => {
         documentSpaceId={documentSpaceId}
         onSubmit={onSubmit}
         isOpen={true}
+        onCloseHandler={jest.fn()}
       />
     );
 

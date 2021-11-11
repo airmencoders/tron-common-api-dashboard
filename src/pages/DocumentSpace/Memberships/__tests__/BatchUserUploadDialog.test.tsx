@@ -3,10 +3,10 @@ import {MemoryRouter} from 'react-router-dom';
 import BatchUserUploadDialog from '../BatchUserUploadDialog';
 import {createState} from '@hookstate/core';
 import {BatchUploadState} from '../DocumentSpaceMemberships';
-import {createAxiosSuccessResponse} from '../../../utils/TestUtils/test-utils';
-import {DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface} from '../../../openapi';
-import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
-import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
+import {createAxiosSuccessResponse} from '../../../../utils/TestUtils/test-utils';
+import {DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface} from '../../../../openapi';
+import DocumentSpaceMembershipService from '../../../../state/document-space/document-space-membership-service';
+import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
 
 jest.mock('../../../state/document-space/document-space-state');
 describe('Document Delete Tests', () => {

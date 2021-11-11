@@ -3,22 +3,24 @@ import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
 import React, { ChangeEvent, FormEvent } from 'react';
-import Checkbox from '../../components/forms/Checkbox/Checkbox';
-import Form from '../../components/forms/Form/Form';
-import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
-import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
-import { SuccessErrorMessageProps } from '../../components/forms/SuccessErrorMessage/SuccessErrorMessageProps';
-import TextInput from '../../components/forms/TextInput/TextInput';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum } from '../../openapi';
-import { FormActionType } from '../../state/crud-page/form-action-type';
-import { documentSpaceMembershipService } from '../../state/document-space/document-space-state';
-import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified, validateEmail, validateRequiredString, validationErrors } from '../../utils/validation-utils';
+import Checkbox from '../../../components/forms/Checkbox/Checkbox';
+import Form from '../../../components/forms/Form/Form';
+import FormGroup from '../../../components/forms/FormGroup/FormGroup';
+import SubmitActions from '../../../components/forms/SubmitActions/SubmitActions';
+import SuccessErrorMessage from '../../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import { SuccessErrorMessageProps } from '../../../components/forms/SuccessErrorMessage/SuccessErrorMessageProps';
+import TextInput from '../../../components/forms/TextInput/TextInput';
+import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
+import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum } from '../../../openapi';
+import { FormActionType } from '../../../state/crud-page/form-action-type';
+import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
+import { getEnumKeyByEnumValue } from '../../../utils/enum-utils';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
+import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified, validateEmail, validateRequiredString, validationErrors } from '../../../utils/validation-utils';
 import { DocumentSpaceMembershipsFormProps } from './DocumentSpaceMembershipsFormProps';
+import './DocumentSpaceMembershipsForm.scss';
+import { resolvePrivName } from './DocumentSpaceMemberships';
 
 interface DocumentSpaceMembershipFormState {
   member: DocumentSpaceDashboardMemberRequestDto;
@@ -126,7 +128,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
   }
 
   return (
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={onSubmit} className='add-members-form'>
       <h4>Add Member</h4>
       <FormGroup
         labelName="email"
@@ -165,7 +167,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
                 key={value}
                 id={`privilege_${value}`}
                 name={value}
-                label={<>{value}</>}
+                label={resolvePrivName(value)}
                 checked={membershipState.member.privileges.value.find(privilege => privilege === value) ? true : false}
                 onChange={onPrivilegeChange}
                 disabled={membershipState.formState.isSubmitting.value}
@@ -184,6 +186,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
         onCloseClicked={membershipState.formState.onCloseClicked.value}
       />
       <SubmitActions
+        onCancel={props.onCloseHandler}
         formActionType={FormActionType.ADD}
         isFormValid={!failsHookstateValidation(membershipState.member)}
         isFormModified={isFormModified(membershipState.originalMember.value, membershipState.member.value)}
