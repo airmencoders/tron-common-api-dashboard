@@ -256,7 +256,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
   //  e.g. WRITE priv would result from a set containing [ READ, WRITE ]..
   function getHighestPrivForMember(data: DocumentSpaceDashboardMemberResponseDto): string {
     if (!data) return '';
-    console.log(data)
+
     if (data.privileges.find((item) => item.type === DocumentSpacePrivilegeDtoTypeEnum.Membership))
       return resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership);
     else if (data.privileges.find((item) => item.type === DocumentSpacePrivilegeDtoTypeEnum.Write))
