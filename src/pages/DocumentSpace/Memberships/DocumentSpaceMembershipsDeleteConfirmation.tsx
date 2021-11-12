@@ -1,7 +1,7 @@
 import React from 'react';
-import Modal from '../../components/Modal/Modal';
-import ModalFooterSubmit from '../../components/Modal/ModalFooterSubmit';
-import WarningIcon from '../../icons/WarningIcon';
+import Modal from '../../../components/Modal/Modal';
+import ModalFooterSubmit from '../../../components/Modal/ModalFooterSubmit';
+import WarningIcon from '../../../icons/WarningIcon';
 import { DocumentSpaceMembershipsDeleteConfirmationProps } from './DocumentSpaceMembershipsDeleteConfirmationProps';
 import './DocumentSpaceMembershipsDeleteConfirmation.scss';
 

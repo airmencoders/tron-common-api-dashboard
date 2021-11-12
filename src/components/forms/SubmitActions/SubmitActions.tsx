@@ -11,10 +11,10 @@ function SubmitActions(props: SubmitActionsProps) {
   return (
       <div className="submit-actions button-container">
         {props.onCancel && variant === 1 &&
-          <Button type="button" onClick={props.onCancel} transparentBackground unstyled>Cancel</Button>
+          <Button type="button" onClick={props.onCancel} transparentBackground unstyled>{props.cancelButtonLabel ?? 'Cancel'}</Button>
         }
         {props.onCancel && variant === 2 &&
-          <Button type="button" onClick={props.onCancel} outline style={{backgroundColor: "#fff", color: '#5F96EA', boxShadow: 'none', border: '1px solid #E5E5E5'}}>Cancel</Button>
+          <Button type="button" onClick={props.onCancel} outline style={{backgroundColor: "#fff", color: '#5F96EA', boxShadow: 'none', border: '1px solid #E5E5E5'}}>{props.cancelButtonLabel ?? 'Cancel'}</Button>
         }
         <Button
             type="submit"

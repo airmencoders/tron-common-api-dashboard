@@ -1,4 +1,5 @@
-@import "../../styles/mixins";
+@import "../../../styles/mixins";
+@import "../../../styles/colors";
 
 .document-space-members {
   &__header {
@@ -20,4 +21,16 @@
       }
     }
   }
+}
+
+.edit-members-form {
+  width: 100%;
+  min-width: 100%;
+}
+
+.pre-title-icon {
+  padding: 4px 4px 4px 4px;
+  border: 1px solid #E5E5E5;
+  border-radius: 4;
+  margin-right: 14px;
 }

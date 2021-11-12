@@ -10,4 +10,5 @@ export interface SideDrawerProps {
   size?: SideDrawerSize;
   titleStyle?: React.CSSProperties;
   preTitleNode?: React.ReactNode;
+  postTitleNode?: React.ReactNode;
 }

@@ -3,21 +3,22 @@ import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
 import React, { ChangeEvent, FormEvent } from 'react';
-import Checkbox from '../../components/forms/Checkbox/Checkbox';
-import Form from '../../components/forms/Form/Form';
-import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
-import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
-import { SuccessErrorMessageProps } from '../../components/forms/SuccessErrorMessage/SuccessErrorMessageProps';
-import TextInput from '../../components/forms/TextInput/TextInput';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum } from '../../openapi';
-import { FormActionType } from '../../state/crud-page/form-action-type';
-import { documentSpaceMembershipService } from '../../state/document-space/document-space-state';
-import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified, validateEmail, validateRequiredString, validationErrors } from '../../utils/validation-utils';
+import Checkbox from '../../../components/forms/Checkbox/Checkbox';
+import Form from '../../../components/forms/Form/Form';
+import FormGroup from '../../../components/forms/FormGroup/FormGroup';
+import SubmitActions from '../../../components/forms/SubmitActions/SubmitActions';
+import SuccessErrorMessage from '../../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
+import { SuccessErrorMessageProps } from '../../../components/forms/SuccessErrorMessage/SuccessErrorMessageProps';
+import TextInput from '../../../components/forms/TextInput/TextInput';
+import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
+import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum } from '../../../openapi';
+import { FormActionType } from '../../../state/crud-page/form-action-type';
+import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
+import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified, validateEmail, validateRequiredString, validationErrors } from '../../../utils/validation-utils';
+import { ADMIN_PRIV_NAME, EDITOR_PRIV_NAME, resolvePrivName, unResolvePrivName } from './DocumentSpaceMemberships';
+import './DocumentSpaceMembershipsForm.scss';
 import { DocumentSpaceMembershipsFormProps } from './DocumentSpaceMembershipsFormProps';
 
 interface DocumentSpaceMembershipFormState {
@@ -101,16 +102,11 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
   }
 
   function onPrivilegeChange(event: ChangeEvent<HTMLInputElement>) {
-    const enumVal = getEnumKeyByEnumValue(DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum, event.target.name);
-    if (enumVal == null) {
-      throw new Error('Document Space Privilege Enum does not exist');
-    }
-
     if (event.target.checked) {
-      membershipState.member.privileges.merge([DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum[enumVal]]);
+      membershipState.member.privileges.set(unResolvePrivName(resolvePrivName(event.target.name))); // will grant the selected priv and any below it
     } else {
       membershipState.member.privileges.merge(prev => {
-        const existingPrivilegeIndex = prev.findIndex(privilege => privilege === DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum[enumVal]);
+        const existingPrivilegeIndex = prev.findIndex(privilege => privilege === event.target.name);
 
         return {
           [existingPrivilegeIndex]: none
@@ -124,10 +120,10 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
       privileges: true
     });
   }
-
+  
   return (
-    <Form onSubmit={onSubmit}>
-      <h4>Add Member</h4>
+    <Form onSubmit={onSubmit} className='add-members-form'>
+      <h4>Add New Member</h4>
       <FormGroup
         labelName="email"
         labelText="Email"
@@ -158,21 +154,23 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
         errorMessages={generateStringErrorMessages(membershipState.member.privileges)}
         required
       >
-        {
-          Object.values(DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum).map(value => {
-            return (
-              <Checkbox
-                key={value}
-                id={`privilege_${value}`}
-                name={value}
-                label={<>{value}</>}
-                checked={membershipState.member.privileges.value.find(privilege => privilege === value) ? true : false}
-                onChange={onPrivilegeChange}
-                disabled={membershipState.formState.isSubmitting.value}
-              />
-            );
-          })
-        }
+        <Checkbox
+          id="privilege_MEMBERSHIP"
+          name={DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership}
+          label={ADMIN_PRIV_NAME}
+          checked={!!membershipState.member.privileges.value.find(privilege => privilege === DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership)}
+          onChange={onPrivilegeChange}
+          disabled={membershipState.formState.isSubmitting.value}
+        />
+        <Checkbox
+          id="privilege_WRITE"
+          name={DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write}
+          label={EDITOR_PRIV_NAME}
+          checked={!!membershipState.member.privileges.value.find(privilege => privilege === DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write)}
+          onChange={onPrivilegeChange}
+          disabled={membershipState.formState.isSubmitting.value 
+            || !!membershipState.member.privileges.value.find(privilege => privilege === DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership)}
+        />
       </FormGroup>
 
       <SuccessErrorMessage
@@ -184,6 +182,8 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
         onCloseClicked={membershipState.formState.onCloseClicked.value}
       />
       <SubmitActions
+        onCancel={props.onCloseHandler}
+        cancelButtonLabel="Close"
         formActionType={FormActionType.ADD}
         isFormValid={!failsHookstateValidation(membershipState.member)}
         isFormModified={isFormModified(membershipState.originalMember.value, membershipState.member.value)}
