@@ -141,7 +141,13 @@ export default function DocumentSpaceArchivedItemsPage() {
     try {
       const itemsToRestore = reduceDocumentDtoListToUnique(pageState.selectedFiles.get());
       for (const item of itemsToRestore) {
-        await documentSpaceService.unArchiveItems(item.spaceId, item.items);
+        // for each item to restore, send the full path + item name to the backend
+        //  it'll need the path in case there's >1 like-named file
+        const listOfFilesWithPaths: string[] = [];
+        for (const i of item.items) {
+          listOfFilesWithPaths.push(item.path + '/' + i);
+        }
+        await documentSpaceService.unArchiveItems(item.spaceId, listOfFilesWithPaths);
       }
       createTextToast(ToastType.SUCCESS, 'Files Restored');
     }

@@ -36,6 +36,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     cancelToken: undefined,
   });
 
+  const inputKeyState = useHookstate(Date.now());
+
   function onCancelUpload(): void {
     uploadState.cancelToken.value?.cancel();
     uploadState.merge({ showDialog: false });
@@ -84,6 +86,10 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         showDialog: false,
       });
     }
+
+    // force react to re-render the hidden file input to clear its selection
+    //  contents ... stackoverflow.com/a/55495449
+    inputKeyState.set(Date.now());
   }
 
   return (
@@ -93,6 +99,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         type="file"
         onChange={(e) => handleFileSelection(e.target.files ?? new FileList())}
         ref={ref}
+        key={inputKeyState.get()}
         multiple
         style={{ display: 'none' }}
       />
