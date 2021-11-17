@@ -15,7 +15,7 @@ import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
-import { archivedItemsSpacesStates, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 
@@ -92,7 +92,6 @@ export default function DocumentSpaceArchivedItemsPage() {
   });
   const documentSpaceService = useDocumentSpaceState();
   const docSpacePrivsState = useDocumentSpacePrivilegesState();
-  const archivedDocSpaceIds = useHookstate(archivedItemsSpacesStates);
   const mountedRef = useRef(false);
 
   useEffect(() => {
@@ -102,9 +101,7 @@ export default function DocumentSpaceArchivedItemsPage() {
     return function cleanup() {
       mountedRef.current = false;
       documentSpaceService.resetState();
-      docSpacePrivsState.resetState();
-      archivedDocSpaceIds.set({});
-    };
+      docSpacePrivsState.resetState();    };
   }, []);
 
   function closeRemoveDialog(): void {
@@ -225,13 +222,7 @@ export default function DocumentSpaceArchivedItemsPage() {
 
   function checkHasWriteForDocSpace(doc: DocumentDto): boolean {
     if (!doc) return false;
-
-    if (Object.keys(archivedDocSpaceIds.get()).includes(doc.spaceId)) {
-      return archivedDocSpaceIds.value[doc.spaceId][DocumentSpacePrivilegeDtoTypeEnum.Write];
-    }
-    else {
-      return false;
-    }
+    return docSpacePrivsState.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write);
   }
 
   return (

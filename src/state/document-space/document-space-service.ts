@@ -9,7 +9,7 @@ import { createFailedDataFetchToast, createTextToast } from '../../components/To
 import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { accessDocumentSpacePrivilegesState, archivedItemsSpacesStates } from './document-space-state';
+import { accessDocumentSpacePrivilegesState, } from './document-space-state';
 
 export enum ArchivedStatus {
   ARCHIVED,
@@ -95,13 +95,12 @@ export default class DocumentSpaceService {
   async getAllArchivedItemsForUser(): Promise<S3PaginationDto> {
     const items = (await this.documentSpaceApi.getAllArchivedFilesForAuthUser()).data
     const spaceIdsList = new Set<string>();
-    const spaceIdsAndPrivs: Record<string, DocumentSpacePrivilegeDtoTypeEnum[]> = {};
     for (const entry of items.documents) {
       if (!spaceIdsList.has(entry.spaceId)) {
         spaceIdsList.add(entry.spaceId);
       }
     }
-    archivedItemsSpacesStates.set(await accessDocumentSpacePrivilegesState().fetchAndStoreDashboardUserDocumentSpacesPrivileges(spaceIdsList).promise);
+    await accessDocumentSpacePrivilegesState().fetchAndStoreDashboardUserDocumentSpacesPrivileges(spaceIdsList).promise;
     return items;
   }
 
