@@ -1,7 +1,6 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Set } from 'typescript';
 import Config from '../../api/config';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -10,6 +9,7 @@ import { createFailedDataFetchToast, createTextToast } from '../../components/To
 import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { accessDocumentSpacePrivilegesState, archivedItemsSpacesStates } from './document-space-state';
 
 export enum ArchivedStatus {
   ARCHIVED,
@@ -39,7 +39,7 @@ export default class DocumentSpaceService {
             data = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
           }
           else if (status === ArchivedStatus.ARCHIVED) {
-            data = (await this.documentSpaceApi.getAllArchivedFilesForAuthUser()).data;
+            data = (await this.getAllArchivedItemsForUser());
           }
           else {
             throw new Error('Illegal Archived Status value');
@@ -87,6 +87,22 @@ export default class DocumentSpaceService {
     }
 
     return datasource;
+  }
+
+  // helper to fetch the archived items for the archived items page
+  //  and also to go ahead and populate the archived items user privs state for
+  //  the current user
+  async getAllArchivedItemsForUser(): Promise<S3PaginationDto> {
+    const items = (await this.documentSpaceApi.getAllArchivedFilesForAuthUser()).data
+    const spaceIdsList = new Set<string>();
+    const spaceIdsAndPrivs: Record<string, DocumentSpacePrivilegeDtoTypeEnum[]> = {};
+    for (const entry of items.documents) {
+      if (!spaceIdsList.has(entry.spaceId)) {
+        spaceIdsList.add(entry.spaceId);
+      }
+    }
+    archivedItemsSpacesStates.set(await accessDocumentSpacePrivilegesState().fetchAndStoreDashboardUserDocumentSpacesPrivileges(spaceIdsList).promise);
+    return items;
   }
 
   createRecentDocumentsDatasource(infiniteScrollOptions: InfiniteScrollOptions): IDatasource {

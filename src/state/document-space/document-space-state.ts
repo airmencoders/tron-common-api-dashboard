@@ -7,6 +7,10 @@ import DocumentSpacePrivilegeService from './document-space-privilege-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 
+// holds the reduced list of document spaces with the current user's privs for that space 
+//  (so we know if the user can be offered the delete/restore functionality on the ag-grid)
+export const archivedItemsSpacesStates = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
+
 /**
  * Will take the form of:
  * {
@@ -53,4 +57,9 @@ const wrapDocumentSpacePrivilegesState = (
 export const useDocumentSpacePrivilegesState = () => wrapDocumentSpacePrivilegesState(
   documentSpaceControllerApi,
   useState(privilegeState)
+);
+
+export const accessDocumentSpacePrivilegesState = () => wrapDocumentSpacePrivilegesState(
+  documentSpaceControllerApi,
+  privilegeState
 );

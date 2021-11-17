@@ -1,12 +1,12 @@
 import { useHookstate } from '@hookstate/core';
-import { CancelTokenSource } from 'axios';
+import { AxiosError, CancelTokenSource } from 'axios';
 import React, { forwardRef } from 'react';
+import Button from '../../../components/Button/Button';
+import Modal from '../../../components/Modal/Modal';
+import ModalTitle from '../../../components/Modal/ModalTitle';
 import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import { ToastType } from '../../Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../Toast/ToastUtils/ToastUtils';
-import Modal from '../../../components/Modal/Modal';
-import ModalTitle from '../../../components/Modal/ModalTitle';
-import Button from '../../../components/Button/Button'
 import './FileUpload.scss';
 
 interface UploadState {
@@ -73,7 +73,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
 
         createTextToast(ToastType.SUCCESS, 'Upload Process completed', { autoClose: 3000 })
       } catch (e) {
-        createTextToast(ToastType.ERROR, 'Upload Process cancelled', { autoClose: 3000 })
+        createTextToast(ToastType.ERROR, (e as AxiosError).response?.data.reason ?? 'Upload Process Cancelled', { autoClose: 5000 })
       }
 
       uploadState.merge({

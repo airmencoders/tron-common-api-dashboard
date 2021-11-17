@@ -16,7 +16,7 @@ import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { archivedItemsSpacesStates, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
@@ -94,6 +94,8 @@ export default function DocumentSpaceArchivedItemsPage() {
   });
   const documentSpaceService = useDocumentSpaceState();
   const authorizedUserService = useAuthorizedUserState();
+  const docSpacePrivsState = useDocumentSpacePrivilegesState();
+  const archivedDocSpaceIds = useHookstate(archivedItemsSpacesStates);
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
   const mountedRef = useRef(false);
 
@@ -104,6 +106,8 @@ export default function DocumentSpaceArchivedItemsPage() {
     return function cleanup() {
       mountedRef.current = false;
       documentSpaceService.resetState();
+      docSpacePrivsState.resetState();
+      archivedDocSpaceIds.set({});
     };
   }, []);
 
@@ -170,11 +174,7 @@ export default function DocumentSpaceArchivedItemsPage() {
   async function loadArchivedItems() {
     pageState.datasource.set(
       documentSpaceService.createDatasource('', '', infiniteScrollOptions, ArchivedStatus.ARCHIVED)
-    );
-  }
-
-  function isAuthorizedForAction(actionType: DocumentSpacePrivilegeDtoTypeEnum) {
-    return isAdmin || pageState.privilegeState.privileges.value[actionType];
+    );    
   }
 
   function onDatasourceUpdateCallback() {
@@ -195,33 +195,52 @@ export default function DocumentSpaceArchivedItemsPage() {
   }
 
   function documentDtoColumnsWithMoreActions() {
-    return isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
-      ? [
-          ...documentDtoColumns,
-          new GridColumn({
-            valueGetter: GridColumn.defaultValueGetter,
-            headerName: 'More',
-            headerClass: 'header-center',
-            cellRenderer: DocumentRowActionCellRenderer,
-            cellRendererParams: {
-              menuItems: [
-                { title: 'Restore', icon: CircleRightArrowIcon, onClick: () => restoreItems(), isAuthorized: () => true },
-                {
-                  title: 'Permanently Delete',
-                  icon: CircleMinusIcon,
-                  onClick: () => pageState.merge({ showDeleteDialog: true }),
-                  isAuthorized: () => true
-                },
-              ],
+    // get unique list of spaceIds we see here in the archived items...
+    //  then see if this use can write or greater on each row -- which will determine if they get the 
+    //  more actions or not
+    if (!pageState.datasource.value) return documentDtoColumns;
+
+    return [
+      ...documentDtoColumns,
+      new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
+        headerName: 'More',
+        headerClass: 'header-center',
+        cellRenderer: DocumentRowActionCellRenderer,
+        cellRendererParams: {
+          menuItems: [
+            {
+              title: 'Restore',
+              icon: CircleRightArrowIcon,
+              onClick: () => restoreItems(),
+              isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
             },
-          }),
-        ]
-      : documentDtoColumns;
+            {
+              title: 'Permanently Delete',
+              icon: CircleMinusIcon,
+              onClick: () => pageState.merge({ showDeleteDialog: true }),
+              isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
+            },
+          ],
+        },
+      }),
+    ];
+  }
+
+  function checkHasWriteForDocSpace(doc: DocumentDto): boolean {
+    if (!doc) return false;
+
+    if (Object.keys(archivedDocSpaceIds.get()).includes(doc.spaceId)) {
+      return archivedDocSpaceIds.value[doc.spaceId][DocumentSpacePrivilegeDtoTypeEnum.Write];
+    }
+    else {
+      return false;
+    }
   }
 
   return (
     <PageFormat pageTitle="Document Space Archived Items">
-      {pageState.datasource.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
+      {pageState.datasource.value && (
         <InfiniteScrollGrid
           columns={documentDtoColumnsWithMoreActions()}
           datasource={pageState.datasource.value}
