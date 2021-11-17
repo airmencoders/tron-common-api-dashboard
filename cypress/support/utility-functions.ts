@@ -8,7 +8,7 @@ export default class UtilityFunctions {
       req.headers = headers;
     });
 
-    cy.visit(url);
+    return cy.visit(url);
   }
 
   /**
@@ -80,5 +80,6 @@ export enum Page {
   PUB_SUB = '/pubsub',
   AUDIT_LOG = '/audit-log',
   APP_SOURCE_METRIC = '/app-source/:id/metrics/:type/:name/:method?',
-  API_TEST = '/app-api/:apiId'
+  API_TEST = '/app-api/:apiId',
+  DOCUMENT_SPACE = '/document-space'
 }

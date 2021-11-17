@@ -1,12 +1,9 @@
 /// <reference types="Cypress" />
 
-import {apiHost, appClientApiHost, appClientDashboardApiHost, personApiBase, userInfoApiBase, adminJwt, ssoXfcc, nonAdminJwt } from "../support";
+import { apiHost, appClientDashboardApiHost, personApiBase, userInfoApiBase, adminJwt, ssoXfcc, nonAdminJwt } from "../support";
 import UtilityFunctions from '../support/utility-functions';
-import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import { cleanup, personIdsToDelete } from "../support/cleanup-helper";
 
 describe('Person can update self from dashboard', () => {
-  const userBaseUrl = appClientApiHost;
   const adminBaseUrl = apiHost;
 
   it('should allow a person to update self regardless of permissions', () => {

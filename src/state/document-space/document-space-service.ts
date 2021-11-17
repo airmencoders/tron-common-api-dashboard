@@ -1,13 +1,12 @@
 import { State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Set } from 'typescript';
 import Config from '../../api/config';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
+import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 

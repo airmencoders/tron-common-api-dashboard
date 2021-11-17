@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
 
 import { apiBase, host , adminJwt, ssoXfcc } from "../support";
-import DataCrudFormPageUtil, { AppClient, AppClientGridColId, AppSourceEmailGridColId, AppSourceEndpointGridColId, AppSourceGridColId } from '../support/data-crud-form-functions';
+import AgGridFunctions, { AppClientGridColId, AppSourceEmailGridColId, AppSourceEndpointGridColId, AppSourceGridColId } from '../support/ag-grid-functions';
+import DataCrudFormPageUtil, { AppClient } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('App Source / App Client Tests', () => {
@@ -28,14 +29,14 @@ describe('App Source / App Client Tests', () => {
     };
 
     DataCrudFormPageUtil.createAppClientAndSuccess(appClient);
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
 
     // Go to edit
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-client/*`
     }).as('appClientDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
 
     // Add admin
@@ -53,7 +54,7 @@ describe('App Source / App Client Tests', () => {
     cy.get('button').contains('Update').should('not.be.disabled').click();
     UtilityFunctions.findToastContainsMessage('Successfully updated App Client');
 
-    DataCrudFormPageUtil.clearFilterColumn(AppClientGridColId.NAME);
+    AgGridFunctions.clearFilterColumn(AppClientGridColId.NAME);
 
     // Delete it
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name, true, true, false);
@@ -67,14 +68,14 @@ describe('App Source / App Client Tests', () => {
     };
 
     DataCrudFormPageUtil.createAppClientAndSuccess(appClient);
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
 
     // Go to edit
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-client/*`
     }).as('appClientDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
 
     // Person Entity Permissions
@@ -95,7 +96,7 @@ describe('App Source / App Client Tests', () => {
     cy.get('button').contains('Update').should('not.be.disabled').click();
     UtilityFunctions.findToastContainsMessage('Successfully updated App Client');
 
-    DataCrudFormPageUtil.clearFilterColumn(AppClientGridColId.NAME);
+    AgGridFunctions.clearFilterColumn(AppClientGridColId.NAME);
 
     // Delete it
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name, true, true, false);
@@ -113,22 +114,22 @@ describe('App Source / App Client Tests', () => {
     // Go to app source page and give permission to app client
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
     const appSourceName = 'puckboard';
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-source/*`
     }).as('appSourceDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
     cy.wait('@appSourceDetails');
 
     const appSourceEndpointPath = '/events';
 
     // Give App Client access
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, false, '.endpoint-grid');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, '.endpoint-grid').click();
+    AgGridFunctions.filterColumnWithSearchValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, false, '.endpoint-grid');
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, '.endpoint-grid').click();
     UtilityFunctions.getModalContainer('Endpoint Editor').within(modalContainer => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).find(`input[type='checkbox']`).should('not.be.checked').click({ force: true });
+      AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+      AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).find(`input[type='checkbox']`).should('not.be.checked').click({ force: true });
       cy.get('button').contains('Done').should('not.be.disabled').click();
     });
 
@@ -138,12 +139,12 @@ describe('App Source / App Client Tests', () => {
 
     // Go to app client page and make sure app client has access to app source now
     UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-client/*`
     }).as('appClientDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
     cy.get('#name').should('have.value', appClient.name);
     cy.get('button').contains(appSourceName, {matchCase: false}).should('exist').click();
@@ -152,14 +153,14 @@ describe('App Source / App Client Tests', () => {
 
     // Go to app source page and revoke permission from app client
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
     cy.wait('@appSourceDetails');
 
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, false, '.endpoint-grid');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, '.endpoint-grid').click();
+    AgGridFunctions.filterColumnWithSearchValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, false, '.endpoint-grid');
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceEndpointGridColId.PATH, appSourceEndpointPath, '.endpoint-grid').click();
     UtilityFunctions.getModalContainer('Endpoint Editor').within(modalContainer => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).find(`input[type='checkbox']`).should('be.checked').click({ force: true });
+      AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+      AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).find(`input[type='checkbox']`).should('be.checked').click({ force: true });
       cy.get('button').contains('Done').should('not.be.disabled').click();
     });
 
@@ -169,15 +170,15 @@ describe('App Source / App Client Tests', () => {
 
     // Go to app client page and make sure app client no longer has access to app source
     UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
+    AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+    AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
     cy.get('#name').should('have.value', appClient.name);
     cy.get('button').contains(appSourceName).should('not.exist');
     cy.get('button').contains('Cancel').click();
 
     // Cleanup
-    DataCrudFormPageUtil.clearFilterColumn(AppClientGridColId.NAME);
+    AgGridFunctions.clearFilterColumn(AppClientGridColId.NAME);
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name, true, false, false);
   });
 
@@ -189,12 +190,12 @@ describe('App Source / App Client Tests', () => {
       UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
       const appSourceName = 'puckboard';
-      DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
+      AgGridFunctions.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
       cy.intercept({
         method: 'GET',
         path: `${apiBase}/app-source/*`
       }).as('appSourceDetails');
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+      AgGridFunctions.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
       cy.wait('@appSourceDetails');
     });
 
@@ -206,9 +207,9 @@ describe('App Source / App Client Tests', () => {
       cy.get('button').contains('Add Admin').should('not.be.disabled').click();
 
       cy.get('.admin-email-grid').within(grid => {
-        DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceEmailGridColId.ADMIN, adminEmail, false);
-        DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceEmailGridColId.ADMIN, adminEmail);
-        DataCrudFormPageUtil.clearFilterColumn(AppSourceEmailGridColId.ADMIN);
+        AgGridFunctions.filterColumnWithSearchValue(AppSourceEmailGridColId.ADMIN, adminEmail, false);
+        AgGridFunctions.getRowWithColIdContainingValue(AppSourceEmailGridColId.ADMIN, adminEmail);
+        AgGridFunctions.clearFilterColumn(AppSourceEmailGridColId.ADMIN);
       });
 
       DataCrudFormPageUtil.submitDataCrudFormUpdate();
@@ -230,12 +231,12 @@ describe('App Source / App Client Tests', () => {
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
     const appSourceName = 'puckboard';
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-source/*`
     }).as('appSourceDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
     cy.wait('@appSourceDetails');
 
     // Force it to be checked and try to change rate limit value

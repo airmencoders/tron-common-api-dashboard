@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
 
 import { apiBase, host, scratchAppApiBase , adminJwt, ssoXfcc } from "../support";
-import DataCrudFormPageUtil, { DigitizeAppsGridColId, ScratchStorageApp, ScratchStorageGridColId, ScratchStorageUser } from '../support/data-crud-form-functions';
+import AgGridFunctions, { DigitizeAppsGridColId, ScratchStorageGridColId } from '../support/ag-grid-functions';
+import DataCrudFormPageUtil, { ScratchStorageApp, ScratchStorageUser } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 function createScratchAppAndFillForm(app: ScratchStorageApp) {
@@ -42,8 +43,8 @@ function createScratchAppAndFilterExists(app: ScratchStorageApp) {
 
   cy.wait('@scratchAppCreate').then((intercept) => {
     filterColumnWithSearchValueNoRequest(ScratchStorageGridColId.ID, intercept?.response?.body.id);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(ScratchStorageGridColId.ID, intercept?.response?.body.id);
-    DataCrudFormPageUtil.clearFilterColumn(ScratchStorageGridColId.ID);
+    AgGridFunctions.getRowWithColIdContainingValue(ScratchStorageGridColId.ID, intercept?.response?.body.id);
+    AgGridFunctions.clearFilterColumn(ScratchStorageGridColId.ID);
   });
 }
 
@@ -52,7 +53,7 @@ function deleteRowWithColIdContainingValue(colId: string, value: string) {
 }
 
 function filterColumnWithSearchValueNoRequest(colId: string, searchValue: string, searchParentSelector?: string) {
-  DataCrudFormPageUtil.filterColumnWithSearchValue(colId, searchValue, false, searchParentSelector);
+  AgGridFunctions.filterColumnWithSearchValue(colId, searchValue, false, searchParentSelector);
 }
 
 /**
@@ -120,7 +121,7 @@ describe('Scratch Storage Tests', () => {
       // Try to edit the scratch app to add a user
       filterColumnWithSearchValueNoRequest(ScratchStorageGridColId.APP_NAME, scratchApp.name);
       const requestAliases = createFormRequestsToInterceptOnRowClick();
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(ScratchStorageGridColId.APP_NAME, scratchApp.name).click();
+      AgGridFunctions.getRowWithColIdContainingValue(ScratchStorageGridColId.APP_NAME, scratchApp.name).click();
       cy.wait(requestAliases);
       cy.get('#appName').should('have.value', scratchApp.name);
 
@@ -164,7 +165,7 @@ describe('Scratch Storage Tests', () => {
     // Check that Scratch App appears as one of our apps in My Digitize Page
     UtilityFunctions.clickOnPageNav(Page.MY_DIGITIZE_APPS);
     filterColumnWithSearchValueNoRequest(DigitizeAppsGridColId.APP_NAME, scratchApp.name);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(DigitizeAppsGridColId.APP_NAME, scratchApp.name);
+    AgGridFunctions.getRowWithColIdContainingValue(DigitizeAppsGridColId.APP_NAME, scratchApp.name);
     
     // Delete it
     UtilityFunctions.clickOnPageNav(Page.SCRATCH_STORAGE);

@@ -1,9 +1,8 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import {appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
+import { appClientApiHost, personApiBase, nonAdminJwt, appClientTesterXfcc } from "../support";
 import PersonSetupFunctions from '../support/person-setup-functions';
-import { cleanup } from '../support/cleanup-helper';
 
 interface FieldTest {
   fieldName: string,
