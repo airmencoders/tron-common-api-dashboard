@@ -1,7 +1,6 @@
 import { none, useHookstate } from '@hookstate/core';
 import { IDatasource } from 'ag-grid-community';
 import React, { FormEvent, useEffect, useRef } from 'react';
-import { NumberTypeNodeParser } from 'ts-json-schema-generator';
 import Button from '../../../components/Button/Button';
 import ComboBoxCellRenderer, {
   ComboBoxCellRendererProps
@@ -27,7 +26,6 @@ import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberReq
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
-import { KpiPageState } from '../../Kpi/kpi-page-state';
 import BatchUserUploadDialog from './BatchUserUploadDialog';
 import './DocumentSpaceMemberships.scss';
 import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
