@@ -14,10 +14,8 @@ import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { archivedItemsSpacesStates, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 
@@ -93,10 +91,8 @@ export default function DocumentSpaceArchivedItemsPage() {
     showDeleteDialog: false,
   });
   const documentSpaceService = useDocumentSpaceState();
-  const authorizedUserService = useAuthorizedUserState();
   const docSpacePrivsState = useDocumentSpacePrivilegesState();
   const archivedDocSpaceIds = useHookstate(archivedItemsSpacesStates);
-  const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
   const mountedRef = useRef(false);
 
   useEffect(() => {
