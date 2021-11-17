@@ -146,7 +146,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         const listOfFilesWithPaths: string[] = [];
         for (const i of item.items) {
           // If the path to these files existed at the root level
-          // then it doesn't need a trailing last after the path
+          // then it doesn't need a trailing slash after the path
           if (item.path === '/') {
             listOfFilesWithPaths.push(item.path + i);
           } else {
