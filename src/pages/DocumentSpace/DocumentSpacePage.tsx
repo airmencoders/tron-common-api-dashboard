@@ -137,7 +137,7 @@ interface DocumentSpacePageState {
 }
 
 function getDocumentUniqueKey(data: DocumentDto): string {
-  return data.key;
+  return data.path + '__' + data.key;
 }
 
 const spaceIdQueryKey = 'spaceId';
@@ -267,13 +267,15 @@ function DocumentSpacePage() {
           infiniteScrollOptions
         ),
         path,
+        selectedFiles: [],
       });
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
         queryParams.set(spaceIdQueryKey, documentSpace.id);
         history.replace({ search: queryParams.toString() });
       }
-    } catch (err) {
+    } 
+    catch (err) {
       const preparedError = prepareRequestError(err);
 
       if (!mountedRef.current) {
@@ -289,7 +291,8 @@ function DocumentSpacePage() {
       mergePageState({
         selectedSpace: undefined,
         datasource: undefined,
-        shouldUpdateDatasource: false
+        shouldUpdateDatasource: false,
+        selectedFiles: [],
       });
     }
   }
