@@ -145,7 +145,13 @@ export default function DocumentSpaceArchivedItemsPage() {
         //  it'll need the path in case there's >1 like-named file
         const listOfFilesWithPaths: string[] = [];
         for (const i of item.items) {
-          listOfFilesWithPaths.push(item.path + '/' + i);
+          // If the path to these files existed at the root level
+          // then it doesn't need a trailing last after the path
+          if (item.path === '/') {
+            listOfFilesWithPaths.push(item.path + i);
+          } else {
+            listOfFilesWithPaths.push(item.path + '/' + i);
+          }
         }
         await documentSpaceService.unArchiveItems(item.spaceId, listOfFilesWithPaths);
       }
