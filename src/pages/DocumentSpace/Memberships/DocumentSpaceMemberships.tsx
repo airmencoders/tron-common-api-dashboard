@@ -304,6 +304,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     return [
       ...membershipColumns,
       new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
         headerName: 'Permissions',
         cellRenderer: ComboBoxCellRenderer,
         cellRendererParams: {
@@ -313,6 +314,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
         } as ComboBoxCellRendererProps,
       }),
       new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
         headerName: 'Remove',
         cellRenderer: DeleteCellRenderer,
         cellRendererParams: {
