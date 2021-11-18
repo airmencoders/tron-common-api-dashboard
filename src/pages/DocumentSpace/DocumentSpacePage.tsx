@@ -48,6 +48,7 @@ import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
 import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
 import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
+import { formatDocumentSpaceDate } from '../../utils/date-utils';
 
 export enum CreateEditOperationType {
   NONE,
@@ -82,7 +83,12 @@ const documentDtoColumns: GridColumn[] = [
     field: 'lastModifiedDate',
     headerName: 'Last Modified',
     resizable: true,
-    initialWidth: 500,
+    initialWidth: 250,
+    valueFormatter: function (params: ValueFormatterParams) {
+      if (params.value) {
+        return formatDocumentSpaceDate(params.value);
+      }
+    }
   }),
   new GridColumn({
     field: 'lastModifiedBy',
