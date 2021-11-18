@@ -48,6 +48,7 @@ import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
 import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
 import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
+import GenericDialog from '../../components/GenericDialog/GenericDialog';
 
 export enum CreateEditOperationType {
   NONE,
@@ -313,6 +314,7 @@ function DocumentSpacePage() {
 
   function onDatasourceUpdateCallback() {
     pageState.shouldUpdateDatasource.set(false);
+    pageState.selectedFiles.set([]);
   }
 
   function getSpaceOptions() {
@@ -468,10 +470,10 @@ function DocumentSpacePage() {
         pageState.get().path,
         pageState.get().selectedFiles.map(item => item.key)
       );
-      createTextToast(ToastType.SUCCESS, 'File Archived');
+      createTextToast(ToastType.SUCCESS, 'Item(s) Archived');
     }
     catch (e) {
-      createTextToast(ToastType.ERROR, 'Could not archive files - ' + (e as Error).message);
+      createTextToast(ToastType.ERROR, 'Could not archive item(s) - ' + (e as Error).message);
     }
 
     pageState.merge({
@@ -642,46 +644,47 @@ function DocumentSpacePage() {
           }}
         />
         <div>
-          {pageState.selectedSpace.value != null &&
-            !documentSpacePrivilegesService.isPromised && (
-              <div className="content-controls">
-                <MobileActions
-                  selectedSpace={pageState.selectedSpace}
-                  path={pageState.nested('path')}
-                  shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-                  createEditElementOpType={pageState.createEditElementOpType}
-                  membershipsState={pageState.membershipsState}
-                />
-                <DesktopActions
-                  selectedSpace={pageState.selectedSpace}
-                  path={pageState.nested('path')}
-                  shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-                  createEditElementOpType={pageState.createEditElementOpType}
-                  membershipsState={pageState.membershipsState}
-                  selectedFiles={pageState.selectedFiles}
-                  showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
-                />
-              </div>
-            )}
+          {pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised && (
+            <div className="content-controls">
+              <MobileActions
+                selectedSpace={pageState.selectedSpace}
+                path={pageState.nested('path')}
+                shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+                createEditElementOpType={pageState.createEditElementOpType}
+                membershipsState={pageState.membershipsState}
+              />
+              <DesktopActions
+                selectedSpace={pageState.selectedSpace}
+                path={pageState.nested('path')}
+                shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+                createEditElementOpType={pageState.createEditElementOpType}
+                membershipsState={pageState.membershipsState}
+                selectedFiles={pageState.selectedFiles}
+                showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
+              />
+            </div>
+          )}
         </div>
       </div>
       {pageState.selectedSpace.value != null &&
         pageState.datasource.value &&
-        documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Read) && (
-          <InfiniteScrollGrid
+        documentSpacePrivilegesService.isAuthorizedForAction(
+          pageState.selectedSpace.value.id,
+          DocumentSpacePrivilegeDtoTypeEnum.Read
+        ) && (
+          <InfiniteScrollGrid            
             columns={documentDtoColumnsWithConditionalDelete()}
             datasource={pageState.datasource.value}
             cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
             maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
-            maxConcurrentDatasourceRequests={
-              infiniteScrollOptions.maxConcurrentDatasourceRequests
-            }
+            maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
             suppressCellSelection
             updateDatasource={pageState.shouldUpdateDatasource.value}
             updateDatasourceCallback={onDatasourceUpdateCallback}
             getRowNodeId={getDocumentUniqueKey}
             onRowSelected={onDocumentRowSelected}
             rowSelection="multiple"
+            suppressRowClickSelection
           />
         )}
 
@@ -692,15 +695,17 @@ function DocumentSpacePage() {
         onCloseHandler={closeDrawer}
         size={pageState.sideDrawerSize.get()}
       >
-        {pageState.drawerOpen.get() && <DocumentSpaceEditForm
-          onCancel={closeDrawer}
-          onSubmit={submitDocumentSpace}
-          isFormSubmitting={pageState.isSubmitting.get()}
-          formActionType={FormActionType.ADD}
-          onCloseErrorMsg={closeErrorMsg}
-          showErrorMessage={pageState.showErrorMessage.get()}
-          errorMessage={pageState.errorMessage.get()}
-        />}
+        {pageState.drawerOpen.get() && (
+          <DocumentSpaceEditForm
+            onCancel={closeDrawer}
+            onSubmit={submitDocumentSpace}
+            isFormSubmitting={pageState.isSubmitting.get()}
+            formActionType={FormActionType.ADD}
+            onCloseErrorMsg={closeErrorMsg}
+            showErrorMessage={pageState.showErrorMessage.get()}
+            errorMessage={pageState.errorMessage.get()}
+          />
+        )}
       </SideDrawer>
       <SideDrawer
         isLoading={false}
@@ -709,20 +714,24 @@ function DocumentSpacePage() {
         onCloseHandler={() => mergeState(pageState, { createEditElementOpType: CreateEditOperationType.NONE })}
         size={pageState.sideDrawerSize.get()}
       >
-        {(pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE) && <DocumentSpaceCreateEditForm
-          onCancel={() => mergeState(pageState, { 
-            showErrorMessage: false, 
-            createEditElementOpType: CreateEditOperationType.NONE,
-            clickedItemName: undefined,
-          })}
-          onSubmit={submitElementName}
-          isFormSubmitting={pageState.isSubmitting.get()}
-          onCloseErrorMsg={closeErrorMsg}
-          showErrorMessage={pageState.showErrorMessage.get()}
-          errorMessage={pageState.errorMessage.get()}
-          elementName={pageState.clickedItemName.get() ?? ''}
-          opType={pageState.createEditElementOpType.get()}
-        />}
+        {pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE && (
+          <DocumentSpaceCreateEditForm
+            onCancel={() =>
+              mergeState(pageState, {
+                showErrorMessage: false,
+                createEditElementOpType: CreateEditOperationType.NONE,
+                clickedItemName: undefined,
+              })
+            }
+            onSubmit={submitElementName}
+            isFormSubmitting={pageState.isSubmitting.get()}
+            onCloseErrorMsg={closeErrorMsg}
+            showErrorMessage={pageState.showErrorMessage.get()}
+            errorMessage={pageState.errorMessage.get()}
+            elementName={pageState.clickedItemName.get() ?? ''}
+            opType={pageState.createEditElementOpType.get()}
+          />
+        )}
       </SideDrawer>
       <SideDrawer
         isLoading={false}
@@ -747,23 +756,25 @@ function DocumentSpacePage() {
         />
       </SideDrawer>
 
-      <DeleteDocumentDialog
-        show={pageState.showDeleteDialog.get()}
+      <GenericDialog
+        title="Archive"
+        submitText="Archive"
+        show={pageState.showDeleteDialog.get() || pageState.showDeleteSelectedDialog.get()}
         onCancel={closeRemoveDialog}
         onSubmit={archiveFile}
-        file={pageState.selectedFiles.get().map(item => item.key.toString()).join(',')}
-      />
-
-      <DeleteDocumentDialog
-        show={pageState.showDeleteSelectedDialog.get()}
-        onCancel={closeRemoveDialog}
-        onSubmit={archiveFile}
-        file={null}
+        content={
+          pageState.selectedFiles.get().length > 1
+            ? `Archive these ${pageState.selectedFiles.get().length} items?`
+            : `Archive this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
+        }
       />
 
       {pageState.selectedSpace.value &&
         !documentSpacePrivilegesService.isPromised &&
-        documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
+        documentSpacePrivilegesService.isAuthorizedForAction(
+          pageState.selectedSpace.value.id,
+          DocumentSpacePrivilegeDtoTypeEnum.Membership
+        ) && (
           <DocumentSpaceMemberships
             documentSpaceId={pageState.selectedSpace.value.id}
             isOpen={pageState.membershipsState.isOpen.value}
