@@ -302,12 +302,16 @@ function DocumentSpacePage() {
   ): void {
     const documentSpaceId = event.target.value;
     if (documentSpaceId != null) {
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
-        queryParams.set(spaceIdQueryKey, documentSpaceId);
-        queryParams.delete(pathQueryKey);
-        history.push({ search: queryParams.toString() });
-      }
+      setNewDocumentSpaceIdQueryParam(documentSpaceId);
+    }
+  }
+
+  function setNewDocumentSpaceIdQueryParam(documentSpaceId: string) {
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
+      queryParams.set(spaceIdQueryKey, documentSpaceId);
+      queryParams.delete(pathQueryKey);
+      history.push({ search: queryParams.toString() });
     }
   }
 
@@ -418,6 +422,7 @@ function DocumentSpacePage() {
           path: '',
           datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
         });
+        setNewDocumentSpaceIdQueryParam(docSpace.id);
       })
       .catch((message) => setPageStateOnException(message));
   }
