@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
 
 import { dashboardUserApiBase, host , adminJwt, ssoXfcc } from "../support";
-import DataCrudFormPageUtil, { DashboardUser, DashboardUserGridColId } from '../support/data-crud-form-functions';
+import AgGridFunctions, { DashboardUserGridColId } from '../support/ag-grid-functions';
+import DataCrudFormPageUtil, { DashboardUser } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 function createDashboardUserAndFillForm(data: DashboardUser) {
@@ -36,8 +37,8 @@ function createDashboardUserAndFilterExists(data: DashboardUser) {
 
   cy.wait('@dashboardUserCreate').then((intercept) => {
     filterColumnWithSearchValueNoRequest(DashboardUserGridColId.ID, intercept.response.body.id);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(DashboardUserGridColId.ID, intercept.response.body.id);
-    DataCrudFormPageUtil.clearFilterColumn(DashboardUserGridColId.ID);
+    AgGridFunctions.getRowWithColIdContainingValue(DashboardUserGridColId.ID, intercept.response.body.id);
+    AgGridFunctions.clearFilterColumn(DashboardUserGridColId.ID);
   });
 }
 
@@ -46,7 +47,7 @@ function deleteRowWithColIdContainingValue(colId: string, value: string) {
 }
 
 function filterColumnWithSearchValueNoRequest(colId: string, searchValue: string, searchParentSelector?: string) {
-  DataCrudFormPageUtil.filterColumnWithSearchValue(colId, searchValue, false, searchParentSelector);
+  AgGridFunctions.filterColumnWithSearchValue(colId, searchValue, false, searchParentSelector);
 }
 
 describe('Dashboard Users Tests', () => {
@@ -80,7 +81,7 @@ describe('Dashboard Users Tests', () => {
 
     // Open edit form
     filterColumnWithSearchValueNoRequest(DashboardUserGridColId.EMAIL, dashboardUser.email);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(DashboardUserGridColId.EMAIL, dashboardUser.email).click();
+    AgGridFunctions.getRowWithColIdContainingValue(DashboardUserGridColId.EMAIL, dashboardUser.email).click();
     cy.get('#email').should('have.value', dashboardUser.email);
 
     // Edit dashboard user

@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
 
 import { host, orgApiBase , adminJwt, ssoXfcc } from "../support";
-import DataCrudFormPageUtil, { Organization, OrganizationGridColId, PersonGridColId } from '../support/data-crud-form-functions';
+import AgGridFunctions, { OrganizationGridColId, PersonGridColId } from '../support/ag-grid-functions';
+import DataCrudFormPageUtil, { Organization } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 function createOrganization(org: Organization) {
@@ -30,8 +31,8 @@ function createOrgAndExpectError(org: Organization, error: string) {
 }
 
 function filterOrgByNameAndExists(searchValue: string) {
-  DataCrudFormPageUtil.filterColumnWithSearchValue(OrganizationGridColId.NAME, searchValue);
-  DataCrudFormPageUtil.getRowWithColIdContainingValue(OrganizationGridColId.NAME, searchValue).should('exist');
+  AgGridFunctions.filterColumnWithSearchValue(OrganizationGridColId.NAME, searchValue);
+  AgGridFunctions.getRowWithColIdContainingValue(OrganizationGridColId.NAME, searchValue).should('exist');
 }
 
 function createOrganizationAndFilterExists(org: Organization) {
@@ -40,11 +41,11 @@ function createOrganizationAndFilterExists(org: Organization) {
 
   cy.wait('@orgCreate').then((intercept) => {
     filterOrgByNameAndExists(intercept.response.body.name);
-    DataCrudFormPageUtil.clearFilterColumn(OrganizationGridColId.NAME);
+    AgGridFunctions.clearFilterColumn(OrganizationGridColId.NAME);
   });
 }
 
-describe.skip('Organization Tests', () => {
+describe('Organization Tests', () => {
   const dataTypeName = 'Organization';
 
   it('Should allow Organization creation & deletion', () => {
@@ -137,7 +138,7 @@ describe.skip('Organization Tests', () => {
     // Try to edit the organization
     filterOrgByNameAndExists(orgToEdit.name);
     cy.intercept({ method: 'GET', path: `${orgApiBase}/*` }).as('getDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(OrganizationGridColId.NAME, orgToEdit.name).click();
+    AgGridFunctions.getRowWithColIdContainingValue(OrganizationGridColId.NAME, orgToEdit.name).click();
 
     cy.wait('@getDetails');
 
@@ -146,32 +147,32 @@ describe.skip('Organization Tests', () => {
     // Change org leader
     cy.get('[data-testid=change-org-leader__btn]').click();
     cy.get('.modal-title__text').should('have.text', 'Leader').parents('.modal-component__container').first().within(modalContainer => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(PersonGridColId.FIRST_NAME, personLeader.firstName);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, personLeader.firstName).find(`input[type='checkbox']`).click();
+      AgGridFunctions.filterColumnWithSearchValue(PersonGridColId.FIRST_NAME, personLeader.firstName);
+      AgGridFunctions.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, personLeader.firstName).find(`input[type='checkbox']`).click();
       cy.get('button').contains('Select').should('not.be.disabled').click();
     });
 
     // Change Parent org
     cy.get('[data-testid=change-org-parent__btn]').click();
     cy.get('.modal-title__text').should('have.text', 'Parent Organization').parents('.modal-component__container').first().within(modalContainer => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(OrganizationGridColId.NAME, parentOrg.name);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(OrganizationGridColId.NAME, parentOrg.name).find(`input[type='checkbox']`).click();
+      AgGridFunctions.filterColumnWithSearchValue(OrganizationGridColId.NAME, parentOrg.name);
+      AgGridFunctions.getRowWithColIdContainingValue(OrganizationGridColId.NAME, parentOrg.name).find(`input[type='checkbox']`).click();
       cy.get('button').contains('Select').should('not.be.disabled').click();
     });
 
     // Add Org member
     cy.get('[data-testid=org-add-member__btn]').click();
     cy.get('.modal-title__text').should('have.text', 'Members').parents('.modal-component__container').first().within(modalContainer => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(PersonGridColId.FIRST_NAME, personMember.firstName);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, personMember.firstName).find(`input[type='checkbox']`).click();
+      AgGridFunctions.filterColumnWithSearchValue(PersonGridColId.FIRST_NAME, personMember.firstName);
+      AgGridFunctions.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, personMember.firstName).find(`input[type='checkbox']`).click();
       cy.get('button').contains('Select').should('not.be.disabled').click();
     });
 
     // Add Sub org
     cy.get('[data-testid=org-add-suborg__btn]').click();
     cy.get('.modal-title__text').should('have.text', 'Subordinate Organizations').parents('.modal-component__container').first().within(modalContainer => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(OrganizationGridColId.NAME, subordinateOrg.name);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(OrganizationGridColId.NAME, subordinateOrg.name).find(`input[type='checkbox']`).click();
+      AgGridFunctions.filterColumnWithSearchValue(OrganizationGridColId.NAME, subordinateOrg.name);
+      AgGridFunctions.getRowWithColIdContainingValue(OrganizationGridColId.NAME, subordinateOrg.name).find(`input[type='checkbox']`).click();
       cy.get('button').contains('Select').should('not.be.disabled').click();
     });
 

@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 
 import {host, orgApiBase, adminJwt, ssoXfcc } from "../support";
+import AgGridFunctions, { PersonGridColId } from '../support/ag-grid-functions';
 import { cleanup } from "../support/cleanup-helper";
-import DataCrudFormPageUtil, { Person, PersonGridColId } from '../support/data-crud-form-functions';
+import DataCrudFormPageUtil, { Person } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 describe('Person Tests', () => {
@@ -77,7 +78,7 @@ describe('Person Tests', () => {
     // Add a new Person
     DataCrudFormPageUtil.createPersonAndSuccess(person);
     DataCrudFormPageUtil.filterPersonAndExists(PersonGridColId.FIRST_NAME, person.firstName);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName).click();
 
     person.email = `${UtilityFunctions.generateRandomString()}@email.com`;
     person.firstName = UtilityFunctions.generateRandomString();
@@ -88,7 +89,7 @@ describe('Person Tests', () => {
 
     UtilityFunctions.findToastContainsMessage('Successfully updated ' + dataTypeName);
 
-    DataCrudFormPageUtil.clearFilterColumn(PersonGridColId.FIRST_NAME);
+    AgGridFunctions.clearFilterColumn(PersonGridColId.FIRST_NAME);
 
     // clean up
     DataCrudFormPageUtil.deleteRowWithColIdContainingValue(PersonGridColId.FIRST_NAME, person.firstName);

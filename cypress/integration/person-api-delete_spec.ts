@@ -1,8 +1,7 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import {apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
-import { cleanup, personIdsToDelete } from '../support/cleanup-helper';
+import { apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Delete API', () => {

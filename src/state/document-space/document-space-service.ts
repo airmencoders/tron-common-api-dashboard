@@ -6,7 +6,7 @@ import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinit
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
+import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { accessDocumentSpacePrivilegesState, } from './document-space-state';

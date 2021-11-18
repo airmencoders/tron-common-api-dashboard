@@ -1,8 +1,9 @@
 /// <reference types="Cypress" />
 
 import { host, subscriptionsApiBase , adminJwt, ssoXfcc } from "../support";
+import AgGridFunctions, { SubscriberGridColId } from '../support/ag-grid-functions';
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import DataCrudFormPageUtil, { SubscribeEvent, Subscriber, SubscriberGridColId } from '../support/data-crud-form-functions';
+import DataCrudFormPageUtil, { SubscribeEvent, Subscriber } from '../support/data-crud-form-functions';
 import UtilityFunctions, { Page } from '../support/utility-functions';
 
 function createSubscriberAndFillForm(data: Subscriber) {
@@ -34,8 +35,8 @@ function createSubscriberAndFilterExists(data: Subscriber) {
 
   cy.wait('@subscriberCreate').then((intercept) => {
     filterColumnWithSearchValueNoRequest(SubscriberGridColId.APP_CLIENT_NAME, intercept.response.body.appClientUser);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, intercept.response.body.appClientUser);
-    DataCrudFormPageUtil.clearFilterColumn(SubscriberGridColId.APP_CLIENT_NAME);
+    AgGridFunctions.getRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, intercept.response.body.appClientUser);
+    AgGridFunctions.clearFilterColumn(SubscriberGridColId.APP_CLIENT_NAME);
   });
 }
 
@@ -44,7 +45,7 @@ function deleteRowWithColIdContainingValue(colId: string, value: string) {
 }
 
 function filterColumnWithSearchValueNoRequest(colId: string, searchValue: string, searchParentSelector?: string) {
-  DataCrudFormPageUtil.filterColumnWithSearchValue(colId, searchValue, false, searchParentSelector);
+  AgGridFunctions.filterColumnWithSearchValue(colId, searchValue, false, searchParentSelector);
 }
 
 describe('Subscriber Events Tests', () => {
@@ -89,7 +90,7 @@ describe('Subscriber Events Tests', () => {
 
     // Open edit form
     filterColumnWithSearchValueNoRequest(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName);
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(SubscriberGridColId.APP_CLIENT_NAME, subscriber.appClientName).click();
     cy.get('#subscriberAddress').should('have.value', subscriber.subscriberAddress);
 
     // Change it

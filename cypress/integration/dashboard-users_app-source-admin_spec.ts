@@ -1,12 +1,9 @@
 /// <reference types="Cypress" />
 
 import {apiBase, host, adminJwt, ssoXfcc } from "../support";
+import AgGridFunctions, { AppSourceEmailGridColId, AppSourceGridColId, DashboardUserGridColId } from '../support/ag-grid-functions';
 import UtilityFunctions, {Page} from '../support/utility-functions';
-import DataCrudFormPageUtil, {
-  AppClient,
-  AppClientGridColId, AppSourceEmailGridColId, AppSourceGridColId,
-  DashboardUserGridColId
-} from '../support/data-crud-form-functions';
+import DataCrudFormPageUtil from '../support/data-crud-form-functions';
 
 describe('Dashboard Users - App Source Admin Tests', () => {
 
@@ -17,12 +14,12 @@ describe('Dashboard Users - App Source Admin Tests', () => {
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
 
     const appSourceName = 'puckboard';
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-source/*`
     }).as('appSourceDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
     cy.wait('@appSourceDetails');
 
     cy.get('#admin').should('have.value', '');
@@ -32,9 +29,9 @@ describe('Dashboard Users - App Source Admin Tests', () => {
     cy.get('button').contains('Add Admin').should('not.be.disabled').click();
 
     cy.get('.admin-email-grid').within(grid => {
-      DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceEmailGridColId.ADMIN, adminEmail, false);
-      DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceEmailGridColId.ADMIN, adminEmail);
-      DataCrudFormPageUtil.clearFilterColumn(AppSourceEmailGridColId.ADMIN);
+      AgGridFunctions.filterColumnWithSearchValue(AppSourceEmailGridColId.ADMIN, adminEmail, false);
+      AgGridFunctions.getRowWithColIdContainingValue(AppSourceEmailGridColId.ADMIN, adminEmail);
+      AgGridFunctions.clearFilterColumn(AppSourceEmailGridColId.ADMIN);
     });
 
     DataCrudFormPageUtil.submitDataCrudFormUpdate();
@@ -44,17 +41,17 @@ describe('Dashboard Users - App Source Admin Tests', () => {
     UtilityFunctions.clickOnPageNav(Page.DASHBOARD_USER);
 
 
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(DashboardUserGridColId.EMAIL, adminEmail);
-    DataCrudFormPageUtil.clearFilterColumn(DashboardUserGridColId.EMAIL);
+    AgGridFunctions.getRowWithColIdContainingValue(DashboardUserGridColId.EMAIL, adminEmail);
+    AgGridFunctions.clearFilterColumn(DashboardUserGridColId.EMAIL);
 
     // remove admin again
     UtilityFunctions.clickOnPageNav(Page.APP_SOURCE);
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppSourceGridColId.NAME, appSourceName, false);
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-source/*`
     }).as('appSourceDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppSourceGridColId.NAME, appSourceName).click();
     cy.wait('@appSourceDetails');
 
     cy.get('#admin').should('have.value', '');
@@ -68,8 +65,8 @@ describe('Dashboard Users - App Source Admin Tests', () => {
     // verify dashboard user removed
     UtilityFunctions.clickOnPageNav(Page.DASHBOARD_USER);
 
-    DataCrudFormPageUtil.filterColumnWithSearchValue(DashboardUserGridColId.EMAIL, adminEmail, false,
+    AgGridFunctions.filterColumnWithSearchValue(DashboardUserGridColId.EMAIL, adminEmail, false,
         undefined, false);
-    DataCrudFormPageUtil.clearFilterColumn(DashboardUserGridColId.EMAIL);
+    AgGridFunctions.clearFilterColumn(DashboardUserGridColId.EMAIL);
   })
 })

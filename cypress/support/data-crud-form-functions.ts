@@ -1,40 +1,10 @@
 /// <reference types="Cypress" />
 
-import { agGridFilterDebounce, apiBase, personApiBase } from '.';
+import { personApiBase } from '.';
+import AgGridFunctions, { PersonGridColId } from './ag-grid-functions';
 import UtilityFunctions from './utility-functions';
 
 export default class DataCrudFormFunctions {
-  /**
-   * Returns the entire row given a column id and value to search for.
-   * The row must be visible to successfully find it.
-   * @param colId the column id to match
-   * @param value the value to find
-   * @param searchParentSelector used to narrow the grid search to a specific parent selector
-   * @returns a cypress reference to the row
-   */
-  static getRowWithColIdContainingValue(colId: string, value: string, searchParentSelector?: string) {
-    if (searchParentSelector != null) {
-      return cy.get(searchParentSelector).find('.ag-row').find(`[col-id="${colId}"]`).contains(value).parents('.ag-row').first();
-    } else {
-      return cy.get('.ag-row').find(`[col-id="${colId}"]`).contains(value, {matchCase: false}).parents('.ag-row').first();
-    }
-  }
-
-  /**
-   * Ensures that a row, given a column id and a value to search for, does not exist.
-   *
-   * @param colId the column id to match
-   * @param value the value to find
-   * @param searchParentSelector used to narrow the grid search to a specific parent selector
-   */
-  static noRowsExist(searchParentSelector?: string) {
-    if (searchParentSelector != null) {
-      cy.get(searchParentSelector).find('.ag-row').should('not.exist');
-    } else {
-      cy.get('.ag-row').should('not.exist');
-    }
-  }
-
   /**
    * Finds the delete cell renderer of a given row that matches a column id and value
    * @param colId the column id to match
@@ -42,7 +12,7 @@ export default class DataCrudFormFunctions {
    * @returns a cypress reference to the delete button
    */
   static findDeleteButtonInRowWithColIdContainingValue(colId: string, value: string) {
-    return DataCrudFormFunctions.getRowWithColIdContainingValue(colId, value).find('.delete-cell-renderer__btn');
+    return AgGridFunctions.getRowWithColIdContainingValue(colId, value).find('.delete-cell-renderer__btn');
   }
 
   static submitDataCrudFormCreateAndWaitForLengthToIncrement(dataTypeNameInToast: string) {
@@ -117,7 +87,7 @@ export default class DataCrudFormFunctions {
    * @param shouldWaitFilterRequest if should wait for filter api request to finish
    */
   static deleteRowWithColIdContainingValue(colId: string, value: string, containsDeleteConfirmation: boolean = true, verifyRowDeleted: boolean = true, shouldWaitFilterRequest?: boolean) {
-    DataCrudFormFunctions.filterColumnWithSearchValue(colId, value, shouldWaitFilterRequest);
+    AgGridFunctions.filterColumnWithSearchValue(colId, value, shouldWaitFilterRequest);
 
     DataCrudFormFunctions.findDeleteButtonInRowWithColIdContainingValue(colId, value).click();
 
@@ -131,87 +101,17 @@ export default class DataCrudFormFunctions {
        * Force the filter again. Some Grids will hard refresh the grid,
        * causing everything to reset, including the previous filter value.
        */
-      DataCrudFormFunctions.filterColumnWithSearchValue(colId, value, shouldWaitFilterRequest, undefined, false);
+      AgGridFunctions.filterColumnWithSearchValue(colId, value, shouldWaitFilterRequest, undefined, false);
 
       /**
        * The grid has been filtered, so there should exist no rows in the
        * grid at this point to verify deletion.
        */
-      DataCrudFormFunctions.noRowsExist();
+      AgGridFunctions.noRowsExist();
     }
 
 
-    DataCrudFormFunctions.clearFilterColumn(colId);
-  }
-
-  /**
-   * Opens the filter menu in the grid given a column id
-   * @param colId the column id to open the menu for
-   */
-  static openColumnFilterMenu(colId: string) {
-    // cy.get('.ag-header-cell-text').contains(colId).parents('.ag-header-cell').first().within((nameHeader) => {
-    //   cy.get('.ag-icon-menu').click();
-    // });
-    cy.get(`[col-id="${colId}"]`).within(() => {
-      cy.get('.ag-icon-menu').first().click();
-    })
-  }
-
-  /**
-   * Filters the grid based on the column with the specified value
-   * @param colId the column id to filter
-   * @param searchValue the value to filter for
-   * @param shouldWaitRequest if should wait for the api request to finish. Should not be set to true if the filter will not perform an api request
-   * @param searchParentSelector used to narrow the grid search to a specific parent selector
-   */
-  static filterColumnWithSearchValue(colId: string, searchValue: string, shouldWaitRequest: boolean = true, searchParentSelector?: string, shouldExpectExists: boolean = true) {
-    DataCrudFormFunctions.openColumnFilterMenu(colId);
-
-    cy.intercept({
-      method: 'POST',
-      path: `${apiBase}/*/filter**`
-    }).as('filterRequest');
-
-    if (searchParentSelector != null) {
-      cy.get(`${searchParentSelector}`).find('.ag-filter-filter input').first().clear().type(`${searchValue}{esc}`);
-
-      if (shouldWaitRequest)
-        cy.wait('@filterRequest');
-
-      if (shouldExpectExists) {
-        cy.get(`${searchParentSelector}`)
-        .find('.ag-center-cols-container')
-        .find('.ag-row').should('have.length', 1)
-        .first()
-        .contains(`[col-id="${colId}"]`, searchValue)
-        .should('exist');
-      }
-    } else {
-      cy.get('.ag-filter-filter input').first().clear().type(`${searchValue}{esc}`);
-
-      if (shouldWaitRequest)
-        cy.wait('@filterRequest');
-
-      if (shouldExpectExists) {
-        cy.get('.ag-center-cols-container')
-          .find('.ag-row')
-          .should('have.length', 1)
-          .first()
-          .contains(`[col-id="${colId}"]`, searchValue, {matchCase: false})
-          .should('exist');
-      }
-    }
-  }
-
-  /**
-   * Clears out the filter value for a column id
-   * @param colId the column id to clear filter
-   */
-  static clearFilterColumn(colId: string) {
-    DataCrudFormFunctions.openColumnFilterMenu(colId);
-    cy.get('.ag-filter-filter input').first().clear().type('{esc}');
-    // This ensures that we wait for ag grid debounce time to take effect
-    cy.wait(agGridFilterDebounce);
+    AgGridFunctions.clearFilterColumn(colId);
   }
 
   static createPerson(person: Person) {
@@ -273,8 +173,8 @@ export default class DataCrudFormFunctions {
 
   static filterPersonAndExists(gridColId: PersonGridColId, searchValue: string) {
     // Filter
-    DataCrudFormFunctions.filterColumnWithSearchValue(gridColId, searchValue);
-    DataCrudFormFunctions.getRowWithColIdContainingValue(gridColId, searchValue).should('exist');
+    AgGridFunctions.filterColumnWithSearchValue(gridColId, searchValue);
+    AgGridFunctions.getRowWithColIdContainingValue(gridColId, searchValue).should('exist');
   }
 
   static createPersonAndFilterExists(person: Person) {
@@ -283,7 +183,7 @@ export default class DataCrudFormFunctions {
 
     return cy.wait('@personCreate').then((intercept) => {
       DataCrudFormFunctions.filterPersonAndExists(PersonGridColId.ID, intercept?.response?.body.id);
-      DataCrudFormFunctions.clearFilterColumn(PersonGridColId.ID);
+      AgGridFunctions.clearFilterColumn(PersonGridColId.ID);
     });
   }
 
@@ -309,69 +209,6 @@ export default class DataCrudFormFunctions {
     // Submit the form
     DataCrudFormFunctions.submitDataCrudFormCreateAndFindErrorContainingMsg(errorMsg);
   }
-}
-
-export enum PersonGridColId {
-  ID = 'id',
-  FIRST_NAME = 'firstName',
-  LAST_NAME = 'lastName'
-}
-
-export enum OrganizationGridColId {
-  ID = 'id',
-  NAME = 'name'
-}
-
-export enum AppClientGridColId {
-  NAME = 'name',
-  PERSON_CREATE = 'personCreate',
-  PERSON_DELETE = 'personDelete',
-  PERSON_EDIT = 'personEdit',
-  PERSON_READ = 'personRead',
-  ORG_CREATE = 'orgCreate',
-  ORG_DELETE = 'orgDelete',
-  ORG_EDIT = 'orgEdit',
-  ORG_READ = 'orgRead',
-}
-
-export enum AppSourceGridColId {
-  NAME = 'name'
-}
-
-export enum AppSourceEndpointGridColId {
-  PATH = 'path'
-}
-
-export enum AppSourceEmailGridColId {
-  ADMIN = 'email'
-}
-
-export enum ScratchStorageGridColId {
-  ID = 'id',
-  APP_NAME = 'appName',
-  IMPLICIT_READ = 'appHasImplicitRead',
-  ACL_MODE = 'aclMode'
-}
-
-export enum DigitizeAppsGridColId {
-  APP_NAME = 'appName',
-  READ = 'scratchRead',
-  WRITE = 'scratchWrite',
-  ADMIN = 'scratchAdmin'
-}
-
-export enum DashboardUserGridColId {
-  ID = 'id',
-  EMAIL = 'email',
-  HAS_ADMIN = 'hasDashboardAdmin',
-  HAS_USER = 'hasDashboardUser'
-}
-
-export enum SubscriberGridColId {
-  ID = 'id',
-  APP_CLIENT_NAME = 'appClientUser',
-  SUBSCRIBER_URL = 'subscriberAddress',
-  SUBSCRIBED_EVENT = 'subscribedEvent'
 }
 
 export interface Person {

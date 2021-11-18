@@ -2,11 +2,8 @@
 
 import {apiBase, host, adminJwt, ssoXfcc } from "../support";
 import UtilityFunctions, {Page} from '../support/utility-functions';
-import DataCrudFormPageUtil, {
-  AppClient,
-  AppClientGridColId,
-  DashboardUserGridColId
-} from '../support/data-crud-form-functions';
+import DataCrudFormPageUtil, { AppClient } from '../support/data-crud-form-functions';
+import AgGridFunctions, { AppClientGridColId, DashboardUserGridColId } from '../support/ag-grid-functions';
 
 describe('Dashboard Users - App Client Dev Tests', () => {
 
@@ -18,14 +15,14 @@ describe('Dashboard Users - App Client Dev Tests', () => {
     };
 
     DataCrudFormPageUtil.createAppClientAndSuccess(appClient);
-    DataCrudFormPageUtil.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
+    AgGridFunctions.filterColumnWithSearchValue(AppClientGridColId.NAME, appClient.name, false);
 
     // Go to edit
     cy.intercept({
       method: 'GET',
       path: `${apiBase}/app-client/*`
     }).as('appClientDetails');
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
+    AgGridFunctions.getRowWithColIdContainingValue(AppClientGridColId.NAME, appClient.name).click();
     cy.wait('@appClientDetails');
 
     // Add admin
@@ -41,8 +38,8 @@ describe('Dashboard Users - App Client Dev Tests', () => {
     // navigate to dashboard users page to check if user exists
     UtilityFunctions.clickOnPageNav(Page.DASHBOARD_USER);
 
-    DataCrudFormPageUtil.getRowWithColIdContainingValue(DashboardUserGridColId.EMAIL, adminDevEmail);
-    DataCrudFormPageUtil.clearFilterColumn(DashboardUserGridColId.EMAIL);
+    AgGridFunctions.getRowWithColIdContainingValue(DashboardUserGridColId.EMAIL, adminDevEmail);
+    AgGridFunctions.clearFilterColumn(DashboardUserGridColId.EMAIL);
 
     // navigate to back to app client page to check if user exists
     UtilityFunctions.clickOnPageNav(Page.APP_CLIENT);
@@ -54,8 +51,8 @@ describe('Dashboard Users - App Client Dev Tests', () => {
     // verify dashboard user removed
     UtilityFunctions.clickOnPageNav(Page.DASHBOARD_USER);
 
-    DataCrudFormPageUtil.filterColumnWithSearchValue(DashboardUserGridColId.EMAIL, adminDevEmail, false,
+    AgGridFunctions.filterColumnWithSearchValue(DashboardUserGridColId.EMAIL, adminDevEmail, false,
         undefined, false);
-    DataCrudFormPageUtil.clearFilterColumn(DashboardUserGridColId.EMAIL);
+    AgGridFunctions.clearFilterColumn(DashboardUserGridColId.EMAIL);
   })
 })

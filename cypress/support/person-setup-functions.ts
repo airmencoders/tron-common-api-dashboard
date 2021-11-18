@@ -5,7 +5,6 @@ import {adminJwt, apiHost, personApiBase, personUrl, ssoXfcc} from './index';
 import {Person} from './data-crud-form-functions';
 import UtilityFunctions from './utility-functions';
 import { PersonDto, PersonDtoBranchEnum } from '../../src/openapi';
-import { personIdsToDelete } from './cleanup-helper';
 
 export const mockPerson: Person = {
   email: `${UtilityFunctions.generateRandomString()}@email.com`,
