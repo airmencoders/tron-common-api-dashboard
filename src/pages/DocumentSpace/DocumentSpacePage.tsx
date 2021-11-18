@@ -256,7 +256,6 @@ function DocumentSpacePage() {
     try {
       // Don't need to load privileges if current user is Dashboard Admin,
       // since they currently have access to everything Document Space related
-      console.log('path change');
       if (!isAdmin) {
         await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
       }
@@ -315,7 +314,6 @@ function DocumentSpacePage() {
 
   function onDatasourceUpdateCallback() {
     pageState.shouldUpdateDatasource.set(false);
-    console.log('source cb')
     pageState.selectedFiles.set([]);
   }
 
@@ -580,7 +578,6 @@ function DocumentSpacePage() {
       cellRendererParams: {
         onClick: (folder: string) => {
           const newPath = pageState.get().path + '/' + folder;
-          console.log('click')
           const queryParams = new URLSearchParams(location.search);
           queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);
