@@ -131,7 +131,7 @@ export default class GridColumn {
   }
 
   static get defaultValueGetter() {
-    return function deleteValueGetter(params: ValueGetterParams) {
+    return function defaultValueGetter(params: ValueGetterParams) {
       return params.data;
     };
   }
