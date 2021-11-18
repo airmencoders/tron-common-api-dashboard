@@ -6,17 +6,6 @@ import { globalOpenapiConfig } from '../../api/openapi-config';
 import DocumentSpacePrivilegeService from './document-space-privilege-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
-
-/**
- * Will take the form of:
- * {
- *    [documentSpaceId]: {
- *      READ: false,
- *      WRITE: false,
- *      MEMBERSHIP: false
- *    }
- * }
- */
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
 
 const documentSpaceControllerApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
@@ -53,4 +42,9 @@ const wrapDocumentSpacePrivilegesState = (
 export const useDocumentSpacePrivilegesState = () => wrapDocumentSpacePrivilegesState(
   documentSpaceControllerApi,
   useState(privilegeState)
+);
+
+export const accessDocumentSpacePrivilegesState = () => wrapDocumentSpacePrivilegesState(
+  documentSpaceControllerApi,
+  privilegeState
 );

@@ -471,7 +471,7 @@ function DocumentSpacePage() {
       createTextToast(ToastType.SUCCESS, 'File Archived');
     }
     catch (e) {
-      createTextToast(ToastType.ERROR, 'Could not archive files - ' + (e as Error).toString());
+      createTextToast(ToastType.ERROR, 'Could not archive files - ' + (e as Error).message);
     }
 
     pageState.merge({
