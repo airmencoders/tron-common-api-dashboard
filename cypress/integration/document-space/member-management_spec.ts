@@ -1,13 +1,9 @@
-import { documentSpaceApiBase } from '../../support';
 import AgGridFunctions, { SpacesManageMembersColId } from '../../support/ag-grid-functions';
-import Funcs, { MoreActionsType } from '../../support/document-space-functions';
-import UtilityFunctions from '../../support/utility-functions';
+import Funcs from '../../support/document-space-functions';
 
-describe('Document Space Folder test', () => {
+describe('Document Space Member Management', () => {
   const spaceId = 'spaceId';
   const spaceIdAlias = `@${spaceId}`;
-  const testFolder = 'testFolder';
-  const testFolderAlias = `@${testFolder}`;
 
   const cypressEmailPrefix = 'cypress_documentspace';
 
@@ -18,10 +14,6 @@ describe('Document Space Folder test', () => {
       .then((cypressSpaceId) =>
         Funcs.visitDocumentSpace(cypressSpaceId)
       );
-  });
-
-  afterEach(() => {
-
   });
 
   it('should be able to add a member to document space and remove them', () => {
@@ -55,8 +47,8 @@ describe('Document Space Folder test', () => {
     // Make sure they exist and remove
     cy.contains('.side-drawer .tabs > ul > li > a', 'Manage Members').click({ force: true });
     AgGridFunctions.getCheckboxInRowWithColIdContainingValue(SpacesManageMembersColId.EMAIL, email).check();
-    cy.contains('i.remove-icon', 'Remove Selected').should('not.be.disabled').click({ force: true });
-    Funcs.clickDeleteConfirmationAction(true);
+    cy.get('.header__actions > [data-testid=button] > .remove-icon').should('not.be.disabled').click({ force: true });
+    cy.get('[data-testid=modal-submit-btn]').click();
 
     // Make sure no longer exists
     AgGridFunctions.getRowWithColIdContainingValue(SpacesManageMembersColId.EMAIL, email).should('not.exist');

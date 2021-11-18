@@ -48,7 +48,7 @@ describe('Document Space File Upload test', () => {
     cy.get<string>(spaceIdAlias)
       .then(cypressSpaceId => {
         Funcs.uploadTestFileAtCurrentLocation(cypressSpaceId).as('file1');
-        Funcs.uploadTestFileAtCurrentLocation(cypressSpaceId, 'file2').as('file2');
+        Funcs.uploadTestFileAtCurrentLocation(cypressSpaceId).as('file2');
       });
 
     // Check both files
