@@ -5,6 +5,7 @@ import {State} from "@hookstate/core";
 import {BatchUploadState} from "./DocumentSpaceMemberships";
 import {createTextToast} from "../../../components/Toast/ToastUtils/ToastUtils";
 import {ToastType} from "../../../components/Toast/ToastUtils/toast-type";
+import UploadIcon from '../../../icons/UploadIcon';
 
 
 export interface DocumentUploadProps {
@@ -64,7 +65,11 @@ export default function BatchUserUploadDialog(props: DocumentUploadProps) {
         onClick={uploadFiles}
         type="button"
       >
-        Upload Batch User CSV
+        <UploadIcon
+          iconTitle="Upload CSV file"
+          size={1}                              
+        />&nbsp;
+        Upload 
       </Button>
     </div>
   );

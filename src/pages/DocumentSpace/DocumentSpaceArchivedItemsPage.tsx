@@ -14,10 +14,8 @@ import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 
@@ -93,8 +91,7 @@ export default function DocumentSpaceArchivedItemsPage() {
     showDeleteDialog: false,
   });
   const documentSpaceService = useDocumentSpaceState();
-  const authorizedUserService = useAuthorizedUserState();
-  const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
+  const docSpacePrivsState = useDocumentSpacePrivilegesState();
   const mountedRef = useRef(false);
 
   useEffect(() => {
@@ -104,7 +101,7 @@ export default function DocumentSpaceArchivedItemsPage() {
     return function cleanup() {
       mountedRef.current = false;
       documentSpaceService.resetState();
-    };
+      docSpacePrivsState.resetState();    };
   }, []);
 
   function closeRemoveDialog(): void {
@@ -146,7 +143,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         const listOfFilesWithPaths: string[] = [];
         for (const i of item.items) {
           // If the path to these files existed at the root level
-          // then it doesn't need a trailing last after the path
+          // then it doesn't need a trailing slash after the path
           if (item.path === '/') {
             listOfFilesWithPaths.push(item.path + i);
           } else {
@@ -176,11 +173,7 @@ export default function DocumentSpaceArchivedItemsPage() {
   async function loadArchivedItems() {
     pageState.datasource.set(
       documentSpaceService.createDatasource('', '', infiniteScrollOptions, ArchivedStatus.ARCHIVED)
-    );
-  }
-
-  function isAuthorizedForAction(actionType: DocumentSpacePrivilegeDtoTypeEnum) {
-    return isAdmin || pageState.privilegeState.privileges.value[actionType];
+    );    
   }
 
   function onDatasourceUpdateCallback() {
@@ -201,33 +194,46 @@ export default function DocumentSpaceArchivedItemsPage() {
   }
 
   function documentDtoColumnsWithMoreActions() {
-    return isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Write)
-      ? [
-          ...documentDtoColumns,
-          new GridColumn({
-            valueGetter: GridColumn.defaultValueGetter,
-            headerName: 'More',
-            headerClass: 'header-center',
-            cellRenderer: DocumentRowActionCellRenderer,
-            cellRendererParams: {
-              menuItems: [
-                { title: 'Restore', icon: CircleRightArrowIcon, onClick: () => restoreItems(), isAuthorized: () => true },
-                {
-                  title: 'Permanently Delete',
-                  icon: CircleMinusIcon,
-                  onClick: () => pageState.merge({ showDeleteDialog: true }),
-                  isAuthorized: () => true
-                },
-              ],
+    // get unique list of spaceIds we see here in the archived items...
+    //  then see if this use can write or greater on each row -- which will determine if they get the 
+    //  more actions or not
+    if (!pageState.datasource.value) return documentDtoColumns;
+
+    return [
+      ...documentDtoColumns,
+      new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
+        headerName: 'More',
+        headerClass: 'header-center',
+        cellRenderer: DocumentRowActionCellRenderer,
+        cellRendererParams: {
+          menuItems: [
+            {
+              title: 'Restore',
+              icon: CircleRightArrowIcon,
+              onClick: () => restoreItems(),
+              isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
             },
-          }),
-        ]
-      : documentDtoColumns;
+            {
+              title: 'Permanently Delete',
+              icon: CircleMinusIcon,
+              onClick: () => pageState.merge({ showDeleteDialog: true }),
+              isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
+            },
+          ],
+        },
+      }),
+    ];
+  }
+
+  function checkHasWriteForDocSpace(doc: DocumentDto): boolean {
+    if (!doc) return false;
+    return docSpacePrivsState.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write);
   }
 
   return (
     <PageFormat pageTitle="Document Space Archived Items">
-      {pageState.datasource.value && isAuthorizedForAction(DocumentSpacePrivilegeDtoTypeEnum.Read) && (
+      {pageState.datasource.value && (
         <InfiniteScrollGrid
           columns={documentDtoColumnsWithMoreActions()}
           datasource={pageState.datasource.value}

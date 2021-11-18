@@ -1,7 +1,6 @@
 import { none, useHookstate } from '@hookstate/core';
 import { IDatasource } from 'ag-grid-community';
 import React, { FormEvent, useEffect, useRef } from 'react';
-import { NumberTypeNodeParser } from 'ts-json-schema-generator';
 import Button from '../../../components/Button/Button';
 import ComboBoxCellRenderer, {
   ComboBoxCellRendererProps
@@ -27,7 +26,6 @@ import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberReq
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
-import { KpiPageState } from '../../Kpi/kpi-page-state';
 import BatchUserUploadDialog from './BatchUserUploadDialog';
 import './DocumentSpaceMemberships.scss';
 import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
@@ -304,6 +302,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     return [
       ...membershipColumns,
       new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
         headerName: 'Permissions',
         cellRenderer: ComboBoxCellRenderer,
         cellRendererParams: {
@@ -313,6 +312,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
         } as ComboBoxCellRendererProps,
       }),
       new GridColumn({
+        valueGetter: GridColumn.defaultValueGetter,
         headerName: 'Remove',
         cellRenderer: DeleteCellRenderer,
         cellRendererParams: {
@@ -325,7 +325,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
 
   return (
     <SideDrawer
-      size={SideDrawerSize.NORMAL}
+      size={SideDrawerSize.WIDE}
       titleStyle={{ color: '#5F96EA', marginTop: -2 }}
       preTitleNode={
         <div className='pre-title-icon'>
@@ -368,7 +368,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
             ),
           },
           {
-            onClick: () => pageState.selectedTab.set(1),
+            onClick: () => { pageState.membersState.selected.set([]); pageState.selectedTab.set(1); },
             text: 'Manage Members',
             content: (
                 pageState.datasourceState.datasource.value && (
@@ -377,7 +377,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
                       <div className="document-space-members__header">
                         <h4 className="header__title">Assigned Members</h4>
                         {
-                          pageState.membersState.selected.length > 0 && <div className="header__actions">
+                          <div className="header__actions">
                             <Button
                               disableMobileFullWidth
                               type={'button'}
@@ -385,7 +385,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
                               onClick={() => pageState.membersState.deletionState.isConfirmationOpen.set(true)}
                               unstyled
                               transparentOnDisabled
-                              className="actions__remove-button"
+                              className={`${pageState.membersState.selected.value.length === 0 ? 'actions__remove-button-hidden' : ''}`}
                             >
                               <RemoveIcon
                                 iconTitle="Remove Selected Members"

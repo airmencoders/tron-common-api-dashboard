@@ -9,6 +9,7 @@ import { createFailedDataFetchToast, createTextToast } from '../../components/To
 import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { accessDocumentSpacePrivilegesState, } from './document-space-state';
 
 export enum ArchivedStatus {
   ARCHIVED,
@@ -38,7 +39,7 @@ export default class DocumentSpaceService {
             data = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
           }
           else if (status === ArchivedStatus.ARCHIVED) {
-            data = (await this.documentSpaceApi.getAllArchivedFilesForAuthUser()).data;
+            data = (await this.getAllArchivedItemsForUser());
           }
           else {
             throw new Error('Illegal Archived Status value');
@@ -86,6 +87,21 @@ export default class DocumentSpaceService {
     }
 
     return datasource;
+  }
+
+  // helper to fetch the archived items for the archived items page
+  //  and also to go ahead and populate the archived items user privs state for
+  //  the current user
+  async getAllArchivedItemsForUser(): Promise<S3PaginationDto> {
+    const items = (await this.documentSpaceApi.getAllArchivedFilesForAuthUser()).data
+    const spaceIdsList = new Set<string>();
+    for (const entry of items.documents) {
+      if (!spaceIdsList.has(entry.spaceId)) {
+        spaceIdsList.add(entry.spaceId);
+      }
+    }
+    await accessDocumentSpacePrivilegesState().fetchAndStoreDashboardUserDocumentSpacesPrivileges(spaceIdsList).promise;
+    return items;
   }
 
   createRecentDocumentsDatasource(infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
