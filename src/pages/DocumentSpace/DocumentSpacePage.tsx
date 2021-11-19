@@ -307,13 +307,11 @@ function DocumentSpacePage() {
   }
 
   function setNewDocumentSpaceIdQueryParam(documentSpaceId: string) {
-    if (mountedRef.current) {
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
-        queryParams.set(spaceIdQueryKey, documentSpaceId);
-        queryParams.delete(pathQueryKey);
-        history.push({ search: queryParams.toString() });
-      }
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
+      queryParams.set(spaceIdQueryKey, documentSpaceId);
+      queryParams.delete(pathQueryKey);
+      history.push({ search: queryParams.toString() });
     }
   }
 
@@ -424,7 +422,12 @@ function DocumentSpacePage() {
           path: '',
           datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
         });
-        setNewDocumentSpaceIdQueryParam(docSpace.id);
+
+        // Ensure the component is still mounted
+        // before pushing any changes to history
+        if (mountedRef.current) {
+          setNewDocumentSpaceIdQueryParam(docSpace.id);
+        }
       })
       .catch((message) => setPageStateOnException(message));
   }
