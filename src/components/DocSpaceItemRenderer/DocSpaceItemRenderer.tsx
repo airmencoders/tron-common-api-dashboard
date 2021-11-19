@@ -8,11 +8,15 @@ import {ICellRendererParams} from 'ag-grid-community';
 import {ClickableCellRenderer} from '../Grid/clickable-cell-renderer';
 import {useDocumentSpaceState} from '../../state/document-space/document-space-state';
 
+export interface DocSpaceItemRendererProps {
+  hideItemLink?: boolean;
+}
+
 /**
  * Component for the file doc space explorer - deals with
  * directories and files
  */
-function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer) {
+function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer & DocSpaceItemRendererProps) {
 
   const documentSpaceService = useDocumentSpaceState();
 
@@ -38,7 +42,7 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
           unstyled
           data-testid="docspace-row-item"
           onClick={() => {
-            if (data.folder) {
+            if (data.folder && !props.hideItemLink) {
               props.onClick(data.key);
             }
           }}
@@ -46,11 +50,14 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
           <span className='directory'>{data.key}</span>
         </Button>
       :
-        <a href={documentSpaceService.createRelativeDownloadFileUrl(
+        props.hideItemLink ?
+          <span>{data.key}</span>        
+        :
+          <a href={documentSpaceService.createRelativeDownloadFileUrl(
             space,
             path,
             fileKey
-        )} target="_blank" rel="noreferrer">{data.key}</a>
+          )} target="_blank" rel="noreferrer">{data.key}</a>
       }
     </div>
   );
