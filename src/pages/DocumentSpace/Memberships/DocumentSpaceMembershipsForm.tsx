@@ -2,7 +2,7 @@ import { none, useHookstate } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
-import React, { ChangeEvent, FormEvent } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useRef } from 'react';
 import Checkbox from '../../../components/forms/Checkbox/Checkbox';
 import Form from '../../../components/forms/Form/Form';
 import FormGroup from '../../../components/forms/FormGroup/FormGroup';
@@ -60,6 +60,16 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
   Validation(membershipState.member.email).validate(validateEmail, validationErrors.invalidEmail, 'error');
   Validation(membershipState.member.email).validate(validateRequiredString, validationErrors.requiredText, 'error');
 
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return function cleanup() {
+      mountedRef.current = false;
+    }
+  }, []);
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -67,27 +77,33 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
       membershipState.formState.isSubmitting.set(true);
       await membershipService.addDocumentSpaceMember(props.documentSpaceId, membershipState.member.value);
 
-      membershipState.member.merge({
-        email: '',
-        privileges: []
-      });
-      membershipState.formState.merge({
-        successMessage: 'Successfully added member to Document Space',
-        showSuccessMessage: true,
-        isSubmitting: false
-      });
+      if (mountedRef.current) {
+        membershipState.member.merge({
+          email: '',
+          privileges: []
+        });
+        membershipState.formState.merge({
+          successMessage: 'Successfully added member to Document Space',
+          showSuccessMessage: true,
+          isSubmitting: false
+        });
+      }
 
       props.onMemberChangeCallback();
     } catch (error) {
-      createTextToast(ToastType.ERROR, 'Failed to add Document Space member');
-      const preparedError = prepareRequestError(error);
-      membershipState.formState.merge({
-        errorMessage: preparedError.message,
-        showErrorMessage: true,
-        isSubmitting: false
-      });
+      if (mountedRef.current) {
+        createTextToast(ToastType.ERROR, 'Failed to add Document Space member');
+        const preparedError = prepareRequestError(error);
+        membershipState.formState.merge({
+          errorMessage: preparedError.message,
+          showErrorMessage: true,
+          isSubmitting: false
+        });
+      }
     } finally {
-      membershipState.touchedState.set(none);
+      if (mountedRef.current) {
+        membershipState.touchedState.set(none);
+      }
     }
   }
 
