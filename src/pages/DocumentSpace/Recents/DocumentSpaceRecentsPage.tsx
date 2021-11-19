@@ -198,7 +198,6 @@ function DocumentSpaceRecentsPage() {
         cellRendererParams: {
           menuItems: [
             { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites'), isAuthorized: () => true },
-            { title: 'Go to file', icon: CircleRightArrowIcon, onClick: () => console.log('go to file'), isAuthorized: () => true },
             {
               title: 'Remove',
               icon: CircleMinusIcon,
