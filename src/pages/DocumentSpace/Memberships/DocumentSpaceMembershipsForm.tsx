@@ -77,15 +77,17 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
       membershipState.formState.isSubmitting.set(true);
       await membershipService.addDocumentSpaceMember(props.documentSpaceId, membershipState.member.value);
 
-      membershipState.member.merge({
-        email: '',
-        privileges: []
-      });
-      membershipState.formState.merge({
-        successMessage: 'Successfully added member to Document Space',
-        showSuccessMessage: true,
-        isSubmitting: false
-      });
+      if (mountedRef.current) {
+        membershipState.member.merge({
+          email: '',
+          privileges: []
+        });
+        membershipState.formState.merge({
+          successMessage: 'Successfully added member to Document Space',
+          showSuccessMessage: true,
+          isSubmitting: false
+        });
+      }
 
       props.onMemberChangeCallback();
     } catch (error) {
