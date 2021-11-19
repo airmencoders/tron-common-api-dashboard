@@ -307,16 +307,18 @@ function DocumentSpacePage() {
   }
 
   function setNewDocumentSpaceIdQueryParam(documentSpaceId: string) {
-    const queryParams = new URLSearchParams(location.search);
-    if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
-      queryParams.set(spaceIdQueryKey, documentSpaceId);
-      queryParams.delete(pathQueryKey);
-      history.push({ search: queryParams.toString() });
+    if (mountedRef.current) {
+      const queryParams = new URLSearchParams(location.search);
+      if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
+        queryParams.set(spaceIdQueryKey, documentSpaceId);
+        queryParams.delete(pathQueryKey);
+        history.push({ search: queryParams.toString() });
+      }
     }
   }
 
   function onDatasourceUpdateCallback() {
-    pageState.shouldUpdateDatasource.set(false);
+    mergePageState({ shouldUpdateDatasource: false });
   }
 
   function getSpaceOptions() {
