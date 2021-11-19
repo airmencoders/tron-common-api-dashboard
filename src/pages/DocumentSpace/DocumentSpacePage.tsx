@@ -39,6 +39,7 @@ import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
+import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
@@ -48,7 +49,6 @@ import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
 import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
 import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
-import { formatDocumentSpaceDate } from '../../utils/date-utils';
 
 export enum CreateEditOperationType {
   NONE,
