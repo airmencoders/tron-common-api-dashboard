@@ -16,6 +16,7 @@ import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
 
@@ -52,6 +53,11 @@ const documentDtoColumns: GridColumn[] = [
     field: 'lastModifiedDate',
     headerName: 'Last Modified',
     resizable: true,
+    valueFormatter: function (params: ValueFormatterParams) {
+      if (params.value != null) {
+        return formatDocumentSpaceDate(params.value);
+      }
+    }
   }),
   new GridColumn({
     field: 'lastModifiedBy',

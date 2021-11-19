@@ -1,4 +1,4 @@
-import { startOfWeek, isBefore, isFuture, isEqual, isThisISOWeek, addWeeks, endOfWeek, parseISO, startOfDay } from 'date-fns';
+import { startOfWeek, isBefore, isFuture, isEqual, isThisISOWeek, addWeeks, endOfWeek, parseISO, startOfDay, format } from 'date-fns';
 
 /**
  * Gets the first day of the week, given a date object
@@ -98,4 +98,21 @@ export function parseIsoDate(date: string): Date {
  */
 export function getStartOfDay(date: Date | number): Date {
   return startOfDay(date);
+}
+
+/**
+ * Will try to parse the given date into the following
+ * format: dd MMM yyyy HHmm
+ * If the date cannot be parsed, the original value is
+ * returned.
+ * 
+ * @param string the date string to parse
+ * @returns formatted date, or the original value given if date cannot be parsed
+ */
+export function formatDocumentSpaceDate(date: string) {
+  try {
+    return format(new Date(date), 'dd MMM yyyy HHmm');
+  } catch (err) {
+    return date;
+  }
 }

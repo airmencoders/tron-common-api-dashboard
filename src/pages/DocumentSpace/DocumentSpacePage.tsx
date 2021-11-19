@@ -39,6 +39,7 @@ import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
+import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
@@ -83,7 +84,12 @@ const documentDtoColumns: GridColumn[] = [
     field: 'lastModifiedDate',
     headerName: 'Last Modified',
     resizable: true,
-    initialWidth: 500,
+    initialWidth: 250,
+    valueFormatter: function (params: ValueFormatterParams) {
+      if (params.value) {
+        return formatDocumentSpaceDate(params.value);
+      }
+    }
   }),
   new GridColumn({
     field: 'lastModifiedBy',
