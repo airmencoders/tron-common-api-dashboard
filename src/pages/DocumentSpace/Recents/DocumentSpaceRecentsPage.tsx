@@ -22,7 +22,7 @@ import { useAuthorizedUserState } from '../../../state/authorized-user/authorize
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import '../DocumentSpacePage.scss';
-import { format } from 'date-fns';
+import { formatDocumentSpaceDate } from '../../../utils/date-utils'
 import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRenderer';
 import DeleteDocumentDialog from '../DocumentDelete';
@@ -52,7 +52,9 @@ const recentDocumentDtoColumns: GridColumn[] = [
   new GridColumn({
     field: 'lastModifiedDate',
     valueFormatter: function (params: ValueFormatterParams) {
-      return params.value && format(new Date(params.value), 'dd MMM yyyy hh:mm aa');
+      if (params.value) {
+        return formatDocumentSpaceDate(params.value);
+      }
     },
     headerName: 'Last Modified',
     resizable: true,
@@ -196,7 +198,6 @@ function DocumentSpaceRecentsPage() {
         cellRendererParams: {
           menuItems: [
             { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites'), isAuthorized: () => true },
-            { title: 'Go to file', icon: CircleRightArrowIcon, onClick: () => console.log('go to file'), isAuthorized: () => true },
             {
               title: 'Remove',
               icon: CircleMinusIcon,
