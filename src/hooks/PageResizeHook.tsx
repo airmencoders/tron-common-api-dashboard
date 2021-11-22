@@ -71,7 +71,7 @@ export function useDeviceInfo(debounceTime = 100) {
         return;
       }
   
-      if (width > DeviceSize.TABLET && deviceInfo.deviceBySize !== DeviceSize.DESKTOP) {
+      if (width > DeviceSize.TABLET) {
         setDeviceInfo({
           deviceBySize: DeviceSize.DESKTOP,
           isMobile: isMobile,
@@ -80,7 +80,7 @@ export function useDeviceInfo(debounceTime = 100) {
             height
           }
         });
-      } else if (width > DeviceSize.MOBILE && deviceInfo.deviceBySize !== DeviceSize.TABLET) {
+      } else if (width > DeviceSize.MOBILE) {
         setDeviceInfo({
           deviceBySize: DeviceSize.TABLET,
           isMobile: isMobile,
@@ -90,16 +90,14 @@ export function useDeviceInfo(debounceTime = 100) {
           }
         });
       } else {
-        if (deviceInfo.deviceBySize !== DeviceSize.MOBILE) {
-          setDeviceInfo({
-            deviceBySize: DeviceSize.MOBILE,
-            isMobile: isMobile,
+        setDeviceInfo({
+          deviceBySize: DeviceSize.MOBILE,
+          isMobile: isMobile,
           windowSize: {
             width,
             height
           }
-          });
-        }
+        });
       }
     }
 

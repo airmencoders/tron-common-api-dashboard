@@ -126,14 +126,6 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
     return privileges && privileges[actionType];
   }
 
-  privileges() {
-    if (!this.isStateReady) {
-      return {};
-    } else {
-      return this.documentSpacePrivilegeState.value;
-    }
-  }
-
   resetState() {
     if (!this.isPromised) {
       this.documentSpacePrivilegeState.set({});
