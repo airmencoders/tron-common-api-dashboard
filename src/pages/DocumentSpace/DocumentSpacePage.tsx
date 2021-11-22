@@ -42,13 +42,13 @@ import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import EditIcon from '../../icons/EditIcon';
 import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
 import GenericDialog from '../../components/GenericDialog/GenericDialog';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
-import { DeviceSize, useDeviceDetect } from '../../hooks/DeviceDetect';
+import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
+import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 
 export enum CreateEditOperationType {
   NONE,
@@ -137,7 +137,7 @@ function DocumentSpacePage() {
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
 
-  const deviceInfo = useDeviceDetect();
+  const deviceInfo = useDeviceInfo();
 
   const documentDtoColumns = useHookstate<GridColumn[]>([
     new GridColumn({
@@ -209,20 +209,20 @@ function DocumentSpacePage() {
             title: 'Upload new version', 
             icon: UploadIcon, 
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: () => true,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: () => console.log('upload') 
           },
           {
             title: 'Remove',
             icon: CircleMinusIcon,
-            isAuthorized: () => true,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFiles: [doc], showDeleteDialog: true }),
           },
           { 
             title: 'Rename Folder', 
             icon: EditIcon, 
             shouldShow: (doc: DocumentDto) => doc && doc.folder,
-            isAuthorized: () => true,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: (doc: DocumentDto) => mergeState(pageState, { 
               clickedItemName: doc.key, 
               createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
@@ -232,7 +232,7 @@ function DocumentSpacePage() {
             title: 'Rename File', 
             icon: EditIcon, 
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: () => true,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: (doc: DocumentDto) => mergeState(pageState, { 
               clickedItemName: doc.key, 
               createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
@@ -291,26 +291,50 @@ function DocumentSpacePage() {
     loadDocSpaceFromLocation(location, documentSpaceService.documentSpaces);
   }, [location.search]);
 
-  // Handle columns associated with privileges
-  useEffect(() => {
-    const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
-
-    if (moreActionsColumn != null) {
-      if (pageState.selectedSpace.value != null && documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write)) {
-        moreActionsColumn.hide.set(false);
-      } else {
-        moreActionsColumn.hide.set(true);
-      }
-    }
-  }, [pageState.selectedSpace.attach(Downgraded).value, documentSpacePrivilegesService.privileges]);
-  
   // Handle hiding columns on resize
   useEffect(() => {
-    const hidableColumns = documentDtoColumns.filter(column => column.field.value !== 'key' && column.field.value !== 'lastModifiedDate' && column.headerName.value !== 'More');
-    if (deviceInfo.isMobile || deviceInfo.deviceBySize < DeviceSize.DESKTOP) {
-      hidableColumns.forEach(column => column.hide.set(true));
+    const hideableColumns = documentDtoColumns.filter(column => column.field.value !== 'key' && column.field.value !== 'lastModifiedDate' && column.headerName.value !== 'More');
+    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
+      hideableColumns.forEach(column => {
+        if (!column.hide.value) {
+          column.hide.set(true)
+        }
+      });
+
+      // Get the "More" actions column
+      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
+      
+      // Check if "Download" action already exists
+      const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>);
+      const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
+
+      if (downloadAction == null) {
+        cellRendererParams.set(state => {
+          state.menuItems.splice(0, 0, { 
+            title: 'Download', 
+            icon: DownloadMaterialIcon,
+            iconProps: {
+              style: 'primary',
+              fill: true
+            },
+            shouldShow: (doc: DocumentDto) => doc != null,
+            isAuthorized: () => true,
+            onClick: (doc: DocumentDto) => window.location.href = documentSpaceService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+          });
+  
+          return state;
+        });
+      }
     } else {
-      hidableColumns.forEach(column => column.hide.set(false));
+      hideableColumns.forEach(column => {
+        if (column.hide.value) {
+          column.hide.set(false)
+        }
+      });
+
+      // Remove Download from "More" actions cell renderer
+      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
+      (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>).menuItems.find(menuItem => menuItem.title.value === 'Download')?.set(none);
     }
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
@@ -660,6 +684,7 @@ function DocumentSpacePage() {
         />
         <DocumentSpaceActions
           show={pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
+          isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
           selectedSpace={pageState.selectedSpace}
           path={pageState.nested('path')}
           shouldUpdateDatasource={pageState.shouldUpdateDatasource}

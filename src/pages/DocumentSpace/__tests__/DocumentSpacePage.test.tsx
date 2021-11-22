@@ -95,15 +95,18 @@ describe('Test Document Space Page', () => {
 
   });
 
-  it('should show error select when retrieving Document Spaces fails', () => {
-    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.reject('Error'));
+  it('should show error select when retrieving Document Spaces fails', async () => {
+    const fetchSpacesSpy = jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.reject('Error'));
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(true);
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
 
     const page = render(
       <MemoryRouter>
         <DocumentSpacePage />
       </MemoryRouter>
     );
+
+    await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalledTimes(1));
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeDisabled();

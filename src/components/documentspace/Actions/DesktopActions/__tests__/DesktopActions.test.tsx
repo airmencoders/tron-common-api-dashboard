@@ -108,7 +108,7 @@ describe('Desktop Actions Test', () => {
     );
 
     expect(element.queryByTestId('upload-new-file')).not.toBeInTheDocument();
-    expect(element.queryByTestId('Add Items')).not.toBeInTheDocument();
+    expect(element.queryByTitle('Add Items')).not.toBeInTheDocument();
     expect(element.queryByTestId('delete-selected-items')).not.toBeInTheDocument();
 
     expect(element.getByTitle('Download Items')).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe('Desktop Actions Test', () => {
     );
 
     expect(element.queryByTestId('upload-new-file')).not.toBeInTheDocument();
-    expect(element.queryByTestId('Add Items')).not.toBeInTheDocument();
+    expect(element.queryByTitle('Add Items')).not.toBeInTheDocument();
     expect(element.queryByTestId('delete-selected-items')).not.toBeInTheDocument();
 
     expect(element.queryByTitle('Download Items')).not.toBeInTheDocument();
@@ -159,7 +159,7 @@ describe('Desktop Actions Test', () => {
     );
 
     expect(element.queryByTestId('upload-new-file')).not.toBeInTheDocument();
-    expect(element.queryByTestId('Add Items')).not.toBeInTheDocument();
+    expect(element.queryByTitle('Add Items')).not.toBeInTheDocument();
     expect(element.queryByTestId('delete-selected-items')).not.toBeInTheDocument();
     expect(element.queryByTitle('Download Items')).not.toBeInTheDocument();
     expect(element.queryByTitle('Manage Users')).not.toBeInTheDocument();

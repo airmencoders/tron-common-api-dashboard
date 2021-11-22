@@ -96,6 +96,10 @@ export default class GridColumn {
     return this._cellRendererParams;
   }
 
+  set cellRendererParams(params: any) {
+    this._cellRendererParams = params;
+  }
+
   get resizable(): boolean {
     return this._resizable;
   }

@@ -11,7 +11,7 @@ import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/Infinit
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DeviceSize, useDeviceDetect } from '../../hooks/DeviceDetect';
+import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
@@ -120,7 +120,7 @@ export default function DocumentSpaceArchivedItemsPage() {
     })
   ]);
 
-  const deviceInfo = useDeviceDetect();
+  const deviceInfo = useDeviceInfo();
 
   const documentSpaceService = useDocumentSpaceState();
   const docSpacePrivsState = useDocumentSpacePrivilegesState();

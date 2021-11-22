@@ -29,11 +29,10 @@ import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
 import StarIcon from '../../../icons/StarIcon';
-import CircleRightArrowIcon from '../../../icons/CircleRightArrowIcon';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import UploadIcon from '../../../icons/UploadIcon';
-import { DeviceSize, useDeviceDetect } from '../../../hooks/DeviceDetect';
+import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -120,7 +119,7 @@ function DocumentSpaceRecentsPage() {
     })
   ]);
 
-  const deviceInfo = useDeviceDetect();
+  const deviceInfo = useDeviceInfo();
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
 
@@ -175,17 +174,17 @@ function DocumentSpaceRecentsPage() {
 
   // Handle hiding columns on resize
   useEffect(() => {
-    const hidableColumns = recentDocumentDtoColumns.filter(column => 
+    const hideableColumns = recentDocumentDtoColumns.filter(column => 
       column.field.value !== 'key' &&
       column.field.value !== 'lastModifiedDate' &&
       column.headerName.value !== 'Document Space' &&
       column.headerName.value !== 'More'
     );
 
-    if (deviceInfo.isMobile || deviceInfo.deviceBySize < DeviceSize.DESKTOP) {
-      hidableColumns.forEach(column => column.hide.set(true));
+    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
+      hideableColumns.forEach(column => column.hide.set(true));
     } else {
-      hidableColumns.forEach(column => column.hide.set(false));
+      hideableColumns.forEach(column => column.hide.set(false));
     }
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
@@ -252,7 +251,7 @@ function DocumentSpaceRecentsPage() {
                     disableMobileFullWidth
                     onClick={() => pageState.showDeleteDialog.set(true)}
                   >
-                    <RemoveIcon className="icon-color" size={1.25} />
+                    <RemoveIcon className="icon-color" size={1} />
                   </Button>
                 </div>
               )}

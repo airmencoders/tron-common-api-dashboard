@@ -1,18 +1,15 @@
 import React from 'react';
-import { DeviceSize, useDeviceDetect } from '../../../hooks/DeviceDetect';
 import { ActionsProps } from './ActionsProps';
 import DesktopActions from './DesktopActions/DesktopActions';
 import { DocumentSpaceActionsProps } from './DocumentSpaceActionsProps';
 import MobileActions from './MobileActions/MobileActions';
 
 function DocumentSpaceActions(props: DocumentSpaceActionsProps & ActionsProps) {
-  const deviceInfo = useDeviceDetect();
-
-  if (deviceInfo.deviceBySize === DeviceSize.UNKNOWN || !props.show) {
+  if (!props.show) {
     return null;
   }
 
-  if (deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile) {
+  if (props.isMobile) {
     return (
       <MobileActions
         selectedSpace={props.selectedSpace}

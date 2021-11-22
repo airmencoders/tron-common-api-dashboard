@@ -2,7 +2,7 @@ import { GridApi } from 'ag-grid-community';
 import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent, SelectionChangedEvent, ColumnVisibleEvent, FirstDataRenderedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useDeviceDetect } from '../../hooks/DeviceDetect';
+import { useDeviceInfo } from '../../hooks/PageResizeHook';
 import './Grid.scss';
 import { GridProps } from './GridProps';
 import { agGridDefaults } from './GridUtils/grid-utils';
@@ -24,7 +24,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
 
   const rowDataLengthChanged = useRef(false);
 
-  const deviceInfo = useDeviceDetect();
+  const deviceInfo = useDeviceInfo();
 
   // Only reset grid data when the length has changed
   useEffect(() => {
@@ -59,7 +59,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0))
       gridApi?.sizeColumnsToFit();
 
-  }, [deviceInfo.window.width]);
+  }, [deviceInfo.windowSize.width]);
 
   // Handles updating infinite scroll cache
   useEffect(() => {
