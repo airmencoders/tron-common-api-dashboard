@@ -37,18 +37,21 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
       {data.folder ? <FolderIcon /> : null}
       {'  '}
       {data.folder ?
-        <Button
-          type="button"
-          unstyled
-          data-testid="docspace-row-item"
-          onClick={() => {
-            if (data.folder && !props.hideItemLink) {
-              props.onClick(data.key);
-            }
-          }}
-        >
-          <span className='directory'>{data.key}</span>
-        </Button>
+        props.hideItemLink ?
+          <span>{data.key}</span>
+        :
+          <Button
+            type="button"
+            unstyled
+            data-testid="docspace-row-item"
+            onClick={() => {
+              if (data.folder) {
+                props.onClick(data.key);
+              }
+            }}
+          >
+            <span className='directory'>{data.key}</span>
+          </Button>
       :
         props.hideItemLink ?
           <span>{data.key}</span>        
