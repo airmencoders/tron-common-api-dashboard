@@ -27,7 +27,7 @@ import { DocumentSpaceDashboardMemberRequestDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceDashboardMemberResponseDtoResponseWrapper } from '../models';
 // @ts-ignore
-import { DocumentSpaceDeleteItemsDto } from '../models';
+import { DocumentSpacePathItemsDto } from '../models';
 // @ts-ignore
 import { DocumentSpacePrivilegeDtoResponseWrapper } from '../models';
 // @ts-ignore
@@ -43,6 +43,8 @@ import { DocumentSpaceResponseDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { DocumentSpaceUnArchiveItemsDto } from '../models';
 // @ts-ignore
+import { DocumentSpaceUserCollectionResponseDtoWrapper } from '../models';
+// @ts-ignore
 import { ExceptionResponse } from '../models';
 // @ts-ignore
 import { FilePathSpec } from '../models';
@@ -56,6 +58,112 @@ import { S3PaginationDto } from '../models';
  */
 export const DocumentSpaceControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addEntityToFavorites: async (id: string, entryId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addEntityToFavorites.');
+            }
+            // verify required parameter 'entryId' is not null or undefined
+            if (entryId === null || entryId === undefined) {
+                throw new RequiredError('entryId','Required parameter entryId was null or undefined when calling addEntityToFavorites.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/collection/favorite/{entryId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Adds a new entry provided with a path to a favorites collection. If no collection exists, it also creates one.
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addPathEntityToFavorites: async (id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addPathEntityToFavorites.');
+            }
+            // verify required parameter 'documentSpacePathItemsDto' is not null or undefined
+            if (documentSpacePathItemsDto === null || documentSpacePathItemsDto === undefined) {
+                throw new RequiredError('documentSpacePathItemsDto','Required parameter documentSpacePathItemsDto was null or undefined when calling addPathEntityToFavorites.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/collection/favorite/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof documentSpacePathItemsDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(documentSpacePathItemsDto !== undefined ? documentSpacePathItemsDto : {})
+                : (documentSpacePathItemsDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Adds a user to a Document Space with specified privileges
          * @summary Adds a user to a Document Space
@@ -389,18 +497,18 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
          * Deletes selected files/folder from a Document Space that are already archived
          * @summary Deletes item(s) that are already in the archived state
          * @param {string} id 
-         * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteArchivedItems: async (id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options: any = {}): Promise<RequestArgs> => {
+        deleteArchivedItems: async (id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteArchivedItems.');
             }
-            // verify required parameter 'documentSpaceDeleteItemsDto' is not null or undefined
-            if (documentSpaceDeleteItemsDto === null || documentSpaceDeleteItemsDto === undefined) {
-                throw new RequiredError('documentSpaceDeleteItemsDto','Required parameter documentSpaceDeleteItemsDto was null or undefined when calling deleteArchivedItems.');
+            // verify required parameter 'documentSpacePathItemsDto' is not null or undefined
+            if (documentSpacePathItemsDto === null || documentSpacePathItemsDto === undefined) {
+                throw new RequiredError('documentSpacePathItemsDto','Required parameter documentSpacePathItemsDto was null or undefined when calling deleteArchivedItems.');
             }
             const localVarPath = `/v2/document-space/spaces/{id}/archived/delete`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -429,13 +537,13 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof documentSpaceDeleteItemsDto !== 'string';
+            const nonString = typeof documentSpacePathItemsDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(documentSpaceDeleteItemsDto !== undefined ? documentSpaceDeleteItemsDto : {})
-                : (documentSpaceDeleteItemsDto || "");
+                ? JSON.stringify(documentSpacePathItemsDto !== undefined ? documentSpacePathItemsDto : {})
+                : (documentSpacePathItemsDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -501,18 +609,18 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
-         * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteItems: async (id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options: any = {}): Promise<RequestArgs> => {
+        deleteItems: async (id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
             if (id === null || id === undefined) {
                 throw new RequiredError('id','Required parameter id was null or undefined when calling deleteItems.');
             }
-            // verify required parameter 'documentSpaceDeleteItemsDto' is not null or undefined
-            if (documentSpaceDeleteItemsDto === null || documentSpaceDeleteItemsDto === undefined) {
-                throw new RequiredError('documentSpaceDeleteItemsDto','Required parameter documentSpaceDeleteItemsDto was null or undefined when calling deleteItems.');
+            // verify required parameter 'documentSpacePathItemsDto' is not null or undefined
+            if (documentSpacePathItemsDto === null || documentSpacePathItemsDto === undefined) {
+                throw new RequiredError('documentSpacePathItemsDto','Required parameter documentSpacePathItemsDto was null or undefined when calling deleteItems.');
             }
             const localVarPath = `/v2/document-space/spaces/{id}/delete`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
@@ -541,13 +649,13 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof documentSpaceDeleteItemsDto !== 'string';
+            const nonString = typeof documentSpacePathItemsDto !== 'string';
             const needsSerialization = nonString && configuration && configuration.isJsonMime
                 ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
                 : nonString;
             localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(documentSpaceDeleteItemsDto !== undefined ? documentSpaceDeleteItemsDto : {})
-                : (documentSpaceDeleteItemsDto || "");
+                ? JSON.stringify(documentSpacePathItemsDto !== undefined ? documentSpacePathItemsDto : {})
+                : (documentSpacePathItemsDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -993,6 +1101,98 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
         },
         /**
          * 
+         * @summary Gets path of entryId and document space id.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDocumentSpaceEntryPath: async (id: string, entryId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getDocumentSpaceEntryPath.');
+            }
+            // verify required parameter 'entryId' is not null or undefined
+            if (entryId === null || entryId === undefined) {
+                throw new RequiredError('entryId','Required parameter entryId was null or undefined when calling getDocumentSpaceEntryPath.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/path/{entryId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Gets entries from a favorites collection. If no collection exists, returns empty list.
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFavorites: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getFavorites.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/collection/favorite`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
          * @param {number} [page] Zero-based page index (0..N)
          * @param {number} [size] The size of the page to be returned
@@ -1213,6 +1413,112 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Removes an entry from a favorites collection.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeEntityFromFavorites: async (id: string, entryId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removeEntityFromFavorites.');
+            }
+            // verify required parameter 'entryId' is not null or undefined
+            if (entryId === null || entryId === undefined) {
+                throw new RequiredError('entryId','Required parameter entryId was null or undefined when calling removeEntityFromFavorites.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/collection/favorite/{entryId}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)))
+                .replace(`{${"entryId"}}`, encodeURIComponent(String(entryId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Removes an entry provided with a path from a favorites collection.
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removePathEntityFromFavorites: async (id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removePathEntityFromFavorites.');
+            }
+            // verify required parameter 'documentSpacePathItemsDto' is not null or undefined
+            if (documentSpacePathItemsDto === null || documentSpacePathItemsDto === undefined) {
+                throw new RequiredError('documentSpacePathItemsDto','Required parameter documentSpacePathItemsDto was null or undefined when calling removePathEntityFromFavorites.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/collection/favorite/`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof documentSpacePathItemsDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(documentSpacePathItemsDto !== undefined ? documentSpacePathItemsDto : {})
+                : (documentSpacePathItemsDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -1514,6 +1820,36 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
 export const DocumentSpaceControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * 
+         * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addEntityToFavorites(id: string, entryId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FilePathSpec>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).addEntityToFavorites(id, entryId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Adds a new entry provided with a path to a favorites collection. If no collection exists, it also creates one.
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addPathEntityToFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).addPathEntityToFavorites(id, documentSpacePathItemsDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Adds a user to a Document Space with specified privileges
          * @summary Adds a user to a Document Space
          * @param {string} id 
@@ -1607,12 +1943,12 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          * Deletes selected files/folder from a Document Space that are already archived
          * @summary Deletes item(s) that are already in the archived state
          * @param {string} id 
-         * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteArchivedItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteArchivedItems(id, documentSpaceDeleteItemsDto, options);
+        async deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteArchivedItems(id, documentSpacePathItemsDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1638,12 +1974,12 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
-         * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteItems(id, documentSpaceDeleteItemsDto, options);
+        async deleteItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteItems(id, documentSpacePathItemsDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1786,6 +2122,35 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
         },
         /**
          * 
+         * @summary Gets path of entryId and document space id.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDocumentSpaceEntryPath(id: string, entryId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getDocumentSpaceEntryPath(id, entryId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Gets entries from a favorites collection. If no collection exists, returns empty list.
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFavorites(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentSpaceUserCollectionResponseDtoWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getFavorites(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
          * @param {number} [page] Zero-based page index (0..N)
          * @param {number} [size] The size of the page to be returned
@@ -1850,8 +2215,38 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async patchSelfDocumentSpaceDefault(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentSpacePrivilegeDtoResponseWrapper>> {
+        async patchSelfDocumentSpaceDefault(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).patchSelfDocumentSpaceDefault(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Removes an entry from a favorites collection.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeEntityFromFavorites(id: string, entryId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FilePathSpec>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).removeEntityFromFavorites(id, entryId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Removes an entry provided with a path from a favorites collection.
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removePathEntityFromFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).removePathEntityFromFavorites(id, documentSpacePathItemsDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1943,6 +2338,28 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
 export const DocumentSpaceControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
         /**
+         * 
+         * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addEntityToFavorites(id: string, entryId: string, options?: any): AxiosPromise<FilePathSpec> {
+            return DocumentSpaceControllerApiFp(configuration).addEntityToFavorites(id, entryId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Adds a new entry provided with a path to a favorites collection. If no collection exists, it also creates one.
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addPathEntityToFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<void> {
+            return DocumentSpaceControllerApiFp(configuration).addPathEntityToFavorites(id, documentSpacePathItemsDto, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Adds a user to a Document Space with specified privileges
          * @summary Adds a user to a Document Space
          * @param {string} id 
@@ -2012,12 +2429,12 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          * Deletes selected files/folder from a Document Space that are already archived
          * @summary Deletes item(s) that are already in the archived state
          * @param {string} id 
-         * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteArchivedItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): AxiosPromise<object> {
-            return DocumentSpaceControllerApiFp(configuration).deleteArchivedItems(id, documentSpaceDeleteItemsDto, options).then((request) => request(axios, basePath));
+        deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).deleteArchivedItems(id, documentSpacePathItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete a single file from a Document Space by parent folder id and filename
@@ -2035,12 +2452,12 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          * Deletes selected files/folder from a Document Space
          * @summary Deletes selected item(s) from a Document Space
          * @param {string} id 
-         * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): AxiosPromise<object> {
-            return DocumentSpaceControllerApiFp(configuration).deleteItems(id, documentSpaceDeleteItemsDto, options).then((request) => request(axios, basePath));
+        deleteItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).deleteItems(id, documentSpacePathItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Deletes a Document Space
@@ -2143,6 +2560,27 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
         },
         /**
          * 
+         * @summary Gets path of entryId and document space id.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDocumentSpaceEntryPath(id: string, entryId: string, options?: any): AxiosPromise<string> {
+            return DocumentSpaceControllerApiFp(configuration).getDocumentSpaceEntryPath(id, entryId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Gets entries from a favorites collection. If no collection exists, returns empty list.
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFavorites(id: string, options?: any): AxiosPromise<DocumentSpaceUserCollectionResponseDtoWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).getFavorites(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
          * @param {number} [page] Zero-based page index (0..N)
          * @param {number} [size] The size of the page to be returned
@@ -2191,8 +2629,30 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<DocumentSpacePrivilegeDtoResponseWrapper> {
+        patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<void> {
             return DocumentSpaceControllerApiFp(configuration).patchSelfDocumentSpaceDefault(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Removes an entry from a favorites collection.
+         * @param {string} id 
+         * @param {string} entryId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeEntityFromFavorites(id: string, entryId: string, options?: any): AxiosPromise<FilePathSpec> {
+            return DocumentSpaceControllerApiFp(configuration).removeEntityFromFavorites(id, entryId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Removes an entry provided with a path from a favorites collection.
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removePathEntityFromFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<void> {
+            return DocumentSpaceControllerApiFp(configuration).removePathEntityFromFavorites(id, documentSpacePathItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Removes Dashboard Users from a Document Space and their privileges
@@ -2259,6 +2719,28 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
  * @interface DocumentSpaceControllerApi
  */
 export interface DocumentSpaceControllerApiInterface {
+    /**
+     * 
+     * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
+     * @param {string} id 
+     * @param {string} entryId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    addEntityToFavorites(id: string, entryId: string, options?: any): AxiosPromise<FilePathSpec>;
+
+    /**
+     * 
+     * @summary Adds a new entry provided with a path to a favorites collection. If no collection exists, it also creates one.
+     * @param {string} id 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    addPathEntityToFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<void>;
+
     /**
      * Adds a user to a Document Space with specified privileges
      * @summary Adds a user to a Document Space
@@ -2329,12 +2811,12 @@ export interface DocumentSpaceControllerApiInterface {
      * Deletes selected files/folder from a Document Space that are already archived
      * @summary Deletes item(s) that are already in the archived state
      * @param {string} id 
-     * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    deleteArchivedItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): AxiosPromise<object>;
+    deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<object>;
 
     /**
      * Delete a single file from a Document Space by parent folder id and filename
@@ -2352,12 +2834,12 @@ export interface DocumentSpaceControllerApiInterface {
      * Deletes selected files/folder from a Document Space
      * @summary Deletes selected item(s) from a Document Space
      * @param {string} id 
-     * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    deleteItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any): AxiosPromise<object>;
+    deleteItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<object>;
 
     /**
      * Deletes a Document Space
@@ -2460,6 +2942,27 @@ export interface DocumentSpaceControllerApiInterface {
 
     /**
      * 
+     * @summary Gets path of entryId and document space id.
+     * @param {string} id 
+     * @param {string} entryId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    getDocumentSpaceEntryPath(id: string, entryId: string, options?: any): AxiosPromise<string>;
+
+    /**
+     * 
+     * @summary Gets entries from a favorites collection. If no collection exists, returns empty list.
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    getFavorites(id: string, options?: any): AxiosPromise<DocumentSpaceUserCollectionResponseDtoWrapper>;
+
+    /**
+     * 
      * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
      * @param {number} [page] Zero-based page index (0..N)
      * @param {number} [size] The size of the page to be returned
@@ -2509,7 +3012,29 @@ export interface DocumentSpaceControllerApiInterface {
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApiInterface
      */
-    patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<DocumentSpacePrivilegeDtoResponseWrapper>;
+    patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<void>;
+
+    /**
+     * 
+     * @summary Removes an entry from a favorites collection.
+     * @param {string} id 
+     * @param {string} entryId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    removeEntityFromFavorites(id: string, entryId: string, options?: any): AxiosPromise<FilePathSpec>;
+
+    /**
+     * 
+     * @summary Removes an entry provided with a path from a favorites collection.
+     * @param {string} id 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    removePathEntityFromFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<void>;
 
     /**
      * Removes Dashboard Users from a Document Space and their privileges
@@ -2576,6 +3101,32 @@ export interface DocumentSpaceControllerApiInterface {
  * @extends {BaseAPI}
  */
 export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpaceControllerApiInterface {
+    /**
+     * 
+     * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
+     * @param {string} id 
+     * @param {string} entryId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public addEntityToFavorites(id: string, entryId: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).addEntityToFavorites(id, entryId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Adds a new entry provided with a path to a favorites collection. If no collection exists, it also creates one.
+     * @param {string} id 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public addPathEntityToFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).addPathEntityToFavorites(id, documentSpacePathItemsDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Adds a user to a Document Space with specified privileges
      * @summary Adds a user to a Document Space
@@ -2658,13 +3209,13 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      * Deletes selected files/folder from a Document Space that are already archived
      * @summary Deletes item(s) that are already in the archived state
      * @param {string} id 
-     * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApi
      */
-    public deleteArchivedItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).deleteArchivedItems(id, documentSpaceDeleteItemsDto, options).then((request) => request(this.axios, this.basePath));
+    public deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).deleteArchivedItems(id, documentSpacePathItemsDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2685,13 +3236,13 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      * Deletes selected files/folder from a Document Space
      * @summary Deletes selected item(s) from a Document Space
      * @param {string} id 
-     * @param {DocumentSpaceDeleteItemsDto} documentSpaceDeleteItemsDto 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceControllerApi
      */
-    public deleteItems(id: string, documentSpaceDeleteItemsDto: DocumentSpaceDeleteItemsDto, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).deleteItems(id, documentSpaceDeleteItemsDto, options).then((request) => request(this.axios, this.basePath));
+    public deleteItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).deleteItems(id, documentSpacePathItemsDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2813,6 +3364,31 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
 
     /**
      * 
+     * @summary Gets path of entryId and document space id.
+     * @param {string} id 
+     * @param {string} entryId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public getDocumentSpaceEntryPath(id: string, entryId: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).getDocumentSpaceEntryPath(id, entryId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Gets entries from a favorites collection. If no collection exists, returns empty list.
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public getFavorites(id: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).getFavorites(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
      * @param {number} [page] Zero-based page index (0..N)
      * @param {number} [size] The size of the page to be returned
@@ -2872,6 +3448,32 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public patchSelfDocumentSpaceDefault(id: string, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).patchSelfDocumentSpaceDefault(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Removes an entry from a favorites collection.
+     * @param {string} id 
+     * @param {string} entryId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public removeEntityFromFavorites(id: string, entryId: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).removeEntityFromFavorites(id, entryId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Removes an entry provided with a path from a favorites collection.
+     * @param {string} id 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public removePathEntityFromFavorites(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).removePathEntityFromFavorites(id, documentSpacePathItemsDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

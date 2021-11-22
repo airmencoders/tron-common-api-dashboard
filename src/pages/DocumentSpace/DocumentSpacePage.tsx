@@ -1,45 +1,44 @@
-import { none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
-import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
-import React, { ChangeEvent, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import {none, SetPartialStateAction, State, useHookstate} from '@hookstate/core';
+import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
+import React, {useEffect, useRef} from 'react';
+import {useHistory} from 'react-router';
+import {useLocation} from 'react-router-dom';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
-import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
+import {InfiniteScrollOptions} from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer, { PopupMenuItem }  from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentRowActionCellRenderer, {PopupMenuItem} from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import Select from '../../components/forms/Select/Select';
-import { GridSelectionType } from '../../components/Grid/grid-selection-type';
+import {GridSelectionType} from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
-import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
+import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
+import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
+import {createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
 import {
-  DocumentDto,
+  DocumentDto, DocumentSpacePathItemsDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
-  DocumentSpaceResponseDto
+  DocumentSpaceResponseDto,
+  DocumentSpaceUserCollectionResponseDto
 } from '../../openapi';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
-import { FormActionType } from '../../state/crud-page/form-action-type';
-import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { formatBytesToString } from '../../utils/file-utils';
-import DeleteDocumentDialog from './DocumentDelete';
+import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
+import {FormActionType} from '../../state/crud-page/form-action-type';
+import {useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
+import {PrivilegeType} from '../../state/privilege/privilege-type';
+import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
+import {formatBytesToString} from '../../utils/file-utils';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
-import { formatDocumentSpaceDate } from '../../utils/date-utils';
+import {formatDocumentSpaceDate} from '../../utils/date-utils';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
@@ -49,7 +48,9 @@ import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
 import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
 import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
+import StarHollowIcon from "../../icons/StarHollowIcon";
 import GenericDialog from '../../components/GenericDialog/GenericDialog';
+import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
 
 export enum CreateEditOperationType {
   NONE,
@@ -141,14 +142,12 @@ interface DocumentSpacePageState {
   showDeleteSelectedDialog: boolean;
   isDefaultDocumentSpaceSettingsOpen: boolean;
   sideDrawerSize: SideDrawerSize;
+  favorites: DocumentSpaceUserCollectionResponseDto[];
 }
 
 function getDocumentUniqueKey(data: DocumentDto): string {
   return data.path + '__' + data.key;
 }
-
-const spaceIdQueryKey = 'spaceId';
-const pathQueryKey = 'path';
 
 function DocumentSpacePage() {
   const pageState = useHookstate<DocumentSpacePageState>({
@@ -171,6 +170,7 @@ function DocumentSpacePage() {
     showDeleteSelectedDialog: false,
     isDefaultDocumentSpaceSettingsOpen: false,
     sideDrawerSize: SideDrawerSize.WIDE,
+    favorites: []
   });
 
   const location = useLocation();
@@ -266,6 +266,8 @@ function DocumentSpacePage() {
       if (!isAdmin) {
         await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
       }
+      const favorites: DocumentSpaceUserCollectionResponseDto[] = (await documentSpaceService.getFavorites(documentSpace.id)).data.data;
+
       mergePageState({
         selectedSpace: documentSpace,
         shouldUpdateDatasource: true,
@@ -276,13 +278,14 @@ function DocumentSpacePage() {
         ),
         path,
         selectedFiles: [],
+        favorites
       });
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
         queryParams.set(spaceIdQueryKey, documentSpace.id);
         history.replace({ search: queryParams.toString() });
       }
-    } 
+    }
     catch (err) {
       const preparedError = prepareRequestError(err);
 
@@ -305,23 +308,6 @@ function DocumentSpacePage() {
     }
   }
 
-  function onDocumentSpaceSelectionChange(
-    event: ChangeEvent<HTMLSelectElement>
-  ): void {
-    const documentSpaceId = event.target.value;
-    if (documentSpaceId != null) {
-      setNewDocumentSpaceIdQueryParam(documentSpaceId);
-    }
-  }
-
-  function setNewDocumentSpaceIdQueryParam(documentSpaceId: string) {
-    const queryParams = new URLSearchParams(location.search);
-    if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
-      queryParams.set(spaceIdQueryKey, documentSpaceId);
-      queryParams.delete(pathQueryKey);
-      history.push({ search: queryParams.toString() });
-    }
-  }
 
   function onDatasourceUpdateCallback() {
     mergePageState({
@@ -330,29 +316,7 @@ function DocumentSpacePage() {
     });
   }
 
-  function getSpaceOptions() {
-    if (isDocumentSpacesLoading) {
-      return (
-        <option value="loading">
-          Loading...
-        </option>
-      )
-    }
 
-    if (isDocumentSpacesErrored) {
-      return (
-        <option value="error">
-          Could not load Document Spaces
-        </option>
-      )
-    }
-
-    return documentSpaceService.documentSpaces.map((item) =>
-      <option key={item.id} value={item.id}>
-        {item.name}
-      </option>
-    );
-  }
 
   function setPageStateOnException(message: string) {
     mergePageState({
@@ -368,7 +332,7 @@ function DocumentSpacePage() {
 
     switch (pageState.createEditElementOpType.get()) {
       case CreateEditOperationType.EDIT_FOLDERNAME:
-        documentSpaceService.renameFolder(pageState.selectedSpace.value?.id, 
+        documentSpaceService.renameFolder(pageState.selectedSpace.value?.id,
           pageState.get().path + "/" + pageState.clickedItemName.get(), 
           name)
           .then(() => {
@@ -384,7 +348,7 @@ function DocumentSpacePage() {
           .catch(message => setPageStateOnException(message));
         break;
       case CreateEditOperationType.CREATE_FOLDER:
-        documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id, 
+        documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id,
           pageState.get().path, name)
           .then(() => {
             mergePageState({
@@ -398,7 +362,7 @@ function DocumentSpacePage() {
           .catch(message => setPageStateOnException(message));
         break;
       case CreateEditOperationType.EDIT_FILENAME:
-        documentSpaceService.renameFile(pageState.selectedSpace.value?.id, 
+        documentSpaceService.renameFile(pageState.selectedSpace.value?.id,
           pageState.get().path, 
           pageState.clickedItemName.get() ?? '',  // blank if undefined, will allow to fail out..
           name)
@@ -433,12 +397,6 @@ function DocumentSpacePage() {
           path: '',
           datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
         });
-
-        // Ensure the component is still mounted
-        // before pushing any changes to history
-        if (mountedRef.current) {
-          setNewDocumentSpaceIdQueryParam(docSpace.id);
-        }
       })
       .catch((message) => setPageStateOnException(message));
   }
@@ -507,6 +465,52 @@ function DocumentSpacePage() {
     closeRemoveDialog();
   }
 
+  async function addToFavorites(doc: DocumentDto) {
+    if(pageState.selectedSpace?.value !== undefined){
+      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
+      await documentSpaceService.addPathEntityToFavorites(
+        pageState.selectedSpace.value.id,
+        reqDto
+      );
+
+      const placeHolderResponse: DocumentSpaceUserCollectionResponseDto = {
+        metadata: {},
+        id: '',
+        itemId: '',
+        documentSpaceId: doc.spaceId,
+        key: doc.key,
+        lastModifiedDate: '',
+        folder: doc.folder
+      }
+      if(mountedRef.current) {
+        pageState.favorites.merge([placeHolderResponse])
+      }
+      createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
+    }else{
+      createTextToast(ToastType.ERROR, 'Could not add to favorites');
+    }
+
+  }
+  async function removeFromFavorites(doc: DocumentDto) {
+    if(pageState.selectedSpace?.value !== undefined){
+      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
+      await documentSpaceService.removePathEntityFromFavorites(
+        pageState.selectedSpace.value.id,
+        reqDto
+      );
+      if(pageState.favorites.value.length){
+        if(mountedRef.current) {
+          pageState.favorites.set(favorites => {
+            return favorites.filter(f => f.key !== doc.key);
+          })
+        }
+        createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
+      }
+    }else{
+      createTextToast(ToastType.ERROR, 'Could not remove from favorites');
+    }
+  }
+
   function onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
     const selectedFiles = pageState.selectedFiles;
     if (selectionEvent === 'selected') {
@@ -521,6 +525,17 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
+  function getFavoritesShouldShow (doc: DocumentDto, add: boolean) {
+     const foundInFavorites = pageState.favorites?.value?.filter(favorite => {
+      if (doc === undefined) {
+        return false
+      } else {
+        return favorite.key === doc.key
+      }
+    }).length
+
+    return add ? !foundInFavorites : foundInFavorites
+  }
   function documentDtoColumnsWithConditionalDelete() {
     const columns = (pageState.selectedSpace.value && documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
       [
@@ -534,11 +549,25 @@ function DocumentSpacePage() {
             menuItems: [
               { 
                 title: 'Add to favorites', 
-                icon: StarIcon, 
+                icon: StarIcon,
+                shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, true),
+                isAuthorized: () => true,
+                onClick: addToFavorites,
+              },
+              {
+                title: 'Remove from favorites',
+                icon: StarHollowIcon,
+                iconSize: 1.1,
+                shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, false),
+                isAuthorized: () => true,
+                onClick: removeFromFavorites,
+              },
+              {
+                title: 'Go to file', 
+                icon: CircleRightArrowIcon, 
                 shouldShow: (doc: DocumentDto) => doc && !doc.folder,
                 isAuthorized: () => true,
-                onClick: () => console.log('add to favorites'),
-                
+                onClick: () => console.log('go to file') 
               },
               { 
                 title: 'Upload new version', 
@@ -606,15 +635,7 @@ function DocumentSpacePage() {
       <FormGroup labelName="document-space" labelText="Spaces" isError={false}>
         <div className="add-space-container">
           <div>
-            <Select
-              id="document-space"
-              name="document-space"
-              value={pageState.selectedSpace.value?.id}
-              disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
-              onChange={onDocumentSpaceSelectionChange}
-            >
-              {getSpaceOptions()}
-            </Select>
+            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpaceId={pageState.selectedSpace?.value?.id}/>
             {isAdmin && !documentSpacePrivilegesService.isPromised && (
               <Button
                 data-testid="add-doc-space__btn"
@@ -684,7 +705,7 @@ function DocumentSpacePage() {
           pageState.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Read
         ) && (
-          <InfiniteScrollGrid            
+          <InfiniteScrollGrid
             columns={documentDtoColumnsWithConditionalDelete()}
             datasource={pageState.datasource.value}
             cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
