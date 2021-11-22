@@ -26,191 +26,17 @@ export const DocumentSpaceWebDavControllerApiAxiosParamCreator = function (confi
     return {
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
+        processWebDavCommand: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand.');
             }
-
-            const localVarRequestOptions = { method: 'OPTIONS', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getContents1: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getContents2: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getContents3: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getContents4: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getContents5: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -242,11 +68,17 @@ export const DocumentSpaceWebDavControllerApiAxiosParamCreator = function (confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents6: async (options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/v2/document-space-dav`;
+        processWebDavCommand1: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand1.');
+            }
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -255,6 +87,216 @@ export const DocumentSpaceWebDavControllerApiAxiosParamCreator = function (confi
             }
 
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} spaceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processWebDavCommand2: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand2.');
+            }
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} spaceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processWebDavCommand3: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand3.');
+            }
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'HEAD', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} spaceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processWebDavCommand4: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand4.');
+            }
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} spaceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processWebDavCommand5: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand5.');
+            }
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'OPTIONS', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} spaceId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        processWebDavCommand6: async (spaceId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'spaceId' is not null or undefined
+            if (spaceId === null || spaceId === undefined) {
+                throw new RequiredError('spaceId','Required parameter spaceId was null or undefined when calling processWebDavCommand6.');
+            }
+            const localVarPath = `/v2/document-space-dav/{spaceId}/**`
+                .replace(`{${"spaceId"}}`, encodeURIComponent(String(spaceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -287,11 +329,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
     return {
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents(options);
+        async processWebDavCommand(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -299,11 +342,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents1(options);
+        async processWebDavCommand1(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand1(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -311,11 +355,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents2(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents2(options);
+        async processWebDavCommand2(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand2(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -323,11 +368,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents3(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents3(options);
+        async processWebDavCommand3(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand3(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -335,11 +381,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents4(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents4(options);
+        async processWebDavCommand4(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand4(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -347,11 +394,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents5(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents5(options);
+        async processWebDavCommand5(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand5(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -359,11 +407,12 @@ export const DocumentSpaceWebDavControllerApiFp = function(configuration?: Confi
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContents6(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).getContents6(options);
+        async processWebDavCommand6(spaceId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceWebDavControllerApiAxiosParamCreator(configuration).processWebDavCommand6(spaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -380,59 +429,66 @@ export const DocumentSpaceWebDavControllerApiFactory = function (configuration?:
     return {
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents(options).then((request) => request(axios, basePath));
+        processWebDavCommand(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand(spaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents1(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents1(options).then((request) => request(axios, basePath));
+        processWebDavCommand1(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand1(spaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents2(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents2(options).then((request) => request(axios, basePath));
+        processWebDavCommand2(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand2(spaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents3(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents3(options).then((request) => request(axios, basePath));
+        processWebDavCommand3(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand3(spaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents4(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents4(options).then((request) => request(axios, basePath));
+        processWebDavCommand4(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand4(spaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents5(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents5(options).then((request) => request(axios, basePath));
+        processWebDavCommand5(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand5(spaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
+         * @param {string} spaceId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContents6(options?: any): AxiosPromise<string> {
-            return DocumentSpaceWebDavControllerApiFp(configuration).getContents6(options).then((request) => request(axios, basePath));
+        processWebDavCommand6(spaceId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceWebDavControllerApiFp(configuration).processWebDavCommand6(spaceId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -445,59 +501,66 @@ export const DocumentSpaceWebDavControllerApiFactory = function (configuration?:
 export interface DocumentSpaceWebDavControllerApiInterface {
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents(options?: any): AxiosPromise<string>;
+    processWebDavCommand(spaceId: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents1(options?: any): AxiosPromise<string>;
+    processWebDavCommand1(spaceId: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents2(options?: any): AxiosPromise<string>;
+    processWebDavCommand2(spaceId: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents3(options?: any): AxiosPromise<string>;
+    processWebDavCommand3(spaceId: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents4(options?: any): AxiosPromise<string>;
+    processWebDavCommand4(spaceId: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents5(options?: any): AxiosPromise<string>;
+    processWebDavCommand5(spaceId: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApiInterface
      */
-    getContents6(options?: any): AxiosPromise<string>;
+    processWebDavCommand6(spaceId: string, options?: any): AxiosPromise<object>;
 
 }
 
@@ -510,71 +573,78 @@ export interface DocumentSpaceWebDavControllerApiInterface {
 export class DocumentSpaceWebDavControllerApi extends BaseAPI implements DocumentSpaceWebDavControllerApiInterface {
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents1(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents1(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand1(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand1(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents2(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents2(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand2(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand2(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents3(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents3(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand3(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand3(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents4(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents4(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand4(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand4(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents5(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents5(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand5(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand5(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
+     * @param {string} spaceId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DocumentSpaceWebDavControllerApi
      */
-    public getContents6(options?: any) {
-        return DocumentSpaceWebDavControllerApiFp(this.configuration).getContents6(options).then((request) => request(this.axios, this.basePath));
+    public processWebDavCommand6(spaceId: string, options?: any) {
+        return DocumentSpaceWebDavControllerApiFp(this.configuration).processWebDavCommand6(spaceId, options).then((request) => request(this.axios, this.basePath));
     }
 }

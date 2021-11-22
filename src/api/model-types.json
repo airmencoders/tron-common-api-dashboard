@@ -902,6 +902,15 @@
       ],
       "type": "object"
     },
+    "DocumentMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "lastDownloaded": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "DocumentSpaceArchiveItemsDto": {
       "additionalProperties": false,
       "properties": {
@@ -997,13 +1006,13 @@
       ],
       "type": "object"
     },
-    "DocumentSpaceDeleteItemsDto": {
+    "DocumentSpacePathItemsDto": {
       "additionalProperties": false,
       "properties": {
         "currentPath": {
           "type": "string"
         },
-        "itemsToDelete": {
+        "items": {
           "items": {
             "type": "string"
           },
@@ -1143,6 +1152,59 @@
           "type": "array"
         }
       },
+      "type": "object"
+    },
+    "DocumentSpaceUserCollectionResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "documentSpaceId": {
+          "type": "string"
+        },
+        "folder": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "model-types.json#/definitions/DocumentMetadata"
+        },
+        "parentId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "itemId",
+        "documentSpaceId",
+        "key",
+        "lastModifiedDate",
+        "metadata"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceUserCollectionResponseDtoWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceUserCollectionResponseDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
       "type": "object"
     },
     "EndpointCountMetricDto": {

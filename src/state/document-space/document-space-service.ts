@@ -6,7 +6,17 @@ import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinit
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DocumentDto, DocumentSpaceControllerApiInterface, DocumentSpaceRenameFileDto, DocumentSpaceRenameFolderDto, DocumentSpaceRequestDto, DocumentSpaceResponseDto, RecentDocumentDto, S3PaginationDto } from '../../openapi';
+import {
+  DocumentDto,
+  DocumentSpaceControllerApiInterface, DocumentSpacePathItemsDto,
+  DocumentSpaceRenameFileDto,
+  DocumentSpaceRenameFolderDto,
+  DocumentSpaceRequestDto,
+  DocumentSpaceResponseDto,
+  DocumentSpaceUserCollectionResponseDto,
+  RecentDocumentDto,
+  S3PaginationDto
+} from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { accessDocumentSpacePrivilegesState, } from './document-space-state';
@@ -152,6 +162,52 @@ export default class DocumentSpaceService {
     return datasource;
   }
 
+  createFavoritesDocumentsDatasource(documentSpaceId: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
+    return {
+      getRows: async (params: IGetRowsParams) => {
+        try {
+          const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
+          const page = Math.floor(params.startRow / limit);
+          const data: DocumentSpaceUserCollectionResponseDto[] = (await this.documentSpaceApi.getFavorites(documentSpaceId)).data.data;
+
+          let lastRow = -1;
+
+          /**
+           * Last page, calculate the last row
+           */
+          if (data.length === 0 || data.length < limit) {
+            lastRow = (page * limit) + data.length;
+          }
+
+          params.successCallback(data, lastRow);
+        } catch (err) {
+          params.failCallback();
+
+          /**
+           * Don't error out the state here. If the request fails for some reason, just show nothing.
+           *
+           * Call the success callback as a hack to prevent
+           * ag grid from showing an infinite loading state on failure.
+           */
+          params.successCallback([], 0);
+
+          const requestErr = prepareRequestError(err);
+
+          if (requestErr.status != null) {
+            createFailedDataFetchToast();
+            return;
+          }
+
+          /**
+           * Something else went wrong... the request did not leave
+           */
+          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
+          return;
+        }
+      }
+    }
+  }
+
   fetchAndStoreSpaces(): CancellableDataRequest<DocumentSpaceResponseDto[]> {
     const cancellableRequest = makeCancellableDataRequestToken(this.documentSpaceApi.getSpaces.bind(this.documentSpaceApi));
 
@@ -232,7 +288,7 @@ export default class DocumentSpaceService {
 
   async deleteItems(space: string, path: string, items: string[]): Promise<void> {
     try {
-      await this.documentSpaceApi.deleteItems(space, { currentPath: path, itemsToDelete: [...items] });
+      await this.documentSpaceApi.deleteItems(space, { currentPath: path, items: [...items] });
       return Promise.resolve();
     }
     catch (e) {
@@ -338,5 +394,37 @@ export default class DocumentSpaceService {
     catch (e) {
       return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
     }
+  }
+
+  async getDocumentSpaceEntryPath(spaceId: string, entryId: string): Promise<string> {
+
+    try {
+      const stringAxiosResponse = await this.documentSpaceApi.getDocumentSpaceEntryPath(spaceId, entryId);
+      return Promise.resolve(stringAxiosResponse.data);
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
+
+  }
+
+
+  addEntityToFavorites(documentSpaceId: string, entityId: string){
+    return this.documentSpaceApi.addEntityToFavorites(documentSpaceId, entityId)
+  }
+
+  addPathEntityToFavorites(documentSpaceId: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto){
+    return this.documentSpaceApi.addPathEntityToFavorites(documentSpaceId, documentSpacePathItemsDto)
+  }
+
+  removePathEntityFromFavorites(documentSpaceId: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto){
+    return this.documentSpaceApi.removePathEntityFromFavorites(documentSpaceId, documentSpacePathItemsDto)
+  }
+  removeEntityFromFavorites(documentSpaceId: string, entityId: string){
+    return this.documentSpaceApi.removeEntityFromFavorites(documentSpaceId, entityId)
+  }
+
+  getFavorites(documentSpaceId: string){
+    return this.documentSpaceApi.getFavorites(documentSpaceId)
   }
 }

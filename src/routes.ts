@@ -23,6 +23,7 @@ import SystemIcon from './icons/SystemIcon';
 import DocSpaceIcon from './icons/DocSpaceIcon';
 import DocumentSpaceRecentsPage from './pages/DocumentSpace/Recents/DocumentSpaceRecentsPage';
 import DocumentSpaceArchivedItemsPage from "./pages/DocumentSpace/DocumentSpaceArchivedItemsPage";
+import DocumentSpaceFavoritesPage from "./pages/DocumentSpace/Favorites/DocumentSpaceFavoritesPage";
 
 export interface RouteItem {
     path: string;
@@ -54,6 +55,7 @@ export enum RoutePath {
     DOCUMENT_SPACE = '/document-space',
     DOCUMENT_SPACE_SPACES = '/document-space/spaces',
     DOCUMENT_SPACE_RECENTS = '/document-space/recents',
+    DOCUMENT_SPACE_FAVORITES = '/document-space/favorites',
     DOCUMENT_SPACE_ARCHIVED = '/document-space/archived',
 }
 
@@ -175,6 +177,15 @@ export const routes: RouteItem[] = [
                 path: RoutePath.DOCUMENT_SPACE_RECENTS,
                 name: 'Recents',
                 component: DocumentSpaceRecentsPage,
+                requiredPrivileges: [
+                    PrivilegeType.DOCUMENT_SPACE_USER,
+                    PrivilegeType.DASHBOARD_ADMIN
+                ]
+            },
+            {
+                path: RoutePath.DOCUMENT_SPACE_FAVORITES,
+                name: 'Favorites',
+                component: DocumentSpaceFavoritesPage,
                 requiredPrivileges: [
                     PrivilegeType.DOCUMENT_SPACE_USER,
                     PrivilegeType.DASHBOARD_ADMIN

@@ -13,25 +13,20 @@
  */
 
 
+import { DocumentSpaceUserCollectionResponseDto } from './document-space-user-collection-response-dto';
 
 /**
  * 
  * @export
- * @interface DocumentSpaceDeleteItemsDto
+ * @interface DocumentSpaceUserCollectionResponseDtoWrapper
  */
-export interface DocumentSpaceDeleteItemsDto {
+export interface DocumentSpaceUserCollectionResponseDtoWrapper {
     /**
      * 
-     * @type {string}
-     * @memberof DocumentSpaceDeleteItemsDto
+     * @type {Array<DocumentSpaceUserCollectionResponseDto>}
+     * @memberof DocumentSpaceUserCollectionResponseDtoWrapper
      */
-    currentPath?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof DocumentSpaceDeleteItemsDto
-     */
-    itemsToDelete?: Array<string>;
+    data: Array<DocumentSpaceUserCollectionResponseDto>;
 }
 
 
