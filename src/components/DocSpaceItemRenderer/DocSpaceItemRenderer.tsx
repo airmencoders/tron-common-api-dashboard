@@ -4,16 +4,19 @@ import { DocumentDto } from '../../openapi';
 import Button from '../Button/Button';
 import Spinner from '../Spinner/Spinner';
 import './DocSpaceItemRenderer.scss';
-import {ICellRendererParams} from 'ag-grid-community';
-import {ClickableCellRenderer} from '../Grid/clickable-cell-renderer';
-import {useDocumentSpaceState} from '../../state/document-space/document-space-state';
+import { ICellRendererParams } from 'ag-grid-community';
+import { ClickableCellRenderer } from '../Grid/clickable-cell-renderer';
+import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+
+export interface DocSpaceItemRendererProps {
+  hideItemLink?: boolean;
+}
 
 /**
  * Component for the file doc space explorer - deals with
  * directories and files
  */
-function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer) {
-
+function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer & DocSpaceItemRendererProps) {
   const documentSpaceService = useDocumentSpaceState();
 
   const data = props.node?.data as DocumentDto;
@@ -25,14 +28,11 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
     return <Spinner small />;
   }
 
-  return (
-    <div
-      className="loading-cell-renderer"
-      data-testid={`docspace-item-cell-renderer__${data.key}`}
-    >
-      {data.folder ? <FolderIcon /> : null}
-      {'  '}
-      {data.folder ?
+  function renderFolderItem() {
+    if (props.hideItemLink) {
+      return <span>{data.key}</span>;
+    } else {
+      return (
         <Button
           type="button"
           unstyled
@@ -43,15 +43,33 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
             }
           }}
         >
-          <span className='directory'>{data.key}</span>
+          <span className="directory">{data.key}</span>
         </Button>
-      :
-        <a href={documentSpaceService.createRelativeDownloadFileUrl(
-            space,
-            path,
-            fileKey
-        )} target="_blank" rel="noreferrer">{data.key}</a>
-      }
+      );
+    }
+  }
+
+  function renderFileItem() {
+    if (props.hideItemLink) {
+      return <span>{data.key}</span>;
+    } else {
+      return (
+        <a
+          href={documentSpaceService.createRelativeDownloadFileUrl(space, path, fileKey)}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {data.key}
+        </a>
+      );
+    }
+  }
+
+  return (
+    <div className="loading-cell-renderer" data-testid={`docspace-item-cell-renderer__${data.key}`}>
+      {data.folder ? <FolderIcon /> : null}
+      {'  '}
+      {data.folder ? renderFolderItem() : renderFileItem()}
     </div>
   );
 }

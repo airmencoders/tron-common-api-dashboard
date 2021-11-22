@@ -259,6 +259,7 @@ function DocumentSpacePage() {
   }
 
   async function setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
+    console.log('state path change')
     try {
       // Don't need to load privileges if current user is Dashboard Admin,
       // since they currently have access to everything Document Space related
@@ -324,7 +325,7 @@ function DocumentSpacePage() {
 
   function onDatasourceUpdateCallback() {
     mergePageState({
-      shouldUpdateDatasource: true,
+      shouldUpdateDatasource: false,
       selectedFiles: []
     });
   }

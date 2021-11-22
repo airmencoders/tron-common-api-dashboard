@@ -37,6 +37,9 @@ const documentDtoColumns: GridColumn[] = [
     headerName: 'Name',
     resizable: true,
     cellRenderer: DocSpaceItemRenderer,
+    cellRendererParams: {
+      hideItemLink: true,
+    },
     checkboxSelection: true,
   }),
   new GridColumn({
