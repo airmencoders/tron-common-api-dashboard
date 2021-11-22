@@ -191,7 +191,6 @@ function DocumentSpacePage() {
       cellRenderer: DocumentDownloadCellRenderer
     }),
     new GridColumn({
-      hide: !pageState.selectedSpace.value || !documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write),
       valueGetter: GridColumn.defaultValueGetter,
       headerName: 'More',
       headerClass: 'header-center',
@@ -205,13 +204,6 @@ function DocumentSpacePage() {
             isAuthorized: () => true,
             onClick: () => console.log('add to favorites'),
             
-          },
-          { 
-            title: 'Go to file', 
-            icon: CircleRightArrowIcon, 
-            shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: () => true,
-            onClick: () => console.log('go to file') 
           },
           { 
             title: 'Upload new version', 
@@ -401,18 +393,24 @@ function DocumentSpacePage() {
   ): void {
     const documentSpaceId = event.target.value;
     if (documentSpaceId != null) {
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
-        queryParams.set(spaceIdQueryKey, documentSpaceId);
-        queryParams.delete(pathQueryKey);
-        history.push({ search: queryParams.toString() });
-      }
+      setNewDocumentSpaceIdQueryParam(documentSpaceId);
+    }
+  }
+
+  function setNewDocumentSpaceIdQueryParam(documentSpaceId: string) {
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get(spaceIdQueryKey) !== documentSpaceId) {
+      queryParams.set(spaceIdQueryKey, documentSpaceId);
+      queryParams.delete(pathQueryKey);
+      history.push({ search: queryParams.toString() });
     }
   }
 
   function onDatasourceUpdateCallback() {
-    pageState.shouldUpdateDatasource.set(false);
-    pageState.selectedFiles.set([]);
+    mergePageState({
+      shouldUpdateDatasource: true,
+      selectedFiles: []
+    });
   }
 
   function getSpaceOptions() {
@@ -518,6 +516,12 @@ function DocumentSpacePage() {
           path: '',
           datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
         });
+
+        // Ensure the component is still mounted
+        // before pushing any changes to history
+        if (mountedRef.current) {
+          setNewDocumentSpaceIdQueryParam(docSpace.id);
+        }
       })
       .catch((message) => setPageStateOnException(message));
   }
