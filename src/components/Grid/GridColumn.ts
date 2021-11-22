@@ -22,7 +22,9 @@ export default class GridColumn {
       initialWidth = undefined,
       filterParams = undefined,
       valueGetter = undefined,
-      valueFormatter = undefined
+      valueFormatter = undefined,
+      hide = false,
+      maxWidth = undefined
     } = params;
 
     this._field = field;
@@ -42,6 +44,8 @@ export default class GridColumn {
     this._initialWidth = initialWidth;
     this._valueGetter = valueGetter;
     this._valueFormatter = valueFormatter;
+    this._hide = hide;
+    this._maxWidth = maxWidth;
   }
 
   private _field: string;
@@ -61,6 +65,8 @@ export default class GridColumn {
   private _initialWidth: number | undefined;
   private _valueGetter?: (params: ValueGetterParams) => any;
   private _valueFormatter?: (params: ValueFormatterParams) => any;
+  private _hide: boolean;
+  private _maxWidth?: number;
 
   get field(): string {
     return this._field;
@@ -129,6 +135,18 @@ export default class GridColumn {
   get valueFormatter(): ((params: ValueFormatterParams) => any) | undefined {
     return this._valueFormatter;
   }
+
+  get hide(): boolean {
+    return this._hide;
+  }
+
+  set hide(shouldHide: boolean) {
+    this._hide = shouldHide;
+  }
+
+  get maxWidth(): number | undefined {
+    return this._maxWidth;
+  } 
 
   static get defaultValueGetter() {
     return function defaultValueGetter(params: ValueGetterParams) {

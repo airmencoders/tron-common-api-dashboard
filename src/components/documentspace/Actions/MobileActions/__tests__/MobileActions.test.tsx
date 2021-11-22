@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../../../../openapi';
+import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../../../../openapi';
 import { useDocumentSpacePrivilegesState } from '../../../../../state/document-space/document-space-state';
 import DocumentSpacePrivilegeService from '../../../../../state/document-space/document-space-privilege-service';
 import MobileActions from '../MobileActions';
@@ -10,6 +10,8 @@ import { CreateEditOperationType } from '../../../../../pages/DocumentSpace/Docu
 
 jest.mock('../../../../../state/document-space/document-space-state');
 describe('Mobile Actions Test', () => {
+  let selectedFiles: State<DocumentDto[]> & StateMethodsDestroy;
+  let showDeleteSelectedDialog: State<boolean> & StateMethodsDestroy;
   let selectedSpace: State<DocumentSpaceResponseDto | undefined> & StateMethodsDestroy;
   let path: State<string> & StateMethodsDestroy;
   let shouldUpdateDatasource: State<boolean> & StateMethodsDestroy;
@@ -22,6 +24,8 @@ describe('Mobile Actions Test', () => {
   let documentSpacePrivilegeService: DocumentSpacePrivilegeService;
 
   beforeEach(() => {
+    selectedFiles = createState<DocumentDto[]>([]);
+    showDeleteSelectedDialog = createState<boolean>(false);
     selectedSpace = createState<DocumentSpaceResponseDto | undefined>({
       id: 'id',
       name: 'test document space'
@@ -41,6 +45,8 @@ describe('Mobile Actions Test', () => {
   });
 
   afterEach(() => {
+    selectedFiles.destroy();
+    showDeleteSelectedDialog.destroy();
     selectedSpace.destroy();
     path.destroy();
     shouldUpdateDatasource.destroy();
@@ -70,6 +76,8 @@ describe('Mobile Actions Test', () => {
         shouldUpdateDatasource={shouldUpdateDatasource}
         createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
+        selectedFiles={selectedFiles}
+        showDeleteSelectedDialog={showDeleteSelectedDialog}
       />
     );
 
@@ -109,6 +117,8 @@ describe('Mobile Actions Test', () => {
         shouldUpdateDatasource={shouldUpdateDatasource}
         createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
+        selectedFiles={selectedFiles}
+        showDeleteSelectedDialog={showDeleteSelectedDialog}
       />
     );
 
@@ -135,6 +145,8 @@ describe('Mobile Actions Test', () => {
         shouldUpdateDatasource={shouldUpdateDatasource}
         createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
+        selectedFiles={selectedFiles}
+        showDeleteSelectedDialog={showDeleteSelectedDialog}
       />
     );
 
@@ -161,6 +173,8 @@ describe('Mobile Actions Test', () => {
         shouldUpdateDatasource={shouldUpdateDatasource}
         createEditElementOpType={createEditElementOpType}
         membershipsState={membershipsState}
+        selectedFiles={selectedFiles}
+        showDeleteSelectedDialog={showDeleteSelectedDialog}
       />
     );
 

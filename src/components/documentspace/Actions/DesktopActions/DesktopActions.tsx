@@ -3,7 +3,6 @@ import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
 import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
-import { DesktopActionsProps } from './DesktopActionsProps';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import PeopleIcon2 from '../../../../icons/PeopleIcon2';
@@ -11,8 +10,9 @@ import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
 import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
+import { ActionsProps } from '../ActionsProps';
 
-function DesktopActions(props: DesktopActionsProps) {
+function DesktopActions(props: ActionsProps) {
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
 
@@ -23,7 +23,7 @@ function DesktopActions(props: DesktopActionsProps) {
   }
 
   return (
-    <>
+    <div className={`document-space-actions document-space-actions--desktop ${props.className ?? ''} `}>
       {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
         <>
           <div data-testid="upload-new-file">
@@ -94,14 +94,14 @@ function DesktopActions(props: DesktopActionsProps) {
       {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
         <Button
           type="button"
-          unstyled
+          icon
           disableMobileFullWidth
           onClick={() => props.membershipsState.isOpen.set(true)}
         >
-          <PeopleIcon2 size={1.5} iconTitle="Manage Users" />
+          <PeopleIcon2 size={1} iconTitle="Manage Users" />
         </Button>
       )}
-    </>
+    </div>
   );
 }
 

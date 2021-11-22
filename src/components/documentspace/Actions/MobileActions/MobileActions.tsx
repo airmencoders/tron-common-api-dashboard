@@ -8,9 +8,12 @@ import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import PeopleIcon from '../../../../icons/PeopleIcon';
 import { ActionsProps } from '../ActionsProps';
-import { useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
+import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
+import DropDown from '../../../DropDown/DropDown';
+import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
+import RemoveIcon from '../../../../icons/RemoveIcon';
 
 interface MoreActionsState {
   popupOpen: boolean;
@@ -22,6 +25,7 @@ function MobileActions(props: ActionsProps) {
   });
 
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
+  const documentSpaceService = useDocumentSpaceState();
 
   const uploadFileRef = createRef<HTMLInputElement>();
 
@@ -34,17 +38,14 @@ function MobileActions(props: ActionsProps) {
     state.popupOpen.set(false);
   }
 
-  /**
-   * Menu for mobile only contains Write and Membership related actions.
-   * So, don't render anything if the user does not have access to anything.
-   */
-  if (!documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
-    !documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership)) {
-    return null;
-  }
+  function getEllipsisContent() {
+    if (props.selectedSpace.value == null ||
+      !documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
+      !documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership)) {
+      return null;
+    }
 
-  return (
-    <div className="document-space-actions">
+    return (
       <Popup
         trigger={
           <div className="document-space-actions__icon" data-testid="document-space-actions">
@@ -85,6 +86,48 @@ function MobileActions(props: ActionsProps) {
           }
         </Popup.Content>
       </Popup>
+    );
+  }
+
+  return (
+    <div className={`document-space-actions document-space-actions--mobile ${props.className ?? ''} `}>
+      {getEllipsisContent()}
+
+      <DropDown
+        id="download-items"
+        data-testid="download-items"
+        anchorContent={<DownloadMaterialIcon size={1} fill iconTitle="Download Items" />}
+        items={[
+          {
+            displayName: 'Download Selected',
+            action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
+              ? documentSpaceService.createRelativeFilesDownloadUrl(
+                props.selectedSpace.value.id,
+                props.path.value,
+                props.selectedFiles.value
+              )
+              : undefined)
+          },
+          {
+            displayName: 'Download All Files (zip)',
+            action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+              props.selectedSpace.value.id))
+          }
+        ]}
+      />
+
+      {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) && 
+        <Button
+          type="button"
+          icon
+          disabled={props.selectedFiles.value.length === 0}
+          data-testid="delete-selected-items"
+          disableMobileFullWidth
+          onClick={() => props.showDeleteSelectedDialog.set(true)}
+        >
+          <RemoveIcon className="icon-color" size={1} />
+        </Button>
+      }
 
       <FileUpload
         ref={uploadFileRef}

@@ -1,4 +1,4 @@
-import { none, useHookstate } from '@hookstate/core';
+import { Downgraded, none, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
@@ -11,6 +11,7 @@ import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/Infinit
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import { DeviceSize, useDeviceDetect } from '../../hooks/DeviceDetect';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
@@ -30,51 +31,6 @@ interface PageState {
   selectedFiles: DocumentDto[];
   showDeleteDialog: boolean;
 }
-
-const documentDtoColumns: GridColumn[] = [
-  new GridColumn({
-    field: 'key',
-    headerName: 'Name',
-    resizable: true,
-    cellRenderer: DocSpaceItemRenderer,
-    checkboxSelection: true,
-  }),
-  new GridColumn({
-    field: 'spaceName',
-    headerName: 'Doc Space',
-    resizable: true,
-  }),
-  new GridColumn({
-    field: 'path',
-    headerName: 'Path',
-    resizable: true,
-  }),
-  new GridColumn({
-    field: 'lastModifiedDate',
-    headerName: 'Last Modified',
-    resizable: true,
-    valueFormatter: function (params: ValueFormatterParams) {
-      if (params.value != null) {
-        return formatDocumentSpaceDate(params.value);
-      }
-    }
-  }),
-  new GridColumn({
-    field: 'lastModifiedBy',
-    headerName: 'Last Modified By',
-    resizable: true,
-  }),
-  new GridColumn({
-    field: 'size',
-    headerName: 'Size',
-    resizable: true,
-    valueFormatter: function (params: ValueFormatterParams) {
-      if (params.value != null) {
-        return params.value ? formatBytesToString(params.value) : '';
-      }
-    },
-  }),
-];
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: false,
@@ -96,6 +52,76 @@ export default function DocumentSpaceArchivedItemsPage() {
     },
     showDeleteDialog: false,
   });
+
+  const documentDtoColumns = useHookstate<GridColumn[]>([
+    new GridColumn({
+      field: 'key',
+      headerName: 'Name',
+      resizable: true,
+      cellRenderer: DocSpaceItemRenderer,
+      checkboxSelection: true,
+    }),
+    new GridColumn({
+      field: 'spaceName',
+      headerName: 'Doc Space',
+      resizable: true,
+    }),
+    new GridColumn({
+      field: 'path',
+      headerName: 'Path',
+      resizable: true,
+    }),
+    new GridColumn({
+      field: 'lastModifiedDate',
+      headerName: 'Last Modified',
+      resizable: true,
+      valueFormatter: function (params: ValueFormatterParams) {
+        if (params.value != null) {
+          return formatDocumentSpaceDate(params.value);
+        }
+      }
+    }),
+    new GridColumn({
+      field: 'lastModifiedBy',
+      headerName: 'Last Modified By',
+      resizable: true,
+    }),
+    new GridColumn({
+      field: 'size',
+      headerName: 'Size',
+      resizable: true,
+      valueFormatter: function (params: ValueFormatterParams) {
+        if (params.value != null) {
+          return params.value ? formatBytesToString(params.value) : '';
+        }
+      },
+    }),
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'More',
+      headerClass: 'header-center',
+      cellRenderer: DocumentRowActionCellRenderer,
+      cellRendererParams: {
+        menuItems: [
+          {
+            title: 'Restore',
+            icon: CircleRightArrowIcon,
+            onClick: () => restoreItems(),
+            isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
+          },
+          {
+            title: 'Permanently Delete',
+            icon: CircleMinusIcon,
+            onClick: () => pageState.merge({ showDeleteDialog: true }),
+            isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
+          },
+        ],
+      },
+    })
+  ]);
+
+  const deviceInfo = useDeviceDetect();
+
   const documentSpaceService = useDocumentSpaceState();
   const docSpacePrivsState = useDocumentSpacePrivilegesState();
   const mountedRef = useRef(false);
@@ -107,8 +133,25 @@ export default function DocumentSpaceArchivedItemsPage() {
     return function cleanup() {
       mountedRef.current = false;
       documentSpaceService.resetState();
-      docSpacePrivsState.resetState();    };
+      docSpacePrivsState.resetState();
+    };
   }, []);
+
+  // Handle hiding columns on resize
+  useEffect(() => {
+    const hidableColumns = documentDtoColumns.filter(column => 
+      column.field.value !== 'key' &&
+      column.field.value !== 'spaceName' &&
+      column.field.value !== 'path' &&
+      column.headerName.value !== 'More'
+    );
+
+    if (deviceInfo.isMobile || deviceInfo.deviceBySize < DeviceSize.DESKTOP) {
+      hidableColumns.forEach(column => column.hide.set(true));
+    } else {
+      hidableColumns.forEach(column => column.hide.set(false));
+    }
+  }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
   function closeRemoveDialog(): void {
     pageState.merge({ showDeleteDialog: false });
@@ -199,39 +242,6 @@ export default function DocumentSpaceArchivedItemsPage() {
     }
   }
 
-  function documentDtoColumnsWithMoreActions() {
-    // get unique list of spaceIds we see here in the archived items...
-    //  then see if this use can write or greater on each row -- which will determine if they get the 
-    //  more actions or not
-    if (!pageState.datasource.value) return documentDtoColumns;
-
-    return [
-      ...documentDtoColumns,
-      new GridColumn({
-        valueGetter: GridColumn.defaultValueGetter,
-        headerName: 'More',
-        headerClass: 'header-center',
-        cellRenderer: DocumentRowActionCellRenderer,
-        cellRendererParams: {
-          menuItems: [
-            {
-              title: 'Restore',
-              icon: CircleRightArrowIcon,
-              onClick: () => restoreItems(),
-              isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
-            },
-            {
-              title: 'Permanently Delete',
-              icon: CircleMinusIcon,
-              onClick: () => pageState.merge({ showDeleteDialog: true }),
-              isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
-            },
-          ],
-        },
-      }),
-    ];
-  }
-
   function checkHasWriteForDocSpace(doc: DocumentDto): boolean {
     if (!doc) return false;
     return docSpacePrivsState.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write);
@@ -241,7 +251,7 @@ export default function DocumentSpaceArchivedItemsPage() {
     <PageFormat pageTitle="Document Space Archived Items">
       {pageState.datasource.value && (
         <InfiniteScrollGrid
-          columns={documentDtoColumnsWithMoreActions()}
+          columns={documentDtoColumns.attach(Downgraded).value}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
           maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
@@ -252,6 +262,7 @@ export default function DocumentSpaceArchivedItemsPage() {
           getRowNodeId={getDocumentUniqueKey}
           onRowSelected={onDocumentRowSelected}
           rowSelection="multiple"
+          autoResizeColumns
         />
       )}
       <DeleteDocumentDialog
