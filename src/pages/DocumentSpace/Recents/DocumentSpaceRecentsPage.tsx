@@ -1,11 +1,11 @@
-import { Downgraded, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
+import { Downgraded, none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer
-  from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+, { PopupMenuItem }  from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import GridColumn from '../../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
@@ -31,8 +31,14 @@ import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
 import StarIcon from '../../../icons/StarIcon';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
-import UploadIcon from '../../../icons/UploadIcon';
 import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
+import { performActionWhenMounted } from '../../../utils/component-utils';
+import SideDrawer from '../../../components/SideDrawer/SideDrawer';
+import { CreateEditOperationType, getCreateEditTitle } from '../../../state/document-space/document-space-utils';
+import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
+import DocumentSpaceCreateEditForm from '../DocumentSpaceCreateEditForm';
+import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
+import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -44,6 +50,12 @@ interface DocumentSpaceRecentsPageState {
   shouldUpdateInfiniteCache: boolean;
   selectedFile?: RecentDocumentDto;
   showDeleteDialog: boolean;
+}
+
+interface RenameFormState {
+  isSubmitting: boolean,
+  isOpen: boolean,
+  isLoading: boolean
 }
 
 function getDocumentUniqueKey(data: RecentDocumentDto): string {
@@ -60,6 +72,12 @@ function DocumentSpaceRecentsPage() {
     shouldUpdateInfiniteCache: false,
     selectedFile: undefined,
     showDeleteDialog: false,
+  });
+
+  const renameFormState = useHookstate<RenameFormState>({
+    isSubmitting: false,
+    isOpen: false,
+    isLoading: false
   });
 
   const recentDocumentDtoColumns = useHookstate<GridColumn[]>([
@@ -101,19 +119,29 @@ function DocumentSpaceRecentsPage() {
       cellRenderer: DocumentRowActionCellRenderer,
       cellRendererParams: {
         menuItems: [
-          { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites'), isAuthorized: () => true },
           {
             title: 'Remove',
             icon: CircleMinusIcon,
             onClick: (doc: RecentDocumentDto) => {
-              mergePageState({ selectedFile: doc, showDeleteDialog: true })
+              performActionWhenMounted(mountedRef.current, () => pageState.merge({ selectedFile: doc, showDeleteDialog: true }))
             },
             isAuthorized: (data: RecentDocumentDto) => {
               return data && documentSpacePrivilegesService.isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
             }
           },
-          { title: 'Rename', icon: EditIcon, onClick: () => console.log('rename'), isAuthorized: () => true },
-          { title: 'Upload new version', icon: UploadIcon, onClick: () => console.log('upload'), isAuthorized: () => true },
+          { 
+            title: 'Rename',
+            icon: EditIcon,
+            onClick: (doc: RecentDocumentDto) => {
+              performActionWhenMounted(mountedRef.current, () => {
+                pageState.selectedFile.set(doc);
+                renameFormState.isOpen.set(true);
+              })
+            },
+            isAuthorized: (data: RecentDocumentDto) => {
+              return data && documentSpacePrivilegesService.isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
+            }
+          },
         ],
       }
     })
@@ -141,19 +169,12 @@ function DocumentSpaceRecentsPage() {
           return privilegesCancellableRequest.promise;
         })
         .catch(err => {
-          if (!mountedRef.current) {
-            return;
-          }
-
-          createTextToast(ToastType.ERROR, 'Could not load privileges for authorized Document Spaces. Actions will be limited', { autoClose: false });
+          performActionWhenMounted(mountedRef.current, () => 
+            createTextToast(ToastType.ERROR, 'Could not load privileges for authorized Document Spaces. Actions will be limited', { autoClose: false }));
         })
-        .then(() => mergePageState({
-          datasource: documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions)
-        }));
+        .then(() => performActionWhenMounted(mountedRef.current, () => pageState.datasource.set(documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions))))
     } else {
-      mergePageState({
-        datasource: documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions)
-      });
+      performActionWhenMounted(mountedRef.current, () => pageState.datasource.set(documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions)));
     }
 
     return function cleanup() {
@@ -181,10 +202,39 @@ function DocumentSpaceRecentsPage() {
       column.headerName.value !== 'More'
     );
 
+    // Get the "More" actions column
+    const moreActionsColumn = recentDocumentDtoColumns.find(column => column.headerName.value === 'More');
+    // Cell Renderer Params for "More" actions column
+    const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<RecentDocumentDto>[] }>);
+    const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
+
     if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
       hideableColumns.forEach(column => column.hide.set(true));
+      
+      // Only add Download if it doesn't exist already
+      if (downloadAction == null) {
+        cellRendererParams.set(state => {
+          state.menuItems.splice(0, 0, { 
+            title: 'Download', 
+            icon: DownloadMaterialIcon,
+            iconProps: {
+              style: 'primary',
+              fill: true
+            },
+            shouldShow: (doc: RecentDocumentDto) => doc != null,
+            isAuthorized: () => true,
+            onClick: (doc: RecentDocumentDto) => 
+              window.location.href = documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(doc.documentSpace.id , doc.parentFolderId, doc.key, true)
+          });
+  
+          return state;
+        });
+      }
     } else {
       hideableColumns.forEach(column => column.hide.set(false));
+
+      // Remove Download if it exists
+      downloadAction?.set(none);
     }
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
@@ -197,24 +247,53 @@ function DocumentSpaceRecentsPage() {
 
     try {
       await documentSpaceService.deleteArchiveItemBySpaceAndParent(file.documentSpace.id, file.parentFolderId, file.key);
+      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.SUCCESS, 'File successfully archived: ' + file.key));
     } catch (error) {
-      createTextToast(ToastType.ERROR, 'Could not delete requested file: ' + file.key);
+      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.ERROR, 'Could not delete requested file: ' + file.key));
     } finally {
-      mergePageState({
+      performActionWhenMounted(mountedRef.current, () => pageState.merge({
         selectedFile: undefined,
         showDeleteDialog: false,
         shouldUpdateInfiniteCache: true
-      });
+      }));
     }
   }
 
-  function mergePageState(partialState: Partial<DocumentSpaceRecentsPageState>): void {
-    mergeState<DocumentSpaceRecentsPageState>(pageState, partialState);
-  }
+  async function renameFile(newName: string) {
+    const file = pageState.selectedFile.value;
 
-  function mergeState<T>(state: State<T>, partialState: SetPartialStateAction<T>): void {
-    if (mountedRef.current) {
-      state.merge(partialState);
+    if (file == null) {
+      throw new Error('File cannot be null for File Rename');
+    }
+    
+    let wasSuccessful = false;
+
+    try {
+      performActionWhenMounted(mountedRef.current, () => renameFormState.isSubmitting.set(true));
+      
+      const pathToFolderContainingFile = await documentSpaceService.getDocumentSpaceEntryPath(file.documentSpace.id, file.parentFolderId);
+      await documentSpaceService.renameFile(file.documentSpace.id, pathToFolderContainingFile, file.key, newName);
+
+      wasSuccessful = true;
+      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.SUCCESS, `Successfully renamed file ${file.key} to ${newName}`));
+    } catch (error) {
+      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.ERROR, `Could not rename file ${file.key}`));
+    } finally {
+      performActionWhenMounted(mountedRef.current, () => {
+        if (wasSuccessful) {
+          pageState.merge({
+            shouldUpdateInfiniteCache: true,
+            selectedFile: undefined
+          });
+        } else {
+          pageState.selectedFile.set(undefined);
+        }
+
+        renameFormState.merge({
+          isOpen: false,
+          isSubmitting: false
+        });
+      });
     }
   }
 
@@ -223,9 +302,7 @@ function DocumentSpaceRecentsPage() {
   }
 
   function shouldUpdateInfiniteCacheCallback() {
-    mergePageState({
-      shouldUpdateInfiniteCache: false
-    });
+    performActionWhenMounted(mountedRef.current, () => pageState.shouldUpdateInfiniteCache.set(false));
   }
 
   return (
@@ -280,6 +357,39 @@ function DocumentSpaceRecentsPage() {
             onSubmit={deleteArchiveFile}
             file={pageState.selectedFile.value?.key ?? null}
           />
+
+          <SideDrawer
+            isLoading={false}
+            title={getCreateEditTitle(CreateEditOperationType.EDIT_FILENAME)}
+            isOpen={renameFormState.isOpen.value && pageState.selectedFile.value != null}
+            onCloseHandler={() => { 
+              pageState.selectedFile.set(undefined);
+              renameFormState.merge({
+                isSubmitting: false,
+                isOpen: false
+              });
+            }}
+            size={SideDrawerSize.WIDE}
+          >
+            {pageState.selectedFile.value &&
+              <DocumentSpaceCreateEditForm
+                onCancel={() => { 
+                  pageState.selectedFile.set(undefined);
+                  renameFormState.merge({
+                    isSubmitting: false,
+                    isOpen: false
+                  });
+                }}
+                onSubmit={renameFile}
+                isFormSubmitting={renameFormState.isSubmitting.value}
+                onCloseErrorMsg={() => { return; }}
+                showErrorMessage={false}
+                // errorMessage={}
+                elementName={pageState.selectedFile.value?.key}
+                opType={CreateEditOperationType.EDIT_FILENAME}
+              />
+            }
+          </SideDrawer>
         </>
       }
     </PageFormat>

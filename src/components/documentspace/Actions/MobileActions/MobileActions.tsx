@@ -10,10 +10,10 @@ import PeopleIcon from '../../../../icons/PeopleIcon';
 import { ActionsProps } from '../ActionsProps';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
-import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
+import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 
 interface MoreActionsState {
   popupOpen: boolean;

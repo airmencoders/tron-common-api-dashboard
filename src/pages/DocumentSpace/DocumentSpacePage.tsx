@@ -50,26 +50,7 @@ import {DocumentSpaceUserCollectionResponseDto} from '../../openapi/models/docum
 import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
-
-export enum CreateEditOperationType {
-  NONE,
-  CREATE_FOLDER,
-  EDIT_FOLDERNAME,
-  EDIT_FILENAME
-}
-
-function getCreateEditTitle(type: CreateEditOperationType) {
-  switch (type) {
-    case CreateEditOperationType.CREATE_FOLDER:
-      return "New Folder";
-    case CreateEditOperationType.EDIT_FOLDERNAME:
-      return "Edit Folder Name";
-    case CreateEditOperationType.EDIT_FILENAME:
-      return "Edit File Name";
-    default:
-      return "Unknown";
-  }
-}
+import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,

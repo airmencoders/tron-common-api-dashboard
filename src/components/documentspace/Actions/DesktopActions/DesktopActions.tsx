@@ -9,8 +9,8 @@ import PeopleIcon2 from '../../../../icons/PeopleIcon2';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
-import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
 import { ActionsProps } from '../ActionsProps';
+import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 
 function DesktopActions(props: ActionsProps) {
   const documentSpaceService = useDocumentSpaceState();

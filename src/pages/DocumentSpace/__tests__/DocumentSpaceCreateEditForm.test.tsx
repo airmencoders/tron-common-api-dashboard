@@ -1,10 +1,9 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
-import { FormActionType } from '../../../state/crud-page/form-action-type';
 import DocumentSpaceCreateEditForm, { DocumentSpaceCreateEditFormProps } from '../DocumentSpaceCreateEditForm';
 import { MemoryRouter } from 'react-router';
 import { waitFor } from '@testing-library/dom';
-import { CreateEditOperationType } from '../DocumentSpacePage';
+import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
 
 
 describe('Doc Space Create Edit form test', () => {
