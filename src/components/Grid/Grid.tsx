@@ -1,5 +1,5 @@
 import { GridApi } from 'ag-grid-community';
-import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent, SelectionChangedEvent, ColumnVisibleEvent, FirstDataRenderedEvent } from 'ag-grid-community/dist/lib/events';
+import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent, SelectionChangedEvent, FirstDataRenderedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDeviceInfo } from '../../hooks/PageResizeHook';
@@ -78,6 +78,12 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     }
   }, [props.scrollToTop]);
 
+  function onColumnVisible() {
+    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
+      gridApi?.sizeColumnsToFit();
+    }
+  }
+
   function onFirstDataRendered(event: FirstDataRenderedEvent) {
     gridApi?.sizeColumnsToFit();
   }
@@ -133,6 +139,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                 suppressCellSelection={props.suppressCellSelection}
                 onSelectionChanged={onSelectionChanged}
                 onFirstDataRendered={onFirstDataRendered}
+                onColumnVisible={onColumnVisible}
             >
               {
                 props.columns.map(col => (
