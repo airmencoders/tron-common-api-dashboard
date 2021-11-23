@@ -1,6 +1,6 @@
 import {SetPartialStateAction, State, useHookstate} from '@hookstate/core';
 import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
-import React, {ChangeEvent, useEffect, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
 import {InfiniteScrollOptions} from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer
@@ -33,7 +33,7 @@ import {useHistory} from "react-router";
 import {useLocation} from "react-router-dom";
 import StarHollowIcon from "../../../icons/StarHollowIcon";
 import {prepareRequestError} from "../../../utils/ErrorHandling/error-handling-utils";
-import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "../DocumentSpaceSelector";
+import DocumentSpaceSelector, {spaceIdQueryKey} from "../DocumentSpaceSelector";
 
 
 const infiniteScrollOptions: InfiniteScrollOptions = {

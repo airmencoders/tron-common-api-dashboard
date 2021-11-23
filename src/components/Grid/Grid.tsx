@@ -1,13 +1,12 @@
-import { useHookstate } from '@hookstate/core';
 import { GridApi } from 'ag-grid-community';
-import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent, SelectionChangedEvent } from 'ag-grid-community/dist/lib/events';
+import { GridReadyEvent, ModelUpdatedEvent, RowSelectedEvent, SelectionChangedEvent, FirstDataRenderedEvent } from 'ag-grid-community/dist/lib/events';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useDeviceInfo } from '../../hooks/PageResizeHook';
 import './Grid.scss';
 import { GridProps } from './GridProps';
 import { agGridDefaults } from './GridUtils/grid-utils';
 import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGridProps';
-import { GridSelectionType } from './grid-selection-type';
 
 function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -24,6 +23,8 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   }
 
   const rowDataLengthChanged = useRef(false);
+
+  const deviceInfo = useDeviceInfo();
 
   // Only reset grid data when the length has changed
   useEffect(() => {
@@ -53,26 +54,12 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     }
   }, [props.data]);
 
-  const windowWidth = useHookstate<number>(window.innerWidth);
-  // Keep track of the size of the window width
-  useEffect(() => {
-    function onResize() {
-      windowWidth.set(window.innerWidth);
-    }
-
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-    }
-  }, []);
-
   // Resize the grid columns if necessary
   useEffect(() => {
     if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0))
       gridApi?.sizeColumnsToFit();
 
-    }, [windowWidth.get()])
+  }, [deviceInfo.windowSize.width]);
 
   // Handles updating infinite scroll cache
   useEffect(() => {
@@ -91,6 +78,15 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     }
   }, [props.scrollToTop]);
 
+  function onColumnVisible() {
+    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
+      gridApi?.sizeColumnsToFit();
+    }
+  }
+
+  function onFirstDataRendered(event: FirstDataRenderedEvent) {
+    gridApi?.sizeColumnsToFit();
+  }
 
   function onRowSelected(event: RowSelectedEvent) {
     const data = event.data;
@@ -142,6 +138,8 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                 immutableData={props.immutableData}
                 suppressCellSelection={props.suppressCellSelection}
                 onSelectionChanged={onSelectionChanged}
+                onFirstDataRendered={onFirstDataRendered}
+                onColumnVisible={onColumnVisible}
             >
               {
                 props.columns.map(col => (
@@ -164,6 +162,8 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                       filterParams={col.filterParams}
                       valueGetter={col.valueGetter}
                       valueFormatter={col.valueFormatter}
+                      hide={col.hide}
+                      maxWidth={col.maxWidth}
                   />
                 ))
               }

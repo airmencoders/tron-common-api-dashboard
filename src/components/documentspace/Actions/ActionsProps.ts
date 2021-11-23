@@ -1,5 +1,5 @@
 import { State } from '@hookstate/core';
-import { DocumentSpaceResponseDto } from '../../../openapi';
+import { DocumentDto, DocumentSpaceResponseDto } from '../../../openapi';
 import { CreateEditOperationType } from '../../../pages/DocumentSpace/DocumentSpacePage';
 
 export interface ActionsProps {
@@ -8,4 +8,7 @@ export interface ActionsProps {
   shouldUpdateDatasource: State<boolean>;
   createEditElementOpType: State<CreateEditOperationType>;
   membershipsState: State<{ isOpen: boolean }>;
+  selectedFiles: State<DocumentDto[]>;
+  showDeleteSelectedDialog: State<boolean>;
+  className?: string;
 }

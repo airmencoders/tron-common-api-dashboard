@@ -21,4 +21,6 @@ export interface GridColumnParams {
   filterParams: GridFilterParams;
   valueGetter?: (params: ValueGetterParams) => any;
   valueFormatter?: (params: ValueFormatterParams) => any;
+  hide?: boolean;
+  maxWidth?: number;
 }

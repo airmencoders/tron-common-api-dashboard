@@ -2,12 +2,13 @@ import React, { useMemo } from 'react';
 import { Popup } from 'semantic-ui-react';
 import EllipsesIcon from '../../icons/EllipsesIcon';
 import { IconProps } from '../../icons/IconProps';
+import { SvgIconProps } from '../../icons/SvgIconProps';
 import './DocumentRowActionCellRenderer.scss';
 
 export interface PopupMenuItem<T> {
   title: string;
-  icon: React.FC<IconProps>;
-  iconSize?: number;
+  icon: React.FC<IconProps | (IconProps & SvgIconProps)>;
+  iconProps?: Partial<IconProps> | Partial<(IconProps & SvgIconProps)>;
   shouldShow?: (data: T) => boolean;
   isAuthorized: (data: T) => boolean;
   onClick: (doc: T) => void;
@@ -56,7 +57,7 @@ function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererPr
                       setOpen(false);
                       popupItem.onClick(props.node.data);
                   }}>
-                    <popupItem.icon className="popper__icon" size={popupItem.iconSize ? popupItem.iconSize : 1} iconTitle={popupItem.title} />
+                    <popupItem.icon className="popper__icon" size={1} iconTitle={popupItem.title} {...popupItem.iconProps} />
                     <span className="popper__title">{popupItem.title}</span>
                   </div>
               ))

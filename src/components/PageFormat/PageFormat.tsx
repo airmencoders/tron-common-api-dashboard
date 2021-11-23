@@ -7,10 +7,9 @@ import Sidebar from '../Sidebar/Sidebar';
 import './PageFormat.scss';
 import CloseNavIcon from '../../icons/CloseNavIcon';
 import Button from '../Button/Button';
-import {useLocalStorage, writeStorage} from '@rehooks/local-storage';
 import OpenNavIcon from '../../icons/OpenNavIcon';
 import {useNavCollapsed} from '../../hooks/PagePreferenceHooks';
-import {useWindowSize, WindowSize} from '../../hooks/PageResizeHook';
+import {DeviceInfo, useDeviceInfo} from '../../hooks/PageResizeHook';
 
 export interface PageFormatProps {
   pageTitle: string;
@@ -20,7 +19,7 @@ export interface PageFormatProps {
 function PageFormat(props: any) {
   const appInfoService = useAppVersionState();
   const [isNavCollapsed, setIsNavCollapsed] = useNavCollapsed();
-  const windowSize: WindowSize = useWindowSize();
+  const deviceInfo: DeviceInfo = useDeviceInfo(0);
 
   function getBackgroundClass() {
     if (appInfoService.state.enclave?.get()?.match(/il4/i)) {
@@ -46,7 +45,7 @@ function PageFormat(props: any) {
         <div className={`page-format__nav-menu ${getBackgroundClass()} 
                         ${isNavCollapsed ? 'page-format__nav-menu--collapsed' : ''}`}
              style={{
-               minHeight: `${windowSize?.height}px`
+               minHeight: deviceInfo.windowSize.height ? `${deviceInfo.windowSize.height}px` : ''
              }}
         >
           <Sidebar items={routes} />
@@ -68,7 +67,7 @@ function PageFormat(props: any) {
         <div className="page-format__page-body-container">
           <div className="page-format__page-body"
                style={{
-                 height: `${windowSize?.height}px`
+                 height: deviceInfo.windowSize.height ? `${deviceInfo.windowSize.height}px` : ''
                }}
           >
             <div className="page-body__title-section">

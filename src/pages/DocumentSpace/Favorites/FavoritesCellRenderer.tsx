@@ -2,7 +2,7 @@ import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import Spinner from '../../../components/Spinner/Spinner';
-import {DocumentSpaceUserCollectionResponseDto, RecentDocumentDto} from '../../../openapi';
+import {DocumentSpaceUserCollectionResponseDto} from '../../../openapi';
 import FolderIcon from "../../../icons/FolderIcon";
 import Button from "../../../components/Button/Button";
 import {ClickableCellRenderer} from "../../../components/Grid/clickable-cell-renderer";
