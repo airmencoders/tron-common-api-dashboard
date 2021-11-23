@@ -1,26 +1,30 @@
-import { createState, State } from '@hookstate/core';
-import { AxiosResponse } from 'axios';
-import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
-import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
+import {createState, State} from '@hookstate/core';
+import {AxiosResponse} from 'axios';
+import {InfiniteScrollOptions} from '../../../components/DataCrudFormPage/infinite-scroll-options';
+import {generateInfiniteScrollLimit} from '../../../components/Grid/GridUtils/grid-utils';
 import {
   DocumentDto,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
-  DocumentSpacePrivilegeDtoResponseWrapper,
-  DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceRenameFolderDto,
+  DocumentSpacePathItemsDto,
+  DocumentSpaceRenameFolderDto,
   DocumentSpaceResponseDto,
-  DocumentSpaceResponseDtoResponseWrapper, FilePathSpec, GenericStringArrayResponseWrapper,
+  DocumentSpaceResponseDtoResponseWrapper,
+  DocumentSpaceUserCollectionResponseDto,
+  DocumentSpaceUserCollectionResponseDtoWrapper,
+  FilePathSpec,
+  GenericStringArrayResponseWrapper,
   S3PaginationDto
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
-import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
-import { RequestError } from '../../../utils/ErrorHandling/request-error';
+import {prepareRequestError} from '../../../utils/ErrorHandling/error-handling-utils';
+import {RequestError} from '../../../utils/ErrorHandling/request-error';
 import {
   createAxiosNoContentResponse,
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse
 } from '../../../utils/TestUtils/test-utils';
-import DocumentSpaceService, { ArchivedStatus } from '../document-space-service';
+import DocumentSpaceService, {ArchivedStatus} from '../document-space-service';
 
 describe('Test Document Space Service', () => {
   const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -527,6 +531,122 @@ describe('Test Document Space Service', () => {
     const expectedError = prepareRequestError(axiosError);
 
     await expect(documentSpaceService.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename)).rejects.toEqual(expectedError);
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should create favorites datasource', (done) => {
+    const favoritesList: DocumentSpaceUserCollectionResponseDto[] = [{id: 'id', itemId: 'itemId', documentSpaceId: 'docSpaceId', key: 'key', parentId: 'parentId', lastModifiedDate:'', metadata: {}, folder: true,}]
+    const favoritesResponse: AxiosResponse<DocumentSpaceUserCollectionResponseDtoWrapper> = createAxiosSuccessResponse(
+      {
+        data: favoritesList,
+      }
+    );
+    documentSpaceApi.getFavorites = jest.fn(() => {
+      return Promise.resolve(favoritesResponse);
+    });
+
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getFavorites');
+
+    const onSuccess = jest.fn((data) => {
+      try {
+        expect(data).toEqual(
+          expect.arrayContaining(favoritesResponse.data.data)
+        );
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+    const onFail = jest.fn();
+    const datasource = documentSpaceService.createFavoritesDocumentsDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+  });
+
+
+  it('should allow a patch default document space to be made', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'patchSelfDocumentSpaceDefault').mockReturnValue(Promise.resolve(createAxiosSuccessResponse<void>(void (0))));
+
+    await documentSpaceService.patchDefaultDocumentSpace('spaceId');
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should make call to get path', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'getDocumentSpaceEntryPath').mockReturnValue(Promise.resolve(createAxiosSuccessResponse<string>('path/to/doc')));
+
+    const path = await documentSpaceService.getDocumentSpaceEntryPath('spaceId', 'entryId');
+    expect(mock).toHaveBeenCalled();
+    expect(path).toEqual('path/to/doc')
+  });
+
+  it('should successfully post an entity to favorites ', async () => {
+    const returnFileSpecPath = {
+      fullPathSpec: 'path/to/doc',
+      documentSpaceId: 'id',
+      itemId: 'itemId',
+      itemName: 'key',
+    }
+
+    const mock = jest.spyOn(documentSpaceApi, 'addEntityToFavorites').mockReturnValue(Promise.resolve(createAxiosSuccessResponse<FilePathSpec>(returnFileSpecPath)));
+
+    const path = await documentSpaceService.addEntityToFavorites('spaceId', 'entryId');
+    expect(mock).toHaveBeenCalled();
+    expect(path.data).toEqual(returnFileSpecPath)
+  });
+
+  it('should successfully delete an entity from favorites ', async () => {
+    const returnFileSpecPath = {
+      fullPathSpec: 'path/to/doc',
+      documentSpaceId: 'id',
+      itemId: 'itemId',
+      itemName: 'key',
+    }
+
+    const mock = jest.spyOn(documentSpaceApi, 'removeEntityFromFavorites').mockReturnValue(Promise.resolve(createAxiosSuccessResponse<FilePathSpec>(returnFileSpecPath)));
+
+    const path = await documentSpaceService.removeEntityFromFavorites('spaceId', 'entryId');
+    expect(mock).toHaveBeenCalled();
+    expect(path.data).toEqual(returnFileSpecPath)
+  });
+  it('should successfully post a path entity to favorites ', async () => {
+    const docSpaceDto: DocumentSpacePathItemsDto = {
+      currentPath: '',
+      items: ['key1']
+    }
+    const mock = jest.spyOn(documentSpaceApi, 'addPathEntityToFavorites').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<void>(void (0))
+      )
+    );
+    await documentSpaceService.addPathEntityToFavorites('spaceId', docSpaceDto);
+    expect(mock).toHaveBeenCalled();
+  });
+
+  it('should successfully delete a path entity from favorites ', async () => {
+
+    const docSpaceDto: DocumentSpacePathItemsDto = {
+      currentPath: '',
+      items: ['key1']
+    }
+    const mock = jest.spyOn(documentSpaceApi, 'removePathEntityFromFavorites').mockReturnValue(
+      Promise.resolve(
+        createAxiosSuccessResponse<void>(void (0))
+      )
+    );
+
+    await documentSpaceService.removePathEntityFromFavorites('spaceId', docSpaceDto);
     expect(mock).toHaveBeenCalled();
   });
 });
