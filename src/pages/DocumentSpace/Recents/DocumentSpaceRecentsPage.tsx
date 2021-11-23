@@ -2,7 +2,6 @@ import { Downgraded, SetPartialStateAction, State, useHookstate } from '@hooksta
 import { IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
-import Button from '../../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer
   from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
@@ -12,7 +11,6 @@ import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/Infi
 import PageFormat from '../../../components/PageFormat/PageFormat';
 import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
-import RemoveIcon from '../../../icons/RemoveIcon';
 import {
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
@@ -68,7 +66,6 @@ function DocumentSpaceRecentsPage() {
       headerName: 'Name',
       resizable: true,
       cellRenderer: RecentDocumentCellRenderer,
-      checkboxSelection: true
     }),
     new GridColumn({
       headerName: 'Document Space',
@@ -218,10 +215,6 @@ function DocumentSpaceRecentsPage() {
     }
   }
 
-  function onSelectionChanged(data?: RecentDocumentDto) {
-    pageState.selectedFile.set(data);
-  }
-
   function shouldUpdateInfiniteCacheCallback() {
     mergePageState({
       shouldUpdateInfiniteCache: false
@@ -239,23 +232,6 @@ function DocumentSpaceRecentsPage() {
               onNavigate={() => { return }}
               rootName="Recents"
             />
-            <div>
-              {!documentSpacePrivilegesService.isPromised && (
-                <div className="content-controls">
-                  <Button
-                    type="button"
-                    icon
-                    disabled={!pageState.selectedFile.value ||
-                      !documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedFile.value.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write)}
-                    data-testid="delete-selected-items"
-                    disableMobileFullWidth
-                    onClick={() => pageState.showDeleteDialog.set(true)}
-                  >
-                    <RemoveIcon className="icon-color" size={1} />
-                  </Button>
-                </div>
-              )}
-            </div>
           </div>
           {pageState.datasource.value &&
             <InfiniteScrollGrid
@@ -265,9 +241,8 @@ function DocumentSpaceRecentsPage() {
               maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
               maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
               suppressCellSelection
+              suppressRowClickSelection
               getRowNodeId={getDocumentUniqueKey}
-              rowSelection="single"
-              onSelectionChanged={onSelectionChanged}
               updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
               updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
               autoResizeColumns
