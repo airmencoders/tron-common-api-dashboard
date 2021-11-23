@@ -1,4 +1,4 @@
-import { Downgraded, none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
+import { Downgraded, none, State, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
@@ -28,7 +28,6 @@ import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRend
 import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
-import StarIcon from '../../../icons/StarIcon';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
@@ -37,7 +36,6 @@ import SideDrawer from '../../../components/SideDrawer/SideDrawer';
 import { CreateEditOperationType, getCreateEditTitle } from '../../../state/document-space/document-space-utils';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import DocumentSpaceCreateEditForm from '../DocumentSpaceCreateEditForm';
-import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -53,9 +51,8 @@ interface DocumentSpaceRecentsPageState {
 }
 
 interface RenameFormState {
-  isSubmitting: boolean,
-  isOpen: boolean,
-  isLoading: boolean
+  isSubmitting: boolean;
+  isOpen: boolean;
 }
 
 function getDocumentUniqueKey(data: RecentDocumentDto): string {
@@ -76,8 +73,7 @@ function DocumentSpaceRecentsPage() {
 
   const renameFormState = useHookstate<RenameFormState>({
     isSubmitting: false,
-    isOpen: false,
-    isLoading: false
+    isOpen: false
   });
 
   const recentDocumentDtoColumns = useHookstate<GridColumn[]>([
@@ -297,6 +293,14 @@ function DocumentSpaceRecentsPage() {
     }
   }
 
+  function closeRenameForm() {
+    pageState.selectedFile.set(undefined);
+    renameFormState.merge({
+      isSubmitting: false,
+      isOpen: false
+    });
+  }
+
   function onSelectionChanged(data?: RecentDocumentDto) {
     pageState.selectedFile.set(data);
   }
@@ -362,29 +366,16 @@ function DocumentSpaceRecentsPage() {
             isLoading={false}
             title={getCreateEditTitle(CreateEditOperationType.EDIT_FILENAME)}
             isOpen={renameFormState.isOpen.value && pageState.selectedFile.value != null}
-            onCloseHandler={() => { 
-              pageState.selectedFile.set(undefined);
-              renameFormState.merge({
-                isSubmitting: false,
-                isOpen: false
-              });
-            }}
-            size={SideDrawerSize.WIDE}
+            onCloseHandler={closeRenameForm}
+            size={SideDrawerSize.NORMAL}
           >
             {pageState.selectedFile.value &&
               <DocumentSpaceCreateEditForm
-                onCancel={() => { 
-                  pageState.selectedFile.set(undefined);
-                  renameFormState.merge({
-                    isSubmitting: false,
-                    isOpen: false
-                  });
-                }}
+                onCancel={closeRenameForm}
                 onSubmit={renameFile}
                 isFormSubmitting={renameFormState.isSubmitting.value}
                 onCloseErrorMsg={() => { return; }}
                 showErrorMessage={false}
-                // errorMessage={}
                 elementName={pageState.selectedFile.value?.key}
                 opType={CreateEditOperationType.EDIT_FILENAME}
               />
