@@ -1453,6 +1453,21 @@
       ],
       "type": "object"
     },
+    "FilePathSpecWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/FilePathSpec"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "FilterCondition": {
       "additionalProperties": false,
       "description": "The list of conditions that must be fulfilled",
