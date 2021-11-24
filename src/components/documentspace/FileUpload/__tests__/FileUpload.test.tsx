@@ -282,4 +282,52 @@ describe('File Upload Tests', () => {
     await waitFor(() => expect(mock).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(0));
   });
+
+  it('should render and fire appropriate events - Yes and No Answers', async () => {
+    const response = createAxiosSuccessResponse<{ [key: string]: string }>({ message: 'good' });
+    const uploadMock = jest.spyOn(documentSpaceService, 'uploadFile').mockReturnValue({
+      promise: Promise.resolve(response),
+      cancelTokenSource: axios.CancelToken.source()
+    });
+
+    jest.spyOn(documentSpaceService, 'checkIfFileExistsAtPath')
+      .mockReturnValue(Promise.resolve([ 'some-file', 'some-file2'  ]));
+
+    const mock = jest.fn();
+    const uploadFileRef = createRef<HTMLInputElement>();
+    const page = render(<MemoryRouter>
+      <FileUpload
+        documentSpaceId='test'
+        currentPath={''}
+        onFinish={mock}
+        ref={uploadFileRef}
+      />
+    </MemoryRouter>);
+
+    mock.mockReset();
+
+    uploadFileRef.current?.click();
+
+    await waitFor(() => expect(page.getByTestId('file-uploader-input')).toBeInTheDocument());
+    await waitFor(() =>
+      fireEvent.change(page.getByTestId('file-uploader-input'), {
+        target: { files: [ { name: 'some-file' }, { name: 'some-file2' }, { name: 'some-file3' }] },
+      })
+    );
+
+    // confirm we have a prompt displayed
+    await waitFor(() => expect(screen.getByText('No')).toBeInTheDocument());
+
+    // click the Yes to overwrite
+    fireEvent.click(screen.getByText('No'));
+
+    // confirm we have a prompt displayed
+    await waitFor(() => expect(screen.getByText('Yes')).toBeInTheDocument());
+
+    // click the Yes to overwrite
+    fireEvent.click(screen.getByText('Yes'));
+
+    await waitFor(() => expect(mock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(2));  // fired twice since we said No on one of them
+  });
 });
