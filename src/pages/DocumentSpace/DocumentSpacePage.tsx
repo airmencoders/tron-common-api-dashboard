@@ -562,13 +562,6 @@ function DocumentSpacePage() {
                 isAuthorized: () => true,
                 onClick: removeFromFavorites,
               },
-              {
-                title: 'Go to file', 
-                icon: CircleRightArrowIcon, 
-                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-                isAuthorized: () => true,
-                onClick: () => console.log('go to file') 
-              },
               { 
                 title: 'Upload new version', 
                 icon: UploadIcon, 

@@ -49,6 +49,8 @@ import { ExceptionResponse } from '../models';
 // @ts-ignore
 import { FilePathSpec } from '../models';
 // @ts-ignore
+import { FilePathSpecWrapper } from '../models';
+// @ts-ignore
 import { RecentDocumentDtoResponseWrapper } from '../models';
 // @ts-ignore
 import { S3PaginationDto } from '../models';
@@ -1697,6 +1699,63 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Similar to usage of the Unix stat command
+         * @summary Get info about a file(s) at given path
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        statElementsAtPath: async (id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling statElementsAtPath.');
+            }
+            // verify required parameter 'documentSpacePathItemsDto' is not null or undefined
+            if (documentSpacePathItemsDto === null || documentSpacePathItemsDto === undefined) {
+                throw new RequiredError('documentSpacePathItemsDto','Required parameter documentSpacePathItemsDto was null or undefined when calling statElementsAtPath.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/stat`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof documentSpacePathItemsDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(documentSpacePathItemsDto !== undefined ? documentSpacePathItemsDto : {})
+                : (documentSpacePathItemsDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Un-archives selected files/folder from a Document Space
          * @summary Un-archives selected item(s) from a Document Space
          * @param {string} id 
@@ -2298,6 +2357,21 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Similar to usage of the Unix stat command
+         * @summary Get info about a file(s) at given path
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async statElementsAtPath(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FilePathSpecWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).statElementsAtPath(id, documentSpacePathItemsDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Un-archives selected files/folder from a Document Space
          * @summary Un-archives selected item(s) from a Document Space
          * @param {string} id 
@@ -2688,6 +2762,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).renameFolder(id, documentSpaceRenameFolderDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Similar to usage of the Unix stat command
+         * @summary Get info about a file(s) at given path
+         * @param {string} id 
+         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        statElementsAtPath(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<FilePathSpecWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).statElementsAtPath(id, documentSpacePathItemsDto, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Un-archives selected files/folder from a Document Space
          * @summary Un-archives selected item(s) from a Document Space
          * @param {string} id 
@@ -3068,6 +3153,17 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     renameFolder(id: string, documentSpaceRenameFolderDto: DocumentSpaceRenameFolderDto, options?: any): AxiosPromise<DocumentSpaceRenameFolderDto>;
+
+    /**
+     * Similar to usage of the Unix stat command
+     * @summary Get info about a file(s) at given path
+     * @param {string} id 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    statElementsAtPath(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<FilePathSpecWrapper>;
 
     /**
      * Un-archives selected files/folder from a Document Space
@@ -3513,6 +3609,19 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public renameFolder(id: string, documentSpaceRenameFolderDto: DocumentSpaceRenameFolderDto, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).renameFolder(id, documentSpaceRenameFolderDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Similar to usage of the Unix stat command
+     * @summary Get info about a file(s) at given path
+     * @param {string} id 
+     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public statElementsAtPath(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).statElementsAtPath(id, documentSpacePathItemsDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

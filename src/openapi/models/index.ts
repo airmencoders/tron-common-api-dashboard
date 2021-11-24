@@ -53,6 +53,7 @@ export * from './event-request-log-dto';
 export * from './event-request-log-dto-pagination-response-wrapper';
 export * from './exception-response';
 export * from './file-path-spec';
+export * from './file-path-spec-wrapper';
 export * from './filter-condition';
 export * from './filter-criteria';
 export * from './filter-dto';

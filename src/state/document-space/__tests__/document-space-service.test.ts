@@ -13,6 +13,7 @@ import {
   DocumentSpaceUserCollectionResponseDto,
   DocumentSpaceUserCollectionResponseDtoWrapper,
   FilePathSpec,
+  FilePathSpecWrapper,
   GenericStringArrayResponseWrapper,
   S3PaginationDto
 } from '../../../openapi';
@@ -649,4 +650,20 @@ describe('Test Document Space Service', () => {
     await documentSpaceService.removePathEntityFromFavorites('spaceId', docSpaceDto);
     expect(mock).toHaveBeenCalled();
   });
+
+  it('should return list of files that exist on backend', async () => {
+    const mock = jest
+      .spyOn(documentSpaceApi, 'statElementsAtPath')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosSuccessResponse<FilePathSpecWrapper>({
+            data: [{ itemName: 'some-file', documentSpaceId: '1', itemId: '1' }, { itemName: 'some-other-file', documentSpaceId: '1', itemId: '2' }],
+          })
+        )
+      );
+
+    const response = await documentSpaceService.checkIfFileExistsAtPath('1', '/', [ 'some-file' ]);
+    expect(response).toContain('some-file');
+  });
+
 });

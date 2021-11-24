@@ -80,6 +80,7 @@ models/event-info-dto.ts
 models/event-request-log-dto-pagination-response-wrapper.ts
 models/event-request-log-dto.ts
 models/exception-response.ts
+models/file-path-spec-wrapper.ts
 models/file-path-spec.ts
 models/filter-condition.ts
 models/filter-criteria.ts
