@@ -13,7 +13,6 @@ import { ActionsProps } from '../ActionsProps';
 import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 
 function DesktopActions(props: ActionsProps) {
-  const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
 
