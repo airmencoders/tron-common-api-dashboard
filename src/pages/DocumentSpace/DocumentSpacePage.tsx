@@ -653,8 +653,8 @@ function DocumentSpacePage() {
   }
 
   return (
-    <PageFormat pageTitle="Document Space">
-      <FormGroup labelName="document-space" labelText="Spaces" isError={false}>
+    <PageFormat pageTitle="Document Space" className="document-space-page">
+      <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
         <div className="add-space-container">
           <div>
             <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpaceId={pageState.selectedSpace?.value?.id}/>
@@ -671,12 +671,12 @@ function DocumentSpacePage() {
 
             {documentSpaceService.documentSpaces.length && (
               <Button
-                data-testid="doc-space-my-settings__btn"
-                type="button"
-                style={{ position: 'absolute', right: 20 }}
-                unstyled
-                disableMobileFullWidth
-                onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
+                  className="document-space-page__space-user-settings"
+                  data-testid="doc-space-my-settings__btn"
+                  type="button"
+                  unstyled
+                  disableMobileFullWidth
+                  onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
               >
                 <UserIcon size={0} />
               </Button>

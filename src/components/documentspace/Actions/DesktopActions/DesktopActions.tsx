@@ -38,11 +38,35 @@ function DesktopActions(props: ActionsProps) {
               onClick={() => uploadFileRef.current?.click()}
               type="button"
               icon
-              className="rotate-icon"
             >
               <UploadMaterialIcon size={1} fill iconTitle="Upload Files" />
             </Button>
           </div>
+
+          {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Read) && (
+              <DropDown
+                  id="download-items"
+                  data-testid="download-items"
+                  anchorContent={<DownloadMaterialIcon size={1} fill iconTitle="Download Items" />}
+                  items={[
+                    {
+                      displayName: 'Download Selected',
+                      action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
+                          ? documentSpaceService.createRelativeFilesDownloadUrl(
+                              props.selectedSpace.value.id,
+                              props.path.value,
+                              props.selectedFiles.value
+                          )
+                          : undefined)
+                    },
+                    {
+                      displayName: 'Download All Files (zip)',
+                      action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+                          props.selectedSpace.value.id))
+                    }
+                  ]}
+              />
+          )}
 
           <DropDown
             id="add-new-items"
@@ -66,30 +90,7 @@ function DesktopActions(props: ActionsProps) {
         </>
       }
 
-      {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Read) && (
-        <DropDown
-          id="download-items"
-          data-testid="download-items"
-          anchorContent={<DownloadMaterialIcon size={1} fill iconTitle="Download Items" />}
-          items={[
-            {
-              displayName: 'Download Selected',
-              action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-                ? documentSpaceService.createRelativeFilesDownloadUrl(
-                  props.selectedSpace.value.id,
-                  props.path.value,
-                  props.selectedFiles.value
-                )
-                : undefined)
-            },
-            {
-              displayName: 'Download All Files (zip)',
-              action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
-                props.selectedSpace.value.id))
-            }
-          ]}
-        />
-      )}
+
 
       {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
         <Button

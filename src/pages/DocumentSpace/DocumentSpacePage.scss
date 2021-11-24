@@ -1,7 +1,20 @@
 @import "../../styles/mixins";
 
+.document-space-page {
+  &__space-select {
+    label {
+      margin-top: 0;
+    }
+  }
+  &__space-user-settings {
+    margin-top: 0;
+    position: absolute;
+    right: calculateRem(20px);
+  }
+}
+
 .add-space-container {
-  margin-bottom: calculateRem(16px);
+  margin-bottom: 2.5rem;
   display: flex;
   flex-direction: row;
   font-family: Source Sans Pro, Roboto, Arial, sans-serif;
