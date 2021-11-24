@@ -51,6 +51,7 @@ import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
 import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
+import StarHollowIcon from '../../icons/StarHollowIcon';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -181,10 +182,20 @@ function DocumentSpacePage() {
           { 
             title: 'Add to favorites', 
             icon: StarIcon, 
-            shouldShow: (doc: DocumentDto) => doc && !doc.folder,
+            shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, true),
             isAuthorized: () => true,
-            onClick: () => console.log('add to favorites'),
+            onClick: addToFavorites,
             
+          },
+          {
+            title: 'Remove from favorites',
+            icon: StarHollowIcon,
+            iconProps: {
+              size: 1.1
+            },
+            shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, false),
+            isAuthorized: () => true,
+            onClick: removeFromFavorites,
           },
           { 
             title: 'Upload new version', 
@@ -396,15 +407,12 @@ function DocumentSpacePage() {
     }
   }
 
-
   function onDatasourceUpdateCallback() {
     mergePageState({
       shouldUpdateDatasource: false,
       selectedFiles: []
     });
   }
-
-
 
   function setPageStateOnException(message: string) {
     mergePageState({

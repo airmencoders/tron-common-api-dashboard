@@ -1,8 +1,7 @@
 import { Downgraded, none, State, useHookstate } from '@hookstate/core';
-import { IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
+import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
-import Button from '../../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer
 , { PopupMenuItem }  from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
@@ -10,20 +9,13 @@ import GridColumn from '../../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../../components/PageFormat/PageFormat';
-import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
-import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
-import RemoveIcon from '../../../icons/RemoveIcon';
 import {
   DocumentSpacePrivilegeDtoTypeEnum,
-  DocumentSpaceResponseDto,
   RecentDocumentDto,
 } from '../../../openapi';
-import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
-import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
-import { PrivilegeType } from '../../../state/privilege/privilege-type';
+import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState, useDocumentSpaceRecentsPageState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import '../DocumentSpacePage.scss';
 import { formatDocumentSpaceDate } from '../../../utils/date-utils'
-import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRenderer';
 import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
@@ -43,38 +35,17 @@ const infiniteScrollOptions: InfiniteScrollOptions = {
   limit: 100,
 };
 
-interface DocumentSpaceRecentsPageState {
-  datasource?: IDatasource;
-  shouldUpdateInfiniteCache: boolean;
-  selectedFile?: RecentDocumentDto;
-  showDeleteDialog: boolean;
-}
-
-interface RenameFormState {
-  isSubmitting: boolean;
-  isOpen: boolean;
-}
-
 function getDocumentUniqueKey(data: RecentDocumentDto): string {
   return data.id;
 }
 
 function DocumentSpaceRecentsPage() {
-  const documentSpaceService = useDocumentSpaceState();
-  const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
-  const authorizedUserService = useAuthorizedUserState();
+  const mountedRef = useRef(false);
 
-  const pageState = useHookstate<DocumentSpaceRecentsPageState>({
-    datasource: undefined,
-    shouldUpdateInfiniteCache: false,
-    selectedFile: undefined,
-    showDeleteDialog: false,
-  });
+  const deviceInfo = useDeviceInfo();
 
-  const renameFormState = useHookstate<RenameFormState>({
-    isSubmitting: false,
-    isOpen: false
-  });
+  const documentSpaceDownloadUrlService = documentSpaceDownloadUrlService();
+  const documentSpaceRecentsPageService = useDocumentSpaceRecentsPageState(mountedRef);
 
   const recentDocumentDtoColumns = useHookstate<GridColumn[]>([
     new GridColumn({
@@ -82,7 +53,6 @@ function DocumentSpaceRecentsPage() {
       headerName: 'Name',
       resizable: true,
       cellRenderer: RecentDocumentCellRenderer,
-      checkboxSelection: true
     }),
     new GridColumn({
       headerName: 'Document Space',
@@ -119,73 +89,40 @@ function DocumentSpaceRecentsPage() {
             title: 'Remove',
             icon: CircleMinusIcon,
             onClick: (doc: RecentDocumentDto) => {
-              performActionWhenMounted(mountedRef.current, () => pageState.merge({ selectedFile: doc, showDeleteDialog: true }))
+              performActionWhenMounted(mountedRef.current, () => documentSpaceRecentsPageService.recentsState.merge({ selectedFile: doc, showDeleteDialog: true }))
             },
-            isAuthorized: (data: RecentDocumentDto) => {
-              return data && documentSpacePrivilegesService.isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
-            }
+            isAuthorized: (data: RecentDocumentDto) => documentSpaceRecentsPageService.isAuthorizedForAction(data, DocumentSpacePrivilegeDtoTypeEnum.Write)
           },
           { 
             title: 'Rename',
             icon: EditIcon,
             onClick: (doc: RecentDocumentDto) => {
               performActionWhenMounted(mountedRef.current, () => {
-                pageState.selectedFile.set(doc);
-                renameFormState.isOpen.set(true);
+                documentSpaceRecentsPageService.recentsState.merge({
+                  selectedFile: doc,
+                  renameFormState: {
+                    isOpen: true,
+                    isSubmitting: false
+                  }
+                });
               })
             },
-            isAuthorized: (data: RecentDocumentDto) => {
-              return data && documentSpacePrivilegesService.isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
-            }
+            isAuthorized: (data: RecentDocumentDto) => documentSpaceRecentsPageService.isAuthorizedForAction(data, DocumentSpacePrivilegeDtoTypeEnum.Write)
           },
         ],
       }
     })
   ]);
 
-  const deviceInfo = useDeviceInfo();
-
-  const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
-
-  const mountedRef = useRef(false);
-
   useEffect(() => {
     mountedRef.current = true;
 
-    let spacesCancellableRequest: CancellableDataRequest<DocumentSpaceResponseDto[]>;
-    let privilegesCancellableRequest: CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>;
-
-    // Don't need to load privileges if current user is Dashboard Admin,
-    // since they currently have access to everything Document Space related
-    if (!isAdmin) {
-      spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-      spacesCancellableRequest.promise
-        .then(response => {
-          privilegesCancellableRequest = documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacesPrivileges(new Set(response.map(item => item.id)));
-          return privilegesCancellableRequest.promise;
-        })
-        .catch(err => {
-          performActionWhenMounted(mountedRef.current, () => 
-            createTextToast(ToastType.ERROR, 'Could not load privileges for authorized Document Spaces. Actions will be limited', { autoClose: false }));
-        })
-        .then(() => performActionWhenMounted(mountedRef.current, () => pageState.datasource.set(documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions))))
-    } else {
-      performActionWhenMounted(mountedRef.current, () => pageState.datasource.set(documentSpaceService.createRecentDocumentsDatasource(infiniteScrollOptions)));
-    }
+    documentSpaceRecentsPageService.fetchSpacesAndPrivileges(infiniteScrollOptions);
 
     return function cleanup() {
       mountedRef.current = false;
 
-      if (spacesCancellableRequest != null) {
-        spacesCancellableRequest.cancelTokenSource.cancel();
-      }
-
-      if (privilegesCancellableRequest != null) {
-        privilegesCancellableRequest.cancelTokenSource.cancel();
-      }
-
-      documentSpaceService.resetState();
-      documentSpacePrivilegesService.resetState();
+      documentSpaceRecentsPageService.resetState();
     };
   }, []);
 
@@ -234,79 +171,18 @@ function DocumentSpaceRecentsPage() {
     }
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
-  async function deleteArchiveFile() {
-    const file = pageState.selectedFile.value;
-
-    if (file == null) {
-      throw new Error('File cannot be null for File Archive Deletion');
-    }
-
-    try {
-      await documentSpaceService.deleteArchiveItemBySpaceAndParent(file.documentSpace.id, file.parentFolderId, file.key);
-      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.SUCCESS, 'File successfully archived: ' + file.key));
-    } catch (error) {
-      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.ERROR, 'Could not delete requested file: ' + file.key));
-    } finally {
-      performActionWhenMounted(mountedRef.current, () => pageState.merge({
-        selectedFile: undefined,
-        showDeleteDialog: false,
-        shouldUpdateInfiniteCache: true
-      }));
-    }
-  }
-
-  async function renameFile(newName: string) {
-    const file = pageState.selectedFile.value;
-
-    if (file == null) {
-      throw new Error('File cannot be null for File Rename');
-    }
-    
-    let wasSuccessful = false;
-
-    try {
-      performActionWhenMounted(mountedRef.current, () => renameFormState.isSubmitting.set(true));
-      
-      const pathToFolderContainingFile = await documentSpaceService.getDocumentSpaceEntryPath(file.documentSpace.id, file.parentFolderId);
-      await documentSpaceService.renameFile(file.documentSpace.id, pathToFolderContainingFile, file.key, newName);
-
-      wasSuccessful = true;
-      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.SUCCESS, `Successfully renamed file ${file.key} to ${newName}`));
-    } catch (error) {
-      performActionWhenMounted(mountedRef.current, () => createTextToast(ToastType.ERROR, `Could not rename file ${file.key}`));
-    } finally {
-      performActionWhenMounted(mountedRef.current, () => {
-        if (wasSuccessful) {
-          pageState.merge({
-            shouldUpdateInfiniteCache: true,
-            selectedFile: undefined
-          });
-        } else {
-          pageState.selectedFile.set(undefined);
-        }
-
-        renameFormState.merge({
-          isOpen: false,
-          isSubmitting: false
-        });
-      });
-    }
-  }
-
   function closeRenameForm() {
-    pageState.selectedFile.set(undefined);
-    renameFormState.merge({
-      isSubmitting: false,
-      isOpen: false
-    });
-  }
-
-  function onSelectionChanged(data?: RecentDocumentDto) {
-    pageState.selectedFile.set(data);
+    documentSpaceRecentsPageService.recentsState.merge({
+      selectedFile: undefined,
+      renameFormState: {
+        isSubmitting: false,
+        isOpen: false
+      }
+    })
   }
 
   function shouldUpdateInfiniteCacheCallback() {
-    performActionWhenMounted(mountedRef.current, () => pageState.shouldUpdateInfiniteCache.set(false));
+    performActionWhenMounted(mountedRef.current, () => documentSpaceRecentsPageService.recentsState.shouldUpdateInfiniteCache.set(false));
   }
 
   return (
@@ -320,63 +196,45 @@ function DocumentSpaceRecentsPage() {
               onNavigate={() => { return }}
               rootName="Recents"
             />
-            <div>
-              {!documentSpacePrivilegesService.isPromised && (
-                <div className="content-controls">
-                  <Button
-                    type="button"
-                    icon
-                    disabled={!pageState.selectedFile.value ||
-                      !documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedFile.value.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write)}
-                    data-testid="delete-selected-items"
-                    disableMobileFullWidth
-                    onClick={() => pageState.showDeleteDialog.set(true)}
-                  >
-                    <RemoveIcon className="icon-color" size={1} />
-                  </Button>
-                </div>
-              )}
-            </div>
           </div>
-          {pageState.datasource.value &&
+          {documentSpaceRecentsPageService.recentsState.datasource.value &&
             <InfiniteScrollGrid
               columns={recentDocumentDtoColumns.attach(Downgraded).value}
-              datasource={pageState.datasource.value}
+              datasource={documentSpaceRecentsPageService.recentsState.datasource.value}
               cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
               maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
               maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
               suppressCellSelection
+              suppressRowClickSelection
               getRowNodeId={getDocumentUniqueKey}
-              rowSelection="single"
-              onSelectionChanged={onSelectionChanged}
-              updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
+              updateInfiniteCache={documentSpaceRecentsPageService.recentsState.shouldUpdateInfiniteCache.value}
               updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
               autoResizeColumns
             />
           }
 
           <DeleteDocumentDialog
-            show={pageState.showDeleteDialog.get()}
-            onCancel={() => pageState.showDeleteDialog.set(false)}
-            onSubmit={deleteArchiveFile}
-            file={pageState.selectedFile.value?.key ?? null}
+            show={documentSpaceRecentsPageService.recentsState.showDeleteDialog.get()}
+            onCancel={() => documentSpaceRecentsPageService.recentsState.showDeleteDialog.set(false)}
+            onSubmit={documentSpaceRecentsPageService.deleteArchiveFile.bind(documentSpaceRecentsPageService)}
+            file={documentSpaceRecentsPageService.recentsState.selectedFile.value?.key ?? null}
           />
 
           <SideDrawer
             isLoading={false}
             title={getCreateEditTitle(CreateEditOperationType.EDIT_FILENAME)}
-            isOpen={renameFormState.isOpen.value && pageState.selectedFile.value != null}
+            isOpen={documentSpaceRecentsPageService.recentsState.renameFormState.isOpen.value && documentSpaceRecentsPageService.recentsState.selectedFile.value != null}
             onCloseHandler={closeRenameForm}
             size={SideDrawerSize.NORMAL}
           >
-            {pageState.selectedFile.value &&
+            {documentSpaceRecentsPageService.recentsState.selectedFile.value &&
               <DocumentSpaceCreateEditForm
                 onCancel={closeRenameForm}
-                onSubmit={renameFile}
-                isFormSubmitting={renameFormState.isSubmitting.value}
+                onSubmit={documentSpaceRecentsPageService.renameFile.bind(documentSpaceRecentsPageService)}
+                isFormSubmitting={documentSpaceRecentsPageService.recentsState.renameFormState.isSubmitting.value}
                 onCloseErrorMsg={() => { return; }}
                 showErrorMessage={false}
-                elementName={pageState.selectedFile.value?.key}
+                elementName={documentSpaceRecentsPageService.recentsState.selectedFile.value?.key}
                 opType={CreateEditOperationType.EDIT_FILENAME}
               />
             }
