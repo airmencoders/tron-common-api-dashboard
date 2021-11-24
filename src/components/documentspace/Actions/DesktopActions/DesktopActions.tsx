@@ -3,7 +3,7 @@ import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
 import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
-import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import PeopleIcon2 from '../../../../icons/PeopleIcon2';
 import DropDown from '../../../DropDown/DropDown';
@@ -15,6 +15,7 @@ import { CreateEditOperationType } from '../../../../state/document-space/docume
 function DesktopActions(props: ActionsProps) {
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
 
   const uploadFileRef = createRef<HTMLInputElement>();
 
@@ -75,7 +76,7 @@ function DesktopActions(props: ActionsProps) {
             {
               displayName: 'Download Selected',
               action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-                ? documentSpaceService.createRelativeFilesDownloadUrl(
+                ? downloadUrlService.createRelativeFilesDownloadUrl(
                   props.selectedSpace.value.id,
                   props.path.value,
                   props.selectedFiles.value
@@ -84,7 +85,7 @@ function DesktopActions(props: ActionsProps) {
             },
             {
               displayName: 'Download All Files (zip)',
-              action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+              action: () => props.selectedSpace.value && window.open(downloadUrlService.createRelativeDownloadAllFilesUrl(
                 props.selectedSpace.value.id))
             }
           ]}

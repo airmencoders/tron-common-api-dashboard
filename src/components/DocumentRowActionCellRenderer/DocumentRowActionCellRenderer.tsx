@@ -24,7 +24,16 @@ function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererPr
   const [open, setOpen] = React.useState(false);
   const popupItems = useMemo<Array<PopupMenuItem<T>>>(() => {
     return props.menuItems
-  }, []);
+                .filter(popupItem => {
+                  return popupItem.shouldShow == undefined 
+                    || popupItem.shouldShow(props.node.data)
+                })
+                .filter(popupItem => popupItem.isAuthorized(props.node.data));
+  }, [props.menuItems]);
+
+  if (popupItems.length === 0) {
+    return null;
+  }
 
   return (
       <div className="document-row-action-cell-renderer" data-testid="document-row-action-cell-renderer">
@@ -45,21 +54,14 @@ function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererPr
         >
           <Popup.Content>
             {
-              popupItems?.length > 0 &&
-              popupItems
-                .filter(popupItem => {
-                  return popupItem.shouldShow == undefined 
-                    || popupItem.shouldShow(props.node.data)
-                })
-                .filter(popupItem => popupItem.isAuthorized(props.node.data))
-                .map(popupItem => (
-                  <div className="popper__item" key={popupItem.title} onClick={() => {
-                      setOpen(false);
-                      popupItem.onClick(props.node.data);
-                  }}>
-                    <popupItem.icon className="popper__icon" size={1} iconTitle={popupItem.title} {...popupItem.iconProps} />
-                    <span className="popper__title">{popupItem.title}</span>
-                  </div>
+              popupItems.map(popupItem => (
+                <div className="popper__item" key={popupItem.title} onClick={() => {
+                    setOpen(false);
+                    popupItem.onClick(props.node.data);
+                }}>
+                  <popupItem.icon className="popper__icon" size={1} iconTitle={popupItem.title} {...popupItem.iconProps} />
+                  <span className="popper__title">{popupItem.title}</span>
+                </div>
               ))
             }
           </Popup.Content>

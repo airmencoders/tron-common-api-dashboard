@@ -13,7 +13,7 @@ import {
   DocumentSpacePrivilegeDtoTypeEnum,
   RecentDocumentDto,
 } from '../../../openapi';
-import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState, useDocumentSpaceRecentsPageState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService, useDocumentSpaceRecentsPageState } from '../../../state/document-space/document-space-state';
 import '../DocumentSpacePage.scss';
 import { formatDocumentSpaceDate } from '../../../utils/date-utils'
 import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRenderer';
@@ -44,7 +44,7 @@ function DocumentSpaceRecentsPage() {
 
   const deviceInfo = useDeviceInfo();
 
-  const documentSpaceDownloadUrlService = documentSpaceDownloadUrlService();
+  const downloadUrlService = documentSpaceDownloadUrlService();
   const documentSpaceRecentsPageService = useDocumentSpaceRecentsPageState(mountedRef);
 
   const recentDocumentDtoColumns = useHookstate<GridColumn[]>([
@@ -157,7 +157,7 @@ function DocumentSpaceRecentsPage() {
             shouldShow: (doc: RecentDocumentDto) => doc != null,
             isAuthorized: () => true,
             onClick: (doc: RecentDocumentDto) => 
-              window.location.href = documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(doc.documentSpace.id , doc.parentFolderId, doc.key, true)
+              window.location.href = downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(doc.documentSpace.id , doc.parentFolderId, doc.key, true)
           });
   
           return state;
@@ -187,13 +187,13 @@ function DocumentSpaceRecentsPage() {
 
   return (
     <PageFormat pageTitle="Recently Uploaded">
-      {documentSpaceService.isDocumentSpacesStatePromised ?
+      {documentSpaceRecentsPageService.isSpacesOrPrivilegesLoading() ?
         <Spinner /> :
         <>
           <div className="breadcrumb-area">
             <BreadCrumbTrail
               path=""
-              onNavigate={() => { return }}
+              onNavigate={() => { return; }}
               rootName="Recents"
             />
           </div>

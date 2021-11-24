@@ -1,19 +1,20 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { render, waitFor } from '@testing-library/react';
+import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import axios from 'axios';
+import { MutableRefObject } from 'react';
 import { MemoryRouter } from 'react-router';
 import { ToastContainer } from '../../../../components/Toast/ToastContainer/ToastContainer';
 import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
-import { useAuthorizedUserState } from '../../../../state/authorized-user/authorized-user-state';
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
-import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
+import { useDocumentSpaceRecentsPageState } from '../../../../state/document-space/document-space-state';
+import RecentsPageService from '../../../../state/document-space/recents-page/recents-page-service';
+import { RecentsPageState } from '../../../../state/document-space/recents-page/recents-page-state';
 import DocumentSpaceRecentsPage from '../DocumentSpaceRecentsPage';
 
 jest.mock('../../../../state/document-space/document-space-state');
-jest.mock('../../../../state/authorized-user/authorized-user-state');
-
 describe('Document Space Recents Page Tests', () => {
   const documentSpaces: DocumentSpaceResponseDto[] = [
     {
@@ -26,8 +27,19 @@ describe('Document Space Recents Page Tests', () => {
     }
   ];
 
-  let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
+  const datasource: IDatasource = {
+    getRows: async (params: IGetRowsParams) => {
+      try {
+        params.successCallback([], 0);
+      } catch (err) {
+        params.failCallback();
+      }
+    }
+  }
+
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
+
+  let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
   let documentSpaceService: DocumentSpaceService;
 
   let documentSpacePrivilegeState: State<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>;
@@ -37,9 +49,16 @@ describe('Document Space Recents Page Tests', () => {
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
 
+  let mountedRef: MutableRefObject<boolean>;
+
+  let recentsPageState: State<RecentsPageState>;
+  let recentsPageService: RecentsPageService;
+
+
   beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
+
+    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
     documentSpacePrivilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -52,9 +71,35 @@ describe('Document Space Recents Page Tests', () => {
     dashboardUserApi = new DashboardUserControllerApi();
     authorizedUserService = new AuthorizedUserService(authorizedUserState, dashboardUserApi);
 
-    (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
-    (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
-    (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
+    mountedRef = {
+      current: true
+    };
+
+    recentsPageState = createState<RecentsPageState>({
+      datasource: datasource,
+      shouldUpdateInfiniteCache: false,
+      selectedFile: undefined,
+      showDeleteDialog: false,
+      renameFormState: {
+        isSubmitting: false,
+        isOpen: false
+      },
+      pageStatus: {
+        isLoading: false,
+        isError: false,
+        message: undefined
+      }
+    });
+    recentsPageService = new RecentsPageService(
+      documentSpaceApi,
+      recentsPageState,
+      mountedRef,
+      authorizedUserService,
+      documentSpaceService,
+      documentSpacePrivilegeService
+    );
+
+    (useDocumentSpaceRecentsPageState as jest.Mock).mockImplementation(() => recentsPageService);
   });
 
   afterEach(() => {
@@ -63,11 +108,11 @@ describe('Document Space Recents Page Tests', () => {
 
   it('should not request for privileges when user is DASHBOARD_ADMIN', async () => {
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
     const fetchAndStoreSpaces = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
     const getPrivileges = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacesPrivileges');
+    jest.spyOn(recentsPageService, 'isSpacesOrPrivilegesLoading').mockImplementation(() => false);
 
-    const { getByText } = render(
+    const { findByText } = render(
       <MemoryRouter>
         <DocumentSpaceRecentsPage />
       </MemoryRouter>
@@ -77,12 +122,11 @@ describe('Document Space Recents Page Tests', () => {
     await waitFor(() => expect(getPrivileges).not.toHaveBeenCalled());
 
     // Just test that Ag Grid loads in by finding one of the header columns
-    expect(getByText('Name')).toBeInTheDocument();
+    await expect(findByText('Name')).resolves.toBeInTheDocument();
   });
 
   it('should request for privileges when user is not DASHBOARD_ADMIN', async () => {
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
-    const loadingState = jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
     const fetchAndStoreSpaces = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
@@ -95,7 +139,9 @@ describe('Document Space Recents Page Tests', () => {
       cancelTokenSource: axios.CancelToken.source()
     });
 
-    const { getByText, rerender } = render(
+    const isLoadingSpy = jest.spyOn(recentsPageService, 'isSpacesOrPrivilegesLoading').mockImplementation(() => false);
+
+    const { findByText, rerender } = render(
       <MemoryRouter>
         <DocumentSpaceRecentsPage />
       </MemoryRouter>
@@ -105,7 +151,7 @@ describe('Document Space Recents Page Tests', () => {
     await waitFor(() => expect(getPrivileges).toHaveBeenCalled());
 
     // rerender the page after loading everything in and loading is false
-    loadingState.mockReturnValue(false);
+    isLoadingSpy.mockImplementation(() => false);
     rerender(
       <MemoryRouter>
         <DocumentSpaceRecentsPage />
@@ -113,12 +159,11 @@ describe('Document Space Recents Page Tests', () => {
     );
 
     // Just test that Ag Grid loads in by finding one of the header columns
-    expect(getByText('Name')).toBeInTheDocument();
+    await expect(findByText('Name')).resolves.toBeInTheDocument();
   });
 
   it('should show limited functionality toast if failed to get privileges', async () => {
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValueOnce(true);
     const fetchAndStoreSpaces = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
@@ -127,6 +172,8 @@ describe('Document Space Recents Page Tests', () => {
       promise: Promise.reject(new Error('no privileges')),
       cancelTokenSource: axios.CancelToken.source()
     });
+
+    jest.spyOn(recentsPageService, 'isSpacesOrPrivilegesLoading').mockImplementation(() => false);
 
     const page = render(
       <MemoryRouter>
@@ -139,7 +186,7 @@ describe('Document Space Recents Page Tests', () => {
     await waitFor(() => expect(getPrivileges).toHaveBeenCalled());
 
     // Test for toast showing limited functionality
-    await expect(page.findByText(/Could not load privileges for authorized Document Spaces/)).resolves.toBeInTheDocument();
+    await expect(page.findByText(/Could not load privileges for authorized Document Spaces. Actions will be limited/)).resolves.toBeInTheDocument();
   });
 
   it('should show spinner while loading', async () => {
@@ -153,6 +200,8 @@ describe('Document Space Recents Page Tests', () => {
       promise: Promise.reject(new Error('no privileges')),
       cancelTokenSource: axios.CancelToken.source()
     });
+
+    jest.spyOn(recentsPageService, 'isSpacesOrPrivilegesLoading').mockImplementation(() => true);
 
     const { getByText } = render(
       <MemoryRouter>

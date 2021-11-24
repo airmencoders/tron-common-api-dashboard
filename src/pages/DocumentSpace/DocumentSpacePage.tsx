@@ -27,7 +27,7 @@ import {
 } from '../../openapi';
 import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
 import {FormActionType} from '../../state/crud-page/form-action-type';
-import {useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
+import {documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
 import {PrivilegeType} from '../../state/privilege/privilege-type';
 import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
 import {formatBytesToString} from '../../utils/file-utils';
@@ -115,6 +115,7 @@ function DocumentSpacePage() {
 
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
   const authorizedUserService = useAuthorizedUserState();
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
@@ -311,7 +312,7 @@ function DocumentSpacePage() {
             },
             shouldShow: (doc: DocumentDto) => doc != null,
             isAuthorized: () => true,
-            onClick: (doc: DocumentDto) => window.location.href = documentSpaceService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+            onClick: (doc: DocumentDto) => window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
           });
   
           return state;

@@ -8,7 +8,7 @@ import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import PeopleIcon from '../../../../icons/PeopleIcon';
 import { ActionsProps } from '../ActionsProps';
-import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
@@ -25,7 +25,7 @@ function MobileActions(props: ActionsProps) {
   });
 
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
-  const documentSpaceService = useDocumentSpaceState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
 
   const uploadFileRef = createRef<HTMLInputElement>();
 
@@ -101,7 +101,7 @@ function MobileActions(props: ActionsProps) {
           {
             displayName: 'Download Selected',
             action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-              ? documentSpaceService.createRelativeFilesDownloadUrl(
+              ? downloadUrlService.createRelativeFilesDownloadUrl(
                 props.selectedSpace.value.id,
                 props.path.value,
                 props.selectedFiles.value
@@ -110,7 +110,7 @@ function MobileActions(props: ActionsProps) {
           },
           {
             displayName: 'Download All Files (zip)',
-            action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+            action: () => props.selectedSpace.value && window.open(downloadUrlService.createRelativeDownloadAllFilesUrl(
               props.selectedSpace.value.id))
           }
         ]}
