@@ -1,15 +1,15 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../../../../openapi';
-import { useDocumentSpacePrivilegesState } from '../../../../../state/document-space/document-space-state';
-import DocumentSpacePrivilegeService from '../../../../../state/document-space/document-space-privilege-service';
-import MobileActions from '../MobileActions';
-import userEvent from '@testing-library/user-event';
-import { CreateEditOperationType } from '../../../../../pages/DocumentSpace/DocumentSpacePage';
+import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../../../openapi';
+import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
+import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
+import { useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
+import DocumentSpaceActions from '../DocumentSpaceActions';
 
-jest.mock('../../../../../state/document-space/document-space-state');
-describe('Mobile Actions Test', () => {
+
+jest.mock('../../../../state/document-space/document-space-state');
+describe('Document Space Actions Test', () => {
   let selectedFiles: State<DocumentDto[]> & StateMethodsDestroy;
   let showDeleteSelectedDialog: State<boolean> & StateMethodsDestroy;
   let selectedSpace: State<DocumentSpaceResponseDto | undefined> & StateMethodsDestroy;
@@ -56,21 +56,23 @@ describe('Mobile Actions Test', () => {
     jest.resetAllMocks();
   });
 
-  it('should render Write actions when authorized for write only', () => {
+  it('should not render when show = false', () => {
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockImplementation((id: string, type: DocumentSpacePrivilegeDtoTypeEnum) => {
       if (type === DocumentSpacePrivilegeDtoTypeEnum.Write) {
         return true;
       }
 
       if (type === DocumentSpacePrivilegeDtoTypeEnum.Membership) {
-        return false;
+        return true;
       }
 
-      return false;
+      return true;
     });
 
     const element = render(
-      <MobileActions
+      <DocumentSpaceActions
+        show={false}
+        isMobile={true}
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
@@ -81,37 +83,32 @@ describe('Mobile Actions Test', () => {
       />
     );
 
-    const actionsButton = element.getByTitle('Actions');
-    userEvent.click(actionsButton);
+    const actionsButton = element.queryByTitle('Actions');
+    const downloadButton = element.queryByTitle('Download Items');
+    const removeButton = element.queryByTitle('remove');
 
-    expect(element.queryByTitle('Manage Users')).not.toBeInTheDocument();
-
-    expect(element.getByTitle('Add Items')).toBeInTheDocument();
-    const newFolder = element.getByTitle('Add Items');
-    userEvent.click(newFolder);
-    expect(createEditElementOpType.value).toEqual(CreateEditOperationType.CREATE_FOLDER);
-
-    userEvent.click(actionsButton);
-
-    expect(element.getByTitle('Upload File')).toBeInTheDocument();
-    userEvent.click(element.getByTitle('Upload File'));
+    expect(actionsButton).not.toBeInTheDocument();
+    expect(downloadButton).not.toBeInTheDocument();
+    expect(removeButton).not.toBeInTheDocument();
   });
-
-  it('should render Membership actions when authorized for membership only', async () => {
+  
+  it('should render Mobile Actions when isMobile = true', () => {
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockImplementation((id: string, type: DocumentSpacePrivilegeDtoTypeEnum) => {
       if (type === DocumentSpacePrivilegeDtoTypeEnum.Write) {
-        return false;
+        return true;
       }
 
       if (type === DocumentSpacePrivilegeDtoTypeEnum.Membership) {
         return true;
       }
 
-      return false;
+      return true;
     });
 
     const element = render(
-      <MobileActions
+      <DocumentSpaceActions
+        show={true}
+        isMobile={true}
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
@@ -122,52 +119,32 @@ describe('Mobile Actions Test', () => {
       />
     );
 
-    const actionsButton = element.getByTitle('Actions');
-    userEvent.click(actionsButton);
+    // All privileges, check for all buttons
+    const actionsButton = element.queryByTitle('Actions');
+    const downloadButton = element.queryByTitle('Download Items');
+    const removeButton = element.queryByTitle('remove');
 
-    expect(element.queryByTitle('Upload File')).not.toBeInTheDocument();
-    expect(element.queryByTitle('Add Items')).not.toBeInTheDocument();
-
-    expect(element.getByTitle('Manage Users')).toBeInTheDocument();
-    const manageUsers = element.getByTitle('Manage Users');
-    userEvent.click(manageUsers);
-    expect(membershipsState.value.isOpen).toBeTruthy();
-    await waitFor(() => expect(membershipsState.value).toBeTruthy());
+    expect(actionsButton).toBeInTheDocument();
+    expect(downloadButton).toBeInTheDocument();
+    expect(removeButton).toBeInTheDocument();
   });
 
-  it('should not render when no selected space', () => {
-    selectedSpace.set(undefined);
-
-    const element = render(
-      <MobileActions
-        selectedSpace={selectedSpace}
-        path={path}
-        shouldUpdateDatasource={shouldUpdateDatasource}
-        createEditElementOpType={createEditElementOpType}
-        membershipsState={membershipsState}
-        selectedFiles={selectedFiles}
-        showDeleteSelectedDialog={showDeleteSelectedDialog}
-      />
-    );
-
-    expect(element.queryByTitle('Actions')).not.toBeInTheDocument();
-  });
-
-  it('should not render when no available actions', () => {
+  it('should render Desktop Actions when isMobile = false', () => {
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockImplementation((id: string, type: DocumentSpacePrivilegeDtoTypeEnum) => {
       if (type === DocumentSpacePrivilegeDtoTypeEnum.Write) {
-        return false;
+        return true;
       }
 
       if (type === DocumentSpacePrivilegeDtoTypeEnum.Membership) {
-        return false;
+        return true;
       }
 
-      return false;
+      return true;
     });
 
     const element = render(
-      <MobileActions
+      <DocumentSpaceActions
+        show={true}
         selectedSpace={selectedSpace}
         path={path}
         shouldUpdateDatasource={shouldUpdateDatasource}
@@ -178,6 +155,13 @@ describe('Mobile Actions Test', () => {
       />
     );
 
-    expect(element.queryByTitle('Actions')).not.toBeInTheDocument();
+    // All privileges, check for all buttons
+    expect(element.queryByTestId('upload-new-file')).toBeInTheDocument();
+    expect(element.queryByTitle('Add Items')).toBeInTheDocument();
+    expect(element.queryByTestId('delete-selected-items')).toBeInTheDocument();
+
+    expect(element.getByTitle('Download Items')).toBeInTheDocument();
+
+    expect(element.queryByTitle('Manage Users')).toBeInTheDocument();
   });
 })

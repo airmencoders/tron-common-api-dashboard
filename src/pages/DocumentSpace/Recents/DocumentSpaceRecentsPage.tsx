@@ -1,8 +1,7 @@
-import { SetPartialStateAction, State, useHookstate } from '@hookstate/core';
+import { Downgraded, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
-import Button from '../../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer
   from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
@@ -12,7 +11,6 @@ import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/Infi
 import PageFormat from '../../../components/PageFormat/PageFormat';
 import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
-import RemoveIcon from '../../../icons/RemoveIcon';
 import {
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
@@ -29,44 +27,10 @@ import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
 import StarIcon from '../../../icons/StarIcon';
-import CircleRightArrowIcon from '../../../icons/CircleRightArrowIcon';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import UploadIcon from '../../../icons/UploadIcon';
-
-const recentDocumentDtoColumns: GridColumn[] = [
-  new GridColumn({
-    field: 'key',
-    headerName: 'Name',
-    resizable: true,
-    cellRenderer: RecentDocumentCellRenderer,
-    checkboxSelection: true
-  }),
-  new GridColumn({
-    headerName: 'Document Space',
-    resizable: true,
-    valueGetter: function getDocumentSpaceName(params: ValueGetterParams) {
-      return params.data?.documentSpace?.name || '';
-    }
-  }),
-  new GridColumn({
-    field: 'lastModifiedDate',
-    valueFormatter: function (params: ValueFormatterParams) {
-      if (params.value) {
-        return formatDocumentSpaceDate(params.value);
-      }
-    },
-    headerName: 'Last Modified',
-    resizable: true,
-  }),
-  new GridColumn({
-    valueGetter: GridColumn.defaultValueGetter,
-    headerName: 'Download',
-    headerClass: 'header-center',
-    resizable: true,
-    cellRenderer: RecentDocumentDownloadCellRenderer
-  })
-];
+import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -95,6 +59,64 @@ function DocumentSpaceRecentsPage() {
     selectedFile: undefined,
     showDeleteDialog: false,
   });
+
+  const recentDocumentDtoColumns = useHookstate<GridColumn[]>([
+    new GridColumn({
+      field: 'key',
+      headerName: 'Name',
+      resizable: true,
+      cellRenderer: RecentDocumentCellRenderer,
+    }),
+    new GridColumn({
+      headerName: 'Document Space',
+      resizable: true,
+      valueGetter: function getDocumentSpaceName(params: ValueGetterParams) {
+        return params.data?.documentSpace?.name || '';
+      }
+    }),
+    new GridColumn({
+      field: 'lastModifiedDate',
+      valueFormatter: function (params: ValueFormatterParams) {
+        if (params.value) {
+          return formatDocumentSpaceDate(params.value);
+        }
+      },
+      headerName: 'Last Modified',
+      resizable: true,
+    }),
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'Download',
+      headerClass: 'header-center',
+      resizable: true,
+      cellRenderer: RecentDocumentDownloadCellRenderer
+    }),
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'More',
+      headerClass: 'header-center',
+      cellRenderer: DocumentRowActionCellRenderer,
+      cellRendererParams: {
+        menuItems: [
+          { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites'), isAuthorized: () => true },
+          {
+            title: 'Remove',
+            icon: CircleMinusIcon,
+            onClick: (doc: RecentDocumentDto) => {
+              mergePageState({ selectedFile: doc, showDeleteDialog: true })
+            },
+            isAuthorized: (data: RecentDocumentDto) => {
+              return data && documentSpacePrivilegesService.isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
+            }
+          },
+          { title: 'Rename', icon: EditIcon, onClick: () => console.log('rename'), isAuthorized: () => true },
+          { title: 'Upload new version', icon: UploadIcon, onClick: () => console.log('upload'), isAuthorized: () => true },
+        ],
+      }
+    })
+  ]);
+
+  const deviceInfo = useDeviceInfo();
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
 
@@ -147,6 +169,22 @@ function DocumentSpaceRecentsPage() {
     };
   }, []);
 
+  // Handle hiding columns on resize
+  useEffect(() => {
+    const hideableColumns = recentDocumentDtoColumns.filter(column => 
+      column.field.value !== 'key' &&
+      column.field.value !== 'lastModifiedDate' &&
+      column.headerName.value !== 'Document Space' &&
+      column.headerName.value !== 'More'
+    );
+
+    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
+      hideableColumns.forEach(column => column.hide.set(true));
+    } else {
+      hideableColumns.forEach(column => column.hide.set(false));
+    }
+  }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
+
   async function deleteArchiveFile() {
     const file = pageState.selectedFile.value;
 
@@ -177,43 +215,10 @@ function DocumentSpaceRecentsPage() {
     }
   }
 
-  function onSelectionChanged(data?: RecentDocumentDto) {
-    pageState.selectedFile.set(data);
-  }
-
   function shouldUpdateInfiniteCacheCallback() {
     mergePageState({
       shouldUpdateInfiniteCache: false
     });
-  }
-
-  function documentDtoColumnsWithConditionalDelete() {
-    return [
-      ...recentDocumentDtoColumns,
-      new GridColumn({
-        valueGetter: GridColumn.defaultValueGetter,
-        headerName: 'More',
-        headerClass: 'header-center',
-        cellRenderer: DocumentRowActionCellRenderer,
-        cellRendererParams: {
-          menuItems: [
-            { title: 'Add to favorites', icon: StarIcon, onClick: () => console.log('add to favorites'), isAuthorized: () => true },
-            {
-              title: 'Remove',
-              icon: CircleMinusIcon,
-              onClick: (doc: RecentDocumentDto) => {
-                mergePageState({ selectedFile: doc, showDeleteDialog: true })
-              },
-              isAuthorized: (data: RecentDocumentDto) => {
-                return data && documentSpacePrivilegesService.isAuthorizedForAction(data.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write);
-              }
-            },
-            { title: 'Rename', icon: EditIcon, onClick: () => console.log('rename'), isAuthorized: () => true },
-            { title: 'Upload new version', icon: UploadIcon, onClick: () => console.log('upload'), isAuthorized: () => true },
-          ],
-        }
-      })
-    ];
   }
 
   return (
@@ -227,37 +232,20 @@ function DocumentSpaceRecentsPage() {
               onNavigate={() => { return }}
               rootName="Recents"
             />
-            <div>
-              {!documentSpacePrivilegesService.isPromised && (
-                <div className="content-controls">
-                  <Button
-                    type="button"
-                    icon
-                    disabled={!pageState.selectedFile.value ||
-                      !documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedFile.value.documentSpace.id, DocumentSpacePrivilegeDtoTypeEnum.Write)}
-                    data-testid="delete-selected-items"
-                    disableMobileFullWidth
-                    onClick={() => pageState.showDeleteDialog.set(true)}
-                  >
-                    <RemoveIcon className="icon-color" size={1.25} />
-                  </Button>
-                </div>
-              )}
-            </div>
           </div>
           {pageState.datasource.value &&
             <InfiniteScrollGrid
-              columns={documentDtoColumnsWithConditionalDelete()}
+              columns={recentDocumentDtoColumns.attach(Downgraded).value}
               datasource={pageState.datasource.value}
               cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
               maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
               maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
               suppressCellSelection
+              suppressRowClickSelection
               getRowNodeId={getDocumentUniqueKey}
-              rowSelection="single"
-              onSelectionChanged={onSelectionChanged}
               updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
               updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
+              autoResizeColumns
             />
           }
 

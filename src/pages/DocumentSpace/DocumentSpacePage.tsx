@@ -1,4 +1,4 @@
-import {none, SetPartialStateAction, State, useHookstate} from '@hookstate/core';
+import {Downgraded, none, SetPartialStateAction, State, useHookstate} from '@hookstate/core';
 import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
 import React, {useEffect, useRef} from 'react';
 import {useHistory} from 'react-router';
@@ -23,8 +23,7 @@ import {
   DocumentDto, DocumentSpacePathItemsDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
-  DocumentSpaceResponseDto,
-  DocumentSpaceUserCollectionResponseDto
+  DocumentSpaceResponseDto
 } from '../../openapi';
 import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
 import {FormActionType} from '../../state/crud-page/form-action-type';
@@ -42,15 +41,16 @@ import {formatDocumentSpaceDate} from '../../utils/date-utils';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
 import EditIcon from '../../icons/EditIcon';
 import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
-import DesktopActions from '../../components/documentspace/Actions/DesktopActions/DesktopActions';
-import MobileActions from '../../components/documentspace/Actions/MobileActions/MobileActions';
-import StarHollowIcon from "../../icons/StarHollowIcon";
 import GenericDialog from '../../components/GenericDialog/GenericDialog';
 import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
+import {DocumentSpaceUserCollectionResponseDto} from '../../openapi/models/document-space-user-collection-response-dto';
+import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
+import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
+import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
+import StarHollowIcon from '../../icons/StarHollowIcon';
 
 export enum CreateEditOperationType {
   NONE,
@@ -71,50 +71,6 @@ function getCreateEditTitle(type: CreateEditOperationType) {
       return "Unknown";
   }
 }
-
-const documentDtoColumns: GridColumn[] = [
-  new GridColumn({
-    field: 'key',
-    headerName: 'Name',
-    resizable: true,
-    cellRenderer: DocSpaceItemRenderer,
-    checkboxSelection: true,
-    initialWidth: 400,
-  }),
-  new GridColumn({
-    field: 'lastModifiedDate',
-    headerName: 'Last Modified',
-    resizable: true,
-    initialWidth: 250,
-    valueFormatter: function (params: ValueFormatterParams) {
-      if (params.value) {
-        return formatDocumentSpaceDate(params.value);
-      }
-    }
-  }),
-  new GridColumn({
-    field: 'lastModifiedBy',
-    headerName: 'Last Modified By',
-    resizable: true,
-  }),
-  new GridColumn({
-    field: 'size',
-    headerName: 'Size',
-    resizable: true,
-    valueFormatter: function (params: ValueFormatterParams) {
-      if (params.value != null) {
-        return params.value ? formatBytesToString(params.value) : '';
-      }
-    }
-  }),
-  new GridColumn({
-    valueGetter: GridColumn.defaultValueGetter,
-    headerName: 'Download',
-    headerClass: 'header-center',
-    resizable: true,
-    cellRenderer: DocumentDownloadCellRenderer
-  })
-];
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -182,6 +138,122 @@ function DocumentSpacePage() {
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
 
+  const deviceInfo = useDeviceInfo();
+
+  const documentDtoColumns = useHookstate<GridColumn[]>([
+    new GridColumn({
+      field: 'key',
+      headerName: 'Name',
+      resizable: true,
+      cellRenderer: DocSpaceItemRenderer,
+      checkboxSelection: true,
+      initialWidth: 400,
+      cellRendererParams: {
+        onClick: (folder: string) => {
+          const newPath = pageState.get().path + '/' + folder;
+          const queryParams = new URLSearchParams(location.search);
+          queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+          queryParams.set(pathQueryKey, newPath);
+          history.push({ search: queryParams.toString() });
+        }
+      }
+    }),
+    new GridColumn({
+      field: 'lastModifiedDate',
+      headerName: 'Last Modified',
+      resizable: true,
+      initialWidth: 250,
+      valueFormatter: function (params: ValueFormatterParams) {
+        if (params.value) {
+          return formatDocumentSpaceDate(params.value);
+        }
+      }
+    }),
+    new GridColumn({
+      field: 'lastModifiedBy',
+      headerName: 'Last Modified By',
+      resizable: true,
+    }),
+    new GridColumn({
+      field: 'size',
+      headerName: 'Size',
+      resizable: true,
+      valueFormatter: function (params: ValueFormatterParams) {
+        if (params.value != null) {
+          return params.value ? formatBytesToString(params.value) : '';
+        }
+      }
+    }),
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'Download',
+      headerClass: 'header-center',
+      resizable: true,
+      cellRenderer: DocumentDownloadCellRenderer
+    }),
+    new GridColumn({
+      valueGetter: GridColumn.defaultValueGetter,
+      headerName: 'More',
+      headerClass: 'header-center',
+      cellRenderer: DocumentRowActionCellRenderer,
+      cellRendererParams: {
+        menuItems: [
+          { 
+            title: 'Add to favorites', 
+            icon: StarIcon, 
+            shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, true),
+            isAuthorized: () => true,
+            onClick: addToFavorites,
+            
+          },
+          {
+            title: 'Remove from favorites',
+            icon: StarHollowIcon,
+            iconProps: {
+              size: 1.1
+            },
+            shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, false),
+            isAuthorized: () => true,
+            onClick: removeFromFavorites,
+          },
+          { 
+            title: 'Upload new version', 
+            icon: UploadIcon, 
+            shouldShow: (doc: DocumentDto) => doc && !doc.folder,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
+            onClick: () => console.log('upload') 
+          },
+          {
+            title: 'Remove',
+            icon: CircleMinusIcon,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
+            onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFiles: [doc], showDeleteDialog: true }),
+          },
+          { 
+            title: 'Rename Folder', 
+            icon: EditIcon, 
+            shouldShow: (doc: DocumentDto) => doc && doc.folder,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
+            onClick: (doc: DocumentDto) => mergeState(pageState, { 
+              clickedItemName: doc.key, 
+              createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
+            })
+          },
+          { 
+            title: 'Rename File', 
+            icon: EditIcon, 
+            shouldShow: (doc: DocumentDto) => doc && !doc.folder,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
+            onClick: (doc: DocumentDto) => mergeState(pageState, { 
+              clickedItemName: doc.key, 
+              createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
+            })
+          },
+        ] as PopupMenuItem<DocumentDto>[],
+      },
+    })
+  ]);
+
   const mountedRef = useRef(false);
 
   useEffect(() => {
@@ -229,6 +301,53 @@ function DocumentSpacePage() {
   useEffect(() => {
     loadDocSpaceFromLocation(location, documentSpaceService.documentSpaces);
   }, [location.search]);
+
+  // Handle hiding columns on resize
+  useEffect(() => {
+    const hideableColumns = documentDtoColumns.filter(column => column.field.value !== 'key' && column.field.value !== 'lastModifiedDate' && column.headerName.value !== 'More');
+    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
+      hideableColumns.forEach(column => {
+        if (!column.hide.value) {
+          column.hide.set(true)
+        }
+      });
+
+      // Get the "More" actions column
+      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
+      
+      // Check if "Download" action already exists
+      const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>);
+      const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
+
+      if (downloadAction == null) {
+        cellRendererParams.set(state => {
+          state.menuItems.splice(0, 0, { 
+            title: 'Download', 
+            icon: DownloadMaterialIcon,
+            iconProps: {
+              style: 'primary',
+              fill: true
+            },
+            shouldShow: (doc: DocumentDto) => doc != null,
+            isAuthorized: () => true,
+            onClick: (doc: DocumentDto) => window.location.href = documentSpaceService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+          });
+  
+          return state;
+        });
+      }
+    } else {
+      hideableColumns.forEach(column => {
+        if (column.hide.value) {
+          column.hide.set(false)
+        }
+      });
+
+      // Remove Download from "More" actions cell renderer
+      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
+      (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>).menuItems.find(menuItem => menuItem.title.value === 'Download')?.set(none);
+    }
+  }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
   function loadDocSpaceFromLocation(locationService: any, documentSpaceList: Array<DocumentSpaceResponseDto>) {
     const queryParams = new URLSearchParams(locationService.search);
@@ -307,15 +426,12 @@ function DocumentSpacePage() {
     }
   }
 
-
   function onDatasourceUpdateCallback() {
     mergePageState({
       shouldUpdateDatasource: false,
       selectedFiles: []
     });
   }
-
-
 
   function setPageStateOnException(message: string) {
     mergePageState({
@@ -535,92 +651,6 @@ function DocumentSpacePage() {
 
     return add ? !foundInFavorites : foundInFavorites
   }
-  function documentDtoColumnsWithConditionalDelete() {
-    const columns = (pageState.selectedSpace.value && documentSpacePrivilegesService.isAuthorizedForAction(pageState.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write)) ?
-      [
-        ...documentDtoColumns,
-        new GridColumn({
-          valueGetter: GridColumn.defaultValueGetter,
-          headerName: 'More',
-          headerClass: 'header-center',
-          cellRenderer: DocumentRowActionCellRenderer,
-          cellRendererParams: {
-            menuItems: [
-              { 
-                title: 'Add to favorites', 
-                icon: StarIcon,
-                shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, true),
-                isAuthorized: () => true,
-                onClick: addToFavorites,
-              },
-              {
-                title: 'Remove from favorites',
-                icon: StarHollowIcon,
-                iconSize: 1.1,
-                shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, false),
-                isAuthorized: () => true,
-                onClick: removeFromFavorites,
-              },
-              { 
-                title: 'Upload new version', 
-                icon: UploadIcon, 
-                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-                isAuthorized: () => true,
-                onClick: () => console.log('upload') 
-              },
-              {
-                title: 'Remove',
-                icon: CircleMinusIcon,
-                isAuthorized: () => true,
-                onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFiles: [doc], showDeleteDialog: true }),
-              },
-              { 
-                title: 'Rename Folder', 
-                icon: EditIcon, 
-                shouldShow: (doc: DocumentDto) => doc && doc.folder,
-                isAuthorized: () => true,
-                onClick: (doc: DocumentDto) => mergeState(pageState, { 
-                  clickedItemName: doc.key, 
-                  createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
-                })
-              },
-              { 
-                title: 'Rename File', 
-                icon: EditIcon, 
-                shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-                isAuthorized: () => true,
-                onClick: (doc: DocumentDto) => mergeState(pageState, { 
-                  clickedItemName: doc.key, 
-                  createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
-                })
-              },
-            ] as PopupMenuItem<DocumentDto>[],
-          },
-        })
-      ]
-      : documentDtoColumns;
-
-    // modify the first column to have a DocSpaceItemRenderer
-    columns[0] = new GridColumn({
-      field: 'key',
-      headerName: 'Name',
-      resizable: true,
-      cellRenderer: DocSpaceItemRenderer,
-      checkboxSelection: true,
-      initialWidth: 400,
-      cellRendererParams: {
-        onClick: (folder: string) => {
-          const newPath = pageState.get().path + '/' + folder;
-          const queryParams = new URLSearchParams(location.search);
-          queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
-          queryParams.set(pathQueryKey, newPath);
-          history.push({ search: queryParams.toString() });
-        }
-      }
-    });
-
-    return columns;
-  }
 
   return (
     <PageFormat pageTitle="Document Space">
@@ -668,28 +698,18 @@ function DocumentSpacePage() {
             history.push({ search: queryParams.toString() });
           }}
         />
-        <div>
-          {pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised && (
-            <div className="content-controls">
-              <MobileActions
-                selectedSpace={pageState.selectedSpace}
-                path={pageState.nested('path')}
-                shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-                createEditElementOpType={pageState.createEditElementOpType}
-                membershipsState={pageState.membershipsState}
-              />
-              <DesktopActions
-                selectedSpace={pageState.selectedSpace}
-                path={pageState.nested('path')}
-                shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-                createEditElementOpType={pageState.createEditElementOpType}
-                membershipsState={pageState.membershipsState}
-                selectedFiles={pageState.selectedFiles}
-                showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
-              />
-            </div>
-          )}
-        </div>
+        <DocumentSpaceActions
+          show={pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
+          isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
+          selectedSpace={pageState.selectedSpace}
+          path={pageState.nested('path')}
+          shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+          createEditElementOpType={pageState.createEditElementOpType}
+          membershipsState={pageState.membershipsState}
+          selectedFiles={pageState.selectedFiles}
+          showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
+          className="content-controls"
+        />
       </div>
       {pageState.selectedSpace.value != null &&
         pageState.datasource.value &&
@@ -697,8 +717,8 @@ function DocumentSpacePage() {
           pageState.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Read
         ) && (
-          <InfiniteScrollGrid
-            columns={documentDtoColumnsWithConditionalDelete()}
+          <InfiniteScrollGrid            
+            columns={documentDtoColumns.attach(Downgraded).value}
             datasource={pageState.datasource.value}
             cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
             maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
@@ -710,6 +730,7 @@ function DocumentSpacePage() {
             onRowSelected={onDocumentRowSelected}
             rowSelection="multiple"
             suppressRowClickSelection
+            autoResizeColumns
           />
         )}
 
