@@ -7,9 +7,11 @@ import './DocSpaceItemRenderer.scss';
 import { ICellRendererParams } from 'ag-grid-community';
 import { ClickableCellRenderer } from '../Grid/clickable-cell-renderer';
 import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import StarGrayIcon from "../../icons/StarGrayIcon";
 
 export interface DocSpaceItemRendererProps {
   hideItemLink?: boolean;
+  isFavorited?: (data: DocumentDto)=>boolean;
 }
 
 /**
@@ -65,11 +67,16 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
     }
   }
 
+  function renderFavoritedStatus() {
+    return ((props.isFavorited && props.isFavorited(data)) ? <span style={{marginLeft: '8px'} }>{<StarGrayIcon size={1.3} fill={false} disabled={true}/> }</span> : null)
+  }
+
   return (
     <div className="loading-cell-renderer" data-testid={`docspace-item-cell-renderer__${data.key}`}>
       {data.folder ? <FolderIcon /> : null}
       {'  '}
       {data.folder ? renderFolderItem() : renderFileItem()}
+      {renderFavoritedStatus()}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {DocumentSpaceUserCollectionResponseDto} from '../../../openapi';
 import FolderIcon from "../../../icons/FolderIcon";
 import Button from "../../../components/Button/Button";
 import {ClickableCellRenderer} from "../../../components/Grid/clickable-cell-renderer";
+import StarGrayIcon from "../../../icons/StarGrayIcon";
 
 function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer) {
 
@@ -15,6 +16,11 @@ function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCe
   if (!value) {
     return <Spinner small />;
   }
+
+  function renderFavoritedStatus() {
+    return (<span style={{marginLeft: '8px'} }>{<StarGrayIcon size={1.3}/> }</span>)
+  }
+
   return (
     <div
       className="loading-cell-renderer"
@@ -42,6 +48,7 @@ function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCe
         value.key
       )} target="_blank" rel="noreferrer">{value.key}</a>
       }
+      {renderFavoritedStatus()}
     </div>
   );
 }

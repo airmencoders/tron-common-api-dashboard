@@ -155,6 +155,9 @@ function DocumentSpacePage() {
           queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);
           history.push({ search: queryParams.toString() });
+        },
+        isFavorited: (document: DocumentDto)=>{
+          return getFavoritesShouldShow(document, false)
         }
       }
     }),
@@ -599,6 +602,9 @@ function DocumentSpacePage() {
       }
       if(mountedRef.current) {
         pageState.favorites.merge([placeHolderResponse])
+
+        // hacky workaround to get the grid to rerender showing favorites
+        pageState.shouldUpdateDatasource.set(true)
       }
       createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
     }else{
@@ -618,6 +624,9 @@ function DocumentSpacePage() {
           pageState.favorites.set(favorites => {
             return favorites.filter(f => f.key !== doc.key);
           })
+
+          // hacky workaround to get the grid to rerender showing favorites
+          pageState.shouldUpdateDatasource.set(true)
         }
         createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
       }
@@ -640,7 +649,7 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  function getFavoritesShouldShow (doc: DocumentDto, add: boolean) {
+  function getFavoritesShouldShow (doc: DocumentDto, addingToFavorites: boolean) {
      const foundInFavorites = pageState.favorites?.value?.filter(favorite => {
       if (doc === undefined) {
         return false
@@ -649,7 +658,7 @@ function DocumentSpacePage() {
       }
     }).length
 
-    return add ? !foundInFavorites : foundInFavorites
+    return addingToFavorites ? !foundInFavorites : foundInFavorites
   }
 
   return (
