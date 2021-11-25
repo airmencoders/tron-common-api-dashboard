@@ -1,9 +1,11 @@
 import { Downgraded, none, useHookstate } from '@hookstate/core';
 import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
+import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
 import DocumentRowActionCellRenderer from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import GenericDialog from '../../components/GenericDialog/GenericDialog';
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
@@ -12,14 +14,18 @@ import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
+import ChevronUpIcon from '../../icons/ChevronUpIcon';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
+import RemoveIcon from '../../icons/RemoveIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
+
+import './DocumentSpaceArchivedItemsPage.scss';
 
 interface PageState {
   datasource?: IDatasource;
@@ -30,6 +36,7 @@ interface PageState {
   shouldUpdateDatasource: boolean;
   selectedFiles: DocumentDto[];
   showDeleteDialog: boolean;
+  showRestoreDialog: boolean;
 }
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -51,6 +58,7 @@ export default function DocumentSpaceArchivedItemsPage() {
       isLoading: false,
     },
     showDeleteDialog: false,
+    showRestoreDialog: false,
   });
 
   const documentDtoColumns = useHookstate<GridColumn[]>([
@@ -154,11 +162,11 @@ export default function DocumentSpaceArchivedItemsPage() {
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
   function closeRemoveDialog(): void {
-    pageState.merge({ showDeleteDialog: false });
+    pageState.merge({ showDeleteDialog: false, showRestoreDialog: false });
   }
 
   // permanently deletes archived files
-  async function deleteFile(): Promise<void> {
+  async function deleteFiles(): Promise<void> {
     try {
       const itemsToPurge = reduceDocumentDtoListToUnique(pageState.selectedFiles.get());
       for (const item of itemsToPurge) {
@@ -250,6 +258,31 @@ export default function DocumentSpaceArchivedItemsPage() {
   return (
     <PageFormat pageTitle="Document Space Archived Items">
       {pageState.datasource.value && (
+        <div>
+        <div className="file-action-buttons">
+          <Button
+            className="file-action-button"
+            type="button"
+            icon
+            disabled={pageState.selectedFiles.value.length === 0}
+            data-testid="restore-selected-items"
+            disableMobileFullWidth
+            onClick={() => pageState.merge({ showRestoreDialog: true })}
+          >
+            <ChevronUpIcon iconTitle="Restore Selected" className="icon-color" size={1} />
+          </Button>
+          <Button
+            className="file-action-button"
+            type="button"
+            icon
+            disabled={pageState.selectedFiles.value.length === 0}
+            data-testid="forever-delete-selected-items"
+            disableMobileFullWidth
+            onClick={() => pageState.merge({ showDeleteDialog: true })}
+          >
+            <RemoveIcon iconTitle="Purge Selected" className="icon-color" size={1} />
+          </Button>
+        </div>
         <InfiniteScrollGrid
           columns={documentDtoColumns.attach(Downgraded).value}
           datasource={pageState.datasource.value}
@@ -264,12 +297,31 @@ export default function DocumentSpaceArchivedItemsPage() {
           rowSelection="multiple"
           autoResizeColumns
         />
+        </div>
       )}
-      <DeleteDocumentDialog
+      <GenericDialog
+        title="Delete Confirm"
+        submitText="Delete Forever"
         show={pageState.showDeleteDialog.get()}
         onCancel={closeRemoveDialog}
-        onSubmit={deleteFile}
-        file={pageState.selectedFiles.get().map(item => item.key.toString()).join(',')}
+        onSubmit={deleteFiles}
+        content={
+          pageState.selectedFiles.get().length > 1
+            ? `Delete these ${pageState.selectedFiles.get().length} items?`
+            : `Delete this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
+        }
+      />
+      <GenericDialog
+        title="Restore Confirm"
+        submitText="Restore"
+        show={pageState.showRestoreDialog.get()}
+        onCancel={closeRemoveDialog}
+        onSubmit={restoreItems}
+        content={
+          pageState.selectedFiles.get().length > 1
+            ? `Restore these ${pageState.selectedFiles.get().length} items?`
+            : `Restore this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
+        }
       />
     </PageFormat>
   );
