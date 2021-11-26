@@ -3,10 +3,11 @@ import { waitFor } from '@testing-library/dom';
 import axios from 'axios';
 import { MutableRefObject } from 'react';
 import { InfiniteScrollOptions } from '../../../../components/DataCrudFormPage/infinite-scroll-options';
-import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
+import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpacePrivilegeDtoTypeEnum, RecentDocumentDto } from '../../../../openapi';
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
+import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
 import RecentsPageService from '../recents-page-service';
 import { RecentsPageState } from '../recents-page-state';
 
@@ -16,6 +17,17 @@ describe('Document Space Recents Page Tests', () => {
   const infiniteScrollOptions: InfiniteScrollOptions = {
     enabled: true,
     limit: 100,
+  };
+
+  const document: RecentDocumentDto = {
+    id: 'file id',
+    key: 'file name',
+    parentFolderId: 'parent id',
+    lastModifiedDate: new Date().toDateString(),
+    documentSpace: {
+      name: 'test document space',
+      id: 'document space id'
+    }
   };
 
   const documentSpaces: DocumentSpaceResponseDto[] = [
@@ -131,11 +143,16 @@ describe('Document Space Recents Page Tests', () => {
 
       const getPrivileges = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacesPrivileges');
 
-      await recentsPageService.fetchSpacesAndPrivileges(infiniteScrollOptions);
+      const request = recentsPageService.fetchSpacesAndPrivileges(infiniteScrollOptions);
+
+      expect(recentsPageService.isSpacesOrPrivilegesLoading()).toEqual(true);
+
+      await request;
 
       await waitFor(() => expect(fetchAndStoreSpaces).toHaveBeenCalled());
       expect(getPrivileges).not.toHaveBeenCalled();
 
+      expect(recentsPageService.isSpacesOrPrivilegesLoading()).toEqual(false);
       expect(recentsPageState.pageStatus.value).toEqual({
         isLoading: false,
         isError: true,
@@ -167,6 +184,128 @@ describe('Document Space Recents Page Tests', () => {
         message: undefined
       });
       expect(recentsPageState.datasource.value).toBeDefined();
+    });
+  });
+
+  it('should return authorization status for a document space', () => {
+    const authorizationSpy = jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(false);
+
+    expect(recentsPageService.isAuthorizedForAction(document, DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(false);
+
+    authorizationSpy.mockReturnValue(true);
+
+    expect(recentsPageService.isAuthorizedForAction(document, DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(true);
+  });
+
+  describe('test deleteArchiveFile', () => {
+    it('should set state for successful request', async () => {
+      recentsPageState.selectedFile.set(document);
+      jest.spyOn(documentSpaceService, 'deleteArchiveItemBySpaceAndParent').mockReturnValue(Promise.resolve(createAxiosSuccessResponse()));
+
+      await recentsPageService.deleteArchiveFile();
+
+      expect(recentsPageState.selectedFile.value).not.toBeDefined();
+      expect(recentsPageState.showDeleteDialog.value).toEqual(false);
+      expect(recentsPageState.shouldUpdateInfiniteCache.value).toEqual(true);
+    });
+
+    it('should set state for unsuccessful request', async () => {
+      recentsPageState.selectedFile.set(document);
+      jest.spyOn(documentSpaceService, 'deleteArchiveItemBySpaceAndParent').mockReturnValue(Promise.reject(createGenericAxiosRequestErrorResponse()));
+
+      await recentsPageService.deleteArchiveFile();
+
+      expect(recentsPageState.selectedFile.value).not.toBeDefined();
+      expect(recentsPageState.showDeleteDialog.value).toEqual(false);
+      expect(recentsPageState.shouldUpdateInfiniteCache.value).toEqual(true);
+    });
+
+    it('should throw when selected file is null/undefined', async () => {
+      recentsPageState.selectedFile.set(undefined);
+
+      await expect(recentsPageService.deleteArchiveFile()).rejects.toEqual(Error('File cannot be null for File Archive Deletion'));
+    });
+  });
+
+  describe('test renameFile', () => {
+    it('should throw when selected file is null/undefined', async () => {
+      recentsPageState.selectedFile.set(undefined);
+
+      await expect(recentsPageService.renameFile('test filename')).rejects.toEqual(Error('File cannot be null for File Rename'));
+    });
+
+    it('should set state for successful request', async () => {
+      recentsPageState.selectedFile.set(document);
+      jest.spyOn(documentSpaceService, 'getDocumentSpaceEntryPath').mockReturnValue(Promise.resolve('path'));
+      jest.spyOn(documentSpaceService, 'renameFile').mockReturnValue(Promise.resolve());
+
+      const request = recentsPageService.renameFile('new name');
+      expect(recentsPageState.renameFormState.isSubmitting.value).toEqual(true);
+
+      await request;
+
+      expect(recentsPageState.selectedFile.value).not.toBeDefined();
+      expect(recentsPageState.renameFormState.value).toEqual({
+        isOpen: false,
+        isSubmitting: false
+      });
+      expect(recentsPageState.shouldUpdateInfiniteCache.value).toEqual(true);
+    });
+
+    it('should set state for unsuccessful request', async () => {
+      recentsPageState.selectedFile.set(document);
+      jest.spyOn(documentSpaceService, 'getDocumentSpaceEntryPath').mockReturnValue(Promise.resolve('path'));
+      jest.spyOn(documentSpaceService, 'renameFile').mockReturnValue(Promise.reject(new Error('failure')));
+
+      const request = recentsPageService.renameFile('new name');
+      expect(recentsPageState.renameFormState.isSubmitting.value).toEqual(true);
+
+      await request;
+
+      expect(recentsPageState.selectedFile.value).not.toBeDefined();
+      expect(recentsPageState.showDeleteDialog.value).toEqual(false);
+      expect(recentsPageState.shouldUpdateInfiniteCache.value).toEqual(false);
+    });
+  });
+
+  it('should reset state', () => {
+    recentsPageState.set({
+      datasource: undefined,
+      shouldUpdateInfiniteCache: false,
+      selectedFile: document,
+      showDeleteDialog: false,
+      renameFormState: {
+        isSubmitting: false,
+        isOpen: true
+      },
+      pageStatus: {
+        isLoading: false,
+        isError: false,
+        message: undefined
+      }
+    });
+
+    const documentSpaceServiceResetSpy = jest.spyOn(documentSpaceService, 'resetState');
+    const documentSpacePrivilegeServiceResetSpy = jest.spyOn(documentSpacePrivilegeService, 'resetState');
+
+    recentsPageService.resetState();
+
+    expect(documentSpaceServiceResetSpy).toHaveBeenCalled();
+    expect(documentSpacePrivilegeServiceResetSpy).toHaveBeenCalled();
+    expect(recentsPageState.value).toEqual({
+      datasource: undefined,
+      shouldUpdateInfiniteCache: false,
+      selectedFile: undefined,
+      showDeleteDialog: false,
+      renameFormState: {
+        isSubmitting: false,
+        isOpen: false
+      },
+      pageStatus: {
+        isLoading: false,
+        isError: false,
+        message: undefined
+      }
     });
   });
 });
