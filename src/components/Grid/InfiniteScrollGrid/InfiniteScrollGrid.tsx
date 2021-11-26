@@ -9,8 +9,10 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
 
   function onGridReady(api?: GridApi) {
     gridApi.current = api;
+    if (props.onGridReady != null) {
+      props.onGridReady(api);
+    }
   }
-
   useEffect(() => {
     if (!props.updateDatasource) {
       return;

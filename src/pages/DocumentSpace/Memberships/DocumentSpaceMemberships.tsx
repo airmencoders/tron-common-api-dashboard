@@ -31,6 +31,7 @@ import './DocumentSpaceMemberships.scss';
 import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
 import DocumentSpaceMembershipsForm from './DocumentSpaceMembershipsForm';
 import { DocumentSpaceMembershipsProps } from './DocumentSpaceMembershipsProps';
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 interface DocumentSpaceMembershipsState {
   datasourceState: {
@@ -397,7 +398,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
                           </div>
                         } 
                       </div>
-                      <InfiniteScrollGrid
+                      <FullPageInfiniteGrid
                         columns={renderMembershipColumns()}
                         datasource={pageState.datasourceState.datasource.value}
                         cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}

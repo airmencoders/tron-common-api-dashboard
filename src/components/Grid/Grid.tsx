@@ -10,6 +10,7 @@ import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGrid
 
 function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
+
   const gridSizeRef = useRef(null);
   const gridReady = (event: GridReadyEvent) => {
     setGridApi(event.api);
@@ -56,8 +57,9 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
 
   // Resize the grid columns if necessary
   useEffect(() => {
-    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0))
+    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
       gridApi?.sizeColumnsToFit();
+    }
 
   }, [deviceInfo.windowSize.width]);
 

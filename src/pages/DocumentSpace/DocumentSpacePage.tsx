@@ -51,6 +51,7 @@ import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
 import StarHollowIcon from '../../icons/StarHollowIcon';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 export enum CreateEditOperationType {
   NONE,
@@ -717,7 +718,7 @@ function DocumentSpacePage() {
           pageState.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Read
         ) && (
-          <InfiniteScrollGrid            
+          <FullPageInfiniteGrid
             columns={documentDtoColumns.attach(Downgraded).value}
             datasource={pageState.datasource.value}
             cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}

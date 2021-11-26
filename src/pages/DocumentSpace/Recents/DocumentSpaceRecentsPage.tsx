@@ -31,6 +31,7 @@ import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import UploadIcon from '../../../icons/UploadIcon';
 import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -234,7 +235,7 @@ function DocumentSpaceRecentsPage() {
             />
           </div>
           {pageState.datasource.value &&
-            <InfiniteScrollGrid
+            <FullPageInfiniteGrid
               columns={recentDocumentDtoColumns.attach(Downgraded).value}
               datasource={pageState.datasource.value}
               cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}

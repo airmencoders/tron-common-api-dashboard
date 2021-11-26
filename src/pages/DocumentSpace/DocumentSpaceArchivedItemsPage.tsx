@@ -20,6 +20,7 @@ import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../st
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import DeleteDocumentDialog from './DocumentDelete';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 interface PageState {
   datasource?: IDatasource;
@@ -250,7 +251,7 @@ export default function DocumentSpaceArchivedItemsPage() {
   return (
     <PageFormat pageTitle="Document Space Archived Items">
       {pageState.datasource.value && (
-        <InfiniteScrollGrid
+        <FullPageInfiniteGrid
           columns={documentDtoColumns.attach(Downgraded).value}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
