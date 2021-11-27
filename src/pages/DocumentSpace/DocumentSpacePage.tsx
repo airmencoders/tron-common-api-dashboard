@@ -44,13 +44,13 @@ import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import EditIcon from '../../icons/EditIcon';
 import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
-import GenericDialog from '../../components/GenericDialog/GenericDialog';
 import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
 import {DocumentSpaceUserCollectionResponseDto} from '../../openapi/models/document-space-user-collection-response-dto';
 import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
 import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
 import StarHollowIcon from '../../icons/StarHollowIcon';
+import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 export enum CreateEditOperationType {
@@ -803,17 +803,11 @@ function DocumentSpacePage() {
         />
       </SideDrawer>
 
-      <GenericDialog
-        title="Archive"
-        submitText="Archive"
+      <ArchiveDialog
         show={pageState.showDeleteDialog.get() || pageState.showDeleteSelectedDialog.get()}
         onCancel={closeRemoveDialog}
         onSubmit={archiveFile}
-        content={
-          pageState.selectedFiles.get().length > 1
-            ? `Archive these ${pageState.selectedFiles.get().length} items?`
-            : `Archive this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
-        }
+        items={pageState.selectedFiles.get()}
       />
 
       {pageState.selectedSpace.value &&
