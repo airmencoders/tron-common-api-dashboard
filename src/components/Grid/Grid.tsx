@@ -57,9 +57,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
 
   // Resize the grid columns if necessary
   useEffect(() => {
-    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
-      gridApi?.sizeColumnsToFit();
-    }
+    sizeColumnsToFit();
 
   }, [deviceInfo.windowSize.width]);
 
@@ -80,10 +78,14 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     }
   }, [props.scrollToTop]);
 
-  function onColumnVisible() {
+  function sizeColumnsToFit() {
     if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
       gridApi?.sizeColumnsToFit();
     }
+  }
+
+  function onColumnVisible() {
+    sizeColumnsToFit();
   }
 
   function onFirstDataRendered(event: FirstDataRenderedEvent) {
