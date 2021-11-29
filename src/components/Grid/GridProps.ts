@@ -23,6 +23,12 @@ export interface GridProps {
   autoResizeColummnsMinWidth?: number;
 
   /**
+   * Set to true to force cells to refresh when the grid resizes columns.
+   * {@link autoResizeColumns} must be set to true for this to take effect.
+   */
+  forceCellRefreshOnResize?: boolean;
+
+  /**
    * If set to true, it will disable column virtualization.
    * Defaults to FALSE (column virtualization enabled)
    */

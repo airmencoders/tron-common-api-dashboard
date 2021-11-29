@@ -33,6 +33,7 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
       rowClass={props.rowClass}
       autoResizeColumns={props.autoResizeColumns}
       autoResizeColummnsMinWidth={props.autoResizeColummnsMinWidth}
+      forceCellRefreshOnResize={props.forceCellRefreshOnResize}
       disabledGridColumnVirtualization={props.disabledGridColumnVirtualization}
       rowModelType="infinite"
       rowSelection={props.rowSelection ?? "single"}

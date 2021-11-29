@@ -1,10 +1,10 @@
 import { ICellRendererParams } from 'ag-grid-community';
-import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService } from '../../../state/document-space/document-space-state';
 import { RecentDocumentDto } from '../../../openapi';
 import GridDownloadButton from '../../../components/documentspace/GridDownloadButton/GridDownloadButton';
 
 function RecentDocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
-  const documentSpaceService = useDocumentSpaceState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
 
   const recentDocument = props.value as RecentDocumentDto;
 
@@ -13,7 +13,7 @@ function RecentDocumentDownloadCellRenderer(props: Partial<ICellRendererParams>)
       {recentDocument &&
         <div className="document-download-cell-renderer">
           <GridDownloadButton
-            link={documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(recentDocument.documentSpace.id, recentDocument.parentFolderId, recentDocument.key, true)}
+            link={downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(recentDocument.documentSpace.id, recentDocument.parentFolderId, recentDocument.key, true)}
             title={recentDocument.key}
           />
         </div>

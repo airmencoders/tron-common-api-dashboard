@@ -452,46 +452,6 @@ describe('Test Document Space Service', () => {
     expect(response.name).toEqual('test');
   });
 
-
-  it('should create relative download url for multi file download', () => {
-    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
-
-    const url = documentSpaceService.createRelativeFilesDownloadUrl(documentSpaceId, '/', documents);
-
-    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download?path=/&files=${documents.map(document => document.key).join(',')}`)).toBeTruthy();
-  });
-
-  it('should create relative download url for a single file download', () => {
-    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
-    const fileKey = 'testfile.key';
-
-    const url = documentSpaceService.createRelativeDownloadFileUrl(documentSpaceId, '/', fileKey);
-
-    expect(url.endsWith(`/document-space/space/${documentSpaceId}/${fileKey}`)).toBeTruthy();
-  });
-
-  it('should create relative download url to download entire space', () => {
-    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
-
-    const url = documentSpaceService.createRelativeDownloadAllFilesUrl(documentSpaceId);
-
-    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/files/download/all`)).toBeTruthy();
-  });
-
-  it('should create relative download url by Document Space and Parent', () => {
-    const documentSpaceId = '412ea028-1fc5-41e0-b48a-c6ef090704d3';
-    const parentFolderId = '00000000-0000-0000-0000-000000000000';
-    const filename = 'testfile.txt';
-
-    // Test for preview link
-    let url = documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId, parentFolderId, filename);
-    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}`)).toBeTruthy();
-
-    // Test for direct download link
-    url = documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId, parentFolderId, filename, true);
-    expect(url.endsWith(`/document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}?download=true`)).toBeTruthy();
-  });
-
   it('should allow file deletion by Document Space and Parent', async () => {
     const mock = jest.spyOn(documentSpaceApi, 'deleteFileBySpaceAndParent').mockReturnValue(
       Promise.resolve(

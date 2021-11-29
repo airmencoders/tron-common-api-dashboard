@@ -2,15 +2,15 @@ import { useHookstate } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
-import React, { FormEvent } from 'react';
+import React, { FormEvent, useEffect } from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import { FormActionType } from '../../state/crud-page/form-action-type';
+import { CreateEditOperationType } from '../../state/document-space/document-space-utils';
 import { validateFolderName } from '../../utils/validation-utils';
-import { CreateEditOperationType } from './DocumentSpacePage';
 
 export interface DocumentSpaceCreateEditFormProps {
   opType: CreateEditOperationType;

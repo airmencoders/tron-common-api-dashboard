@@ -80,6 +80,9 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
 
   function sizeColumnsToFit() {
     if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
+      if (props.forceCellRefreshOnResize) {
+        gridApi?.refreshCells({ force: true });
+      }
       gridApi?.sizeColumnsToFit();
     }
   }
