@@ -1,6 +1,6 @@
 import React from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
-import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService } from '../../../state/document-space/document-space-state';
 import Spinner from '../../../components/Spinner/Spinner';
 import {DocumentSpaceUserCollectionResponseDto} from '../../../openapi';
 import FolderIcon from "../../../icons/FolderIcon";
@@ -10,7 +10,7 @@ import StarGrayIcon from "../../../icons/StarGrayIcon";
 
 function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer) {
 
-  const documentSpaceService = useDocumentSpaceState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
   const value = props.data as DocumentSpaceUserCollectionResponseDto;
 
   if (!value) {
@@ -42,7 +42,7 @@ function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCe
           <span className='directory'>{value.key}</span>
         </Button>
         :
-      <a href={documentSpaceService.createRelativeDownloadFileUrlBySpaceAndParent(
+      <a href={downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(
         value.documentSpaceId,
         value.parentId!,
         value.key

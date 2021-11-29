@@ -2,10 +2,10 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../../../openapi';
-import { CreateEditOperationType } from '../../../../pages/DocumentSpace/DocumentSpacePage';
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import { useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
 import DocumentSpaceActions from '../DocumentSpaceActions';
+import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 
 
 jest.mock('../../../../state/document-space/document-space-state');

@@ -6,7 +6,7 @@ import Spinner from '../Spinner/Spinner';
 import './DocSpaceItemRenderer.scss';
 import { ICellRendererParams } from 'ag-grid-community';
 import { ClickableCellRenderer } from '../Grid/clickable-cell-renderer';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService } from '../../state/document-space/document-space-state';
 import StarGrayIcon from "../../icons/StarGrayIcon";
 
 export interface DocSpaceItemRendererProps {
@@ -19,7 +19,7 @@ export interface DocSpaceItemRendererProps {
  * directories and files
  */
 function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer & DocSpaceItemRendererProps) {
-  const documentSpaceService = useDocumentSpaceState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
 
   const data = props.node?.data as DocumentDto;
   const path = data?.path;
@@ -57,7 +57,7 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
     } else {
       return (
         <a
-          href={documentSpaceService.createRelativeDownloadFileUrl(space, path, fileKey)}
+          href={downloadUrlService.createRelativeDownloadFileUrl(space, path, fileKey)}
           target="_blank"
           rel="noreferrer"
         >

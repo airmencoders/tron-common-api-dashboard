@@ -6,7 +6,7 @@ import { useDocumentSpacePrivilegesState } from '../../../../../state/document-s
 import DocumentSpacePrivilegeService from '../../../../../state/document-space/document-space-privilege-service';
 import MobileActions from '../MobileActions';
 import userEvent from '@testing-library/user-event';
-import { CreateEditOperationType } from '../../../../../pages/DocumentSpace/DocumentSpacePage';
+import { CreateEditOperationType } from '../../../../../state/document-space/document-space-utils';
 
 jest.mock('../../../../../state/document-space/document-space-state');
 describe('Mobile Actions Test', () => {
