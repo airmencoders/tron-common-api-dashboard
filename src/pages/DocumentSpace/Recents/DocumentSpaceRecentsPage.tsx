@@ -1,4 +1,4 @@
-import { Downgraded, none, State, useHookstate } from '@hookstate/core';
+import { Downgraded, State, useHookstate } from '@hookstate/core';
 import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
@@ -85,6 +85,18 @@ function DocumentSpaceRecentsPage() {
       cellRenderer: DocumentRowActionCellRenderer,
       cellRendererParams: {
         menuItems: [
+          { 
+            title: 'Download', 
+            icon: DownloadMaterialIcon,
+            iconProps: {
+              style: 'primary',
+              fill: true
+            },
+            shouldShow: (doc: RecentDocumentDto) => doc != null && isMobileLayout(),
+            isAuthorized: () => true,
+            onClick: (doc: RecentDocumentDto) => 
+              window.location.href = downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(doc.documentSpace.id , doc.parentFolderId, doc.key, true)
+          },
           {
             title: 'Remove',
             icon: CircleMinusIcon,
@@ -141,35 +153,33 @@ function DocumentSpaceRecentsPage() {
     const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<RecentDocumentDto>[] }>);
     const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
 
-    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
+    if (isMobileLayout()) {
       hideableColumns.forEach(column => column.hide.set(true));
       
-      // Only add Download if it doesn't exist already
-      if (downloadAction == null) {
-        cellRendererParams.set(state => {
-          state.menuItems.splice(0, 0, { 
-            title: 'Download', 
-            icon: DownloadMaterialIcon,
-            iconProps: {
-              style: 'primary',
-              fill: true
-            },
-            shouldShow: (doc: RecentDocumentDto) => doc != null,
-            isAuthorized: () => true,
-            onClick: (doc: RecentDocumentDto) => 
-              window.location.href = downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(doc.documentSpace.id , doc.parentFolderId, doc.key, true)
-          });
-  
-          return state;
-        });
-      }
+      downloadAction?.set(state => {
+        state.shouldShow = (doc: RecentDocumentDto) => doc != null;
+        return state;
+      });
     } else {
       hideableColumns.forEach(column => column.hide.set(false));
 
-      // Remove Download if it exists
-      downloadAction?.set(none);
+      downloadAction?.set(state => {
+        state.shouldShow = () => false;
+        return state;
+      });
     }
+
+    cellRendererParams.set(state => {
+      // Need to copy the array so that the cell renderer recalculates
+      // the items properly
+      state.menuItems = [...state.menuItems];
+      return state;
+    });
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
+
+  function isMobileLayout() {
+    return deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET;
+  }
 
   function closeRenameForm() {
     documentSpaceRecentsPageService.recentsState.merge({
@@ -210,6 +220,7 @@ function DocumentSpaceRecentsPage() {
               updateInfiniteCache={documentSpaceRecentsPageService.recentsState.shouldUpdateInfiniteCache.value}
               updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
               autoResizeColumns
+              forceCellRefreshOnResize
             />
           }
 

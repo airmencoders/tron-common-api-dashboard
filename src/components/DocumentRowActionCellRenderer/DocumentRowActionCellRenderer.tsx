@@ -32,7 +32,7 @@ function DocumentRowActionCellRenderer<T>(props: DocumentRowActionCellRendererPr
   }, [props.menuItems]);
 
   if (popupItems.length === 0) {
-    return null;
+    return <div></div>;
   }
 
   return (
