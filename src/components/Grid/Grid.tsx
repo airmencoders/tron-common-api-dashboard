@@ -139,7 +139,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                 suppressCellSelection={props.suppressCellSelection}
                 onSelectionChanged={onSelectionChanged}
                 onFirstDataRendered={onFirstDataRendered}
-                onColumnVisible={onColumnVisible}
+                onColumnVisible={onColumnVisible}                
             >
               {
                 props.columns.map(col => (
@@ -152,6 +152,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                       headerClass={col.headerClass}
                       cellRendererFramework={col.cellRenderer}
                       cellRendererParams={col.cellRendererParams}
+                      cellStyle={col.cellStyle ?? undefined}
                       tooltipField={col.showTooltip ? col.field : undefined}
                       resizable={col.resizable}
                       checkboxSelection={col.checkboxSelection}

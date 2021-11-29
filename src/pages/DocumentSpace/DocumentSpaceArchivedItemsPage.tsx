@@ -72,12 +72,11 @@ export default function DocumentSpaceArchivedItemsPage() {
       headerName: 'Name',
       resizable: true,
       cellRenderer: DocSpaceItemRenderer,
+      cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : '',
       cellRendererParams: {
         hideItemLink: true,
       },
-     checkboxSelection: (params) => {
-       return checkHasWriteForDocSpace(params.node?.data);
-     },
+      checkboxSelection: true
     }),
     new GridColumn({
       field: 'spaceName',

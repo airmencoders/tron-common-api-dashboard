@@ -11,6 +11,7 @@ export interface GridColumnParams {
   headerClass: string;
   cellRenderer: React.ReactNode;
   cellRendererParams: any;
+  cellStyle: any;
   resizable: boolean;
   showTooltip: boolean;
   checkboxSelection: boolean | ((params: CheckboxSelectionCallbackParams) => boolean);

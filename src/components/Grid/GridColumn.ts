@@ -13,6 +13,7 @@ export default class GridColumn {
       headerClass = '',
       cellRenderer,
       cellRendererParams,
+      cellStyle,
       resizable = false,
       showTooltip = true,
       checkboxSelection = false,
@@ -41,6 +42,7 @@ export default class GridColumn {
     this._headerCheckboxSelectionFilteredOnly = headerCheckboxSelectionFilteredOnly;
     this._filterParams = filterParams;
     this._pinned = pinned;
+    this._cellStyle = cellStyle;
     this._initialWidth = initialWidth;
     this._valueGetter = valueGetter;
     this._valueFormatter = valueFormatter;
@@ -57,6 +59,7 @@ export default class GridColumn {
   private _cellRendererParams?: any;
   private _resizable: boolean;
   private _showTooltip: boolean;
+  private _cellStyle: any;
   private _checkboxSelection: boolean | ((params: CheckboxSelectionCallbackParams) => boolean);
   private _headerCheckboxSelection: boolean;
   private _headerCheckboxSelectionFilteredOnly: boolean;
@@ -90,6 +93,10 @@ export default class GridColumn {
 
   get cellRenderer(): React.ReactNode {
     return this._cellRenderer;
+  }
+
+  get cellStyle(): React.ReactNode {
+    return this._cellStyle;
   }
 
   get cellRendererParams(): any {
