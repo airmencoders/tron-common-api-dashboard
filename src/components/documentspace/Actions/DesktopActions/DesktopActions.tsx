@@ -23,85 +23,90 @@ function DesktopActions(props: ActionsProps) {
   }
 
   return (
-    <div className={`document-space-actions document-space-actions--desktop ${props.className ?? ''} `}>
-      {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
+      <div className={`document-space-actions document-space-actions--desktop ${props.className ?? ''} `}>
+        {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
         <>
           <div data-testid="upload-new-file">
             <FileUpload
-              ref={uploadFileRef}
-              documentSpaceId={props.selectedSpace.value.id}
-              currentPath={props.path.value}
-              onFinish={() => props.shouldUpdateDatasource.set(true)}
+                ref={uploadFileRef}
+                documentSpaceId={props.selectedSpace.value.id}
+                currentPath={props.path.value}
+                onFinish={() => props.shouldUpdateDatasource.set(true)}
             />
             <Button
-              data-testid="upload-file__btn"
-              onClick={() => uploadFileRef.current?.click()}
-              type="button"
-              icon
-              className="rotate-icon"
+                data-testid="upload-file__btn"
+                onClick={() => uploadFileRef.current?.click()}
+                type="button"
+                icon
             >
-              <UploadMaterialIcon size={1} fill iconTitle="Upload Files" />
+              <UploadMaterialIcon size={1} fill iconTitle="Upload Files"/>
             </Button>
           </div>
-
+        </>
+        }
+        {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Read) && (
+            <DropDown
+                id="download-items"
+                data-testid="download-items"
+                anchorContent={<DownloadMaterialIcon size={1} fill iconTitle="Download Items"/>}
+                items={[
+                  {
+                    displayName: 'Download Selected',
+                    action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
+                        ? documentSpaceService.createRelativeFilesDownloadUrl(
+                            props.selectedSpace.value.id,
+                            props.path.value,
+                            props.selectedFiles.value
+                        )
+                        : undefined)
+                  },
+                  {
+                    displayName: 'Download All Files (zip)',
+                    action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
+                        props.selectedSpace.value.id))
+                  }
+                ]}
+            />
+        )}
+        {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
+        <>
           <DropDown
-            id="add-new-items"
-            data-testid="add-new-items"
-            anchorContent={<AddMaterialIcon fill size={1} iconTitle="Add Items" />}
-            items={[
-              { displayName: 'Add New Folder', action: () => props.createEditElementOpType.set(CreateEditOperationType.CREATE_FOLDER) }
-            ]}
+              id="add-new-items"
+              data-testid="add-new-items"
+              anchorContent={<AddMaterialIcon fill size={1} iconTitle="Add Items"/>}
+              items={[
+                {
+                  displayName: 'Add New Folder',
+                  action: () => props.createEditElementOpType.set(CreateEditOperationType.CREATE_FOLDER)
+                }
+              ]}
           />
 
           <Button
-            type="button"
-            icon
-            disabled={props.selectedFiles.value.length === 0}
-            data-testid="delete-selected-items"
-            disableMobileFullWidth
-            onClick={() => props.showDeleteSelectedDialog.set(true)}
+              type="button"
+              icon
+              disabled={props.selectedFiles.value.length === 0}
+              data-testid="delete-selected-items"
+              disableMobileFullWidth
+              onClick={() => props.showDeleteSelectedDialog.set(true)}
           >
-            <RemoveIcon className="icon-color" size={1} />
+            <RemoveIcon className="icon-color" size={1}/>
           </Button>
         </>
-      }
+        }
 
-      {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Read) && (
-        <DropDown
-          id="download-items"
-          data-testid="download-items"
-          anchorContent={<DownloadMaterialIcon size={1} fill iconTitle="Download Items" />}
-          items={[
-            {
-              displayName: 'Download Selected',
-              action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-                ? documentSpaceService.createRelativeFilesDownloadUrl(
-                  props.selectedSpace.value.id,
-                  props.path.value,
-                  props.selectedFiles.value
-                )
-                : undefined)
-            },
-            {
-              displayName: 'Download All Files (zip)',
-              action: () => props.selectedSpace.value && window.open(documentSpaceService.createRelativeDownloadAllFilesUrl(
-                props.selectedSpace.value.id))
-            }
-          ]}
-        />
-      )}
 
-      {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
-        <Button
-          type="button"
-          icon
-          disableMobileFullWidth
-          onClick={() => props.membershipsState.isOpen.set(true)}
-        >
-          <PeopleIcon2 size={1} iconTitle="Manage Users" />
-        </Button>
-      )}
-    </div>
+        {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Membership) && (
+            <Button
+                type="button"
+                icon
+                disableMobileFullWidth
+                onClick={() => props.membershipsState.isOpen.set(true)}
+            >
+              <PeopleIcon2 size={1} iconTitle="Manage Users"/>
+            </Button>
+        )}
+      </div>
   );
 }
 

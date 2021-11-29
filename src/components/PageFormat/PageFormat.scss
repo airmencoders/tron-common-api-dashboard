@@ -55,14 +55,14 @@
   }
   .page-body {
     &__title-section {
-      flex: 0 0 80px;
+      flex: 0 0 60px;
       background: $page-title-background;
       border-bottom: 1px solid $page-border-color;
       padding: $default-panel-padding-y $page-padding ;
     }
     &__content {
       flex: 1;
-      background: $light-shade;
+      background: white;
     }
   }
 }

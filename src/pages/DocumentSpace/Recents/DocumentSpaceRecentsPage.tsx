@@ -23,7 +23,6 @@ import '../DocumentSpacePage.scss';
 import { formatDocumentSpaceDate } from '../../../utils/date-utils'
 import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRenderer';
-import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
 import StarIcon from '../../../icons/StarIcon';
@@ -31,6 +30,7 @@ import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import UploadIcon from '../../../icons/UploadIcon';
 import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
+import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -195,7 +195,7 @@ function DocumentSpaceRecentsPage() {
     try {
       await documentSpaceService.deleteArchiveItemBySpaceAndParent(file.documentSpace.id, file.parentFolderId, file.key);
     } catch (error) {
-      createTextToast(ToastType.ERROR, 'Could not delete requested file: ' + file.key);
+      createTextToast(ToastType.ERROR, 'Could not archive requested file: ' + file.key);
     } finally {
       mergePageState({
         selectedFile: undefined,
@@ -249,11 +249,11 @@ function DocumentSpaceRecentsPage() {
             />
           }
 
-          <DeleteDocumentDialog
-            show={pageState.showDeleteDialog.get()}
+          <ArchiveDialog
+            show={pageState.showDeleteDialog.value}
             onCancel={() => pageState.showDeleteDialog.set(false)}
             onSubmit={deleteArchiveFile}
-            file={pageState.selectedFile.value?.key ?? null}
+            items={pageState.selectedFile.value}
           />
         </>
       }
