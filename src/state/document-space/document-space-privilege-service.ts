@@ -1,4 +1,4 @@
-import { State } from '@hookstate/core';
+import { postpone, State } from '@hookstate/core';
 import axios from 'axios';
 import {
   DocumentSpaceControllerApiInterface,
@@ -20,6 +20,8 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
 
   private authorizedUserService = accessAuthorizedUserState();
 
+  private fetchDashboardUserPrivilegesRequest?: CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>> = undefined;
+
   /**
    * Gets privileges for a dashboard user for a specific document space and
    * sets the state to it.
@@ -28,6 +30,11 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
    * @returns returns the promise that was set
    */
   fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpaceId: string): CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>> {
+    // Only allow a single request to fetch spaces
+    if (this.fetchDashboardUserPrivilegesRequest != null) {
+      this.fetchDashboardUserPrivilegesRequest.cancelTokenSource.cancel();
+    }
+
     const cancellableRequest = makeCancellableDataRequestToken(this.documentSpaceApi.getSelfDashboardUserPrivilegesForDocumentSpace.bind(this.documentSpaceApi, documentSpaceId));
 
     const privileges = cancellableRequest.axiosPromise()
@@ -41,12 +48,21 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
         return privilegeRecord;
       });
 
-    this.documentSpacePrivilegeState.set(privileges);
-
-    return {
-      cancelTokenSource: cancellableRequest.cancelTokenSource,
-      promise: privileges
-    };
+      const dataRequest = {
+        promise: privileges,
+        cancelTokenSource: cancellableRequest.cancelTokenSource
+      };
+  
+      this.documentSpacePrivilegeState.batch(state => {
+        if (state.promised) {
+          return postpone;
+        }
+  
+        this.fetchDashboardUserPrivilegesRequest = dataRequest;
+        state.set(privileges);
+      });
+  
+      return dataRequest;
   }
 
   /**
@@ -59,6 +75,11 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
    * @returns the privileges of the user, separated by each document space
    */
   fetchAndStoreDashboardUserDocumentSpacesPrivileges(documentSpaceIds: Set<string>): CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>> {
+    // Only allow a single request to fetch spaces
+    if (this.fetchDashboardUserPrivilegesRequest != null) {
+      this.fetchDashboardUserPrivilegesRequest.cancelTokenSource.cancel();
+    }
+
     // Contains requests made to get privileges for each document space
     const requests: Promise<{ id: string, privileges: Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> }>[] = [];
 
@@ -97,12 +118,22 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
         return privileges;
       });
 
-    this.documentSpacePrivilegeState.set(allPrivileges);
-
-    return {
-      cancelTokenSource: cancelToken,
-      promise: allPrivileges
+    const dataRequest = {
+      promise: allPrivileges,
+      cancelTokenSource: cancelToken
     };
+
+    this.documentSpacePrivilegeState.batch(state => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.fetchDashboardUserPrivilegesRequest = dataRequest;
+      state.set(allPrivileges);
+    });
+
+
+    return dataRequest;
   }
 
   convertDocumentSpacePrivilegesToRecord(privileges: DocumentSpacePrivilegeDto[]): Record<DocumentSpacePrivilegeDtoTypeEnum, boolean> {
@@ -130,5 +161,9 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
     if (!this.isPromised) {
       this.documentSpacePrivilegeState.set({});
     }
+
+    // Cancel pending requests if necessary
+    this.fetchDashboardUserPrivilegesRequest?.cancelTokenSource.cancel();
+    this.fetchDashboardUserPrivilegesRequest = undefined;
   }
 }

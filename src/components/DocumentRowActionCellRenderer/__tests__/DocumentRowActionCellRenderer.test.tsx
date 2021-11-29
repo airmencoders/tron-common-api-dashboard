@@ -10,10 +10,38 @@ describe('Row Action Cell Renderer', () => {
     onClick = jest.fn();
   });
 
-  it('Renders correctly', async () => {
-    const page = render(<DocumentRowActionCellRenderer node={{ data: 'data' }} menuItems={[]} />);
+  it('should render when length of menuItems is > 0 after being filtered for shown and authorized elements', () => {
+    const page = render(
+      <DocumentRowActionCellRenderer node={{ data: 'data' }} 
+        menuItems={[
+          {
+            title: 'Remove',
+            icon: CircleMinusIcon,
+            onClick: onClick,
+            isAuthorized: () => true
+          }
+        ]}
+      />
+    );
 
     expect(page.getByTestId('document-row-action-cell-renderer')).toBeTruthy();
+  });
+
+  it('should not render when there are 0 menuItems after being filtered for shown and authorized elements', () => {
+    const page = render(
+      <DocumentRowActionCellRenderer node={{ data: 'data' }} 
+        menuItems={[
+          {
+            title: 'Remove',
+            icon: CircleMinusIcon,
+            onClick: onClick,
+            isAuthorized: () => false
+          }
+        ]}
+      />
+    );
+
+    expect(page.queryByTestId('document-row-action-cell-renderer')).not.toBeInTheDocument();
   });
 
   it('Btn click handler', async () => {
@@ -66,6 +94,12 @@ describe('Row Action Cell Renderer', () => {
         onClick: onClick,
         title: 'Remove',
         isAuthorized: () => false
+      },
+      {
+        icon: CircleMinusIcon,
+        onClick: onClick,
+        title: 'Exists',
+        isAuthorized: () => true
       },
     ];
 
