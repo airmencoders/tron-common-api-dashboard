@@ -216,13 +216,6 @@ function DocumentSpacePage() {
             isAuthorized: () => true,
             onClick: removeFromFavorites,
           },
-          { 
-            title: 'Upload new version', 
-            icon: UploadIcon, 
-            shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: () => console.log('upload') 
-          },
           {
             title: 'Remove',
             icon: CircleMinusIcon,

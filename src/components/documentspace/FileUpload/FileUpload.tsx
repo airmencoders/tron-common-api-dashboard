@@ -5,6 +5,7 @@ import Button from '../../../components/Button/Button';
 import Modal from '../../../components/Modal/Modal';
 import ModalTitle from '../../../components/Modal/ModalTitle';
 import { useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import GenericDialog from '../../GenericDialog/GenericDialog';
 import { ToastType } from '../../Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../Toast/ToastUtils/ToastUtils';
 import './FileUpload.scss';
@@ -26,6 +27,8 @@ interface UploadState {
   currentFile: string;
   progress: number;
   cancelToken: CancelTokenSource | undefined;
+  uploadErrors: Record<string, string>[],
+  showErrorDialog: boolean;
 }
 
 export interface FileUploadProps {
@@ -48,6 +51,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     currentFile: '',
     progress: 0,
     cancelToken: undefined,
+    uploadErrors: [],
+    showErrorDialog: false,
   });
 
   const inputKeyState = useHookstate(Date.now());
@@ -58,6 +63,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
       fileCount: 0,
       showUploadDialog: false,
       showConfirmDialog: false,
+      uploadErrors: [],
+      showErrorDialog: false,
     });
 
 
@@ -71,50 +78,57 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
   }
 
   async function uploadFile(fileIndex: number) {
-    try {
-      for (let i=fileIndex; i<uploadState.fileCount.value; i++) {
-        const currentFile: string = uploadState.fileList?.get()?.[i].name ?? '';
+    for (let i = fileIndex; i < uploadState.fileCount.value; i++) {
+      const currentFile: string = uploadState.fileList?.get()?.[i].name ?? '';
 
-        if (currentFile) {
-          uploadState.merge({ fileIndex: i, currentFile });
+      if (currentFile) {
+        uploadState.merge({ fileIndex: i, currentFile });
 
-          // if this current file is listed in the state's 'backendFileInfo'
-          //  then we need to prompt (..maybe)
-          if (uploadState.backendFileInfo.get().includes(currentFile)) {
-            switch (uploadState.currentConflictStrategy.value) {
-              case FileConflictStrategy.PROMPT:
-                uploadState.merge({ showConfirmDialog: true });
-                return;  // done until next user interaction
-              case FileConflictStrategy.OVERWRITE_REMOTE:
-                break;  // don't have to do anything for overwrites
-              case FileConflictStrategy.PRESERVE_REMOTE:
-                continue;  // skip the upload below if we're preserving remote copy
-              default:
-                break;
-            }            
+        // if this current file is listed in the state's 'backendFileInfo'
+        //  then we need to prompt (..maybe)
+        if (uploadState.backendFileInfo.get().includes(currentFile)) {
+          switch (uploadState.currentConflictStrategy.value) {
+            case FileConflictStrategy.PROMPT:
+              uploadState.merge({ showConfirmDialog: true });
+              return; // done until next user interaction
+            case FileConflictStrategy.OVERWRITE_REMOTE:
+              break; // don't have to do anything for overwrites
+            case FileConflictStrategy.PRESERVE_REMOTE:
+              continue; // skip the upload below if we're preserving remote copy
+            default:
+              break;
           }
+        }
 
-          // if we get here, then the currentFile didn't collide with the backend
-          //  and/or user chose to overwrite-all..
-          const list = uploadState.fileList.attach(Downgraded).get();
-          if (list) {
+        // if we get here, then the currentFile didn't collide with the backend
+        //  and/or user chose to overwrite-all..
+        const list = uploadState.fileList.attach(Downgraded).get();
+        if (list) {
+          try {
             const response = documentSpaceService.uploadFile(
               props.documentSpaceId,
               props.currentPath,
               list[i],
               updateProgress
             );
-            
+
             uploadState.cancelToken.set(response.cancelTokenSource);
             await response.promise;
+          } catch (e) {
+            uploadState.uploadErrors.set([...uploadState.uploadErrors.get(), 
+              { file: list[i].name, reason: (e as AxiosError).response?.data.reason ??
+                'Upload Process Cancelled' }]
+            );
           }
         }
       }
+    }
 
+    if (uploadState.uploadErrors.get().length === 0) {
       createTextToast(ToastType.SUCCESS, 'Upload Process completed', { autoClose: 3000 });
-    } 
-    catch (e) {
-      createTextToast(ToastType.ERROR, (e as AxiosError).response?.data.reason ?? 'Upload Process Cancelled', { autoClose: 5000 })
+    }
+    else {
+      uploadState.merge({ showErrorDialog: true });
     }
 
     uploadState.merge({
@@ -128,7 +142,6 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     // force react to re-render the hidden file input to clear its selection
     //  contents ... stackoverflow.com/a/55495449
     inputKeyState.set(Date.now());
-    
   }
 
   function onOverwriteFile() {
@@ -156,6 +169,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         fileCount: files.length,
         fileList: files,
         fileIndex: 0,
+        uploadErrors: [],
+        showErrorDialog: false,
         backendFileInfo: [],
       });
 
@@ -284,6 +299,14 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         <div>There is already a file named <strong>{uploadState.currentFile.value}</strong> on the server.</div>
         <div><br/> Do you want to replace it with this copy?</div>
       </Modal>
+      <GenericDialog
+        show={uploadState.showErrorDialog.get()}
+        onCancel={() => uploadState.showErrorDialog.set(false)}
+        onSubmit={() => uploadState.showErrorDialog.set(false)}
+        submitText="OK"
+        title="Upload File Errors"
+        content={<ul>These files did not upload: {uploadState.uploadErrors.get().map(item => <li key={item.file}>{item.file} - {item.reason}</li>)}</ul>}
+      />
     </>
   )
 });

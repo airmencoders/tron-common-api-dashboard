@@ -6,7 +6,7 @@ import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpace
 import DocumentRowActionCellRenderer from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
-import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
+import { createDefaultGridFilterParamsForType, generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
@@ -60,21 +60,30 @@ export default function DocumentSpaceArchivedItemsPage() {
       resizable: true,
       cellRenderer: DocSpaceItemRenderer,
       checkboxSelection: true,
+      sortable: true,
+      filter: true,
     }),
     new GridColumn({
       field: 'spaceName',
       headerName: 'Doc Space',
       resizable: true,
+      sortable: true,
+      filter: true
     }),
     new GridColumn({
       field: 'path',
       headerName: 'Path',
       resizable: true,
+      sortable: true,
+      filter: true,      
     }),
     new GridColumn({
       field: 'lastModifiedDate',
       headerName: 'Last Modified',
       resizable: true,
+      sortable: true,
+      filter: true,
+      filterParams: createDefaultGridFilterParamsForType('date'),
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return formatDocumentSpaceDate(params.value);
@@ -85,11 +94,16 @@ export default function DocumentSpaceArchivedItemsPage() {
       field: 'lastModifiedBy',
       headerName: 'Last Modified By',
       resizable: true,
+      sortable: true,
+      filter: true,
     }),
     new GridColumn({
       field: 'size',
       headerName: 'Size',
       resizable: true,
+      sortable: true,
+      filter: true,
+      filterParams: createDefaultGridFilterParamsForType('number'),
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return params.value ? formatBytesToString(params.value) : '';
