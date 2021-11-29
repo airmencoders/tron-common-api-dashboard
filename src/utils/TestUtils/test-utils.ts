@@ -20,7 +20,7 @@ export function createGenericAxiosRequestErrorResponse(statusCode: number = 400)
   };
 }
 
-export function createAxiosSuccessResponse<T>(data?: T): AxiosResponse<T | undefined> {
+export function createAxiosSuccessResponse<T>(data: T): AxiosResponse<T> {
   return {
     data,
     status: 200,
@@ -33,6 +33,16 @@ export function createAxiosSuccessResponse<T>(data?: T): AxiosResponse<T | undef
 export function createAxiosNoContentResponse(): AxiosResponse<{}> {
   return {
     data: {},
+    status: 204,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+}
+
+export function createAxiosVoidContentResponse(): AxiosResponse<undefined> {
+  return {
+    data: undefined,
     status: 204,
     statusText: 'OK',
     config: {},

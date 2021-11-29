@@ -7,7 +7,7 @@ import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerAp
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
-import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
+import { createAxiosVoidContentResponse, createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
 import RecentsPageService from '../recents-page-service';
 import { RecentsPageState } from '../recents-page-state';
 
@@ -200,7 +200,7 @@ describe('Document Space Recents Page Tests', () => {
   describe('test deleteArchiveFile', () => {
     it('should set state for successful request', async () => {
       recentsPageState.selectedFile.set(document);
-      jest.spyOn(documentSpaceService, 'deleteArchiveItemBySpaceAndParent').mockReturnValue(Promise.resolve(createAxiosSuccessResponse()));
+      jest.spyOn(documentSpaceService, 'deleteArchiveItemBySpaceAndParent').mockReturnValue(Promise.resolve(createAxiosVoidContentResponse()));
 
       await recentsPageService.deleteArchiveFile();
 

@@ -50,7 +50,9 @@ describe('Document Space Favorites Page Tests', () => {
       key: 'title',
       lastModifiedDate: '',
       folder: false,
-    }, {
+      metadata: {}
+    }, 
+    {
       id: 'id2',
       itemId: 'itemId2',
       documentSpaceId: 'docSpaceId',
@@ -58,6 +60,7 @@ describe('Document Space Favorites Page Tests', () => {
       lastModifiedDate: '',
       parentId: 'parentFolderId',
       folder: true,
+      metadata: {}
     },
   ];
 
