@@ -34,6 +34,7 @@ import {useLocation} from "react-router-dom";
 import StarHollowIcon from "../../../icons/StarHollowIcon";
 import {prepareRequestError} from "../../../utils/ErrorHandling/error-handling-utils";
 import DocumentSpaceSelector, {spaceIdQueryKey} from "../DocumentSpaceSelector";
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -338,7 +339,7 @@ function DocumentSpaceFavoritesPage() {
             />
           </div>
           {pageState.datasource.value &&
-            <InfiniteScrollGrid
+            <FullPageInfiniteGrid
               columns={documentDtoColumns()}
               datasource={pageState.datasource.value}
               cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}

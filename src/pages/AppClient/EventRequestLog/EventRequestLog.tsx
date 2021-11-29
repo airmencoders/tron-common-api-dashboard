@@ -11,6 +11,7 @@ import { useEventRequestLogState } from '../../../state/event-request-log/event-
 import { EventRequestLogProps } from './event-request-log-props';
 import { EventRequestLogState } from './event-request-log-state';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 const columns = [
   new GridColumn({
@@ -102,7 +103,7 @@ function EventRequestLog({ id }: EventRequestLogProps) {
         width="75%"
         height="auto"
       >
-        <InfiniteScrollGrid
+        <FullPageInfiniteGrid
           columns={columns}
           datasource={eventRequestLogService.createDatasource(id, infiniteScrollOptions)}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
