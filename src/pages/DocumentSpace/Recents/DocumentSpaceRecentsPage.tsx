@@ -17,7 +17,6 @@ import { documentSpaceDownloadUrlService, useDocumentSpaceRecentsPageState } fro
 import '../DocumentSpacePage.scss';
 import { formatDocumentSpaceDate } from '../../../utils/date-utils'
 import RecentDocumentDownloadCellRenderer from './RecentDocumentDownloadCellRenderer';
-import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import RecentDocumentCellRenderer from './RecentDocumentCellRenderer';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
@@ -29,6 +28,7 @@ import { CreateEditOperationType, getCreateEditTitle } from '../../../state/docu
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import DocumentSpaceCreateEditForm from '../DocumentSpaceCreateEditForm';
 import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
+import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -224,11 +224,11 @@ function DocumentSpaceRecentsPage() {
             />
           }
 
-          <DeleteDocumentDialog
-            show={documentSpaceRecentsPageService.recentsState.showDeleteDialog.get()}
+          <ArchiveDialog
+            show={documentSpaceRecentsPageService.recentsState.showDeleteDialog.value}
             onCancel={() => documentSpaceRecentsPageService.recentsState.showDeleteDialog.set(false)}
             onSubmit={documentSpaceRecentsPageService.deleteArchiveFile.bind(documentSpaceRecentsPageService)}
-            file={documentSpaceRecentsPageService.recentsState.selectedFile.value?.key ?? null}
+            items={documentSpaceRecentsPageService.recentsState.selectedFile.value}
           />
 
           <SideDrawer

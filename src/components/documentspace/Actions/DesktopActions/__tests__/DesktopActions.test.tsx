@@ -66,6 +66,7 @@ describe('Desktop Actions Test', () => {
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction')
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true)
       .mockReturnValueOnce(false);
 
     const element = render(
@@ -93,6 +94,7 @@ describe('Desktop Actions Test', () => {
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction')
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(false);
 
     const element = render(
@@ -118,6 +120,7 @@ describe('Desktop Actions Test', () => {
 
   it('should render Membership actions when authorized for membership only', () => {
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction')
+      .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(true);

@@ -100,6 +100,32 @@ export default class DocumentSpaceService {
     return datasource;
   }
 
+  /**
+   * Used to see if a file(s) exists on the backend
+   * @param spaceId Space id
+   * @param path path
+   * @param files file name(s)
+   * @returns array of fileNames that exist on backend (of the names given) or the Axios error (via exception) value if backend call failed
+   */
+  async checkIfFileExistsAtPath(spaceId: string, path: string, files: string[]): Promise<string[]> {
+    try {
+      const response = await this.documentSpaceApi.statElementsAtPath(spaceId, { currentPath: path, items: files });
+      const resp: string[] = [];
+      if (response.data) {
+        for (const file of files)  {
+          // if this file was in the response, then it exists
+          if (response.data.data.find(item => item.itemName === file)) {
+            resp.push(file);
+          }
+        }
+      }      
+      return resp;
+    }
+    catch (e) {
+      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    }
+  }
+
   // helper to fetch the archived items for the archived items page
   //  and also to go ahead and populate the archived items user privs state for
   //  the current user

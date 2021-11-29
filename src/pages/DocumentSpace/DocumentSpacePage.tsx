@@ -44,7 +44,6 @@ import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import EditIcon from '../../icons/EditIcon';
 import StarIcon from '../../icons/StarIcon';
 import UploadIcon from '../../icons/UploadIcon';
-import GenericDialog from '../../components/GenericDialog/GenericDialog';
 import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
 import {DocumentSpaceUserCollectionResponseDto} from '../../openapi/models/document-space-user-collection-response-dto';
 import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
@@ -52,6 +51,7 @@ import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
 import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
 import StarHollowIcon from '../../icons/StarHollowIcon';
+import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -635,8 +635,8 @@ function DocumentSpacePage() {
   }
 
   return (
-    <PageFormat pageTitle="Document Space">
-      <FormGroup labelName="document-space" labelText="Spaces" isError={false}>
+    <PageFormat pageTitle="Document Space" className="document-space-page">
+      <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
         <div className="add-space-container">
           <div>
             <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpaceId={pageState.selectedSpace?.value?.id}/>
@@ -653,12 +653,12 @@ function DocumentSpacePage() {
 
             {documentSpaceService.documentSpaces.length && (
               <Button
-                data-testid="doc-space-my-settings__btn"
-                type="button"
-                style={{ position: 'absolute', right: 20 }}
-                unstyled
-                disableMobileFullWidth
-                onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
+                  className="document-space-page__space-user-settings"
+                  data-testid="doc-space-my-settings__btn"
+                  type="button"
+                  unstyled
+                  disableMobileFullWidth
+                  onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
               >
                 <UserIcon size={0} />
               </Button>
@@ -784,17 +784,11 @@ function DocumentSpacePage() {
         />
       </SideDrawer>
 
-      <GenericDialog
-        title="Archive"
-        submitText="Archive"
+      <ArchiveDialog
         show={pageState.showDeleteDialog.get() || pageState.showDeleteSelectedDialog.get()}
         onCancel={closeRemoveDialog}
         onSubmit={archiveFile}
-        content={
-          pageState.selectedFiles.get().length > 1
-            ? `Archive these ${pageState.selectedFiles.get().length} items?`
-            : `Archive this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
-        }
+        items={pageState.selectedFiles.get()}
       />
 
       {pageState.selectedSpace.value &&
