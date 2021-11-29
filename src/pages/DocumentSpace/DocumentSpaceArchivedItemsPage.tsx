@@ -1,5 +1,5 @@
 import { Downgraded, none, useHookstate } from '@hookstate/core';
-import { GridApi, IDatasource, RowNode, ValueFormatterParams } from 'ag-grid-community';
+import { GridApi, IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
@@ -24,9 +24,8 @@ import { ArchivedStatus } from '../../state/document-space/document-space-servic
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
-import DeleteDocumentDialog from './DocumentDelete';
-
 import './DocumentSpaceArchivedItemsPage.scss';
+
 
 interface PageState {
   datasource?: IDatasource;
