@@ -14,6 +14,7 @@ ENV REACT_APP_API_PATH_PREFIX=${REACT_APP_API_PATH_PREFIX}
 
 # do not install cypress
 RUN npm uninstall cypress
+RUN node -e 'var fs=require("fs");var c=JSON.parse(fs.readFileSync("tsconfig.json")); delete c.compilerOptions.types; fs.writeFileSync("tsconfig.json", JSON.stringify(c));'
 
 RUN npm install
 RUN npm run build
