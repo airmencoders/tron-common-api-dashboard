@@ -1,7 +1,7 @@
 import { GridFilterParams } from './grid-filter-params';
 import { GridColumnParams } from "./GridColumnParams";
 import {GridColumnPinnedOption} from './grid-column-pinned-option';
-import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
+import { CheckboxSelectionCallbackParams, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 
 export default class GridColumn {
   constructor(params: Partial<GridColumnParams>) {
@@ -57,7 +57,7 @@ export default class GridColumn {
   private _cellRendererParams?: any;
   private _resizable: boolean;
   private _showTooltip: boolean;
-  private _checkboxSelection: boolean;
+  private _checkboxSelection: boolean | ((params: CheckboxSelectionCallbackParams) => boolean);
   private _headerCheckboxSelection: boolean;
   private _headerCheckboxSelectionFilteredOnly: boolean;
   private _filterParams?: GridFilterParams;
@@ -108,7 +108,7 @@ export default class GridColumn {
     return this._showTooltip;
   }
 
-  get checkboxSelection(): boolean {
+  get checkboxSelection(): boolean | ((params: CheckboxSelectionCallbackParams) => boolean) {
     return this._checkboxSelection;
   }
 
