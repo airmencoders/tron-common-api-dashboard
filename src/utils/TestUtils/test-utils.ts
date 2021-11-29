@@ -39,3 +39,13 @@ export function createAxiosNoContentResponse(): AxiosResponse<{}> {
     headers: {}
   };
 }
+
+export function createAxiosVoidContentResponse(): AxiosResponse<undefined> {
+  return {
+    data: undefined,
+    status: 204,
+    statusText: 'OK',
+    config: {},
+    headers: {}
+  };
+}

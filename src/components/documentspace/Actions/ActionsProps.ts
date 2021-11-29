@@ -1,6 +1,6 @@
 import { State } from '@hookstate/core';
 import { DocumentDto, DocumentSpaceResponseDto } from '../../../openapi';
-import { CreateEditOperationType } from '../../../pages/DocumentSpace/DocumentSpacePage';
+import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
 
 export interface ActionsProps {
   selectedSpace: State<DocumentSpaceResponseDto | undefined>;

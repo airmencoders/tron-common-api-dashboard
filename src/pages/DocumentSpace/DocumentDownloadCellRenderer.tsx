@@ -1,10 +1,10 @@
 import { ICellRendererParams } from 'ag-grid-community';
-import { useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService } from '../../state/document-space/document-space-state';
 import './DocumentDownloadCellRenderer.scss';
 import GridDownloadButton from '../../components/documentspace/GridDownloadButton/GridDownloadButton';
 
 function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
-  const documentSpaceService = useDocumentSpaceState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
 
   const path = props.node?.data?.path;
   const fileKey = props.node?.data?.key;
@@ -18,12 +18,12 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
           <GridDownloadButton
             link={
               isFolder
-                ? documentSpaceService.createRelativeFilesDownloadUrl(
+                ? downloadUrlService.createRelativeFilesDownloadUrl(
                     space,
                     path,
                     [props.node?.data]
                   )
-                : documentSpaceService.createRelativeDownloadFileUrl(
+                : downloadUrlService.createRelativeDownloadFileUrl(
                     space,
                     path,
                     fileKey,
