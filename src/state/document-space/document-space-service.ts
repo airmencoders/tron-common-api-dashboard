@@ -1,4 +1,4 @@
-import { State } from '@hookstate/core';
+import { postpone, State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import Config from '../../api/config';
@@ -14,7 +14,6 @@ import {
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
-  RecentDocumentDto,
   S3PaginationDto
 } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
@@ -32,6 +31,8 @@ export default class DocumentSpaceService {
     public documentSpacesState: State<DocumentSpaceResponseDto[]>) { }
 
   private paginationPageToTokenMap = new Map<number, string | undefined>([[0, undefined]]);
+
+  private fetchSpacesRequest?: CancellableDataRequest<DocumentSpaceResponseDto[]> = undefined;
 
   createDatasource(spaceName: string, 
     path: string, 
@@ -140,54 +141,6 @@ export default class DocumentSpaceService {
     return items;
   }
 
-  createRecentDocumentsDatasource(infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
-    const datasource: IDatasource = {
-      getRows: async (params: IGetRowsParams) => {
-        try {
-          const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
-          const page = Math.floor(params.startRow / limit);
-          const data: RecentDocumentDto[] = (await this.documentSpaceApi.getRecentlyUploadedFilesByAuthenticatedUser(page, limit)).data.data;
-
-          let lastRow = -1;
-
-          /**
-           * Last page, calculate the last row
-           */
-          if (data.length === 0 || data.length < limit) {
-            lastRow = (page * limit) + data.length;
-          }
-
-          params.successCallback(data, lastRow);
-        } catch (err) {
-          params.failCallback();
-
-          /**
-           * Don't error out the state here. If the request fails for some reason, just show nothing.
-           *
-           * Call the success callback as a hack to prevent
-           * ag grid from showing an infinite loading state on failure.
-           */
-          params.successCallback([], 0);
-
-          const requestErr = prepareRequestError(err);
-
-          if (requestErr.status != null) {
-            createFailedDataFetchToast();
-            return;
-          }
-
-          /**
-           * Something else went wrong... the request did not leave
-           */
-          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
-          return;
-        }
-      }
-    }
-
-    return datasource;
-  }
-
   createFavoritesDocumentsDatasource(documentSpaceId: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
     return {
       getRows: async (params: IGetRowsParams) => {
@@ -235,6 +188,11 @@ export default class DocumentSpaceService {
   }
 
   fetchAndStoreSpaces(): CancellableDataRequest<DocumentSpaceResponseDto[]> {
+    // Only allow a single request to fetch spaces
+    if (this.fetchSpacesRequest != null) {
+      this.fetchSpacesRequest.cancelTokenSource.cancel();
+    }
+
     const cancellableRequest = makeCancellableDataRequestToken(this.documentSpaceApi.getSpaces.bind(this.documentSpaceApi));
 
     const spacesRequest = cancellableRequest.axiosPromise()
@@ -249,12 +207,21 @@ export default class DocumentSpaceService {
         return Promise.reject(prepareRequestError(error));
       });
 
-    this.documentSpacesState.set(spacesRequest);
+      const dataRequest = {
+        promise: spacesRequest,
+        cancelTokenSource: cancellableRequest.cancelTokenSource
+      };
 
-    return {
-      promise: spacesRequest,
-      cancelTokenSource: cancellableRequest.cancelTokenSource
-    };
+      this.documentSpacesState.batch(state => {
+        if (state.promised) {
+          return postpone;
+        }
+
+        this.fetchSpacesRequest = dataRequest;
+        state.set(spacesRequest);
+      });
+
+    return dataRequest;
   }
 
   async createNewFolder(space: string, path: string, name: string): Promise<void> {
@@ -276,24 +243,6 @@ export default class DocumentSpaceService {
     catch (e) {
       return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
     }
-  }
-
-  createRelativeFilesDownloadUrl(id: string, path: string, documents: DocumentDto[]) {
-    const fileKeysParam = documents.map(document => document.key).join(',');
-    return `${Config.API_URL_V2}` + (`document-space/spaces/${id}/files/download?path=${path}&files=${fileKeysParam}`).replace(/[\/]+/g, '/');
-  }
-
-  createRelativeDownloadFileUrl(id: string, path: string, key: string, asDownload = false): string {
-    const downloadLink =  `${Config.API_URL_V2}` + (`document-space/space/${id}/${path}/${key}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
-    return asDownload ? downloadLink + '?download=true' : downloadLink;
-  }
-
-  createRelativeDownloadAllFilesUrl(id: string): string {
-    return `${Config.API_URL_V2}document-space/spaces/${id}/files/download/all`;
-  }
-
-  createRelativeDownloadFileUrlBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string, asDownload = false): string {
-    return `${Config.API_URL_V2}` + (`document-space/spaces/${documentSpaceId}/folder/${parentFolderId}/file/${filename}${asDownload ? '?download=true' : ''}`.replace(/[\/]+/g, '/'));  // remove any repeated '/'s
   }
 
   async deleteFileBySpaceAndParent(documentSpaceId: string, parentFolderId: string, filename: string) {
@@ -403,6 +352,10 @@ export default class DocumentSpaceService {
     if (!this.isDocumentSpacesStatePromised) {
       this.documentSpacesState.set([]);
     }
+
+    // Cancel pending requests if necessary
+    this.fetchSpacesRequest?.cancelTokenSource.cancel();
+    this.fetchSpacesRequest = undefined;
 
     this.resetPaginationMap();
   }

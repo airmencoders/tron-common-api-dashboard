@@ -56,8 +56,13 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
 
   // Resize the grid columns if necessary
   useEffect(() => {
-    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0))
+    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
+      if (props.forceCellRefreshOnResize) {
+        gridApi?.refreshCells({ force: true });
+      }
+
       gridApi?.sizeColumnsToFit();
+    }
 
   }, [deviceInfo.windowSize.width]);
 
