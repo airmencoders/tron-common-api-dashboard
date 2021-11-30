@@ -27,7 +27,7 @@ import {
 } from '../../openapi';
 import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
 import {FormActionType} from '../../state/crud-page/form-action-type';
-import {documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
+import {documentSpaceDownloadUrlService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
 import {PrivilegeType} from '../../state/privilege/privilege-type';
 import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
 import {formatBytesToString} from '../../utils/file-utils';
@@ -53,6 +53,7 @@ import { CreateEditOperationType, getCreateEditTitle } from '../../state/documen
 import StarHollowIcon from '../../icons/StarHollowIcon';
 import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import { performActionWhenMounted } from '../../utils/component-utils';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -117,6 +118,7 @@ function DocumentSpacePage() {
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
+  const globalDocumentSpaceService = useDocumentSpaceGlobalState();
   const authorizedUserService = useAuthorizedUserState();
 
   const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
@@ -245,26 +247,30 @@ function DocumentSpacePage() {
     const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
 
     async function setInitialSpaceOnLoad() {
+      let data: DocumentSpaceResponseDto[];
       try {
-        const data = await spacesCancellableRequest.promise;
-
-        if (data?.length > 0) {
-          const queryParams = new URLSearchParams(location.search);
-          if (queryParams.get(spaceIdQueryKey) != null) {
-            loadDocSpaceFromLocation(location, data);
-          } else {
-            const defaultDocumentSpaceId = authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-            const defaultDocumentSpace = data.find(d => d.id === defaultDocumentSpaceId);
-            if (defaultDocumentSpace != null) {
-              setStateOnDocumentSpaceAndPathChange(defaultDocumentSpace, '');
-            } else {
-              setStateOnDocumentSpaceAndPathChange(data[0], '');
-            }
-          }
-        }
+        data = await spacesCancellableRequest.promise;
       } catch (err) {
         createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
+        return;
       }
+
+      // Check if navigating to an existing document space first
+      const queryParams = new URLSearchParams(location.search);
+      if (queryParams.get(spaceIdQueryKey) != null) {
+        loadDocSpaceFromLocation(location, data);
+        return;
+      }
+
+      const selectedSpace = globalDocumentSpaceService.getInitialSelectedDocumentSpace(data, authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
+      
+      performActionWhenMounted(mountedRef.current, () => {
+        if (selectedSpace != null) {
+          setStateOnDocumentSpaceAndPathChange(selectedSpace, '');
+        } else {
+          createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
+        }
+      });
     }
 
     setInitialSpaceOnLoad();
@@ -381,6 +387,7 @@ function DocumentSpacePage() {
         selectedFiles: [],
         favorites
       });
+
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
         queryParams.set(spaceIdQueryKey, documentSpace.id);
@@ -640,7 +647,7 @@ function DocumentSpacePage() {
       <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
         <div className="add-space-container">
           <div>
-            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpaceId={pageState.selectedSpace?.value?.id}/>
+            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpace={pageState.selectedSpace?.value}/>
             {isAdmin && !documentSpacePrivilegesService.isPromised && (
               <Button
                 data-testid="add-doc-space__btn"
