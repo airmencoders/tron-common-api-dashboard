@@ -11,7 +11,7 @@ describe('string util tests', () => {
     expect(shortenString('someoklenstring!.txt')).toEqual('someoklenstring!.txt');    
     expect(shortenString('somefile.withverylongcrazyextension')).toEqual('s...e.withverylongcr');    
     expect(shortenString('somereallyreallylongfilename.txt')).toEqual('somereallyrea...e.txt');
-    expect(shortenString('somereallyreallylongfilenamenoextension')).toEqual('somereallyreallylong');
+    expect(shortenString('somereallyreallylongfilenamenoextension')).toEqual('somereallyreallyl...');
     expect(shortenString('somereallyreally.ong.ilename.txt')).toEqual('somereallyrea...e.txt');
   });
 })

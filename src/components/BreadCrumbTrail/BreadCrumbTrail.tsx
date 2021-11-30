@@ -14,7 +14,7 @@ export interface BreadCrumbTrailProps {
 }
 
 // maximum path depth before we "collapse" the rest
-const MAX_PATH_COMPONENTS = 5;
+const MAX_PATH_COMPONENTS = 3;
 
 export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
 
@@ -67,7 +67,8 @@ export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
               type='button'
               data-testid={`path_element_${pathElementCount}`}
               id={`path_element_${pathElementCount++}`}
-              unstyled onClick={navToFolderName}
+              unstyled 
+              onClick={navToFolderName}
             >
               <span className='breadcrumb-bar-link'>{shortenString(item)}</span>
             </Button>
@@ -76,23 +77,29 @@ export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
       )
     }
     else {
-      return <DropDown
-        id="collapsed-path-items"
-        data-testid="collapsed-path-items"
-        anchorContent={
-          <span data-testid="collapsed-path-ellipsis" className='breadcrumb-bar-link'>...</span>
-        }
-        items={pathState.get()
-          .filter(item => item.trim() !== '')
-          .map(item => { 
-            return {
-              displayName: shortenString(item),
-            action: (event: MouseEvent<HTMLButtonElement>) => { navToFolderName(event) },
-              id: `path_element_${pathElementCount++}`
+      return (
+        <div className='breadcrumb-path-item'>
+          <ChevronRightIcon />
+          <DropDown
+            id="collapsed-path-items"
+            data-testid="collapsed-path-items"
+            anchorUnstyled
+            anchorContent={
+              <span data-testid="collapsed-path-ellipsis" className='breadcrumb-bar-link'>...</span>
             }
-          })
-        }
-      />
+            items={pathState.get()
+              .filter(item => item.trim() !== '')
+              .map(item => { 
+                return {
+                  displayName: shortenString(item),
+                  action: (event: MouseEvent<HTMLButtonElement>) => { navToFolderName(event) },
+                  id: `path_element_${pathElementCount++}`
+                }
+              })
+            }
+          />
+        </div>
+      )
     }
   }
   

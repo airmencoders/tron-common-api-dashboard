@@ -6,11 +6,12 @@ import Button from '../../components/Button/Button';
 export interface Item {
   id?: string;
   displayName: string;
-  action: ((event: React.MouseEvent<HTMLButtonElement>) => void) | (() => void);
+  action: ((event: React.MouseEvent<HTMLButtonElement>) => void) | (() => void);  
 }
 
 export interface DropDownProps {
   id: string;
+  anchorUnstyled?: boolean;
   anchorContent: string | ReactNode;
   items: Item[];
 }
@@ -43,7 +44,7 @@ export default function DropDown(props: DropDownProps) {
   return (
     <Dropdown>
       <Dropdown.Toggle variant="none" bsPrefix="p-0">
-        <Button icon type="button">
+        <Button icon type="button" unstyled={props.anchorUnstyled}>
           {props.anchorContent}
         </Button>
       </Dropdown.Toggle>

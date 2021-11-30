@@ -36,6 +36,6 @@ export function shortenString(str: string | undefined | null): string {
     }
   } else {
     // apparently no extension, just truncate to MAX LEN
-    return str.substr(0, STRING_LEN_MAX);
+    return str.substr(0, STRING_LEN_MAX-3) + '...';
   }
 }
