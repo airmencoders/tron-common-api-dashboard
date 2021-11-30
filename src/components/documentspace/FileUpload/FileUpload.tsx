@@ -115,7 +115,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
             uploadState.cancelToken.set(response.cancelTokenSource);
             await response.promise;
           } catch (e) {
-            uploadState.uploadErrors.set([...uploadState.uploadErrors.get(), 
+
+            uploadState.uploadErrors.set([...uploadState.uploadErrors.attach(Downgraded).get(), 
               { file: list[i].name, reason: (e as AxiosError).response?.data.reason ??
                 'Upload Process Cancelled' }]
             );
