@@ -586,7 +586,6 @@ function DocumentSpacePage() {
       if(mountedRef.current) {
         pageState.favorites.merge([placeHolderResponse])
 
-        // hacky workaround to get the grid to rerender showing favorites
         pageState.shouldUpdateDatasource.set(true)
       }
       createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
@@ -608,7 +607,6 @@ function DocumentSpacePage() {
             return favorites.filter(f => f.key !== doc.key);
           })
 
-          // hacky workaround to get the grid to rerender showing favorites
           pageState.shouldUpdateDatasource.set(true)
         }
         createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
