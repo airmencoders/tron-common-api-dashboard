@@ -14,11 +14,11 @@ import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
-import ChevronUpIcon from '../../icons/ChevronUpIcon';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
-import CloseIcon from '../../icons/CloseIcon';
+import RemoveAllIcon from '../../icons/RemoveAllIcon';
 import RemoveIcon from '../../icons/RemoveIcon';
+import RestoreIcon from '../../icons/RestoreIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
@@ -306,7 +306,7 @@ export default function DocumentSpaceArchivedItemsPage() {
             disableMobileFullWidth
             onClick={() => pageState.merge({ showRestoreDialog: true })}
           >
-            <ChevronUpIcon iconTitle="Restore Selected" className="icon-color" size={1} />
+            <RestoreIcon iconTitle="Restore Selected" className="icon-color" size={1} />
           </Button>
           <Button
             className="file-action-button"
@@ -328,7 +328,7 @@ export default function DocumentSpaceArchivedItemsPage() {
             disableMobileFullWidth
             onClick={() => pageState.merge({ showDeleteAllDialog: true })}
           >
-            <CloseIcon iconTitle="Purge All Archived Items" className="icon-color" size={1} />
+            <RemoveAllIcon iconTitle="Purge All Archived Items" className="icon-color" size={1} />
           </Button>
         </div>
         <FullPageInfiniteGrid
@@ -375,7 +375,8 @@ export default function DocumentSpaceArchivedItemsPage() {
       />
       <GenericDialog
         title="Delete All Confirm"
-        submitText="Delete All Forever"
+        submitText="Delete All"
+        submitDanger={true}
         show={pageState.showDeleteAllDialog.get()}
         onCancel={closeDialogs}
         onSubmit={deleteAllItems}
