@@ -6,10 +6,10 @@ import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinit
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
 import DocumentRowActionCellRenderer from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import GenericDialog from '../../components/GenericDialog/GenericDialog';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
@@ -25,7 +25,6 @@ import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../st
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import './DocumentSpaceArchivedItemsPage.scss';
-
 
 interface PageState {
   datasource?: IDatasource;
@@ -332,7 +331,7 @@ export default function DocumentSpaceArchivedItemsPage() {
             <CloseIcon iconTitle="Purge All Archived Items" className="icon-color" size={1} />
           </Button>
         </div>
-        <InfiniteScrollGrid
+        <FullPageInfiniteGrid
           onGridReady={(api) => {gridApi.current = api;}}
           columns={documentDtoColumns.attach(Downgraded).value}
           datasource={pageState.datasource.value}

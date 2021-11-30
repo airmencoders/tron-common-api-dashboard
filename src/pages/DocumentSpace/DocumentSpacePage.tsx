@@ -52,6 +52,7 @@ import DocumentSpaceActions from '../../components/documentspace/Actions/Documen
 import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
 import StarHollowIcon from '../../icons/StarHollowIcon';
 import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -699,7 +700,7 @@ function DocumentSpacePage() {
           pageState.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Read
         ) && (
-          <InfiniteScrollGrid            
+          <FullPageInfiniteGrid
             columns={documentDtoColumns.attach(Downgraded).value}
             datasource={pageState.datasource.value}
             cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}

@@ -35,6 +35,7 @@ import { mapDataItemsToStringIds } from '../../state/data-service/data-service-u
 import Fieldset from '../../components/forms/Fieldset/Fieldset';
 import Label from '../../components/forms/Label/Label';
 import TextInputWithDelete from '../../components/forms/TextInputWithDelete/TextInputWithDelete';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 const ACTION_BUTTON_SIZE = 1.25;
 
@@ -721,7 +722,7 @@ function OrganizationEditForm(props: CreateUpdateFormProps<OrganizationDtoWithDe
         height="auto"
         width="30%"
       >
-        <InfiniteScrollGrid
+        <FullPageInfiniteGrid
           height='300px'
           columns={chooserDataColumns}
           rowClass='ag-grid--row-pointer'

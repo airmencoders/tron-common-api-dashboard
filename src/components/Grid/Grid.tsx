@@ -10,6 +10,7 @@ import { InfiniteScrollGridProps } from './InfiniteScrollGrid/InfiniteScrollGrid
 
 function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
+
   const gridSizeRef = useRef(null);
   const gridReady = (event: GridReadyEvent) => {
     setGridApi(event.api);
@@ -56,13 +57,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
 
   // Resize the grid columns if necessary
   useEffect(() => {
-    if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
-      if (props.forceCellRefreshOnResize) {
-        gridApi?.refreshCells({ force: true });
-      }
-
-      gridApi?.sizeColumnsToFit();
-    }
+    sizeColumnsToFit();
 
   }, [deviceInfo.windowSize.width]);
 
@@ -83,10 +78,17 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
     }
   }, [props.scrollToTop]);
 
-  function onColumnVisible() {
+  function sizeColumnsToFit() {
     if (props.autoResizeColumns && window.innerWidth > (props.autoResizeColummnsMinWidth ?? 0)) {
+      if (props.forceCellRefreshOnResize) {
+        gridApi?.refreshCells({ force: true });
+      }
       gridApi?.sizeColumnsToFit();
     }
+  }
+
+  function onColumnVisible() {
+    sizeColumnsToFit();
   }
 
   function onFirstDataRendered(event: FirstDataRenderedEvent) {
