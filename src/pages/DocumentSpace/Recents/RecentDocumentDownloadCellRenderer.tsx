@@ -15,6 +15,7 @@ function RecentDocumentDownloadCellRenderer(props: Partial<ICellRendererParams>)
           <GridDownloadButton
             link={downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(recentDocument.documentSpace.id, recentDocument.parentFolderId, recentDocument.key, true)}
             title={recentDocument.key}
+            doc={undefined}
           />
         </div>
       }

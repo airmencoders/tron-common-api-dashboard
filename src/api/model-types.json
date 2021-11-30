@@ -869,6 +869,9 @@
         "folder": {
           "type": "boolean"
         },
+        "hasContents": {
+          "type": "boolean"
+        },
         "key": {
           "type": "string"
         },

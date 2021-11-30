@@ -313,7 +313,13 @@ function DocumentSpacePage() {
             },
             shouldShow: (doc: DocumentDto) => doc != null,
             isAuthorized: () => true,
-            onClick: (doc: DocumentDto) => window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+            onClick: (doc: DocumentDto) => {
+              if(doc.folder && !doc.hasContents){
+                createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
+              }else{
+                window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+              }
+            }
           });
   
           return state;
