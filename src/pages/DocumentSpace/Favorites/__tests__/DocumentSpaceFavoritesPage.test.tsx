@@ -1,6 +1,5 @@
 import {createState, State, StateMethodsDestroy} from '@hookstate/core';
 import {render, waitFor} from '@testing-library/react';
-import axios from 'axios';
 import {MemoryRouter} from 'react-router';
 import {
   DashboardUserControllerApi,
@@ -18,15 +17,14 @@ import {
 } from '../../../../state/authorized-user/authorized-user-state';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
 import {
-  documentSpaceMembershipService,
+  useDocumentSpaceGlobalState,
   useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../../state/document-space/document-space-state';
 import DocumentSpaceFavoritesPage from '../DocumentSpaceFavoritesPage';
 import DocumentSpacePrivilegeService from "../../../../state/document-space/document-space-privilege-service";
 import {createAxiosSuccessResponse} from "../../../../utils/TestUtils/test-utils";
-import DocumentSpaceArchivedItemsPage from "../../DocumentSpaceArchivedItemsPage";
-import DocumentSpaceMembershipService from "../../../../state/document-space/document-space-membership-service";
+import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../../state/document-space/document-space-global-service';
 
 jest.mock('../../../../state/document-space/document-space-state');
 jest.mock('../../../../state/authorized-user/authorized-user-state');
@@ -68,6 +66,9 @@ describe('Document Space Favorites Page Tests', () => {
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let documentSpaceService: DocumentSpaceService;
 
+  let globalDocumentSpaceState: State<DocumentSpaceGlobalState>;
+  let globalDocumentSpaceService: DocumentSpaceGlobalService;
+
   let authorizedUserState: State<DashboardUserDto | undefined> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
@@ -81,6 +82,11 @@ describe('Document Space Favorites Page Tests', () => {
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
+    globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({
+      currentDocumentSpace: undefined
+    });
+    globalDocumentSpaceService = new DocumentSpaceGlobalService(globalDocumentSpaceState);
+
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
     dashboardUserApi = new DashboardUserControllerApi();
     authorizedUserService = new AuthorizedUserService(authorizedUserState, dashboardUserApi);
@@ -91,22 +97,11 @@ describe('Document Space Favorites Page Tests', () => {
       documentSpacePrivilegeState
     );
 
-
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
     (accessAuthorizedUserState as jest.Mock).mockReturnValue(new AuthorizedUserService(authorizedUserState, dashboardUserApi));
-
-    // const getFavorites = jest.spyOn(documentSpaceApi, 'getFavorites').mockReturnValue(Promise.resolve(createAxiosSuccessResponse({data: favorties})))
-
-    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
-    documentSpaceApi = new DocumentSpaceControllerApi();
-    documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
-
-
-
-    (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
-    (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
+    (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
   });
 
   afterEach(() => {
