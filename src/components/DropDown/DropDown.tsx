@@ -24,6 +24,8 @@ export default function DropDown(props: DropDownProps) {
         <>
         <Dropdown.Item key={`${props.id}_dropdown_item__${i}`}>
           <Button
+            id={props.items[i].id ?? ''}
+            data-testid={props.items[i].id ?? ''}
             type="button"
             unstyled
             onClick={() => props.items[i].action()}
