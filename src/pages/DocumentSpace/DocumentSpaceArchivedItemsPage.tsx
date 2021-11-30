@@ -68,7 +68,8 @@ export default function DocumentSpaceArchivedItemsPage() {
       headerName: 'Doc Space',
       resizable: true,
       sortable: true,
-      filter: true
+      filter: true,
+      valueGetter: (params) => (params.data as DocumentDto)?.spaceName ?? ''
     }),
     new GridColumn({
       field: 'path',
@@ -82,8 +83,8 @@ export default function DocumentSpaceArchivedItemsPage() {
       headerName: 'Last Modified',
       resizable: true,
       sortable: true,
-      filter: true,
-      filterParams: createDefaultGridFilterParamsForType('date'),
+      filter: 'agDateColumnFilter',
+      valueGetter: (params) => new Date((params.data as DocumentDto)?.lastModifiedDate) ?? '',
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return formatDocumentSpaceDate(params.value);

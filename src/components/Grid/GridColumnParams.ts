@@ -6,7 +6,7 @@ import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 export interface GridColumnParams {
   field: string;
   sortable: boolean;
-  filter: boolean;
+  filter: boolean | string;
   headerName: string;
   headerClass: string;
   cellRenderer: React.ReactNode;

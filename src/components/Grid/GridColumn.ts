@@ -50,7 +50,7 @@ export default class GridColumn {
 
   private _field: string;
   private _sortable: boolean;
-  private _filter: boolean;
+  private _filter: boolean | string;
   private _headerName: string;
   private _headerClass: string;
   private _cellRenderer?: React.ReactNode;
@@ -76,7 +76,7 @@ export default class GridColumn {
     return this._sortable;
   }
 
-  get filter(): boolean {
+  get filter(): boolean | string {
     return this._filter;
   }
 
