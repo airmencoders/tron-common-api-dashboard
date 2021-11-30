@@ -6,7 +6,7 @@ import Button from '../../components/Button/Button';
 export interface Item {
   id?: string;
   displayName: string;
-  action: () => void;
+  action: ((event: React.MouseEvent<HTMLButtonElement>) => void) | (() => void);
 }
 
 export interface DropDownProps {
@@ -28,7 +28,7 @@ export default function DropDown(props: DropDownProps) {
             data-testid={props.items[i].id ?? ''}
             type="button"
             unstyled
-            onClick={() => props.items[i].action()}
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => props.items[i].action(event)}
           >
             {props.items[i].displayName}
           </Button>

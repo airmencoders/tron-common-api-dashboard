@@ -87,7 +87,7 @@ export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
           .map(item => { 
             return {
               displayName: shortenString(item),
-            action: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => { navToFolderName(event) },
+            action: (event: MouseEvent<HTMLButtonElement>) => { navToFolderName(event) },
               id: `path_element_${pathElementCount++}`
             }
           })
