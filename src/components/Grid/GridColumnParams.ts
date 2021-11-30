@@ -1,7 +1,7 @@
 import { GridFilterParams } from './grid-filter-params';
 
 import {GridColumnPinnedOption} from './grid-column-pinned-option';
-import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
+import { CheckboxSelectionCallbackParams, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 
 export interface GridColumnParams {
   field: string;
@@ -11,9 +11,10 @@ export interface GridColumnParams {
   headerClass: string;
   cellRenderer: React.ReactNode;
   cellRendererParams: any;
+  cellStyle: any;
   resizable: boolean;
   showTooltip: boolean;
-  checkboxSelection: boolean;
+  checkboxSelection: boolean | ((params: CheckboxSelectionCallbackParams) => boolean);
   headerCheckboxSelection: boolean;
   headerCheckboxSelectionFilteredOnly: boolean;
   pinned: GridColumnPinnedOption,
