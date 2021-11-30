@@ -1019,6 +1019,10 @@
           "type": "array"
         }
       },
+      "required": [
+        "currentPath",
+        "items"
+      ],
       "type": "object"
     },
     "DocumentSpacePrivilegeDto": {
