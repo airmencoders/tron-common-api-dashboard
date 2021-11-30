@@ -6,4 +6,5 @@ export interface ModalFooterSubmitProps {
   disableSubmit?: boolean;
   submitText?: string;
   cancelText?: string;
+  submitDanger?: boolean;  
 }
