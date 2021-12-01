@@ -25,13 +25,13 @@ export interface DocumentSpacePathItemsDto {
      * @type {string}
      * @memberof DocumentSpacePathItemsDto
      */
-    currentPath?: string;
+    currentPath: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof DocumentSpacePathItemsDto
      */
-    items?: Array<string>;
+    items: Array<string>;
 }
 
 
