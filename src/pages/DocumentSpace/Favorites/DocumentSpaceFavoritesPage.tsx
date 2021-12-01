@@ -7,7 +7,6 @@ import DocumentRowActionCellRenderer
   from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import GridColumn from '../../../components/Grid/GridColumn';
 import {generateInfiniteScrollLimit} from '../../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../../components/PageFormat/PageFormat';
 import {ToastType} from '../../../components/Toast/ToastUtils/toast-type';
 import {createTextToast} from '../../../components/Toast/ToastUtils/ToastUtils';
@@ -18,6 +17,7 @@ import {
 } from '../../../openapi';
 import {useAuthorizedUserState} from '../../../state/authorized-user/authorized-user-state';
 import {
+  useDocumentSpaceGlobalState,
   useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../state/document-space/document-space-state';
@@ -35,6 +35,7 @@ import StarHollowIcon from "../../../icons/StarHollowIcon";
 import {prepareRequestError} from "../../../utils/ErrorHandling/error-handling-utils";
 import DocumentSpaceSelector, {spaceIdQueryKey} from "../DocumentSpaceSelector";
 import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import { performActionWhenMounted } from '../../../utils/component-utils';
 
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -48,7 +49,7 @@ interface DocumentSpaceFavoritesPageState {
   selectedFile?: DocumentSpaceUserCollectionResponseDto;
   showDeleteDialog: boolean;
   showRemoveDialog: boolean;
-  selectedDocumentSpaceId?: string;
+  selectedDocumentSpace?: DocumentSpaceResponseDto;
   shouldUpdateDatasource: boolean;
 }
 
@@ -60,6 +61,7 @@ function DocumentSpaceFavoritesPage() {
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const authorizedUserService = useAuthorizedUserState();
+  const globalDocumentSpaceService = useDocumentSpaceGlobalState();
   const history = useHistory();
   const location = useLocation();
 
@@ -71,7 +73,7 @@ function DocumentSpaceFavoritesPage() {
     selectedFile: undefined,
     showDeleteDialog: false,
     showRemoveDialog: false,
-    selectedDocumentSpaceId: undefined
+    selectedDocumentSpace: undefined
   });
 
   useEffect(() => {
@@ -86,7 +88,7 @@ function DocumentSpaceFavoritesPage() {
         createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
         return;
       }
-      if (selectedDocumentSpace.id !== pageState.get().selectedDocumentSpaceId) {
+      if (selectedDocumentSpace.id !== pageState.get().selectedDocumentSpace?.id) {
         setStateOnDocumentSpace(selectedDocumentSpace);
       }
     }
@@ -100,11 +102,18 @@ function DocumentSpaceFavoritesPage() {
         await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
       }
 
-      mergePageState({
-        selectedDocumentSpaceId: documentSpace.id,
-        shouldUpdateDatasource: true,
-        datasource: documentSpaceService.createFavoritesDocumentsDatasource(documentSpace.id, infiniteScrollOptions),
+      performActionWhenMounted(mountedRef.current, () => {
+        pageState.merge({
+          selectedDocumentSpace: documentSpace,
+          shouldUpdateDatasource: true,
+          datasource: documentSpaceService.createFavoritesDocumentsDatasource(documentSpace.id, infiniteScrollOptions)
+        });
 
+        const queryParams = new URLSearchParams(location.search);
+        if (queryParams.get(spaceIdQueryKey) == null) {
+          queryParams.set(spaceIdQueryKey, documentSpace.id);
+          history.replace({ search: queryParams.toString() });
+        }
       });
     }
     catch (err) {
@@ -119,7 +128,7 @@ function DocumentSpaceFavoritesPage() {
       }
 
       mergePageState({
-        selectedDocumentSpaceId: undefined,
+        selectedDocumentSpace: undefined,
         datasource: undefined,
         shouldUpdateDatasource: false,
       });
@@ -140,35 +149,37 @@ function DocumentSpaceFavoritesPage() {
     mountedRef.current = true;
 
     let spacesCancellableRequest: CancellableDataRequest<DocumentSpaceResponseDto[]>;
+
     async function loadDocumentSpaces() {
       spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
 
       let spaces: DocumentSpaceResponseDto[];
       try {
         spaces = await spacesCancellableRequest.promise;
-
-        const defaultDocumentSpaceId = authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-
-
-        if(!!defaultDocumentSpaceId){
-          mergePageState({
-            selectedDocumentSpaceId: defaultDocumentSpaceId,
-            datasource: documentSpaceService.createFavoritesDocumentsDatasource(defaultDocumentSpaceId, infiniteScrollOptions),
-            shouldUpdateDatasource: true,
-          });
-        } else if (spaces.length > 0) {
-          const initialSpaceId = spaces[0].id;
-          mergePageState({
-            selectedDocumentSpaceId: initialSpaceId,
-            datasource: documentSpaceService.createFavoritesDocumentsDatasource(initialSpaceId, infiniteScrollOptions),
-            shouldUpdateDatasource: true,
-          });
-        }
       } catch (err) {
-        if (mountedRef.current) {
+        performActionWhenMounted(mountedRef.current, () => {
           createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
-        }
+        });
+
+        return;
       }
+
+      // Check if navigating to an existing document space first
+      const queryParams = new URLSearchParams(location.search);
+      if (queryParams.get(spaceIdQueryKey) != null) {
+        loadDocSpaceFromLocation(location, spaces);
+        return;
+      }
+
+      const selectedSpace = globalDocumentSpaceService.getInitialSelectedDocumentSpace(spaces, authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
+      
+      performActionWhenMounted(mountedRef.current, () => {
+        if (selectedSpace != null) {
+          setStateOnDocumentSpace(selectedSpace);
+        } else {
+          createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
+        }
+      });
     }
 
     loadDocumentSpaces();
@@ -190,8 +201,8 @@ function DocumentSpaceFavoritesPage() {
 
     async function loadPrivileges() {
       // Load privileges for the selected document space
-      if (!isAdmin && pageState.selectedDocumentSpaceId.value) {
-        privilegesCancellableRequest = documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(pageState.selectedDocumentSpaceId.value);
+      if (!isAdmin && pageState.selectedDocumentSpace.value) {
+        privilegesCancellableRequest = documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(pageState.selectedDocumentSpace.value.id);
 
         try {
           await privilegesCancellableRequest.promise;
@@ -211,7 +222,7 @@ function DocumentSpaceFavoritesPage() {
         privilegesCancellableRequest.cancelTokenSource.cancel();
       }
     };
-  }, [pageState.selectedDocumentSpaceId.value]);
+  }, [pageState.selectedDocumentSpace.value]);
 
   async function deleteArchiveFile() {
     const file = pageState.selectedFile.value;
@@ -262,7 +273,7 @@ function DocumentSpaceFavoritesPage() {
       createTextToast(ToastType.ERROR, 'Could not getFolderPath');
     }else{
       const queryParams = new URLSearchParams(location.search);
-      queryParams.set('spaceId', pageState.get().selectedDocumentSpaceId ?? '');
+      queryParams.set('spaceId', pageState.get().selectedDocumentSpace?.id ?? '');
       queryParams.set('path', responsePath);
       if(mountedRef.current){
         history.push({pathname: '/document-space/spaces', search: queryParams.toString() });
@@ -329,7 +340,7 @@ function DocumentSpaceFavoritesPage() {
         <Spinner /> :
         <>
           <>
-            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpaceId={pageState.selectedDocumentSpaceId?.value}/>
+            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpace={pageState.selectedDocumentSpace?.value}/>
           </>
           <div className="breadcrumb-area">
             <BreadCrumbTrail

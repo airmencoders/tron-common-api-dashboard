@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {useHistory} from 'react-router';
 import {useLocation} from 'react-router-dom';
 import Select from '../../components/forms/Select/Select';
 import './DocumentSpacePage.scss';
 import DocumentSpaceService from "../../state/document-space/document-space-service";
 import {DocumentSpaceSelectorProps} from "./DocumentSpaceSelectorProps";
+import {useDocumentSpaceGlobalState} from '../../state/document-space/document-space-state';
 
 
 export const spaceIdQueryKey = 'spaceId';
@@ -14,6 +15,13 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
   const location = useLocation();
   const history = useHistory();
 
+  const globalDocumentSpaceService = useDocumentSpaceGlobalState();
+
+  useEffect(() => {
+    if (props.selectedSpace) {
+      globalDocumentSpaceService.setCurrentDocumentSpace(props.selectedSpace);
+    }
+  }, [props.selectedSpace]);
 
   function getSpaceOptions(isDocumentSpacesLoading: boolean, isDocumentSpacesErrored: boolean, documentSpaceService: DocumentSpaceService) {
     if (isDocumentSpacesLoading) {
@@ -43,7 +51,7 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
     <Select
       id="document-space"
       name="document-space"
-      value={props.selectedSpaceId}
+      value={props.selectedSpace?.id}
       disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
       onChange={(event) => {
         const documentSpaceId = event.target.value;
