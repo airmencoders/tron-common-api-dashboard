@@ -290,6 +290,13 @@ function DocumentSpacePage() {
     loadDocSpaceFromLocation(location, documentSpaceService.documentSpaces);
   }, [location.search]);
 
+  function conditionalMenuDownloadOnClick (doc: DocumentDto) {
+    if(doc.folder && !doc.hasContents){
+      createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
+    }else{
+      window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+    }
+  }
   // Handle hiding columns on resize
   useEffect(() => {
     const hideableColumns = documentDtoColumns.filter(column => column.field.value !== 'key' && column.field.value !== 'lastModifiedDate' && column.headerName.value !== 'More');
@@ -318,13 +325,7 @@ function DocumentSpacePage() {
             },
             shouldShow: (doc: DocumentDto) => doc != null,
             isAuthorized: () => true,
-            onClick: (doc: DocumentDto) => {
-              if(doc.folder && !doc.hasContents){
-                createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
-              }else{
-                window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
-              }
-            }
+            onClick: conditionalMenuDownloadOnClick
           });
   
           return state;
