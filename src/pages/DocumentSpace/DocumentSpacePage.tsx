@@ -12,7 +12,6 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import {GridSelectionType} from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
@@ -481,22 +480,24 @@ function DocumentSpacePage() {
     }
   }
 
-  function submitDocumentSpace(space: DocumentSpaceRequestDto) {
+  async function submitDocumentSpace(space: DocumentSpaceRequestDto) {
     pageState.merge({ isSubmitting: true });
-    documentSpaceService
-      .createDocumentSpace(space)
-      .then((docSpace) => {
-        mergePageState({
-          drawerOpen: false,
-          isSubmitting: false,
-          showErrorMessage: false,
-          selectedSpace: docSpace,
-          shouldUpdateDatasource: true,
-          path: '',
-          datasource: documentSpaceService.createDatasource(docSpace.id, '', infiniteScrollOptions)
-        });
-      })
-      .catch((message) => setPageStateOnException(message));
+
+    try {
+      const createdSpace = await documentSpaceService.createDocumentSpace(space);
+      mergePageState({
+        drawerOpen: false,
+        isSubmitting: false,
+        showErrorMessage: false
+      });
+
+      const queryParams = new URLSearchParams(location.search);
+      queryParams.set(spaceIdQueryKey, createdSpace.id);
+      queryParams.delete(pathQueryKey);
+      history.push({ search: queryParams.toString() });
+    } catch (error) {
+      setPageStateOnException(error as string);
+    }
   }
 
   function closeDrawer(): void {
