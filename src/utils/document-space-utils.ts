@@ -1,5 +1,17 @@
 import { DocumentDto } from "../openapi";
 
+function sortKeys(a: DocumentDto, b: DocumentDto): number {
+  if (a.key.toLowerCase() < b.key.toLowerCase()) return 1;
+  if (a.key.toLowerCase() === b.key.toLowerCase()) return 0;
+  else return -1;
+}
+
+function sortDates(a: DocumentDto, b: DocumentDto): number {
+  if (new Date(a.lastModifiedDate) < new Date(b.lastModifiedDate)) return 1;
+  if (new Date(a.lastModifiedDate) === new Date(b.lastModifiedDate)) return 0;
+  else return -1;
+}
+
 /**
    * Sorts from given criteria of the ag-grid (currently just 'key' and 'lastModifiedDate')
    * @param data Server data to sort client-side (since we're not using true infinite/paginated data currently)
@@ -20,33 +32,13 @@ export function applySortCriteria(
 
   switch (sortModel.colId) {
     case 'key':
-      directories = directories.sort((a: DocumentDto, b: DocumentDto) => {
-        if (a.key.toLowerCase() < b.key.toLowerCase()) return 1;
-        if (a.key.toLowerCase() === b.key.toLowerCase()) return 0;
-        else return -1;
-      });
-
-      files = files.sort((a: DocumentDto, b: DocumentDto) => {
-        if (a.key.toLowerCase() < b.key.toLowerCase()) return 1;
-        if (a.key.toLowerCase() === b.key.toLowerCase()) return 0;
-        else return -1;
-      });
-
+      directories = directories.sort(sortKeys);
+      files = files.sort(sortKeys);
       retVal = [ ...files, ...directories ];
       break;
     case 'lastModifiedDate':
-      directories = directories.sort((a: DocumentDto, b: DocumentDto) => {
-        if (new Date(a.lastModifiedDate) < new Date(b.lastModifiedDate)) return 1;
-        if (new Date(a.lastModifiedDate) === new Date(b.lastModifiedDate)) return 0;
-        else return -1;
-      });
-
-      files = files.sort((a: DocumentDto, b: DocumentDto) => {
-        if (new Date(a.lastModifiedDate) < new Date(b.lastModifiedDate)) return 1;
-        if (new Date(a.lastModifiedDate) === new Date(b.lastModifiedDate)) return 0;
-        else return -1;
-      });
-
+      directories = directories.sort(sortDates);
+      files = files.sort(sortDates);
       retVal = [ ...files, ...directories ];
       break;
     default:
