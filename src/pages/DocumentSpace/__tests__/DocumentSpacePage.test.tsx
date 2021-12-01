@@ -15,10 +15,11 @@ import {
 } from '../../../openapi';
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
+import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../state/document-space/document-space-global-service';
 import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
 import DocumentSpacePrivilegeService from '../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
-import { documentSpaceMembershipService, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
 import DocumentSpacePage from '../DocumentSpacePage';
 
@@ -48,6 +49,9 @@ describe('Test Document Space Page', () => {
 
   let membershipService: DocumentSpaceMembershipService;
 
+  let globalDocumentSpaceState: State<DocumentSpaceGlobalState>;
+  let globalDocumentSpaceService: DocumentSpaceGlobalService;
+
   let authorizedUserState: State<DashboardUserDto | undefined> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
@@ -63,8 +67,12 @@ describe('Test Document Space Page', () => {
       documentSpacePrivilegeState
     );
 
-
     membershipService = new DocumentSpaceMembershipService(documentSpaceApi);
+
+    globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({
+      currentDocumentSpace: undefined
+    });
+    globalDocumentSpaceService = new DocumentSpaceGlobalService(globalDocumentSpaceState);
 
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
     dashboardUserApi = new DashboardUserControllerApi();
@@ -74,6 +82,7 @@ describe('Test Document Space Page', () => {
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
     (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
+    (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
   });
 
   afterEach(() => {
