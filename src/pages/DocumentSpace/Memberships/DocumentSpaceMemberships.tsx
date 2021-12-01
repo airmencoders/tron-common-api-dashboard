@@ -31,6 +31,7 @@ import './DocumentSpaceMemberships.scss';
 import DocumentSpaceMembershipsDeleteConfirmation from './DocumentSpaceMembershipsDeleteConfirmation';
 import DocumentSpaceMembershipsForm from './DocumentSpaceMembershipsForm';
 import { DocumentSpaceMembershipsProps } from './DocumentSpaceMembershipsProps';
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 interface DocumentSpaceMembershipsState {
   datasourceState: {
@@ -264,8 +265,12 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
 
   // for a given priv change from member-management list, add the changed user to membersToUpdateState
   function onMemberPrivilegeDropDownChanged(row: DocumentSpaceDashboardMemberResponseDto, item: string): void {
-    if (!pageState.membersState.membersToUpdate.value.find((i) => i.email === row.email)) {
+    const memberUpdateIndex = pageState.membersState.membersToUpdate.value.findIndex((i) => i.email === row.email);
+    if (memberUpdateIndex === -1) {
       pageState.membersState.membersToUpdate.merge([ { email: row.email, privileges: unResolvePrivName(item) }]);
+    } else {
+      // we've already staged this member for an update, so update existing pending-update
+      pageState.membersState.membersToUpdate[memberUpdateIndex].set({ email: row.email, privileges: unResolvePrivName(item) });
     }
   }
 
@@ -368,7 +373,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
             ),
           },
           {
-            onClick: () => { pageState.membersState.selected.set([]); pageState.selectedTab.set(1); },
+            onClick: () => { pageState.membersState.merge({ selected: [], memberUpdateSuccessMessage: ''}); pageState.selectedTab.set(1); },
             text: 'Manage Members',
             content: (
                 pageState.datasourceState.datasource.value && (
@@ -397,7 +402,7 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
                           </div>
                         } 
                       </div>
-                      <InfiniteScrollGrid
+                      <FullPageInfiniteGrid
                         columns={renderMembershipColumns()}
                         datasource={pageState.datasourceState.datasource.value}
                         cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}

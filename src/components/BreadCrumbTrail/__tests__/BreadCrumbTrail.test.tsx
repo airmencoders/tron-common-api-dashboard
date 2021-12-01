@@ -32,7 +32,7 @@ describe('Bread Crumb Tests', () => {
     await waitFor(() => expect(mock).not.toHaveBeenCalled());
   })
 
-  it('show show other path components', async() => {
+  it('should show other path components', async() => {
     const mock = jest.fn();
     const page = render(<BreadCrumbTrail path={"/root/path/folder"} onNavigate={mock} />);
     const rootElement = page.getByTestId('path_element_root');
@@ -40,6 +40,20 @@ describe('Bread Crumb Tests', () => {
     await waitFor(() => expect(rootElement).toBeTruthy());
     await waitFor(() => expect(secondElement).toBeTruthy());
     fireEvent.click(secondElement);
+    await waitFor(() => expect(mock).toHaveBeenCalled());
+  })
+
+  it('should collapse the crumbs when exceeds MAX DEPTH', async() => {
+    const mock = jest.fn();
+    const page = render(<BreadCrumbTrail path={"/root/path/folder/that/is/very/really/long"} onNavigate={mock} />);
+    const dropDownElement = page.getByTestId('collapsed-path-ellipsis');
+    fireEvent.click(dropDownElement);
+    await waitFor(() => expect(page.getByTestId('path_element_0')).toBeVisible());
+    await waitFor(() => expect(page.getByTestId('path_element_1')).toBeVisible());
+    await waitFor(() => expect(page.getByTestId('path_element_2')).toBeVisible());
+    await waitFor(() => expect(page.getByTestId('path_element_3')).toBeVisible());
+    await waitFor(() => expect(page.getByTestId('path_element_4')).toBeVisible());
+    fireEvent.click(page.getByTestId('path_element_4'));
     await waitFor(() => expect(mock).toHaveBeenCalled());
   })
 })

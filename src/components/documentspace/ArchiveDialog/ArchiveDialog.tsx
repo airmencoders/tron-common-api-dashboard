@@ -1,4 +1,5 @@
 import React from 'react';
+import { shortenString } from '../../../utils/string-utils';
 import GenericDialog from '../../GenericDialog/GenericDialog';
 import { ArchiveDialogProps } from './ArchiveDialogProps';
 
@@ -29,7 +30,7 @@ function getContent<T extends { key: string }>(items: T[]) {
 
   return (
     <>
-      Archive this item - {items[0].key}
+      Archive this item - {shortenString(items[0].key)}
     </>
   );
 }

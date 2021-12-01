@@ -1,8 +1,7 @@
 import { Downgraded, State, useState } from '@hookstate/core';
-import { IDatasource, IGetRowsParams, RowClickedEvent } from 'ag-grid-community';
+import {IDatasource, IGetRowsParams, RowClickedEvent} from 'ag-grid-community';
 import React, {ReactText, useEffect, useRef} from 'react';
 import Button from '../../components/Button/Button';
-import Grid from '../../components/Grid/Grid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { StatusType } from '../../components/StatusCard/status-type';
@@ -29,6 +28,8 @@ import { DataCrudFormPageProps } from './DataCrudFormPageProps';
 import { ResponseType } from '../../state/data-service/response-type';
 import { PatchResponse } from '../../state/data-service/patch-response';
 import { CancelTokenSource } from 'axios';
+import FullPageGrid from "../Grid/FullPageGrid/FullPageGrid";
+import FullPageInfiniteGrid from "../Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 /***
  * Generic page template for CRUD operations on entity arrays.
@@ -45,7 +46,9 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
 
   const updateInfiniteCache = useState<boolean>(false);
 
+
   const mountedRef = useRef(false);
+
 
   useEffect(() => {
     let cancelTokenSource: CancelTokenSource | undefined = undefined;
@@ -451,7 +454,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                   </div>
                 }
                 {infiniteScroll?.enabled ?
-                  <InfiniteScrollGrid
+                  <FullPageInfiniteGrid
                     columns={columns}
                     onRowClicked={onRowClicked}
                     rowClass="ag-grid--row-pointer"
@@ -468,7 +471,7 @@ export function DataCrudFormPage<T extends GridRowData, R>(props: DataCrudFormPa
                     updateInfiniteCacheCallback={updateInfiniteCacheCallback}
                   />
                   :
-                  <Grid
+                  <FullPageGrid
                     data={[...dataState.state.attach(Downgraded).get()]}
                     columns={columns}
                     onRowClicked={onRowClicked}

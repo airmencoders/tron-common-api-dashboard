@@ -29,6 +29,7 @@ import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size'
 import DocumentSpaceCreateEditForm from '../DocumentSpaceCreateEditForm';
 import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
 import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -85,8 +86,8 @@ function DocumentSpaceRecentsPage() {
       cellRenderer: DocumentRowActionCellRenderer,
       cellRendererParams: {
         menuItems: [
-          { 
-            title: 'Download', 
+          {
+            title: 'Download',
             icon: DownloadMaterialIcon,
             iconProps: {
               style: 'primary',
@@ -94,7 +95,7 @@ function DocumentSpaceRecentsPage() {
             },
             shouldShow: (doc: RecentDocumentDto) => doc != null && isMobileLayout(),
             isAuthorized: () => true,
-            onClick: (doc: RecentDocumentDto) => 
+            onClick: (doc: RecentDocumentDto) =>
               window.location.href = downloadUrlService.createRelativeDownloadFileUrlBySpaceAndParent(doc.documentSpace.id , doc.parentFolderId, doc.key, true)
           },
           {
@@ -105,7 +106,7 @@ function DocumentSpaceRecentsPage() {
             },
             isAuthorized: (data: RecentDocumentDto) => documentSpaceRecentsPageService.isAuthorizedForAction(data, DocumentSpacePrivilegeDtoTypeEnum.Write)
           },
-          { 
+          {
             title: 'Rename',
             icon: EditIcon,
             onClick: (doc: RecentDocumentDto) => {
@@ -155,7 +156,7 @@ function DocumentSpaceRecentsPage() {
 
     if (isMobileLayout()) {
       hideableColumns.forEach(column => column.hide.set(true));
-      
+
       downloadAction?.set(state => {
         state.shouldShow = (doc: RecentDocumentDto) => doc != null;
         return state;
@@ -208,7 +209,7 @@ function DocumentSpaceRecentsPage() {
             />
           </div>
           {documentSpaceRecentsPageService.recentsState.datasource.value &&
-            <InfiniteScrollGrid
+            <FullPageInfiniteGrid
               columns={recentDocumentDtoColumns.attach(Downgraded).value}
               datasource={documentSpaceRecentsPageService.recentsState.datasource.value}
               cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
