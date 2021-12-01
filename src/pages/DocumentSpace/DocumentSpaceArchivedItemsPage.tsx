@@ -24,6 +24,7 @@ import { ArchivedStatus } from '../../state/document-space/document-space-servic
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
+import { shortenString } from '../../utils/string-utils';
 import './DocumentSpaceArchivedItemsPage.scss';
 
 interface PageState {
@@ -358,7 +359,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         content={
           pageState.selectedFiles.get().length > 1
             ? `Delete these ${pageState.selectedFiles.get().length} items?`
-            : `Delete this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
+            : `Delete this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
         }
       />
       <GenericDialog
@@ -370,7 +371,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         content={
           pageState.selectedFiles.get().length > 1
             ? `Restore these ${pageState.selectedFiles.get().length} items?`
-            : `Restore this item - ${pageState.selectedFiles.get().map((item) => item.key.toString()).join(',')}`
+            : `Restore this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
         }
       />
       <GenericDialog
