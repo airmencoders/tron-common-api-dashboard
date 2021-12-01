@@ -28,9 +28,16 @@
   }
 
   &--wide {
-    @include breakpoint-above(desktop) {
-      width: 40%;
+    width: 40%;
+
+    @include breakpoint-below(desktop) {
+      width: 75%;
     }
+
+    @include breakpoint-below(tablet) {
+      width: 100%;
+    }
+    
     .tron-form .usa-form {
       @include breakpoint-above(desktop) {
         max-width: 100%;
