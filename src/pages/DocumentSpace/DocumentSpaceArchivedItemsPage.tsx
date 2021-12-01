@@ -356,24 +356,22 @@ export default function DocumentSpaceArchivedItemsPage() {
         show={pageState.showDeleteDialog.get()}
         onCancel={closeDialogs}
         onSubmit={deleteSelectedFiles}
-        content={
-          pageState.selectedFiles.get().length > 1
+      >
+        {pageState.selectedFiles.get().length > 1
             ? `Delete these ${pageState.selectedFiles.get().length} items?`
-            : `Delete this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
-        }
-      />
+            : `Delete this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`}
+      </GenericDialog>
       <GenericDialog
         title="Restore Confirm"
         submitText="Restore"
         show={pageState.showRestoreDialog.get()}
         onCancel={closeDialogs}
         onSubmit={restoreItems}
-        content={
-          pageState.selectedFiles.get().length > 1
+      >
+        {pageState.selectedFiles.get().length > 1
             ? `Restore these ${pageState.selectedFiles.get().length} items?`
-            : `Restore this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
-        }
-      />
+            : `Restore this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`}
+      </GenericDialog>
       <GenericDialog
         title="Delete All Confirm"
         submitText="Delete All"
@@ -381,8 +379,9 @@ export default function DocumentSpaceArchivedItemsPage() {
         show={pageState.showDeleteAllDialog.get()}
         onCancel={closeDialogs}
         onSubmit={deleteAllItems}
-        content="Really delete all Archived Items?"
-      />
+      >
+        Really delete all Archived Items?
+      </GenericDialog>
     </PageFormat>
   );
 }

@@ -14,19 +14,23 @@
     height: 100%;
   }
   &__header {
-    position: relative;
-    flex: 0 0 units(7);
+    padding: $default-panel-padding-x $default-panel-padding-y;
     border-bottom: solid 1px $page-border-color;
+
+    & > :nth-child(1) {
+      margin-right: units(1);
+    }
+
+    display: flex;
+    align-items: center;
+
     .header {
       &__close-icon {
-        position: absolute;
-        right: $default-panel-padding-x;
-        top: 14px;
         cursor: pointer;
         background: none;
         border: none;
         padding: 0;
-        display: block;
+        margin-left: auto;
         .close-icon {
           color: color('gray-40');
         }

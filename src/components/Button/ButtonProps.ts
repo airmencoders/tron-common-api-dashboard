@@ -18,4 +18,5 @@ export interface ButtonProps {
   disableMobileFullWidth?: boolean;
   transparentOnDisabled?: boolean;
   transparentBackground?: boolean;
+  title?: string;
 }

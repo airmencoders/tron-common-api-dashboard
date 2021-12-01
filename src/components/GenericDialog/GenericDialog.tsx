@@ -11,7 +11,7 @@ export interface GenericDialogProps {
   submitText?: string;
   show: boolean;
   disableSubmit?: boolean;
-  content: string | React.ReactNode;
+  children: string | React.ReactNode;
 }
 
 export default function GenericDialog(props: GenericDialogProps) {
@@ -31,7 +31,7 @@ export default function GenericDialog(props: GenericDialogProps) {
       width="auto"
       height="auto"
     >
-      {props.content}
+      {props.children}
     </Modal>
   )
 }

@@ -46,8 +46,9 @@ function ArchiveDialog<T extends { key: string }>(props: ArchiveDialogProps<T>) 
       onCancel={props.onCancel}
       onSubmit={props.onSubmit}
       disableSubmit={items.length === 0}
-      content={getContent(items)}
-    />
+    >
+      {getContent(items)}
+    </GenericDialog>
   )
 }
 
