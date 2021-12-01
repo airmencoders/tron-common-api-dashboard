@@ -128,6 +128,8 @@ function DocumentSpacePage() {
       field: 'key',
       headerName: 'Name',
       resizable: true,
+      sortable: true,
+      sort: 'desc',
       cellRenderer: DocSpaceItemRenderer,
       checkboxSelection: true,
       initialWidth: 400,
@@ -144,6 +146,7 @@ function DocumentSpacePage() {
     new GridColumn({
       field: 'lastModifiedDate',
       headerName: 'Last Modified',
+      sortable: true,
       resizable: true,
       initialWidth: 250,
       valueFormatter: function (params: ValueFormatterParams) {

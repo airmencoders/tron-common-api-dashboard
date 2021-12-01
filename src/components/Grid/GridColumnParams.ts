@@ -6,6 +6,7 @@ import { CheckboxSelectionCallbackParams, ValueFormatterParams, ValueGetterParam
 export interface GridColumnParams {
   field: string;
   sortable: boolean;
+  sort?: string;
   filter: boolean | string;
   headerName: string;
   headerClass: string;

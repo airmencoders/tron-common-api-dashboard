@@ -154,6 +154,7 @@ function Grid(props: GridProps & Partial<InfiniteScrollGridProps>) {
                       key={col.field}
                       field={col.field}
                       headerName={col.headerName}
+                      sort={col.sort}
                       sortable={col.sortable}
                       filter={col.filter}
                       headerClass={col.headerClass}

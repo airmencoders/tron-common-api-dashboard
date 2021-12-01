@@ -70,6 +70,8 @@ export default function DocumentSpaceArchivedItemsPage() {
       field: 'key',
       headerName: 'Name',
       resizable: true,
+      sortable: true,
+      sort: 'desc',  // default desc sort
       cellRenderer: DocSpaceItemRenderer,
       cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : '',
       cellRendererParams: {
@@ -81,24 +83,21 @@ export default function DocumentSpaceArchivedItemsPage() {
       field: 'spaceName',
       headerName: 'Doc Space',
       resizable: true,
-      sortable: true,
-      filter: true,
-      valueGetter: (params) => (params.data as DocumentDto)?.spaceName ?? ''
     }),
     new GridColumn({
       field: 'path',
       headerName: 'Path',
       resizable: true,
-      sortable: true,
-      filter: true,      
     }),
     new GridColumn({
       field: 'lastModifiedDate',
       headerName: 'Last Modified',
       resizable: true,
       sortable: true,
-      filter: 'agDateColumnFilter',
-      valueGetter: (params) => new Date((params.data as DocumentDto)?.lastModifiedDate) ?? '',
+      valueGetter: (params) => {
+        if (!params.data) return '';
+        return new Date((params.data as DocumentDto)?.lastModifiedDate);
+      },
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return formatDocumentSpaceDate(params.value);
@@ -109,16 +108,11 @@ export default function DocumentSpaceArchivedItemsPage() {
       field: 'lastModifiedBy',
       headerName: 'Last Modified By',
       resizable: true,
-      sortable: true,
-      filter: true,
     }),
     new GridColumn({
       field: 'size',
       headerName: 'Size',
       resizable: true,
-      sortable: true,
-      filter: true,
-      filterParams: createDefaultGridFilterParamsForType('number'),
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return params.value ? formatBytesToString(params.value) : '';

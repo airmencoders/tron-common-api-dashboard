@@ -8,6 +8,7 @@ export default class GridColumn {
     const {
       field = '',
       sortable = false,
+      sort,
       filter = false,
       headerName = '',
       headerClass = '',
@@ -30,6 +31,7 @@ export default class GridColumn {
 
     this._field = field;
     this._sortable = sortable;
+    this._sort = sort;
     this._filter = filter;
     this._headerName = headerName;
     this._headerClass = headerClass;
@@ -52,6 +54,7 @@ export default class GridColumn {
 
   private _field: string;
   private _sortable: boolean;
+  private _sort?: string;
   private _filter: boolean | string;
   private _headerName: string;
   private _headerClass: string;
@@ -77,6 +80,10 @@ export default class GridColumn {
 
   get sortable(): boolean {
     return this._sortable;
+  }
+
+  get sort(): string  | undefined {
+    return this._sort;
   }
 
   get filter(): boolean | string {
