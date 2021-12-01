@@ -14,7 +14,12 @@ function ModalFooterSubmit(props: ModalFooterSubmitProps) {
               {props.cancelText ?? 'Cancel'}
             </Button>
           }
-          <Button data-testid="modal-submit-btn" type="submit" onClick={props.onSubmit} disabled={props.disableSubmit}>
+          <Button 
+            data-testid="modal-submit-btn" 
+            className={`${props.submitDanger ? 'submit-danger' : ''}`}
+            type="submit" 
+            onClick={props.onSubmit} 
+            disabled={props.disableSubmit}>
             {props.submitText ?? 'Submit'}
           </Button>
         </div>

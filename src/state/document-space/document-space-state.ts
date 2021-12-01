@@ -10,6 +10,7 @@ import React, { MutableRefObject } from 'react';
 import DocumentSpaceDownloadUrlService from './document-space-download-url-service';
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../authorized-user/authorized-user-service';
+import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from './document-space-global-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -28,6 +29,10 @@ const recentsPageState = createState<RecentsPageState>({
     isError: false,
     message: undefined
   }
+});
+
+const globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({
+  currentDocumentSpace: undefined
 });
 
 const documentSpaceControllerApi: DocumentSpaceControllerApiInterface = new DocumentSpaceControllerApi(
@@ -101,3 +106,10 @@ export const useDocumentSpaceRecentsPageState = (mountedRef: MutableRefObject<bo
   accessDocumentSpaceState(),
   accessDocumentSpacePrivilegesState()
 );
+
+
+const wrapGlobalDocumentSpaceState = (globalState: State<DocumentSpaceGlobalState>) => {
+  return new DocumentSpaceGlobalService(globalState)
+}
+
+export const useDocumentSpaceGlobalState = () => wrapGlobalDocumentSpaceState(useState(globalDocumentSpaceState));

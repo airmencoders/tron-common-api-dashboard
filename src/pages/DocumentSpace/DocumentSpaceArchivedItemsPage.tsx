@@ -1,26 +1,31 @@
 import { Downgraded, none, useHookstate } from '@hookstate/core';
-import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import { GridApi, IDatasource, ValueFormatterParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
+import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
 import DocumentRowActionCellRenderer from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import GenericDialog from '../../components/GenericDialog/GenericDialog';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import CircleRightArrowIcon from '../../icons/CircleRightArrowIcon';
+import RemoveAllIcon from '../../icons/RemoveAllIcon';
+import RemoveIcon from '../../icons/RemoveIcon';
+import RestoreIcon from '../../icons/RestoreIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
-import DeleteDocumentDialog from './DocumentDelete';
-import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import { shortenString } from '../../utils/string-utils';
+import './DocumentSpaceArchivedItemsPage.scss';
 
 interface PageState {
   datasource?: IDatasource;
@@ -31,6 +36,9 @@ interface PageState {
   shouldUpdateDatasource: boolean;
   selectedFiles: DocumentDto[];
   showDeleteDialog: boolean;
+  showRestoreDialog: boolean;
+  showDeleteAllDialog: boolean;
+  userCanDeleteSomethingArchived: boolean;
 }
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -52,6 +60,9 @@ export default function DocumentSpaceArchivedItemsPage() {
       isLoading: false,
     },
     showDeleteDialog: false,
+    showRestoreDialog: false,
+    showDeleteAllDialog: false,
+    userCanDeleteSomethingArchived: false,
   });
 
   const documentDtoColumns = useHookstate<GridColumn[]>([
@@ -60,7 +71,11 @@ export default function DocumentSpaceArchivedItemsPage() {
       headerName: 'Name',
       resizable: true,
       cellRenderer: DocSpaceItemRenderer,
-      checkboxSelection: true,
+      cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : '',
+      cellRendererParams: {
+        hideItemLink: true,
+      },
+      checkboxSelection: true
     }),
     new GridColumn({
       field: 'spaceName',
@@ -122,7 +137,7 @@ export default function DocumentSpaceArchivedItemsPage() {
   ]);
 
   const deviceInfo = useDeviceInfo();
-
+  const gridApi = useRef<GridApi | undefined>(undefined);
   const documentSpaceService = useDocumentSpaceState();
   const docSpacePrivsState = useDocumentSpacePrivilegesState();
   const mountedRef = useRef(false);
@@ -154,14 +169,18 @@ export default function DocumentSpaceArchivedItemsPage() {
     }
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
-  function closeRemoveDialog(): void {
-    pageState.merge({ showDeleteDialog: false });
+  function closeDialogs(): void {
+    pageState.merge({ 
+      showDeleteDialog: false, 
+      showRestoreDialog: false, 
+      showDeleteAllDialog: false 
+    });
   }
 
-  // permanently deletes archived files
-  async function deleteFile(): Promise<void> {
+  // performs the act of deleting items on the backend
+  async function deleteFiles(files: DocumentDto[]): Promise<void> {
     try {
-      const itemsToPurge = reduceDocumentDtoListToUnique(pageState.selectedFiles.get());
+      const itemsToPurge = reduceDocumentDtoListToUnique(files);
       for (const item of itemsToPurge) {
         await documentSpaceService.deleteItems(item.spaceId, item.path, item.items);
       }
@@ -181,7 +200,27 @@ export default function DocumentSpaceArchivedItemsPage() {
         ArchivedStatus.ARCHIVED
       ),
     });
-    closeRemoveDialog();
+    closeDialogs();
+  }
+
+  // deletes selected files
+  async function deleteSelectedFiles() {
+    await deleteFiles(pageState.selectedFiles.get());
+  }
+
+  // deletes everything in archived (that the user has privs to delete)
+  async function deleteAllItems(): Promise<void> {
+    const rowData: DocumentDto[] = [];
+    gridApi.current?.forEachNode(node => {
+      if (checkHasWriteForDocSpace(node.data)) {
+        rowData.push(node.data);
+      }
+    });
+    await deleteFiles(rowData);
+
+    // we've deleted (assumed successfully) all the items we had privs
+    //  to delete, so disable the delete all button
+    pageState.userCanDeleteSomethingArchived.set(false);
   }
 
   async function restoreItems(): Promise<void> {
@@ -218,6 +257,8 @@ export default function DocumentSpaceArchivedItemsPage() {
         ArchivedStatus.ARCHIVED
       ),
     });
+
+    closeDialogs();
   }
 
   async function loadArchivedItems() {
@@ -245,13 +286,54 @@ export default function DocumentSpaceArchivedItemsPage() {
 
   function checkHasWriteForDocSpace(doc: DocumentDto): boolean {
     if (!doc) return false;
-    return docSpacePrivsState.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write);
+    if (docSpacePrivsState.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write)) {
+      pageState.userCanDeleteSomethingArchived.set(true);
+      return true;
+    }
+    return false;
   }
 
   return (
     <PageFormat pageTitle="Document Space Archived Items">
       {pageState.datasource.value && (
+        <div>
+        <div className="file-action-buttons">
+          <Button
+            className="file-action-button"
+            type="button"
+            icon
+            disabled={pageState.selectedFiles.value.length === 0}
+            data-testid="restore-selected-items"
+            disableMobileFullWidth
+            onClick={() => pageState.merge({ showRestoreDialog: true })}
+          >
+            <RestoreIcon iconTitle="Restore Selected" className="icon-color" size={1} />
+          </Button>
+          <Button
+            className="file-action-button"
+            type="button"
+            icon
+            disabled={pageState.selectedFiles.value.length === 0}
+            data-testid="forever-delete-selected-items"
+            disableMobileFullWidth
+            onClick={() => pageState.merge({ showDeleteDialog: true })}
+          >
+            <RemoveIcon iconTitle="Purge Selected" className="icon-color" size={1} />
+          </Button>
+          <Button
+            className="file-action-button"
+            type="button"
+            icon
+            disabled={!pageState.userCanDeleteSomethingArchived.get()}
+            data-testid="forever-delete-all-items"
+            disableMobileFullWidth
+            onClick={() => pageState.merge({ showDeleteAllDialog: true })}
+          >
+            <RemoveAllIcon iconTitle="Purge All Archived Items" className="icon-color" size={1} />
+          </Button>
+        </div>
         <FullPageInfiniteGrid
+          onGridReady={(api) => {gridApi.current = api;}}
           columns={documentDtoColumns.attach(Downgraded).value}
           datasource={pageState.datasource.value}
           cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
@@ -262,15 +344,44 @@ export default function DocumentSpaceArchivedItemsPage() {
           updateDatasourceCallback={onDatasourceUpdateCallback}
           getRowNodeId={getDocumentUniqueKey}
           onRowSelected={onDocumentRowSelected}
+          suppressRowClickSelection
           rowSelection="multiple"
           autoResizeColumns
         />
+        </div>
       )}
-      <DeleteDocumentDialog
+      <GenericDialog
+        title="Delete Confirm"
+        submitText="Delete Forever"
         show={pageState.showDeleteDialog.get()}
-        onCancel={closeRemoveDialog}
-        onSubmit={deleteFile}
-        file={pageState.selectedFiles.get().map(item => item.key.toString()).join(',')}
+        onCancel={closeDialogs}
+        onSubmit={deleteSelectedFiles}
+        content={
+          pageState.selectedFiles.get().length > 1
+            ? `Delete these ${pageState.selectedFiles.get().length} items?`
+            : `Delete this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
+        }
+      />
+      <GenericDialog
+        title="Restore Confirm"
+        submitText="Restore"
+        show={pageState.showRestoreDialog.get()}
+        onCancel={closeDialogs}
+        onSubmit={restoreItems}
+        content={
+          pageState.selectedFiles.get().length > 1
+            ? `Restore these ${pageState.selectedFiles.get().length} items?`
+            : `Restore this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
+        }
+      />
+      <GenericDialog
+        title="Delete All Confirm"
+        submitText="Delete All"
+        submitDanger={true}
+        show={pageState.showDeleteAllDialog.get()}
+        onCancel={closeDialogs}
+        onSubmit={deleteAllItems}
+        content="Really delete all Archived Items?"
       />
     </PageFormat>
   );
