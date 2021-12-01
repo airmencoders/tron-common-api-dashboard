@@ -396,7 +396,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         }
       />
       <GenericDialog
-        title="Delete Single Confirm"
+        title="Delete Confirm"
         submitText="Delete Forever"
         show={pageState.showSingleDeleteDialog.get()}
         onCancel={closeDialogs}
