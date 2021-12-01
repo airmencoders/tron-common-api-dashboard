@@ -1,12 +1,12 @@
 import React from 'react';
-import { ICellRendererParams } from 'ag-grid-community';
-import { documentSpaceDownloadUrlService } from '../../../state/document-space/document-space-state';
+import {ICellRendererParams} from 'ag-grid-community';
+import {documentSpaceDownloadUrlService} from '../../../state/document-space/document-space-state';
 import Spinner from '../../../components/Spinner/Spinner';
 import {DocumentSpaceUserCollectionResponseDto} from '../../../openapi';
 import FolderIcon from "../../../icons/FolderIcon";
 import Button from "../../../components/Button/Button";
 import {ClickableCellRenderer} from "../../../components/Grid/clickable-cell-renderer";
-import StarGrayIcon from "../../../icons/StarGrayIcon";
+import StarIcon from "../../../icons/StarIcon";
 
 function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer) {
 
@@ -18,7 +18,7 @@ function FavoritesCellRenderer(props: Partial<ICellRendererParams> & ClickableCe
   }
 
   function renderFavoritedStatus() {
-    return (<span style={{marginLeft: '8px'} }>{<StarGrayIcon size={1.3}/> }</span>)
+    return (<span style={{marginLeft: '8px', bottom: '2px', position:'relative'} }>{<StarIcon fillColor={'#C2C4CB'} size={1.1}/> }</span>)
   }
 
   return (
