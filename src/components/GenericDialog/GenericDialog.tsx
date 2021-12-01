@@ -6,6 +6,7 @@ import ModalFooterSubmit from '../Modal/ModalFooterSubmit';
 export interface GenericDialogProps {
   onCancel: () => void;
   onSubmit: () => void;
+  submitDanger?: boolean;
   title: string;
   submitText?: string;
   show: boolean;
@@ -19,6 +20,7 @@ export default function GenericDialog(props: GenericDialogProps) {
     <Modal
       headerComponent={<ModalTitle title={props.title} />}
       footerComponent={<ModalFooterSubmit
+        submitDanger={props.submitDanger}
         onCancel={props.onCancel}
         onSubmit={props.onSubmit}
         submitText={props.submitText ?? 'Submit'}
