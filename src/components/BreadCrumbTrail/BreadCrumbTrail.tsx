@@ -16,6 +16,59 @@ export interface BreadCrumbTrailProps {
 // maximum path depth before we "collapse" the rest
 const MAX_PATH_COMPONENTS = 3;
 
+// build out the path segments (crumbs).. if path depth exceeds the MAX_PATH_COMPONENTS
+//  value then we put the crumbs into a drop down (save for the first and last elements)
+function buildOutPaths(items: string[], callback: (event: MouseEvent<HTMLButtonElement>) => void) {
+  let pathElementCount = 0;
+  if (items.length <= MAX_PATH_COMPONENTS) {
+    return items
+      .filter(item => item.trim() !== '')
+      .map(item => (
+          <div 
+            key={item} 
+            className='breadcrumb-path-item'
+          >
+          <ChevronRightIcon />
+          <Button
+            type='button'
+            data-testid={`path_element_${pathElementCount}`}
+            id={`path_element_${pathElementCount++}`}
+            unstyled 
+            onClick={callback}
+          >
+            <span className='breadcrumb-bar-link'>{shortenString(item)}</span>
+          </Button>
+        </div>
+      )
+    )
+  }
+  else {
+    return (
+      <div className='breadcrumb-path-item'>
+        <ChevronRightIcon />
+        <DropDown
+          id="collapsed-path-items"
+          data-testid="collapsed-path-items"
+          anchorUnstyled
+          anchorContent={
+            <span data-testid="collapsed-path-ellipsis" className='breadcrumb-bar-link'>...</span>
+          }
+          items={items
+            .filter(item => item.trim() !== '')
+            .map(item => { 
+              return {
+                displayName: shortenString(item),
+                action: (event: MouseEvent<HTMLButtonElement>) => { callback(event) },
+                id: `path_element_${pathElementCount++}`
+              }
+            })
+          }
+        />
+      </div>
+    )
+  }
+}
+
 export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
 
   const pathState = useHookstate<string[]>([]);
@@ -51,59 +104,6 @@ export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
     props.onNavigate('/' + pathAccum.join('/'));
   }
 
-  // build out the path segments (crumbs).. if path depth exceeds the MAX_PATH_COMPONENTS
-  //  value then we put the crumbs into a drop down (save for the first and last elements)
-  function buildOutPaths() {
-    if (pathState.get().length <= MAX_PATH_COMPONENTS) {
-      return pathState.get()
-        .filter(item => item.trim() !== '')
-        .map(item => (
-            <div 
-              key={item} 
-              className='breadcrumb-path-item'
-            >
-            <ChevronRightIcon />
-            <Button
-              type='button'
-              data-testid={`path_element_${pathElementCount}`}
-              id={`path_element_${pathElementCount++}`}
-              unstyled 
-              onClick={navToFolderName}
-            >
-              <span className='breadcrumb-bar-link'>{shortenString(item)}</span>
-            </Button>
-          </div>
-        )
-      )
-    }
-    else {
-      return (
-        <div className='breadcrumb-path-item'>
-          <ChevronRightIcon />
-          <DropDown
-            id="collapsed-path-items"
-            data-testid="collapsed-path-items"
-            anchorUnstyled
-            anchorContent={
-              <span data-testid="collapsed-path-ellipsis" className='breadcrumb-bar-link'>...</span>
-            }
-            items={pathState.get()
-              .filter(item => item.trim() !== '')
-              .map(item => { 
-                return {
-                  displayName: shortenString(item),
-                  action: (event: MouseEvent<HTMLButtonElement>) => { navToFolderName(event) },
-                  id: `path_element_${pathElementCount++}`
-                }
-              })
-            }
-          />
-        </div>
-      )
-    }
-  }
-  
-  let pathElementCount = 0;
   return (
     <div className='breadcrumb-bar'>
       <div className='breadcrumb-root-item'>
@@ -120,7 +120,7 @@ export default function BreadCrumbTrail(props: BreadCrumbTrailProps) {
           <span data-testid='path_element_root' className='breadcrumb-bar--root-only'>{props.rootName ?? 'My Folders'}</span>
         }
       </div>
-      { buildOutPaths() }
+      { buildOutPaths([...pathState.get()], navToFolderName) }
       {
         lastElement.get() !== '' ?
         <div 
