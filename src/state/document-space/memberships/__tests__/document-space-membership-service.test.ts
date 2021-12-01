@@ -1,6 +1,6 @@
 import { waitFor } from '@testing-library/dom';
 import { AxiosResponse } from 'axios';
-import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
+import { InfiniteScrollOptions } from '../../../../components/DataCrudFormPage/infinite-scroll-options';
 import {
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
@@ -8,12 +8,13 @@ import {
   DocumentSpaceDashboardMemberResponseDto,
   DocumentSpaceDashboardMemberResponseDtoResponseWrapper,
   DocumentSpacePrivilegeDtoTypeEnum
-} from '../../../openapi';
+} from '../../../../openapi';
 import {
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse,
-} from '../../../utils/TestUtils/test-utils';
+} from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceMembershipService from '../document-space-membership-service';
+import { DocumentSpacePrivilegeNiceName } from '../document-space-privilege-nice-name';
 
 describe('Test Document Space Membership Service', () => {
   const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -41,6 +42,20 @@ describe('Test Document Space Membership Service', () => {
         {
           id: '90f4d33b-b761-4a29-bcdd-1bf8fe46831c',
           type: DocumentSpacePrivilegeDtoTypeEnum.Read
+        }
+      ]
+    },
+    {
+      id: '407bf847-5ac7-485c-842f-c9efaf8a6b5e',
+      email: 'test2@dev.com',
+      privileges: [
+        {
+          id: '90f4d33b-b761-4a29-bcdd-1bf8fe46831c',
+          type: DocumentSpacePrivilegeDtoTypeEnum.Read
+        },
+        {
+          id: '90f4d33b-b761-4a29-bcdd-1bf8fe46831d',
+          type: DocumentSpacePrivilegeDtoTypeEnum.Write
         }
       ]
     }
@@ -196,5 +211,28 @@ describe('Test Document Space Membership Service', () => {
     }]);
 
     await waitFor(() => expect(removeMemberApiSpy).toHaveBeenCalledTimes(1));
+  });
+
+  it('should resolve Document Space Privileges to nice names', () => {
+    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership)).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
+    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
+    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read)).toEqual(DocumentSpacePrivilegeNiceName.VIWER);
+  });
+
+  it('should resolve privilege nice names to Document Space Privileges', () => {
+    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.ADMIN)).toEqual([
+      DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
+    ]);
+    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.EDITOR)).toEqual([
+      DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
+    ]);
+    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.VIWER)).toEqual([]);
+  });
+
+  it('should get the highest privilege level for Document Space member', () => {
+    expect(membershipService.getHighestPrivForMember(members[0])).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
+    expect(membershipService.getHighestPrivForMember(members[1])).toEqual(DocumentSpacePrivilegeNiceName.VIWER);
+    expect(membershipService.getHighestPrivForMember(members[2])).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
+    expect(membershipService.getHighestPrivForMember(undefined as any)).toEqual('');
   });
 });

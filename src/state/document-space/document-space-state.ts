@@ -1,7 +1,7 @@
 import { createState, State, useState } from '@hookstate/core';
 import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../openapi';
 import DocumentSpaceService from './document-space-service';
-import DocumentSpaceMembershipService from './document-space-membership-service';
+import DocumentSpaceMembershipService from './memberships/document-space-membership-service';
 import { globalOpenapiConfig } from '../../api/openapi-config';
 import DocumentSpacePrivilegeService from './document-space-privilege-service';
 import { RecentsPageState } from './recents-page/recents-page-state';

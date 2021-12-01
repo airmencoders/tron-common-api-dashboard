@@ -2,7 +2,7 @@ import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToastContainer } from '../../../../components/Toast/ToastContainer/ToastContainer';
 import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from '../../../../openapi';
-import DocumentSpaceMembershipService from '../../../../state/document-space/document-space-membership-service';
+import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';
 import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceMembershipsForm from '../DocumentSpaceMembershipsForm';
