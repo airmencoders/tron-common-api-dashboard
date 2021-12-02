@@ -306,8 +306,13 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         onSubmit={() => uploadState.showErrorDialog.set(false)}
         submitText="OK"
         title="Upload File Errors"
-        content={<><div>{`Successfully uploaded ${uploadState.fileCount.value - uploadState.uploadErrors.value.length} files.`}</div><div>These files did not upload:</div><ul>{uploadState.uploadErrors.get().map(item => <li key={item.file}>{item.file} - {item.reason}</li>)}</ul></>}
-      />
+      >
+        <>
+          <div>{`Successfully uploaded ${uploadState.fileCount.value - uploadState.uploadErrors.value.length} files.`}</div>
+          <div>These files did not upload:</div>
+          <ul>{uploadState.uploadErrors.get().map(item => <li key={item.file}>{item.file} - {item.reason}</li>)}</ul>
+        </>
+      </GenericDialog>
     </>
   )
 });
