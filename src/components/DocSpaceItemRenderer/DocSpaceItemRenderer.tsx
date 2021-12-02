@@ -1,15 +1,17 @@
 import React from 'react';
 import FolderIcon from '../../icons/FolderIcon';
-import { DocumentDto } from '../../openapi';
+import {DocumentDto} from '../../openapi';
 import Button from '../Button/Button';
 import Spinner from '../Spinner/Spinner';
 import './DocSpaceItemRenderer.scss';
-import { ICellRendererParams } from 'ag-grid-community';
-import { ClickableCellRenderer } from '../Grid/clickable-cell-renderer';
-import { documentSpaceDownloadUrlService } from '../../state/document-space/document-space-state';
+import {ICellRendererParams} from 'ag-grid-community';
+import {ClickableCellRenderer} from '../Grid/clickable-cell-renderer';
+import {documentSpaceDownloadUrlService} from '../../state/document-space/document-space-state';
+import StarIcon from "../../icons/StarIcon";
 
 export interface DocSpaceItemRendererProps {
   hideItemLink?: boolean;
+  isFavorited?: (data: DocumentDto)=>boolean;
 }
 
 /**
@@ -65,11 +67,16 @@ function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCel
     }
   }
 
+  function renderFavoritedStatus() {
+    return ((props.isFavorited && props.isFavorited(data)) ? <span style={{marginLeft:8, bottom: '2px', position:'relative'} }>{<StarIcon size={1.1} fillColor={'#C2C4CB'}/> }</span> : null)
+  }
+
   return (
     <div className="loading-cell-renderer" data-testid={`docspace-item-cell-renderer__${data.key}`}>
       {data.folder ? <FolderIcon /> : null}
       {'  '}
       {data.folder ? renderFolderItem() : renderFileItem()}
+      {renderFavoritedStatus()}
     </div>
   );
 }

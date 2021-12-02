@@ -12,7 +12,7 @@ import {
 } from '../../../openapi';
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
 import {useAuthorizedUserState} from '../../../state/authorized-user/authorized-user-state';
-import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
+import DocumentSpaceMembershipService from '../../../state/document-space/memberships/document-space-membership-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import {
   documentSpaceMembershipService,

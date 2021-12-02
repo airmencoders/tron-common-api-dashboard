@@ -6,4 +6,5 @@ export interface IconProps {
   className?: string;
   disabled?: boolean;
   style?: IconStyleType;
+  fillColor?: string;
 }

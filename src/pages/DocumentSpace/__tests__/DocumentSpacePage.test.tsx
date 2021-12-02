@@ -16,7 +16,7 @@ import {
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../state/document-space/document-space-global-service';
-import DocumentSpaceMembershipService from '../../../state/document-space/document-space-membership-service';
+import DocumentSpaceMembershipService from '../../../state/document-space/memberships/document-space-membership-service';
 import DocumentSpacePrivilegeService from '../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import { documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';

@@ -35,7 +35,9 @@ interface PageState {
   };
   shouldUpdateDatasource: boolean;
   selectedFiles: DocumentDto[];
+  selectedFile?: DocumentDto;
   showDeleteDialog: boolean;
+  showSingleDeleteDialog: boolean;
   showRestoreDialog: boolean;
   showDeleteAllDialog: boolean;
   userCanDeleteSomethingArchived: boolean;
@@ -51,6 +53,7 @@ export default function DocumentSpaceArchivedItemsPage() {
     datasource: undefined,
     shouldUpdateDatasource: false,
     selectedFiles: [],
+    selectedFile: undefined,
     privilegeState: {
       privileges: {
         READ: false,
@@ -60,6 +63,7 @@ export default function DocumentSpaceArchivedItemsPage() {
       isLoading: false,
     },
     showDeleteDialog: false,
+    showSingleDeleteDialog: false,
     showRestoreDialog: false,
     showDeleteAllDialog: false,
     userCanDeleteSomethingArchived: false,
@@ -133,7 +137,7 @@ export default function DocumentSpaceArchivedItemsPage() {
           {
             title: 'Permanently Delete',
             icon: CircleMinusIcon,
-            onClick: () => pageState.merge({ showDeleteDialog: true }),
+            onClick: (doc: DocumentDto) => pageState.merge({ showSingleDeleteDialog: true, selectedFile: doc }),
             isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
           },
         ],
@@ -176,10 +180,39 @@ export default function DocumentSpaceArchivedItemsPage() {
 
   function closeDialogs(): void {
     pageState.merge({ 
-      showDeleteDialog: false, 
-      showRestoreDialog: false, 
-      showDeleteAllDialog: false 
+      showDeleteDialog: false,
+      showSingleDeleteDialog: false,
+      showRestoreDialog: false,
+      showDeleteAllDialog: false,
     });
+  }
+
+  async function deleteSingleFile() {
+    const file = pageState.selectedFile.value;
+    
+    if (file == null) {
+      throw new Error('Selected file cannot be null for deletion');
+    }
+
+    try {
+      await documentSpaceService.deleteItems(file.spaceId, file.path, [file.key]);
+      createTextToast(ToastType.SUCCESS, 'File deleted: ' + file.key);
+    } catch (err) {
+      createTextToast(ToastType.ERROR, 'Could not delete file ' + file.key);
+    } finally {
+      pageState.merge({
+        shouldUpdateDatasource: true,
+        selectedFile: undefined,
+        datasource: documentSpaceService.createDatasource(
+          '',
+          '',
+          infiniteScrollOptions,
+          ArchivedStatus.ARCHIVED
+        ),
+      });
+
+      closeDialogs();
+    }
   }
 
   // performs the act of deleting items on the backend
@@ -361,24 +394,37 @@ export default function DocumentSpaceArchivedItemsPage() {
         show={pageState.showDeleteDialog.get()}
         onCancel={closeDialogs}
         onSubmit={deleteSelectedFiles}
-        content={
-          pageState.selectedFiles.get().length > 1
+      >
+        {pageState.selectedFiles.get().length > 1
             ? `Delete these ${pageState.selectedFiles.get().length} items?`
-            : `Delete this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
+            : `Delete this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`}
+      </GenericDialog>
+      <GenericDialog
+        title="Delete Confirm"
+        submitText="Delete Forever"
+        show={pageState.showSingleDeleteDialog.get()}
+        onCancel={closeDialogs}
+        onSubmit={deleteSingleFile}
+        disableSubmit={pageState.selectedFile.value == null}
+      >
+        {
+          pageState.selectedFile.value ?
+          `Delete this item - ${shortenString(pageState.selectedFile.value.key)}`
+          :
+          'No item selected'
         }
-      />
+      </GenericDialog>
       <GenericDialog
         title="Restore Confirm"
         submitText="Restore"
         show={pageState.showRestoreDialog.get()}
         onCancel={closeDialogs}
         onSubmit={restoreItems}
-        content={
-          pageState.selectedFiles.get().length > 1
+      >
+        {pageState.selectedFiles.get().length > 1
             ? `Restore these ${pageState.selectedFiles.get().length} items?`
-            : `Restore this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`
-        }
-      />
+            : `Restore this item - ${pageState.selectedFiles.get().map((item) => shortenString(item.key.toString())).join(',')}`}
+      </GenericDialog>
       <GenericDialog
         title="Delete All Confirm"
         submitText="Delete All"
@@ -386,8 +432,9 @@ export default function DocumentSpaceArchivedItemsPage() {
         show={pageState.showDeleteAllDialog.get()}
         onCancel={closeDialogs}
         onSubmit={deleteAllItems}
-        content="Really delete all Archived Items?"
-      />
+      >
+        Really delete all Archived Items?
+      </GenericDialog>
     </PageFormat>
   );
 }

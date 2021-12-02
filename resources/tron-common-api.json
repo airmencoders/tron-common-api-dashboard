@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080/api",
+      "url": "http://localhost:8088/api",
       "description": "Generated server url"
     }
   ],
@@ -110,16 +110,6 @@
           "required": true
         },
         "responses": {
-          "409": {
-            "description": "Folder with provided name already exists at that path in this document space",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -146,6 +136,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/FilePathSpec"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Folder with provided name already exists at that path in this document space",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -184,6 +184,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "Operation Successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageUserDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Scratch User Email Address is already is use",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "User id not found",
             "content": {
@@ -206,26 +226,6 @@
           },
           "400": {
             "description": "Malformed Scratch Storage object or malformed user UUID",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Operation Successful",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageUserDto"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Scratch User Email Address is already is use",
             "content": {
               "*/*": {
                 "schema": {
@@ -256,6 +256,26 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Operation Successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageUserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed user UUID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "User id not found",
             "content": {
@@ -272,26 +292,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Malformed user UUID",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Operation Successful",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageUserDto"
                 }
               }
             }
@@ -340,8 +340,8 @@
               }
             }
           },
-          "409": {
-            "description": "App Name is already is use",
+          "400": {
+            "description": "Malformed request body / app name already exists or appId is malformed",
             "content": {
               "*/*": {
                 "schema": {
@@ -370,8 +370,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed request body / app name already exists or appId is malformed",
+          "409": {
+            "description": "App Name is already is use",
             "content": {
               "*/*": {
                 "schema": {
@@ -402,16 +402,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "App Removed OK",
             "content": {
@@ -434,6 +424,16 @@
           },
           "404": {
             "description": "Application ID not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -484,6 +484,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -500,16 +510,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -546,6 +546,16 @@
           "required": true
         },
         "responses": {
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -558,16 +568,6 @@
           },
           "200": {
             "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
               "*/*": {
                 "schema": {
@@ -598,9 +598,6 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful operation"
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -610,6 +607,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "Successful operation"
           }
         }
       },
@@ -658,26 +658,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "203": {
             "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
@@ -694,6 +674,26 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -730,22 +730,22 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Mismatch in email between updated Person record and user's JWT or Request was from an app client)",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonDto"
                 }
               }
             }
@@ -804,12 +804,12 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request or malformed UUID",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
@@ -817,12 +817,12 @@
           "404": {
             "description": "Resource not found"
           },
-          "200": {
-            "description": "Successful operation",
+          "400": {
+            "description": "Bad Request or malformed UUID",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -859,16 +859,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
@@ -879,8 +869,8 @@
               }
             }
           },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
@@ -889,8 +879,18 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
               "*/*": {
                 "schema": {
@@ -921,9 +921,6 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful operation"
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -933,6 +930,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "Successful operation"
           }
         }
       },
@@ -983,16 +983,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
@@ -1003,8 +993,8 @@
               }
             }
           },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
@@ -1013,8 +1003,18 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
               "*/*": {
                 "schema": {
@@ -1047,16 +1047,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -1069,6 +1059,16 @@
           },
           "400": {
             "description": "Bad request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -1109,22 +1109,22 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/DashboardUserDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -1151,9 +1151,6 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful operation"
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -1163,6 +1160,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "Successful operation"
           }
         }
       }
@@ -1188,8 +1188,8 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "404": {
+            "description": "Requested App Source not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1208,8 +1208,8 @@
               }
             }
           },
-          "404": {
-            "description": "Requested App Source not found",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
               "application/json": {
                 "schema": {
@@ -1250,8 +1250,18 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "400": {
+            "description": "Malformed Request Body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested App Source not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1270,18 +1280,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed Request Body",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested App Source not found",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
               "application/json": {
                 "schema": {
@@ -1312,22 +1312,22 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "App Source Removed OK",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppSourceDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -1375,26 +1375,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Requester isn't a DASHBOARD_ADMIN or an App Client Developer of this App Client",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource with that ID doesn't exist",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
@@ -1411,6 +1391,26 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppClientUserDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Requester isn't a DASHBOARD_ADMIN or an App Client Developer of this App Client",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource with that ID doesn't exist",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -1447,6 +1447,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -1463,16 +1473,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppClientUserDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -1714,18 +1714,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad data or validation error",
+          "201": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/PersonDtoResponseWrapper"
                 }
               }
             }
           },
-          "201": {
-            "description": "Successful operation",
+          "203": {
+            "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
               "*/*": {
                 "schema": {
@@ -1744,12 +1744,12 @@
               }
             }
           },
-          "203": {
-            "description": "Successful - Entity Field Authority denied access to some fields",
+          "400": {
+            "description": "Bad data or validation error",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PersonDtoResponseWrapper"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -1796,6 +1796,16 @@
           "required": true
         },
         "responses": {
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -1812,16 +1822,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PersonDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -1975,16 +1975,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad data or validation error",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Successful operation",
             "content": {
@@ -2011,6 +2001,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/OrganizationDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad data or validation error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2160,22 +2160,22 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found -- no App Client found for the Authenticated user",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found -- no App Client found for the Authenticated user",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2356,22 +2356,22 @@
         "summary": "Retrieves all document spaces for the requesting user",
         "operationId": "getSpaces",
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN or DOCUMENT_SPACE_USER)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/DocumentSpaceResponseDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN or DOCUMENT_SPACE_USER)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2396,22 +2396,22 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/DocumentSpaceResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2459,22 +2459,22 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "204": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2595,22 +2595,22 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation - provided path and doc space were valid",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/FilePathSpecWrapper"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Not Found - space not found or supplied path does not exist",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation - provided path and doc space were valid",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilePathSpecWrapper"
                 }
               }
             }
@@ -2662,12 +2662,15 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -2682,15 +2685,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Not Found - space not found",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -2727,16 +2727,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "204": {
             "description": "Successful operation",
             "content": {
@@ -2749,6 +2739,16 @@
           },
           "403": {
             "description": "Forbidden (Requires Write privilege to document space, or DASHBOARD_ADMIN)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -2798,16 +2798,6 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "409": {
             "description": "Entry already exists in the favorites collection",
             "content": {
@@ -2820,6 +2810,16 @@
           },
           "404": {
             "description": "Not Found - user, space, or entry not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "*/*": {
                 "schema": {
@@ -2867,8 +2867,8 @@
               }
             }
           },
-          "403": {
-            "description": "Forbidden",
+          "404": {
+            "description": "Not Found - user, space, or entry not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -2877,8 +2877,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found - user, space, or entry not found",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "*/*": {
                 "schema": {
@@ -2919,19 +2919,6 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Successful operation"
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "409": {
             "description": "Entry already exists in the favorites collection",
             "content": {
@@ -2942,8 +2929,21 @@
               }
             }
           },
+          "201": {
+            "description": "Successful operation"
+          },
           "404": {
             "description": "Not Found - user, space, or entry not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "*/*": {
                 "schema": {
@@ -2985,8 +2985,8 @@
           "204": {
             "description": "Successful operation"
           },
-          "403": {
-            "description": "Forbidden",
+          "404": {
+            "description": "Not Found - user, space, or entry not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -2995,8 +2995,8 @@
               }
             }
           },
-          "404": {
-            "description": "Not Found - user, space, or entry not found",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "*/*": {
                 "schema": {
@@ -3043,16 +3043,6 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful or partially successful operation",
             "content": {
@@ -3062,6 +3052,16 @@
                   "items": {
                     "type": "string"
                   }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -3161,22 +3161,22 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageEntryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application ID / Key name not valid or found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -3191,8 +3191,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID / Key name not valid or found",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -3243,8 +3243,8 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "404": {
+            "description": "Application ID / Key name not valid or found / JSON path spec not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -3253,8 +3253,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed Application UUID / Value cannot be jsonized / Unable to serialize response to JSON",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -3273,8 +3273,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID / Key name not valid or found / JSON path spec not found",
+          "400": {
+            "description": "Malformed Application UUID / Value cannot be jsonized / Unable to serialize response to JSON",
             "content": {
               "*/*": {
                 "schema": {
@@ -3324,6 +3324,16 @@
           "required": true
         },
         "responses": {
+          "404": {
+            "description": "Application ID / Key name not valid or found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "204": {
             "description": "Successful operation",
             "content": {
@@ -3336,16 +3346,6 @@
           },
           "400": {
             "description": "Malformed Application UUID / Value cannot be jsonized / Bad JSON Path / Unable to serialize response to JSON",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Application ID / Key name not valid or found",
             "content": {
               "*/*": {
                 "schema": {
@@ -3395,6 +3395,16 @@
           "required": true
         },
         "responses": {
+          "404": {
+            "description": "Application ID / Key name not valid or found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "204": {
             "description": "Successful operation",
             "content": {
@@ -3407,16 +3417,6 @@
           },
           "400": {
             "description": "Malformed Application UUID / Value cannot be jsonized / Bad JSON Path / Unable to serialize response to JSON",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Application ID / Key name not valid or found",
             "content": {
               "*/*": {
                 "schema": {
@@ -3437,22 +3437,22 @@
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "getAllUsersWrapped",
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageUserDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -3477,6 +3477,26 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "New user added operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageUserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed Scratch Storage object",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges",
             "content": {
@@ -3496,26 +3516,6 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Malformed Scratch Storage object",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "New user added operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageUserDto"
-                }
-              }
-            }
           }
         }
       }
@@ -3529,22 +3529,22 @@
         "description": "Requester has to have DASHBOARD_ADMIN rights",
         "operationId": "getScratchSpaceAppsWrapped",
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageAppRegistryDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -3569,8 +3569,8 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
+          "400": {
+            "description": "Malformed request body or app name already exists",
             "content": {
               "*/*": {
                 "schema": {
@@ -3589,8 +3589,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed request body or app name already exists",
+          "409": {
+            "description": "App UUID or App Name is already is use",
             "content": {
               "*/*": {
                 "schema": {
@@ -3599,8 +3599,8 @@
               }
             }
           },
-          "409": {
-            "description": "App UUID or App Name is already is use",
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -3621,16 +3621,6 @@
         "description": "Requires request to be under DASHBOARD_ADMIN privileges",
         "operationId": "getAllKeyValuePairsWrapped",
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Malformed request body",
             "content": {
@@ -3647,6 +3637,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageEntryDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -3671,8 +3671,18 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Write / Update action forbidden - no WRITE privileges",
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageEntryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application ID / Key name not valid or found",
             "content": {
               "*/*": {
                 "schema": {
@@ -3691,18 +3701,8 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageEntryDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Application ID / Key name not valid or found",
+          "403": {
+            "description": "Write / Update action forbidden - no WRITE privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -4098,6 +4098,16 @@
           "required": true
         },
         "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationDto"
+                }
+              }
+            }
+          },
           "203": {
             "description": "Successful - Entity Field Authority denied access to some fields",
             "content": {
@@ -4114,16 +4124,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
@@ -4211,22 +4211,22 @@
         "summary": "Gets a list of the available app clients (their names and UUIDs)",
         "operationId": "getAvailableAppClientsWrapped",
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AppClientSummaryDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4251,10 +4251,10 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "400": {
+            "description": "An Id is malformed",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
                 }
@@ -4271,22 +4271,22 @@
               }
             }
           },
-          "400": {
-            "description": "An Id is malformed",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Record Added/Updated OK",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppSourceDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4343,8 +4343,8 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges",
+          "400": {
+            "description": "Malformed Request Body",
             "content": {
               "application/json": {
                 "schema": {
@@ -4353,8 +4353,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed Request Body",
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges",
             "content": {
               "application/json": {
                 "schema": {
@@ -4415,16 +4415,6 @@
           "required": true
         },
         "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppClientUserDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad request",
             "content": {
@@ -4441,6 +4431,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppClientUserDto"
                 }
               }
             }
@@ -4524,16 +4524,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Not authorized to this Document Space)",
             "content": {
@@ -4546,6 +4536,16 @@
           },
           "200": {
             "description": "Successful operation"
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -4581,6 +4581,16 @@
           "required": true
         },
         "responses": {
+          "403": {
+            "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "200": {
             "description": "App Priv Added OK",
             "content": {
@@ -4591,18 +4601,8 @@
               }
             }
           },
-          "409": {
-            "description": "This app/user/priv combo already exists",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
+          "400": {
+            "description": "Malformed request body / app name already exists or appId is malformed",
             "content": {
               "*/*": {
                 "schema": {
@@ -4621,8 +4621,8 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed request body / app name already exists or appId is malformed",
+          "409": {
+            "description": "This app/user/priv combo already exists",
             "content": {
               "*/*": {
                 "schema": {
@@ -4665,16 +4665,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Malformed appId or query parameter",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
             "content": {
@@ -4691,6 +4681,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed appId or query parameter",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4739,16 +4739,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Malformed appId or query parameter",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
             "content": {
@@ -4765,6 +4755,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed appId or query parameter",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4818,18 +4818,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Provided org UUID(s) was/were invalid",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
           },
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
+          "400": {
+            "description": "Provided org UUID(s) was/were invalid",
             "content": {
               "*/*": {
                 "schema": {
@@ -4848,12 +4848,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4895,18 +4895,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Provided org UUID(s) was/were invalid",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
           },
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
+          "400": {
+            "description": "Provided org UUID(s) was/were invalid",
             "content": {
               "*/*": {
                 "schema": {
@@ -4925,12 +4925,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -4974,26 +4974,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Provided person UUID(s) was/were invalid",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Provided organization UUID was invalid",
             "content": {
@@ -5010,6 +4990,26 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/OrganizationDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Provided person UUID(s) was/were invalid",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5061,12 +5061,12 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "A organization UUID was invalid",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/OrganizationDto"
                 }
               }
             }
@@ -5081,8 +5081,8 @@
               }
             }
           },
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
+          "404": {
+            "description": "A organization UUID was invalid",
             "content": {
               "*/*": {
                 "schema": {
@@ -5091,12 +5091,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5135,12 +5135,12 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "200": {
+            "description": "Admin Removed OK",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/AppSourceDetailsDto"
                 }
               }
             }
@@ -5155,20 +5155,20 @@
               }
             }
           },
-          "200": {
-            "description": "Admin Removed OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSourceDetailsDto"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Id is malformed",
             "content": {
               "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient privileges",
+            "content": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
                 }
@@ -5207,12 +5207,12 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "200": {
+            "description": "Admin Added OK",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/AppSourceDetailsDto"
                 }
               }
             }
@@ -5237,12 +5237,12 @@
               }
             }
           },
-          "200": {
-            "description": "Admin Added OK",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AppSourceDetailsDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5400,12 +5400,12 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Write / Update action forbidden - no WRITE privileges",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/ScratchStorageEntryDto"
                 }
               }
             }
@@ -5430,12 +5430,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "403": {
+            "description": "Write / Update action forbidden - no WRITE privileges",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageEntryDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5674,6 +5674,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericStringArrayResponseWrapper"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Malformed Application UUID",
             "content": {
@@ -5700,16 +5710,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericStringArrayResponseWrapper"
                 }
               }
             }
@@ -5772,16 +5772,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
@@ -5798,6 +5788,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/KpiSummaryDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -5838,8 +5838,8 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "400": {
+            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be set to within the current week or in the future (there would be no data).",
             "content": {
               "*/*": {
                 "schema": {
@@ -5858,8 +5858,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be set to within the current week or in the future (there would be no data).",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
@@ -5916,22 +5916,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found -- no App Client found for the Authenticated user",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/EventRequestLogDtoPaginationResponseWrapper"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found -- no App Client found for the Authenticated user",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6138,6 +6138,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSpaceDashboardMemberResponseDtoResponseWrapper"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found - space not found",
             "content": {
@@ -6154,16 +6164,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/DocumentSpaceDashboardMemberResponseDtoResponseWrapper"
                 }
               }
             }
@@ -6202,22 +6202,22 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "204": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6244,16 +6244,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Not authorized to this Document Space)",
             "content": {
@@ -6270,6 +6260,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/DocumentSpacePrivilegeDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6305,22 +6305,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space, or entry not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space, or entry not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6383,16 +6383,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -6410,6 +6400,16 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6517,12 +6517,12 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/S3PaginationDto"
                 }
               }
             }
@@ -6537,12 +6537,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Not Found - space not found",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/S3PaginationDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6591,16 +6591,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found, file(s) not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -6617,6 +6607,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/StreamingResponseBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found, file(s) not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6644,16 +6644,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found, file(s) not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -6670,6 +6660,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/StreamingResponseBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found, file(s) not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6706,6 +6706,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/S3PaginationDto"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -6722,16 +6732,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/S3PaginationDto"
                 }
               }
             }
@@ -6758,12 +6758,12 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden",
+          "200": {
+            "description": "Successful",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/DocumentSpaceUserCollectionResponseDtoWrapper"
                 }
               }
             }
@@ -6778,12 +6778,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/DocumentSpaceUserCollectionResponseDtoWrapper"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6811,6 +6811,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/S3PaginationDto"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -6827,16 +6837,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/S3PaginationDto"
                 }
               }
             }
@@ -6909,22 +6909,22 @@
         "summary": "Retrieves all archived files for the requesting user for spaces they have access to",
         "operationId": "getAllArchivedFilesForAuthUser",
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN or DOCUMENT_SPACE_USER)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/S3PaginationDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN or DOCUMENT_SPACE_USER)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -6960,16 +6960,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "403": {
             "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
             "content": {
@@ -6987,6 +6977,16 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7027,8 +7027,8 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+          "400": {
+            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
               "*/*": {
                 "schema": {
@@ -7047,8 +7047,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
             "content": {
               "*/*": {
                 "schema": {
@@ -7093,16 +7093,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
@@ -7119,6 +7109,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppSourceErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7159,16 +7159,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
@@ -7185,6 +7175,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/EntityAccessorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7225,16 +7225,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request. Possible reasons include: \n\nStart Date required.\n\nStart date must be before or equal to End Date.\n\nStart date cannot be in the future (there would be no data).",
             "content": {
@@ -7251,6 +7241,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/EntityAccessorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7310,22 +7310,22 @@
         "summary": "Returns person record matching email for existing logged in user jwt",
         "operationId": "getExistingPersonRecord",
         "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/PersonDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7385,22 +7385,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Record not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/SubscriberDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7426,22 +7426,22 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Record not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/SubscriberDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Record not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7479,26 +7479,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Malformed Application UUID",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient privileges",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -7511,6 +7491,26 @@
           },
           "404": {
             "description": "Application ID / Key name not valid or found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed Application UUID",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -7542,22 +7542,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privilege for given app ID.",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
                 }
               }
             }
@@ -7574,16 +7574,6 @@
         "description": "Each Scratch Storage App returned will only contain user privileges for the Authorized User. It will not contain the privileges of other users.",
         "operationId": "getScratchSpaceAppsByAuthorizedUser",
         "responses": {
-          "403": {
-            "description": "Not Authorized",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -7593,6 +7583,16 @@
                   "items": {
                     "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
                   }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -7827,16 +7827,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/EndpointMetricDto"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -7853,6 +7843,16 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndpointMetricDto"
                 }
               }
             }
@@ -7939,6 +7939,16 @@
           }
         ],
         "responses": {
+          "400": {
+            "description": "Bad Rquest (Start date, end date, and path are all required. Start date must be before end date)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -7955,16 +7965,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppEndpointCountMetricDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Rquest (Start date, end date, and path are all required. Start date must be before end date)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -8032,12 +8032,12 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successful operation",
+          "400": {
+            "description": "Bad Rquest (Start date, end date, and name are all required. Start date must be before end date)",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/AppClientCountMetricDto"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -8052,12 +8052,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Rquest (Start date, end date, and name are all required. Start date must be before end date)",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "$ref": "#/components/schemas/AppClientCountMetricDto"
                 }
               }
             }
@@ -8116,6 +8116,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSourceCountMetricDto"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Resource not found",
             "content": {
@@ -8132,16 +8142,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSourceCountMetricDto"
                 }
               }
             }
@@ -8210,22 +8210,22 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Rquest (Start date and end date are both required. Start date must be before end date)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/AppSourceMetricDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Rquest (Start date and end date are both required. Start date must be before end date)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -8442,8 +8442,19 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "I/O error involving file",
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -8462,23 +8473,12 @@
               }
             }
           },
-          "404": {
-            "description": "File not found",
+          "400": {
+            "description": "I/O error involving file",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
                 }
               }
             }
@@ -8495,16 +8495,6 @@
         "description": "Retrieves all logfiles available for download",
         "operationId": "getLogfileInfo",
         "responses": {
-          "403": {
-            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -8514,6 +8504,16 @@
                   "items": {
                     "$ref": "#/components/schemas/LogfileDto"
                   }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN privilege)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -8584,6 +8584,16 @@
               }
             }
           },
+          "400": {
+            "description": "Id is malformed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Insufficient privileges",
             "content": {
@@ -8596,16 +8606,6 @@
           },
           "404": {
             "description": "App Source or API Specification file not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Id is malformed",
             "content": {
               "*/*": {
                 "schema": {
@@ -8648,6 +8648,16 @@
               }
             }
           },
+          "400": {
+            "description": "Id is malformed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
           "403": {
             "description": "Insufficient privileges",
             "content": {
@@ -8660,16 +8670,6 @@
           },
           "404": {
             "description": "App Source or API Specification file not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Id is malformed",
             "content": {
               "*/*": {
                 "schema": {
@@ -8748,12 +8748,12 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "Not Found - space not found",
+          "200": {
+            "description": "Successful operation",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
+                  "type": "object"
                 }
               }
             }
@@ -8768,12 +8768,12 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
+          "404": {
+            "description": "Not Found - space not found",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/ExceptionResponse"
                 }
               }
             }
@@ -9063,8 +9063,18 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Write / Update action forbidden - no WRITE privileges",
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageEntryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application ID / Key name not valid or found",
             "content": {
               "*/*": {
                 "schema": {
@@ -9083,18 +9093,8 @@
               }
             }
           },
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageEntryDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Application ID / Key name not valid or found",
+          "403": {
+            "description": "Write / Update action forbidden - no WRITE privileges",
             "content": {
               "*/*": {
                 "schema": {
@@ -9137,16 +9137,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "App Priv Removed OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
-                }
-              }
-            }
-          },
           "403": {
             "description": "No DASHBOARD_ADMIN privileges, or no SCRATCH_ADMIN privileges for given app id",
             "content": {
@@ -9157,8 +9147,8 @@
               }
             }
           },
-          "404": {
-            "description": "Application ID not found",
+          "400": {
+            "description": "Malformed request body / app name already exists or appId is malformed",
             "content": {
               "*/*": {
                 "schema": {
@@ -9167,8 +9157,18 @@
               }
             }
           },
-          "400": {
-            "description": "Malformed request body / app name already exists or appId is malformed",
+          "200": {
+            "description": "App Priv Removed OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScratchStorageAppRegistryDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Application ID not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -9201,16 +9201,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -9223,6 +9213,16 @@
           },
           "404": {
             "description": "Organization not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
@@ -9255,16 +9255,6 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Not Authorized - do not have privilege to edit this field",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "Successful operation",
             "content": {
@@ -9277,6 +9267,16 @@
           },
           "404": {
             "description": "Organization not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not Authorized - do not have privilege to edit this field",
             "content": {
               "*/*": {
                 "schema": {
@@ -9319,10 +9319,20 @@
           }
         ],
         "responses": {
-          "403": {
-            "description": "Insufficient privileges",
+          "400": {
+            "description": "An Id is malformed",
             "content": {
-              "application/json": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "App Source/End Point/App Client not found",
+            "content": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
                 }
@@ -9339,20 +9349,10 @@
               }
             }
           },
-          "404": {
-            "description": "App Source/End Point/App Client not found",
+          "403": {
+            "description": "Insufficient privileges",
             "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "An Id is malformed",
-            "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
                 }
@@ -9383,32 +9383,22 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "All App Client Privileges Removed OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppSourceDetailsDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Insufficient privileges",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
           "404": {
             "description": "App Source not found",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "All App Client Privileges Removed OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSourceDetailsDto"
                 }
               }
             }
@@ -9422,128 +9412,22 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Insufficient privileges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v2/document-space-dav/{spaceId}/**": {
       "get": {
-        "tags": [
-          "document-space-web-dav-controller"
-        ],
-        "operationId": "processWebDavCommand_6",
-        "parameters": [
-          {
-            "name": "spaceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "document-space-web-dav-controller"
-        ],
-        "operationId": "processWebDavCommand_3",
-        "parameters": [
-          {
-            "name": "spaceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "document-space-web-dav-controller"
-        ],
-        "operationId": "processWebDavCommand_1",
-        "parameters": [
-          {
-            "name": "spaceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "document-space-web-dav-controller"
-        ],
-        "operationId": "processWebDavCommand_2",
-        "parameters": [
-          {
-            "name": "spaceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      },
-      "options": {
         "tags": [
           "document-space-web-dav-controller"
         ],
@@ -9572,7 +9456,65 @@
           }
         }
       },
-      "head": {
+      "put": {
+        "tags": [
+          "document-space-web-dav-controller"
+        ],
+        "operationId": "processWebDavCommand_2",
+        "parameters": [
+          {
+            "name": "spaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "document-space-web-dav-controller"
+        ],
+        "operationId": "processWebDavCommand_5",
+        "parameters": [
+          {
+            "name": "spaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
         "tags": [
           "document-space-web-dav-controller"
         ],
@@ -9601,11 +9543,69 @@
           }
         }
       },
+      "options": {
+        "tags": [
+          "document-space-web-dav-controller"
+        ],
+        "operationId": "processWebDavCommand_1",
+        "parameters": [
+          {
+            "name": "spaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "document-space-web-dav-controller"
+        ],
+        "operationId": "processWebDavCommand_3",
+        "parameters": [
+          {
+            "name": "spaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "document-space-web-dav-controller"
         ],
-        "operationId": "processWebDavCommand_5",
+        "operationId": "processWebDavCommand_6",
         "parameters": [
           {
             "name": "spaceId",
@@ -11486,6 +11486,9 @@
           },
           "lastModifiedBy": {
             "type": "string"
+          },
+          "hasContents": {
+            "type": "boolean"
           },
           "folder": {
             "type": "boolean"

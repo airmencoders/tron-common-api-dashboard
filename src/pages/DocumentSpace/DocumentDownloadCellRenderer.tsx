@@ -30,6 +30,7 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
                     true
                   )
             }
+            doc={props.node?.data}
             title={fileKey}
           />
         </div>

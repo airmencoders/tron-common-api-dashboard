@@ -142,6 +142,9 @@ function DocumentSpacePage() {
           queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);
           history.push({ search: queryParams.toString() });
+        },
+        isFavorited: (document: DocumentDto)=>{
+          return getFavoritesShouldShow(document, false)
         }
       }
     }),
@@ -288,6 +291,13 @@ function DocumentSpacePage() {
     loadDocSpaceFromLocation(location, documentSpaceService.documentSpaces);
   }, [location.search]);
 
+  function conditionalMenuDownloadOnClick (doc: DocumentDto) {
+    if(doc.folder && !doc.hasContents){
+      createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
+    }else{
+      window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+    }
+  }
   // Handle hiding columns on resize
   useEffect(() => {
     const hideableColumns = documentDtoColumns.filter(column => column.field.value !== 'key' && column.field.value !== 'lastModifiedDate' && column.headerName.value !== 'More');
@@ -316,7 +326,7 @@ function DocumentSpacePage() {
             },
             shouldShow: (doc: DocumentDto) => doc != null,
             isAuthorized: () => true,
-            onClick: (doc: DocumentDto) => window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
+            onClick: conditionalMenuDownloadOnClick
           });
   
           return state;
@@ -588,6 +598,8 @@ function DocumentSpacePage() {
       }
       if(mountedRef.current) {
         pageState.favorites.merge([placeHolderResponse])
+
+        pageState.shouldUpdateDatasource.set(true)
       }
       createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
     }else{
@@ -607,6 +619,8 @@ function DocumentSpacePage() {
           pageState.favorites.set(favorites => {
             return favorites.filter(f => f.key !== doc.key);
           })
+
+          pageState.shouldUpdateDatasource.set(true)
         }
         createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
       }
@@ -629,7 +643,7 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  function getFavoritesShouldShow (doc: DocumentDto, add: boolean) {
+  function getFavoritesShouldShow (doc: DocumentDto, addingToFavorites: boolean) {
      const foundInFavorites = pageState.favorites?.value?.filter(favorite => {
       if (doc === undefined) {
         return false
@@ -638,7 +652,7 @@ function DocumentSpacePage() {
       }
     }).length
 
-    return add ? !foundInFavorites : foundInFavorites
+    return addingToFavorites ? !foundInFavorites : foundInFavorites
   }
 
   return (
