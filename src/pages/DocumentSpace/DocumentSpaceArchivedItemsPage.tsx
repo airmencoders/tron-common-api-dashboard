@@ -76,7 +76,7 @@ export default function DocumentSpaceArchivedItemsPage() {
       resizable: true,
       sortable: true,
       sortingOrder: ['asc', 'desc'],
-      sort: 'desc',  // default desc sort
+      sort: 'asc',  // default sort
       cellRenderer: DocSpaceItemRenderer,
       cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : '',
       cellRendererParams: {

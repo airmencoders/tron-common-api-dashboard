@@ -130,7 +130,7 @@ function DocumentSpacePage() {
       headerName: 'Name',
       resizable: true,
       sortable: true,
-      sort: 'desc',
+      sort: 'asc',
       sortingOrder: ['asc', 'desc'],
       cellRenderer: DocSpaceItemRenderer,
       checkboxSelection: true,
