@@ -126,7 +126,7 @@ export default function DocumentSpaceArchivedItemsPage() {
           {
             title: 'Restore',
             icon: CircleRightArrowIcon,
-            onClick: () => restoreItems(),
+            onClick: (doc: DocumentDto) => restoreItems([doc]),
             isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
           },
           {
@@ -256,9 +256,9 @@ export default function DocumentSpaceArchivedItemsPage() {
     pageState.userCanDeleteSomethingArchived.set(false);
   }
 
-  async function restoreItems(): Promise<void> {
+  async function restoreItems(items: DocumentDto[]): Promise<void> {
     try {
-      const itemsToRestore = reduceDocumentDtoListToUnique(pageState.selectedFiles.get());
+      const itemsToRestore = reduceDocumentDtoListToUnique(items);
       for (const item of itemsToRestore) {
         // for each item to restore, send the full path + item name to the backend
         //  it'll need the path in case there's >1 like-named file
@@ -414,7 +414,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         submitText="Restore"
         show={pageState.showRestoreDialog.get()}
         onCancel={closeDialogs}
-        onSubmit={restoreItems}
+        onSubmit={() => restoreItems(pageState.selectedFiles.value)}
       >
         {pageState.selectedFiles.get().length > 1
             ? `Restore these ${pageState.selectedFiles.get().length} items?`
