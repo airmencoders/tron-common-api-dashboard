@@ -21,10 +21,11 @@ describe('DataCrudDelete Tests', () => {
           onCancel={onClose}
           disableSubmit={false}
           show={true}
-          content="Hello"
           title="Dialog"
           submitText="Send It"
-        />
+        >
+          Hello
+        </GenericDialog>
       </MemoryRouter>
     );
 
@@ -37,6 +38,4 @@ describe('DataCrudDelete Tests', () => {
     fireEvent.click(screen.getByText('Cancel'));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
-
-  
 });

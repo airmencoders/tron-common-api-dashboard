@@ -14,7 +14,6 @@ import { SuccessErrorMessageProps } from '../../../components/forms/SuccessError
 import { GridSelectionType } from '../../../components/Grid/grid-selection-type';
 import GridColumn from '../../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../../components/SideDrawer/SideDrawer';
 import TabBar from '../../../components/TabBar/TabBar';
@@ -22,7 +21,7 @@ import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
 import RemoveIcon from '../../../icons/RemoveIcon';
 import UserIconCircle from '../../../icons/UserIconCircle';
-import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum, DocumentSpaceDashboardMemberResponseDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../openapi';
+import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberResponseDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../openapi';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
@@ -55,33 +54,6 @@ interface DocumentSpaceMembershipsState {
 
 export interface BatchUploadState {
   successErrorState: SuccessErrorMessageProps;
-}
-
-export const ADMIN_PRIV_NAME = 'Admin';
-export const EDITOR_PRIV_NAME = 'Editor';
-export const VIEWER_PRIV_NAME = 'Viewer';
-
-// converts backend priv names to friendlier names for UI/users per mocks
-export function resolvePrivName(privName: string): string {
-  if (privName === DocumentSpacePrivilegeDtoTypeEnum.Membership) {
-    return ADMIN_PRIV_NAME;
-  } else if (privName === DocumentSpacePrivilegeDtoTypeEnum.Write) {
-    return EDITOR_PRIV_NAME;
-  } else {
-    return VIEWER_PRIV_NAME;
-  }
-}
-
-// converts friendly priv names from the UI to the needed one(s) for the backend
-//  it also gives any of the "free" implicit ones that come with a higher privilege (e.g. ADMIN gives EDITOR AND VIEWER)
-export function unResolvePrivName(privName: string): DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum[] {
-  if (privName === ADMIN_PRIV_NAME) {
-    return [ DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write ];
-  } else if (privName === EDITOR_PRIV_NAME) {
-    return [ DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write ]
-  } else {
-    return [];
-  }
 }
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -251,26 +223,14 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
     pageState.membersState.selected.find((member) => member.value.id === id)?.set(none);
   }
 
-  // callback for the combobox renderer to decide what item is selected, go with highest priv if more than one..
-  //  e.g. WRITE priv would result from a set containing [ READ, WRITE ]..
-  function getHighestPrivForMember(data: DocumentSpaceDashboardMemberResponseDto): string {
-    if (!data) return '';
-
-    if (data.privileges.find((item) => item.type === DocumentSpacePrivilegeDtoTypeEnum.Membership))
-      return resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership);
-    else if (data.privileges.find((item) => item.type === DocumentSpacePrivilegeDtoTypeEnum.Write))
-      return resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write);
-    else return resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read);
-  }
-
   // for a given priv change from member-management list, add the changed user to membersToUpdateState
   function onMemberPrivilegeDropDownChanged(row: DocumentSpaceDashboardMemberResponseDto, item: string): void {
     const memberUpdateIndex = pageState.membersState.membersToUpdate.value.findIndex((i) => i.email === row.email);
     if (memberUpdateIndex === -1) {
-      pageState.membersState.membersToUpdate.merge([ { email: row.email, privileges: unResolvePrivName(item) }]);
+      pageState.membersState.membersToUpdate.merge([ { email: row.email, privileges: membershipService.unResolvePrivName(item) }]);
     } else {
       // we've already staged this member for an update, so update existing pending-update
-      pageState.membersState.membersToUpdate[memberUpdateIndex].set({ email: row.email, privileges: unResolvePrivName(item) });
+      pageState.membersState.membersToUpdate[memberUpdateIndex].set({ email: row.email, privileges: membershipService.unResolvePrivName(item) });
     }
   }
 
@@ -311,9 +271,9 @@ function DocumentSpaceMemberships(props: DocumentSpaceMembershipsProps) {
         headerName: 'Permissions',
         cellRenderer: ComboBoxCellRenderer,
         cellRendererParams: {
-          items: Object.values(DocumentSpacePrivilegeDtoTypeEnum).map(item => resolvePrivName(item)),
+          items: Object.values(DocumentSpacePrivilegeDtoTypeEnum).map(item => membershipService.resolvePrivName(item)),
           onChange: onMemberPrivilegeDropDownChanged,
-          selectedItem: getHighestPrivForMember,
+          selectedItem: membershipService.getHighestPrivForMember.bind(membershipService),
         } as ComboBoxCellRendererProps,
       }),
       new GridColumn({

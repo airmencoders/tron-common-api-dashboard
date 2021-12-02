@@ -15,9 +15,9 @@ import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils
 import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum } from '../../../openapi';
 import { FormActionType } from '../../../state/crud-page/form-action-type';
 import { documentSpaceMembershipService } from '../../../state/document-space/document-space-state';
+import { DocumentSpacePrivilegeNiceName } from '../../../state/document-space/memberships/document-space-privilege-nice-name';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified, validateEmail, validateRequiredString, validationErrors } from '../../../utils/validation-utils';
-import { ADMIN_PRIV_NAME, EDITOR_PRIV_NAME, resolvePrivName, unResolvePrivName } from './DocumentSpaceMemberships';
 import './DocumentSpaceMembershipsForm.scss';
 import { DocumentSpaceMembershipsFormProps } from './DocumentSpaceMembershipsFormProps';
 
@@ -119,7 +119,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
 
   function onPrivilegeChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
-      membershipState.member.privileges.set(unResolvePrivName(resolvePrivName(event.target.name))); // will grant the selected priv and any below it
+      membershipState.member.privileges.set(membershipService.unResolvePrivName(membershipService.resolvePrivName(event.target.name))); // will grant the selected priv and any below it
     } else {
       membershipState.member.privileges.merge(prev => {
         const existingPrivilegeIndex = prev.findIndex(privilege => privilege === event.target.name);
@@ -173,7 +173,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
         <Checkbox
           id="privilege_MEMBERSHIP"
           name={DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership}
-          label={ADMIN_PRIV_NAME}
+          label={DocumentSpacePrivilegeNiceName.ADMIN}
           checked={!!membershipState.member.privileges.value.find(privilege => privilege === DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership)}
           onChange={onPrivilegeChange}
           disabled={membershipState.formState.isSubmitting.value}
@@ -181,7 +181,7 @@ function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) 
         <Checkbox
           id="privilege_WRITE"
           name={DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write}
-          label={EDITOR_PRIV_NAME}
+          label={DocumentSpacePrivilegeNiceName.EDITOR}
           checked={!!membershipState.member.privileges.value.find(privilege => privilege === DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write)}
           onChange={onPrivilegeChange}
           disabled={membershipState.formState.isSubmitting.value 

@@ -2,7 +2,7 @@ import { fireEvent, render, waitFor, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DocumentSpaceDashboardMemberResponseDto } from '../../../../openapi';
 import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from '../../../../openapi/apis/document-space-controller-api';
-import DocumentSpaceMembershipService from '../../../../state/document-space/document-space-membership-service';
+import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';
 import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceMemberships from '../DocumentSpaceMemberships';

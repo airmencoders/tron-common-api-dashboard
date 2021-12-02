@@ -4,6 +4,8 @@ import ReactModal from 'react-modal';
 
 import './Modal.scss';
 import CloseIcon from '../../icons/CloseIcon';
+import CloseIcon2 from '../../icons/CloseIcon2';
+import Button from '../../components/Button/Button';
 
 // required for accessibility
 ReactModal.setAppElement('body');
@@ -32,10 +34,16 @@ function Modal(props: ModalProps) {
           <div className="modal-component__container">
             <div className="modal-component__header">
               {props.headerComponent}
-              <button className="header__close-icon close-btn" onClick={props.onHide}
-                      title="close-modal">
-                <CloseIcon size={1.75} />
-              </button>
+              <Button 
+                className="header__close-icon close-btn" 
+                onClick={props.onHide}
+                unstyled
+                disableMobileFullWidth
+                type="button"
+                title="close-modal"
+              >
+                <CloseIcon2 iconTitle="close" size={1} />
+              </Button>
             </div>
             <div className="modal-component__body">
               {props.children}
