@@ -67,6 +67,12 @@ export interface DocumentDto {
      * @type {boolean}
      * @memberof DocumentDto
      */
+    hasContents?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DocumentDto
+     */
     folder?: boolean;
 }
 
