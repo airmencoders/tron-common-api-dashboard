@@ -401,13 +401,14 @@ export default function DocumentSpaceArchivedItemsPage() {
         onCancel={closeDialogs}
         onSubmit={deleteSingleFile}
         disableSubmit={pageState.selectedFile.value == null}
-        content={
+      >
+        {
           pageState.selectedFile.value ?
           `Delete this item - ${shortenString(pageState.selectedFile.value.key)}`
           :
           'No item selected'
         }
-      />
+      </GenericDialog>
       <GenericDialog
         title="Restore Confirm"
         submitText="Restore"
