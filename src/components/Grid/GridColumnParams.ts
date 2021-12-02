@@ -7,6 +7,7 @@ export interface GridColumnParams {
   field: string;
   sortable: boolean;
   sort?: string;
+  sortingOrder: undefined | string[];
   filter: boolean | string;
   headerName: string;
   headerClass: string;

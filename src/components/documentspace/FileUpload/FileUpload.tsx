@@ -126,7 +126,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     }
 
     if (uploadState.uploadErrors.get().length === 0) {
-      createTextToast(ToastType.SUCCESS, 'Upload Process completed', { autoClose: 3000 });
+      createTextToast(ToastType.SUCCESS, uploadState.fileCount.value > 1 ? `Upload Process completed for ${uploadState.fileCount.value} files` : 'Upload Process completed successfully', { autoClose: 3000 });
     }
     else {
       uploadState.merge({ showErrorDialog: true });
@@ -306,7 +306,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         onSubmit={() => uploadState.showErrorDialog.set(false)}
         submitText="OK"
         title="Upload File Errors"
-        content={<ul>These files did not upload: {uploadState.uploadErrors.get().map(item => <li key={item.file}>{item.file} - {item.reason}</li>)}</ul>}
+        content={<><div>{`Successfully uploaded ${uploadState.fileCount.value - uploadState.uploadErrors.value.length} files.`}</div><div>These files did not upload:</div><ul>{uploadState.uploadErrors.get().map(item => <li key={item.file}>{item.file} - {item.reason}</li>)}</ul></>}
       />
     </>
   )

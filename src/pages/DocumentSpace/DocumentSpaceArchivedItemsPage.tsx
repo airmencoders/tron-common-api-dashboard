@@ -71,6 +71,7 @@ export default function DocumentSpaceArchivedItemsPage() {
       headerName: 'Name',
       resizable: true,
       sortable: true,
+      sortingOrder: ['asc', 'desc'],
       sort: 'desc',  // default desc sort
       cellRenderer: DocSpaceItemRenderer,
       cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : '',
@@ -94,10 +95,7 @@ export default function DocumentSpaceArchivedItemsPage() {
       headerName: 'Last Modified',
       resizable: true,
       sortable: true,
-      valueGetter: (params) => {
-        if (!params.data) return '';
-        return new Date((params.data as DocumentDto)?.lastModifiedDate);
-      },
+      sortingOrder: ['asc', 'desc'],
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return formatDocumentSpaceDate(params.value);

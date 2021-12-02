@@ -45,6 +45,6 @@ export function applySortCriteria(
       break;        
   }    
   
-  if (sortModel.sort == 'desc') retVal.reverse();
+  if (sortModel.sort == 'asc') retVal.reverse();
   return retVal;
 }

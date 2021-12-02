@@ -131,6 +131,7 @@ function DocumentSpacePage() {
       resizable: true,
       sortable: true,
       sort: 'desc',
+      sortingOrder: ['asc', 'desc'],
       cellRenderer: DocSpaceItemRenderer,
       checkboxSelection: true,
       initialWidth: 400,
@@ -148,6 +149,7 @@ function DocumentSpacePage() {
       field: 'lastModifiedDate',
       headerName: 'Last Modified',
       sortable: true,
+      sortingOrder: ['asc', 'desc'],
       resizable: true,
       initialWidth: 250,
       valueFormatter: function (params: ValueFormatterParams) {

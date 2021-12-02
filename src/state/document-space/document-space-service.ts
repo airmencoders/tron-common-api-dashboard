@@ -47,7 +47,6 @@ export default class DocumentSpaceService {
           const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
           const page = Math.floor(params.startRow / limit);
           let data: S3PaginationDto;
-          console.log(params.sortModel)
           if (status === ArchivedStatus.NOT_ARCHIVED) {
             data = (await this.documentSpaceApi.dumpContentsAtPath(spaceName, path)).data;
           } else if (status === ArchivedStatus.ARCHIVED) {
