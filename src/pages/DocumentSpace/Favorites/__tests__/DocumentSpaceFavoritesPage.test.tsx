@@ -101,7 +101,8 @@ describe('Document Space Favorites Page Tests', () => {
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
-    (accessAuthorizedUserState as jest.Mock).mockReturnValue(new AuthorizedUserService(authorizedUserState, dashboardUserApi));
+    (accessAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
+    (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
   });
 
