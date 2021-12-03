@@ -6,7 +6,9 @@ import { CheckboxSelectionCallbackParams, ValueFormatterParams, ValueGetterParam
 export interface GridColumnParams {
   field: string;
   sortable: boolean;
-  filter: boolean;
+  sort?: string;
+  sortingOrder: undefined | string[];
+  filter: boolean | string;
   headerName: string;
   headerClass: string;
   cellRenderer: React.ReactNode;

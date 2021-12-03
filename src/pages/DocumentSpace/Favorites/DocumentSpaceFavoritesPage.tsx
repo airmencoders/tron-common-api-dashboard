@@ -25,7 +25,6 @@ import {PrivilegeType} from '../../../state/privilege/privilege-type';
 import '../DocumentSpacePage.scss';
 import {format} from 'date-fns';
 import {CancellableDataRequest} from '../../../utils/cancellable-data-request';
-import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import FavoritesCellRenderer from './FavoritesCellRenderer';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
@@ -36,6 +35,7 @@ import {prepareRequestError} from "../../../utils/ErrorHandling/error-handling-u
 import DocumentSpaceSelector, {spaceIdQueryKey} from "../DocumentSpaceSelector";
 import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 import { performActionWhenMounted } from '../../../utils/component-utils';
+import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
 
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -117,10 +117,11 @@ function DocumentSpaceFavoritesPage() {
       });
     }
     catch (err) {
-      const preparedError = prepareRequestError(err);
       if (!mountedRef.current) {
         return;
       }
+      
+      const preparedError = prepareRequestError(err);
       if (preparedError.status === 403) {
         createTextToast(ToastType.ERROR, 'Not authorized for the selected Document Space');
       } else {
@@ -196,34 +197,6 @@ function DocumentSpaceFavoritesPage() {
     };
   }, []);
 
-  useEffect(() => {
-    let privilegesCancellableRequest: CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>;
-
-    async function loadPrivileges() {
-      // Load privileges for the selected document space
-      if (!isAdmin && pageState.selectedDocumentSpace.value) {
-        privilegesCancellableRequest = documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(pageState.selectedDocumentSpace.value.id);
-
-        try {
-          await privilegesCancellableRequest.promise;
-
-        } catch (err) {
-          if (mountedRef.current) {
-            createTextToast(ToastType.WARNING, 'Could not load Document Space privileges. Actions will be limited');
-          }
-        }
-      }
-    }
-
-    loadPrivileges();
-
-    return function cleanup() {
-      if (privilegesCancellableRequest != null) {
-        privilegesCancellableRequest.cancelTokenSource.cancel();
-      }
-    };
-  }, [pageState.selectedDocumentSpace.value]);
-
   async function deleteArchiveFile() {
     const file = pageState.selectedFile.value;
 
@@ -288,7 +261,6 @@ function DocumentSpaceFavoritesPage() {
         headerName: 'Name',
         resizable: true,
         cellRenderer: FavoritesCellRenderer,
-        checkboxSelection: true,
         cellRendererParams: {
           onClick: getFolderPath
         }
@@ -308,7 +280,8 @@ function DocumentSpaceFavoritesPage() {
         cellRenderer: DocumentRowActionCellRenderer,
         cellRendererParams: {
           menuItems: [
-            { title: 'Remove from favorites',
+            {
+              title: 'Remove from favorites',
               icon: StarHollowIcon,
               onClick: (data: DocumentSpaceUserCollectionResponseDto) => {
                 documentSpaceService.removeEntityFromFavorites(data.documentSpaceId, data.id)
@@ -357,8 +330,8 @@ function DocumentSpaceFavoritesPage() {
               maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
               maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
               suppressCellSelection
+              suppressRowClickSelection
               getRowNodeId={getDocumentUniqueKey}
-              rowSelection="single"
               updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
               updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
               updateDatasource={pageState.shouldUpdateDatasource.value}
@@ -366,11 +339,11 @@ function DocumentSpaceFavoritesPage() {
             />
           }
 
-          <DeleteDocumentDialog
+          <ArchiveDialog
             show={pageState.showDeleteDialog.get()}
             onCancel={() => pageState.showDeleteDialog.set(false)}
             onSubmit={deleteArchiveFile}
-            file={pageState.selectedFile.value?.key ?? null}
+            items={pageState.selectedFile.value}
           />
         </>
       }
