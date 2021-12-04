@@ -25,6 +25,7 @@ import DocumentSpaceFavoritesPage from '../DocumentSpaceFavoritesPage';
 import DocumentSpacePrivilegeService from "../../../../state/document-space/document-space-privilege-service";
 import {createAxiosSuccessResponse} from "../../../../utils/TestUtils/test-utils";
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../../state/document-space/document-space-global-service';
+import axios from 'axios';
 
 jest.mock('../../../../state/document-space/document-space-state');
 jest.mock('../../../../state/authorized-user/authorized-user-state');
@@ -100,7 +101,8 @@ describe('Document Space Favorites Page Tests', () => {
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
-    (accessAuthorizedUserState as jest.Mock).mockReturnValue(new AuthorizedUserService(authorizedUserState, dashboardUserApi));
+    (accessAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
+    (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
   });
 
@@ -111,7 +113,10 @@ describe('Document Space Favorites Page Tests', () => {
 
   it('renders the page', async () => {
     jest.spyOn(documentSpaceApi, 'getFavorites').mockReturnValue(Promise.resolve(createAxiosSuccessResponse({data: favorties})))
-
+    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
+      promise: Promise.resolve(documentSpaces),
+      cancelTokenSource: axios.CancelToken.source()
+    })
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
 
     const {getByText} = render(

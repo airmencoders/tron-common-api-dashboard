@@ -22,6 +22,7 @@ import RestoreIcon from '../../icons/RestoreIcon';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../openapi';
 import { ArchivedStatus } from '../../state/document-space/document-space-service';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { performActionWhenMounted } from '../../utils/component-utils';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { formatBytesToString, reduceDocumentDtoListToUnique } from '../../utils/file-utils';
 import { shortenString } from '../../utils/string-utils';
@@ -78,7 +79,7 @@ export default function DocumentSpaceArchivedItemsPage() {
       sortingOrder: ['asc', 'desc'],
       sort: 'asc',  // default sort
       cellRenderer: DocSpaceItemRenderer,
-      cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : '',
+      cellStyle: (params: any) => !checkHasWriteForDocSpace(params.node?.data) ? {'pointer-events': 'none', opacity: '0.4' } : {'pointer-events': 'auto', opacity: '1' },
       cellRendererParams: {
         hideItemLink: true,
       },
@@ -131,7 +132,7 @@ export default function DocumentSpaceArchivedItemsPage() {
           {
             title: 'Restore',
             icon: CircleRightArrowIcon,
-            onClick: () => restoreItems(),
+            onClick: (doc: DocumentDto) => restoreItems([doc], true),
             isAuthorized: (doc: DocumentDto) => checkHasWriteForDocSpace(doc),
           },
           {
@@ -194,24 +195,16 @@ export default function DocumentSpaceArchivedItemsPage() {
       throw new Error('Selected file cannot be null for deletion');
     }
 
+    let wasSuccess = false;
+
     try {
       await documentSpaceService.deleteItems(file.spaceId, file.path, [file.key]);
+      wasSuccess = true;
       createTextToast(ToastType.SUCCESS, 'File deleted: ' + file.key);
     } catch (err) {
       createTextToast(ToastType.ERROR, 'Could not delete file ' + file.key);
     } finally {
-      pageState.merge({
-        shouldUpdateDatasource: true,
-        selectedFile: undefined,
-        datasource: documentSpaceService.createDatasource(
-          '',
-          '',
-          infiniteScrollOptions,
-          ArchivedStatus.ARCHIVED
-        ),
-      });
-
-      closeDialogs();
+      performActionWhenMounted(mountedRef.current, () => setStateOnItemRestorationOrDeletion([file], wasSuccess, true));
     }
   }
 
@@ -261,9 +254,15 @@ export default function DocumentSpaceArchivedItemsPage() {
     pageState.userCanDeleteSomethingArchived.set(false);
   }
 
-  async function restoreItems(): Promise<void> {
+  /**
+   * 
+   * @param items the items to restore
+   * @param isSingle true if this action is used to restore a single item (from "more actions")
+   */
+  async function restoreItems(items: DocumentDto[], isSingle = false): Promise<void> {
+    let wasSuccess = false;
     try {
-      const itemsToRestore = reduceDocumentDtoListToUnique(pageState.selectedFiles.get());
+      const itemsToRestore = reduceDocumentDtoListToUnique(items);
       for (const item of itemsToRestore) {
         // for each item to restore, send the full path + item name to the backend
         //  it'll need the path in case there's >1 like-named file
@@ -279,24 +278,68 @@ export default function DocumentSpaceArchivedItemsPage() {
         }
         await documentSpaceService.unArchiveItems(item.spaceId, listOfFilesWithPaths);
       }
-      createTextToast(ToastType.SUCCESS, 'Files Restored');
+
+      wasSuccess = true;
+      createTextToast(ToastType.SUCCESS, isSingle ? 'File Restored' : 'Files Restored');
     }
     catch (e) {
       createTextToast(ToastType.ERROR, 'Could not restore files - ' + (e as Error).toString());
+    } finally {
+      performActionWhenMounted(mountedRef.current, () => setStateOnItemRestorationOrDeletion(items, wasSuccess, isSingle));
     }
+  }
 
-    pageState.merge({
-      shouldUpdateDatasource: true,
-      selectedFiles: [],
-      datasource: documentSpaceService.createDatasource(
+  /**
+   * Resets the datasource. If this was a non-bulk action, it ensures the multi-selected
+   * item state is kept in sync with the item of the target action. Closes all dialogs.
+   * 
+   * @param items the target items of the action (items being deleted/restored)
+   * @param wasSuccess if the request was successful
+   * @param isSingle true if this action is not a bulk action, false otherwise
+   */
+  function setStateOnItemRestorationOrDeletion(items: DocumentDto[], wasSuccess: boolean, isSingle = false) {
+    pageState.merge(state => {
+      state.shouldUpdateDatasource = true;
+      state.datasource = documentSpaceService.createDatasource(
         '',
         '',
         infiniteScrollOptions,
         ArchivedStatus.ARCHIVED
-      ),
+      );
+      state.selectedFile = undefined;
+
+      if (!wasSuccess) {
+        return state;
+      }
+
+      if (!isSingle) {
+        state.selectedFiles = [];
+        return state;
+      } 
+
+      // Check if this item exists in multi-file selection state
+      // If it is, just remove it as it should no longer exist
+      if (items.length === 1) {
+        spliceExistingElement(state.selectedFiles, items[0]);
+      }
+
+      return state;
     });
 
     closeDialogs();
+  }
+
+  /**
+   * The removal happens in place
+   * @param items items to check
+   * @param itemToRemove the item to remove
+   */
+  function spliceExistingElement(items: DocumentDto[], itemToRemove: DocumentDto) {
+    const uniqueKey = getDocumentUniqueKey(itemToRemove);
+    const existingItemIndex = items.findIndex(document => getDocumentUniqueKey(document) === uniqueKey);
+    if (existingItemIndex !== -1) {
+      items.splice(existingItemIndex, 1);
+    }
   }
 
   async function loadArchivedItems() {
@@ -310,7 +353,7 @@ export default function DocumentSpaceArchivedItemsPage() {
   }
 
   function getDocumentUniqueKey(data: DocumentDto): string {
-    return data.key;
+    return `${data.spaceId}__${data.path}__${data.key}`;
   }
 
   function onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
@@ -419,7 +462,7 @@ export default function DocumentSpaceArchivedItemsPage() {
         submitText="Restore"
         show={pageState.showRestoreDialog.get()}
         onCancel={closeDialogs}
-        onSubmit={restoreItems}
+        onSubmit={() => restoreItems(pageState.selectedFiles.value)}
       >
         {pageState.selectedFiles.get().length > 1
             ? `Restore these ${pageState.selectedFiles.get().length} items?`
