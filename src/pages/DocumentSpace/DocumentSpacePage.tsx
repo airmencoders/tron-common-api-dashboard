@@ -42,7 +42,6 @@ import UserIconCircle from "../../icons/UserIconCircle";
 import CircleMinusIcon from '../../icons/CircleMinusIcon';
 import EditIcon from '../../icons/EditIcon';
 import StarIcon from '../../icons/StarIcon';
-import UploadIcon from '../../icons/UploadIcon';
 import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
 import {DocumentSpaceUserCollectionResponseDto} from '../../openapi/models/document-space-user-collection-response-dto';
 import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
@@ -70,6 +69,7 @@ interface DocumentSpacePageState {
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
   fileToDelete: string;
+  selectedFile?: DocumentDto;
   selectedFiles: DocumentDto[];
   membershipsState: {
     isOpen: boolean;
@@ -99,6 +99,7 @@ function DocumentSpacePage() {
     showUploadDialog: false,
     showDeleteDialog: false,
     fileToDelete: '',
+    selectedFile: undefined,
     selectedFiles: [],
     membershipsState: {
       isOpen: false
@@ -212,7 +213,7 @@ function DocumentSpacePage() {
             title: 'Remove',
             icon: CircleMinusIcon,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFiles: [doc], showDeleteDialog: true }),
+            onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFile: doc, showDeleteDialog: true }),
           },
           { 
             title: 'Rename Folder', 
@@ -425,8 +426,7 @@ function DocumentSpacePage() {
 
   function onDatasourceUpdateCallback() {
     mergePageState({
-      shouldUpdateDatasource: false,
-      selectedFiles: []
+      shouldUpdateDatasource: false
     });
   }
 
@@ -548,35 +548,86 @@ function DocumentSpacePage() {
     pageState.merge({ showDeleteDialog: false, showDeleteSelectedDialog: false });
   }
 
-  async function archiveFile(): Promise<void> {
+  async function archiveFile(isSingle = false): Promise<void> {
     const selectedSpace = pageState.selectedSpace.value;
 
     if (selectedSpace == null) {
       return;
     }
 
+    let items: DocumentDto[];
+
+    if (isSingle) {
+      if (pageState.selectedFile.value == null) {
+        throw new Error('Selected file cannot be null for archive');
+      } else {
+        items = [pageState.selectedFile.value];
+      }
+    } else {
+      items = pageState.selectedFiles.value;
+    }
+
+    let wasSuccess = false;
+
     try {
       await documentSpaceService.archiveItems(
         selectedSpace.id,
         pageState.get().path,
-        pageState.get().selectedFiles.map(item => item.key)
+        items.map(item => item.key)
       );
       createTextToast(ToastType.SUCCESS, 'Item(s) Archived');
+      wasSuccess = true;
     }
     catch (e) {
       createTextToast(ToastType.ERROR, 'Could not archive item(s) - ' + (e as Error).message);
+    } finally {
+      performActionWhenMounted(mountedRef.current, () => setStateOnArchive(items, wasSuccess, isSingle));
     }
+  }
 
-    pageState.merge({
-      shouldUpdateDatasource: true,
-      selectedFiles: [],
-      datasource: documentSpaceService.createDatasource(
+  function setStateOnArchive(itemsToBeArchived: DocumentDto[], wasSuccess: boolean, isSingle = false) {
+    pageState.merge(state => {
+      state.shouldUpdateDatasource = true;
+      state.datasource = documentSpaceService.createDatasource(
         pageState.get().selectedSpace?.id ?? '',
         pageState.get().path,
         infiniteScrollOptions
-      ),
+      );
+      state.selectedFile = undefined;
+
+      if (!wasSuccess) {
+        return state;
+      }
+
+      console.log(isSingle)
+      if (!isSingle) {
+        state.selectedFiles = [];
+        return state;
+      }
+
+      // If this was a single file delete, check to make sure
+      // the multi-select files are kept in sync
+      if (itemsToBeArchived.length === 1) {
+        spliceExistingDocument(state.selectedFiles, itemsToBeArchived[0]);
+      }
+
+      return state;
     });
+    
     closeRemoveDialog();
+  }
+
+  /**
+   * The removal happens in place. Removes a document from an array.
+   * @param items items to check
+   * @param itemToRemove the item to remove
+   */
+  function spliceExistingDocument(items: DocumentDto[], itemToRemove: DocumentDto) {
+    const uniqueKey = getDocumentUniqueKey(itemToRemove);
+    const existingItemIndex = items.findIndex(document => getDocumentUniqueKey(document) === uniqueKey);
+    if (existingItemIndex !== -1) {
+      items.splice(existingItemIndex, 1);
+    }
   }
 
   async function addToFavorites(doc: DocumentDto) {
@@ -806,10 +857,17 @@ function DocumentSpacePage() {
       </SideDrawer>
 
       <ArchiveDialog
-        show={pageState.showDeleteDialog.get() || pageState.showDeleteSelectedDialog.get()}
+        show={pageState.showDeleteDialog.get()}
         onCancel={closeRemoveDialog}
-        onSubmit={archiveFile}
-        items={pageState.selectedFiles.get()}
+        onSubmit={() => archiveFile(true)}
+        items={pageState.selectedFile.value}
+      />
+
+      <ArchiveDialog
+        show={pageState.showDeleteSelectedDialog.get()}
+        onCancel={closeRemoveDialog}
+        onSubmit={() => archiveFile(false)}
+        items={pageState.selectedFiles.value}
       />
 
       {pageState.selectedSpace.value &&
