@@ -75,7 +75,6 @@ interface DocumentSpacePageState {
     isOpen: boolean;
   },
   createEditElementOpType: CreateEditOperationType;
-  clickedItemName?: string;
   path: string;
   showDeleteSelectedDialog: boolean;
   isDefaultDocumentSpaceSettingsOpen: boolean;
@@ -221,7 +220,7 @@ function DocumentSpacePage() {
             shouldShow: (doc: DocumentDto) => doc && doc.folder,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: (doc: DocumentDto) => mergeState(pageState, { 
-              clickedItemName: doc.key, 
+              selectedFile: doc, 
               createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
             })
           },
@@ -231,7 +230,7 @@ function DocumentSpacePage() {
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: (doc: DocumentDto) => mergeState(pageState, { 
-              clickedItemName: doc.key, 
+              selectedFile: doc, 
               createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
             })
           },
@@ -444,8 +443,11 @@ function DocumentSpacePage() {
 
     switch (pageState.createEditElementOpType.get()) {
       case CreateEditOperationType.EDIT_FOLDERNAME:
+        if (pageState.selectedFile.value == null) {
+          throw new Error('Folder document cannot be null for rename');
+        }
         documentSpaceService.renameFolder(pageState.selectedSpace.value?.id,
-          pageState.get().path + "/" + pageState.clickedItemName.get(), 
+          pageState.get().path + "/" + pageState.selectedFile.value.key, 
           name)
           .then(() => {
             mergePageState({
@@ -453,7 +455,7 @@ function DocumentSpacePage() {
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
-              clickedItemName: undefined,
+              selectedFile: undefined
             });
             createTextToast(ToastType.SUCCESS, "Folder renamed");
           })
@@ -474,9 +476,12 @@ function DocumentSpacePage() {
           .catch(message => setPageStateOnException(message));
         break;
       case CreateEditOperationType.EDIT_FILENAME:
+        if (pageState.selectedFile.value == null) {
+          throw new Error('File document cannot be null for rename');
+        }
         documentSpaceService.renameFile(pageState.selectedSpace.value?.id,
           pageState.get().path, 
-          pageState.clickedItemName.get() ?? '',  // blank if undefined, will allow to fail out..
+          pageState.selectedFile.value.key,
           name)
           .then(() => {
             mergePageState({
@@ -484,7 +489,7 @@ function DocumentSpacePage() {
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
-              clickedItemName: undefined,
+              selectedFile: undefined
             });
             createTextToast(ToastType.SUCCESS, "File renamed");
           })
@@ -820,7 +825,7 @@ function DocumentSpacePage() {
               mergeState(pageState, {
                 showErrorMessage: false,
                 createEditElementOpType: CreateEditOperationType.NONE,
-                clickedItemName: undefined,
+                selectedFile: undefined
               })
             }
             onSubmit={submitElementName}
@@ -828,7 +833,7 @@ function DocumentSpacePage() {
             onCloseErrorMsg={closeErrorMsg}
             showErrorMessage={pageState.showErrorMessage.get()}
             errorMessage={pageState.errorMessage.get()}
-            elementName={pageState.clickedItemName.get() ?? ''}
+            elementName={pageState.selectedFile.value?.key}
             opType={pageState.createEditElementOpType.get()}
           />
         )}
