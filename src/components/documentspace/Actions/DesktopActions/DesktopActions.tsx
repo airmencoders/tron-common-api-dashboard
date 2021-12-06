@@ -31,7 +31,7 @@ function DesktopActions(props: ActionsProps) {
                 ref={uploadFileRef}
                 documentSpaceId={props.selectedSpace.value.id}
                 currentPath={props.path.value}
-                onFinish={() => props.shouldUpdateDatasource.set(true)}
+                onFinish={() => props.shouldUpdateInfiniteCache.set(true)}
             />
             <Button
                 data-testid="upload-file__btn"

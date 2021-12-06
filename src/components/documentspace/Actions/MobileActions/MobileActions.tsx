@@ -133,7 +133,7 @@ function MobileActions(props: ActionsProps) {
         ref={uploadFileRef}
         currentPath={props.path.value}
         documentSpaceId={props.selectedSpace.value.id}
-        onFinish={() => props.shouldUpdateDatasource.set(true)}
+        onFinish={() => props.shouldUpdateInfiniteCache.set(true)}
       />
     </div>
   );

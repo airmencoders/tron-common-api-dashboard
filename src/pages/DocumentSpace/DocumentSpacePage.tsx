@@ -65,6 +65,7 @@ interface DocumentSpacePageState {
   errorMessage: string;
   showErrorMessage: boolean;
   selectedSpace?: DocumentSpaceResponseDto;
+  shouldUpdateInfiniteCache: boolean;
   shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
   showUploadDialog: boolean;
@@ -94,6 +95,7 @@ function DocumentSpacePage() {
     showErrorMessage: false,
     errorMessage: '',
     selectedSpace: undefined,
+    shouldUpdateInfiniteCache: false,
     shouldUpdateDatasource: false,
     datasource: undefined,
     showUploadDialog: false,
@@ -430,6 +432,12 @@ function DocumentSpacePage() {
     });
   }
 
+  function onInfiniteCacheUpdateCallback() {
+    mergePageState({
+      shouldUpdateInfiniteCache: false
+    });
+  }
+
   function setPageStateOnException(message: string) {
     mergePageState({
       isSubmitting: false,
@@ -452,7 +460,7 @@ function DocumentSpacePage() {
               createEditElementOpType: CreateEditOperationType.NONE,
               isSubmitting: false,
               showErrorMessage: false,
-              shouldUpdateDatasource: true,
+              shouldUpdateInfiniteCache: true,
               clickedItemName: undefined,
             });
             createTextToast(ToastType.SUCCESS, "Folder renamed");
@@ -467,7 +475,7 @@ function DocumentSpacePage() {
               createEditElementOpType: CreateEditOperationType.NONE,
               isSubmitting: false,
               showErrorMessage: false,
-              shouldUpdateDatasource: true,
+              shouldUpdateInfiniteCache: true,
             });
             createTextToast(ToastType.SUCCESS, "Folder created");
           })
@@ -483,7 +491,7 @@ function DocumentSpacePage() {
               createEditElementOpType: CreateEditOperationType.NONE,
               isSubmitting: false,
               showErrorMessage: false,
-              shouldUpdateDatasource: true,
+              shouldUpdateInfiniteCache: true,
               clickedItemName: undefined,
             });
             createTextToast(ToastType.SUCCESS, "File renamed");
@@ -568,13 +576,8 @@ function DocumentSpacePage() {
     }
 
     pageState.merge({
-      shouldUpdateDatasource: true,
       selectedFiles: [],
-      datasource: documentSpaceService.createDatasource(
-        pageState.get().selectedSpace?.id ?? '',
-        pageState.get().path,
-        infiniteScrollOptions
-      ),
+      shouldUpdateInfiniteCache: true
     });
     closeRemoveDialog();
   }
@@ -599,7 +602,7 @@ function DocumentSpacePage() {
       if(mountedRef.current) {
         pageState.favorites.merge([placeHolderResponse])
 
-        pageState.shouldUpdateDatasource.set(true)
+        pageState.shouldUpdateInfiniteCache.set(true)
       }
       createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
     }else{
@@ -620,7 +623,7 @@ function DocumentSpacePage() {
             return favorites.filter(f => f.key !== doc.key);
           })
 
-          pageState.shouldUpdateDatasource.set(true)
+          pageState.shouldUpdateInfiniteCache.set(true)
         }
         createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
       }
@@ -706,7 +709,7 @@ function DocumentSpacePage() {
           isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
           selectedSpace={pageState.selectedSpace}
           path={pageState.nested('path')}
-          shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+          shouldUpdateInfiniteCache={pageState.shouldUpdateInfiniteCache}
           createEditElementOpType={pageState.createEditElementOpType}
           membershipsState={pageState.membershipsState}
           selectedFiles={pageState.selectedFiles}
@@ -734,6 +737,8 @@ function DocumentSpacePage() {
             rowSelection="multiple"
             suppressRowClickSelection
             autoResizeColumns
+            updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
+            updateInfiniteCacheCallback={onInfiniteCacheUpdateCallback}
           />
         )}
 
