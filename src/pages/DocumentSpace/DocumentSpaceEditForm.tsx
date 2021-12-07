@@ -12,6 +12,7 @@ import TextInput from '../../components/forms/TextInput/TextInput';
 import { DocumentSpaceRequestDto } from '../../openapi';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { validateDocSpaceName } from '../../utils/validation-utils';
+import InfoNotice from '../../components/InfoNotice/InfoNotice';
 
 export interface DocumentSpaceEditFormProps {
   documentSpace?: DocumentSpaceRequestDto;
@@ -74,6 +75,19 @@ export default function DocumentSpaceEditForm(props: DocumentSpaceEditFormProps)
           onChange={(event) => formState.name.set(event.target.value)}
           value={formState.name.get() ?? ''}
         />
+        <br/>
+        <InfoNotice type={'info'}>
+          Valid Space Names:
+          <ul>
+            <li>Are not empty or blank</li>
+            <li>Do not contain whitespace (spaces, tabs, etc)</li>
+            <li>Are greater than 2 and less than 64 characters</li>
+            <li>Have no uppercase letters</li>
+            <li>Start and end with letter or number</li>
+            <li>Cannot be an IP address</li>
+            <li>Cannot contain any slashes</li>
+          </ul>
+        </InfoNotice>
         <SuccessErrorMessage
           errorMessage={props?.errorMessage ?? ''}
           showErrorMessage={props?.showErrorMessage ?? false}

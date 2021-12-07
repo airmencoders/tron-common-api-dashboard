@@ -11,6 +11,7 @@ import TextInput from '../../components/forms/TextInput/TextInput';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import { CreateEditOperationType } from '../../state/document-space/document-space-utils';
 import { validateFolderName } from '../../utils/validation-utils';
+import InfoNotice from '../../components/InfoNotice/InfoNotice';
 
 export interface DocumentSpaceCreateEditFormProps {
   opType: CreateEditOperationType;
@@ -87,6 +88,16 @@ export default function DocumentSpaceCreateEditForm(props: DocumentSpaceCreateEd
           onChange={(event) => formState.set(event.target.value)}
           value={formState.get() ?? ''}
         />
+        <br/>
+        <InfoNotice type={'info'}>
+          Valid folder and file names:
+          <ul>
+            <li>Are not empty or blank</li>
+            <li>Are only alpha-numeric characters including spaces, parens, hyphens, underscores, and periods</li>
+            <li>Have no spaces/whitespace before or after file extension</li>
+            <li>One period (.) per name (e.g. file.txt)</li>
+          </ul>
+        </InfoNotice>
         <SuccessErrorMessage
           errorMessage={props?.errorMessage ?? ''}
           showErrorMessage={props?.showErrorMessage ?? false}
