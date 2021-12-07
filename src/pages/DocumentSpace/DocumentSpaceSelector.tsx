@@ -51,6 +51,7 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
     <Select
       id="document-space"
       name="document-space"
+      data-testid="document-space-selector"
       value={props.selectedSpace?.id}
       disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
       onChange={(event) => {

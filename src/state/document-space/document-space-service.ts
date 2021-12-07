@@ -258,6 +258,16 @@ export default class DocumentSpaceService {
     }
   }
 
+  async deleteDocumentSpace(documentSpaceId: string): Promise<void> {
+    try {
+      await this.documentSpaceApi.deleteSpace(documentSpaceId);
+      return Promise.resolve();
+    }
+    catch (error) {
+      return Promise.reject((error as AxiosError).response?.data?.reason ?? (error as AxiosError).message);
+    }
+  }
+
   async deleteArchiveItemBySpaceAndParent(documentSpaceId: string, parentFolderId: string, name: string) {
     try {
       return await this.documentSpaceApi.deleteArchiveItemBySpaceAndParent(documentSpaceId, parentFolderId, name);

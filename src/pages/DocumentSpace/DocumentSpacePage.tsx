@@ -1,58 +1,58 @@
-import {Downgraded, none, SetPartialStateAction, State, useHookstate} from '@hookstate/core';
-import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
-import React, {useEffect, useRef} from 'react';
-import {useHistory} from 'react-router';
-import {useLocation} from 'react-router-dom';
+import { Downgraded, none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
+import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import React, { useEffect, useRef } from 'react';
+import { useHistory } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
-import {InfiniteScrollOptions} from '../../components/DataCrudFormPage/infinite-scroll-options';
+import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer, {PopupMenuItem} from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentRowActionCellRenderer, { PopupMenuItem } from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
+import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import {GridSelectionType} from '../../components/Grid/grid-selection-type';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
-import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
+import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
+import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
-import {createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
+import CircleMinusIcon from '../../icons/CircleMinusIcon';
+import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
+import EditIcon from '../../icons/EditIcon';
+import StarHollowIcon from '../../icons/StarHollowIcon';
+import StarIcon from '../../icons/StarIcon';
+import UserIcon from "../../icons/UserIcon";
+import UserIconCircle from "../../icons/UserIconCircle";
 import {
   DocumentDto, DocumentSpacePathItemsDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto
 } from '../../openapi';
-import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
-import {FormActionType} from '../../state/crud-page/form-action-type';
-import {documentSpaceDownloadUrlService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
-import {PrivilegeType} from '../../state/privilege/privilege-type';
-import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
-import {formatBytesToString} from '../../utils/file-utils';
+import { DocumentSpaceUserCollectionResponseDto } from '../../openapi/models/document-space-user-collection-response-dto';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { documentSpaceDownloadUrlService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
+import { CancellableDataRequest } from '../../utils/cancellable-data-request';
+import { performActionWhenMounted } from '../../utils/component-utils';
+import { formatDocumentSpaceDate } from '../../utils/date-utils';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { formatBytesToString } from '../../utils/file-utils';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
-import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
-import {formatDocumentSpaceDate} from '../../utils/date-utils';
-import UserIcon from "../../icons/UserIcon";
-import UserIconCircle from "../../icons/UserIconCircle";
-import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import EditIcon from '../../icons/EditIcon';
-import StarIcon from '../../icons/StarIcon';
-import UploadIcon from '../../icons/UploadIcon';
-import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
-import {DocumentSpaceUserCollectionResponseDto} from '../../openapi/models/document-space-user-collection-response-dto';
-import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
-import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
-import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
-import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
-import StarHollowIcon from '../../icons/StarHollowIcon';
-import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
-import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
-import { performActionWhenMounted } from '../../utils/component-utils';
+import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./DocumentSpaceSelector";
+import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,
@@ -107,13 +107,12 @@ function DocumentSpacePage() {
     path: '',
     showDeleteSelectedDialog: false,
     isDefaultDocumentSpaceSettingsOpen: false,
-    sideDrawerSize: SideDrawerSize.WIDE,
+    sideDrawerSize: SideDrawerSize.NORMAL,
     favorites: []
   });
 
   const location = useLocation();
   const history = useHistory();
-
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
@@ -241,40 +240,37 @@ function DocumentSpacePage() {
 
   const mountedRef = useRef(false);
 
-  useEffect(() => {
-    mountedRef.current = true;
-
-    const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-
-    async function setInitialSpaceOnLoad() {
-      let data: DocumentSpaceResponseDto[];
-      try {
-        data = await spacesCancellableRequest.promise;
-      } catch (err) {
-        createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
-        return;
-      }
-
-      // Check if navigating to an existing document space first
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams.get(spaceIdQueryKey) != null) {
-        loadDocSpaceFromLocation(location, data);
-        return;
-      }
-
-      const selectedSpace = globalDocumentSpaceService.getInitialSelectedDocumentSpace(data, authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
-      
-      performActionWhenMounted(mountedRef.current, () => {
-        if (selectedSpace != null) {
-          setStateOnDocumentSpaceAndPathChange(selectedSpace, '');
-        } else {
-          createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
-        }
-      });
+  async function setInitialSpaceOnLoad(spacesCancellableRequest: CancellableDataRequest<DocumentSpaceResponseDto[]>) {
+    let data: DocumentSpaceResponseDto[];
+    try {
+      data = await spacesCancellableRequest.promise;
+    } catch (err) {
+      createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
+      return;
     }
 
-    setInitialSpaceOnLoad();
+    // Check if navigating to an existing document space first
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.get(spaceIdQueryKey) != null) {
+      loadDocSpaceFromLocation(location, data);
+      return;
+    }
 
+    const selectedSpace = globalDocumentSpaceService.getInitialSelectedDocumentSpace(data, authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
+    
+    performActionWhenMounted(mountedRef.current, () => {
+      if (selectedSpace != null) {
+        setStateOnDocumentSpaceAndPathChange(selectedSpace, '');
+      } else {
+        createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
+      }
+    });    
+  }
+
+  useEffect(() => {
+    mountedRef.current = true;
+    const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
+    setInitialSpaceOnLoad(spacesCancellableRequest);
     return function cleanup() {
       mountedRef.current = false;
 
@@ -284,7 +280,7 @@ function DocumentSpacePage() {
 
       documentSpaceService.resetState();
       documentSpacePrivilegesService.resetState();
-    };
+    };   
   }, []);
 
   useEffect(() => {
@@ -374,19 +370,23 @@ function DocumentSpacePage() {
   }
 
   async function setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
+    
+    // make sure this is unwrapped from any proxy-ish wrappers (esp when this is called during space deletion)
+    const docSpace = Object.assign({}, documentSpace);
+    
     try {
       // Don't need to load privileges if current user is Dashboard Admin,
       // since they currently have access to everything Document Space related
       if (!isAdmin) {
-        await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
+        await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(docSpace.id).promise;
       }
-      const favorites: DocumentSpaceUserCollectionResponseDto[] = (await documentSpaceService.getFavorites(documentSpace.id)).data.data;
+      const favorites: DocumentSpaceUserCollectionResponseDto[] = (await documentSpaceService.getFavorites(docSpace.id)).data.data;
 
       mergePageState({
-        selectedSpace: documentSpace,
+        selectedSpace: docSpace,
         shouldUpdateDatasource: true,
         datasource: documentSpaceService.createDatasource(
-          documentSpace.id,
+          docSpace.id,
           path,
           infiniteScrollOptions
         ),
@@ -397,8 +397,13 @@ function DocumentSpacePage() {
 
       const queryParams = new URLSearchParams(location.search);
       if (queryParams.get(spaceIdQueryKey) == null) {
-        queryParams.set(spaceIdQueryKey, documentSpace.id);
+        queryParams.set(spaceIdQueryKey, docSpace.id);
         history.replace({ search: queryParams.toString() });
+      }
+      else if (queryParams.get(spaceIdQueryKey) !== docSpace.id) {
+        queryParams.set(spaceIdQueryKey, docSpace.id);
+        queryParams.delete(pathQueryKey);
+        history.push({search: queryParams.toString()});
       }
     }
     catch (err) {
@@ -512,6 +517,17 @@ function DocumentSpacePage() {
       history.push({ search: queryParams.toString() });
     } catch (error) {
       setPageStateOnException(error as string);
+    }
+  }
+
+  async function deleteDocumentSpace(space: DocumentSpaceResponseDto | undefined) {
+    if (space) {
+      performActionWhenMounted(mountedRef.current, () => {
+          globalDocumentSpaceService.setCurrentDocumentSpace(space);
+          setStateOnDocumentSpaceAndPathChange(space, '');
+      });
+    } else {
+      pageState.selectedSpace.set(undefined);
     }
   }
 
@@ -687,33 +703,40 @@ function DocumentSpacePage() {
           </div>
         </div>
       </FormGroup>
-      <div className="breadcrumb-area">
-        <BreadCrumbTrail
-          path={pageState.get().path}
-          onNavigate={(newPath) => {
-            const queryParams = new URLSearchParams(location.search);
-            queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
-            if (newPath !== '') {
-              queryParams.set(pathQueryKey, newPath);
-            } else {
-              queryParams.delete(pathQueryKey);
-            }
-            history.push({ search: queryParams.toString() });
-          }}
-        />
-        <DocumentSpaceActions
-          show={pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
-          isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
-          selectedSpace={pageState.selectedSpace}
-          path={pageState.nested('path')}
-          shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-          createEditElementOpType={pageState.createEditElementOpType}
-          membershipsState={pageState.membershipsState}
-          selectedFiles={pageState.selectedFiles}
-          showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
-          className="content-controls"
-        />
-      </div>
+      {pageState.selectedSpace.value != null &&
+        pageState.datasource.value &&
+        documentSpacePrivilegesService.isAuthorizedForAction(
+          pageState.selectedSpace.value.id,
+          DocumentSpacePrivilegeDtoTypeEnum.Read
+        ) && (
+          <div className="breadcrumb-area">
+            <BreadCrumbTrail
+              path={pageState.get().path}
+              onNavigate={(newPath) => {
+                const queryParams = new URLSearchParams(location.search);
+                queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+                if (newPath !== '') {
+                  queryParams.set(pathQueryKey, newPath);
+                } else {
+                  queryParams.delete(pathQueryKey);
+                }
+                history.push({ search: queryParams.toString() });
+              }}
+            />
+            <DocumentSpaceActions
+              show={pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
+              isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
+              selectedSpace={pageState.selectedSpace}
+              path={pageState.nested('path')}
+              shouldUpdateDatasource={pageState.shouldUpdateDatasource}
+              createEditElementOpType={pageState.createEditElementOpType}
+              membershipsState={pageState.membershipsState}
+              selectedFiles={pageState.selectedFiles}
+              showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
+              className="content-controls"
+            />
+        </div>
+      )}
       {pageState.selectedSpace.value != null &&
         pageState.datasource.value &&
         documentSpacePrivilegesService.isAuthorizedForAction(
@@ -787,7 +810,7 @@ function DocumentSpacePage() {
         title="My Settings"
         isOpen={pageState.isDefaultDocumentSpaceSettingsOpen.get()}
         onCloseHandler={closeMySettingsDrawer}
-        size={SideDrawerSize.WIDE}
+        size={pageState.sideDrawerSize.get()}
         titleStyle={{ color: '#5F96EA', marginTop: -2 }}
         preTitleNode={
           <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>
@@ -800,8 +823,9 @@ function DocumentSpacePage() {
           onSubmit={submitDefaultDocumentSpace}
           isFormSubmitting={pageState.isSubmitting.get()}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaceService.documentSpaces}
+          documentSpaces={documentSpaceService.documentSpacesState}
           authorizedUserService={authorizedUserService}
+          onDocumentSpaceDeleted={deleteDocumentSpace}
         />
       </SideDrawer>
 
