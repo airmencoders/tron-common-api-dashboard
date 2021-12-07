@@ -11,6 +11,7 @@ import PageFormat from '../../../components/PageFormat/PageFormat';
 import {ToastType} from '../../../components/Toast/ToastUtils/toast-type';
 import {createTextToast} from '../../../components/Toast/ToastUtils/ToastUtils';
 import {
+  DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
@@ -18,6 +19,7 @@ import {
 import {useAuthorizedUserState} from '../../../state/authorized-user/authorized-user-state';
 import {
   useDocumentSpaceGlobalState,
+  documentSpaceDownloadUrlService,
   useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../state/document-space/document-space-state';
@@ -25,7 +27,6 @@ import {PrivilegeType} from '../../../state/privilege/privilege-type';
 import '../DocumentSpacePage.scss';
 import {format} from 'date-fns';
 import {CancellableDataRequest} from '../../../utils/cancellable-data-request';
-import DeleteDocumentDialog from '../DocumentDelete';
 import Spinner from '../../../components/Spinner/Spinner';
 import FavoritesCellRenderer from './FavoritesCellRenderer';
 import CircleMinusIcon from '../../../icons/CircleMinusIcon';
@@ -35,7 +36,9 @@ import StarHollowIcon from "../../../icons/StarHollowIcon";
 import {prepareRequestError} from "../../../utils/ErrorHandling/error-handling-utils";
 import DocumentSpaceSelector, {spaceIdQueryKey} from "../DocumentSpaceSelector";
 import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import DownloadMaterialIcon from "../../../icons/DownloadMaterialIcon";
 import { performActionWhenMounted } from '../../../utils/component-utils';
+import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
 
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -62,6 +65,8 @@ function DocumentSpaceFavoritesPage() {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const authorizedUserService = useAuthorizedUserState();
   const globalDocumentSpaceService = useDocumentSpaceGlobalState();
+  const downloadUrlService = documentSpaceDownloadUrlService();
+
   const history = useHistory();
   const location = useLocation();
 
@@ -117,10 +122,11 @@ function DocumentSpaceFavoritesPage() {
       });
     }
     catch (err) {
-      const preparedError = prepareRequestError(err);
       if (!mountedRef.current) {
         return;
       }
+
+      const preparedError = prepareRequestError(err);
       if (preparedError.status === 403) {
         createTextToast(ToastType.ERROR, 'Not authorized for the selected Document Space');
       } else {
@@ -172,7 +178,7 @@ function DocumentSpaceFavoritesPage() {
       }
 
       const selectedSpace = globalDocumentSpaceService.getInitialSelectedDocumentSpace(spaces, authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
-      
+
       performActionWhenMounted(mountedRef.current, () => {
         if (selectedSpace != null) {
           setStateOnDocumentSpace(selectedSpace);
@@ -195,34 +201,6 @@ function DocumentSpaceFavoritesPage() {
       documentSpacePrivilegesService.resetState();
     };
   }, []);
-
-  useEffect(() => {
-    let privilegesCancellableRequest: CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>;
-
-    async function loadPrivileges() {
-      // Load privileges for the selected document space
-      if (!isAdmin && pageState.selectedDocumentSpace.value) {
-        privilegesCancellableRequest = documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(pageState.selectedDocumentSpace.value.id);
-
-        try {
-          await privilegesCancellableRequest.promise;
-
-        } catch (err) {
-          if (mountedRef.current) {
-            createTextToast(ToastType.WARNING, 'Could not load Document Space privileges. Actions will be limited');
-          }
-        }
-      }
-    }
-
-    loadPrivileges();
-
-    return function cleanup() {
-      if (privilegesCancellableRequest != null) {
-        privilegesCancellableRequest.cancelTokenSource.cancel();
-      }
-    };
-  }, [pageState.selectedDocumentSpace.value]);
 
   async function deleteArchiveFile() {
     const file = pageState.selectedFile.value;
@@ -288,7 +266,6 @@ function DocumentSpaceFavoritesPage() {
         headerName: 'Name',
         resizable: true,
         cellRenderer: FavoritesCellRenderer,
-        checkboxSelection: true,
         cellRendererParams: {
           onClick: getFolderPath
         }
@@ -308,6 +285,32 @@ function DocumentSpaceFavoritesPage() {
         cellRenderer: DocumentRowActionCellRenderer,
         cellRendererParams: {
           menuItems: [
+            { title: 'Download',
+              icon: DownloadMaterialIcon,
+              iconProps: {
+                style: 'primary',
+                fill: true
+              },
+              shouldShow: (doc: DocumentSpaceUserCollectionResponseDto) => doc != null,
+              onClick: async (data: DocumentSpaceUserCollectionResponseDto) => {
+                const responsePath  = await documentSpaceService.getDocumentSpaceEntryPath(data.documentSpaceId, data.parentId!)
+
+                  if(data.folder){
+                    const doc: DocumentDto = {
+                      lastModifiedBy: "", lastModifiedDate: "",
+                      path: responsePath,
+                      size: 0,
+                      spaceId: data.documentSpaceId,
+                      key:data.key
+                    }
+                    window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(data.documentSpaceId, responsePath, [doc])
+                  }else{
+                    window.location.href = downloadUrlService.createRelativeDownloadFileUrl(data.documentSpaceId, responsePath, data.key, true)
+                  }
+
+              },
+              isAuthorized: () => true
+            },
             { title: 'Remove from favorites',
               icon: StarHollowIcon,
               onClick: (data: DocumentSpaceUserCollectionResponseDto) => {
@@ -357,8 +360,8 @@ function DocumentSpaceFavoritesPage() {
               maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
               maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
               suppressCellSelection
+              suppressRowClickSelection
               getRowNodeId={getDocumentUniqueKey}
-              rowSelection="single"
               updateInfiniteCache={pageState.shouldUpdateInfiniteCache.value}
               updateInfiniteCacheCallback={shouldUpdateInfiniteCacheCallback}
               updateDatasource={pageState.shouldUpdateDatasource.value}
@@ -366,11 +369,11 @@ function DocumentSpaceFavoritesPage() {
             />
           }
 
-          <DeleteDocumentDialog
+          <ArchiveDialog
             show={pageState.showDeleteDialog.get()}
             onCancel={() => pageState.showDeleteDialog.set(false)}
             onSubmit={deleteArchiveFile}
-            file={pageState.selectedFile.value?.key ?? null}
+            items={pageState.selectedFile.value}
           />
         </>
       }
