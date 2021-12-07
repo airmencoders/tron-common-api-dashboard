@@ -116,7 +116,8 @@ describe('Test Document Space Page', () => {
     );
 
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalledTimes(1));
-
+    await waitFor(() => expect(page.getByLabelText('Spaces')).toBeInTheDocument());
+    
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeDisabled();
     expect(documentSpacesSelect).toHaveValue('error');
