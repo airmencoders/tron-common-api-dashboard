@@ -1,0 +1,65 @@
+.my-settings-header {
+  width: calc(100%-48px);
+  display: flex;
+  color: #515B68;
+  border-bottom: 1px solid #E5E5E5;
+  padding-bottom: 6px;
+  margin-left: 32px;
+  margin-right: 16px;
+
+  &-col {
+    flex: 1;
+    font-size: 12px;
+  }
+
+  &-col-centered {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    font-size: 12px;
+  }
+}
+
+.my-settings-body {
+  width: calc(100%-48px);
+  margin-left: 32px;
+  margin-right: 16px;
+
+  &-row {
+    display: flex;
+    border-bottom: 1px solid #E5E5E5;
+    padding-bottom: 10px;
+    padding-top: 10px;
+  }
+
+  &-cell {
+    flex: 1;
+    color: #1B1C22;
+    font-weight: 400;
+    font-size: 14px;
+
+    &-pointer {
+      flex: 1;
+      cursor: 'pointer';
+    }
+
+    &-remove {
+      flex: 1;
+      align-items: center;
+      margin-top: 0px;
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
+
+.remove-button {
+  margin-top: 0px !important;
+}
+
+.my-settings-submit-section {
+  position: absolute;
+  bottom: 47px;
+  right: 24px;
+}
+

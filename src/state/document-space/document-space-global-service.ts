@@ -26,6 +26,11 @@ export default class DocumentSpaceGlobalService extends AbstractGlobalStateServi
   getInitialSelectedDocumentSpace(spaces: DocumentSpaceResponseDto[], defaultDocumentSpaceId?: string): DocumentSpaceResponseDto | undefined {
     let selectedSpace: DocumentSpaceResponseDto | undefined = this.state.currentDocumentSpace.value;
 
+    // guard for if selected space is deleted, force to pick another
+    if (spaces && spaces.findIndex(space => space.id === selectedSpace?.id) === -1) {
+      selectedSpace = undefined;
+    }
+
     if (selectedSpace == null && spaces.length > 0) {
       const defaultDocumentSpace = defaultDocumentSpaceId == null ? undefined : spaces.find(space => space.id === defaultDocumentSpaceId);
 
