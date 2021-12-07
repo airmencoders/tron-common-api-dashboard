@@ -15,7 +15,7 @@ import {
 } from '../../state/document-space/document-space-state';
 import './DeleteDocumentSpaceDialog.scss';
 
-interface DeleteDocumentSpaceDialog {
+interface DeleteDocumentSpaceDialogProps {
   show: boolean;
   docSpaceId: string;
   docSpaceName: string;
@@ -28,7 +28,7 @@ interface DialogState {
   isDeleting: boolean;
 }
 
-export default function DeleteDocumentSpaceDialog(props: DeleteDocumentSpaceDialog) {
+export default function DeleteDocumentSpaceDialog(props: DeleteDocumentSpaceDialogProps) {
   const dialogState = useHookstate<DialogState>({ textFieldContents: '', isDeleting: false });
   const documentSpaceService = useDocumentSpaceState();
   const globalDocumentService = useDocumentSpaceGlobalState();
