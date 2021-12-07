@@ -107,7 +107,7 @@ function DocumentSpacePage() {
     path: '',
     showDeleteSelectedDialog: false,
     isDefaultDocumentSpaceSettingsOpen: false,
-    sideDrawerSize: SideDrawerSize.WIDE,
+    sideDrawerSize: SideDrawerSize.NORMAL,
     favorites: []
   });
 
@@ -810,7 +810,7 @@ function DocumentSpacePage() {
         title="My Settings"
         isOpen={pageState.isDefaultDocumentSpaceSettingsOpen.get()}
         onCloseHandler={closeMySettingsDrawer}
-        size={SideDrawerSize.WIDE}
+        size={pageState.sideDrawerSize.get()}
         titleStyle={{ color: '#5F96EA', marginTop: -2 }}
         preTitleNode={
           <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>

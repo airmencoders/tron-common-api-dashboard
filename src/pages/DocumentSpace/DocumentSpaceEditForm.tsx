@@ -52,7 +52,7 @@ export default function DocumentSpaceEditForm(props: DocumentSpaceEditFormProps)
   };
 
   return (
-    <Form onSubmit={submitForm}>
+    <Form onSubmit={submitForm} style={{ minWidth: '100%'}}>
       <FormGroup
         labelName="new-document-space"
         labelText="Document Space Details"

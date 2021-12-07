@@ -71,7 +71,7 @@ export default function DocumentSpaceCreateEditForm(props: DocumentSpaceCreateEd
   }
 
   return (
-    <Form onSubmit={submitForm}>
+    <Form onSubmit={submitForm} style={{ minWidth: '100%'}}>
       <FormGroup
         labelName="element-name"
         labelText={resolveLabelText()}

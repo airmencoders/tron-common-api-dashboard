@@ -61,7 +61,7 @@ export default function DocumentSpaceMySettingsForm(props: DocumentSpaceMySettin
     pageState.selectedDefaultSpaceId.set(id);
   }
   return (
-    <Form onSubmit={submitForm}>
+    <Form onSubmit={submitForm} style={{ minWidth: '100%' }}>
       <div id="my-settings-header" className="my-settings-header">
         <div className="my-settings-header-col">DOCUMENT SPACES</div>
         <div className="my-settings-header-col">SET AS DEFAULT SPACE</div>
