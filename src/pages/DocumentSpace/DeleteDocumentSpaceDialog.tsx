@@ -15,7 +15,7 @@ import {
 } from '../../state/document-space/document-space-state';
 import './DeleteDocumentSpaceDialog.scss';
 
-interface DeleteDocumentSpaceDialogProps {
+export interface DeleteDocumentSpaceDialogProps {
   show: boolean;
   docSpaceId: string;
   docSpaceName: string;
