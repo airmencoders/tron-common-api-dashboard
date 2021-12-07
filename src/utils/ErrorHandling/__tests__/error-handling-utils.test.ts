@@ -1,16 +1,16 @@
 import { createGenericAxiosRequestErrorResponse } from '../../TestUtils/test-utils';
 import { prepareRequestError } from '../error-handling-utils';
-import { RequestError } from '../request-error';
+import RequestError from '../request-error';
 
 describe('User Info Service Tests', () => {
   it('should prepare response error', () => {
     const responseError = createGenericAxiosRequestErrorResponse();
 
-    const requestError = {
+    const requestError = new RequestError({
       status: responseError.response.data.status,
       error: responseError.response.data.error,
       message: responseError.response.data.reason
-    } as RequestError;
+    });
 
     const requestErrorToTest = prepareRequestError(responseError);
 
@@ -24,9 +24,9 @@ describe('User Info Service Tests', () => {
       }
     };
 
-    const requestError = {
+    const requestError = new RequestError({
       message: 'Error contacting server. Try again later.'
-    } as RequestError;
+    })
 
     const requestErrorToTest = prepareRequestError(dataRequestError);
 
@@ -36,9 +36,9 @@ describe('User Info Service Tests', () => {
   it('should prepare unknown error', () => {
     const dataRequestError = new Error('Failed');
 
-    const requestError = {
+    const requestError = new RequestError({
       message: 'Failed'
-    } as RequestError;
+    });
 
     const requestErrorToTest = prepareRequestError(dataRequestError);
 
@@ -48,9 +48,9 @@ describe('User Info Service Tests', () => {
   it('should prepare unknown object', () => {
     const dataRequestError = {};
 
-    const requestError = {
+    const requestError = new RequestError({
       message: 'Unknown error occurred.'
-    } as RequestError;
+    });
 
     const requestErrorToTest = prepareRequestError(dataRequestError);
 

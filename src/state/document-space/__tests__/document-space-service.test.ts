@@ -19,7 +19,7 @@ import {
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
 import {prepareRequestError} from '../../../utils/ErrorHandling/error-handling-utils';
-import {RequestError} from '../../../utils/ErrorHandling/request-error';
+import RequestError from '../../../utils/ErrorHandling/request-error';
 import {
   createAxiosNoContentResponse,
   createAxiosSuccessResponse,
@@ -277,11 +277,11 @@ describe('Test Document Space Service', () => {
     const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getSpaces');
 
     const cancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-    await expect(cancellableRequest.promise).rejects.toEqual({
+    await expect(cancellableRequest.promise).rejects.toEqual(new RequestError({
       status: errorResponse.response.data.status,
       error: errorResponse.response.data.error,
       message: errorResponse.response.data.reason,
-    } as RequestError);
+    }));
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
 

@@ -48,21 +48,21 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
         return privilegeRecord;
       });
 
-      const dataRequest = {
-        promise: privileges,
-        cancelTokenSource: cancellableRequest.cancelTokenSource
-      };
-  
-      this.documentSpacePrivilegeState.batch(state => {
-        if (state.promised) {
-          return postpone;
-        }
-  
-        this.fetchDashboardUserPrivilegesRequest = dataRequest;
-        state.set(privileges);
-      });
-  
-      return dataRequest;
+    const dataRequest = {
+      promise: privileges,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
+
+    this.documentSpacePrivilegeState.batch(state => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      this.fetchDashboardUserPrivilegesRequest = dataRequest;
+      state.set(privileges);
+    });
+
+    return dataRequest;
   }
 
   /**
