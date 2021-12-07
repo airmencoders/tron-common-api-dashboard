@@ -89,7 +89,7 @@ describe('Test Document Space Page', () => {
     jest.resetAllMocks();
   });
 
-  it('should show loading select when first retrieving Document Spaces', () => {
+  it('should show loading select when first retrieving Document Spaces', async () => {
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
 
     const page = render(
@@ -98,6 +98,7 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
+    await waitFor(() => expect(page.getByLabelText('Spaces')).toBeInTheDocument());
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeDisabled();
     expect(documentSpacesSelect).toHaveValue('loading');
