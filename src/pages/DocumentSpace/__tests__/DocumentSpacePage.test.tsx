@@ -66,8 +66,6 @@ describe('Test Document Space Page', () => {
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
 
-  let fetchSpacesSpy: jest.SpyInstance<CancellableDataRequest<DocumentSpaceResponseDto[]>, []>;
-
   beforeEach(() => {
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
     dashboardUserApi = new DashboardUserControllerApi();
@@ -134,11 +132,11 @@ describe('Test Document Space Page', () => {
     (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
     (useDocumentSpacePageState as jest.Mock).mockReturnValue(documentSpacePageService);
 
-    mockSuccessfulPageLoad();
+    setupDefaultMocks();
   });
 
-
-  function mockSuccessfulPageLoad() {
+  let fetchSpacesSpy: jest.SpyInstance<CancellableDataRequest<DocumentSpaceResponseDto[]>, []>;
+  function setupDefaultMocks() {
     fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
@@ -219,21 +217,13 @@ describe('Test Document Space Page', () => {
   });
 
   it('should allow to change space', async () => {
-    const fetchDataSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockImplementation(() => {
-      return {
-        promise: Promise.resolve(documentSpaces),
-        cancelTokenSource: axios.CancelToken.source()
-      }
-    });
-    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
-
     const page = render(
       <MemoryRouter>
         <DocumentSpacePage />
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(fetchDataSpy).toHaveBeenCalled());
+    await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
 
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeEnabled();
@@ -244,14 +234,6 @@ describe('Test Document Space Page', () => {
   });
 
   it('should open/close Document Space Memberships side drawer', async () => {
-    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
-    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
-      promise: Promise.resolve(documentSpaces),
-      cancelTokenSource: axios.CancelToken.source()
-    });
     const getPrivilegesSpy = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacePrivileges').mockReturnValue({
       promise: Promise.resolve({
         'id': {
@@ -261,9 +243,7 @@ describe('Test Document Space Page', () => {
         }
       }),
       cancelTokenSource: axios.CancelToken.source()
-    });
-    jest.spyOn(documentSpacePrivilegeService, 'isPromised', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
+    });    
 
     const page = render(
       <MemoryRouter>
@@ -271,11 +251,13 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
+    await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
+    
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeEnabled();
     userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
 
-    await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalled());
 
     await waitFor(()=>expect(page.getByTitle('Manage Users')).toBeInTheDocument())
 
@@ -294,13 +276,13 @@ describe('Test Document Space Page', () => {
 
   describe('Test error behaviors for document space privilege retrieval', () => {
     it('should show error toast when failed to retrieve document space privileges', async () => {
-      const privilegePromise = Promise.reject(createGenericAxiosRequestErrorResponse(404));
-      const getPrivilegesSpy = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacePrivileges')
-        .mockReturnValue({
-          promise: privilegePromise,
-          cancelTokenSource: axios.CancelToken.source()
-        });
-
+      jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+      fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
+        promise: Promise.resolve(documentSpaces),
+        cancelTokenSource: axios.CancelToken.source()
+      });
+      const getPrivilegesSpy = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace').mockReturnValue(Promise.reject(createGenericAxiosRequestErrorResponse(404)));
+  
       const page = render(
         <MemoryRouter>
           <DocumentSpacePage />
@@ -313,13 +295,12 @@ describe('Test Document Space Page', () => {
           />
         </MemoryRouter>
       );
-
-      // await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
+  
+      await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalled());
-      await expect(privilegePromise).rejects.toBeDefined();
       const toasts = await page.findAllByText('Could not load privileges for the selected Document Space');
       expect(toasts.length).toBeGreaterThanOrEqual(1);
-
+  
       // No actions should be available, and no grid
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
       expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
@@ -329,15 +310,15 @@ describe('Test Document Space Page', () => {
       // find by a column header in grid
       expect(page.queryByText('Name')).not.toBeInTheDocument();
     });
-
+  
     it('should show error toast when not authorized to a space', async () => {
-      const privilegePromise = Promise.reject(createGenericAxiosRequestErrorResponse(403));
-      const getPrivilegesSpy = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacePrivileges')
-        .mockReturnValue({
-          promise: privilegePromise,
-          cancelTokenSource: axios.CancelToken.source()
-        });
-
+      jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
+      fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
+        promise: Promise.resolve(documentSpaces),
+        cancelTokenSource: axios.CancelToken.source()
+      });
+      const getPrivilegesSpy = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace').mockReturnValue(Promise.reject(createGenericAxiosRequestErrorResponse(403)));
+  
       const page = render(
         <MemoryRouter>
           <DocumentSpacePage />
@@ -350,13 +331,12 @@ describe('Test Document Space Page', () => {
           />
         </MemoryRouter>
       );
-
-      // await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
+  
+      await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
       await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalled());
-      await expect(privilegePromise).rejects.toBeDefined();
       const toasts = await page.findAllByText('Not authorized for the selected Document Space');
       expect(toasts.length).toBeGreaterThanOrEqual(1);
-
+  
       // No actions should be available, and no grid
       expect(page.queryByText('Add New Space')).not.toBeInTheDocument();
       expect(page.queryByTitle('Download Items')).not.toBeInTheDocument();
@@ -367,20 +347,8 @@ describe('Test Document Space Page', () => {
       expect(page.queryByText('Name')).not.toBeInTheDocument();
     });
   });
-
-
+  
   describe('Test conditional actions based on document space privilege', () => {
-    beforeEach(() => {
-      jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
-      jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
-      jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
-      jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
-      jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockReturnValue({
-        promise: Promise.resolve(documentSpaces),
-        cancelTokenSource: axios.CancelToken.source()
-      });
-    });
-
     it('should show Add New Space button with DASHBOARD_ADMIN privilege', () => {
       jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
 
@@ -409,17 +377,6 @@ describe('Test Document Space Page', () => {
   });
 
   it('should update the url when navigating to another space', async () => {
-    jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
-    jest.spyOn(documentSpaceService, 'documentSpaces', 'get').mockReturnValue(documentSpaces);
-    jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces').mockImplementation(() => {
-      return {
-        promise: Promise.resolve(documentSpaces),
-        cancelTokenSource: axios.CancelToken.source()
-      }
-    });
-
     let testHistory: any;
     let testLocation: any;
     const page = render(
@@ -435,6 +392,9 @@ describe('Test Document Space Page', () => {
         />
       </MemoryRouter>
     );
+
+    await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
+
     const documentSpacesSelect = page.getByLabelText('Spaces');
     expect(documentSpacesSelect).toBeEnabled();
     await waitFor(() => expect(page.queryAllByText(documentSpaces[0].name)).toBeTruthy())

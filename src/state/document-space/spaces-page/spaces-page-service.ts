@@ -80,7 +80,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     return queryParams;
   }
 
-  async loadDocSpaceFromLocation(currentUrlSearchParams: string) {
+  loadDocSpaceFromLocation(currentUrlSearchParams: string) {
     const queryParams = new URLSearchParams(currentUrlSearchParams);
     const documentSpaces = this.documentSpaceService.documentSpaces;
 
@@ -94,11 +94,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       const path = queryParams.get(pathQueryKey) ?? '';
       if (selectedDocumentSpace.id !== this.spacesState.get().selectedSpace?.id ||
         path !== this.spacesState.get().path) {
-          try {
-            await this.setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path, currentUrlSearchParams);
-          } catch (err) {
-            
-          }
+        this.setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path, currentUrlSearchParams);
       }
     }
   }
