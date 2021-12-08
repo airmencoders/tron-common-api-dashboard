@@ -1,4 +1,4 @@
-import { none, useHookstate } from '@hookstate/core';
+import { useHookstate } from '@hookstate/core';
 import Form from '../../components/forms/Form/Form';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import Modal from '../../components/Modal/Modal';
@@ -8,9 +8,7 @@ import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import RemoveIcon from '../../icons/RemoveIcon';
 import { DocumentSpaceResponseDto } from '../../openapi';
-import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import {
-  useDocumentSpaceGlobalState,
   useDocumentSpaceState
 } from '../../state/document-space/document-space-state';
 import './DeleteDocumentSpaceDialog.scss';
@@ -20,7 +18,7 @@ export interface DeleteDocumentSpaceDialogProps {
   docSpaceId: string;
   docSpaceName: string;
   onClose: () => void;
-  onDocumentSpaceDeleted: (space: DocumentSpaceResponseDto | undefined) => void;
+  onDocumentSpaceDeleted: () => void;
 }
 
 interface DialogState {
@@ -31,27 +29,13 @@ interface DialogState {
 export default function DeleteDocumentSpaceDialog(props: DeleteDocumentSpaceDialogProps) {
   const dialogState = useHookstate<DialogState>({ textFieldContents: '', isDeleting: false });
   const documentSpaceService = useDocumentSpaceState();
-  const globalDocumentService = useDocumentSpaceGlobalState();
-  const authorizedUserService = useAuthorizedUserState();
 
   async function deleteSpace() {    
     try {
-
-      // remove the space to be delete from the service state
-      const index = documentSpaceService.documentSpacesState.get().findIndex((item) => item.id === props.docSpaceId);
-      if (index >= 0) documentSpaceService.documentSpacesState[index].set(none);
-
       // delete it from the backend
       await documentSpaceService.deleteDocumentSpace(props.docSpaceId);
 
-      // tell the global doc space service to pick the next appropriate space
-      const nextDocSpace = globalDocumentService.getInitialSelectedDocumentSpace(
-        documentSpaceService.documentSpacesState.get(),
-        authorizedUserService.authorizedUser?.defaultDocumentSpaceId
-      );
-
-      props.onDocumentSpaceDeleted && props.onDocumentSpaceDeleted(nextDocSpace);
-
+      props.onDocumentSpaceDeleted && props.onDocumentSpaceDeleted();
     } catch (error) {
       createTextToast(ToastType.ERROR, (error as Error).message);
     }

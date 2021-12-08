@@ -49,7 +49,9 @@ import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 function DocumentSpacePage() {
   const location = useLocation();
   const history = useHistory();
+
   const mountedRef = useRef(false);
+
   const pageService = useDocumentSpacePageState(mountedRef);
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
@@ -174,13 +176,17 @@ function DocumentSpacePage() {
     })
   ]);
 
-  async function init() {
+  async function fetchSpaces() {
     try {
       await pageService.loadDocumentSpaces();
     } catch (err) {
       createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
       return;
     }
+  }
+
+  async function loadSpaceOnInit() {
+    await fetchSpaces();
 
     // Check if navigating to an existing document space first
     if (pageService.locationIncludesDocumentSpace(location.search)) {
@@ -191,11 +197,17 @@ function DocumentSpacePage() {
     loadDefaultSpace();
   }
 
+  async function loadSpaceOnDeletion() {
+    await fetchSpaces();
+    loadDefaultSpace();
+  }
+
   function loadDefaultSpace() {
     // Load in a default space if no existing
     const selectedSpace = pageService.getInitialDocumentSpace();
 
     if (selectedSpace == null) {
+      pageService.spacesState.selectedSpace.set(undefined);
       createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
       return;
     }
@@ -207,7 +219,7 @@ function DocumentSpacePage() {
   useEffect(() => {
     mountedRef.current = true;
 
-    init();
+    loadSpaceOnInit();
 
     return function cleanup() {
       mountedRef.current = false;
@@ -447,7 +459,7 @@ function DocumentSpacePage() {
           formActionType={FormActionType.SAVE}
           documentSpaces={documentSpaceService.documentSpacesState}
           authorizedUserService={authorizedUserService}
-          onDocumentSpaceDeleted={() => {init();}}
+          onDocumentSpaceDeleted={loadSpaceOnDeletion}
         />
       </SideDrawer>
 

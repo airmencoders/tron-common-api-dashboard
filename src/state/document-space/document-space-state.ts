@@ -11,9 +11,9 @@ import DocumentSpaceDownloadUrlService from './document-space-download-url-servi
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../authorized-user/authorized-user-service';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from './document-space-global-service';
-import { SpacesPageState } from './spaces-page/spaces-page-state';
 import { CreateEditOperationType } from './document-space-utils';
 import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
+import { SpacesPageState } from './spaces-page/spaces-page-state';
 import SpacesPageService from './spaces-page/spaces-page-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());

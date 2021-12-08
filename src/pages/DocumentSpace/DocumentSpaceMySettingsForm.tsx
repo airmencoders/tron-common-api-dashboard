@@ -22,7 +22,7 @@ export interface DocumentSpaceMySettingsFormProps {
   formActionType: FormActionType;
   documentSpaces: State<DocumentSpaceResponseDto[]>;
   authorizedUserService: AuthorizedUserService;
-  onDocumentSpaceDeleted: (space: DocumentSpaceResponseDto | undefined) => void;
+  onDocumentSpaceDeleted: () => void;
 }
 
 interface DocumentSpaceMySettingsState {

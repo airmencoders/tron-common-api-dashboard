@@ -1,4 +1,4 @@
-import { postpone, State } from '@hookstate/core';
+import { Downgraded, postpone, State } from '@hookstate/core';
 import { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
@@ -219,12 +219,13 @@ export default class DocumentSpaceService {
       cancelTokenSource: cancellableRequest.cancelTokenSource,
     };
 
+    this.fetchSpacesRequest = dataRequest;
+
     this.documentSpacesState.batch((state) => {
       if (state.promised) {
         return postpone;
       }
 
-      this.fetchSpacesRequest = dataRequest;
       state.set(spacesRequest);
     });
 
@@ -369,7 +370,7 @@ export default class DocumentSpaceService {
       return [];
     }
 
-    return this.documentSpacesState.value;
+    return this.documentSpacesState.attach(Downgraded).value;
   }
 
   resetState(): void {

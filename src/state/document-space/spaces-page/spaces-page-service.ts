@@ -94,12 +94,12 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       const path = queryParams.get(pathQueryKey) ?? '';
       if (selectedDocumentSpace.id !== this.spacesState.get().selectedSpace?.id ||
         path !== this.spacesState.get().path) {
-        this.setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path, currentUrlSearchParams);
+        this.setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
       }
     }
   }
 
-  async setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string, currentUrlSearchParams: string) {
+  async setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
     try {
       // Don't need to load privileges if current user is Dashboard Admin,
       // since they currently have access to everything Document Space related
