@@ -688,7 +688,7 @@ function DocumentSpacePage() {
               </Button>
             )}
 
-            {documentSpaceService.documentSpaces.length && (
+            {documentSpaceService.documentSpaces.length > 0 && (
               <Button
                   className="document-space-page__space-user-settings"
                   data-testid="doc-space-my-settings__btn"
