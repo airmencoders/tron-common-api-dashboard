@@ -225,8 +225,6 @@ function DocumentSpacePage() {
       mountedRef.current = false;
 
       pageService.resetState();
-      documentSpaceService.resetState();
-      documentSpacePrivilegesService.resetState();
     };   
   }, []);
 

@@ -138,7 +138,6 @@ export const useDocumentSpaceRecentsPageState = (mountedRef: MutableRefObject<bo
 const wrapDocumentSpacePageState = (
   spacesServiceState: State<SpacesPageState>,
   mountedRef: MutableRefObject<boolean>,
-  documentSpaceApi: DocumentSpaceControllerApiInterface,
   authorizedUserService: AuthorizedUserService,
   documentSpaceGlobalService: DocumentSpaceGlobalService,
   documentSpaceService: DocumentSpaceService,
@@ -146,7 +145,6 @@ const wrapDocumentSpacePageState = (
   return new SpacesPageService(
     spacesServiceState,
     mountedRef,
-    documentSpaceApi,
     authorizedUserService,
     documentSpaceGlobalService,
     documentSpaceService,
@@ -156,7 +154,6 @@ const wrapDocumentSpacePageState = (
 export const useDocumentSpacePageState = (mountedRef: MutableRefObject<boolean>) => wrapDocumentSpacePageState(
   useState(spacesPageState),
   mountedRef,
-  documentSpaceControllerApi,
   accessAuthorizedUserState(),
   accessDocumentSpaceGlobalState(),
   accessDocumentSpaceState(),

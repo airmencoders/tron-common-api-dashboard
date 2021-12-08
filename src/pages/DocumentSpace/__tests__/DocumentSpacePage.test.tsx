@@ -28,7 +28,6 @@ import { MutableRefObject } from 'react';
 import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
-import { PrivilegeType } from '../../../state/privilege/privilege-type';
 
 jest.mock('../../../state/document-space/document-space-state');
 jest.mock('../../../state/authorized-user/authorized-user-state');
@@ -119,7 +118,6 @@ describe('Test Document Space Page', () => {
     documentSpacePageService = new SpacesPageService(
       documentSpacePageState,
       mountedRef,
-      documentSpaceApi,
       authorizedUserService,
       globalDocumentSpaceService,
       documentSpaceService,

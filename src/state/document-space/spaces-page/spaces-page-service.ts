@@ -30,7 +30,6 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   constructor(
     public spacesState: State<SpacesPageState>,
     private mountedRef: MutableRefObject<boolean>,
-    private documentSpaceApi: DocumentSpaceControllerApiInterface,
     private authorizedUserService: AuthorizedUserService,
     private documentSpaceGlobalService: DocumentSpaceGlobalService,
     private documentSpaceService: DocumentSpaceService,
