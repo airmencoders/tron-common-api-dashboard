@@ -28,6 +28,7 @@ import { MutableRefObject } from 'react';
 import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
 
 jest.mock('../../../state/document-space/document-space-state');
 jest.mock('../../../state/authorized-user/authorized-user-state');
@@ -283,7 +284,9 @@ describe('Test Document Space Page', () => {
         promise: Promise.resolve(documentSpaces),
         cancelTokenSource: axios.CancelToken.source()
       });
-      const getPrivilegesSpy = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace').mockReturnValue(Promise.reject(createGenericAxiosRequestErrorResponse(404)));
+      jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
+      const getPrivilegesSpy = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace')
+        .mockReturnValue(new Promise((resolve, reject) => setTimeout(() => reject(createGenericAxiosRequestErrorResponse(404)), 10)));
   
       const page = render(
         <MemoryRouter>
@@ -319,7 +322,9 @@ describe('Test Document Space Page', () => {
         promise: Promise.resolve(documentSpaces),
         cancelTokenSource: axios.CancelToken.source()
       });
-      const getPrivilegesSpy = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace').mockReturnValue(Promise.reject(createGenericAxiosRequestErrorResponse(403)));
+      jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
+      const getPrivilegesSpy = jest.spyOn(documentSpaceApi, 'getSelfDashboardUserPrivilegesForDocumentSpace')
+        .mockReturnValue(new Promise((resolve, reject) => setTimeout(() => reject(createGenericAxiosRequestErrorResponse(403)), 10)));
   
       const page = render(
         <MemoryRouter>

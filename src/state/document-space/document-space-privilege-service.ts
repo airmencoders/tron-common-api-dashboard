@@ -60,13 +60,14 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
       promise: privileges,
       cancelTokenSource: cancellableRequest.cancelTokenSource
     };
+    
+    this.fetchDashboardUserPrivilegesRequest = dataRequest;
 
     this.documentSpacePrivilegeState.batch(state => {
       if (state.promised) {
         return postpone;
       }
 
-      this.fetchDashboardUserPrivilegesRequest = dataRequest;
       state.set(privileges);
     });
 
