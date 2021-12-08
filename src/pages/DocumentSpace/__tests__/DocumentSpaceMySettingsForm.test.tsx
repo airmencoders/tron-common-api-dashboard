@@ -23,6 +23,7 @@ import {FormActionType} from "../../../state/crud-page/form-action-type";
 import DocumentSpaceMySettingsForm from "../DocumentSpaceMySettingsForm";
 import React from "react";
 import {waitFor} from "@testing-library/dom";
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
 
 jest.mock('../../../state/document-space/document-space-state');
 jest.mock('../../../state/authorized-user/authorized-user-state');
@@ -56,7 +57,7 @@ describe('Test Document SpaceMySettingsForm', () => {
   let authorizedUserService: AuthorizedUserService;
 
   beforeEach(() => {
-    documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
+    documentSpacesState = createState<DocumentSpaceResponseDto[]>(documentSpaces);
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
 
@@ -79,7 +80,8 @@ describe('Test Document SpaceMySettingsForm', () => {
           onSubmit={jest.fn()}
           isFormSubmitting={false}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaces}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn}
           authorizedUserService={authorizedUserService}
         />
       </MemoryRouter>
@@ -101,7 +103,8 @@ describe('Test Document SpaceMySettingsForm', () => {
           onSubmit={jest.fn()}
           isFormSubmitting={false}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaces}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn}
           authorizedUserService={authorizedUserService}
         />
       </MemoryRouter>
@@ -124,7 +127,8 @@ describe('Test Document SpaceMySettingsForm', () => {
           onSubmit={jest.fn()}
           isFormSubmitting={false}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaces}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn}
           authorizedUserService={authorizedUserService}
         />
       </MemoryRouter>
@@ -157,7 +161,8 @@ describe('Test Document SpaceMySettingsForm', () => {
           onSubmit={jest.fn()}
           isFormSubmitting={false}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaces}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn}
           authorizedUserService={authorizedUserService}
         />
       </MemoryRouter>
@@ -179,7 +184,8 @@ describe('Test Document SpaceMySettingsForm', () => {
           onSubmit={onSave}
           isFormSubmitting={false}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaces}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn}
           authorizedUserService={authorizedUserService}
         />
       </MemoryRouter>
@@ -202,7 +208,8 @@ describe('Test Document SpaceMySettingsForm', () => {
           onSubmit={onSave}
           isFormSubmitting={false}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaces}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn}
           authorizedUserService={authorizedUserService}
         />
       </MemoryRouter>
@@ -224,6 +231,51 @@ describe('Test Document SpaceMySettingsForm', () => {
     expect(onSave).toBeCalled()
   });
 
+  it('should not show deletion option for an non dashboard admin', async () => {
 
+    jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
+    const onSave = jest.fn();
+    const onDelete = jest.fn();
+
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpaceMySettingsForm
+          onCancel={jest.fn()}
+          onSubmit={onSave}
+          isFormSubmitting={false}
+          formActionType={FormActionType.SAVE}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={onDelete}
+          authorizedUserService={authorizedUserService}
+        />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(page.queryByTestId('remove-docspace-id1')).toBeFalsy());
+  });
+
+  it('should allow for space deletion as an admin', async () => {
+
+    jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockImplementation((privilege) => {
+      if (privilege === PrivilegeType.DASHBOARD_ADMIN) return true;
+      else return false;
+    });
+    const onSave = jest.fn();
+    const page = render(
+      <MemoryRouter>
+        <DocumentSpaceMySettingsForm
+          onCancel={jest.fn()}
+          onSubmit={onSave}
+          isFormSubmitting={false}
+          formActionType={FormActionType.SAVE}
+          documentSpaces={documentSpacesState}
+          onDocumentSpaceDeleted={jest.fn()}
+          authorizedUserService={authorizedUserService}
+        />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(page.getByTestId('remove-docspace-id1')).toBeInTheDocument());
+  });
 
 });

@@ -99,6 +99,7 @@ function ScratchStorageEditForm(props: CreateUpdateFormProps<ScratchStorageFlat>
   const isFormModified = (): boolean => {
     return Initial(formState.appName).modified() ||
       Initial(formState.appHasImplicitRead).modified() ||
+      Initial(formState.aclMode).modified() ||
       Initial(formState.userPrivs).modified() ||
       Initial(formState.keyNames).modified() ||
       scratchStorageService.createUpdateState.length !== 0;

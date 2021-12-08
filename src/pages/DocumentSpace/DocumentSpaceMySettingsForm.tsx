@@ -1,12 +1,18 @@
-import {useHookstate} from '@hookstate/core';
-import React, {FormEvent, useEffect} from 'react';
+import { none, State, useHookstate } from '@hookstate/core';
+import React, { FormEvent, useEffect } from 'react';
+import Button from '../../components/Button/Button';
 import Form from '../../components/forms/Form/Form';
-import {DocumentSpaceRequestDto, DocumentSpaceResponseDto} from '../../openapi';
-import {FormActionType} from '../../state/crud-page/form-action-type';
-import AuthorizedUserService from "../../state/authorized-user/authorized-user-service";
-import SubmitActions from "../../components/forms/SubmitActions/SubmitActions";
-import CircleFilledIcon from "../../icons/CircleFilledIcon";
-import CircleEmptyIcon from "../../icons/CircleEmptyIcon";
+import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
+import CircleEmptyIcon from '../../icons/CircleEmptyIcon';
+import CircleFilledIcon from '../../icons/CircleFilledIcon';
+import RemoveIcon from '../../icons/RemoveIcon';
+import { DocumentSpaceRequestDto, DocumentSpaceResponseDto } from '../../openapi';
+import AuthorizedUserService from '../../state/authorized-user/authorized-user-service';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { PrivilegeType } from '../../state/privilege/privilege-type';
+import DeleteDocumentSpaceDialog from './DeleteDocumentSpaceDialog';
+import './DocumentSpaceMySettings.scss';
 
 export interface DocumentSpaceMySettingsFormProps {
   documentSpace?: DocumentSpaceRequestDto;
@@ -14,74 +20,122 @@ export interface DocumentSpaceMySettingsFormProps {
   onCancel: () => void;
   isFormSubmitting: boolean;
   formActionType: FormActionType;
-  documentSpaces: DocumentSpaceResponseDto[];
+  documentSpaces: State<DocumentSpaceResponseDto[]>;
   authorizedUserService: AuthorizedUserService;
+  onDocumentSpaceDeleted: (space: DocumentSpaceResponseDto | undefined) => void;
 }
 
 interface DocumentSpaceMySettingsState {
-  selectedDefaultSpaceId: string,
+  selectedDefaultSpaceId: string;
+  documentSpaceToDelete: string;
+  documentSpaceToDeleteId: string;
+  showDeleteDialog: boolean;
 }
 
 export default function DocumentSpaceMySettingsForm(props: DocumentSpaceMySettingsFormProps) {
-
   const pageState = useHookstate<DocumentSpaceMySettingsState>({
-    selectedDefaultSpaceId: ''
-  })
-  useEffect(()=>{
-    const defaultDocumentSpaceId = props.authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-    if(defaultDocumentSpaceId !== undefined){
-      pageState.selectedDefaultSpaceId.set(defaultDocumentSpaceId)
-    }
-  },[props.authorizedUserService.authorizedUser])
+    selectedDefaultSpaceId: '',
+    documentSpaceToDelete: '',
+    documentSpaceToDeleteId: '',
+    showDeleteDialog: false,
+  });
 
-  function submitForm (event: FormEvent<HTMLFormElement>) {
+  const authorizedUserService = useAuthorizedUserState();
+  const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
+
+  useEffect(() => {
+    const defaultDocumentSpaceId = props.authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
+    if (defaultDocumentSpaceId !== undefined) {
+      pageState.selectedDefaultSpaceId.set(defaultDocumentSpaceId);
+    }
+  }, [props.authorizedUserService.authorizedUser]);
+
+  function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (props.formActionType === FormActionType.SAVE) {
       props.onSubmit(pageState.selectedDefaultSpaceId.get());
     }
   }
 
-  function setSelectedDocumentSpace (id:string) {
-    pageState.selectedDefaultSpaceId.set(id)
+  function setSelectedDocumentSpace(id: string) {
+    pageState.selectedDefaultSpaceId.set(id);
   }
-  return <Form onSubmit={submitForm}>
-    <div id={'header'} style={{width:'calc(100%-48px)', display: "flex", color: '#515B68', borderBottom: '1px solid #E5E5E5', paddingBottom: 6, marginLeft: 32, marginRight: 16}}>
-      <div style={{width:'50%', fontSize: 12}}>
-        DOCUMENT SPACES
+  return (
+    <Form onSubmit={submitForm} style={{ minWidth: '100%' }}>
+      <div id="my-settings-header" className="my-settings-header">
+        <div className="my-settings-header-col">DOCUMENT SPACES</div>
+        <div className="my-settings-header-col">SET AS DEFAULT SPACE</div>
+        {isAdmin ? <div className="my-settings-header-col-centered">REMOVE SPACE</div> : null}
       </div>
-      <div style={{width:'50%', fontSize: 12}}>
-        SET AS DEFAULT SPACE
-      </div>
-    </div>
-    <div id={'body'} style={{width:'calc(100%-48px)', marginLeft: 32, marginRight: 16}} >
-      {props.documentSpaces.map((documentSpace)=>{
+      <div id="my-settings-body" className="my-settings-body">
+        { !props.documentSpaces.promised && props.documentSpaces.get()?.map((documentSpace) => {
+          if (documentSpace === undefined) {
+            return null;
+          }
+          const isDefaultSpace = documentSpace.id === pageState.selectedDefaultSpaceId.get();
 
-        if(documentSpace === undefined){
-          return null
+          return (
+            <div key={documentSpace.id} className="my-settings-body-row">
+              <div className="my-settings-body-cell">{documentSpace.name}</div>
+              <div
+                data-testid={`${documentSpace.id}-${isDefaultSpace}`}
+                className="my-settings-body-cell-pointer"
+                onClick={() => setSelectedDocumentSpace(documentSpace.id)}
+              >
+                {isDefaultSpace ? <CircleFilledIcon size={18} /> : <CircleEmptyIcon size={18} />}
+              </div>
+              {isAdmin ? (
+                <div className="my-settings-body-cell-remove">
+                  <Button
+                    id={`remove-docspace-${documentSpace.id}`}
+                    data-testid={`remove-docspace-${documentSpace.id}`}
+                    onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                      pageState.merge({
+                        documentSpaceToDeleteId: event.currentTarget.id.replace('remove-docspace-', ''),
+                        documentSpaceToDelete: documentSpace.name,
+                        showDeleteDialog: true,
+                      });
+                    }}
+                    className="remove-button"
+                    icon
+                    unstyled
+                    type="button"
+                  >
+                    <RemoveIcon size={1.2} />
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+      <DeleteDocumentSpaceDialog
+        docSpaceId={pageState.documentSpaceToDeleteId.value}
+        docSpaceName={pageState.documentSpaceToDelete.value}
+        onClose={() =>
+          pageState.merge({
+            documentSpaceToDelete: '',
+            documentSpaceToDeleteId: '',
+            showDeleteDialog: false,
+          })
         }
-        const isDefaultSpace = documentSpace.id === pageState.selectedDefaultSpaceId.get();
+        show={pageState.showDeleteDialog.value}
+        onDocumentSpaceDeleted={props.onDocumentSpaceDeleted}
+      />
 
-        return <div key={documentSpace.id} style={{display:'flex',borderBottom: '1px solid #E5E5E5', paddingBottom: 10, paddingTop: 10}}>
-            <div style={{width:'50%', color: '#1B1C22', fontWeight: 400, fontSize: 14 }}>
-              {documentSpace.name}
-            </div>
-            <div data-testid={`${documentSpace.id}-${isDefaultSpace}`} style={{width:'50%', cursor:'pointer'}} onClick={()=>setSelectedDocumentSpace(documentSpace.id)}>
-              {isDefaultSpace ? <CircleFilledIcon size={18}/> : <CircleEmptyIcon size={18}/>}
-            </div>
-          </div>
-
-      })}
-    </div>
-
-    <div style={{position:'absolute', bottom:'47px', right: '24px'}}>
-      <SubmitActions
-      formActionType={props.formActionType}
-      variant={2}
-      onCancel={props.onCancel}
-      isFormValid={true}
-      isFormModified={pageState.selectedDefaultSpaceId.get() !== props.authorizedUserService.authorizedUser?.defaultDocumentSpaceId}
-      isFormSubmitting={props.isFormSubmitting}
-    />
-    </div>
-  </Form>;
+      <div className="my-settings-submit-section">
+        <SubmitActions
+          formActionType={props.formActionType}
+          variant={2}
+          onCancel={props.onCancel}
+          isFormValid={true}
+          isFormModified={
+            pageState.selectedDefaultSpaceId.get() !==
+            props.authorizedUserService.authorizedUser?.defaultDocumentSpaceId
+          }
+          isFormSubmitting={props.isFormSubmitting}
+        />
+      </div>
+    </Form>
+  );
 }

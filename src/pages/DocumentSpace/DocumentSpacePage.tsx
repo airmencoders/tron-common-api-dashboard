@@ -1,59 +1,56 @@
-import {Downgraded, none, State, useHookstate} from '@hookstate/core';
-import {ValueFormatterParams} from 'ag-grid-community';
-import React, {useEffect, useRef} from 'react';
-import {useHistory} from 'react-router';
-import {useLocation} from 'react-router-dom';
+import { Downgraded, none, State, useHookstate } from '@hookstate/core';
+import { ValueFormatterParams } from 'ag-grid-community';
+import React, { useEffect, useRef } from 'react';
+import { useHistory } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer, {PopupMenuItem} from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentRowActionCellRenderer, { PopupMenuItem } from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
+import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
+import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 import GridColumn from '../../components/Grid/GridColumn';
-import {generateInfiniteScrollLimit} from '../../components/Grid/GridUtils/grid-utils';
+import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import {SideDrawerSize} from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import {ToastType} from '../../components/Toast/ToastUtils/toast-type';
-import {createTextToast} from '../../components/Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
+import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
+import CircleMinusIcon from '../../icons/CircleMinusIcon';
+import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
+import EditIcon from '../../icons/EditIcon';
+import StarHollowIcon from '../../icons/StarHollowIcon';
+import StarIcon from '../../icons/StarIcon';
+import UserIcon from "../../icons/UserIcon";
+import UserIconCircle from "../../icons/UserIconCircle";
 import {
   DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
 } from '../../openapi';
-import {useAuthorizedUserState} from '../../state/authorized-user/authorized-user-state';
-import {FormActionType} from '../../state/crud-page/form-action-type';
-import {documentSpaceDownloadUrlService, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState} from '../../state/document-space/document-space-state';
-import {prepareRequestError} from '../../utils/ErrorHandling/error-handling-utils';
-import {formatBytesToString} from '../../utils/file-utils';
+import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
+import { FormActionType } from '../../state/crud-page/form-action-type';
+import { documentSpaceDownloadUrlService, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
+import { formatDocumentSpaceDate } from '../../utils/date-utils';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
+import { formatBytesToString } from '../../utils/file-utils';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
-import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
-import {formatDocumentSpaceDate} from '../../utils/date-utils';
-import UserIcon from "../../icons/UserIcon";
-import UserIconCircle from "../../icons/UserIconCircle";
-import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import EditIcon from '../../icons/EditIcon';
-import StarIcon from '../../icons/StarIcon';
-import DocumentSpaceSelector, {pathQueryKey, spaceIdQueryKey} from "./DocumentSpaceSelector";
-import {DeviceSize, useDeviceInfo} from '../../hooks/PageResizeHook';
-import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
-import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
-import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
-import StarHollowIcon from '../../icons/StarHollowIcon';
-import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
-import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./DocumentSpaceSelector";
+import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 
 function DocumentSpacePage() {
   const location = useLocation();
   const history = useHistory();
-
   const mountedRef = useRef(false);
   const pageService = useDocumentSpacePageState(mountedRef);
-
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
@@ -177,34 +174,38 @@ function DocumentSpacePage() {
     })
   ]);
 
+  async function init() {
+    try {
+      await pageService.loadDocumentSpaces();
+    } catch (err) {
+      createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
+      return;
+    }
+
+    // Check if navigating to an existing document space first
+    if (pageService.locationIncludesDocumentSpace(location.search)) {
+      pageService.loadDocSpaceFromLocation(location.search);
+      return;
+    }
+
+    loadDefaultSpace();
+  }
+
+  function loadDefaultSpace() {
+    // Load in a default space if no existing
+    const selectedSpace = pageService.getInitialDocumentSpace();
+
+    if (selectedSpace == null) {
+      createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
+      return;
+    }
+
+    const queryParams = pageService.getUrlParametersForSpaceAndPath(selectedSpace.id);
+    history.replace({ search: queryParams.toString() });
+  }
+
   useEffect(() => {
     mountedRef.current = true;
-
-    async function init() {
-      try {
-        await pageService.loadDocumentSpaces();
-      } catch (err) {
-        createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
-        return;
-      }
-
-      // Check if navigating to an existing document space first
-      if (pageService.locationIncludesDocumentSpace(location.search)) {
-        pageService.loadDocSpaceFromLocation(location.search);
-        return;
-      }
-
-      // Load in a default space if no existing
-      const selectedSpace = pageService.getInitialDocumentSpace();
-
-      if (selectedSpace == null) {
-        createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
-        return;
-      }
-      
-      const queryParams = pageService.getUrlParametersForSpaceAndPath(selectedSpace.id);
-      history.replace({ search: queryParams.toString() });
-    }
 
     init();
 
@@ -214,7 +215,7 @@ function DocumentSpacePage() {
       pageService.resetState();
       documentSpaceService.resetState();
       documentSpacePrivilegesService.resetState();
-    };
+    };   
   }, []);
 
   useEffect(() => {
@@ -328,33 +329,40 @@ function DocumentSpacePage() {
           </div>
         </div>
       </FormGroup>
-      <div className="breadcrumb-area">
-        <BreadCrumbTrail
-          path={pageService.state.get().path}
-          onNavigate={(newPath) => {
-            const queryParams = new URLSearchParams(location.search);
-            queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
-            if (newPath !== '') {
-              queryParams.set(pathQueryKey, newPath);
-            } else {
-              queryParams.delete(pathQueryKey);
-            }
-            history.push({ search: queryParams.toString() });
-          }}
-        />
-        <DocumentSpaceActions
-          show={pageService.state.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
-          isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
-          selectedSpace={pageService.state.selectedSpace}
-          path={pageService.state.nested('path')}
-          shouldUpdateDatasource={pageService.state.shouldUpdateDatasource}
-          createEditElementOpType={pageService.state.createEditElementOpType}
-          membershipsState={pageService.state.membershipsState}
-          selectedFiles={pageService.state.selectedFiles}
-          showDeleteSelectedDialog={pageService.state.showDeleteSelectedDialog}
-          className="content-controls"
-        />
-      </div>
+      {pageService.state.selectedSpace.value != null &&
+        pageService.state.datasource.value &&
+        documentSpacePrivilegesService.isAuthorizedForAction(
+          pageService.state.selectedSpace.value.id,
+          DocumentSpacePrivilegeDtoTypeEnum.Read
+        ) && (
+          <div className="breadcrumb-area">
+            <BreadCrumbTrail
+              path={pageService.state.get().path}
+              onNavigate={(newPath) => {
+                const queryParams = new URLSearchParams(location.search);
+                queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
+                if (newPath !== '') {
+                  queryParams.set(pathQueryKey, newPath);
+                } else {
+                  queryParams.delete(pathQueryKey);
+                }
+                history.push({ search: queryParams.toString() });
+              }}
+            />
+            <DocumentSpaceActions
+              show={pageService.state.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
+              isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
+              selectedSpace={pageService.state.selectedSpace}
+              path={pageService.state.nested('path')}
+              shouldUpdateDatasource={pageService.state.shouldUpdateDatasource}
+              createEditElementOpType={pageService.state.createEditElementOpType}
+              membershipsState={pageService.state.membershipsState}
+              selectedFiles={pageService.state.selectedFiles}
+              showDeleteSelectedDialog={pageService.state.showDeleteSelectedDialog}
+              className="content-controls"
+            />
+          </div>
+      )}
       {pageService.state.selectedSpace.value != null &&
         pageService.state.datasource.value &&
         <FullPageInfiniteGrid
@@ -424,7 +432,7 @@ function DocumentSpacePage() {
         title="My Settings"
         isOpen={pageService.state.isDefaultDocumentSpaceSettingsOpen.get()}
         onCloseHandler={pageService.closeMySettingsDrawer.bind(pageService)}
-        size={SideDrawerSize.WIDE}
+        size={pageService.state.sideDrawerSize.get()}
         titleStyle={{ color: '#5F96EA', marginTop: -2 }}
         preTitleNode={
           <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>
@@ -437,8 +445,9 @@ function DocumentSpacePage() {
           onSubmit={pageService.submitDefaultDocumentSpace.bind(pageService)}
           isFormSubmitting={pageService.state.isSubmitting.get()}
           formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaceService.documentSpaces}
+          documentSpaces={documentSpaceService.documentSpacesState}
           authorizedUserService={authorizedUserService}
+          onDocumentSpaceDeleted={() => {init();}}
         />
       </SideDrawer>
 
