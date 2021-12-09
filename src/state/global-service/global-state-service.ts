@@ -1,4 +1,4 @@
-import { RequestError } from '../../utils/ErrorHandling/request-error';
+import RequestError from '../../utils/ErrorHandling/request-error';
 
 export interface GlobalStateService {
   isPromised: boolean;

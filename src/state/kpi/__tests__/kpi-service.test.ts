@@ -1,7 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { KpiControllerApi, KpiControllerApiInterface, KpiSummaryDto, UniqueVisitorCountDtoVisitorTypeEnum } from '../../../openapi';
 import { formatDateToEnCa } from '../../../utils/date-utils';
-import { RequestError } from '../../../utils/ErrorHandling/request-error';
+import RequestError from '../../../utils/ErrorHandling/request-error';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import KpiService from '../kpi-service';
 
@@ -67,7 +67,7 @@ describe('KPI Service Tests', () => {
 
     const cancellableRequest = kpiService.fetchAndStoreData(formatDateToEnCa(startDate), formatDateToEnCa(endDate));
 
-    await expect(cancellableRequest.promise).rejects.toEqual({ message: 'rejected' } as RequestError);
+    await expect(cancellableRequest.promise).rejects.toEqual(new RequestError({message: 'rejected'}));
   });
 
   it('should throw on bad date when fetch and store Summary data', () => {
@@ -98,7 +98,7 @@ describe('KPI Service Tests', () => {
 
     const cancellableRequest = kpiService.fetchAndStoreSeriesData(formatDateToEnCa(startDate), formatDateToEnCa(endDate));
 
-    await expect(cancellableRequest.promise).rejects.toEqual({ message: 'rejected' } as RequestError);
+    await expect(cancellableRequest.promise).rejects.toEqual(new RequestError({message: 'rejected'}));
   });
 
   it('should throw on bad date when fetch and store Series data', () => {
@@ -116,7 +116,7 @@ describe('KPI Service Tests', () => {
     const cancellableRequest = kpiService.fetchAndStoreData(formatDateToEnCa(startDate), formatDateToEnCa(endDate));
     await expect(cancellableRequest.promise).rejects.toBeTruthy();
 
-    expect(kpiService.error).toEqual({ message: 'rejected' } as RequestError);
+    expect(kpiService.error).toEqual(new RequestError({message: 'rejected'}));
   });
 
   it('should not reset state if promised state', async () => {
