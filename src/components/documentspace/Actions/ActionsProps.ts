@@ -5,7 +5,7 @@ import { CreateEditOperationType } from '../../../state/document-space/document-
 export interface ActionsProps {
   selectedSpace: State<DocumentSpaceResponseDto | undefined>;
   path: State<string>;
-  shouldUpdateInfiniteCache: State<boolean>;
+  shouldUpdateDatasource: State<boolean>;
   createEditElementOpType: State<CreateEditOperationType>;
   membershipsState: State<{ isOpen: boolean }>;
   selectedFiles: State<DocumentDto[]>;

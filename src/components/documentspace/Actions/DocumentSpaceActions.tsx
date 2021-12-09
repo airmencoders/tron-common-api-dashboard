@@ -14,7 +14,7 @@ function DocumentSpaceActions(props: DocumentSpaceActionsProps & ActionsProps) {
       <MobileActions
         selectedSpace={props.selectedSpace}
         path={props.path}
-        shouldUpdateInfiniteCache={props.shouldUpdateInfiniteCache}
+        shouldUpdateDatasource={props.shouldUpdateDatasource}
         createEditElementOpType={props.createEditElementOpType}
         membershipsState={props.membershipsState}
         selectedFiles={props.selectedFiles}
@@ -28,7 +28,7 @@ function DocumentSpaceActions(props: DocumentSpaceActionsProps & ActionsProps) {
     <DesktopActions
       selectedSpace={props.selectedSpace}
       path={props.path}
-      shouldUpdateInfiniteCache={props.shouldUpdateInfiniteCache}
+      shouldUpdateDatasource={props.shouldUpdateDatasource}
       createEditElementOpType={props.createEditElementOpType}
       membershipsState={props.membershipsState}
       selectedFiles={props.selectedFiles}
