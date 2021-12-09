@@ -104,7 +104,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       if (!this.isAdmin()) {
         await this.documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
       }
-      const favorites: DocumentSpaceUserCollectionResponseDto[] = (await this.documentSpaceService.getFavorites(documentSpace.id)).data.data;
+      const favorites: DocumentSpaceUserCollectionResponseDto[] = await this.documentSpaceService.getFavorites(documentSpace.id);
 
       this.spacesState.merge({
         selectedSpace: documentSpace,
@@ -255,29 +255,34 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   async addToFavorites(doc: DocumentDto) {
     if(this.spacesState.selectedSpace?.value !== undefined){
       const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
-      await this.documentSpaceService.addPathEntityToFavorites(
-        this.spacesState.selectedSpace.value.id,
-        reqDto
-      );
 
-      const placeHolderResponse: DocumentSpaceUserCollectionResponseDto = {
-        metadata: {},
-        id: '',
-        itemId: '',
-        documentSpaceId: doc.spaceId,
-        key: doc.key,
-        lastModifiedDate: '',
-        folder: doc.folder
-      }
-      
-      performActionWhenMounted(this.mountedRef.current, () => {
-        this.spacesState.favorites.merge([placeHolderResponse])
-        this.spacesState.shouldUpdateDatasource.set(true)
+      try {
+        await this.documentSpaceService.addPathEntityToFavorites(
+          this.spacesState.selectedSpace.value.id,
+          reqDto
+        );
+
+        const placeHolderResponse: DocumentSpaceUserCollectionResponseDto = {
+          metadata: {},
+          id: '',
+          itemId: '',
+          documentSpaceId: doc.spaceId,
+          key: doc.key,
+          lastModifiedDate: '',
+          folder: doc.folder
+        }
         
-        createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
-      });
-
-    } else{
+        performActionWhenMounted(this.mountedRef.current, () => {
+          this.spacesState.favorites.merge([placeHolderResponse])
+          this.spacesState.shouldUpdateDatasource.set(true)
+          
+          createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
+        });
+      }
+      catch (error) {
+        createTextToast(ToastType.ERROR, 'Failed to add to favorites - ' + (error as Error).message);
+      }
+    } else {
       createTextToast(ToastType.ERROR, 'Could not add to favorites');
     }
   }
@@ -285,21 +290,26 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   async removeFromFavorites(doc: DocumentDto) {
     if(this.spacesState.selectedSpace?.value !== undefined){
       const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
-      await this.documentSpaceService.removePathEntityFromFavorites(
-        this.spacesState.selectedSpace.value.id,
-        reqDto
-      );
-      if(this.spacesState.favorites.value.length){
-        performActionWhenMounted(this.mountedRef.current, () => {
-          this.spacesState.favorites.set(favorites => {
-            return favorites.filter(f => f.key !== doc.key);
-          });
-          this.spacesState.shouldUpdateDatasource.set(true);
+      try {
+        await this.documentSpaceService.removePathEntityFromFavorites(
+          this.spacesState.selectedSpace.value.id,
+          reqDto
+        );
+        if(this.spacesState.favorites.value.length){
+          performActionWhenMounted(this.mountedRef.current, () => {
+            this.spacesState.favorites.set(favorites => {
+              return favorites.filter(f => f.key !== doc.key);
+            });
+            this.spacesState.shouldUpdateDatasource.set(true);
 
-          createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
-        });
+            createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
+          });
+        }
       }
-    }else{
+      catch (error) {
+        createTextToast(ToastType.ERROR, 'Failed to remove favorites - ' + (error as Error).message);
+      }
+    } else {
       createTextToast(ToastType.ERROR, 'Could not remove from favorites');
     }
   }

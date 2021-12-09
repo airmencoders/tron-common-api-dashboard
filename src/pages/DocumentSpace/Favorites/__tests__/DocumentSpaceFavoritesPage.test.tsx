@@ -1,6 +1,7 @@
-import {createState, State, StateMethodsDestroy} from '@hookstate/core';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { fireEvent, render, waitFor } from '@testing-library/react';
-import {MemoryRouter} from 'react-router';
+import axios from 'axios';
+import { MemoryRouter } from 'react-router';
 import {
   DashboardUserControllerApi,
   DashboardUserDto,
@@ -15,6 +16,9 @@ import {
   accessAuthorizedUserState,
   useAuthorizedUserState
 } from '../../../../state/authorized-user/authorized-user-state';
+import DocumentSpaceDownloadUrlService from '../../../../state/document-space/document-space-download-url-service';
+import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../../state/document-space/document-space-global-service';
+import DocumentSpacePrivilegeService from "../../../../state/document-space/document-space-privilege-service";
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
 import {
   documentSpaceDownloadUrlService,
@@ -22,12 +26,8 @@ import {
   useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../../state/document-space/document-space-state';
+import { createAxiosSuccessResponse } from "../../../../utils/TestUtils/test-utils";
 import DocumentSpaceFavoritesPage from '../DocumentSpaceFavoritesPage';
-import DocumentSpacePrivilegeService from "../../../../state/document-space/document-space-privilege-service";
-import {createAxiosSuccessResponse} from "../../../../utils/TestUtils/test-utils";
-import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../../state/document-space/document-space-global-service';
-import axios from 'axios';
-import DocumentSpaceDownloadUrlService from '../../../../state/document-space/document-space-download-url-service';
 
 jest.mock('../../../../state/document-space/document-space-state');
 jest.mock('../../../../state/authorized-user/authorized-user-state');
@@ -172,5 +172,4 @@ describe('Document Space Favorites Page Tests', () => {
 
 
   });
-
 });
