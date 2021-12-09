@@ -7,7 +7,6 @@ import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
 import {
   DocumentDto,
-  DocumentSpaceControllerApiInterface,
   DocumentSpacePathItemsDto,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
@@ -190,8 +189,9 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   submitElementName(name: string) {
-    this.spacesState.merge({ isSubmitting: true });
     if (this.spacesState.selectedSpace.value?.id === undefined) return;
+
+    this.spacesState.merge({ isSubmitting: true });
 
     switch (this.spacesState.createEditElementOpType.get()) {
       case CreateEditOperationType.EDIT_FOLDERNAME:
@@ -305,13 +305,13 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   getFavoritesShouldShow(doc: DocumentDto, addingToFavorites: boolean) {
-    const foundInFavorites = this.spacesState.favorites?.value?.filter(favorite => {
-      if (doc === undefined) {
-        return false
-      } else {
-        return favorite.key === doc.key
+    const foundInFavorites = this.spacesState.favorites?.value?.some(favorite => {
+      if (doc == null) {
+        return false;
       }
-    }).length;
+
+      return favorite.key === doc.key;
+    });
 
     return addingToFavorites ? !foundInFavorites : foundInFavorites
   }
