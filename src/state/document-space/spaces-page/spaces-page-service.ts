@@ -316,7 +316,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     return addingToFavorites ? !foundInFavorites : foundInFavorites
   }
 
-  setStateOnArchive(itemsToBeArchived: DocumentDto[], wasSuccess: boolean, isSingle = false) {
+  setStateOnArchive() {
     this.spacesState.merge(state => {
       state.shouldUpdateDatasource = true;
       state.datasource = this.documentSpaceService.createDatasource(
@@ -325,21 +325,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         this.infiniteScrollOptions
       );
       state.selectedFile = undefined;
-
-      if (!wasSuccess) {
-        return state;
-      }
-
-      if (!isSingle) {
-        state.selectedFiles = [];
-        return state;
-      }
-
-      // If this was a single file delete, check to make sure
-      // the multi-select files are kept in sync
-      if (itemsToBeArchived.length === 1) {
-        this.spliceExistingDocument(state.selectedFiles, itemsToBeArchived[0]);
-      }
+      state.selectedFiles = [];
 
       return state;
     });
@@ -366,8 +352,6 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       items = this.spacesState.selectedFiles.value;
     }
 
-    let wasSuccess = false;
-
     try {
       await this.documentSpaceService.archiveItems(
         selectedSpace.id,
@@ -375,25 +359,11 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         items.map(item => item.key)
       );
       createTextToast(ToastType.SUCCESS, 'Item(s) Archived');
-      wasSuccess = true;
     }
     catch (e) {
       createTextToast(ToastType.ERROR, 'Could not archive item(s) - ' + (e as Error).message);
     } finally {
-      performActionWhenMounted(this.mountedRef.current, () => this.setStateOnArchive(items, wasSuccess, isSingle));
-    }
-  }
-
-  /**
-   * The removal happens in place. Removes a document from an array.
-   * @param items items to check
-   * @param itemToRemove the item to remove
-   */
-  spliceExistingDocument(items: DocumentDto[], itemToRemove: DocumentDto) {
-    const uniqueKey = this.getDocumentUniqueKey(itemToRemove);
-    const existingItemIndex = items.findIndex(document => this.getDocumentUniqueKey(document) === uniqueKey);
-    if (existingItemIndex !== -1) {
-      items.splice(existingItemIndex, 1);
+      performActionWhenMounted(this.mountedRef.current, () => this.setStateOnArchive());
     }
   }
   
