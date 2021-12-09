@@ -13,6 +13,7 @@ import {
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
+  FilePathSpec,
   S3PaginationDto
 } from '../../openapi';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
@@ -407,22 +408,50 @@ export default class DocumentSpaceService {
     }
   }
 
-  addEntityToFavorites(documentSpaceId: string, entityId: string) {
-    return this.documentSpaceApi.addEntityToFavorites(documentSpaceId, entityId);
+  async addEntityToFavorites(documentSpaceId: string, entityId: string): Promise<FilePathSpec> {
+    try {
+      return (await this.documentSpaceApi.addEntityToFavorites(documentSpaceId, entityId)).data;
+    }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error));
+    }
   }
 
-  addPathEntityToFavorites(documentSpaceId: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto) {
-    return this.documentSpaceApi.addPathEntityToFavorites(documentSpaceId, documentSpacePathItemsDto);
+  async addPathEntityToFavorites(documentSpaceId: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto): Promise<void> {
+    try {
+      await this.documentSpaceApi.addPathEntityToFavorites(documentSpaceId, documentSpacePathItemsDto);
+      return Promise.resolve();
+    }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error));
+    }
   }
 
-  removePathEntityFromFavorites(documentSpaceId: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto) {
-    return this.documentSpaceApi.removePathEntityFromFavorites(documentSpaceId, documentSpacePathItemsDto);
-  }
-  removeEntityFromFavorites(documentSpaceId: string, entityId: string) {
-    return this.documentSpaceApi.removeEntityFromFavorites(documentSpaceId, entityId);
+  async removePathEntityFromFavorites(documentSpaceId: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto): Promise<void> {
+    try {
+      await this.documentSpaceApi.removePathEntityFromFavorites(documentSpaceId, documentSpacePathItemsDto);
+      return Promise.resolve();
+    }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error));
+    } 
   }
 
-  getFavorites(documentSpaceId: string) {
-    return this.documentSpaceApi.getFavorites(documentSpaceId);
+  async removeEntityFromFavorites(documentSpaceId: string, entityId: string): Promise<FilePathSpec> {
+    try {
+      return (await this.documentSpaceApi.removeEntityFromFavorites(documentSpaceId, entityId)).data;
+    }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error));
+    }
+  }
+
+  async getFavorites(documentSpaceId: string): Promise<DocumentSpaceUserCollectionResponseDto[]> {
+    try {
+      return (await this.documentSpaceApi.getFavorites(documentSpaceId)).data.data;
+    }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error));
+    }
   }
 }
