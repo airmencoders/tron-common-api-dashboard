@@ -564,7 +564,7 @@ describe('Test Document Space Service', () => {
 
     const path = await documentSpaceService.addEntityToFavorites('spaceId', 'entryId');
     expect(mock).toHaveBeenCalled();
-    expect(path.data).toEqual(returnFileSpecPath)
+    expect(path).toEqual(returnFileSpecPath)
   });
 
   it('should successfully delete an entity from favorites ', async () => {
@@ -579,7 +579,7 @@ describe('Test Document Space Service', () => {
 
     const path = await documentSpaceService.removeEntityFromFavorites('spaceId', 'entryId');
     expect(mock).toHaveBeenCalled();
-    expect(path.data).toEqual(returnFileSpecPath)
+    expect(path).toEqual(returnFileSpecPath)
   });
   it('should successfully post a path entity to favorites ', async () => {
     const docSpaceDto: DocumentSpacePathItemsDto = {

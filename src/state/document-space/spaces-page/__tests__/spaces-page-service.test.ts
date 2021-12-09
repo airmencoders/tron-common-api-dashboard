@@ -1,17 +1,17 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { waitFor } from '@testing-library/dom';
-import axios, { AxiosPromise } from 'axios';
+import axios from 'axios';
 import { MutableRefObject } from 'react';
 import { SideDrawerSize } from '../../../../components/SideDrawer/side-drawer-size';
 import { ToastType } from '../../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../../components/Toast/ToastUtils/ToastUtils';
-import { DashboardUserControllerApi, DashboardUserDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpaceResponseDto, DocumentSpacePrivilegeDtoTypeEnum, DocumentDto, DocumentSpaceUserCollectionResponseDto, DocumentSpaceUserCollectionResponseDtoWrapper } from '../../../../openapi';
+import { DashboardUserControllerApi, DashboardUserDto, DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto, DocumentSpaceUserCollectionResponseDto } from '../../../../openapi';
 import { pathQueryKey, spaceIdQueryKey } from '../../../../pages/DocumentSpace/DocumentSpaceSelector';
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
 import { CancellableDataRequest } from '../../../../utils/cancellable-data-request';
-import { createAxiosSuccessResponse, createAxiosVoidContentResponse, createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
+import { createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../document-space-global-service';
 import { CreateEditOperationType } from '../../document-space-utils';
 import SpacesPageService from '../spaces-page-service';
@@ -238,7 +238,7 @@ describe('Spaces Page Service Test', () => {
   describe('state changes on Document Space / path change', () => {
     let isAdminSpy: jest.SpyInstance<boolean, []>;
     let privilegesSpy: jest.SpyInstance<CancellableDataRequest<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>>;
-    let favoritesRequestSpy: jest.SpyInstance<AxiosPromise<DocumentSpaceUserCollectionResponseDtoWrapper>, [documentSpaceId: string]>;
+    let favoritesRequestSpy: jest.SpyInstance<Promise<DocumentSpaceUserCollectionResponseDto[]>, [documentSpaceId: string]>;
     beforeEach(() => {
       isAdminSpy = jest.spyOn(spacesService, 'isAdmin');
       privilegesSpy = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacePrivileges');
@@ -269,7 +269,7 @@ describe('Spaces Page Service Test', () => {
 
     it('should handle state change on success', async () => {
       isAdminSpy.mockReturnValue(true);
-      favoritesRequestSpy.mockReturnValue(Promise.resolve(createAxiosSuccessResponse({ data: favorites })));
+      favoritesRequestSpy.mockReturnValue(Promise.resolve(favorites));
 
       const stateChange = spacesService.setStateOnDocumentSpaceAndPathChange(documentSpaces[0], '');
       await stateChange;
@@ -562,7 +562,7 @@ describe('Spaces Page Service Test', () => {
     });
 
     it('should handle successful addition', async () => {
-      const addFavoriteSpy = jest.spyOn(documentSpaceService, 'addPathEntityToFavorites').mockReturnValue(Promise.resolve(createAxiosVoidContentResponse()));
+      const addFavoriteSpy = jest.spyOn(documentSpaceService, 'addPathEntityToFavorites').mockReturnValue(Promise.resolve());
 
       expect(spacesState.favorites.value.length).toEqual(0);
 
@@ -602,7 +602,7 @@ describe('Spaces Page Service Test', () => {
     });
 
     it('should handle successful removal', async () => {
-      const removeFavoriteSpy = jest.spyOn(documentSpaceService, 'removePathEntityFromFavorites').mockReturnValue(Promise.resolve(createAxiosVoidContentResponse()));
+      const removeFavoriteSpy = jest.spyOn(documentSpaceService, 'removePathEntityFromFavorites').mockReturnValue(Promise.resolve());
 
       const docToRemove = documents[0];
 
