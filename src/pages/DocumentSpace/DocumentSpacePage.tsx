@@ -1,22 +1,19 @@
-import { Downgraded, none, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
-import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import { Downgraded, none, State, useHookstate } from '@hookstate/core';
+import { ValueFormatterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
 import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
-import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
 import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
 import DocumentRowActionCellRenderer, { PopupMenuItem } from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
 import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
-import { GridSelectionType } from '../../components/Grid/grid-selection-type';
 import GridColumn from '../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
 import PageFormat from '../../components/PageFormat/PageFormat';
-import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
@@ -30,19 +27,14 @@ import StarIcon from '../../icons/StarIcon';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import {
-  DocumentDto, DocumentSpacePathItemsDto,
+  DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
-  DocumentSpaceResponseDto
 } from '../../openapi';
-import { DocumentSpaceUserCollectionResponseDto } from '../../openapi/models/document-space-user-collection-response-dto';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { documentSpaceDownloadUrlService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
+import { documentSpaceDownloadUrlService, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
 import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
-import { PrivilegeType } from '../../state/privilege/privilege-type';
-import { CancellableDataRequest } from '../../utils/cancellable-data-request';
-import { performActionWhenMounted } from '../../utils/component-utils';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { formatBytesToString } from '../../utils/file-utils';
@@ -54,72 +46,19 @@ import './DocumentSpacePage.scss';
 import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./DocumentSpaceSelector";
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 
-const infiniteScrollOptions: InfiniteScrollOptions = {
-  enabled: true,
-  limit: 100,
-};
-
-interface DocumentSpacePageState {
-  drawerOpen: boolean;
-  isSubmitting: boolean;
-  errorMessage: string;
-  showErrorMessage: boolean;
-  selectedSpace?: DocumentSpaceResponseDto;
-  shouldUpdateDatasource: boolean;
-  datasource?: IDatasource;
-  showUploadDialog: boolean;
-  showDeleteDialog: boolean;
-  fileToDelete: string;
-  selectedFiles: DocumentDto[];
-  membershipsState: {
-    isOpen: boolean;
-  },
-  createEditElementOpType: CreateEditOperationType;
-  clickedItemName?: string;
-  path: string;
-  showDeleteSelectedDialog: boolean;
-  isDefaultDocumentSpaceSettingsOpen: boolean;
-  sideDrawerSize: SideDrawerSize;
-  favorites: DocumentSpaceUserCollectionResponseDto[];
-}
-
-function getDocumentUniqueKey(data: DocumentDto): string {
-  return data.path + '__' + data.key;
-}
-
 function DocumentSpacePage() {
-  const pageState = useHookstate<DocumentSpacePageState>({
-    drawerOpen: false,
-    isSubmitting: false,
-    showErrorMessage: false,
-    errorMessage: '',
-    selectedSpace: undefined,
-    shouldUpdateDatasource: false,
-    datasource: undefined,
-    showUploadDialog: false,
-    showDeleteDialog: false,
-    fileToDelete: '',
-    selectedFiles: [],
-    membershipsState: {
-      isOpen: false
-    },
-    createEditElementOpType: CreateEditOperationType.NONE,
-    path: '',
-    showDeleteSelectedDialog: false,
-    isDefaultDocumentSpaceSettingsOpen: false,
-    sideDrawerSize: SideDrawerSize.NORMAL,
-    favorites: []
-  });
-
   const location = useLocation();
   const history = useHistory();
+
+  const mountedRef = useRef(false);
+
+  const pageService = useDocumentSpacePageState(mountedRef);
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
-  const globalDocumentSpaceService = useDocumentSpaceGlobalState();
   const authorizedUserService = useAuthorizedUserState();
 
-  const isAdmin = authorizedUserService.authorizedUserHasPrivilege(PrivilegeType.DASHBOARD_ADMIN);
+  const isAdmin = pageService.isAdmin();
 
   const deviceInfo = useDeviceInfo();
 
@@ -136,14 +75,14 @@ function DocumentSpacePage() {
       initialWidth: 400,
       cellRendererParams: {
         onClick: (folder: string) => {
-          const newPath = pageState.get().path + '/' + folder;
+          const newPath = pageService.state.get().path + '/' + folder;
           const queryParams = new URLSearchParams(location.search);
-          queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+          queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);
           history.push({ search: queryParams.toString() });
         },
-        isFavorited: (document: DocumentDto)=>{
-          return getFavoritesShouldShow(document, false)
+        isFavorited: (document: DocumentDto) => {
+          return pageService.getFavoritesShouldShow.bind(pageService, document, false)();
         }
       }
     }),
@@ -192,10 +131,9 @@ function DocumentSpacePage() {
           { 
             title: 'Add to favorites', 
             icon: StarIcon, 
-            shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, true),
+            shouldShow: (doc: DocumentDto) => pageService.getFavoritesShouldShow.bind(pageService, doc, true)(),
             isAuthorized: () => true,
-            onClick: addToFavorites,
-            
+            onClick: pageService.addToFavorites.bind(pageService),
           },
           {
             title: 'Remove from favorites',
@@ -203,23 +141,23 @@ function DocumentSpacePage() {
             iconProps: {
               size: 1.1
             },
-            shouldShow: (doc: DocumentDto) => getFavoritesShouldShow(doc, false),
+            shouldShow: (doc: DocumentDto) => pageService.getFavoritesShouldShow.bind(pageService, doc, false)(),
             isAuthorized: () => true,
-            onClick: removeFromFavorites,
+            onClick: pageService.removeFromFavorites.bind(pageService),
           },
           {
             title: 'Remove',
             icon: CircleMinusIcon,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => mergeState(pageState, { selectedFiles: [doc], showDeleteDialog: true }),
+            onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
           },
           { 
             title: 'Rename Folder', 
             icon: EditIcon, 
             shouldShow: (doc: DocumentDto) => doc && doc.folder,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => mergeState(pageState, { 
-              clickedItemName: doc.key, 
+            onClick: (doc: DocumentDto) => pageService.mergeState({ 
+              selectedFile: doc, 
               createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
             })
           },
@@ -228,8 +166,8 @@ function DocumentSpacePage() {
             icon: EditIcon, 
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => mergeState(pageState, { 
-              clickedItemName: doc.key, 
+            onClick: (doc: DocumentDto) => pageService.mergeState({ 
+              selectedFile: doc, 
               createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
             })
           },
@@ -238,53 +176,60 @@ function DocumentSpacePage() {
     })
   ]);
 
-  const mountedRef = useRef(false);
-
-  async function setInitialSpaceOnLoad(spacesCancellableRequest: CancellableDataRequest<DocumentSpaceResponseDto[]>) {
-    let data: DocumentSpaceResponseDto[];
+  async function fetchSpaces() {
     try {
-      data = await spacesCancellableRequest.promise;
+      await pageService.loadDocumentSpaces();
     } catch (err) {
       createTextToast(ToastType.ERROR, 'Could not load Document Spaces');
       return;
     }
+  }
+
+  async function loadSpaceOnInit() {
+    await fetchSpaces();
 
     // Check if navigating to an existing document space first
-    const queryParams = new URLSearchParams(location.search);
-    if (queryParams.get(spaceIdQueryKey) != null) {
-      loadDocSpaceFromLocation(location, data);
+    if (pageService.locationIncludesDocumentSpace(location.search)) {
+      pageService.loadDocSpaceFromLocation(location.search);
       return;
     }
 
-    const selectedSpace = globalDocumentSpaceService.getInitialSelectedDocumentSpace(data, authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
-    
-    performActionWhenMounted(mountedRef.current, () => {
-      if (selectedSpace != null) {
-        setStateOnDocumentSpaceAndPathChange(selectedSpace, '');
-      } else {
-        createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
-      }
-    });    
+    loadDefaultSpace();
+  }
+
+  async function loadSpaceOnDeletion() {
+    await fetchSpaces();
+    loadDefaultSpace();
+  }
+
+  function loadDefaultSpace() {
+    // Load in a default space if no existing
+    const selectedSpace = pageService.getInitialDocumentSpace();
+
+    if (selectedSpace == null) {
+      pageService.spacesState.selectedSpace.set(undefined);
+      createTextToast(ToastType.ERROR, 'You do not have access to any Document Spaces');
+      return;
+    }
+
+    const queryParams = pageService.getUrlParametersForSpaceAndPath(selectedSpace.id);
+    history.replace({ search: queryParams.toString() });
   }
 
   useEffect(() => {
     mountedRef.current = true;
-    const spacesCancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-    setInitialSpaceOnLoad(spacesCancellableRequest);
+
+    loadSpaceOnInit();
+
     return function cleanup() {
       mountedRef.current = false;
 
-      if (spacesCancellableRequest != null) {
-        spacesCancellableRequest.cancelTokenSource.cancel();
-      }
-
-      documentSpaceService.resetState();
-      documentSpacePrivilegesService.resetState();
+      pageService.resetState();
     };   
   }, []);
 
   useEffect(() => {
-    loadDocSpaceFromLocation(location, documentSpaceService.documentSpaces);
+    pageService.loadDocSpaceFromLocation(location.search);
   }, [location.search]);
 
   function conditionalMenuDownloadOnClick (doc: DocumentDto) {
@@ -341,316 +286,14 @@ function DocumentSpacePage() {
     }
   }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
 
-  function loadDocSpaceFromLocation(locationService: any, documentSpaceList: Array<DocumentSpaceResponseDto>) {
-    const queryParams = new URLSearchParams(locationService.search);
-    if (queryParams.get(spaceIdQueryKey) != null && documentSpaceList.length > 0) {
-      const selectedDocumentSpace = documentSpaceList.find(documentSpace => documentSpace.id === queryParams.get('spaceId'));
-      if (selectedDocumentSpace == null) {
-        createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
-        return;
-      }
-      const path = queryParams.get(pathQueryKey) ?? '';
-      if (selectedDocumentSpace.id !== pageState.get().selectedSpace?.id ||
-        path !== pageState.get().path) {
-        setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
-      }
-    }
-  }
-
-  function mergePageState(partialState: Partial<DocumentSpacePageState>): void {
-    if (mountedRef.current) {
-      mergeState<DocumentSpacePageState>(pageState, partialState);
-    }
-  }
-
-  function mergeState<T>(state: State<T>, partialState: SetPartialStateAction<T>): void {
-    if (mountedRef.current) {
-      state.merge(partialState);
-    }
-  }
-
-  async function setStateOnDocumentSpaceAndPathChange(documentSpace: DocumentSpaceResponseDto, path: string) {
-    
-    // make sure this is unwrapped from any proxy-ish wrappers (esp when this is called during space deletion)
-    const docSpace = Object.assign({}, documentSpace);
-    
+  async function handleDocumentSpaceCreation(space: DocumentSpaceRequestDto) {
     try {
-      // Don't need to load privileges if current user is Dashboard Admin,
-      // since they currently have access to everything Document Space related
-      if (!isAdmin) {
-        await documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(docSpace.id).promise;
-      }
-      const favorites: DocumentSpaceUserCollectionResponseDto[] = (await documentSpaceService.getFavorites(docSpace.id)).data.data;
+      const createdSpace = await pageService.submitDocumentSpace(space);
 
-      mergePageState({
-        selectedSpace: docSpace,
-        shouldUpdateDatasource: true,
-        datasource: documentSpaceService.createDatasource(
-          docSpace.id,
-          path,
-          infiniteScrollOptions
-        ),
-        path,
-        selectedFiles: [],
-        favorites
-      });
-
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams.get(spaceIdQueryKey) == null) {
-        queryParams.set(spaceIdQueryKey, docSpace.id);
-        history.replace({ search: queryParams.toString() });
-      }
-      else if (queryParams.get(spaceIdQueryKey) !== docSpace.id) {
-        queryParams.set(spaceIdQueryKey, docSpace.id);
-        queryParams.delete(pathQueryKey);
-        history.push({search: queryParams.toString()});
-      }
-    }
-    catch (err) {
-      const preparedError = prepareRequestError(err);
-
-      if (!mountedRef.current) {
-        return;
-      }
-
-      if (preparedError.status === 403) {
-        createTextToast(ToastType.ERROR, 'Not authorized for the selected Document Space');
-      } else {
-        createTextToast(ToastType.ERROR, 'Could not load privileges for the selected Document Space');
-      }
-
-      mergePageState({
-        selectedSpace: undefined,
-        datasource: undefined,
-        shouldUpdateDatasource: false,
-        selectedFiles: [],
-      });
-    }
-  }
-
-  function onDatasourceUpdateCallback() {
-    mergePageState({
-      shouldUpdateDatasource: false,
-      selectedFiles: []
-    });
-  }
-
-  function setPageStateOnException(message: string) {
-    mergePageState({
-      isSubmitting: false,
-      errorMessage: message,
-      showErrorMessage: true,
-    })
-  }
-
-  function submitElementName(name: string) {
-    pageState.merge({ isSubmitting: true });
-    if (pageState.selectedSpace.value?.id === undefined) return;
-
-    switch (pageState.createEditElementOpType.get()) {
-      case CreateEditOperationType.EDIT_FOLDERNAME:
-        documentSpaceService.renameFolder(pageState.selectedSpace.value?.id,
-          pageState.get().path + "/" + pageState.clickedItemName.get(), 
-          name)
-          .then(() => {
-            mergePageState({
-              createEditElementOpType: CreateEditOperationType.NONE,
-              isSubmitting: false,
-              showErrorMessage: false,
-              shouldUpdateDatasource: true,
-              clickedItemName: undefined,
-            });
-            createTextToast(ToastType.SUCCESS, "Folder renamed");
-          })
-          .catch(message => setPageStateOnException(message));
-        break;
-      case CreateEditOperationType.CREATE_FOLDER:
-        documentSpaceService.createNewFolder(pageState.selectedSpace.value?.id,
-          pageState.get().path, name)
-          .then(() => {
-            mergePageState({
-              createEditElementOpType: CreateEditOperationType.NONE,
-              isSubmitting: false,
-              showErrorMessage: false,
-              shouldUpdateDatasource: true,
-            });
-            createTextToast(ToastType.SUCCESS, "Folder created");
-          })
-          .catch(message => setPageStateOnException(message));
-        break;
-      case CreateEditOperationType.EDIT_FILENAME:
-        documentSpaceService.renameFile(pageState.selectedSpace.value?.id,
-          pageState.get().path, 
-          pageState.clickedItemName.get() ?? '',  // blank if undefined, will allow to fail out..
-          name)
-          .then(() => {
-            mergePageState({
-              createEditElementOpType: CreateEditOperationType.NONE,
-              isSubmitting: false,
-              showErrorMessage: false,
-              shouldUpdateDatasource: true,
-              clickedItemName: undefined,
-            });
-            createTextToast(ToastType.SUCCESS, "File renamed");
-          })
-          .catch(message => setPageStateOnException(message));
-        break;
-      default:
-        break;
-    }
-  }
-
-  async function submitDocumentSpace(space: DocumentSpaceRequestDto) {
-    pageState.merge({ isSubmitting: true });
-
-    try {
-      const createdSpace = await documentSpaceService.createDocumentSpace(space);
-      mergePageState({
-        drawerOpen: false,
-        isSubmitting: false,
-        showErrorMessage: false
-      });
-
-      const queryParams = new URLSearchParams(location.search);
-      queryParams.set(spaceIdQueryKey, createdSpace.id);
-      queryParams.delete(pathQueryKey);
+      const queryParams = pageService.getUrlParametersForSpaceAndPath(createdSpace.id);
       history.push({ search: queryParams.toString() });
     } catch (error) {
-      setPageStateOnException(error as string);
-    }
-  }
-
-  async function deleteDocumentSpace(space: DocumentSpaceResponseDto | undefined) {
-    if (space) {
-      performActionWhenMounted(mountedRef.current, () => {
-          globalDocumentSpaceService.setCurrentDocumentSpace(space);
-          setStateOnDocumentSpaceAndPathChange(space, '');
-      });
-    } else {
-      pageState.selectedSpace.set(undefined);
-    }
-  }
-
-  function closeDrawer(): void {
-    pageState.merge({ drawerOpen: false });
-  }
-
-  function closeMySettingsDrawer(): void {
-    pageState.merge({ isDefaultDocumentSpaceSettingsOpen: false });
-  }
-
-  function submitDefaultDocumentSpace(spaceId: string) {
-    pageState.merge({ isSubmitting: true });
-    documentSpaceService
-      .patchDefaultDocumentSpace(spaceId)
-      .then((docSpaceId) => {
-
-        authorizedUserService.setDocumentSpaceDefaultId(docSpaceId);
-        mergePageState({
-          isDefaultDocumentSpaceSettingsOpen: false,
-          isSubmitting: false,
-          showErrorMessage: false,
-          path: '',
-        });
-      })
-      .catch((message) => setPageStateOnException(message));
-  }
-
-  function closeErrorMsg(): void {
-    pageState.merge({ showErrorMessage: false });
-  }
-
-  function closeRemoveDialog(): void {
-    pageState.merge({ showDeleteDialog: false, showDeleteSelectedDialog: false });
-  }
-
-  async function archiveFile(): Promise<void> {
-    const selectedSpace = pageState.selectedSpace.value;
-
-    if (selectedSpace == null) {
-      return;
-    }
-
-    try {
-      await documentSpaceService.archiveItems(
-        selectedSpace.id,
-        pageState.get().path,
-        pageState.get().selectedFiles.map(item => item.key)
-      );
-      createTextToast(ToastType.SUCCESS, 'Item(s) Archived');
-    }
-    catch (e) {
-      createTextToast(ToastType.ERROR, 'Could not archive item(s) - ' + (e as Error).message);
-    }
-
-    pageState.merge({
-      shouldUpdateDatasource: true,
-      selectedFiles: [],
-      datasource: documentSpaceService.createDatasource(
-        pageState.get().selectedSpace?.id ?? '',
-        pageState.get().path,
-        infiniteScrollOptions
-      ),
-    });
-    closeRemoveDialog();
-  }
-
-  async function addToFavorites(doc: DocumentDto) {
-    if(pageState.selectedSpace?.value !== undefined){
-      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
-      await documentSpaceService.addPathEntityToFavorites(
-        pageState.selectedSpace.value.id,
-        reqDto
-      );
-
-      const placeHolderResponse: DocumentSpaceUserCollectionResponseDto = {
-        metadata: {},
-        id: '',
-        itemId: '',
-        documentSpaceId: doc.spaceId,
-        key: doc.key,
-        lastModifiedDate: '',
-        folder: doc.folder
-      }
-      if(mountedRef.current) {
-        pageState.favorites.merge([placeHolderResponse])
-
-        pageState.shouldUpdateDatasource.set(true)
-      }
-      createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
-    }else{
-      createTextToast(ToastType.ERROR, 'Could not add to favorites');
-    }
-
-  }
-  async function removeFromFavorites(doc: DocumentDto) {
-    if(pageState.selectedSpace?.value !== undefined){
-      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
-      await documentSpaceService.removePathEntityFromFavorites(
-        pageState.selectedSpace.value.id,
-        reqDto
-      );
-      if(pageState.favorites.value.length){
-        if(mountedRef.current) {
-          pageState.favorites.set(favorites => {
-            return favorites.filter(f => f.key !== doc.key);
-          })
-
-          pageState.shouldUpdateDatasource.set(true)
-        }
-        createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
-      }
-    }else{
-      createTextToast(ToastType.ERROR, 'Could not remove from favorites');
-    }
-  }
-
-  function onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
-    const selectedFiles = pageState.selectedFiles;
-    if (selectionEvent === 'selected') {
-      selectedFiles[selectedFiles.length].set(data);
-    } else {
-      selectedFiles.find(document => document.key.value === data.key)?.set(none);
+      createTextToast(ToastType.ERROR, prepareRequestError(error).message);
     }
   }
 
@@ -659,29 +302,22 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
-  function getFavoritesShouldShow (doc: DocumentDto, addingToFavorites: boolean) {
-     const foundInFavorites = pageState.favorites?.value?.filter(favorite => {
-      if (doc === undefined) {
-        return false
-      } else {
-        return favorite.key === doc.key
-      }
-    }).length
-
-    return addingToFavorites ? !foundInFavorites : foundInFavorites
-  }
-
   return (
     <PageFormat pageTitle="Document Space" className="document-space-page">
       <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
         <div className="add-space-container">
           <div>
-            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpace={pageState.selectedSpace?.value}/>
+            <DocumentSpaceSelector 
+              isDocumentSpacesLoading={isDocumentSpacesLoading}
+              isDocumentSpacesErrored={isDocumentSpacesErrored}
+              documentSpaceService={documentSpaceService}
+              selectedSpace={pageService.state.selectedSpace?.value}
+            />
             {isAdmin && !documentSpacePrivilegesService.isPromised && (
               <Button
                 data-testid="add-doc-space__btn"
                 type="button"
-                onClick={() => pageState.merge({ drawerOpen: true })}
+                onClick={() => pageService.state.merge({ drawerOpen: true })}
                 disabled={isDocumentSpacesLoading || isDocumentSpacesErrored}
               >
                 Add New Space <AddMaterialIcon fill size={1} />
@@ -695,7 +331,7 @@ function DocumentSpacePage() {
                   type="button"
                   unstyled
                   disableMobileFullWidth
-                  onClick={() => pageState.isDefaultDocumentSpaceSettingsOpen.set(true)}
+                  onClick={() => pageService.state.isDefaultDocumentSpaceSettingsOpen.set(true)}
               >
                 <UserIcon size={0} />
               </Button>
@@ -703,18 +339,18 @@ function DocumentSpacePage() {
           </div>
         </div>
       </FormGroup>
-      {pageState.selectedSpace.value != null &&
-        pageState.datasource.value &&
+      {pageService.state.selectedSpace.value != null &&
+        pageService.state.datasource.value &&
         documentSpacePrivilegesService.isAuthorizedForAction(
-          pageState.selectedSpace.value.id,
+          pageService.state.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Read
         ) && (
           <div className="breadcrumb-area">
             <BreadCrumbTrail
-              path={pageState.get().path}
+              path={pageService.state.get().path}
               onNavigate={(newPath) => {
                 const queryParams = new URLSearchParams(location.search);
-                queryParams.set(spaceIdQueryKey, pageState.get().selectedSpace?.id ?? '');
+                queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
                 if (newPath !== '') {
                   queryParams.set(pathQueryKey, newPath);
                 } else {
@@ -724,93 +360,89 @@ function DocumentSpacePage() {
               }}
             />
             <DocumentSpaceActions
-              show={pageState.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
+              show={pageService.state.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
               isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
-              selectedSpace={pageState.selectedSpace}
-              path={pageState.nested('path')}
-              shouldUpdateDatasource={pageState.shouldUpdateDatasource}
-              createEditElementOpType={pageState.createEditElementOpType}
-              membershipsState={pageState.membershipsState}
-              selectedFiles={pageState.selectedFiles}
-              showDeleteSelectedDialog={pageState.showDeleteSelectedDialog}
+              selectedSpace={pageService.state.selectedSpace}
+              path={pageService.state.nested('path')}
+              shouldUpdateDatasource={pageService.state.shouldUpdateDatasource}
+              createEditElementOpType={pageService.state.createEditElementOpType}
+              membershipsState={pageService.state.membershipsState}
+              selectedFiles={pageService.state.selectedFiles}
+              showDeleteSelectedDialog={pageService.state.showDeleteSelectedDialog}
               className="content-controls"
             />
-        </div>
+          </div>
       )}
-      {pageState.selectedSpace.value != null &&
-        pageState.datasource.value &&
-        documentSpacePrivilegesService.isAuthorizedForAction(
-          pageState.selectedSpace.value.id,
-          DocumentSpacePrivilegeDtoTypeEnum.Read
-        ) && (
-          <FullPageInfiniteGrid
-            columns={documentDtoColumns.attach(Downgraded).value}
-            datasource={pageState.datasource.value}
-            cacheBlockSize={generateInfiniteScrollLimit(infiniteScrollOptions)}
-            maxBlocksInCache={infiniteScrollOptions.maxBlocksInCache}
-            maxConcurrentDatasourceRequests={infiniteScrollOptions.maxConcurrentDatasourceRequests}
-            suppressCellSelection
-            updateDatasource={pageState.shouldUpdateDatasource.value}
-            updateDatasourceCallback={onDatasourceUpdateCallback}
-            getRowNodeId={getDocumentUniqueKey}
-            onRowSelected={onDocumentRowSelected}
-            rowSelection="multiple"
-            suppressRowClickSelection
-            autoResizeColumns
-          />
-        )}
+      {pageService.state.selectedSpace.value != null &&
+        pageService.state.datasource.value &&
+        <FullPageInfiniteGrid
+          columns={documentDtoColumns.attach(Downgraded).value}
+          datasource={pageService.state.datasource.value}
+          cacheBlockSize={generateInfiniteScrollLimit(pageService.infiniteScrollOptions)}
+          maxBlocksInCache={pageService.infiniteScrollOptions.maxBlocksInCache}
+          maxConcurrentDatasourceRequests={pageService.infiniteScrollOptions.maxConcurrentDatasourceRequests}
+          suppressCellSelection
+          updateDatasource={pageService.state.shouldUpdateDatasource.value}
+          updateDatasourceCallback={pageService.onDatasourceUpdateCallback.bind(pageService)}
+          getRowNodeId={pageService.getDocumentUniqueKey.bind(pageService)}
+          onRowSelected={pageService.onDocumentRowSelected.bind(pageService)}
+          rowSelection="multiple"
+          suppressRowClickSelection
+          autoResizeColumns
+        />
+      }
 
       <SideDrawer
         isLoading={false}
         title="Add New Document Space"
-        isOpen={pageState.drawerOpen.get()}
-        onCloseHandler={closeDrawer}
-        size={pageState.sideDrawerSize.get()}
+        isOpen={pageService.state.drawerOpen.get()}
+        onCloseHandler={pageService.closeDrawer.bind(pageService)}
+        size={pageService.state.sideDrawerSize.get()}
       >
-        {pageState.drawerOpen.get() && (
+        {pageService.state.drawerOpen.get() && (
           <DocumentSpaceEditForm
-            onCancel={closeDrawer}
-            onSubmit={submitDocumentSpace}
-            isFormSubmitting={pageState.isSubmitting.get()}
+            onCancel={pageService.closeDrawer.bind(pageService)}
+            onSubmit={handleDocumentSpaceCreation}
+            isFormSubmitting={pageService.state.isSubmitting.get()}
             formActionType={FormActionType.ADD}
-            onCloseErrorMsg={closeErrorMsg}
-            showErrorMessage={pageState.showErrorMessage.get()}
-            errorMessage={pageState.errorMessage.get()}
+            onCloseErrorMsg={pageService.closeErrorMsg.bind(pageService)}
+            showErrorMessage={pageService.state.showErrorMessage.get()}
+            errorMessage={pageService.state.errorMessage.get()}
           />
         )}
       </SideDrawer>
       <SideDrawer
         isLoading={false}
-        title={getCreateEditTitle(pageState.createEditElementOpType.get())}
-        isOpen={pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE}
-        onCloseHandler={() => mergeState(pageState, { createEditElementOpType: CreateEditOperationType.NONE })}
-        size={pageState.sideDrawerSize.get()}
+        title={getCreateEditTitle(pageService.state.createEditElementOpType.get())}
+        isOpen={pageService.state.createEditElementOpType.get() !== CreateEditOperationType.NONE}
+        onCloseHandler={() => pageService.mergeState({ createEditElementOpType: CreateEditOperationType.NONE })}
+        size={pageService.state.sideDrawerSize.get()}
       >
-        {pageState.createEditElementOpType.get() !== CreateEditOperationType.NONE && (
+        {pageService.state.createEditElementOpType.get() !== CreateEditOperationType.NONE && (
           <DocumentSpaceCreateEditForm
             onCancel={() =>
-              mergeState(pageState, {
+              pageService.mergeState({
                 showErrorMessage: false,
                 createEditElementOpType: CreateEditOperationType.NONE,
-                clickedItemName: undefined,
+                selectedFile: undefined
               })
             }
-            onSubmit={submitElementName}
-            isFormSubmitting={pageState.isSubmitting.get()}
-            onCloseErrorMsg={closeErrorMsg}
-            showErrorMessage={pageState.showErrorMessage.get()}
-            errorMessage={pageState.errorMessage.get()}
-            elementName={pageState.clickedItemName.get() ?? ''}
-            opType={pageState.createEditElementOpType.get()}
+            onSubmit={pageService.submitElementName.bind(pageService)}
+            isFormSubmitting={pageService.state.isSubmitting.get()}
+            onCloseErrorMsg={pageService.closeErrorMsg.bind(pageService)}
+            showErrorMessage={pageService.state.showErrorMessage.get()}
+            errorMessage={pageService.state.errorMessage.get()}
+            elementName={pageService.state.selectedFile.value?.key}
+            opType={pageService.state.createEditElementOpType.get()}
           />
         )}
       </SideDrawer>
       <SideDrawer
         isLoading={false}
         title="My Settings"
-        isOpen={pageState.isDefaultDocumentSpaceSettingsOpen.get()}
-        onCloseHandler={closeMySettingsDrawer}
-        size={pageState.sideDrawerSize.get()}
+        isOpen={pageService.state.isDefaultDocumentSpaceSettingsOpen.get()}
+        onCloseHandler={pageService.closeMySettingsDrawer.bind(pageService)}
+        size={pageService.state.sideDrawerSize.get()}
         titleStyle={{ color: '#5F96EA', marginTop: -2 }}
         preTitleNode={
           <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>
@@ -819,34 +451,41 @@ function DocumentSpacePage() {
         }
       >
         <DocumentSpaceMySettingsForm
-          onCancel={closeMySettingsDrawer}
-          onSubmit={submitDefaultDocumentSpace}
-          isFormSubmitting={pageState.isSubmitting.get()}
+          onCancel={pageService.closeMySettingsDrawer.bind(pageService)}
+          onSubmit={pageService.submitDefaultDocumentSpace.bind(pageService)}
+          isFormSubmitting={pageService.state.isSubmitting.get()}
           formActionType={FormActionType.SAVE}
           documentSpaces={documentSpaceService.documentSpacesState}
           authorizedUserService={authorizedUserService}
-          onDocumentSpaceDeleted={deleteDocumentSpace}
+          onDocumentSpaceDeleted={loadSpaceOnDeletion}
         />
       </SideDrawer>
 
       <ArchiveDialog
-        show={pageState.showDeleteDialog.get() || pageState.showDeleteSelectedDialog.get()}
-        onCancel={closeRemoveDialog}
-        onSubmit={archiveFile}
-        items={pageState.selectedFiles.get()}
+        show={pageService.state.showDeleteDialog.get()}
+        onCancel={pageService.closeRemoveDialog.bind(pageService)}
+        onSubmit={pageService.archiveFile.bind(pageService, true)}
+        items={pageService.state.selectedFile.value}
       />
 
-      {pageState.selectedSpace.value &&
+      <ArchiveDialog
+        show={pageService.state.showDeleteSelectedDialog.get()}
+        onCancel={pageService.closeRemoveDialog.bind(pageService)}
+        onSubmit={pageService.archiveFile.bind(pageService, false)}
+        items={pageService.state.selectedFiles.value}
+      />
+
+      {pageService.state.selectedSpace.value &&
         !documentSpacePrivilegesService.isPromised &&
         documentSpacePrivilegesService.isAuthorizedForAction(
-          pageState.selectedSpace.value.id,
+          pageService.state.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Membership
         ) && (
           <DocumentSpaceMemberships
-            documentSpaceId={pageState.selectedSpace.value.id}
-            isOpen={pageState.membershipsState.isOpen.value}
-            onSubmit={() => pageState.membershipsState.isOpen.set(false)}
-            onCloseHandler={() => pageState.membershipsState.isOpen.set(false)}
+            documentSpaceId={pageService.state.selectedSpace.value.id}
+            isOpen={pageService.state.membershipsState.isOpen.value}
+            onSubmit={() => pageService.state.membershipsState.isOpen.set(false)}
+            onCloseHandler={() => pageService.state.membershipsState.isOpen.set(false)}
           />
         )}
     </PageFormat>

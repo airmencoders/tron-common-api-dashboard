@@ -5,7 +5,8 @@ import {
   DocumentSpacePrivilegeDto,
   DocumentSpacePrivilegeDtoTypeEnum
 } from '../../openapi';
-import { CancellableDataRequest, makeCancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
+import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
 import { AbstractGlobalStateService } from '../global-service/abstract-global-state-service';
 import { PrivilegeType } from '../privilege/privilege-type';
@@ -46,23 +47,31 @@ export default class DocumentSpacePrivilegeService extends AbstractGlobalStateSe
         privilegeRecord[documentSpaceId] = documentSpacePrivileges;
 
         return privilegeRecord;
+      })
+      .catch(err => {
+        if (isDataRequestCancelError(err)) {
+          return {};
+        }
+
+        return Promise.reject(prepareRequestError(err));
       });
 
-      const dataRequest = {
-        promise: privileges,
-        cancelTokenSource: cancellableRequest.cancelTokenSource
-      };
-  
-      this.documentSpacePrivilegeState.batch(state => {
-        if (state.promised) {
-          return postpone;
-        }
-  
-        this.fetchDashboardUserPrivilegesRequest = dataRequest;
-        state.set(privileges);
-      });
-  
-      return dataRequest;
+    const dataRequest = {
+      promise: privileges,
+      cancelTokenSource: cancellableRequest.cancelTokenSource
+    };
+    
+    this.fetchDashboardUserPrivilegesRequest = dataRequest;
+
+    this.documentSpacePrivilegeState.batch(state => {
+      if (state.promised) {
+        return postpone;
+      }
+
+      state.set(privileges);
+    });
+
+    return dataRequest;
   }
 
   /**

@@ -114,7 +114,6 @@ describe('Document Space Favorites Page Tests', () => {
 
     downloadUrlService = new DocumentSpaceDownloadUrlService();
 
-    (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
     (accessAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
@@ -133,7 +132,7 @@ describe('Document Space Favorites Page Tests', () => {
       promise: Promise.resolve(documentSpaces),
       cancelTokenSource: axios.CancelToken.source()
     })
-    jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
+    jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
 
     const {getByText} = render(
       <MemoryRouter>

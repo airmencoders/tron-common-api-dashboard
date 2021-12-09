@@ -11,6 +11,10 @@ import DocumentSpaceDownloadUrlService from './document-space-download-url-servi
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../authorized-user/authorized-user-service';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from './document-space-global-service';
+import { CreateEditOperationType } from './document-space-utils';
+import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
+import { SpacesPageState } from './spaces-page/spaces-page-state';
+import SpacesPageService from './spaces-page/spaces-page-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -29,6 +33,30 @@ const recentsPageState = createState<RecentsPageState>({
     isError: false,
     message: undefined
   }
+});
+
+const spacesPageState = createState<SpacesPageState>({
+  drawerOpen: false,
+  isSubmitting: false,
+  showErrorMessage: false,
+  errorMessage: '',
+  selectedSpace: undefined,
+  shouldUpdateDatasource: false,
+  datasource: undefined,
+  showUploadDialog: false,
+  showDeleteDialog: false,
+  fileToDelete: '',
+  selectedFile: undefined,
+  selectedFiles: [],
+  membershipsState: {
+    isOpen: false
+  },
+  createEditElementOpType: CreateEditOperationType.NONE,
+  path: '',
+  showDeleteSelectedDialog: false,
+  isDefaultDocumentSpaceSettingsOpen: false,
+  sideDrawerSize: SideDrawerSize.WIDE,
+  favorites: []
 });
 
 const globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({
@@ -107,9 +135,34 @@ export const useDocumentSpaceRecentsPageState = (mountedRef: MutableRefObject<bo
   accessDocumentSpacePrivilegesState()
 );
 
+const wrapDocumentSpacePageState = (
+  spacesServiceState: State<SpacesPageState>,
+  mountedRef: MutableRefObject<boolean>,
+  authorizedUserService: AuthorizedUserService,
+  documentSpaceGlobalService: DocumentSpaceGlobalService,
+  documentSpaceService: DocumentSpaceService,
+  documentSpacePrivilegesService: DocumentSpacePrivilegeService) => {
+  return new SpacesPageService(
+    spacesServiceState,
+    mountedRef,
+    authorizedUserService,
+    documentSpaceGlobalService,
+    documentSpaceService,
+    documentSpacePrivilegesService);
+}
+
+export const useDocumentSpacePageState = (mountedRef: MutableRefObject<boolean>) => wrapDocumentSpacePageState(
+  useState(spacesPageState),
+  mountedRef,
+  accessAuthorizedUserState(),
+  accessDocumentSpaceGlobalState(),
+  accessDocumentSpaceState(),
+  accessDocumentSpacePrivilegesState()
+);
 
 const wrapGlobalDocumentSpaceState = (globalState: State<DocumentSpaceGlobalState>) => {
   return new DocumentSpaceGlobalService(globalState)
 }
 
 export const useDocumentSpaceGlobalState = () => wrapGlobalDocumentSpaceState(useState(globalDocumentSpaceState));
+export const accessDocumentSpaceGlobalState = () => wrapGlobalDocumentSpaceState(globalDocumentSpaceState);
