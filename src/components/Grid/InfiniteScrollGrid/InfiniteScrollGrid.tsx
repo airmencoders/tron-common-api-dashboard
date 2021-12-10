@@ -25,7 +25,7 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
     }
 
     props.updateDatasourceCallback?.();
-  }, [props.datasource]);
+  }, [props.datasource, props.updateDatasource]);
 
   return (
     <Grid
