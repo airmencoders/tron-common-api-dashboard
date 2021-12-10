@@ -21,6 +21,7 @@ function InfiniteScrollGrid(props: InfiniteScrollGridProps & GridProps) {
     const datasource = props.datasource;
     if (datasource) {
       gridApi.current?.setDatasource(datasource);
+      gridApi.current?.deselectAll();
     }
 
     props.updateDatasourceCallback?.();

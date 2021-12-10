@@ -195,16 +195,13 @@ export default function DocumentSpaceArchivedItemsPage() {
       throw new Error('Selected file cannot be null for deletion');
     }
 
-    let wasSuccess = false;
-
     try {
       await documentSpaceService.deleteItems(file.spaceId, file.path, [file.key]);
-      wasSuccess = true;
       createTextToast(ToastType.SUCCESS, 'File deleted: ' + file.key);
     } catch (err) {
       createTextToast(ToastType.ERROR, 'Could not delete file ' + file.key);
     } finally {
-      performActionWhenMounted(mountedRef.current, () => setStateOnItemRestorationOrDeletion([file], wasSuccess, true));
+      performActionWhenMounted(mountedRef.current, () => setStateOnItemRestorationOrDeletion());
     }
   }
 
@@ -260,7 +257,6 @@ export default function DocumentSpaceArchivedItemsPage() {
    * @param isSingle true if this action is used to restore a single item (from "more actions")
    */
   async function restoreItems(items: DocumentDto[], isSingle = false): Promise<void> {
-    let wasSuccess = false;
     try {
       const itemsToRestore = reduceDocumentDtoListToUnique(items);
       for (const item of itemsToRestore) {
@@ -279,25 +275,16 @@ export default function DocumentSpaceArchivedItemsPage() {
         await documentSpaceService.unArchiveItems(item.spaceId, listOfFilesWithPaths);
       }
 
-      wasSuccess = true;
       createTextToast(ToastType.SUCCESS, isSingle ? 'File Restored' : 'Files Restored');
     }
     catch (e) {
       createTextToast(ToastType.ERROR, 'Could not restore files - ' + (e as Error).toString());
     } finally {
-      performActionWhenMounted(mountedRef.current, () => setStateOnItemRestorationOrDeletion(items, wasSuccess, isSingle));
+      performActionWhenMounted(mountedRef.current, () => setStateOnItemRestorationOrDeletion());
     }
   }
 
-  /**
-   * Resets the datasource. If this was a non-bulk action, it ensures the multi-selected
-   * item state is kept in sync with the item of the target action. Closes all dialogs.
-   * 
-   * @param items the target items of the action (items being deleted/restored)
-   * @param wasSuccess if the request was successful
-   * @param isSingle true if this action is not a bulk action, false otherwise
-   */
-  function setStateOnItemRestorationOrDeletion(items: DocumentDto[], wasSuccess: boolean, isSingle = false) {
+  function setStateOnItemRestorationOrDeletion() {
     pageState.merge(state => {
       state.shouldUpdateDatasource = true;
       state.datasource = documentSpaceService.createDatasource(
@@ -307,39 +294,12 @@ export default function DocumentSpaceArchivedItemsPage() {
         ArchivedStatus.ARCHIVED
       );
       state.selectedFile = undefined;
-
-      if (!wasSuccess) {
-        return state;
-      }
-
-      if (!isSingle) {
-        state.selectedFiles = [];
-        return state;
-      } 
-
-      // Check if this item exists in multi-file selection state
-      // If it is, just remove it as it should no longer exist
-      if (items.length === 1) {
-        spliceExistingElement(state.selectedFiles, items[0]);
-      }
+      state.selectedFiles = [];
 
       return state;
     });
 
     closeDialogs();
-  }
-
-  /**
-   * The removal happens in place
-   * @param items items to check
-   * @param itemToRemove the item to remove
-   */
-  function spliceExistingElement(items: DocumentDto[], itemToRemove: DocumentDto) {
-    const uniqueKey = getDocumentUniqueKey(itemToRemove);
-    const existingItemIndex = items.findIndex(document => getDocumentUniqueKey(document) === uniqueKey);
-    if (existingItemIndex !== -1) {
-      items.splice(existingItemIndex, 1);
-    }
   }
 
   async function loadArchivedItems() {

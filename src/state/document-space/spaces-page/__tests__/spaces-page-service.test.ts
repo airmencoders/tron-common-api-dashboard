@@ -692,7 +692,7 @@ describe('Spaces Page Service Test', () => {
       expect(spacesState.shouldUpdateDatasource.value).toEqual(true);
       expect(spacesState.datasource.value).toBeDefined();
       expect(spacesState.selectedFile.value).not.toBeDefined();
-      expect(spacesState.selectedFiles.value).toEqual(documents);
+      expect(spacesState.selectedFiles.value).toEqual([]);
       expect(closeDialogsSpy).toHaveBeenCalled();
 
       expect(createTextToastMock).toHaveBeenCalledWith(ToastType.ERROR, 'Could not archive item(s) - failure');
@@ -713,9 +713,7 @@ describe('Spaces Page Service Test', () => {
       expect(spacesState.shouldUpdateDatasource.value).toEqual(true);
       expect(spacesState.datasource.value).toBeDefined();
       expect(spacesState.selectedFile.value).not.toBeDefined();
-
-      spacesService.spliceExistingDocument(selectedDocuments, itemToBeArchived);
-      expect(spacesState.selectedFiles.value).toEqual(selectedDocuments);
+      expect(spacesState.selectedFiles.value).toEqual([]);
 
       expect(closeDialogsSpy).toHaveBeenCalled();
     });
@@ -734,7 +732,8 @@ describe('Spaces Page Service Test', () => {
       expect(spacesState.shouldUpdateDatasource.value).toEqual(true);
       expect(spacesState.datasource.value).toBeDefined();
       expect(spacesState.selectedFile.value).not.toBeDefined();
-      expect(spacesState.selectedFiles.value).toEqual(documents);
+      expect(spacesState.selectedFiles.value).toEqual([]);
+
       expect(closeDialogsSpy).toHaveBeenCalled();
     });
 
@@ -742,15 +741,6 @@ describe('Spaces Page Service Test', () => {
       spacesState.selectedFile.set(undefined);
       await expect(spacesService.archiveFile(true)).rejects.toEqual(Error('Selected file cannot be null for archive'));
     });
-  });
-
-  it('should remove an existing DocumentDto in place', () => {
-    const documentsToTest = [...documents];
-
-    expect(documentsToTest.length).toEqual(documents.length);
-    spacesService.spliceExistingDocument(documentsToTest, documents[0]);
-    expect(documentsToTest.length).toEqual(documents.length - 1);
-    expect(documentsToTest).not.toContainEqual(documents[0]);
   });
 
   it('should handle merging state depending on component mounted status', () => {
