@@ -302,6 +302,8 @@ function DocumentSpacePage() {
   const isDocumentSpacesErrored =
     documentSpaceService.isDocumentSpacesStateErrored;
 
+  const datasource = pageService.state.datasource.attach(Downgraded).value;
+
   return (
     <PageFormat pageTitle="Document Space" className="document-space-page">
       <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
@@ -374,10 +376,10 @@ function DocumentSpacePage() {
           </div>
       )}
       {pageService.state.selectedSpace.value != null &&
-        pageService.state.datasource.value &&
+        datasource &&
         <FullPageInfiniteGrid
           columns={documentDtoColumns.attach(Downgraded).value}
-          datasource={pageService.state.datasource.value}
+          datasource={datasource}
           cacheBlockSize={generateInfiniteScrollLimit(pageService.infiniteScrollOptions)}
           maxBlocksInCache={pageService.infiniteScrollOptions.maxBlocksInCache}
           maxConcurrentDatasourceRequests={pageService.infiniteScrollOptions.maxConcurrentDatasourceRequests}
