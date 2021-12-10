@@ -2,7 +2,7 @@ import { useHookstate } from '@hookstate/core';
 import { Initial } from '@hookstate/initial';
 import { Touched } from '@hookstate/touched';
 import { Validation } from '@hookstate/validation';
-import React, { FormEvent, useEffect } from 'react';
+import React, { FormEvent } from 'react';
 import Form from '../../components/forms/Form/Form';
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
@@ -94,6 +94,7 @@ export default function DocumentSpaceCreateEditForm(props: DocumentSpaceCreateEd
           <ul>
             <li>Are not empty or blank</li>
             <li>Are only alpha-numeric characters including spaces, parens, hyphens, underscores, and periods</li>
+            <li>Contains no more than 255 characters</li>
             <li>Have no spaces/whitespace before or after file extension</li>
             <li>One period (.) per name (e.g. file.txt)</li>
           </ul>

@@ -1,5 +1,5 @@
 import { ApexOptions } from 'apexcharts';
-import { HTMLProps, useMemo } from 'react';
+import { HTMLProps } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { ChartWithTitleAndTotalProps } from './ChartWithTitleAndTotalProps';
 import './ChartWithTitleAndTotal.scss';

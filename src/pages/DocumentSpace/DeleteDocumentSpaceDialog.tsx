@@ -7,7 +7,6 @@ import ModalIconTitle from '../../components/Modal/ModalIconTitle';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import RemoveIcon from '../../icons/RemoveIcon';
-import { DocumentSpaceResponseDto } from '../../openapi';
 import {
   useDocumentSpaceState
 } from '../../state/document-space/document-space-state';

@@ -20,7 +20,6 @@ import { convertAgGridSortToQueryParams, generateInfiniteScrollLimit } from '../
 import Spinner from '../Spinner/Spinner';
 import { ToastType } from '../Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../Toast/ToastUtils/ToastUtils';
-import InfiniteScrollGrid from '../Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import { prepareDataCrudErrorResponse } from '../../state/data-service/data-service-utils';
 import DataCrudDelete from './DataCrudDelete';
 import './DataCrudFormPage.scss';

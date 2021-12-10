@@ -225,6 +225,7 @@ export function validateDocSpaceName(name: string): boolean {
  export function validateFolderName(name: string): boolean {
   if (!name) return false; // null check
   if (name.trim() === '') return false; // blank check
+  if (name.length > 255) return false;
   return /^[A-Za-z0-9-._()\s]+$/.test(name)
     && (name.match(/(\.)/g) || []).length <= 1  // no more than 1 dots
     && !(/\s[.]|[.]\s/.test(name));  // no spaces before extension .. or after

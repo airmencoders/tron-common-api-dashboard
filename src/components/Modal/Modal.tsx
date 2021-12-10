@@ -3,7 +3,6 @@ import {ModalProps} from './ModalProps';
 import ReactModal from 'react-modal';
 
 import './Modal.scss';
-import CloseIcon from '../../icons/CloseIcon';
 import CloseIcon2 from '../../icons/CloseIcon2';
 import Button from '../../components/Button/Button';
 

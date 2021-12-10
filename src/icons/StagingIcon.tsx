@@ -1,4 +1,3 @@
-import { IconProps } from './IconProps';
 import React from 'react';
 
 function StagingIcon() {
