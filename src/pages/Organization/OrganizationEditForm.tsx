@@ -24,7 +24,6 @@ import { OrganizationDtoWithDetails, OrgWithDetails, PersonWithDetails, useOrgan
 import { getEnumKeyByEnumValue } from '../../utils/enum-utils';
 import { validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import CopyToClipboard from '../../components/CopyToClipboard/CopyToClipboard';
-import InfiniteScrollGrid from '../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import EditIcon from '../../icons/EditIcon';
 import RemoveIcon from '../../icons/RemoveIcon';
 import './OrganizationEditForm.scss';

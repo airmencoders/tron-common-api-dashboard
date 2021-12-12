@@ -7,7 +7,6 @@ import DocumentRowActionCellRenderer
 , { PopupMenuItem }  from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import GridColumn from '../../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import PageFormat from '../../../components/PageFormat/PageFormat';
 import {
   DocumentSpacePrivilegeDtoTypeEnum,

@@ -1,4 +1,4 @@
-import { none, State, useHookstate } from '@hookstate/core';
+import { State, useHookstate } from '@hookstate/core';
 import React, { FormEvent, useEffect } from 'react';
 import Button from '../../components/Button/Button';
 import Form from '../../components/forms/Form/Form';

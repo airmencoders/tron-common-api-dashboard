@@ -12,7 +12,7 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { failsHookstateValidation, generateStringErrorMessages, validateCheckboxPrivileges, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
+import { failsHookstateValidation, generateStringErrorMessages, validateEmail, validateRequiredString, validateStringLength, validationErrors } from '../../utils/validation-utils';
 import {DashboardUserDto} from '../../openapi/models';
 import {PrivilegeType} from '../../state/privilege/privilege-type';
 import {useDashboardUserState} from '../../state/dashboard-user/dashboard-user-state';

@@ -3,7 +3,6 @@ import { useHookstate } from '@hookstate/core';
 import Button from '../../../components/Button/Button';
 import GridColumn from '../../../components/Grid/GridColumn';
 import { createDefaultGridFilterParamsForType, generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
-import InfiniteScrollGrid from '../../../components/Grid/InfiniteScrollGrid/InfiniteScrollGrid';
 import Modal from '../../../components/Modal/Modal';
 import ModalFooterSubmit from '../../../components/Modal/ModalFooterSubmit';
 import ModalTitle from '../../../components/Modal/ModalTitle';
