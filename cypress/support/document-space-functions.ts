@@ -2,6 +2,14 @@ import { adminJwt, documentSpaceApiBase, documentSpaceDashboardUrl, documentSpac
 import { DocumentSpaceResponseDto, DocumentSpaceResponseDtoResponseWrapper } from '../../src/openapi';
 import AgGridFunctions, { SpacesGridColId } from './ag-grid-functions';
 import UtilityFunctions from './utility-functions';
+import { shortenString } from '../../src/utils/string-utils';
+
+export enum OverwriteAction {
+  YES = '[data-testid=upload-overwrite-yes__btn]',
+  YES_TO_ALL = '[data-testid=upload-overwrite-all__btn]',
+  NO = '[data-testid=upload-overwrite-no__btn]',
+  NO_TO_ALL = '[data-testid=upload-overwrite-none__btn]'
+}
 
 export default class DocumentSpaceFunctions {
   /**
@@ -58,8 +66,19 @@ export default class DocumentSpaceFunctions {
       headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
       body: {
         currentPath: path,
-        itemsToDelete: filenames
+        items: filenames
       }
+    }).then(response => {
+      expect(response.status).to.eq(204);
+      return response;
+    });
+  }
+
+  static deleteSpace(spaceId: string) {
+    return cy.request({
+      url: `${documentSpaceUrl}/spaces/${spaceId}`,
+      method: 'DELETE',
+      headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc },
     }).then(response => {
       expect(response.status).to.eq(204);
       return response;
@@ -216,8 +235,50 @@ export default class DocumentSpaceFunctions {
     return visitSite;
   }
 
+  static visitFavoritePage(spaceId?: string) {
+    const visitSite = UtilityFunctions.visitSite(`${documentSpaceDashboardUrl}/favorites`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc } });
+
+    if (spaceId != null) {
+      return this.selectDocumentSpaceOption(spaceId);
+    }
+
+    return visitSite;
+  }
+
+  static visitRecentsPage() {
+    cy.intercept('GET', `${documentSpaceApiBase}/spaces/files/recently-uploaded*`).as('getRecentsRequest');
+    const visitSite = UtilityFunctions.visitSite(`${documentSpaceDashboardUrl}/recents`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc } });
+
+    cy.wait('@getRecentsRequest');
+
+    return visitSite;
+  }
+
   static getMoreActionsColumnByRowOnNameCol(name: string) {
     return AgGridFunctions.getRowWithColIdContainingValue(SpacesGridColId.NAME, name).find('[data-testid=document-row-action-cell-renderer] > [data-testid=more_action]').should('have.length', 1);
+  }
+
+  static selectDocumentSpaceOption(spaceId: string) {
+    return cy.get('[data-testid=document-space-selector]').find('option:selected').invoke('val')
+      .then(selected => {
+        if (selected !== spaceId) {
+          return cy.get('[data-testid=document-space-selector]').select(spaceId);
+        }
+      });
+  }
+
+  static fillRenameElementForm(newName: string) {
+    if (newName === '') {
+      return cy.get('[data-testid=element-name-field]').clear();
+    }
+
+    return cy.get('[data-testid=element-name-field]').clear().type(newName);
+  }
+
+  static fillRenameElementFormAndSubmit(newName: string) {
+    this.fillRenameElementForm(newName);
+
+    return cy.get('button').contains('Update').click({ force: true });
   }
 
   /**
@@ -231,7 +292,22 @@ export default class DocumentSpaceFunctions {
   }
 
   /**
-   * Clicks the "Delete Confirmation" modal for file/folder deletion/delete archive.
+   * Clicks the "Archive" modal for file/folder deletion/delete archive.
+   * @param isConfirmed press the confirm (Delete) button if true, otherwise presses cancel
+   * @param waitForRequest if true, will wait for a DELETE request to be made
+   * @param waitForDataRequest if true, will wait for a GET request to be made (specifically for the refetch of data)
+   * @returns
+   */
+  static clickArchiveConfirmationAction(isConfirmed: boolean = true) {
+    if (isConfirmed) {
+      return UtilityFunctions.getModalContainer('Archive').find('[data-testid=modal-submit-btn]').click({ force: true });
+    } else {
+      return UtilityFunctions.getModalContainer('Archive').find('[data-testid=modal-cancel-btn]').click({ force: true });
+    }
+  }
+
+  /**
+   * Clicks the "Archive" modal for file/folder deletion/delete archive.
    * @param isConfirmed press the confirm (Delete) button if true, otherwise presses cancel
    * @param waitForRequest if true, will wait for a DELETE request to be made
    * @param waitForDataRequest if true, will wait for a GET request to be made (specifically for the refetch of data)
@@ -239,10 +315,19 @@ export default class DocumentSpaceFunctions {
    */
   static clickDeleteConfirmationAction(isConfirmed: boolean = true) {
     if (isConfirmed) {
-      return UtilityFunctions.getModalContainer('Delete Confirmation').find('[data-testid=modal-submit-btn]').click({ force: true });
+      return UtilityFunctions.getModalContainer('Delete Confirm').find('[data-testid=modal-submit-btn]').click({ force: true });
     } else {
-      return UtilityFunctions.getModalContainer('Delete Confirmation').find('[data-testid=modal-cancel-btn]').click({ force: true });
+      return UtilityFunctions.getModalContainer('Delete Confirm').find('[data-testid=modal-cancel-btn]').click({ force: true });
     }
+  }
+
+  /**
+   * Clicks the Overwrite confirmation action
+   * @param overwriteAction the action to click
+   * @returns 
+   */
+  static clickOverwriteConfirmationAction(overwriteAction: OverwriteAction) {
+    return UtilityFunctions.getModalContainer('Confirm Overwrite').find(overwriteAction).click({ force: true });
   }
 
   /**
@@ -251,7 +336,8 @@ export default class DocumentSpaceFunctions {
    * @returns 
    */
   static getItemInBreadcrumbs(itemName: string) {
-    return cy.get('.breadcrumb-area').find('span').contains(itemName).should('have.length', 1);
+    const itemShorten = shortenString(itemName);
+    return cy.get('.breadcrumb-area').contains('span', itemShorten).should('have.length', 1);
   }
 
   /**
@@ -278,7 +364,7 @@ export enum MoreActionsType {
   RESTORE = "Restore",
   PERMANENT_DELETE = "Permanently Delete",
   FAVORITE = "Add to favorites",
-  NEW_VERSION = "Upload new version",
+  UNFAVORITE = "Remove from favorites",
   REMOVE = "Remove",
   RENAME = "Rename"
 }

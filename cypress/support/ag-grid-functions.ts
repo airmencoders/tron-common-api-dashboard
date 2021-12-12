@@ -197,3 +197,11 @@ export enum SpacesGridColId {
 export enum SpacesManageMembersColId {
   EMAIL = 'email'
 }
+
+export enum FavoritesGridColId {
+  NAME = 'key'
+}
+
+export enum RecentsGridColId {
+  NAME = 'key'
+}

@@ -33,6 +33,12 @@ describe('Document Space Folder test', () => {
       }).as('cleanUp');
   });
 
+  after(() => {
+    cy.get<string>(spaceIdAlias).then(spaceId => {
+      Funcs.deleteSpace(spaceId);
+    });
+  });
+
   it('should be able to create a folder and navigate to it', () => {
     cy.get<string>(testFolderAlias)
       .then(folderName => {
@@ -85,8 +91,8 @@ describe('Document Space Folder test', () => {
         cy.get<string>('@secondLevel')
           .then(secondFolderName => {
             Funcs.clickMoreActionsButton(secondFolderName, MoreActionsType.REMOVE);
-            Funcs.clickDeleteConfirmationAction(true);
-            UtilityFunctions.findToastContainsMessage('File Archived');
+            Funcs.clickArchiveConfirmationAction(true);
+            UtilityFunctions.findToastContainsMessage('Item(s) Archived');
           });
       });
 
@@ -97,7 +103,7 @@ describe('Document Space Folder test', () => {
       Funcs.clickMoreActionsButton(secondLevel, MoreActionsType.PERMANENT_DELETE);
       Funcs.clickDeleteConfirmationAction(true);
 
-      UtilityFunctions.findToastContainsMessage('Files Deleted');
+      UtilityFunctions.findToastContainsMessage(`File deleted: ${secondLevel}`)
     });
   });
 
@@ -106,7 +112,7 @@ describe('Document Space Folder test', () => {
     cy.get<string>(testFolderAlias)
       .then(folderName => {
         Funcs.clickMoreActionsButton(folderName, MoreActionsType.REMOVE);
-        Funcs.clickDeleteConfirmationAction(true);
+        Funcs.clickArchiveConfirmationAction(true);
       });
 
     // Try to create another folder with the same name,
