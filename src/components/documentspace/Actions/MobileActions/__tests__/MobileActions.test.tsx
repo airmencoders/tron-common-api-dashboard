@@ -93,8 +93,8 @@ describe('Mobile Actions Test', () => {
 
     userEvent.click(actionsButton);
 
-    expect(element.getByTitle('Upload File')).toBeInTheDocument();
-    userEvent.click(element.getByTitle('Upload File'));
+    expect(element.getByTitle('Upload File(s)')).toBeInTheDocument();
+    userEvent.click(element.getByTitle('Upload File(s)'));
   });
 
   it('should render Membership actions when authorized for membership only', async () => {

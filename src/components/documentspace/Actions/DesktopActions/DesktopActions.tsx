@@ -11,15 +11,23 @@ import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
 import { ActionsProps } from '../ActionsProps';
 import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
+import { useHookstate } from '@hookstate/core';
 
 function DesktopActions(props: ActionsProps) {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
-
   const uploadFileRef = createRef<HTMLInputElement>();
 
   if (props.selectedSpace.value == null) {
     return null;
+  }
+
+  function openFileUpload(mode: 'file' | 'folder') {
+    if (uploadFileRef.current) {
+      (uploadFileRef.current as any).webkitdirectory = mode === 'folder';
+    }
+
+    uploadFileRef.current?.click();
   }
 
   return (
@@ -33,14 +41,21 @@ function DesktopActions(props: ActionsProps) {
                 currentPath={props.path.value}
                 onFinish={() => props.shouldUpdateDatasource.set(true)}
             />
-            <Button
-                data-testid="upload-file__btn"
-                onClick={() => uploadFileRef.current?.click()}
-                type="button"
-                icon
-            >
-              <UploadMaterialIcon size={1} fill iconTitle="Upload Files"/>
-            </Button>
+            <DropDown
+              id="upload-items"
+              data-testid="upload-items"
+              anchorContent={<UploadMaterialIcon size={1} fill iconTitle="Upload File(s)"/>}
+              items={[
+                {
+                  displayName: 'Upload File(s)',
+                  action: () => openFileUpload('file')
+                },
+                {
+                  displayName: 'Upload Folder',
+                  action: () => openFileUpload('folder')
+                }
+              ]}
+            />
           </div>
         </>
         }
