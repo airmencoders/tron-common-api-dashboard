@@ -38,6 +38,14 @@ function MobileActions(props: ActionsProps) {
     state.popupOpen.set(false);
   }
 
+  function openFileUpload(mode: 'file' | 'folder') {
+    if (uploadFileRef.current) {
+      (uploadFileRef.current as any).webkitdirectory = mode === 'folder';
+    }
+
+    uploadFileRef.current?.click();
+  }
+
   function getEllipsisContent() {
     if (props.selectedSpace.value == null ||
       !documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
@@ -66,9 +74,14 @@ function MobileActions(props: ActionsProps) {
         <Popup.Content>
           {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
             <>
-              <div className="popper__item" onClick={() => closePopupWithAction(() => uploadFileRef.current?.click())}>
-                <UploadMaterialIcon style="primary" fill className="popper__icon item__icon" size={1} iconTitle="Upload File" />
-                <span className="popper__title item__title">Upload File</span>
+              <div className="popper__item" onClick={() => closePopupWithAction(() => openFileUpload('file'))}>
+                <UploadMaterialIcon style="primary" fill className="popper__icon item__icon" size={1} iconTitle="Upload File(s)" />
+                <span className="popper__title item__title">Upload File(s)</span>
+              </div>
+
+              <div className="popper__item" onClick={() => closePopupWithAction(() => openFileUpload('folder'))}>
+                <UploadMaterialIcon style="primary" fill className="popper__icon item__icon" size={1} iconTitle="Upload Folder" />
+                <span className="popper__title item__title">Upload Folder</span>
               </div>
 
               <div className="popper__item" onClick={() => closePopupWithAction(() => props.createEditElementOpType.set(CreateEditOperationType.CREATE_FOLDER))}>
