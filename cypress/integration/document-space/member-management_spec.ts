@@ -16,6 +16,12 @@ describe('Document Space Member Management', () => {
       );
   });
 
+  after(() => {
+    cy.get<string>(spaceIdAlias).then(spaceId => {
+      Funcs.deleteSpace(spaceId);
+    });
+  });
+
   it('should be able to add a member to document space and remove them', () => {
     const email = `${cypressEmailPrefix}@user.com`;
 

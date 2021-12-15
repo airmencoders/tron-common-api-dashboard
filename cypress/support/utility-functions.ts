@@ -52,7 +52,7 @@ export default class UtilityFunctions {
    * @returns cypress reference to the modal
    */
   static getModalContainer(titleToSearch: string) {
-    return cy.get('.modal-title__text').should('have.text', titleToSearch).parents('.modal-component__container').first();
+    return cy.contains('.modal-title__text', titleToSearch).parents('.modal-component__container').first();
   }
 
   static findPrivilegeFromResponse(privNamesToFind: string[], privResponse: PrivilegeDtoResponseWrapper):

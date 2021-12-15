@@ -8,7 +8,7 @@ export default function UploadMaterialIcon(props: IconProps & SvgIconProps) {
       viewBox="0 0 24 26"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`svg-icon upload-material-icon` +
+      className={`svg-icon upload-material-icon ` +
         `${getSvgIconColorClassname(props.style, props.disabled, props.fill)} ` +
         `${props.className ?? ''}`
       }

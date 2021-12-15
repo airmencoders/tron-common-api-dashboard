@@ -1,13 +1,13 @@
 /// <reference types="Cypress" />
 
-import {apiBase, host, adminJwt, ssoXfcc } from "../support";
+import {apiBase, host, adminJwt, ssoXfcc, skipIfPipeline } from "../support";
 import AgGridFunctions, { AppSourceEmailGridColId, AppSourceGridColId, DashboardUserGridColId } from '../support/ag-grid-functions';
 import UtilityFunctions, {Page} from '../support/utility-functions';
 import DataCrudFormPageUtil from '../support/data-crud-form-functions';
 
 describe('Dashboard Users - App Source Admin Tests', () => {
 
-  it.skip('Should create a Dashboard User for App Source Admin add', () => {
+  skipIfPipeline('Should create a Dashboard User for App Source Admin add', () => {
     const adminEmail = `${UtilityFunctions.generateRandomString()}@email.com`;
 
     UtilityFunctions.visitSite(`${host}`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});

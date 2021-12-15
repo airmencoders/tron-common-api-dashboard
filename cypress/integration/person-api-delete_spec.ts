@@ -1,12 +1,12 @@
 /// <reference types="Cypress" />
 
 import AppClientSetupFunctions from '../support/app-client-setup-functions';
-import { apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc } from "../support";
+import { apiHost, appClientApiHost, personApiBase, adminJwt, ssoXfcc, nonAdminJwt, appClientTesterXfcc, skipIfPipeline } from "../support";
 import UtilityFunctions from '../support/utility-functions';
 
 describe('Person Delete API', () => {
 
-  it.skip('Should allow an authorized App Client to Delete a Person', () => {
+  skipIfPipeline('Should allow an authorized App Client to Delete a Person', () => {
     AppClientSetupFunctions.addAndConfigureAppClient(['PERSON_DELETE'])
         .then((appClientId: string) => {
           return cy
