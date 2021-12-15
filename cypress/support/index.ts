@@ -47,6 +47,8 @@ export const documentSpaceDashboardUrl = `${host}/document-space`;
 
 export const agGridFilterDebounce = 500;
 
+export const skipIfPipeline = Cypress.env('LOCAL_ENV') ? it : it.skip
+
 const word = 'jwtToken';
 const type = 'HS256';
 

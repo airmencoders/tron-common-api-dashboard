@@ -1,4 +1,4 @@
-import { appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt } from '../../../support';
+import { appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt, skipIfPipeline } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -27,7 +27,7 @@ describe('ORGANIZATION_DELETE EFA privilege', () => {
       });
     });
 
-    it.skip('should allow with ORGANIZATION_DELETE privilege with 204', () => {
+    skipIfPipeline('should allow with ORGANIZATION_DELETE privilege with 204', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_DELETE']);
 
       OrgSetupFunctions.createOrganization()

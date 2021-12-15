@@ -1,13 +1,13 @@
 /// <reference types="Cypress" />
 
-import {apiBase, host, adminJwt, ssoXfcc } from "../support";
+import {apiBase, host, adminJwt, ssoXfcc, skipIfPipeline } from "../support";
 import UtilityFunctions, {Page} from '../support/utility-functions';
 import DataCrudFormPageUtil, { AppClient } from '../support/data-crud-form-functions';
 import AgGridFunctions, { AppClientGridColId, DashboardUserGridColId } from '../support/ag-grid-functions';
 
 describe('Dashboard Users - App Client Dev Tests', () => {
 
-  it.skip('Should create a Dashboard User for App Client Dev add', () => {
+  skipIfPipeline('Should create a Dashboard User for App Client Dev add', () => {
     UtilityFunctions.visitSite(`${host}/app-clients`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc }});
 
     const appClient: AppClient = {

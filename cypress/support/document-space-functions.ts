@@ -171,7 +171,8 @@ export default class DocumentSpaceFunctions {
     cy.intercept('POST', `${documentSpaceApiBase}/spaces/${spaceId}/files/upload*`).as('uploadRequest');
     cy.intercept('GET', `${documentSpaceApiBase}/spaces/${spaceId}/content*`).as('getFilesRequest');
 
-    cy.get('[data-testid=upload-file__btn]').click({ force: true })
+    cy.get('.dropdown .upload-material-icon').click({ force: true });
+    cy.contains('button', 'Upload File(s)')
       .then(() => {
         cy.get('input[type=file]').attachFile({
           filePath: 'test-upload.txt',
@@ -211,7 +212,8 @@ export default class DocumentSpaceFunctions {
       filename = overrideName;
     }
 
-    cy.get('[data-testid=upload-file__btn]').click({ force: true })
+    cy.get('.dropdown .upload-material-icon').click({ force: true });
+    cy.contains('button', 'Upload File(s)')
       .then(() => {
         cy.get('input[type=file]').attachFile({
           filePath: 'test-upload.txt',

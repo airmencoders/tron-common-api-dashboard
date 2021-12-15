@@ -1,5 +1,5 @@
 import { OrganizationDto, OrganizationDtoResponseWrapper } from '../../../../src/openapi';
-import { appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt } from '../../../support';
+import { appClientHostOrganizationUrl, appClientTesterXfcc, nonAdminJwt, skipIfPipeline } from '../../../support';
 import AppClientSetupFunctions from '../../../support/app-client-setup-functions';
 import { cleanup, orgIdsToDelete } from '../../../support/cleanup-helper';
 import OrgSetupFunctions from '../../../support/organization/organization-setup-functions';
@@ -29,7 +29,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
       });
     });
 
-    it.skip('should allow with ORGANIZATION_CREATE privilege with 201', () => {
+    skipIfPipeline('should allow with ORGANIZATION_CREATE privilege with 201', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_CREATE']);
 
       cy.request({
@@ -60,7 +60,7 @@ describe('ORGANIZATION_CREATE EFA privilege', () => {
       });
     });
 
-    it.skip('should allow with ORGANIZATION_CREATE privilege with 201', () => {
+    skipIfPipeline('should allow with ORGANIZATION_CREATE privilege with 201', () => {
       AppClientSetupFunctions.addAndConfigureAppClient(['ORGANIZATION_CREATE']);
 
       const orgsToCreate: OrganizationDto[] = [];
