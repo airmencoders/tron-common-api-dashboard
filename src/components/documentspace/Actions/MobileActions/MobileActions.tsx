@@ -9,11 +9,14 @@ import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import PeopleIcon from '../../../../icons/PeopleIcon';
 import { ActionsProps } from '../ActionsProps';
 import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
-import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
+import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
 import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
+import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../../Toast/ToastUtils/toast-type';
+import { checkIfItemsIsLoneEmptyFolder } from '../DesktopActions/DesktopActions';
 
 interface MoreActionsState {
   popupOpen: boolean;
@@ -113,13 +116,14 @@ function MobileActions(props: ActionsProps) {
         items={[
           {
             displayName: 'Download Selected',
-            action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-              ? downloadUrlService.createRelativeFilesDownloadUrl(
+            action: () => {
+              if (props.selectedFiles.value.length > 0 && props.selectedSpace.value && checkIfItemsIsLoneEmptyFolder(props.selectedFiles.value)) {
+                window.open(downloadUrlService.createRelativeFilesDownloadUrl(
                 props.selectedSpace.value.id,
                 props.path.value,
-                props.selectedFiles.value
-              )
-              : undefined)
+                props.selectedFiles.value));
+              }
+            }
           },
           {
             displayName: 'Download All Files (zip)',

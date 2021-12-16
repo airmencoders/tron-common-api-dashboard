@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import DesktopActions from '../DesktopActions';
+import DesktopActions, { checkIfItemsIsLoneEmptyFolder } from '../DesktopActions';
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../../../../openapi';
 import { useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../../../state/document-space/document-space-state';
@@ -166,5 +166,15 @@ describe('Desktop Actions Test', () => {
     expect(element.queryByTestId('delete-selected-items')).not.toBeInTheDocument();
     expect(element.queryByTitle('Download Items')).not.toBeInTheDocument();
     expect(element.queryByTitle('Manage Users')).not.toBeInTheDocument();
+  });
+
+  it('should disallow downloading of a lone, empty folder', () => {
+    expect(checkIfItemsIsLoneEmptyFolder(undefined!)).toBeFalsy();
+    expect(checkIfItemsIsLoneEmptyFolder([])).toBeFalsy();
+    expect(checkIfItemsIsLoneEmptyFolder([ { hasContents: true, folder: true } as DocumentDto])).toBeTruthy();
+    expect(checkIfItemsIsLoneEmptyFolder([ { hasContents: true, folder: false } as DocumentDto])).toBeTruthy();
+    expect(checkIfItemsIsLoneEmptyFolder([ { hasContents: false, folder: true } as DocumentDto])).toBeFalsy();
+    expect(checkIfItemsIsLoneEmptyFolder([ { hasContents: false, folder: true } as DocumentDto, { hasContents: true, folder: true } as DocumentDto])).toBeTruthy();
+    expect(checkIfItemsIsLoneEmptyFolder([ { hasContents: false, folder: true } as DocumentDto, { hasContents: false, folder: false } as DocumentDto])).toBeTruthy();
   });
 });

@@ -4,7 +4,7 @@ import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
-import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
+import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import PeopleIcon2 from '../../../../icons/PeopleIcon2';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
@@ -12,6 +12,21 @@ import RemoveIcon from '../../../../icons/RemoveIcon';
 import { ActionsProps } from '../ActionsProps';
 import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 import { useHookstate } from '@hookstate/core';
+import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../../Toast/ToastUtils/toast-type';
+
+export function checkIfItemsIsLoneEmptyFolder(selectedFiles: DocumentDto[]): boolean {
+  if (!selectedFiles || selectedFiles.length === 0) return false;
+
+  if (selectedFiles.length > 1) return true;  // we dont care if we multiple items whether or not one of them is empty
+  else {
+    if (selectedFiles[0].folder && !selectedFiles[0].hasContents) {
+      createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
+      return false; // an empty folder
+    }
+    else return true;
+  }
+}
 
 function DesktopActions(props: ActionsProps) {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
@@ -67,13 +82,14 @@ function DesktopActions(props: ActionsProps) {
                 items={[
                   {
                     displayName: 'Download Selected',
-                    action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-                        ? downloadUrlService.createRelativeFilesDownloadUrl(
-                            props.selectedSpace.value.id,
-                            props.path.value,
-                            props.selectedFiles.value
-                        )
-                        : undefined)
+                    action: () => {
+                      if (props.selectedFiles.value.length > 0 && props.selectedSpace.value && checkIfItemsIsLoneEmptyFolder(props.selectedFiles.value)) {
+                        window.open(downloadUrlService.createRelativeFilesDownloadUrl(
+                        props.selectedSpace.value.id,
+                        props.path.value,
+                        props.selectedFiles.value));
+                      }
+                    }
                   },
                   {
                     displayName: 'Download All Files (zip)',
