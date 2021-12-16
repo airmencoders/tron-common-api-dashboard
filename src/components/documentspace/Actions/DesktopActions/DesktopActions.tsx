@@ -4,7 +4,7 @@ import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
 import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
-import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
+import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import PeopleIcon2 from '../../../../icons/PeopleIcon2';
 import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
@@ -12,6 +12,27 @@ import RemoveIcon from '../../../../icons/RemoveIcon';
 import { ActionsProps } from '../ActionsProps';
 import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 import { useHookstate } from '@hookstate/core';
+import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
+import { ToastType } from '../../../Toast/ToastUtils/toast-type';
+
+/**
+ * Helper to check a list of selected rows (DocumentDto objects) to see if we only have one
+ * item in there, and if that's true, dont allow it to be downloaded if its BOTH (a folder AND its empty with no children)
+ * @param selectedFiles list of user selected row(s)
+ * @returns true if ok to proceed with download false otherwise
+ */
+export function checkIfItemsIsLoneEmptyFolder(selectedFiles: DocumentDto[]): boolean {
+  if (!selectedFiles || selectedFiles.length === 0) return false; // shouldn't get here... but disallow
+
+  if (selectedFiles.length > 1) return true;  // if we have multiple items - we dont care if one is empty
+  else {
+    if (selectedFiles[0].folder && !selectedFiles[0].hasContents) {
+      createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
+      return false; // an empty folder - disallow download if it as it would be dubious otherwise
+    }
+    else return true;  // must have been a file or a folder with contents - allow
+  }
+}
 
 function DesktopActions(props: ActionsProps) {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
@@ -67,13 +88,14 @@ function DesktopActions(props: ActionsProps) {
                 items={[
                   {
                     displayName: 'Download Selected',
-                    action: () => window.open((props.selectedFiles.value.length > 0 && props.selectedSpace.value)
-                        ? downloadUrlService.createRelativeFilesDownloadUrl(
-                            props.selectedSpace.value.id,
-                            props.path.value,
-                            props.selectedFiles.value
-                        )
-                        : undefined)
+                    action: () => {
+                      if (props.selectedFiles.value.length > 0 && props.selectedSpace.value && checkIfItemsIsLoneEmptyFolder(props.selectedFiles.value)) {
+                        window.open(downloadUrlService.createRelativeFilesDownloadUrl(
+                        props.selectedSpace.value.id,
+                        props.path.value,
+                        props.selectedFiles.value));
+                      }
+                    }
                   },
                   {
                     displayName: 'Download All Files (zip)',
