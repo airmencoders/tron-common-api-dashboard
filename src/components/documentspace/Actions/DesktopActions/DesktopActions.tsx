@@ -15,16 +15,22 @@ import { useHookstate } from '@hookstate/core';
 import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
 import { ToastType } from '../../../Toast/ToastUtils/toast-type';
 
+/**
+ * Helper to check a list of selected rows (DocumentDto objects) to see if we only have one
+ * item in there, and if that's true, dont allow it to be downloaded if its BOTH (a folder AND its empty with no children)
+ * @param selectedFiles list of user selected row(s)
+ * @returns true if ok to proceed with download false otherwise
+ */
 export function checkIfItemsIsLoneEmptyFolder(selectedFiles: DocumentDto[]): boolean {
-  if (!selectedFiles || selectedFiles.length === 0) return false;
+  if (!selectedFiles || selectedFiles.length === 0) return false; // shouldn't get here... but disallow
 
-  if (selectedFiles.length > 1) return true;  // we dont care if we multiple items whether or not one of them is empty
+  if (selectedFiles.length > 1) return true;  // if we have multiple items - we dont care if one is empty
   else {
     if (selectedFiles[0].folder && !selectedFiles[0].hasContents) {
       createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
-      return false; // an empty folder
+      return false; // an empty folder - disallow download if it as it would be dubious otherwise
     }
-    else return true;
+    else return true;  // must have been a file or a folder with contents - allow
   }
 }
 
