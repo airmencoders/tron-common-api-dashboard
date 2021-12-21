@@ -277,11 +277,7 @@ describe('Test Document Space Service', () => {
     const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getSpaces');
 
     const cancellableRequest = documentSpaceService.fetchAndStoreSpaces();
-    await expect(cancellableRequest.promise).rejects.toEqual(new RequestError({
-      status: errorResponse.response.data.status,
-      error: errorResponse.response.data.error,
-      message: errorResponse.response.data.reason,
-    }));
+    await expect(cancellableRequest.promise).rejects.toEqual(errorResponse.response.data.reason);
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
 
@@ -491,7 +487,7 @@ describe('Test Document Space Service', () => {
     const filename = 'testfile.txt';
     const expectedError = prepareRequestError(axiosError);
 
-    await expect(documentSpaceService.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename)).rejects.toEqual(expectedError);
+    await expect(documentSpaceService.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename)).rejects.toEqual(expectedError.message);
     expect(mock).toHaveBeenCalled();
   });
 
