@@ -56,7 +56,8 @@ const spacesPageState = createState<SpacesPageState>({
   showDeleteSelectedDialog: false,
   isDefaultDocumentSpaceSettingsOpen: false,
   sideDrawerSize: SideDrawerSize.WIDE,
-  favorites: []
+  favorites: [],
+  spaceNotFound: false
 });
 
 const globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({

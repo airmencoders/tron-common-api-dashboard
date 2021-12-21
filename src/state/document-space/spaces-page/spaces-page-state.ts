@@ -25,4 +25,5 @@ export interface SpacesPageState {
   isDefaultDocumentSpaceSettingsOpen: boolean;
   sideDrawerSize: SideDrawerSize;
   favorites: DocumentSpaceUserCollectionResponseDto[];
+  spaceNotFound: boolean;
 }

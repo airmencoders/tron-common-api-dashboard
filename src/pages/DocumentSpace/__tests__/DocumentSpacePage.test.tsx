@@ -112,7 +112,8 @@ describe('Test Document Space Page', () => {
       showDeleteSelectedDialog: false,
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
-      favorites: []
+      favorites: [],
+      spaceNotFound: false
     });
 
     documentSpacePageService = new SpacesPageService(

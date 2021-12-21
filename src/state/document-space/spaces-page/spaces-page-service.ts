@@ -78,13 +78,16 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     return queryParams;
   }
 
-  loadDocSpaceFromLocation(currentUrlSearchParams: string) {
+  loadDocSpaceFromLocation(currentUrlSearchParams: string, onNoSpaceFound?: ()=>void) {
     const queryParams = new URLSearchParams(currentUrlSearchParams);
     const documentSpaces = this.documentSpaceService.documentSpaces;
 
     if (queryParams.get(spaceIdQueryKey) != null && documentSpaces.length > 0) {
       const selectedDocumentSpace = documentSpaces.find(documentSpace => documentSpace.id === queryParams.get('spaceId'));
       if (selectedDocumentSpace == null) {
+        if(onNoSpaceFound !== undefined){
+          onNoSpaceFound()
+        }
         createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
         return;
       }
@@ -433,7 +436,8 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       showDeleteSelectedDialog: false,
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
-      favorites: []
+      favorites: [],
+      spaceNotFound: false
     });
 
     this.documentSpaceService.resetState();
