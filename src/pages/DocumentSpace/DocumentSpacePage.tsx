@@ -33,8 +33,13 @@ import {
 } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { documentSpaceDownloadUrlService, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../state/document-space/document-space-state';
-import { CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
+import {
+  documentSpaceDownloadUrlService,
+  useDocumentSpacePageState,
+  useDocumentSpacePrivilegesState,
+  useDocumentSpaceState
+} from '../../state/document-space/document-space-state';
+import {CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
 import { formatBytesToString } from '../../utils/file-utils';
@@ -45,6 +50,8 @@ import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
 import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./DocumentSpaceSelector";
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
+import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
+import {RoutePath} from "../../routes";
 
 function DocumentSpacePage() {
   const location = useLocation();
@@ -128,9 +135,9 @@ function DocumentSpacePage() {
       cellRenderer: DocumentRowActionCellRenderer,
       cellRendererParams: {
         menuItems: [
-          { 
-            title: 'Add to favorites', 
-            icon: StarIcon, 
+          {
+            title: 'Add to favorites',
+            icon: StarIcon,
             shouldShow: (doc: DocumentDto) => pageService.getFavoritesShouldShow.bind(pageService, doc, true)(),
             isAuthorized: () => true,
             onClick: pageService.addToFavorites.bind(pageService),
@@ -151,24 +158,24 @@ function DocumentSpacePage() {
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
             onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
           },
-          { 
-            title: 'Rename Folder', 
-            icon: EditIcon, 
+          {
+            title: 'Rename Folder',
+            icon: EditIcon,
             shouldShow: (doc: DocumentDto) => doc && doc.folder,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => pageService.mergeState({ 
-              selectedFile: doc, 
-              createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME, 
+            onClick: (doc: DocumentDto) => pageService.mergeState({
+              selectedFile: doc,
+              createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME,
             })
           },
-          { 
-            title: 'Rename File', 
-            icon: EditIcon, 
+          {
+            title: 'Rename File',
+            icon: EditIcon,
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
             isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => pageService.mergeState({ 
-              selectedFile: doc, 
-              createEditElementOpType: CreateEditOperationType.EDIT_FILENAME, 
+            onClick: (doc: DocumentDto) => pageService.mergeState({
+              selectedFile: doc,
+              createEditElementOpType: CreateEditOperationType.EDIT_FILENAME,
             })
           },
         ] as PopupMenuItem<DocumentDto>[],
@@ -190,7 +197,7 @@ function DocumentSpacePage() {
 
     // Check if navigating to an existing document space first
     if (pageService.locationIncludesDocumentSpace(location.search)) {
-      pageService.loadDocSpaceFromLocation(location.search);
+      pageService.loadDocSpaceFromLocation(location.search, ()=> pageService.state.spaceNotFound.set(true));
       return;
     }
 
@@ -225,11 +232,11 @@ function DocumentSpacePage() {
       mountedRef.current = false;
 
       pageService.resetState();
-    };   
+    };
   }, []);
 
   useEffect(() => {
-    pageService.loadDocSpaceFromLocation(location.search);
+    pageService.loadDocSpaceFromLocation(location.search, ()=> pageService.state.spaceNotFound.set(true));
   }, [location.search]);
 
   function conditionalMenuDownloadOnClick (doc: DocumentDto) {
@@ -251,15 +258,15 @@ function DocumentSpacePage() {
 
       // Get the "More" actions column
       const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
-      
+
       // Check if "Download" action already exists
       const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>);
       const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
 
       if (downloadAction == null) {
         cellRendererParams.set(state => {
-          state.menuItems.splice(0, 0, { 
-            title: 'Download', 
+          state.menuItems.splice(0, 0, {
+            title: 'Download',
             icon: DownloadMaterialIcon,
             iconProps: {
               style: 'primary',
@@ -269,7 +276,7 @@ function DocumentSpacePage() {
             isAuthorized: () => true,
             onClick: conditionalMenuDownloadOnClick
           });
-  
+
           return state;
         });
       }
@@ -307,7 +314,7 @@ function DocumentSpacePage() {
       <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
         <div className="add-space-container">
           <div>
-            <DocumentSpaceSelector 
+            <DocumentSpaceSelector
               isDocumentSpacesLoading={isDocumentSpacesLoading}
               isDocumentSpacesErrored={isDocumentSpacesErrored}
               documentSpaceService={documentSpaceService}
@@ -390,7 +397,11 @@ function DocumentSpacePage() {
           suppressRowClickSelection
           autoResizeColumns
         />
-      }
+        }
+      <SpaceNotFoundDialog shouldShow={pageService.state.spaceNotFound.value} onHide={()=>{
+        pageService.state.spaceNotFound.set(false)
+        history.push(RoutePath.HOME)
+      }} />
 
       <SideDrawer
         isLoading={false}

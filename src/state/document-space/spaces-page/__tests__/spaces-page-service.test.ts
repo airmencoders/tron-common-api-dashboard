@@ -136,7 +136,8 @@ describe('Spaces Page Service Test', () => {
       showDeleteSelectedDialog: false,
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
-      favorites: []
+      favorites: [],
+      spaceNotFound: false,
     });
 
     spacesService = new SpacesPageService(
@@ -833,7 +834,8 @@ describe('Spaces Page Service Test', () => {
       showDeleteSelectedDialog: true,
       isDefaultDocumentSpaceSettingsOpen: true,
       sideDrawerSize: SideDrawerSize.WIDE,
-      favorites: []
+      favorites: [],
+      spaceNotFound: false,
     });
 
     const documentSpaceServiceResetSpy = jest.spyOn(documentSpaceService, 'resetState');
@@ -864,7 +866,8 @@ describe('Spaces Page Service Test', () => {
       showDeleteSelectedDialog: false,
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
-      favorites: []
+      favorites: [],
+      spaceNotFound: false,
     });
   });
 });
