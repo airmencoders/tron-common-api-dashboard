@@ -121,8 +121,8 @@ export default class DocumentSpaceService {
         }
       }
       return resp;
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -212,7 +212,7 @@ export default class DocumentSpaceService {
           return [];
         }
 
-        return Promise.reject(prepareRequestError(error));
+        return Promise.reject(prepareRequestError(error).message);
       });
 
     const dataRequest = {
@@ -237,8 +237,8 @@ export default class DocumentSpaceService {
     try {
       await this.documentSpaceApi.createFolder(space, { path: path, folderName: name });
       return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -247,8 +247,8 @@ export default class DocumentSpaceService {
       const spaceDto = await this.documentSpaceApi.createSpace(dto);
       this.documentSpacesState[this.documentSpacesState.length].set(spaceDto.data);
       return Promise.resolve(spaceDto.data);
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -256,7 +256,7 @@ export default class DocumentSpaceService {
     try {
       return await this.documentSpaceApi.deleteFileBySpaceAndParent(documentSpaceId, parentFolderId, filename);
     } catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -274,7 +274,7 @@ export default class DocumentSpaceService {
     try {
       return await this.documentSpaceApi.deleteArchiveItemBySpaceAndParent(documentSpaceId, parentFolderId, name);
     } catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -282,8 +282,8 @@ export default class DocumentSpaceService {
     try {
       await this.documentSpaceApi.deleteItems(space, { currentPath: path, items: [...items] });
       return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -295,8 +295,8 @@ export default class DocumentSpaceService {
         newName,
       } as DocumentSpaceRenameFileDto);
       return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -307,8 +307,8 @@ export default class DocumentSpaceService {
         newName: name,
       } as DocumentSpaceRenameFolderDto);
       return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -316,8 +316,8 @@ export default class DocumentSpaceService {
     try {
       await this.documentSpaceApi.archiveItems(space, { currentPath: path, itemsToArchive: [...items] });
       return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -325,8 +325,8 @@ export default class DocumentSpaceService {
     try {
       await this.documentSpaceApi.unArchiveItems(space, { itemsToUnArchive: [...items] });
       return Promise.resolve();
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -394,8 +394,8 @@ export default class DocumentSpaceService {
     try {
       await this.documentSpaceApi.patchSelfDocumentSpaceDefault(spaceId);
       return Promise.resolve(spaceId);
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -403,8 +403,8 @@ export default class DocumentSpaceService {
     try {
       const stringAxiosResponse = await this.documentSpaceApi.getDocumentSpaceEntryPath(spaceId, entryId);
       return Promise.resolve(stringAxiosResponse.data);
-    } catch (e) {
-      return Promise.reject((e as AxiosError).response?.data?.reason ?? (e as AxiosError).message);
+    } catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -413,7 +413,7 @@ export default class DocumentSpaceService {
       return (await this.documentSpaceApi.addEntityToFavorites(documentSpaceId, entityId)).data;
     }
     catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -423,7 +423,7 @@ export default class DocumentSpaceService {
       return Promise.resolve();
     }
     catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -433,7 +433,7 @@ export default class DocumentSpaceService {
       return Promise.resolve();
     }
     catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     } 
   }
 
@@ -442,7 +442,7 @@ export default class DocumentSpaceService {
       return (await this.documentSpaceApi.removeEntityFromFavorites(documentSpaceId, entityId)).data;
     }
     catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 
@@ -451,7 +451,7 @@ export default class DocumentSpaceService {
       return (await this.documentSpaceApi.getFavorites(documentSpaceId)).data.data;
     }
     catch (error) {
-      return Promise.reject(prepareRequestError(error));
+      return Promise.reject(prepareRequestError(error).message);
     }
   }
 }
