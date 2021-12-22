@@ -45,10 +45,10 @@ export default function DocumentSpaceMySettingsForm(props: DocumentSpaceMySettin
 
   useEffect(() => {
     const defaultDocumentSpaceId = props.authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-    if (defaultDocumentSpaceId !== undefined) {
+    if (defaultDocumentSpaceId !== undefined ) {
       pageState.selectedDefaultSpaceId.set(defaultDocumentSpaceId);
     }
-  }, [props.authorizedUserService.authorizedUser]);
+  }, []);
 
   function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,6 +73,9 @@ export default function DocumentSpaceMySettingsForm(props: DocumentSpaceMySettin
             return null;
           }
           const isDefaultSpace = documentSpace.id === pageState.selectedDefaultSpaceId.get();
+          if (documentSpace.id === pageState.selectedDefaultSpaceId.get()) {
+            console.log(documentSpace.name);
+          }
 
           return (
             <div key={documentSpace.id} className="my-settings-body-row">
