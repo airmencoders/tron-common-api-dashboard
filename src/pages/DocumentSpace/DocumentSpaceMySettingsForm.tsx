@@ -73,9 +73,6 @@ export default function DocumentSpaceMySettingsForm(props: DocumentSpaceMySettin
             return null;
           }
           const isDefaultSpace = documentSpace.id === pageState.selectedDefaultSpaceId.get();
-          if (documentSpace.id === pageState.selectedDefaultSpaceId.get()) {
-            console.log(documentSpace.name);
-          }
 
           return (
             <div key={documentSpace.id} className="my-settings-body-row">
