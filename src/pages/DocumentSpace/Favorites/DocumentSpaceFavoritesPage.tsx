@@ -1,44 +1,41 @@
-import {SetPartialStateAction, State, useHookstate} from '@hookstate/core';
-import {IDatasource, ValueFormatterParams} from 'ag-grid-community';
-import React, {useEffect, useRef} from 'react';
+import { Downgraded, SetPartialStateAction, State, useHookstate } from '@hookstate/core';
+import { IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import { format } from 'date-fns';
+import React, { useEffect, useRef } from 'react';
+import { useHistory } from "react-router";
+import { useLocation } from "react-router-dom";
 import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail';
-import {InfiniteScrollOptions} from '../../../components/DataCrudFormPage/infinite-scroll-options';
-import DocumentRowActionCellRenderer
-  from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
+import DocumentRowActionCellRenderer from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
+import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
+import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 import GridColumn from '../../../components/Grid/GridColumn';
-import {generateInfiniteScrollLimit} from '../../../components/Grid/GridUtils/grid-utils';
+import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
 import PageFormat from '../../../components/PageFormat/PageFormat';
-import {ToastType} from '../../../components/Toast/ToastUtils/toast-type';
-import {createTextToast} from '../../../components/Toast/ToastUtils/ToastUtils';
+import Spinner from '../../../components/Spinner/Spinner';
+import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
+import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
+import CircleMinusIcon from '../../../icons/CircleMinusIcon';
+import DownloadMaterialIcon from "../../../icons/DownloadMaterialIcon";
+import StarHollowIcon from "../../../icons/StarHollowIcon";
 import {
   DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
-  DocumentSpaceUserCollectionResponseDto,
+  DocumentSpaceUserCollectionResponseDto
 } from '../../../openapi';
-import {useAuthorizedUserState} from '../../../state/authorized-user/authorized-user-state';
+import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
 import {
-  useDocumentSpaceGlobalState,
-  documentSpaceDownloadUrlService,
-  useDocumentSpacePrivilegesState,
+  documentSpaceDownloadUrlService, useDocumentSpaceGlobalState, useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../state/document-space/document-space-state';
-import {PrivilegeType} from '../../../state/privilege/privilege-type';
-import '../DocumentSpacePage.scss';
-import {format} from 'date-fns';
-import {CancellableDataRequest} from '../../../utils/cancellable-data-request';
-import Spinner from '../../../components/Spinner/Spinner';
-import FavoritesCellRenderer from './FavoritesCellRenderer';
-import CircleMinusIcon from '../../../icons/CircleMinusIcon';
-import {useHistory} from "react-router";
-import {useLocation} from "react-router-dom";
-import StarHollowIcon from "../../../icons/StarHollowIcon";
-import {prepareRequestError} from "../../../utils/ErrorHandling/error-handling-utils";
-import DocumentSpaceSelector, {spaceIdQueryKey} from "../DocumentSpaceSelector";
-import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
-import DownloadMaterialIcon from "../../../icons/DownloadMaterialIcon";
+import { PrivilegeType } from '../../../state/privilege/privilege-type';
+import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
 import { performActionWhenMounted } from '../../../utils/component-utils';
-import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
+import { prepareRequestError } from "../../../utils/ErrorHandling/error-handling-utils";
+import '../DocumentSpacePage.scss';
+import DocumentSpaceSelector, { spaceIdQueryKey } from "../DocumentSpaceSelector";
+import FavoritesCellRenderer from './FavoritesCellRenderer';
 
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -78,7 +75,7 @@ function DocumentSpaceFavoritesPage() {
     selectedFile: undefined,
     showDeleteDialog: false,
     showRemoveDialog: false,
-    selectedDocumentSpace: undefined
+    selectedDocumentSpace: undefined,
   });
 
   useEffect(() => {
@@ -94,7 +91,7 @@ function DocumentSpaceFavoritesPage() {
         return;
       }
       if (selectedDocumentSpace.id !== pageState.get().selectedDocumentSpace?.id) {
-        setStateOnDocumentSpace(selectedDocumentSpace);
+        pageState.selectedDocumentSpace.set(selectedDocumentSpace);
       }
     }
   }
@@ -150,6 +147,11 @@ function DocumentSpaceFavoritesPage() {
 
 
   const mountedRef = useRef(false);
+
+  useEffect(() => {
+    if (pageState.selectedDocumentSpace.get())
+      setStateOnDocumentSpace(pageState.selectedDocumentSpace.get()!);
+  }, [pageState.selectedDocumentSpace.attach(Downgraded).value])
 
   useEffect(() => {
     mountedRef.current = true;
@@ -343,7 +345,12 @@ function DocumentSpaceFavoritesPage() {
         <Spinner /> :
         <>
           <>
-            <DocumentSpaceSelector isDocumentSpacesLoading={isDocumentSpacesLoading} isDocumentSpacesErrored={isDocumentSpacesErrored} documentSpaceService={documentSpaceService} selectedSpace={pageState.selectedDocumentSpace?.value}/>
+            <DocumentSpaceSelector 
+              isDocumentSpacesLoading={isDocumentSpacesLoading} 
+              isDocumentSpacesErrored={isDocumentSpacesErrored} 
+              documentSpaceService={documentSpaceService} 
+              selectedSpace={pageState.selectedDocumentSpace?.value}
+            />
           </>
           <div className="breadcrumb-area">
             <BreadCrumbTrail
