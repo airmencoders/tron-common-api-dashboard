@@ -187,8 +187,12 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
           showErrorMessage: false,
           path: '',
         });
+        createTextToast(ToastType.SUCCESS, 'User Default Space Updated');
       })
-      .catch((message) => this.setPageStateOnException(message));
+      .catch((message) => {
+        this.setPageStateOnException(message);
+        createTextToast(ToastType.ERROR, 'Space update failed: ' + message);
+      });
   }
 
   submitElementName(name: string) {

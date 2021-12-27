@@ -45,10 +45,10 @@ export default function DocumentSpaceMySettingsForm(props: DocumentSpaceMySettin
 
   useEffect(() => {
     const defaultDocumentSpaceId = props.authorizedUserService.authorizedUser?.defaultDocumentSpaceId;
-    if (defaultDocumentSpaceId !== undefined) {
+    if (defaultDocumentSpaceId !== undefined ) {
       pageState.selectedDefaultSpaceId.set(defaultDocumentSpaceId);
     }
-  }, [props.authorizedUserService.authorizedUser]);
+  }, []);
 
   function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
