@@ -243,7 +243,7 @@ describe('Dashboard User State Test', () => {
       return new Promise<AxiosResponse<DashboardUserDto>>((resolve, reject) => reject(axiosRejectResponse));
     });
 
-    await expect(state.sendCreate(testUserFlat)).rejects.toEqual(rejectMsg);
+    await expect(state.sendCreate(testUserFlat)).rejects.toEqual(axiosRejectResponse);
   });
 
   it('Test sendDelete Success', async () => {

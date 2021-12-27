@@ -9,6 +9,7 @@ import { PrivilegeDto } from '../../openapi';
 import { accessPrivilegeState } from '../privilege/privilege-state';
 import { prepareDataCrudErrorResponse } from '../data-service/data-service-utils';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequest } from '../../utils/cancellable-data-request';
+import { AxiosError } from 'axios';
 
 /**
  * PII WARNING:
@@ -124,7 +125,7 @@ export default class DashboardUserService implements DataService<DashboardUserFl
       return Promise.resolve(dashboardUserFlat);
     }
     catch (error) {
-      return Promise.reject(prepareDataCrudErrorResponse(error));
+      return Promise.reject(error);
     }
   }
 
