@@ -10,7 +10,7 @@ import {useKpiPageState} from './kpi-page-state';
 import {KpiChartTitles} from './kpi-chart-titles';
 import {useEffect, useMemo, useState} from 'react';
 
-type ChartDataMap = Record<string, { data: Array<KpiMiniData>, title: string, total: number }>;
+type ChartDataMap = Record<string, { data: Array<KpiMiniData>, title: string, total: number, units?: string }>;
 
 function KpiSeriesContent() {
   const kpiService = useKpiState();
@@ -93,15 +93,16 @@ function KpiSeriesContent() {
     };
     updatedMiniCharts[KpiChartTitles.AVG_UNIQUE_DASHBOARD_USERS] = {
       data: uniqueDashUsersSeriesMini, title: KpiChartTitles.AVG_UNIQUE_DASHBOARD_USERS,
-      total: uniqueDashUsersTotal / copiedKpis.length
+      total: (uniqueDashUsersTotal / copiedKpis.length) ? (uniqueDashUsersTotal / copiedKpis.length) : 0,
     };
     updatedMiniCharts[KpiChartTitles.AVG_UNIQUE_APP_CLIENTS] = {
       data: uniqueAppClientsSeriesMini, title: KpiChartTitles.AVG_UNIQUE_APP_CLIENTS,
-      total: uniqueAppClientsTotal / copiedKpis.length
+      total: (uniqueAppClientsTotal / copiedKpis.length) ? (uniqueAppClientsTotal / copiedKpis.length) : 0,
     };
     updatedMiniCharts[KpiChartTitles.AVG_LATENCY_SUCCESSFUL_REQUESTS] = {
       data: latencySeriesMini, title: KpiChartTitles.AVG_LATENCY_SUCCESSFUL_REQUESTS,
-      total: latencySeriesTotal / copiedKpis.length
+      total: (latencySeriesTotal / copiedKpis.length) ? (latencySeriesTotal / copiedKpis.length) : 0,
+      units: 'ms'
     };
     setMiniChart(updatedMiniCharts);
   }, [kpis]);
@@ -144,6 +145,7 @@ function KpiSeriesContent() {
                             key={miniCharts[miniChartKey].title}
                             data={miniCharts[miniChartKey].data}
                             aggregateValues={{primaryValue: miniCharts[miniChartKey].total}}
+                            units={miniCharts[miniChartKey].units ?? ''}
                             isActive={kpiPageState.get().selectedTab === miniCharts[miniChartKey].title}
                             title={miniCharts[miniChartKey].title}
                             onSelected={handleMiniChartSelected}

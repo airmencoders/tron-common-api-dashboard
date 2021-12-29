@@ -5,6 +5,7 @@ export interface KpiMiniChartProps {
   data: Array<KpiMiniData>;
   aggregateValues: KpiMiniDataValues;
   isActive: boolean;
+  units?: string;
   title: string;
   onSelected: (kpiTitle: string) => void;
 }

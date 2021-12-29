@@ -10,6 +10,7 @@ export interface MiniChartProps<T extends R, R> {
   width: number,
   height: number,
   data: Array<T>,
+  units?: string,
   xAccessor: (d: T) => number | Date,
   yAccessors: MiniChartDataAccessors<T>,
   seriesColors: { [seriesKey: string]: string },
