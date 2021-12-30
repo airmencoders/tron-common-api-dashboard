@@ -53,6 +53,27 @@ export default function FolderSizeDialog(props: FolderSizeDialogProps) {
     getFolderSize();
   }, []);
 
+  function renderDialogContent() {
+    if (dialogState.status.get() === StatusState.FETCHING) {
+      return (<Spinner />)
+    }
+    else if (dialogState.status.get() === StatusState.DONE) {
+      return (<div>
+        <table className='folder-details-table'>
+          <tbody>
+          <tr><td>Folder:</td><td>{props.folderPath}</td></tr>
+          <tr><td>Folder Size:</td><td>{formatBytesToString(dialogState.size.get())}</td></tr>
+          <tr><td>Number of Files:</td><td>{dialogState.count.get()}</td></tr>
+          </tbody>
+        </table>
+      </div>)
+    }
+    else {
+      return (<h4>Unable to get folder size!</h4>)
+    }
+    
+  }
+
   return (
     <Modal
       headerComponent={<ModalIconTitle icon={<InfoIcon size={1.2} />} text="Folder Size" />}
@@ -70,21 +91,7 @@ export default function FolderSizeDialog(props: FolderSizeDialogProps) {
       show={props.show}
       onHide={props.onClose}
     >
-      {dialogState.status.get() === StatusState.FETCHING ? (
-        <Spinner />
-      ) : dialogState.status.get() === StatusState.DONE ? (
-        <div>
-          <table className='folder-details-table'>
-            <tbody>
-            <tr><td>Folder:</td><td>{props.folderPath}</td></tr>
-            <tr><td>Folder Size:</td><td>{formatBytesToString(dialogState.size.get())}</td></tr>
-            <tr><td>Number of Files:</td><td>{dialogState.count.get()}</td></tr>
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <h4>Unable to get folder size!</h4>
-      )}
+      {renderDialogContent()}
     </Modal>
   );
 }
