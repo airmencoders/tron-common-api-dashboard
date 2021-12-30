@@ -27,6 +27,8 @@ import { DocumentSpaceDashboardMemberRequestDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceDashboardMemberResponseDtoResponseWrapper } from '../models';
 // @ts-ignore
+import { DocumentSpaceFolderInfoDto } from '../models';
+// @ts-ignore
 import { DocumentSpacePathItemsDto } from '../models';
 // @ts-ignore
 import { DocumentSpacePrivilegeDtoResponseWrapper } from '../models';
@@ -1195,6 +1197,54 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
         },
         /**
          * 
+         * @summary Get a folder\'s total size
+         * @param {string} id 
+         * @param {string} [path] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFolderSize: async (id: string, path?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getFolderSize.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/folder-size`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (path !== undefined) {
+                localVarQueryParameter['path'] = path;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
          * @param {number} [page] Zero-based page index (0..N)
          * @param {number} [size] The size of the page to be returned
@@ -2210,6 +2260,21 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
         },
         /**
          * 
+         * @summary Get a folder\'s total size
+         * @param {string} id 
+         * @param {string} [path] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFolderSize(id: string, path?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentSpaceFolderInfoDto>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getFolderSize(id, path, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
          * @param {number} [page] Zero-based page index (0..N)
          * @param {number} [size] The size of the page to be returned
@@ -2655,6 +2720,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
         },
         /**
          * 
+         * @summary Get a folder\'s total size
+         * @param {string} id 
+         * @param {string} [path] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFolderSize(id: string, path?: string, options?: any): AxiosPromise<DocumentSpaceFolderInfoDto> {
+            return DocumentSpaceControllerApiFp(configuration).getFolderSize(id, path, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Retrieves files from all spaces that the authenticated user has recently uploaded
          * @param {number} [page] Zero-based page index (0..N)
          * @param {number} [size] The size of the page to be returned
@@ -3045,6 +3121,17 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     getFavorites(id: string, options?: any): AxiosPromise<DocumentSpaceUserCollectionResponseDtoWrapper>;
+
+    /**
+     * 
+     * @summary Get a folder\'s total size
+     * @param {string} id 
+     * @param {string} [path] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    getFolderSize(id: string, path?: string, options?: any): AxiosPromise<DocumentSpaceFolderInfoDto>;
 
     /**
      * 
@@ -3481,6 +3568,19 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public getFavorites(id: string, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).getFavorites(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get a folder\'s total size
+     * @param {string} id 
+     * @param {string} [path] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public getFolderSize(id: string, path?: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).getFolderSize(id, path, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

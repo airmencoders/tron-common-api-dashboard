@@ -57,7 +57,9 @@ const spacesPageState = createState<SpacesPageState>({
   isDefaultDocumentSpaceSettingsOpen: false,
   sideDrawerSize: SideDrawerSize.WIDE,
   favorites: [],
-  spaceNotFound: false
+  spaceNotFound: false,
+  showFolderSizeDialog: false,
+  selectedItemForSize: undefined,
 });
 
 const globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({

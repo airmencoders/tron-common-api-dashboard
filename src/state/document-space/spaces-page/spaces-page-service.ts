@@ -441,7 +441,9 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
-      spaceNotFound: false
+      spaceNotFound: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
 
     this.documentSpaceService.resetState();

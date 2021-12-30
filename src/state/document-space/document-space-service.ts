@@ -16,6 +16,7 @@ import {
   FilePathSpec,
   S3PaginationDto
 } from '../../openapi';
+import { DocumentSpaceFolderInfoDto } from '../../openapi/models/document-space-folder-info-dto';
 import { CancellableDataRequest, isDataRequestCancelError, makeCancellableDataRequestToken } from '../../utils/cancellable-data-request';
 import { applySortCriteria } from '../../utils/document-space-utils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
@@ -450,6 +451,15 @@ export default class DocumentSpaceService {
     try {
       return (await this.documentSpaceApi.getFavorites(documentSpaceId)).data.data;
     }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
+    }
+  }
+
+  async getFolderSize(documentSpaceId: string, folderPath: string): Promise<DocumentSpaceFolderInfoDto> {
+    try {
+      return (await this.documentSpaceApi.getFolderSize(documentSpaceId, folderPath)).data;
+    } 
     catch (error) {
       return Promise.reject(prepareRequestError(error).message);
     }

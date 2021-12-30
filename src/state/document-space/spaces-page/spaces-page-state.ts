@@ -26,4 +26,6 @@ export interface SpacesPageState {
   sideDrawerSize: SideDrawerSize;
   favorites: DocumentSpaceUserCollectionResponseDto[];
   spaceNotFound: boolean;
+  showFolderSizeDialog: boolean;
+  selectedItemForSize: DocumentDto | undefined;
 }

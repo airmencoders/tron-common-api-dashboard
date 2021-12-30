@@ -1009,6 +1009,34 @@
       ],
       "type": "object"
     },
+    "DocumentSpaceFolderInfoDto": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "number"
+        },
+        "documentSpaceId": {
+          "type": "string"
+        },
+        "itemId": {
+          "type": "string"
+        },
+        "itemName": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "size",
+        "count",
+        "itemName",
+        "itemId",
+        "documentSpaceId"
+      ],
+      "type": "object"
+    },
     "DocumentSpacePathItemsDto": {
       "additionalProperties": false,
       "properties": {

@@ -138,6 +138,8 @@ describe('Spaces Page Service Test', () => {
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
 
     spacesService = new SpacesPageService(
@@ -836,6 +838,8 @@ describe('Spaces Page Service Test', () => {
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
 
     const documentSpaceServiceResetSpy = jest.spyOn(documentSpaceService, 'resetState');
@@ -868,6 +872,8 @@ describe('Spaces Page Service Test', () => {
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
   });
 });

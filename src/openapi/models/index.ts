@@ -32,6 +32,7 @@ export * from './document-space-create-folder-dto';
 export * from './document-space-dashboard-member-request-dto';
 export * from './document-space-dashboard-member-response-dto';
 export * from './document-space-dashboard-member-response-dto-response-wrapper';
+export * from './document-space-folder-info-dto';
 export * from './document-space-path-items-dto';
 export * from './document-space-privilege-dto';
 export * from './document-space-privilege-dto-response-wrapper';
