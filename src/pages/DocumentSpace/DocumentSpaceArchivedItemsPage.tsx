@@ -1,5 +1,5 @@
 import { Downgraded, none, useHookstate } from '@hookstate/core';
-import { GridApi, IDatasource, ValueFormatterParams } from 'ag-grid-community';
+import { GridApi, IDatasource, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import { useEffect, useRef } from 'react';
 import Button from '../../components/Button/Button';
 import { InfiniteScrollOptions } from '../../components/DataCrudFormPage/infinite-scroll-options';
@@ -101,6 +101,11 @@ export default function DocumentSpaceArchivedItemsPage() {
       resizable: true,
       sortable: true,
       sortingOrder: ['asc', 'desc'],
+      valueGetter: function (params: ValueGetterParams) {
+        if (params.data != null) {
+          return new Date(params.data.lastModifiedDate);  // return value as a JS Date that ag-grid likes for sorting
+        }
+      },
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value != null) {
           return formatDocumentSpaceDate(params.value);
