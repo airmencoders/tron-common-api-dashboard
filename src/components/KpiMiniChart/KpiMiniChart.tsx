@@ -60,6 +60,7 @@ function KpiMiniChart(props: KpiMiniChartProps) {
             isActive={props.isActive}
             aggregateValues={props.aggregateValues}
             title={props.title}
+            units={props.units}
             width={220}
             height={160}
             data={props.data}

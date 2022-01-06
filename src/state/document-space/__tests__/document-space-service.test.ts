@@ -6,6 +6,7 @@ import {
   DocumentDto,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
+  DocumentSpaceFolderInfoDto,
   DocumentSpacePathItemsDto,
   DocumentSpaceRenameFolderDto,
   DocumentSpaceResponseDto,
@@ -620,6 +621,32 @@ describe('Test Document Space Service', () => {
 
     const response = await documentSpaceService.checkIfFileExistsAtPath('1', '/', [ 'some-file' ]);
     expect(response).toContain('some-file');
+  });
+
+  it('should return folder size', async () => {
+    jest
+      .spyOn(documentSpaceApi, 'getFolderSize')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosSuccessResponse<DocumentSpaceFolderInfoDto>({
+            count: 20, size: 10000, documentSpaceId: 'some id', itemId: 'some id2', itemName: 'some-folder',
+          })
+        )
+      );
+
+    let response = await documentSpaceService.getFolderSize('some id', '/some-folder');
+    expect(response).resolves;
+
+    jest
+      .spyOn(documentSpaceApi, 'getFolderSize')
+      .mockRejectedValue({ reason: 'It Broke', status: 400, message: 'System down', });
+
+    try {
+    response = await documentSpaceService.getFolderSize('some id', '/some-folder');
+    }
+    catch (e) {
+      expect(e).toEqual('System down');
+    }
   });
 
 });

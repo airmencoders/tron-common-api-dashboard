@@ -140,6 +140,8 @@ describe('Spaces Page Service Test', () => {
       favorites: [],
       spaceNotFound: false,
       showNoChosenSpace: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
 
     spacesService = new SpacesPageService(
@@ -838,6 +840,8 @@ describe('Spaces Page Service Test', () => {
       favorites: [],
       spaceNotFound: false,
       showNoChosenSpace: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
 
     const documentSpaceServiceResetSpy = jest.spyOn(documentSpaceService, 'resetState');
@@ -871,6 +875,8 @@ describe('Spaces Page Service Test', () => {
       favorites: [],
       spaceNotFound: false,
       showNoChosenSpace: false,
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined,
     });
   });
 });

@@ -1,5 +1,5 @@
 import { Downgraded, none, State, useHookstate } from '@hookstate/core';
-import { ValueFormatterParams } from 'ag-grid-community';
+import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
@@ -52,6 +52,8 @@ import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./Document
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
 import {RoutePath} from "../../routes";
+import FolderSizeDialog from './FolderSizeDialog';
+import InfoIcon from '../../icons/InfoIcon';
 
 function DocumentSpacePage() {
   const location = useLocation();
@@ -100,6 +102,11 @@ function DocumentSpacePage() {
       sortingOrder: ['asc', 'desc'],
       resizable: true,
       initialWidth: 250,
+      valueGetter: function (params: ValueGetterParams) {
+        if (params.data != null) {
+          return new Date(params.data.lastModifiedDate);  // return value as a JS Date that ag-grid likes for sorting
+        }
+      },
       valueFormatter: function (params: ValueFormatterParams) {
         if (params.value) {
           return formatDocumentSpaceDate(params.value);
@@ -167,6 +174,15 @@ function DocumentSpacePage() {
               selectedFile: doc,
               createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME,
             })
+          },
+          {
+            title: 'Get Folder Size',
+            icon: InfoIcon,
+            shouldShow: (doc: DocumentDto) => doc && doc.folder,
+            isAuthorized: () => true,
+            onClick: (doc: DocumentDto) => {
+              pageService.mergeState({ selectedItemForSize: doc, showFolderSizeDialog: true })
+            }
           },
           {
             title: 'Rename File',
@@ -491,6 +507,15 @@ function DocumentSpacePage() {
         onSubmit={pageService.archiveFile.bind(pageService, false)}
         items={pageService.state.selectedFiles.value}
       />
+
+      { pageService.state.selectedItemForSize && pageService.state.showFolderSizeDialog.get() &&
+        <FolderSizeDialog
+          show={pageService.state.showFolderSizeDialog.get()}
+          onClose={() => pageService.mergeState({ selectedItemForSize: undefined, showFolderSizeDialog: false })}
+          spaceId={pageService.state.selectedItemForSize.get()!.spaceId}
+          folderPath={(pageService.state.selectedItemForSize.get()!.path + '/' + pageService.state.selectedItemForSize.get()!.key).replace(/[\/]+/g, '/')}
+        />
+      }        
 
       {pageService.state.selectedSpace.value &&
         !documentSpacePrivilegesService.isPromised &&

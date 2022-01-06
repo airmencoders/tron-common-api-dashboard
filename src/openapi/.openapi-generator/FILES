@@ -60,6 +60,7 @@ models/document-space-create-folder-dto.ts
 models/document-space-dashboard-member-request-dto.ts
 models/document-space-dashboard-member-response-dto-response-wrapper.ts
 models/document-space-dashboard-member-response-dto.ts
+models/document-space-folder-info-dto.ts
 models/document-space-path-items-dto.ts
 models/document-space-privilege-dto-response-wrapper.ts
 models/document-space-privilege-dto.ts

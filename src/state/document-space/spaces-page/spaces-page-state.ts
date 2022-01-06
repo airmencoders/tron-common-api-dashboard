@@ -27,4 +27,6 @@ export interface SpacesPageState {
   favorites: DocumentSpaceUserCollectionResponseDto[];
   spaceNotFound: boolean;
   showNoChosenSpace: boolean; // state we get into if we nav to an non-exist or private space
+  showFolderSizeDialog: boolean;
+  selectedItemForSize: DocumentDto | undefined;
 }
