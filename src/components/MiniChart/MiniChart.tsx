@@ -44,7 +44,7 @@ function MiniChart(props: MiniChartProps<any, any>) {
               yAccessorKeys.map((yKey, i) => (
                   <span key={yKey}>
                     <span style={{color: props.seriesLabelColors[yKey]}}>{
-                      props.aggregateValues[yKey] != null ? setSignificantDigits(props.aggregateValues[yKey], 2) : 'NA'}</span>
+                      props.aggregateValues[yKey] != null ? `${setSignificantDigits(props.aggregateValues[yKey], 2)} ${props.units ?? ''}` : 'NA'}</span>
                     {
                       i < yAccessorKeys.length - 1 &&
                       <span className="header__value-separator"> | </span>
