@@ -40,6 +40,14 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
       )
     }
 
+    if (props.onUnreachableSpace) {
+      return [ { id: 'none', name: ' ' }, ...documentSpaceService.documentSpaces].map((item) =>
+        <option key={item.id} value={item.id}>
+          {item.name}
+        </option>
+    );
+    }
+
     return documentSpaceService.documentSpaces.map((item) =>
       <option key={item.id} value={item.id}>
         {item.name}
@@ -52,7 +60,7 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
       id="document-space"
       name="document-space"
       data-testid="document-space-selector"
-      value={props.selectedSpace?.id}
+      value={props.onUnreachableSpace ? 'none' : props.selectedSpace?.id}
       disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
       onChange={(event) => {
         const documentSpaceId = event.target.value;

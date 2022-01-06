@@ -57,6 +57,7 @@ const spacesPageState = createState<SpacesPageState>({
   isDefaultDocumentSpaceSettingsOpen: false,
   sideDrawerSize: SideDrawerSize.WIDE,
   favorites: [],
+  showNoChosenSpace: false,
   spaceNotFound: false
 });
 

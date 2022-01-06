@@ -319,6 +319,7 @@ function DocumentSpacePage() {
               isDocumentSpacesErrored={isDocumentSpacesErrored}
               documentSpaceService={documentSpaceService}
               selectedSpace={pageService.state.selectedSpace?.value}
+              onUnreachableSpace={pageService.state.spaceNotFound.value || pageService.state.showNoChosenSpace.value }
             />
             {isAdmin && !documentSpacePrivilegesService.isPromised && (
               <Button
@@ -331,7 +332,7 @@ function DocumentSpacePage() {
               </Button>
             )}
 
-            {documentSpaceService.documentSpaces.length > 0 && (
+            {documentSpaceService.documentSpaces.length > 0 && !(pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value) && (
               <Button
                   className="document-space-page__space-user-settings"
                   data-testid="doc-space-my-settings__btn"
@@ -398,10 +399,13 @@ function DocumentSpacePage() {
           autoResizeColumns
         />
         }
-      <SpaceNotFoundDialog shouldShow={pageService.state.spaceNotFound.value} onHide={()=>{
-        pageService.state.spaceNotFound.set(false)
-        history.push(RoutePath.HOME)
-      }} />
+      <SpaceNotFoundDialog 
+        shouldShow={pageService.state.spaceNotFound.value} 
+        onHide={() => {
+          pageService.state.spaceNotFound.set(false)          
+          pageService.state.showNoChosenSpace.set(true)  // force user to user space drop down 
+        }} 
+      />
 
       <SideDrawer
         isLoading={false}
@@ -448,29 +452,31 @@ function DocumentSpacePage() {
           />
         )}
       </SideDrawer>
-      <SideDrawer
-        isLoading={false}
-        title="My Settings"
-        isOpen={pageService.state.isDefaultDocumentSpaceSettingsOpen.get()}
-        onCloseHandler={pageService.closeMySettingsDrawer.bind(pageService)}
-        size={pageService.state.sideDrawerSize.get()}
-        titleStyle={{ color: '#5F96EA', marginTop: -2 }}
-        preTitleNode={
-          <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>
-            <UserIconCircle size={0} />
-          </div>
-        }
-      >
-        <DocumentSpaceMySettingsForm
-          onCancel={pageService.closeMySettingsDrawer.bind(pageService)}
-          onSubmit={pageService.submitDefaultDocumentSpace.bind(pageService)}
-          isFormSubmitting={pageService.state.isSubmitting.get()}
-          formActionType={FormActionType.SAVE}
-          documentSpaces={documentSpaceService.documentSpacesState}
-          authorizedUserService={authorizedUserService}
-          onDocumentSpaceDeleted={loadSpaceOnDeletion}
-        />
-      </SideDrawer>
+      { pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value ? null :
+        <SideDrawer
+          isLoading={false}
+          title="My Settings"
+          isOpen={pageService.state.isDefaultDocumentSpaceSettingsOpen.get()}
+          onCloseHandler={pageService.closeMySettingsDrawer.bind(pageService)}
+          size={pageService.state.sideDrawerSize.get()}
+          titleStyle={{ color: '#5F96EA', marginTop: -2 }}
+          preTitleNode={
+            <div style={{ padding: '4px 4px 4px 4px', border: '1px solid #E5E5E5', borderRadius: 4, marginRight: 14 }}>
+              <UserIconCircle size={0} />
+            </div>
+          }
+        >
+          <DocumentSpaceMySettingsForm
+            onCancel={pageService.closeMySettingsDrawer.bind(pageService)}
+            onSubmit={pageService.submitDefaultDocumentSpace.bind(pageService)}
+            isFormSubmitting={pageService.state.isSubmitting.get()}
+            formActionType={FormActionType.SAVE}
+            documentSpaces={documentSpaceService.documentSpacesState}
+            authorizedUserService={authorizedUserService}
+            onDocumentSpaceDeleted={loadSpaceOnDeletion}
+          />
+        </SideDrawer>
+      }
 
       <ArchiveDialog
         show={pageService.state.showDeleteDialog.get()}
