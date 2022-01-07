@@ -34,7 +34,7 @@ function SpaceNotFoundDialog(props: SpaceNotFoundDialogProps) {
           textAlign:'center',
           fontSize:'18px'
         }}>
-          You do not have access to this space.
+          You do not have access to this space or it does not exist.
         </div>
       </div>
     </Modal>

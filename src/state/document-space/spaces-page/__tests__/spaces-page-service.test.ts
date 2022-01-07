@@ -1,6 +1,7 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { waitFor } from '@testing-library/dom';
 import axios from 'axios';
+import { flatMap } from 'cypress/types/lodash';
 import { MutableRefObject } from 'react';
 import { SideDrawerSize } from '../../../../components/SideDrawer/side-drawer-size';
 import { ToastType } from '../../../../components/Toast/ToastUtils/toast-type';
@@ -138,6 +139,7 @@ describe('Spaces Page Service Test', () => {
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
     });
@@ -233,7 +235,6 @@ describe('Spaces Page Service Test', () => {
 
       spacesService.loadDocSpaceFromLocation(searchParams.toString());
 
-      expect(createTextToastMock).toHaveBeenCalledWith(ToastType.ERROR, 'Could not process the selected Document Space');
       expect(setStateOnSpaceOrPathChangeSpy).not.toHaveBeenCalled();
     });
   });
@@ -838,6 +839,7 @@ describe('Spaces Page Service Test', () => {
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
     });
@@ -872,6 +874,7 @@ describe('Spaces Page Service Test', () => {
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
     });

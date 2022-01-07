@@ -8,6 +8,7 @@ import BreadCrumbTrail from '../../../components/BreadCrumbTrail/BreadCrumbTrail
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import DocumentRowActionCellRenderer from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
+import SpaceNotFoundDialog from '../../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog';
 import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
 import GridColumn from '../../../components/Grid/GridColumn';
 import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
@@ -51,6 +52,8 @@ interface DocumentSpaceFavoritesPageState {
   showRemoveDialog: boolean;
   selectedDocumentSpace?: DocumentSpaceResponseDto;
   shouldUpdateDatasource: boolean;
+  spaceNotFound: boolean;
+  showNoChosenSpace: boolean;
 }
 
 function getDocumentUniqueKey(data: DocumentSpaceUserCollectionResponseDto): string {
@@ -76,6 +79,8 @@ function DocumentSpaceFavoritesPage() {
     showDeleteDialog: false,
     showRemoveDialog: false,
     selectedDocumentSpace: undefined,
+    spaceNotFound: false,
+    showNoChosenSpace: false,
   });
 
   useEffect(() => {
@@ -87,7 +92,7 @@ function DocumentSpaceFavoritesPage() {
     if (queryParams.get(spaceIdQueryKey) != null && documentSpaceList.length > 0) {
       const selectedDocumentSpace = documentSpaceList.find(documentSpace => documentSpace.id === queryParams.get('spaceId'));
       if (selectedDocumentSpace == null) {
-        createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
+        pageState.spaceNotFound.set(true)
         return;
       }
       if (selectedDocumentSpace.id !== pageState.get().selectedDocumentSpace?.id) {
@@ -108,6 +113,7 @@ function DocumentSpaceFavoritesPage() {
         pageState.merge({
           selectedDocumentSpace: documentSpace,
           shouldUpdateDatasource: true,
+          showNoChosenSpace: false,
           datasource: documentSpaceService.createFavoritesDocumentsDatasource(documentSpace.id, infiniteScrollOptions)
         });
 
@@ -133,6 +139,7 @@ function DocumentSpaceFavoritesPage() {
       mergePageState({
         selectedDocumentSpace: undefined,
         datasource: undefined,
+        showNoChosenSpace: false, 
         shouldUpdateDatasource: false,
       });
     }
@@ -317,7 +324,7 @@ function DocumentSpaceFavoritesPage() {
               icon: StarHollowIcon,
               onClick: (data: DocumentSpaceUserCollectionResponseDto) => {
                 documentSpaceService.removeEntityFromFavorites(data.documentSpaceId, data.id)
-                  .then((response)=>{
+                  .then(()=>{
                     pageState.shouldUpdateDatasource.set(true)
                   })
               },
@@ -350,15 +357,18 @@ function DocumentSpaceFavoritesPage() {
               isDocumentSpacesErrored={isDocumentSpacesErrored} 
               documentSpaceService={documentSpaceService} 
               selectedSpace={pageState.selectedDocumentSpace?.value}
+              onUnreachableSpace={pageState.spaceNotFound.value || pageState.showNoChosenSpace.value }
             />
           </>
-          <div className="breadcrumb-area">
-            <BreadCrumbTrail
-              path=""
-              onNavigate={() => { return }}
-              rootName="Favorites"
-            />
-          </div>
+          { pageState.showNoChosenSpace.value || pageState.spaceNotFound.value ? null : 
+            <div className="breadcrumb-area">
+              <BreadCrumbTrail
+                path=""
+                onNavigate={() => { return }}
+                rootName="Favorites"
+              />
+            </div>
+          }
           {pageState.datasource.value &&
             <FullPageInfiniteGrid
               columns={documentDtoColumns()}
@@ -384,6 +394,13 @@ function DocumentSpaceFavoritesPage() {
           />
         </>
       }
+      <SpaceNotFoundDialog 
+        shouldShow={pageState.spaceNotFound.value} 
+        onHide={() => {
+          pageState.spaceNotFound.set(false)          
+          pageState.showNoChosenSpace.set(true)  // force user to user space drop down 
+        }} 
+      />
     </PageFormat>
   );
 }

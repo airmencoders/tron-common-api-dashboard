@@ -88,7 +88,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         if(onNoSpaceFound !== undefined){
           onNoSpaceFound()
         }
-        createTextToast(ToastType.ERROR, 'Could not process the selected Document Space');
+        this.spacesState.spaceNotFound.set(true);
         return;
       }
 
@@ -119,6 +119,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         ),
         path,
         selectedFiles: [],
+        showNoChosenSpace: false,
         favorites
       });
     }
@@ -139,6 +140,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         selectedSpace: undefined,
         datasource: undefined,
         shouldUpdateDatasource: false,
+        showNoChosenSpace: false,
         selectedFiles: [],
       });
     }
@@ -442,6 +444,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
       spaceNotFound: false,
+      showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
     });

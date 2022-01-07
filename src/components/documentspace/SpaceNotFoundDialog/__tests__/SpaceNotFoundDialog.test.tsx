@@ -13,7 +13,7 @@ describe('SpaceNotFoundDialog Tests', () => {
       />
     );
 
-    expect(queryByText('You do not have access to this space.')).toBeNull();
+    expect(queryByText('You do not have access to this space or it does not exist.')).toBeNull();
   });
   it('should render modal when shouldShow is true', () => {
     const {queryByText} = render(
@@ -23,7 +23,7 @@ describe('SpaceNotFoundDialog Tests', () => {
       />
     );
 
-    expect(queryByText('You do not have access to this space.')).toBeInTheDocument();
+    expect(queryByText('You do not have access to this space or it does not exist.')).toBeInTheDocument();
   });
 
 

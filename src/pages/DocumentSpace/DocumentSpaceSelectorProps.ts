@@ -6,4 +6,5 @@ export interface DocumentSpaceSelectorProps {
   isDocumentSpacesErrored: boolean;
   documentSpaceService: DocumentSpaceService;
   selectedSpace?: DocumentSpaceResponseDto;
+  onUnreachableSpace: boolean;
 }
