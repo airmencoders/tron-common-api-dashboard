@@ -6,12 +6,14 @@ import { RouteItem } from '../../../routes';
 import HealthPage from '../../../pages/Health/HealthPage';
 import { PrivilegeType } from '../../../state/privilege/privilege-type';
 import PersonPage from '../../../pages/Person/PersonPage';
-import {DashboardUserDto} from '../../../openapi/models';
+import {AppVersionInfoDto, DashboardUserDto} from '../../../openapi/models';
 import {AxiosResponse} from 'axios';
 import {createState, State, StateMethodsDestroy} from '@hookstate/core';
-import {DashboardUserControllerApi} from '../../../openapi';
+import {AppVersionControllerApi, DashboardUserControllerApi} from '../../../openapi';
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
+import AppInfoService from '../../../state/app-info/app-info-service';
 import {useAuthorizedUserState} from '../../../state/authorized-user/authorized-user-state';
+import {useAppVersionState} from '../../../state/app-info/app-info-state';
 
 const testRoutes: RouteItem[] = [
   {
@@ -60,6 +62,7 @@ function createRenderElem(routes: RouteItem[]) {
 }
 
 jest.mock('../../../state/authorized-user/authorized-user-state');
+jest.mock('../../../state/app-info/app-info-state');
 
 describe('Sidebar', () => {
   function mockAuthorizedUserState() {
@@ -71,8 +74,24 @@ describe('Sidebar', () => {
     });
   }
 
+  function mockAppInfoState(enclave: string) {
+    let appInfoState: State<AppVersionInfoDto> & StateMethodsDestroy = createState<AppVersionInfoDto>({ enclave: '', environment: '', version: '' } as AppVersionInfoDto);
+    let appVersionApi: AppVersionControllerApi = new AppVersionControllerApi();
+    (useAppVersionState as jest.Mock).mockReturnValue(new AppInfoService(appInfoState, appVersionApi));
+    appVersionApi.getVersion = jest.fn(() => {
+      return Promise.resolve({ 
+        data: { enclave: enclave, environment: '', version: '' },
+        status: 200,
+        statusText: 'OK',
+        config: {},
+        headers: {}
+      });
+    });
+  }
+
   it('Renders', async () => {
     mockAuthorizedUserState();
+    mockAppInfoState('IL2');
     await useAuthorizedUserState().fetchAndStoreAuthorizedUser();
 
     const pageRender = render(
@@ -84,8 +103,27 @@ describe('Sidebar', () => {
     expect(elem).toBeInTheDocument();
   });
 
+  it('Does not show document space for IL2', async () => {
+    mockAuthorizedUserState();
+    mockAppInfoState('IL2');
+    await useAuthorizedUserState().fetchAndStoreAuthorizedUser();
+
+    const pageRender = render(
+      createRenderElem(testRoutes)
+    );
+
+    testRoutes.forEach((item) => {
+      if (item.name === 'Document Space') {
+        expect(pageRender.getByText(item.name)).not.toBeInTheDocument();
+      } else {
+        expect(pageRender.getByText(item.name)).toBeInTheDocument();
+      }
+    });
+  });
+
   it('Renders all items (admin & user privilege)', async () => {
     mockAuthorizedUserState();
+    mockAppInfoState('IL4');
     await useAuthorizedUserState().fetchAndStoreAuthorizedUser();
 
     const pageRender = render(

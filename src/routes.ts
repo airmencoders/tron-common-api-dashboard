@@ -29,6 +29,7 @@ export interface RouteItem {
     path: string;
     name: string;
     component?: React.FunctionComponent;
+    hide?: (enclave: string) => boolean;
     requiredPrivileges: PrivilegeType[];
     childRoutes?: RouteItem[];
     icon?: (props: IconProps) => JSX.Element;
@@ -159,6 +160,7 @@ export const routes: RouteItem[] = [
     {
         path: '#',
         name: 'Document Space',
+        hide: (enclave: string) => enclave === 'IL2',
         requiredPrivileges: [
             PrivilegeType.DOCUMENT_SPACE_USER,
             PrivilegeType.DASHBOARD_ADMIN
