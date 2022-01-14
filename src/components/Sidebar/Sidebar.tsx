@@ -10,13 +10,26 @@ import SidebarContainer from './SidebarContainer';
 import SidebarItem from './SidebarItem';
 import {useNavCollapsed} from '../../hooks/PagePreferenceHooks';
 import SidebarItemWithChildren from './SidebarItemWithChildren';
+import { useAppVersionState } from '../../state/app-info/app-info-state';
+import { setConstantValue } from 'typescript';
 
 function Sidebar({ items }: { items: RouteItem[] }) {
   const authorizedUserState = useAuthorizedUserState();
+  const appVersionState = useAppVersionState();
   const location = useLocation();
   const [openedMenu, setOpenedMenu] = useState('');
   const [isNavCollapsed] = useNavCollapsed();
   const activeItem = useHookstate('');
+  const [enclave, setEnclave] = useState<string>('');
+
+  useEffect(() => {
+    async function versionFetch() {
+      await appVersionState.fetchVersion();  // fetches backend version/env if not already done so
+      setEnclave(appVersionState.state.enclave.value ?? '');
+    }
+
+    versionFetch();
+  }, []);
 
   useEffect(() => {
     for (const item of items) {
@@ -58,7 +71,8 @@ function Sidebar({ items }: { items: RouteItem[] }) {
         </div>
         <nav className="sidebar__nav">
           {
-            items.map((item) => {
+            items.filter(item => item.hide == undefined || !item.hide(enclave))
+                .map((item) => {
                   if (authorizedUserState.authorizedUserHasAnyPrivilege(item.requiredPrivileges)) {
                     return (item.childRoutes != null && item.childRoutes.length > 0) ?
                         <SidebarItemWithChildren
