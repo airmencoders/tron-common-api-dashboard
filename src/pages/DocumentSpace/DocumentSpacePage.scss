@@ -1,5 +1,10 @@
 @import "../../styles/mixins";
 
+.clipboard-notification {
+  display: flex;
+  justify-content: center;
+}
+
 .document-space-page {
   &__space-select {
     label {

@@ -34,6 +34,7 @@ import {
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import {
+  clipBoardState,
   documentSpaceDownloadUrlService,
   useDocumentSpacePageState,
   useDocumentSpacePrivilegesState,
@@ -42,7 +43,7 @@ import {
 import {CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
 import { formatDocumentSpaceDate } from '../../utils/date-utils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { formatBytesToString } from '../../utils/file-utils';
+import { formatBytesToString, joinPathParts } from '../../utils/file-utils';
 import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
 import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
@@ -51,9 +52,11 @@ import './DocumentSpacePage.scss';
 import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./DocumentSpaceSelector";
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
-import {RoutePath} from "../../routes";
 import FolderSizeDialog from './FolderSizeDialog';
 import InfoIcon from '../../icons/InfoIcon';
+import CopyContentIcon from '../../icons/CopyContentIcon';
+import CutIcon from '../../icons/CutIcon';
+import InfoNotice from '../../components/InfoNotice/InfoNotice';
 
 function DocumentSpacePage() {
   const location = useLocation();
@@ -62,6 +65,7 @@ function DocumentSpacePage() {
   const mountedRef = useRef(false);
 
   const pageService = useDocumentSpacePageState(mountedRef);
+  const localClipboardState = useHookstate(clipBoardState);
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
@@ -194,6 +198,34 @@ function DocumentSpacePage() {
               createEditElementOpType: CreateEditOperationType.EDIT_FILENAME,
             })
           },
+          {
+            title: 'Cut',
+            icon: CutIcon,
+            shouldShow: () => true,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
+            onClick: (doc: DocumentDto) => {
+              localClipboardState.set({
+                sourceSpace: doc.spaceId,
+                isCopy: false,
+                items: [ joinPathParts(doc.path, doc.key) ]
+              });
+              createTextToast(ToastType.SUCCESS, 'Items selected for CUT');
+            }
+          },
+          {
+            title: 'Copy',
+            icon: CopyContentIcon,
+            shouldShow: () => true,
+            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
+            onClick: (doc: DocumentDto) => {
+              localClipboardState.set({
+                sourceSpace: doc.spaceId,
+                isCopy: true,
+                items: [ joinPathParts(doc.path, doc.key) ]
+              });
+              createTextToast(ToastType.SUCCESS, 'Items selected for COPY');
+            }
+          }
         ] as PopupMenuItem<DocumentDto>[],
       },
     })
@@ -327,6 +359,26 @@ function DocumentSpacePage() {
 
   return (
     <PageFormat pageTitle="Document Space" className="document-space-page">
+        {
+          localClipboardState.value && localClipboardState.value.items && localClipboardState.value.items.length > 0 ? 
+          <div className='clipboard-notification'>
+            <InfoNotice
+              type={'success'}
+              slim={true}
+            >
+              {`${localClipboardState.value.items.length} items on clipboard`}&nbsp;
+                <Button 
+                  data-testid='clear-clipboard-button'
+                  unstyled 
+                  type={'button'}
+                  onClick={() => localClipboardState.set(undefined)}
+                >
+                  Clear
+                </Button>      
+            </InfoNotice>
+          </div>
+          : null
+        }
       <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
         <div className="add-space-container">
           <div>
@@ -394,6 +446,7 @@ function DocumentSpacePage() {
               selectedFiles={pageService.state.selectedFiles}
               showDeleteSelectedDialog={pageService.state.showDeleteSelectedDialog}
               className="content-controls"
+              documentPageService={pageService}
             />
           </div>
       )}

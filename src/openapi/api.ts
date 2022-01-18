@@ -20,6 +20,7 @@ export * from './apis/app-version-controller-api';
 export * from './apis/dashboard-controller-api';
 export * from './apis/dashboard-user-controller-api';
 export * from './apis/document-space-controller-api';
+export * from './apis/document-space-mobile-controller-api';
 export * from './apis/document-space-web-dav-controller-api';
 export * from './apis/event-request-log-controller-api';
 export * from './apis/http-logs-controller-api';

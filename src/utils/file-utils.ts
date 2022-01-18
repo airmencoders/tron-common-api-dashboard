@@ -54,3 +54,26 @@ export function reduceDocumentDtoListToUnique(list: DocumentDto[]): UniqueSpaceA
 
   return Object.keys(uniqSpaceAndPathsMap).map(item => uniqSpaceAndPathsMap[item]);
 }
+
+/**
+ * Helper to concat elements together to form a path suitable for the backend
+ * @param items path components
+ */
+export function joinPathParts(...items: string[]) {
+  const path = [];
+  for (const item of items) {
+    path.push(item);
+  }
+
+  return path.join('/').replace(/[\/]+/g, '/').replace(/[\/+]$/, '');
+}
+
+/**
+ * Helper to get the file from a path
+ * @param pathString String containing the path and filename
+ * @returns filename
+ */
+export function getPathFileName(pathString: string) {
+  const pathParts = pathString.split('/');
+  return pathParts[pathParts.length - 1];
+}

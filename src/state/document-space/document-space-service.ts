@@ -339,6 +339,7 @@ export default class DocumentSpaceService {
   ): CancellableDataRequest<AxiosResponse<{ [key: string]: string }>> {
     const token = axios.CancelToken.source();
     const promise = this.documentSpaceApi.upload(space, path, file, {
+      headers: { 'Last-Modified': (file as File).lastModified },  // send the last modified date with the file
       cancelToken: token.token,
       onUploadProgress: function (progressEvent: any) {
         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -460,6 +461,26 @@ export default class DocumentSpaceService {
     try {
       return (await this.documentSpaceApi.getFolderSize(documentSpaceId, folderPath)).data;
     } 
+    catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
+    }
+  }
+
+  async copyFiles(destinationSpaceId: string, sourceSpaceId: string | undefined, items: { [key: string]: string }): Promise<void> {
+    try {    
+      await this.documentSpaceApi.copyFiles(destinationSpaceId, items, sourceSpaceId);
+      return Promise.resolve();
+    }
+    catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
+    }
+  }
+
+  async moveFiles(destinationSpaceId: string, sourceSpaceId: string | undefined, items: { [key: string]: string }): Promise<void> {
+    try {
+      await this.documentSpaceApi.moveFiles(destinationSpaceId, items, sourceSpaceId);
+      return Promise.resolve();
+    }
     catch (error) {
       return Promise.reject(prepareRequestError(error).message);
     }

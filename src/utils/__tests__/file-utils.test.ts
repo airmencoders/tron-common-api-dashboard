@@ -1,5 +1,5 @@
 import { DocumentDto } from '../../openapi';
-import { formatBytesToString, reduceDocumentDtoListToUnique } from '../file-utils';
+import { formatBytesToString, getPathFileName, joinPathParts, reduceDocumentDtoListToUnique } from '../file-utils';
 
 describe('File Utils Test', () => {
   it('should return formatted string from number of bytes', () => {
@@ -29,4 +29,18 @@ describe('File Utils Test', () => {
     expect(reduceDocumentDtoListToUnique([])).toHaveLength(0);
     expect(reduceDocumentDtoListToUnique(null!)).toHaveLength(0);
   });
+
+  it('should create suitable paths', () => {
+    expect(joinPathParts('', 'documents.txt')).toEqual('/documents.txt');
+    expect(joinPathParts('home/directory/', 'documents.txt')).toEqual('home/directory/documents.txt');
+    expect(joinPathParts('home/directory', 'documents.txt')).toEqual('home/directory/documents.txt');
+    expect(joinPathParts('home/directory', 'documents.txt/')).toEqual('home/directory/documents.txt');
+    expect(joinPathParts('home/directory', 'documents.txt////')).toEqual('home/directory/documents.txt');
+  });
+
+  it('should give the filename part of a path', () => {
+    expect(getPathFileName('/some/docs/file.txt')).toEqual('file.txt');
+    expect(getPathFileName('file.txt')).toEqual('file.txt');
+    expect(getPathFileName('/file.txt')).toEqual('file.txt');
+  })
 });

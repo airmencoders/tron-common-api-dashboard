@@ -179,7 +179,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
       //  to just array of strings (the filenames)
       const fileNames: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        fileNames.push(files[i].name);
+        fileNames.push((files[i] as any).webkitRelativePath);
       }
 
       // go ask the backend for the existence of any of these 

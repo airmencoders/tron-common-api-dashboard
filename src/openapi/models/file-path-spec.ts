@@ -62,6 +62,12 @@ export interface FilePathSpec {
      * @memberof FilePathSpec
      */
     docSpaceQualifiedPath?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FilePathSpec
+     */
+    docSpaceQualifiedFilePath?: string;
 }
 
 

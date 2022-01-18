@@ -2538,11 +2538,84 @@
         }
       }
     },
+    "/v2/document-space/spaces/{id}/move": {
+      "post": {
+        "tags": ["document-space-controller"],
+        "summary": "Moves file(s)/folders(s) from one location in a document space to another within same space.",
+        "operationId": "moveFiles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sourceSpaceId",
+            "in": "query",
+            "description": "UUID of the source space (if cross space moving) - otherwise uses current space",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space, or entry not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/document-space/spaces/{id}/files/upload": {
       "post": {
         "tags": ["document-space-controller"],
         "summary": "Uploads a file to a Document Space",
-        "description": "Uploads a file to a Document Space",
+        "description": "Uploads a file to a Document Space. API will attempt to use the `Last-Modified` date (formatted as long epoch date) in the header in order to keep the uploaded copy's modified date to track its origin.  If that header is not given, then current date/time will be used.",
         "operationId": "upload",
         "parameters": [
           {
@@ -2665,6 +2738,79 @@
           },
           "404": {
             "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/document-space/spaces/{id}/copy": {
+      "post": {
+        "tags": ["document-space-controller"],
+        "summary": "Copies file(s)/folders(s) from one location in a document space to another within same space.",
+        "operationId": "copyFiles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sourceSpaceId",
+            "in": "query",
+            "description": "UUID of the source space (if cross space copying) - otherwise uses current space",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space, or entry not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -6815,6 +6961,95 @@
         }
       }
     },
+    "/v2/document-space-mobile/spaces": {
+      "get": {
+        "tags": ["document-space-mobile-controller"],
+        "summary": "Retrieves all document spaces that the requesting user can access, and their default space (if any)",
+        "operationId": "getSpacesAvailableAndDefault",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSpaceMobileResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires DASHBOARD_ADMIN or DOCUMENT_SPACE_USER)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/document-space-mobile/spaces/{id}/contents": {
+      "get": {
+        "tags": ["document-space-mobile-controller"],
+        "summary": "List folders and files at given path - with favorites indicator included",
+        "description": "Lists folders and files contained within given folder path - one level deep (does not recurse into any sub-folders).  Intended for mobile usage since it included favorites indication as well",
+        "operationId": "dumpContentsAtPath_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/S3MobilePaginationDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found or part of supplied path does not exist",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/dashboard/app-source-usage": {
       "get": {
         "tags": ["dashboard-controller"],
@@ -9155,7 +9390,7 @@
     "/v2/document-space-dav/{spaceId}/**": {
       "get": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_1",
+        "operationId": "processWebDavCommand_3",
         "parameters": [
           {
             "name": "spaceId",
@@ -9182,7 +9417,7 @@
       },
       "put": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_3",
+        "operationId": "processWebDavCommand_2",
         "parameters": [
           {
             "name": "spaceId",
@@ -9209,7 +9444,7 @@
       },
       "post": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_2",
+        "operationId": "processWebDavCommand",
         "parameters": [
           {
             "name": "spaceId",
@@ -9236,7 +9471,7 @@
       },
       "delete": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_5",
+        "operationId": "processWebDavCommand_6",
         "parameters": [
           {
             "name": "spaceId",
@@ -9263,7 +9498,7 @@
       },
       "options": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_6",
+        "operationId": "processWebDavCommand_4",
         "parameters": [
           {
             "name": "spaceId",
@@ -9290,7 +9525,7 @@
       },
       "head": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand",
+        "operationId": "processWebDavCommand_5",
         "parameters": [
           {
             "name": "spaceId",
@@ -9317,7 +9552,7 @@
       },
       "patch": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_4",
+        "operationId": "processWebDavCommand_1",
         "parameters": [
           {
             "name": "spaceId",
@@ -10495,6 +10730,9 @@
           },
           "docSpaceQualifiedPath": {
             "type": "string"
+          },
+          "docSpaceQualifiedFilePath": {
+            "type": "string"
           }
         }
       },
@@ -11090,6 +11328,9 @@
           "key": {
             "type": "string"
           },
+          "path": {
+            "type": "string"
+          },
           "parentId": {
             "type": "string",
             "format": "uuid"
@@ -11151,6 +11392,112 @@
             "items": {
               "$ref": "#/components/schemas/RecentDocumentDto"
             }
+          }
+        }
+      },
+      "DocumentSpaceMobileResponseDto": {
+        "type": "object",
+        "properties": {
+          "spaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpaceInfo"
+            }
+          },
+          "defaultSpace": {
+            "$ref": "#/components/schemas/SpaceInfo"
+          }
+        }
+      },
+      "SpaceInfo": {
+        "required": ["id", "name"],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "privilege": {
+            "type": "string",
+            "enum": ["VIEWER", "EDITOR", "ADMIN"]
+          }
+        }
+      },
+      "DocumentMobileDto": {
+        "required": ["key", "lastModifiedBy", "lastModifiedDate", "path", "size", "spaceId"],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "spaceId": {
+            "type": "string"
+          },
+          "spaceName": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size in bytes",
+            "format": "int64"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedBy": {
+            "type": "string"
+          },
+          "hasContents": {
+            "type": "boolean"
+          },
+          "elementUniqueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "favorite": {
+            "type": "boolean"
+          },
+          "folder": {
+            "type": "boolean"
+          }
+        }
+      },
+      "S3MobilePaginationDto": {
+        "required": ["documents", "size", "totalElements"],
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentMobileDto"
+            }
+          },
+          "currentContinuationToken": {
+            "type": "string"
+          },
+          "nextContinuationToken": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "description": "The size of the page",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "description": "The size of the returned elements of this page",
+            "format": "int32"
           }
         }
       },

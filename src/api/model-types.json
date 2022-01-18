@@ -914,6 +914,57 @@
       },
       "type": "object"
     },
+    "DocumentMobileDto": {
+      "additionalProperties": false,
+      "properties": {
+        "elementUniqueId": {
+          "type": "string"
+        },
+        "favorite": {
+          "type": "boolean"
+        },
+        "folder": {
+          "type": "boolean"
+        },
+        "hasContents": {
+          "type": "boolean"
+        },
+        "key": {
+          "type": "string"
+        },
+        "lastModifiedBy": {
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "size": {
+          "description": "Size in bytes",
+          "type": "number"
+        },
+        "spaceId": {
+          "type": "string"
+        },
+        "spaceName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "path",
+        "spaceId",
+        "size",
+        "lastModifiedDate",
+        "lastModifiedBy"
+      ],
+      "type": "object"
+    },
     "DocumentSpaceArchiveItemsDto": {
       "additionalProperties": false,
       "properties": {
@@ -1035,6 +1086,21 @@
         "itemId",
         "documentSpaceId"
       ],
+      "type": "object"
+    },
+    "DocumentSpaceMobileResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "defaultSpace": {
+          "$ref": "model-types.json#/definitions/SpaceInfo"
+        },
+        "spaces": {
+          "items": {
+            "$ref": "model-types.json#/definitions/SpaceInfo"
+          },
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "DocumentSpacePathItemsDto": {
@@ -1214,6 +1280,9 @@
           "$ref": "model-types.json#/definitions/DocumentMetadata"
         },
         "parentId": {
+          "type": "string"
+        },
+        "path": {
           "type": "string"
         }
       },
@@ -1456,6 +1525,9 @@
     "FilePathSpec": {
       "additionalProperties": false,
       "properties": {
+        "docSpaceQualifiedFilePath": {
+          "type": "string"
+        },
         "docSpaceQualifiedPath": {
           "type": "string"
         },
@@ -2634,6 +2706,37 @@
       },
       "type": "object"
     },
+    "S3MobilePaginationDto": {
+      "additionalProperties": false,
+      "properties": {
+        "currentContinuationToken": {
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentMobileDto"
+          },
+          "type": "array"
+        },
+        "nextContinuationToken": {
+          "type": "string"
+        },
+        "size": {
+          "description": "The size of the page",
+          "type": "number"
+        },
+        "totalElements": {
+          "description": "The size of the returned elements of this page",
+          "type": "number"
+        }
+      },
+      "required": [
+        "documents",
+        "size",
+        "totalElements"
+      ],
+      "type": "object"
+    },
     "S3PaginationDto": {
       "additionalProperties": false,
       "properties": {
@@ -2837,6 +2940,33 @@
     },
     "Soldier": {
       "$ref": "model-types.json#/definitions/PersonDto"
+    },
+    "SpaceInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "privilege": {
+          "$ref": "model-types.json#/definitions/SpaceInfoPrivilegeEnum"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "SpaceInfoPrivilegeEnum": {
+      "enum": [
+        "VIEWER",
+        "EDITOR",
+        "ADMIN"
+      ],
+      "type": "string"
     },
     "Spaceman": {
       "$ref": "model-types.json#/definitions/PersonDto"
