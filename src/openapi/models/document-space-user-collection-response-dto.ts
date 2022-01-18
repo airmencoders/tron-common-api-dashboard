@@ -50,6 +50,12 @@ export interface DocumentSpaceUserCollectionResponseDto {
      * @type {string}
      * @memberof DocumentSpaceUserCollectionResponseDto
      */
+    path?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DocumentSpaceUserCollectionResponseDto
+     */
     parentId?: string;
     /**
      * 

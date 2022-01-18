@@ -649,4 +649,52 @@ describe('Test Document Space Service', () => {
     }
   });
 
+  it('should copy files', async () => {
+    jest
+      .spyOn(documentSpaceApi, 'copyFiles')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosNoContentResponse()
+        )
+      );
+
+    let response = await documentSpaceService.copyFiles('some id', 'some other id', { 'file1': 'file2' });
+    expect(response).resolves;
+
+    jest
+      .spyOn(documentSpaceApi, 'copyFiles')
+      .mockRejectedValue({ reason: 'It Broke', status: 400, message: 'System down', });
+
+    try {
+      response = await documentSpaceService.copyFiles('some id', 'some other id', { 'file1': 'file2' });
+    }
+    catch (e) {
+      expect(e).toEqual('System down');
+    }
+  });
+
+  it('should cut files', async () => {
+    jest
+      .spyOn(documentSpaceApi, 'moveFiles')
+      .mockReturnValue(
+        Promise.resolve(
+          createAxiosNoContentResponse()
+        )
+      );
+
+    let response = await documentSpaceService.moveFiles('some id', 'some other id', { 'file1': 'file2' });
+    expect(response).resolves;
+
+    jest
+      .spyOn(documentSpaceApi, 'moveFiles')
+      .mockRejectedValue({ reason: 'It Broke', status: 400, message: 'System down', });
+
+    try {
+      response = await documentSpaceService.moveFiles('some id', 'some other id', { 'file1': 'file2' });
+    }
+    catch (e) {
+      expect(e).toEqual('System down');
+    }
+  });
+
 });

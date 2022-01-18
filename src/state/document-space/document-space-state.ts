@@ -19,6 +19,15 @@ import SpacesPageService from './spaces-page/spaces-page-service';
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
 
+// the clipboard global state for cut/copy/paste operations
+export interface ClipBoardState {
+  sourceSpace?: string;  // space where we initiated the cut/copy
+  isCopy: boolean;  // copy or cut?
+  items: string[];
+}
+export const clipBoardState = createState<ClipBoardState | undefined>(undefined);
+
+
 const recentsPageState = createState<RecentsPageState>({
   datasource: undefined,
   shouldUpdateInfiniteCache: false,
@@ -145,14 +154,16 @@ const wrapDocumentSpacePageState = (
   authorizedUserService: AuthorizedUserService,
   documentSpaceGlobalService: DocumentSpaceGlobalService,
   documentSpaceService: DocumentSpaceService,
-  documentSpacePrivilegesService: DocumentSpacePrivilegeService) => {
+  documentSpacePrivilegesService: DocumentSpacePrivilegeService,
+  documentSpaceClipboardState: State<ClipBoardState | undefined>) => {
   return new SpacesPageService(
     spacesServiceState,
     mountedRef,
     authorizedUserService,
     documentSpaceGlobalService,
     documentSpaceService,
-    documentSpacePrivilegesService);
+    documentSpacePrivilegesService,
+    documentSpaceClipboardState);
 }
 
 export const useDocumentSpacePageState = (mountedRef: MutableRefObject<boolean>) => wrapDocumentSpacePageState(
@@ -161,7 +172,8 @@ export const useDocumentSpacePageState = (mountedRef: MutableRefObject<boolean>)
   accessAuthorizedUserState(),
   accessDocumentSpaceGlobalState(),
   accessDocumentSpaceState(),
-  accessDocumentSpacePrivilegesState()
+  accessDocumentSpacePrivilegesState(),
+  clipBoardState
 );
 
 const wrapGlobalDocumentSpaceState = (globalState: State<DocumentSpaceGlobalState>) => {

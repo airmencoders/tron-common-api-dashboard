@@ -2,12 +2,13 @@ import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { act, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
+import { MutableRefObject } from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
+import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import { ToastContainer } from '../../../components/Toast/ToastContainer/ToastContainer';
 import {
   DashboardUserControllerApi,
-  DashboardUserDto,
-  DocumentSpaceControllerApi,
+  DashboardUserDto, DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
@@ -16,18 +17,16 @@ import {
 import AuthorizedUserService from '../../../state/authorized-user/authorized-user-service';
 import { useAuthorizedUserState } from '../../../state/authorized-user/authorized-user-state';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../state/document-space/document-space-global-service';
-import DocumentSpaceMembershipService from '../../../state/document-space/memberships/document-space-membership-service';
 import DocumentSpacePrivilegeService from '../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
-import { documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
-import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
-import DocumentSpacePage from '../DocumentSpacePage';
+import { ClipBoardState, documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
+import DocumentSpaceMembershipService from '../../../state/document-space/memberships/document-space-membership-service';
 import SpacesPageService from '../../../state/document-space/spaces-page/spaces-page-service';
 import { SpacesPageState } from '../../../state/document-space/spaces-page/spaces-page-state';
-import { MutableRefObject } from 'react';
-import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
-import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
+import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
+import DocumentSpacePage from '../DocumentSpacePage';
 
 jest.mock('../../../state/document-space/document-space-state');
 jest.mock('../../../state/authorized-user/authorized-user-state');
@@ -65,6 +64,8 @@ describe('Test Document Space Page', () => {
   let authorizedUserState: State<DashboardUserDto | undefined> & StateMethodsDestroy;
   let dashboardUserApi: DashboardUserControllerApi;
   let authorizedUserService: AuthorizedUserService;
+
+  let clipboardStateLocal = createState<ClipBoardState | undefined>({ items: [ 'items.txt' ], isCopy: true, sourceSpace: 'sdf'});
 
   beforeEach(() => {
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
@@ -113,7 +114,10 @@ describe('Test Document Space Page', () => {
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
-      spaceNotFound: false
+      spaceNotFound: false,
+      showNoChosenSpace: false, // state we get into if we nav to an non-exist or private space
+      showFolderSizeDialog: false,
+      selectedItemForSize: undefined
     });
 
     documentSpacePageService = new SpacesPageService(
@@ -122,7 +126,8 @@ describe('Test Document Space Page', () => {
       authorizedUserService,
       globalDocumentSpaceService,
       documentSpaceService,
-      documentSpacePrivilegeService
+      documentSpacePrivilegeService,
+      clipboardStateLocal
     );
 
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);

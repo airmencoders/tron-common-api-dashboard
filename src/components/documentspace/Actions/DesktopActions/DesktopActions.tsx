@@ -3,7 +3,7 @@ import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
 import FileUpload from '../../FileUpload/FileUpload';
 import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
-import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
+import { clipBoardState, documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
 import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import PeopleIcon2 from '../../../../icons/PeopleIcon2';
 import DropDown from '../../../DropDown/DropDown';
@@ -14,6 +14,9 @@ import { CreateEditOperationType } from '../../../../state/document-space/docume
 import { useHookstate } from '@hookstate/core';
 import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
 import { ToastType } from '../../../Toast/ToastUtils/toast-type';
+import PasteIcon from '../../../../icons/PasteIcon';
+import CutIcon from '../../../../icons/CutIcon';
+import CopyContentIcon from '../../../../icons/CopyContentIcon';
 
 /**
  * Helper to check a list of selected rows (DocumentDto objects) to see if we only have one
@@ -38,6 +41,7 @@ function DesktopActions(props: ActionsProps) {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
   const uploadFileRef = createRef<HTMLInputElement>();
+  const localClipboardState = useHookstate(clipBoardState);
 
   if (props.selectedSpace.value == null) {
     return null;
@@ -55,6 +59,36 @@ function DesktopActions(props: ActionsProps) {
       <div className={`document-space-actions document-space-actions--desktop ${props.className ?? ''} `}>
         {documentSpacePrivilegesService.isAuthorizedForAction(props.selectedSpace.value.id, DocumentSpacePrivilegeDtoTypeEnum.Write) &&
         <>
+          <Button
+              type="button"
+              icon
+              disabled={props.selectedFiles.length === 0}
+              data-testid="copy-items-button"
+              disableMobileFullWidth
+              onClick={() => props.documentPageService.copySelectedItems()}
+          >
+            <CopyContentIcon className="icon-color" fillColor='white' size={1}/>
+          </Button>
+          <Button
+              type="button"
+              icon
+              disabled={props.selectedFiles.length === 0}
+              data-testid="cut-items-button"
+              disableMobileFullWidth
+              onClick={() => props.documentPageService.cutSelectedItems()}
+          >
+            <CutIcon className="icon-color" fillColor='white' size={1}/>
+          </Button>
+          <Button
+              type="button"
+              icon
+              disabled={!(localClipboardState.value && localClipboardState.value.items)}
+              data-testid="paste-items-button"
+              disableMobileFullWidth
+              onClick={() => props.documentPageService.pasteItems()}
+          >
+            <PasteIcon className="icon-color" fillColor='white' size={1}/>
+          </Button>
           <div data-testid="upload-new-file">
             <FileUpload
                 ref={uploadFileRef}

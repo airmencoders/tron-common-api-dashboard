@@ -336,6 +336,68 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
         },
         /**
          * 
+         * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
+         * @param {string} id 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        copyFiles: async (id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling copyFiles.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling copyFiles.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/copy`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (sourceSpaceId !== undefined) {
+                localVarQueryParameter['sourceSpaceId'] = sourceSpaceId;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Creates a new folder within a Document Space
          * @param {string} id 
          * @param {DocumentSpaceCreateFolderDto} documentSpaceCreateFolderDto 
@@ -1430,6 +1492,68 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
         },
         /**
          * 
+         * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
+         * @param {string} id 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        moveFiles: async (id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling moveFiles.');
+            }
+            // verify required parameter 'requestBody' is not null or undefined
+            if (requestBody === null || requestBody === undefined) {
+                throw new RequiredError('requestBody','Required parameter requestBody was null or undefined when calling moveFiles.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/move`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (sourceSpaceId !== undefined) {
+                localVarQueryParameter['sourceSpaceId'] = sourceSpaceId;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof requestBody !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(requestBody !== undefined ? requestBody : {})
+                : (requestBody || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Sets the default Document Space privileges of the requesting user
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -1863,7 +1987,7 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * Uploads a file to a Document Space
+         * Uploads a file to a Document Space. API will attempt to use the `Last-Modified` date (formatted as long epoch date) in the header in order to keep the uploaded copy\'s modified date to track its origin.  If that header is not given, then current date/time will be used.
          * @summary Uploads a file to a Document Space
          * @param {string} id 
          * @param {string} [path] 
@@ -1998,6 +2122,22 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          */
         async batchAddUserToDocumentSpace(id: string, file?: any, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
             const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).batchAddUserToDocumentSpace(id, file, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
+         * @param {string} id 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async copyFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).copyFiles(id, requestBody, sourceSpaceId, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -2334,6 +2474,22 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
         },
         /**
          * 
+         * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
+         * @param {string} id 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async moveFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).moveFiles(id, requestBody, sourceSpaceId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Sets the default Document Space privileges of the requesting user
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -2452,7 +2608,7 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-         * Uploads a file to a Document Space
+         * Uploads a file to a Document Space. API will attempt to use the `Last-Modified` date (formatted as long epoch date) in the header in order to keep the uploaded copy\'s modified date to track its origin.  If that header is not given, then current date/time will be used.
          * @summary Uploads a file to a Document Space
          * @param {string} id 
          * @param {string} [path] 
@@ -2530,6 +2686,18 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          */
         batchAddUserToDocumentSpace(id: string, file?: any, options?: any): AxiosPromise<Array<string>> {
             return DocumentSpaceControllerApiFp(configuration).batchAddUserToDocumentSpace(id, file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
+         * @param {string} id 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        copyFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).copyFiles(id, requestBody, sourceSpaceId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2774,6 +2942,18 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
         },
         /**
          * 
+         * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
+         * @param {string} id 
+         * @param {{ [key: string]: string; }} requestBody 
+         * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        moveFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).moveFiles(id, requestBody, sourceSpaceId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Sets the default Document Space privileges of the requesting user
          * @param {string} id 
          * @param {*} [options] Override http request option.
@@ -2860,7 +3040,7 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).unArchiveItems(id, documentSpaceUnArchiveItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
-         * Uploads a file to a Document Space
+         * Uploads a file to a Document Space. API will attempt to use the `Last-Modified` date (formatted as long epoch date) in the header in order to keep the uploaded copy\'s modified date to track its origin.  If that header is not given, then current date/time will be used.
          * @summary Uploads a file to a Document Space
          * @param {string} id 
          * @param {string} [path] 
@@ -2934,6 +3114,18 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     batchAddUserToDocumentSpace(id: string, file?: any, options?: any): AxiosPromise<Array<string>>;
+
+    /**
+     * 
+     * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
+     * @param {string} id 
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    copyFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any): AxiosPromise<object>;
 
     /**
      * 
@@ -3178,6 +3370,18 @@ export interface DocumentSpaceControllerApiInterface {
 
     /**
      * 
+     * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
+     * @param {string} id 
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    moveFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any): AxiosPromise<object>;
+
+    /**
+     * 
      * @summary Sets the default Document Space privileges of the requesting user
      * @param {string} id 
      * @param {*} [options] Override http request option.
@@ -3264,7 +3468,7 @@ export interface DocumentSpaceControllerApiInterface {
     unArchiveItems(id: string, documentSpaceUnArchiveItemsDto: DocumentSpaceUnArchiveItemsDto, options?: any): AxiosPromise<object>;
 
     /**
-     * Uploads a file to a Document Space
+     * Uploads a file to a Document Space. API will attempt to use the `Last-Modified` date (formatted as long epoch date) in the header in order to keep the uploaded copy\'s modified date to track its origin.  If that header is not given, then current date/time will be used.
      * @summary Uploads a file to a Document Space
      * @param {string} id 
      * @param {string} [path] 
@@ -3347,6 +3551,20 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public batchAddUserToDocumentSpace(id: string, file?: any, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).batchAddUserToDocumentSpace(id, file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
+     * @param {string} id 
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public copyFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).copyFiles(id, requestBody, sourceSpaceId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3636,6 +3854,20 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
 
     /**
      * 
+     * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
+     * @param {string} id 
+     * @param {{ [key: string]: string; }} requestBody 
+     * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public moveFiles(id: string, requestBody: { [key: string]: string; }, sourceSpaceId?: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).moveFiles(id, requestBody, sourceSpaceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Sets the default Document Space privileges of the requesting user
      * @param {string} id 
      * @param {*} [options] Override http request option.
@@ -3738,7 +3970,7 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-     * Uploads a file to a Document Space
+     * Uploads a file to a Document Space. API will attempt to use the `Last-Modified` date (formatted as long epoch date) in the header in order to keep the uploaded copy\'s modified date to track its origin.  If that header is not given, then current date/time will be used.
      * @summary Uploads a file to a Document Space
      * @param {string} id 
      * @param {string} [path] 

@@ -1,4 +1,5 @@
 import { none, State } from '@hookstate/core';
+import { DatePicker } from '@trussworks/react-uswds';
 import React, { MutableRefObject } from 'react';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import { GridSelectionType } from '../../../components/Grid/grid-selection-type';
@@ -15,17 +16,18 @@ import {
 import { pathQueryKey, spaceIdQueryKey } from '../../../pages/DocumentSpace/DocumentSpaceSelector';
 import { performActionWhenMounted } from '../../../utils/component-utils';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
+import { getPathFileName, joinPathParts } from '../../../utils/file-utils';
 import AuthorizedUserService from '../../authorized-user/authorized-user-service';
 import { AbstractGlobalStateService } from '../../global-service/abstract-global-state-service';
 import { PrivilegeType } from '../../privilege/privilege-type';
 import DocumentSpaceGlobalService from '../document-space-global-service';
 import DocumentSpacePrivilegeService from '../document-space-privilege-service';
 import DocumentSpaceService from '../document-space-service';
+import { ClipBoardState } from '../document-space-state';
 import { CreateEditOperationType } from '../document-space-utils';
 import { SpacesPageState } from './spaces-page-state';
 
 export default class SpacesPageService extends AbstractGlobalStateService<SpacesPageState> {
-
   constructor(
     public spacesState: State<SpacesPageState>,
     private mountedRef: MutableRefObject<boolean>,
@@ -33,6 +35,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     private documentSpaceGlobalService: DocumentSpaceGlobalService,
     private documentSpaceService: DocumentSpaceService,
     private documentSpacePrivilegesService: DocumentSpacePrivilegeService,
+    private documentSpaceClipboardState: State<ClipBoardState | undefined>
   ) {
     super(spacesState);
   }
@@ -41,7 +44,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     return {
       enabled: true,
       limit: 100,
-    }
+    };
   }
 
   isAdmin() {
@@ -64,7 +67,10 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   getInitialDocumentSpace() {
-    return this.documentSpaceGlobalService.getInitialSelectedDocumentSpace(this.documentSpaceService.documentSpaces, this.authorizedUserService.authorizedUser?.defaultDocumentSpaceId);
+    return this.documentSpaceGlobalService.getInitialSelectedDocumentSpace(
+      this.documentSpaceService.documentSpaces,
+      this.authorizedUserService.authorizedUser?.defaultDocumentSpaceId
+    );
   }
 
   getUrlParametersForSpaceAndPath(documentSpaceId: string, path?: string): URLSearchParams {
@@ -78,23 +84,27 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     return queryParams;
   }
 
-  loadDocSpaceFromLocation(currentUrlSearchParams: string, onNoSpaceFound?: ()=>void) {
+  loadDocSpaceFromLocation(currentUrlSearchParams: string, onNoSpaceFound?: () => void) {
     const queryParams = new URLSearchParams(currentUrlSearchParams);
     const documentSpaces = this.documentSpaceService.documentSpaces;
 
     if (queryParams.get(spaceIdQueryKey) != null && documentSpaces.length > 0) {
-      const selectedDocumentSpace = documentSpaces.find(documentSpace => documentSpace.id === queryParams.get('spaceId'));
+      const selectedDocumentSpace = documentSpaces.find(
+        (documentSpace) => documentSpace.id === queryParams.get('spaceId')
+      );
       if (selectedDocumentSpace == null) {
-        if(onNoSpaceFound !== undefined){
-          onNoSpaceFound()
+        if (onNoSpaceFound !== undefined) {
+          onNoSpaceFound();
         }
         this.spacesState.spaceNotFound.set(true);
         return;
       }
 
       const path = queryParams.get(pathQueryKey) ?? '';
-      if (selectedDocumentSpace.id !== this.spacesState.get().selectedSpace?.id ||
-        path !== this.spacesState.get().path) {
+      if (
+        selectedDocumentSpace.id !== this.spacesState.get().selectedSpace?.id ||
+        path !== this.spacesState.get().path
+      ) {
         this.setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
       }
     }
@@ -105,25 +115,23 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       // Don't need to load privileges if current user is Dashboard Admin,
       // since they currently have access to everything Document Space related
       if (!this.isAdmin()) {
-        await this.documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id).promise;
+        await this.documentSpacePrivilegesService.fetchAndStoreDashboardUserDocumentSpacePrivileges(documentSpace.id)
+          .promise;
       }
-      const favorites: DocumentSpaceUserCollectionResponseDto[] = await this.documentSpaceService.getFavorites(documentSpace.id);
+      const favorites: DocumentSpaceUserCollectionResponseDto[] = await this.documentSpaceService.getFavorites(
+        documentSpace.id
+      );
 
       this.spacesState.merge({
         selectedSpace: documentSpace,
         shouldUpdateDatasource: true,
-        datasource: this.documentSpaceService.createDatasource(
-          documentSpace.id,
-          path,
-          this.infiniteScrollOptions
-        ),
+        datasource: this.documentSpaceService.createDatasource(documentSpace.id, path, this.infiniteScrollOptions),
         path,
         selectedFiles: [],
         showNoChosenSpace: false,
-        favorites
+        favorites,
       });
-    }
-    catch (err) {
+    } catch (err) {
       if (!this.mountedRef.current) {
         return;
       }
@@ -155,7 +163,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     if (selectionEvent === 'selected') {
       selectedFiles[selectedFiles.length].set(data);
     } else {
-      selectedFiles.find(document => document.key.value === data.key)?.set(none);
+      selectedFiles.find((document) => document.key.value === data.key)?.set(none);
     }
   }
 
@@ -167,7 +175,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       this.mergeState({
         drawerOpen: false,
         isSubmitting: false,
-        showErrorMessage: false
+        showErrorMessage: false,
       });
 
       return createdSpace;
@@ -207,24 +215,27 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         if (this.spacesState.selectedFile.value == null) {
           throw new Error('Folder document cannot be null for rename');
         }
-        this.documentSpaceService.renameFolder(this.spacesState.selectedSpace.value?.id,
-          this.spacesState.get().path + "/" + this.spacesState.selectedFile.value.key, 
-          name)
+        this.documentSpaceService
+          .renameFolder(
+            this.spacesState.selectedSpace.value?.id,
+            this.spacesState.get().path + '/' + this.spacesState.selectedFile.value.key,
+            name
+          )
           .then(() => {
             this.mergeState({
               createEditElementOpType: CreateEditOperationType.NONE,
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
-              selectedFile: undefined
+              selectedFile: undefined,
             });
-            createTextToast(ToastType.SUCCESS, "Folder renamed");
+            createTextToast(ToastType.SUCCESS, 'Folder renamed');
           })
-          .catch(message => this.setPageStateOnException(message));
+          .catch((message) => this.setPageStateOnException(message));
         break;
       case CreateEditOperationType.CREATE_FOLDER:
-        this.documentSpaceService.createNewFolder(this.spacesState.selectedSpace.value?.id,
-          this.spacesState.get().path, name)
+        this.documentSpaceService
+          .createNewFolder(this.spacesState.selectedSpace.value?.id, this.spacesState.get().path, name)
           .then(() => {
             this.mergeState({
               createEditElementOpType: CreateEditOperationType.NONE,
@@ -232,29 +243,32 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               showErrorMessage: false,
               shouldUpdateDatasource: true,
             });
-            createTextToast(ToastType.SUCCESS, "Folder created");
+            createTextToast(ToastType.SUCCESS, 'Folder created');
           })
-          .catch(message => this.setPageStateOnException(message));
+          .catch((message) => this.setPageStateOnException(message));
         break;
       case CreateEditOperationType.EDIT_FILENAME:
         if (this.spacesState.selectedFile.value == null) {
           throw new Error('File document cannot be null for rename');
         }
-        this.documentSpaceService.renameFile(this.spacesState.selectedSpace.value?.id,
-          this.spacesState.get().path, 
-          this.spacesState.selectedFile.value.key,
-          name)
+        this.documentSpaceService
+          .renameFile(
+            this.spacesState.selectedSpace.value?.id,
+            this.spacesState.get().path,
+            this.spacesState.selectedFile.value.key,
+            name
+          )
           .then(() => {
             this.mergeState({
               createEditElementOpType: CreateEditOperationType.NONE,
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
-              selectedFile: undefined
+              selectedFile: undefined,
             });
-            createTextToast(ToastType.SUCCESS, "File renamed");
+            createTextToast(ToastType.SUCCESS, 'File renamed');
           })
-          .catch(message => this.setPageStateOnException(message));
+          .catch((message) => this.setPageStateOnException(message));
         break;
       default:
         break;
@@ -262,14 +276,11 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   async addToFavorites(doc: DocumentDto) {
-    if(this.spacesState.selectedSpace?.value !== undefined){
-      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
+    if (this.spacesState.selectedSpace?.value !== undefined) {
+      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key] };
 
       try {
-        await this.documentSpaceService.addPathEntityToFavorites(
-          this.spacesState.selectedSpace.value.id,
-          reqDto
-        );
+        await this.documentSpaceService.addPathEntityToFavorites(this.spacesState.selectedSpace.value.id, reqDto);
 
         const placeHolderResponse: DocumentSpaceUserCollectionResponseDto = {
           metadata: {},
@@ -277,18 +288,18 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
           itemId: '',
           documentSpaceId: doc.spaceId,
           key: doc.key,
+          path: doc.path,
           lastModifiedDate: '',
-          folder: doc.folder
-        }
-        
+          folder: doc.folder,
+        };
+
         performActionWhenMounted(this.mountedRef.current, () => {
-          this.spacesState.favorites.merge([placeHolderResponse])
-          this.spacesState.shouldUpdateDatasource.set(true)
-          
+          this.spacesState.favorites.merge([placeHolderResponse]);
+          this.spacesState.shouldUpdateDatasource.set(true);
+
           createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
         });
-      }
-      catch (error) {
+      } catch (error) {
         createTextToast(ToastType.ERROR, 'Failed to add to favorites - ' + (error as Error).message);
       }
     } else {
@@ -297,25 +308,21 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   async removeFromFavorites(doc: DocumentDto) {
-    if(this.spacesState.selectedSpace?.value !== undefined){
-      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key]}
+    if (this.spacesState.selectedSpace?.value !== undefined) {
+      const reqDto: DocumentSpacePathItemsDto = { currentPath: doc.path, items: [doc.key] };
       try {
-        await this.documentSpaceService.removePathEntityFromFavorites(
-          this.spacesState.selectedSpace.value.id,
-          reqDto
-        );
-        if(this.spacesState.favorites.value.length){
+        await this.documentSpaceService.removePathEntityFromFavorites(this.spacesState.selectedSpace.value.id, reqDto);
+        if (this.spacesState.favorites.value.length) {
           performActionWhenMounted(this.mountedRef.current, () => {
-            this.spacesState.favorites.set(favorites => {
-              return favorites.filter(f => f.key !== doc.key);
+            this.spacesState.favorites.set((favorites) => {
+              return favorites.filter((f) => f.key !== doc.key);
             });
             this.spacesState.shouldUpdateDatasource.set(true);
 
             createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
           });
         }
-      }
-      catch (error) {
+      } catch (error) {
         createTextToast(ToastType.ERROR, 'Failed to remove favorites - ' + (error as Error).message);
       }
     } else {
@@ -324,19 +331,18 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   getFavoritesShouldShow(doc: DocumentDto, addingToFavorites: boolean) {
-    const foundInFavorites = this.spacesState.favorites?.value?.some(favorite => {
+    const foundInFavorites = this.spacesState.favorites?.value?.some((favorite) => {
       if (doc == null) {
         return false;
       }
-
-      return favorite.key === doc.key;
+      return favorite.key === doc.key && favorite.path?.replace(/^\/+/, '') === doc.path?.replace(/^\/+/, '');
     });
 
-    return addingToFavorites ? !foundInFavorites : foundInFavorites
+    return addingToFavorites ? !foundInFavorites : foundInFavorites;
   }
 
   setStateOnArchive() {
-    this.spacesState.merge(state => {
+    this.spacesState.merge((state) => {
       state.shouldUpdateDatasource = true;
       state.datasource = this.documentSpaceService.createDatasource(
         this.spacesState.get().selectedSpace?.id ?? '',
@@ -348,7 +354,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
       return state;
     });
-    
+
     this.closeRemoveDialog();
   }
 
@@ -375,17 +381,16 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       await this.documentSpaceService.archiveItems(
         selectedSpace.id,
         this.spacesState.get().path,
-        items.map(item => item.key)
+        items.map((item) => item.key)
       );
       createTextToast(ToastType.SUCCESS, 'Item(s) Archived');
-    }
-    catch (e) {
+    } catch (e) {
       createTextToast(ToastType.ERROR, 'Could not archive item(s) - ' + (e as Error).message);
     } finally {
       performActionWhenMounted(this.mountedRef.current, () => this.setStateOnArchive());
     }
   }
-  
+
   mergeState(state: Partial<SpacesPageState>) {
     performActionWhenMounted(this.mountedRef.current, () => this.spacesState.merge(state));
   }
@@ -408,7 +413,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
   onDatasourceUpdateCallback() {
     this.mergeState({
-      shouldUpdateDatasource: false
+      shouldUpdateDatasource: false,
     });
   }
 
@@ -417,7 +422,60 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       isSubmitting: false,
       errorMessage: message,
       showErrorMessage: true,
-    })
+    });
+  }
+
+  /**
+   * Places what ever is in the selected items state onto the clipboard marked as a copy operation
+   */
+  copySelectedItems() {
+    this.documentSpaceClipboardState.set({
+      sourceSpace: this.state.selectedFiles.value[0].spaceId,
+      isCopy: true,
+      items: this.state.selectedFiles.value.map((item) => joinPathParts(item.path, item.key)),
+    });
+    createTextToast(ToastType.SUCCESS, 'Items selected for COPY!');
+  }
+
+  /**
+   * Places what ever is in the selected items state onto the clipboard marked as a cut operation (move)
+   */
+  cutSelectedItems() {
+    this.documentSpaceClipboardState.set({
+      sourceSpace: this.state.selectedFiles.value[0].spaceId,
+      isCopy: false,
+      items: this.state.selectedFiles.value.map((item) => joinPathParts(item.path, item.key)),
+    });
+    createTextToast(ToastType.SUCCESS, 'Items selected for CUT!');
+  }
+
+  /**
+   * Performs either the cut or copy operation for the items in the clipboard state and then clears
+   * the clipboard always
+   */
+  async pasteItems() {
+    if (this.documentSpaceClipboardState.value && this.state.selectedSpace.value) {
+      const srcDestMap: Record<string, string> = {};
+      for (const item of this.documentSpaceClipboardState.value.items) {
+        srcDestMap[item] = joinPathParts(this.state.get().path, getPathFileName(item));
+      }
+      try {
+        if (this.documentSpaceClipboardState.value.isCopy) {
+          await this.documentSpaceService.copyFiles(this.state.selectedSpace.value.id, this.documentSpaceClipboardState.value.sourceSpace, srcDestMap);
+        } else {
+          await this.documentSpaceService.moveFiles(this.state.selectedSpace.value.id, this.documentSpaceClipboardState.value.sourceSpace, srcDestMap);
+        }
+
+        createTextToast(ToastType.SUCCESS, 'Items pasted!');
+      } catch (e) {
+        createTextToast(ToastType.ERROR, e as string);
+      } finally {
+        this.documentSpaceClipboardState.set(undefined);
+        this.mergeState({ shouldUpdateDatasource: true });
+      }
+    } else {
+      createTextToast(ToastType.WARNING, 'Nothing to paste!');
+    }
   }
 
   resetState() {
@@ -435,7 +493,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       selectedFile: undefined,
       selectedFiles: [],
       membershipsState: {
-        isOpen: false
+        isOpen: false,
       },
       createEditElementOpType: CreateEditOperationType.NONE,
       path: '',

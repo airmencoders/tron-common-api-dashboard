@@ -20,6 +20,7 @@ function DocumentSpaceActions(props: DocumentSpaceActionsProps & ActionsProps) {
         selectedFiles={props.selectedFiles}
         showDeleteSelectedDialog={props.showDeleteSelectedDialog}
         className={props.className}
+        documentPageService={props.documentPageService}
       />
     );
   }
@@ -34,6 +35,7 @@ function DocumentSpaceActions(props: DocumentSpaceActionsProps & ActionsProps) {
       selectedFiles={props.selectedFiles}
       showDeleteSelectedDialog={props.showDeleteSelectedDialog}
       className={props.className}
+      documentPageService={props.documentPageService}
     />
   );
 }

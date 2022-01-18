@@ -1,5 +1,6 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { waitFor } from '@testing-library/dom';
+import { _ } from 'ag-grid-community';
 import axios from 'axios';
 import { flatMap } from 'cypress/types/lodash';
 import { MutableRefObject } from 'react';
@@ -14,6 +15,7 @@ import DocumentSpaceService from '../../../../state/document-space/document-spac
 import { CancellableDataRequest } from '../../../../utils/cancellable-data-request';
 import { createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../document-space-global-service';
+import { ClipBoardState } from '../../document-space-state';
 import { CreateEditOperationType } from '../../document-space-utils';
 import SpacesPageService from '../spaces-page-service';
 import { SpacesPageState } from '../spaces-page-state';
@@ -54,7 +56,8 @@ describe('Spaces Page Service Test', () => {
       key: documents[0].key,
       lastModifiedDate: documents[0].lastModifiedDate,
       folder: documents[0].folder,
-      metadata: {}
+      metadata: {},
+      path: '',
     }
   ];
 
@@ -116,6 +119,8 @@ describe('Spaces Page Service Test', () => {
       current: true
     };
 
+    let clipboard = createState<ClipBoardState | undefined>(undefined);
+
     spacesState = createState<SpacesPageState>({
       drawerOpen: false,
       isSubmitting: false,
@@ -150,7 +155,8 @@ describe('Spaces Page Service Test', () => {
       authorizedUserService,
       globalDocumentSpaceService,
       documentSpaceService,
-      documentSpacePrivilegeService
+      documentSpacePrivilegeService,
+      clipboard
     );
 
     createTextToastMock = jest.fn((toastType: ToastType, message: string) => { return; });
@@ -813,6 +819,10 @@ describe('Spaces Page Service Test', () => {
     expect(spacesState.isSubmitting.value).toEqual(false);
     expect(spacesState.errorMessage.value).toEqual('test failure');
     expect(spacesState.showErrorMessage.value).toEqual(true);
+  });
+
+  it('should copy selected files to the clipboard', async () => {
+    
   });
 
   it('should reset state', () => {

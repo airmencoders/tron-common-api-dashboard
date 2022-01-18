@@ -1,21 +1,22 @@
 import { useHookstate } from '@hookstate/core';
 import { createRef } from 'react';
 import { Popup } from 'semantic-ui-react';
-import EllipsesIcon from '../../../../icons/EllipsesIcon';
-import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
-import FileUpload from '../../FileUpload/FileUpload';
-import Button from '../../../Button/Button';
 import AddMaterialIcon from '../../../../icons/AddMaterialIcon';
-import PeopleIcon from '../../../../icons/PeopleIcon';
-import { ActionsProps } from '../ActionsProps';
-import { documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
-import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
-import DropDown from '../../../DropDown/DropDown';
+import CopyContentIcon from '../../../../icons/CopyContentIcon';
+import CutIcon from '../../../../icons/CutIcon';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
+import EllipsesIcon from '../../../../icons/EllipsesIcon';
+import PasteIcon from '../../../../icons/PasteIcon';
+import PeopleIcon from '../../../../icons/PeopleIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
+import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
+import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
+import { clipBoardState, ClipBoardState, documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
 import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
-import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
-import { ToastType } from '../../../Toast/ToastUtils/toast-type';
+import Button from '../../../Button/Button';
+import DropDown from '../../../DropDown/DropDown';
+import FileUpload from '../../FileUpload/FileUpload';
+import { ActionsProps } from '../ActionsProps';
 import { checkIfItemsIsLoneEmptyFolder } from '../DesktopActions/DesktopActions';
 
 interface MoreActionsState {
@@ -29,7 +30,7 @@ function MobileActions(props: ActionsProps) {
 
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const downloadUrlService = documentSpaceDownloadUrlService();
-
+  const localClipboardState = useHookstate(clipBoardState);
   const uploadFileRef = createRef<HTMLInputElement>();
 
   if (props.selectedSpace.value == null) {
@@ -91,6 +92,23 @@ function MobileActions(props: ActionsProps) {
                 <AddMaterialIcon style="primary" fill className="popper__icon" size={1} iconTitle="Add Items" />
                 <span className="popper__title item__title">New Folder</span>
               </div>
+
+              <div className="popper__item" onClick={() => closePopupWithAction(() => {props.documentPageService.cutSelectedItems()})}>
+                <CutIcon style="primary" className="popper__icon" size={1} iconTitle="Cut Items" />
+                <span className="popper__title item__title">Cut Items</span>
+              </div>
+
+              <div className="popper__item" onClick={() => closePopupWithAction(() => {props.documentPageService.copySelectedItems()})}>
+                <CopyContentIcon style="primary" className="popper__icon" size={1} iconTitle="Copy Items" />
+                <span className="popper__title item__title">Copy Items</span>
+              </div>
+
+              { localClipboardState.value && localClipboardState.value.items &&
+                <div className="popper__item" onClick={() => closePopupWithAction(() => {props.documentPageService.pasteItems()})}>
+                  <PasteIcon style="primary" className="popper__icon" size={1} iconTitle="Paste Items" />
+                  <span className="popper__title item__title">Paste Items</span>
+                </div>
+              }
             </>
           }
 
