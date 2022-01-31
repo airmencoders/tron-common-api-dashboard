@@ -25,7 +25,7 @@ function buildOutPaths(items: string[], callback: (event: MouseEvent<HTMLButtonE
       .filter(item => item.trim() !== '')
       .map(item => (
           <div 
-            key={item} 
+            key={`item-${Date.now()}`}   // react gets upset on dup keys that happen if we have subdirs same name as parent
             className='breadcrumb-path-item'
           >
           <ChevronRightIcon />

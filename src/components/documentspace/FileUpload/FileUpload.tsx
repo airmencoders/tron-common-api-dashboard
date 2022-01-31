@@ -16,6 +16,12 @@ enum FileConflictStrategy {
   PRESERVE_REMOTE,
 }
 
+// OS meta files we dont want to pollute our space with
+const blacklistedFiles: string[] = [
+  ".DS_Store",
+  "thumbs.db"
+];
+
 interface UploadState {
   showUploadDialog: boolean;
   showConfirmDialog: boolean;
@@ -81,7 +87,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     for (let i = fileIndex; i < uploadState.fileCount.value; i++) {
       const currentFile: string = uploadState.fileList?.get()?.[i].name ?? '';
 
-      if (currentFile) {
+      if (currentFile && !blacklistedFiles.includes(currentFile)) {  // skip over blacklisted files we don't want as well
         uploadState.merge({ fileIndex: i, currentFile });
 
         // if this current file is listed in the state's 'backendFileInfo'
@@ -161,6 +167,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     uploadFile(uploadState.fileIndex.value + 1);
   }
 
+  // this is what's called if a user clicks ok from the file browser dialog.... 
   async function handleFileSelection(files: FileList): Promise<void> {
     if (files && files.length > 0) {
       uploadState.merge({
@@ -179,8 +186,25 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
       //  to just array of strings (the filenames)
       const fileNames: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        fileNames.push((files[i] as any).webkitRelativePath);
+
+        // skip over blacklisted files
+        if (blacklistedFiles.includes(files[i].name)) {
+          continue;
+        }
+
+        if ((ref as any).webkitdirectory) {
+          // if we're in directory selection mode send the while path+file to the backend
+          fileNames.push((files[i] as any).webkitRelativePath);
+        } else {
+          // if we're just in file selection mode, send the name itself (which will be relative to our current directory)
+          fileNames.push(files[i].name)
+        }
       }
+
+      // update file list count
+      uploadState.merge({
+        fileCount: fileNames.length,
+      });
 
       // go ask the backend for the existence of any of these 
       //  about-to-be-uploaded files

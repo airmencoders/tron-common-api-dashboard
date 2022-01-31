@@ -53,7 +53,7 @@ describe('File Upload Tests', () => {
     await waitFor(() => expect(page.getByTestId('file-uploader-input')).toBeInTheDocument());
     await waitFor(() =>
       fireEvent.change(page.getByTestId('file-uploader-input'), {
-        target: { files: [ { name: 'some-file' }, { name: 'some-file2' }] },
+        target: { files: [ { name: 'some-file' }, { name: 'some-file2' }, { name: '.DS_Store' }] },
       })
     );
 
@@ -70,6 +70,8 @@ describe('File Upload Tests', () => {
     fireEvent.click(screen.getByText('Yes'));
 
     await waitFor(() => expect(mock).toHaveBeenCalledTimes(1));
+
+    // check ignored .DS_Store blacklisted file
     await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(2));
   });
 
