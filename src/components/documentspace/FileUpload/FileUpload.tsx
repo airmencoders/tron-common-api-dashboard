@@ -184,8 +184,6 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         backendFileInfo: [],
       });
 
-      console.log(files)
-
       // convert the selected files structure (a FileList type)
       //  to just array of strings (the filenames)
       const fileNames: string[] = [];
@@ -198,7 +196,6 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
 
         if ((ref as React.RefObject<HTMLInputElement>).current?.hasAttribute('webkitdirectory')) {
           // if we're in directory selection mode send the while path+file to the backend
-          console.log((files[i] as any).webkitRelativePath)
           fileNames.push((files[i] as any).webkitRelativePath);
         } else {
           // if we're just in file selection mode, send the name itself (which will be relative to our current directory)
