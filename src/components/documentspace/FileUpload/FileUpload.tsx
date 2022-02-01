@@ -1,6 +1,8 @@
 import { Downgraded, none, useHookstate } from '@hookstate/core';
+import { AnyD3Scale } from '@visx/scale';
 import { AxiosError, CancelTokenSource } from 'axios';
 import React, { forwardRef } from 'react';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 import Button from '../../../components/Button/Button';
 import Modal from '../../../components/Modal/Modal';
 import ModalTitle from '../../../components/Modal/ModalTitle';
@@ -182,6 +184,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         backendFileInfo: [],
       });
 
+      console.log(files)
+
       // convert the selected files structure (a FileList type)
       //  to just array of strings (the filenames)
       const fileNames: string[] = [];
@@ -192,8 +196,9 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
           continue;
         }
 
-        if ((ref as any).webkitdirectory) {
+        if ((ref as React.RefObject<HTMLInputElement>).current?.hasAttribute('webkitdirectory')) {
           // if we're in directory selection mode send the while path+file to the backend
+          console.log((files[i] as any).webkitRelativePath)
           fileNames.push((files[i] as any).webkitRelativePath);
         } else {
           // if we're just in file selection mode, send the name itself (which will be relative to our current directory)

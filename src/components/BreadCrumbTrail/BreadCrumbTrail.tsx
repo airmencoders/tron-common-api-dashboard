@@ -2,7 +2,7 @@ import { useHookstate } from '@hookstate/core';
 import { MouseEvent, useEffect } from 'react';
 import ChevronRightIcon from '../../icons/ChevronRightIcon';
 import FolderIcon from '../../icons/FolderIcon';
-import { shortenString } from '../../utils/string-utils';
+import { randomId, shortenString } from '../../utils/string-utils';
 import DropDown from '../DropDown/DropDown';
 import Button from '../Button/Button';
 import './BreadCrumbTrail.scss';
@@ -25,7 +25,7 @@ function buildOutPaths(items: string[], callback: (event: MouseEvent<HTMLButtonE
       .filter(item => item.trim() !== '')
       .map(item => (
           <div 
-            key={`item-${Date.now()}`}   // react gets upset on dup keys that happen if we have subdirs same name as parent
+            key={`item-${randomId()}`}   // react gets upset on dup keys that happen if we have subdirs same name as parent
             className='breadcrumb-path-item'
           >
           <ChevronRightIcon />
