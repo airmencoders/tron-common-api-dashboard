@@ -1,8 +1,6 @@
 import { Downgraded, none, useHookstate } from '@hookstate/core';
-import { AnyD3Scale } from '@visx/scale';
 import { AxiosError, CancelTokenSource } from 'axios';
 import React, { forwardRef } from 'react';
-import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 import Button from '../../../components/Button/Button';
 import Modal from '../../../components/Modal/Modal';
 import ModalTitle from '../../../components/Modal/ModalTitle';
