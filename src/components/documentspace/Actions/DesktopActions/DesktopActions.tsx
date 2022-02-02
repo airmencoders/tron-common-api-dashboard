@@ -107,7 +107,13 @@ function DesktopActions(props: ActionsProps) {
                 },
                 {
                   displayName: 'Upload Folder',
-                  action: () => openFileUpload('folder')
+                  action: () => {
+                    if (/Chrome|Firefox/i.test(navigator.userAgent)) {
+                      openFileUpload('folder');
+                    } else {
+                      alert('Folder upload only supported in Chromium-based browsers or Firefox');
+                    }
+                  }
                 }
               ]}
             />

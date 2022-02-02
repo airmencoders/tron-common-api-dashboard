@@ -83,7 +83,13 @@ function MobileActions(props: ActionsProps) {
                 <span className="popper__title item__title">Upload File(s)</span>
               </div>
 
-              <div className="popper__item" onClick={() => closePopupWithAction(() => openFileUpload('folder'))}>
+              <div className="popper__item" onClick={() => closePopupWithAction(() => {
+                  if (/Chrome|Firefox/i.test(navigator.userAgent)) {
+                    openFileUpload('folder');
+                  } else {
+                    alert('Folder upload only supported in Chromium-based browsers or Firefox');
+                  }
+              })}>
                 <UploadMaterialIcon style="primary" fill className="popper__icon item__icon" size={1} iconTitle="Upload Folder" />
                 <span className="popper__title item__title">Upload Folder</span>
               </div>
