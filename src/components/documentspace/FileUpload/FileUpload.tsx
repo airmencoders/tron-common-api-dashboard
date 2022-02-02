@@ -174,6 +174,28 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     uploadFile(uploadState.fileIndex.value + 1);
   }
 
+  // helper to convert the fileList type structure to list of filename strings whilst filtered out
+  //  blacklisted files too
+  function convertFileListTypeToArray(files: FileList, isFolderMode: boolean | undefined): string[] {
+    const fileNames: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+
+      // skip over blacklisted files
+      if (blacklistedFiles.includes(files[i].name)) {
+        continue;
+      }
+
+      if (isFolderMode) {
+        // if we're in directory selection mode send the while path+file to the backend
+        fileNames.push((files[i] as any).webkitRelativePath);
+      } else {
+        // if we're just in file selection mode, send the name itself (which will be relative to our current directory)
+        fileNames.push(files[i].name)
+      }
+    }
+    return fileNames;
+  }
+
   // this is what's called if a user clicks ok from the file browser dialog.... 
   async function handleFileSelection(files: FileList): Promise<void> {
     if (files && files.length > 0) {
@@ -193,22 +215,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
 
       // convert the selected files structure (a FileList type)
       //  to just array of strings (the filenames)
-      const fileNames: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-
-        // skip over blacklisted files
-        if (blacklistedFiles.includes(files[i].name)) {
-          continue;
-        }
-
-        if (isFolderMode) {
-          // if we're in directory selection mode send the while path+file to the backend
-          fileNames.push((files[i] as any).webkitRelativePath);
-        } else {
-          // if we're just in file selection mode, send the name itself (which will be relative to our current directory)
-          fileNames.push(files[i].name)
-        }
-      }
+      const fileNames: string[] = convertFileListTypeToArray(files, isFolderMode);
 
       // update file list count
       uploadState.merge({
