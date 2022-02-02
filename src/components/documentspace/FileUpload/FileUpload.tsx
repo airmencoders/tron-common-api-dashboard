@@ -35,6 +35,7 @@ interface UploadState {
   cancelToken: CancelTokenSource | undefined;
   uploadErrors: Record<string, string>[],
   showErrorDialog: boolean;
+  showFolderUploadConfirmation: boolean;
 }
 
 export interface FileUploadProps {
@@ -59,6 +60,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     cancelToken: undefined,
     uploadErrors: [],
     showErrorDialog: false,
+    showFolderUploadConfirmation: false,
   });
 
   const inputKeyState = useHookstate(Date.now());
@@ -73,9 +75,12 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
       showErrorDialog: false,
     });
 
+    clearFileInputSelections();
+  }
 
-    // force react to re-render the hidden file input to clear its selection
-    //  contents ... stackoverflow.com/a/55495449
+  // force react to re-render the hidden file input to clear its selection
+  //  contents ... stackoverflow.com/a/55495449
+  function clearFileInputSelections() {
     inputKeyState.set(Date.now());
   }
 
@@ -151,6 +156,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     inputKeyState.set(Date.now());
   }
 
+
+
   function onOverwriteFile() {
     // land here when user chooses to overwrite the current file..
     //  so remove it from the list of those that exist on the backend
@@ -170,6 +177,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
   // this is what's called if a user clicks ok from the file browser dialog.... 
   async function handleFileSelection(files: FileList): Promise<void> {
     if (files && files.length > 0) {
+      const isFolderMode = (ref as React.RefObject<HTMLInputElement>).current?.hasAttribute('webkitdirectory');
       uploadState.merge({
         showUploadDialog: true,
         showConfirmDialog: false,
@@ -180,6 +188,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         uploadErrors: [],
         showErrorDialog: false,
         backendFileInfo: [],
+        showFolderUploadConfirmation: false,
       });
 
       // convert the selected files structure (a FileList type)
@@ -192,7 +201,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
           continue;
         }
 
-        if ((ref as React.RefObject<HTMLInputElement>).current?.hasAttribute('webkitdirectory')) {
+        if (isFolderMode) {
           // if we're in directory selection mode send the while path+file to the backend
           fileNames.push((files[i] as any).webkitRelativePath);
         } else {
@@ -206,8 +215,17 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         fileCount: fileNames.length,
       });
 
+      // if its folder upload mode, we're not going to warn for overwrite checks
+      // since this could be a lot of files to check the existence of, so we're gonna
+      // return here, and just warn the user of this policy.  If they choose to continue
+      // then we'll call `upload` from the button action
+      if (isFolderMode) {
+        uploadState.merge({ showFolderUploadConfirmation: true });
+        return;
+      }
+
       // go ask the backend for the existence of any of these 
-      //  about-to-be-uploaded files
+      //  about-to-be-uploaded files (for non-folder upload mode)
       let itemsInfo: string[] = [];
       try {
         itemsInfo = await documentSpaceService.checkIfFileExistsAtPath(
@@ -222,8 +240,10 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
         return;
       }
 
-      // kick off the process
+      // merge in the backend pre-existence test results to the state for later
       uploadState.merge({ backendFileInfo: itemsInfo, });
+
+      // kick off the process
       uploadFile(0);
     } else {
       uploadState.merge({
@@ -337,6 +357,39 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
           <ul>{uploadState.uploadErrors.get().map(item => <li key={item.file}>{item.file} - {item.reason}</li>)}</ul>
         </>
       </GenericDialog>
+      <Modal
+        show={uploadState.showFolderUploadConfirmation.get()}
+        headerComponent={<ModalTitle title="Upload Folder Confirmation" />}
+        footerComponent={
+          <div className={'modal-footer-submit'}>
+            <Button
+              type="button"
+              data-testid="upload-folder-no__btn"
+              inverse
+              outline
+              onClick={() => uploadState.merge({ showFolderUploadConfirmation: false })}
+            >
+              No
+            </Button>
+            <Button
+              type="button"
+              data-testid="upload-folder-yes__btn"
+              onClick={() => {
+                uploadState.merge({ showFolderUploadConfirmation: false });
+                uploadFile(0);
+              }}
+            >
+              Yes
+            </Button>
+          </div>
+        }
+        onHide={() => uploadState.merge({ showFolderUploadConfirmation: false })}
+        height="auto"
+        width="30%"
+      >
+        <div>You are about to upload this folder, this action will <strong>overwrite</strong> any same-named folders/files at this path</div>
+        <div><br/> Do you want to continue?</div>
+      </Modal>
     </>
   )
 });
