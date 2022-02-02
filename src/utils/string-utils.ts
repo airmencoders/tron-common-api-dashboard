@@ -39,3 +39,14 @@ export function shortenString(str: string | undefined | null): string {
     return str.substr(0, STRING_LEN_MAX-3) + '...';
   }
 }
+
+// generates a random sequence of numbers/letters (if running in a browser) 
+//  otherwise returns new datestamp stringified
+export function randomId() {
+  if (window.crypto) {
+    const uint32 = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    return uint32.toString(16);
+  } else {
+    return Date.now().toString();
+  }
+}

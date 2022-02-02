@@ -192,7 +192,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
           continue;
         }
 
-        if ((ref as any).webkitdirectory) {
+        if ((ref as React.RefObject<HTMLInputElement>).current?.hasAttribute('webkitdirectory')) {
           // if we're in directory selection mode send the while path+file to the backend
           fileNames.push((files[i] as any).webkitRelativePath);
         } else {
