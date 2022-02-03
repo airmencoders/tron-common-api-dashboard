@@ -143,7 +143,13 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
       uploadState.merge({ showErrorDialog: true });
     }
 
+    cleanupPostUpload();
+  }
+
+  // cleans up any open dialogs, resets the file picker selection, and fires onFinish prop
+  function cleanupPostUpload() {
     uploadState.merge({
+      showFolderUploadConfirmation: false,
       showUploadDialog: false,
       showConfirmDialog: false,
     });
@@ -155,7 +161,6 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
     //  contents ... stackoverflow.com/a/55495449
     inputKeyState.set(Date.now());
   }
-
 
 
   function onOverwriteFile() {
@@ -374,7 +379,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>((props, ref) =>
               data-testid="upload-folder-no__btn"
               inverse
               outline
-              onClick={() => uploadState.merge({ showFolderUploadConfirmation: false })}
+              onClick={() => cleanupPostUpload()}
             >
               No
             </Button>
