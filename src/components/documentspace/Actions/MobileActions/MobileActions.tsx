@@ -43,6 +43,11 @@ function MobileActions(props: ActionsProps) {
   }
 
   function openFileUpload(mode: 'file' | 'folder') {
+    if (mode === 'folder' && !(/Chrome|Firefox/i.test(navigator.userAgent))) {
+      alert('Folder upload only supported in Chromium-based browsers or Firefox');
+      return;
+    }
+
     if (uploadFileRef.current) {
       (uploadFileRef.current as any).webkitdirectory = mode === 'folder';
     }
