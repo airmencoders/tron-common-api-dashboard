@@ -332,4 +332,69 @@ describe('File Upload Tests', () => {
     await waitFor(() => expect(mock).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(2));  // fired twice since we said No on one of them
   });
+
+  it('should render a confirmation dialog on folder upload', async () => {
+    const mock = jest.fn();
+    const uploadFileRef = createRef<HTMLInputElement>();
+
+    const response = createAxiosSuccessResponse<{ [key: string]: string }>({ message: 'good' });
+    const uploadMock = jest.spyOn(documentSpaceService, 'uploadFile').mockReturnValue({
+      promise: Promise.resolve(response),
+      cancelTokenSource: axios.CancelToken.source()
+    });
+
+    const page = render(<MemoryRouter>
+      <FileUpload
+        documentSpaceId='test'
+        currentPath={''}
+        onFinish={mock}
+        ref={uploadFileRef}
+      />
+    </MemoryRouter>);
+
+    uploadFileRef.current?.setAttribute('webkitdirectory', '');
+    uploadFileRef.current?.click();
+
+    await waitFor(() => expect(page.getByTestId('file-uploader-input')).toBeInTheDocument());
+    await waitFor(() =>
+      fireEvent.change(page.getByTestId('file-uploader-input'), {
+        target: { files: [ 
+          { name: 'some-file', webkitRelativePath: '/folder1/some-file' },
+          { name: 'some-file2', webkitRelativePath: '/folder1/some-file2' }, 
+        ] },
+      })
+    );
+
+    // confirm we have the confirmation displayed
+    await waitFor(() => expect(screen.getByTestId('upload-folder-yes__btn')).toBeVisible());
+
+    // click the No to cancel
+    fireEvent.click(screen.getByTestId('upload-folder-no__btn'));
+
+    // check it disappers
+    await waitFor(() => expect(screen.queryByTestId('upload-folder-yes__btn')).toBeFalsy());
+
+    // bring it up again
+    uploadFileRef.current?.click();
+
+    // choose same folder ('folder1')
+    await waitFor(() => expect(page.getByTestId('file-uploader-input')).toBeInTheDocument());
+    await waitFor(() =>
+      fireEvent.change(page.getByTestId('file-uploader-input'), {
+        target: { files: [ 
+          { name: 'some-file', webkitRelativePath: '/folder1/some-file' },
+          { name: 'some-file2', webkitRelativePath: '/folder1/some-file2' }, 
+        ] },
+      })
+    );
+
+    // confirm we have the confirmation displayed
+    await waitFor(() => expect(screen.getByTestId('upload-folder-yes__btn')).toBeVisible());
+
+    // click the Yes to continue
+    fireEvent.click(screen.getByTestId('upload-folder-yes__btn'));
+
+    // check we uploaded
+    await waitFor(() => expect(mock).toHaveBeenCalledTimes(1));
+  });
 });
