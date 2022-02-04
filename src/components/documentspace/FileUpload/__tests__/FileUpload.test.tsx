@@ -371,10 +371,15 @@ describe('File Upload Tests', () => {
     // click the No to cancel
     fireEvent.click(screen.getByTestId('upload-folder-no__btn'));
 
-    // check it disappers
+    // check it disappers and we have no dialogs open
     await waitFor(() => expect(screen.queryByTestId('upload-folder-yes__btn')).toBeFalsy());
+    await waitFor(() => expect(screen.queryByTestId('upload-cancel__btn')).toBeFalsy());
+    expect(mock).toHaveBeenCalled();
+
+    mock.mockReset();
 
     // bring it up again
+    uploadFileRef.current?.setAttribute('webkitdirectory', '');
     uploadFileRef.current?.click();
 
     // choose same folder ('folder1')
@@ -395,6 +400,6 @@ describe('File Upload Tests', () => {
     fireEvent.click(screen.getByTestId('upload-folder-yes__btn'));
 
     // check we uploaded
-    await waitFor(() => expect(mock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(uploadMock).toHaveBeenCalledTimes(1));
   });
 });
