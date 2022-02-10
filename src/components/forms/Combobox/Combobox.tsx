@@ -13,7 +13,6 @@ function Combobox(props: ComboboxProps){
         <div className="combobox-component">
             <Dropdown 
                 {...props}
-                fluid
                 selection
                 options={values}
             />

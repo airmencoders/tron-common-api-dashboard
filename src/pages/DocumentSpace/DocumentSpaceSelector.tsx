@@ -8,7 +8,7 @@ import DocumentSpaceService from "../../state/document-space/document-space-serv
 import {DocumentSpaceSelectorProps} from "./DocumentSpaceSelectorProps";
 import {useDocumentSpaceGlobalState} from '../../state/document-space/document-space-state';
 //mport { Dropdown } from '@trussworks/react-uswds';
-import { Dropdown } from 'semantic-ui-react';
+import { Dropdown, DropdownItemProps, Item, ItemMeta } from 'semantic-ui-react';
 import { isPropertySignature } from 'typescript';
 
 
@@ -20,7 +20,6 @@ export const pathQueryKey = 'path';
 function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
   const location = useLocation();
   const history = useHistory();
-
   const globalDocumentSpaceService = useDocumentSpaceGlobalState();
 
   useEffect(() => {
@@ -29,55 +28,42 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
     }
   }, [props.selectedSpace]);
 
-  function getSpaceOptions(isDocumentSpacesLoading: boolean, isDocumentSpacesErrored: boolean, documentSpaceService: DocumentSpaceService) {
+  function getSpaceOptions(isDocumentSpacesLoading: boolean, isDocumentSpacesErrored: boolean, documentSpaceService: DocumentSpaceService): DropdownItemProps[] {
     if (isDocumentSpacesLoading) {
       return (
-        <option value="loading">
-          Loading...
-        </option>
+        [{text: 'Loading...', value: 'Loading...'}]
       )
     }
 
     if (isDocumentSpacesErrored) {
       return (
-        <option value="error">
-          Could not load Document Spaces
-        </option>
+        [{text: 'Could not load spaces', value: 'error'}]
       )
     }
     
     if (props.onUnreachableSpace) {
       return [ { id: 'none', name: ' ' }, ...documentSpaceService.documentSpaces].map((item) =>
-        <option key={item.id} value={item.id}>
-          {item.name}
-        </option>
+        ({value: item.id, text: item.name})
     );
     }
-    /*
+    
     return documentSpaceService.documentSpaces.map((item) =>
-      <option key={item.id} value={item.id}>
-        {item.name}
-      </option>
+      ({value: item.id, text: item.name, 'data-testid': item.name})
     );
-    */
-   return documentSpaceService.documentSpaces;
-    
-   //return documentSpaceService.documentSpaces;
-    
   }
 
    
   return (
-    <Combobox
+    <Dropdown
       id="document-space"
       name="document-space"
       data-testid="document-space-selector"
-      value={props.onUnreachableSpace ? 'none' : props.selectedSpace?.id}
-      //text={props.selectedSpace?.name}
-      disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
-      
+      //value={props.onUnreachableSpace ? 'none' : props.selectedSpace?.id}
+      //Text={props.selectedSpace?.name}
+      //disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
+      disabled={true}
+      selection
       onChange={(event, data) => {
-        console.log("this isi a test", data.value);
         
         let documentSpaceId;
         //const documentSpaceId = event.target.value;
@@ -98,10 +84,9 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
      }}
      
       
-      opts={getSpaceOptions(props.isDocumentSpacesLoading, props.isDocumentSpacesErrored, props.documentSpaceService)}
+      options={getSpaceOptions(props.isDocumentSpacesLoading, props.isDocumentSpacesErrored, props.documentSpaceService)}
       
-    >
-    </Combobox>
+    />
   );
 }
 
