@@ -1,5 +1,5 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { act, prettyDOM, render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axios, { AxiosResponse } from 'axios';
 import { MutableRefObject } from 'react';
@@ -152,7 +152,6 @@ describe('Test Document Space Page', () => {
   });
 
   it('should show loading select when first retrieving Document Spaces', async () => {
-    //THIS ONE
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
 
     const page = render(
@@ -169,7 +168,6 @@ describe('Test Document Space Page', () => {
   });
 
   it('should show error select when retrieving Document Spaces fails', async () => {
-    //THIS ONE
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(true);
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(false);
 
@@ -232,6 +230,7 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
+    
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
 
     const documentSpacesSelect = page.getByTestId('document-space-selector');
@@ -246,8 +245,8 @@ describe('Test Document Space Page', () => {
     act(() => {
       userEvent.click(item2);
     })
-    //userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
-    await waitFor(() => expect(documentSpacesSelect.textContent).toContain(documentSpaces[1].name));
+    await waitFor(() => expect(item2.textContent).toContain(documentSpaces[1].name));
+
   });
 
   it('should open/close Document Space Memberships side drawer', async () => {
@@ -426,7 +425,6 @@ describe('Test Document Space Page', () => {
     expect(documentSpacesSelect).toBeEnabled();
     await waitFor(() => expect(page.queryAllByText(documentSpaces[0].name)).toBeTruthy())
     act(() => {
-      //userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
       userEvent.click(documentSpacesSelect)
     });
     await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));

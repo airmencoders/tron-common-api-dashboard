@@ -1,17 +1,11 @@
 import React, { useEffect } from 'react';
 import {useHistory} from 'react-router';
 import {useLocation} from 'react-router-dom';
-import Select from '../../components/forms/Select/Select';
-import Combobox from '../../components/forms/Combobox/Combobox';
 import './DocumentSpacePage.scss';
 import DocumentSpaceService from "../../state/document-space/document-space-service";
 import {DocumentSpaceSelectorProps} from "./DocumentSpaceSelectorProps";
 import {useDocumentSpaceGlobalState} from '../../state/document-space/document-space-state';
-//mport { Dropdown } from '@trussworks/react-uswds';
 import { Dropdown, DropdownItemProps, Item, ItemMeta } from 'semantic-ui-react';
-import { isPropertySignature } from 'typescript';
-
-
 
 
 export const spaceIdQueryKey = 'spaceId';
@@ -58,15 +52,12 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
       id="document-space"
       name="document-space"
       data-testid="document-space-selector"
-      //value={props.onUnreachableSpace ? 'none' : props.selectedSpace?.id}
-      //Text={props.selectedSpace?.name}
-      //disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
-      disabled={true}
+      value={props.onUnreachableSpace ? 'none' : props.selectedSpace?.id}
+      disabled={props.isDocumentSpacesLoading || props.isDocumentSpacesErrored}
       selection
       onChange={(event, data) => {
         
         let documentSpaceId;
-        //const documentSpaceId = event.target.value;
         if (data.value != undefined){
           documentSpaceId = data.value.toString();
         }
@@ -80,12 +71,8 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
             history.push({search: queryParams.toString()});
           }
         }
-        
      }}
-     
-      
       options={getSpaceOptions(props.isDocumentSpacesLoading, props.isDocumentSpacesErrored, props.documentSpaceService)}
-      
     />
   );
 }
