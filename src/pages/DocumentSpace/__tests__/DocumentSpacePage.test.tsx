@@ -160,10 +160,10 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(page.getByLabelText('Spaces')).toBeInTheDocument());
-    const documentSpacesSelect = page.getByLabelText('Spaces');
-    expect(documentSpacesSelect).toBeDisabled();
-    expect(documentSpacesSelect).toHaveValue('loading');
+    await waitFor(() => expect(page.getByTestId('document-space-selector')).toBeInTheDocument());
+    const documentSpacesSelect = page.getByTestId('document-space-selector');
+    expect(documentSpacesSelect.className).toContain('disabled');
+    expect(documentSpacesSelect.textContent).toContain('Loading...');
 
   });
 
@@ -178,11 +178,11 @@ describe('Test Document Space Page', () => {
     );
 
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(page.getByLabelText('Spaces')).toBeInTheDocument());
+    await waitFor(() => expect(page.getByTestId('document-space-selector')).toBeInTheDocument());
     
-    const documentSpacesSelect = page.getByLabelText('Spaces');
-    expect(documentSpacesSelect).toBeDisabled();
-    expect(documentSpacesSelect).toHaveValue('error');
+    const documentSpacesSelect = page.getByTestId('document-space-selector');
+    expect(documentSpacesSelect.className).toContain('disabled');
+    expect(documentSpacesSelect.textContent).toContain('Could not load spaces');
   });
 
   it('should show Document Spaces options select with first item in state when state is not promised or errored', async () => {
@@ -193,10 +193,10 @@ describe('Test Document Space Page', () => {
     );
 
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
-    await waitFor(() => expect(page.findByLabelText('Spaces')).resolves.toBeInTheDocument());
-    const documentSpacesSelect = page.getByLabelText('Spaces');
+    await waitFor(() => expect(page.findByTestId('document-space-selector')).resolves.toBeInTheDocument());
+    const documentSpacesSelect = page.getByTestId('document-space-selector');
     expect(documentSpacesSelect).toBeEnabled();
-    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].id);
+    expect(documentSpacesSelect.textContent).toContain(documentSpaces[0].name);
   });
 
   it('should show DocumentSpaceMySettingButton when the user has at least one document space', async () => {
@@ -230,14 +230,23 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
+    
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
 
-    const documentSpacesSelect = page.getByLabelText('Spaces');
+    const documentSpacesSelect = page.getByTestId('document-space-selector');
     expect(documentSpacesSelect).toBeEnabled();
-    expect(documentSpacesSelect).toHaveValue(documentSpaces[0].id);
+    await waitFor(() => expect(documentSpacesSelect.textContent).toContain(documentSpaces[0].name));
+    
+    act(() => {
+      userEvent.click(documentSpacesSelect);
+    });
+    await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));
+    const item2 = page.getByTestId(documentSpaces[1].name);
+    act(() => {
+      userEvent.click(item2);
+    })
+    await waitFor(() => expect(item2.textContent).toContain(documentSpaces[1].name));
 
-    userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
-    await waitFor(() => expect(documentSpacesSelect).toHaveValue(documentSpaces[1].id));
   });
 
   it('should open/close Document Space Memberships side drawer', async () => {
@@ -260,10 +269,17 @@ describe('Test Document Space Page', () => {
 
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
     
-    const documentSpacesSelect = page.getByLabelText('Spaces');
+    const documentSpacesSelect = page.getByTestId('document-space-selector');
     expect(documentSpacesSelect).toBeEnabled();
-    userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
-
+    act(() => 
+    {
+      userEvent.click(documentSpacesSelect);
+    });
+    await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));
+    const item2 = page.getByTestId(documentSpaces[1].name);
+    act(() => {
+      userEvent.click(item2);
+    })
     await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalled());
 
     await waitFor(()=>expect(page.getByTitle('Manage Users')).toBeInTheDocument())
@@ -403,15 +419,19 @@ describe('Test Document Space Page', () => {
         />
       </MemoryRouter>
     );
-
+    
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
-
-    const documentSpacesSelect = page.getByLabelText('Spaces');
+    const documentSpacesSelect = page.getByTestId("document-space-selector"); 
     expect(documentSpacesSelect).toBeEnabled();
     await waitFor(() => expect(page.queryAllByText(documentSpaces[0].name)).toBeTruthy())
     act(() => {
-      userEvent.selectOptions(documentSpacesSelect, documentSpaces[1].id);
+      userEvent.click(documentSpacesSelect)
     });
+    await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));
+    const item2 = page.getByTestId(documentSpaces[1].name);
+    act(() => {
+      userEvent.click(item2);
+    })
 
     const queryParams = new URLSearchParams(testLocation?.search);
     expect(queryParams.get('spaceId')).toEqual(documentSpaces[1].id);

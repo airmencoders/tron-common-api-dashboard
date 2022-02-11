@@ -164,10 +164,10 @@ describe('Document Space Favorites Page Tests', () => {
     );
 
     await waitFor(() => expect(page.getByTestId('document-space-selector')).toBeInTheDocument());
-    await waitFor(() => expect(page.getByDisplayValue('space1')).toBeVisible());
+    await waitFor(() => expect(page.getAllByText('space1')[0]).toBeVisible());
     await waitFor(() => expect(page.getByText('title')).toBeInTheDocument());
 
-    fireEvent.change(page.getByTestId('document-space-selector'), { target: { value: 'space2'}});
+    fireEvent.change(page.getByTestId('document-space-selector'), { target: { name: 'space2'}});
     await waitFor(() => expect(spaceChangeMock).toHaveBeenCalled());
 
 
