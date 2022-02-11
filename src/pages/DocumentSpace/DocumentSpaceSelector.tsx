@@ -57,10 +57,7 @@ function DocumentSpaceSelector(props: DocumentSpaceSelectorProps) {
       selection
       onChange={(event, data) => {
         
-        let documentSpaceId;
-        if (data.value != undefined){
-          documentSpaceId = data.value.toString();
-        }
+        const documentSpaceId = data.value?.toString();
         
         if (documentSpaceId != null) {
           const queryParams = new URLSearchParams(location.search);
