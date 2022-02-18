@@ -875,6 +875,9 @@
         "key": {
           "type": "string"
         },
+        "lastActivity": {
+          "type": "string"
+        },
         "lastModifiedBy": {
           "type": "string"
         },
@@ -930,6 +933,9 @@
           "type": "boolean"
         },
         "key": {
+          "type": "string"
+        },
+        "lastActivity": {
           "type": "string"
         },
         "lastModifiedBy": {
@@ -1000,6 +1006,9 @@
       "additionalProperties": false,
       "properties": {
         "email": {
+          "type": "string"
+        },
+        "name": {
           "type": "string"
         },
         "privileges": {
@@ -1164,6 +1173,9 @@
     "DocumentSpaceRenameFileDto": {
       "additionalProperties": false,
       "properties": {
+        "existingFileName": {
+          "type": "string"
+        },
         "existingFilename": {
           "type": "string"
         },
@@ -1273,6 +1285,9 @@
         "key": {
           "type": "string"
         },
+        "lastActivity": {
+          "type": "string"
+        },
         "lastModifiedDate": {
           "type": "string"
         },
@@ -1292,6 +1307,7 @@
         "documentSpaceId",
         "key",
         "lastModifiedDate",
+        "lastActivity",
         "metadata"
       ],
       "type": "object"
@@ -2661,6 +2677,9 @@
           "type": "string"
         },
         "key": {
+          "type": "string"
+        },
+        "lastActivityBy": {
           "type": "string"
         },
         "lastModifiedDate": {

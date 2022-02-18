@@ -14,6 +14,7 @@ import {
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
   FilePathSpec,
+  RecentDocumentDto,
   S3PaginationDto
 } from '../../openapi';
 import { DocumentSpaceFolderInfoDto } from '../../openapi/models/document-space-folder-info-dto';
@@ -482,6 +483,15 @@ export default class DocumentSpaceService {
       return Promise.resolve();
     }
     catch (error) {
+      return Promise.reject(prepareRequestError(error).message);
+    }
+  }
+
+  async getRecentUploadsForSpace(spaceId: string): Promise<RecentDocumentDto[]> {
+    try {
+      // leave date undefined to let the server use current date/time
+      return (await this.documentSpaceApi.getRecentsForSpace(spaceId, undefined, 0, 10)).data.data;
+    } catch (error) {
       return Promise.reject(prepareRequestError(error).message);
     }
   }

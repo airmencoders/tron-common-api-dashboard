@@ -335,9 +335,9 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * 
+         * Copies files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If copying cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
          * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
-         * @param {string} id 
+         * @param {string} id Destination Space UUID
          * @param {{ [key: string]: string; }} requestBody 
          * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
          * @param {*} [options] Override http request option.
@@ -553,63 +553,6 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Deletes selected files/folder from a Document Space that are already archived
-         * @summary Deletes item(s) that are already in the archived state
-         * @param {string} id 
-         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteArchivedItems: async (id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling deleteArchivedItems.');
-            }
-            // verify required parameter 'documentSpacePathItemsDto' is not null or undefined
-            if (documentSpacePathItemsDto === null || documentSpacePathItemsDto === undefined) {
-                throw new RequiredError('documentSpacePathItemsDto','Required parameter documentSpacePathItemsDto was null or undefined when calling deleteArchivedItems.');
-            }
-            const localVarPath = `/v2/document-space/spaces/{id}/archived/delete`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const queryParameters = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                queryParameters.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.query) {
-                queryParameters.set(key, options.query[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const nonString = typeof documentSpacePathItemsDto !== 'string';
-            const needsSerialization = nonString && configuration && configuration.isJsonMime
-                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
-                : nonString;
-            localVarRequestOptions.data =  needsSerialization
-                ? JSON.stringify(documentSpacePathItemsDto !== undefined ? documentSpacePathItemsDto : {})
-                : (documentSpacePathItemsDto || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -1358,6 +1301,71 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Requester must have at least READ access to provided Space.
+         * @summary Gets provided space\'s recently uploaded files/updated files activity
+         * @param {string} id Space UUID
+         * @param {string} [date] ISO UTC date/time to search from looking back
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecentsForSpace: async (id: string, date?: string, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getRecentsForSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/recents`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (date !== undefined) {
+                localVarQueryParameter['date'] = (date as any instanceof Date) ?
+                    (date as any).toISOString() :
+                    date;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Gets the Document Space privileges of the requesting user
          * @param {string} id 
@@ -1491,9 +1499,9 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
-         * 
+         * Moves files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If moving cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
          * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
-         * @param {string} id 
+         * @param {string} id UUID of the destination space
          * @param {{ [key: string]: string; }} requestBody 
          * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
          * @param {*} [options] Override http request option.
@@ -2128,9 +2136,9 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-         * 
+         * Copies files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If copying cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
          * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
-         * @param {string} id 
+         * @param {string} id Destination Space UUID
          * @param {{ [key: string]: string; }} requestBody 
          * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
          * @param {*} [options] Override http request option.
@@ -2183,21 +2191,6 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
          */
         async deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteArchiveItemBySpaceAndParent(id, parentFolderId, filename, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * Deletes selected files/folder from a Document Space that are already archived
-         * @summary Deletes item(s) that are already in the archived state
-         * @param {string} id 
-         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).deleteArchivedItems(id, documentSpacePathItemsDto, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -2430,6 +2423,24 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Requester must have at least READ access to provided Space.
+         * @summary Gets provided space\'s recently uploaded files/updated files activity
+         * @param {string} id Space UUID
+         * @param {string} [date] ISO UTC date/time to search from looking back
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRecentsForSpace(id: string, date?: string, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RecentDocumentDtoResponseWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getRecentsForSpace(id, date, page, size, sort, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * 
          * @summary Gets the Document Space privileges of the requesting user
          * @param {string} id 
@@ -2473,9 +2484,9 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
-         * 
+         * Moves files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If moving cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
          * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
-         * @param {string} id 
+         * @param {string} id UUID of the destination space
          * @param {{ [key: string]: string; }} requestBody 
          * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
          * @param {*} [options] Override http request option.
@@ -2688,9 +2699,9 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).batchAddUserToDocumentSpace(id, file, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Copies files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If copying cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
          * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
-         * @param {string} id 
+         * @param {string} id Destination Space UUID
          * @param {{ [key: string]: string; }} requestBody 
          * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
          * @param {*} [options] Override http request option.
@@ -2731,17 +2742,6 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
          */
         deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any): AxiosPromise<void> {
             return DocumentSpaceControllerApiFp(configuration).deleteArchiveItemBySpaceAndParent(id, parentFolderId, filename, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Deletes selected files/folder from a Document Space that are already archived
-         * @summary Deletes item(s) that are already in the archived state
-         * @param {string} id 
-         * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<object> {
-            return DocumentSpaceControllerApiFp(configuration).deleteArchivedItems(id, documentSpacePathItemsDto, options).then((request) => request(axios, basePath));
         },
         /**
          * Delete a single file from a Document Space by parent folder id and filename
@@ -2910,6 +2910,20 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).getRecentlyUploadedFilesByAuthenticatedUser(page, size, sort, options).then((request) => request(axios, basePath));
         },
         /**
+         * Requester must have at least READ access to provided Space.
+         * @summary Gets provided space\'s recently uploaded files/updated files activity
+         * @param {string} id Space UUID
+         * @param {string} [date] ISO UTC date/time to search from looking back
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRecentsForSpace(id: string, date?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<RecentDocumentDtoResponseWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).getRecentsForSpace(id, date, page, size, sort, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Gets the Document Space privileges of the requesting user
          * @param {string} id 
@@ -2941,9 +2955,9 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).listObjects(id, continuation, limit, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         * Moves files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If moving cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
          * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
-         * @param {string} id 
+         * @param {string} id UUID of the destination space
          * @param {{ [key: string]: string; }} requestBody 
          * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
          * @param {*} [options] Override http request option.
@@ -3116,9 +3130,9 @@ export interface DocumentSpaceControllerApiInterface {
     batchAddUserToDocumentSpace(id: string, file?: any, options?: any): AxiosPromise<Array<string>>;
 
     /**
-     * 
+     * Copies files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If copying cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
      * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
-     * @param {string} id 
+     * @param {string} id Destination Space UUID
      * @param {{ [key: string]: string; }} requestBody 
      * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
      * @param {*} [options] Override http request option.
@@ -3159,17 +3173,6 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any): AxiosPromise<void>;
-
-    /**
-     * Deletes selected files/folder from a Document Space that are already archived
-     * @summary Deletes item(s) that are already in the archived state
-     * @param {string} id 
-     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DocumentSpaceControllerApiInterface
-     */
-    deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any): AxiosPromise<object>;
 
     /**
      * Delete a single file from a Document Space by parent folder id and filename
@@ -3338,6 +3341,20 @@ export interface DocumentSpaceControllerApiInterface {
     getRecentlyUploadedFilesByAuthenticatedUser(page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<RecentDocumentDtoResponseWrapper>;
 
     /**
+     * Requester must have at least READ access to provided Space.
+     * @summary Gets provided space\'s recently uploaded files/updated files activity
+     * @param {string} id Space UUID
+     * @param {string} [date] ISO UTC date/time to search from looking back
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    getRecentsForSpace(id: string, date?: string, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<RecentDocumentDtoResponseWrapper>;
+
+    /**
      * 
      * @summary Gets the Document Space privileges of the requesting user
      * @param {string} id 
@@ -3369,9 +3386,9 @@ export interface DocumentSpaceControllerApiInterface {
     listObjects(id: string, continuation?: string, limit?: number, options?: any): AxiosPromise<S3PaginationDto>;
 
     /**
-     * 
+     * Moves files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If moving cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
      * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
-     * @param {string} id 
+     * @param {string} id UUID of the destination space
      * @param {{ [key: string]: string; }} requestBody 
      * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
      * @param {*} [options] Override http request option.
@@ -3554,9 +3571,9 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-     * 
+     * Copies files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If copying cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
      * @summary Copies file(s)/folders(s) from one location in a document space to another within same space.
-     * @param {string} id 
+     * @param {string} id Destination Space UUID
      * @param {{ [key: string]: string; }} requestBody 
      * @param {string} [sourceSpaceId] UUID of the source space (if cross space copying) - otherwise uses current space
      * @param {*} [options] Override http request option.
@@ -3604,19 +3621,6 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public deleteArchiveItemBySpaceAndParent(id: string, parentFolderId: string, filename: string, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).deleteArchiveItemBySpaceAndParent(id, parentFolderId, filename, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Deletes selected files/folder from a Document Space that are already archived
-     * @summary Deletes item(s) that are already in the archived state
-     * @param {string} id 
-     * @param {DocumentSpacePathItemsDto} documentSpacePathItemsDto 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DocumentSpaceControllerApi
-     */
-    public deleteArchivedItems(id: string, documentSpacePathItemsDto: DocumentSpacePathItemsDto, options?: any) {
-        return DocumentSpaceControllerApiFp(this.configuration).deleteArchivedItems(id, documentSpacePathItemsDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -3816,6 +3820,22 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
+     * Requester must have at least READ access to provided Space.
+     * @summary Gets provided space\'s recently uploaded files/updated files activity
+     * @param {string} id Space UUID
+     * @param {string} [date] ISO UTC date/time to search from looking back
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public getRecentsForSpace(id: string, date?: string, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).getRecentsForSpace(id, date, page, size, sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Gets the Document Space privileges of the requesting user
      * @param {string} id 
@@ -3853,9 +3873,9 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
-     * 
+     * Moves files either within the same space (if sourceSpaceId is equal to the destination space \'id\').  If moving cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination
      * @summary Moves file(s)/folders(s) from one location in a document space to another within same space.
-     * @param {string} id 
+     * @param {string} id UUID of the destination space
      * @param {{ [key: string]: string; }} requestBody 
      * @param {string} [sourceSpaceId] UUID of the source space (if cross space moving) - otherwise uses current space
      * @param {*} [options] Override http request option.

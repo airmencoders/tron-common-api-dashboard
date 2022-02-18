@@ -16,6 +16,7 @@ import {
   FilePathSpec,
   FilePathSpecWrapper,
   GenericStringArrayResponseWrapper,
+  RecentDocumentDto,
   S3PaginationDto
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
@@ -493,7 +494,19 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create favorites datasource', (done) => {
-    const favoritesList: DocumentSpaceUserCollectionResponseDto[] = [{id: 'id', itemId: 'itemId', documentSpaceId: 'docSpaceId', key: 'key', parentId: 'parentId', lastModifiedDate:'', metadata: {}, folder: true,}]
+    const favoritesList: DocumentSpaceUserCollectionResponseDto[] = [
+      {
+        id: 'id',
+        itemId: 'itemId',
+        documentSpaceId: 'docSpaceId',
+        key: 'key',
+        parentId: 'parentId',
+        lastModifiedDate: '',
+        metadata: {},
+        folder: true,
+        lastActivity: new Date().toISOString(),
+      },
+    ];
     const favoritesResponse: AxiosResponse<DocumentSpaceUserCollectionResponseDtoWrapper> = createAxiosSuccessResponse(
       {
         data: favoritesList,
@@ -697,4 +710,36 @@ describe('Test Document Space Service', () => {
     }
   });
 
+  it('should get most recent uploads for a given space', async () => {
+    jest
+    .spyOn(documentSpaceApi, 'getRecentsForSpace')
+    .mockReturnValue(
+      Promise.resolve(
+        {
+          data: [
+            { id: 'some id',
+              key: 'some file',
+              documentSpace: { name: 'some space', id: 'space id' },
+              lastModifiedDate: new Date().toISOString(),
+              parentFolderId: 'some parent id',
+            } as RecentDocumentDto
+          ]
+        } as AxiosResponse
+      )
+    );
+
+    let response = await documentSpaceService.getRecentUploadsForSpace('some id');
+    expect(response).resolves;
+
+    jest
+      .spyOn(documentSpaceApi, 'getRecentsForSpace')
+      .mockRejectedValue({ reason: 'It Broke', status: 400, message: 'System down', });
+
+    try {
+      response = await documentSpaceService.getRecentUploadsForSpace('some id');
+    }
+    catch (e) {
+      expect(e).toEqual('System down');
+    }
+  });
 });

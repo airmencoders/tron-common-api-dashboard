@@ -196,7 +196,7 @@ function DocumentSpaceRecentsPage() {
   }
 
   return (
-    <PageFormat pageTitle="Recently Uploaded">
+    <PageFormat pageTitle="Recently Uploaded By Me">
       {documentSpaceRecentsPageService.isSpacesOrPrivilegesLoading() ?
         <Spinner /> :
         <>

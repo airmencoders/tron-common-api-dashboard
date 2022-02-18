@@ -65,6 +65,12 @@ export interface DocumentSpaceUserCollectionResponseDto {
     lastModifiedDate: string;
     /**
      * 
+     * @type {string}
+     * @memberof DocumentSpaceUserCollectionResponseDto
+     */
+    lastActivity: string;
+    /**
+     * 
      * @type {DocumentMetadata}
      * @memberof DocumentSpaceUserCollectionResponseDto
      */

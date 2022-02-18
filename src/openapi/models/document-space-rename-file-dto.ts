@@ -38,6 +38,12 @@ export interface DocumentSpaceRenameFileDto {
      * @memberof DocumentSpaceRenameFileDto
      */
     newName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DocumentSpaceRenameFileDto
+     */
+    existingFileName?: string;
 }
 
 

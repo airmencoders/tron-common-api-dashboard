@@ -34,3 +34,5 @@ logs/
 
 cypress/screenshots/
 cypress/videos/
+.prettierrc
+Dockerfile.local

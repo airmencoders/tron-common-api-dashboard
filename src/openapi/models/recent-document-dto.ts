@@ -38,6 +38,12 @@ export interface RecentDocumentDto {
      * @type {string}
      * @memberof RecentDocumentDto
      */
+    lastActivityBy?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecentDocumentDto
+     */
     parentFolderId: string;
     /**
      * 
