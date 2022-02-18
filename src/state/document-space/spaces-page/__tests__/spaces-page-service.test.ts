@@ -874,6 +874,7 @@ describe('Spaces Page Service Test', () => {
       fileToDelete: '',
       selectedFile: undefined,
       selectedFiles: [],
+      recentUploads: [],
       membershipsState: {
         isOpen: false
       },

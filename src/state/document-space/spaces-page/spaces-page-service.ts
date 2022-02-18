@@ -1,6 +1,5 @@
 import { none, State } from '@hookstate/core';
-import { DatePicker } from '@trussworks/react-uswds';
-import React, { MutableRefObject } from 'react';
+import { MutableRefObject } from 'react';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import { GridSelectionType } from '../../../components/Grid/grid-selection-type';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
@@ -12,6 +11,7 @@ import {
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
+  RecentDocumentDto
 } from '../../../openapi';
 import { pathQueryKey, spaceIdQueryKey } from '../../../pages/DocumentSpace/DocumentSpaceSelector';
 import { performActionWhenMounted } from '../../../utils/component-utils';
@@ -121,6 +121,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       const favorites: DocumentSpaceUserCollectionResponseDto[] = await this.documentSpaceService.getFavorites(
         documentSpace.id
       );
+      const recents: RecentDocumentDto[] = await this.documentSpaceService.getRecentUploadsForSpace(documentSpace.id);
 
       this.spacesState.merge({
         selectedSpace: documentSpace,
@@ -128,6 +129,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         datasource: this.documentSpaceService.createDatasource(documentSpace.id, path, this.infiniteScrollOptions),
         path,
         selectedFiles: [],
+        recentUploads: recents,
         showNoChosenSpace: false,
         favorites,
       });
@@ -291,6 +293,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
           path: doc.path,
           lastModifiedDate: '',
           folder: doc.folder,
+          lastActivity: new Date().toISOString(),
         };
 
         performActionWhenMounted(this.mountedRef.current, () => {
@@ -501,6 +504,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
+      recentUploads: [],
       spaceNotFound: false,
       showNoChosenSpace: false,
       showFolderSizeDialog: false,

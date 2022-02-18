@@ -2542,11 +2542,13 @@
       "post": {
         "tags": ["document-space-controller"],
         "summary": "Moves file(s)/folders(s) from one location in a document space to another within same space.",
+        "description": "Moves files either within the same space (if sourceSpaceId is equal to the destination space 'id').  If moving cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination",
         "operationId": "moveFiles",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "UUID of the destination space",
             "required": true,
             "schema": {
               "type": "string",
@@ -2753,11 +2755,13 @@
       "post": {
         "tags": ["document-space-controller"],
         "summary": "Copies file(s)/folders(s) from one location in a document space to another within same space.",
+        "description": "Copies files either within the same space (if sourceSpaceId is equal to the destination space 'id').  If copying cross-space, then the user must have READ privileges at a minimum on the source space ID - and obviously needs at least WRITE at the destination",
         "operationId": "copyFiles",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "Destination Space UUID",
             "required": true,
             "schema": {
               "type": "string",
@@ -6209,6 +6213,102 @@
         }
       }
     },
+    "/v2/document-space/spaces/{id}/recents": {
+      "get": {
+        "tags": ["document-space-controller"],
+        "summary": "Gets provided space's recently uploaded files/updated files activity",
+        "description": "Requester must have at least READ access to provided Space.",
+        "operationId": "getRecentsForSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Space UUID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "ISO UTC date/time to search from looking back",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": "0"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": "20"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentDocumentDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space, or entry not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/document-space/spaces/{id}/path/{entryId}": {
       "get": {
         "tags": ["document-space-controller"],
@@ -8884,67 +8984,6 @@
         }
       }
     },
-    "/v2/document-space/spaces/{id}/archived/delete": {
-      "delete": {
-        "tags": ["document-space-controller"],
-        "summary": "Deletes item(s) that are already in the archived state",
-        "description": "Deletes selected files/folder from a Document Space that are already archived",
-        "operationId": "deleteArchivedItems",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DocumentSpacePathItemsDto"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Successful operation",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden (Requires Write privilege to document space, or DASHBOARD_ADMIN)",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found - space not found, file not found",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ExceptionResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v2/document-space/spaces/{id}/archive": {
       "delete": {
         "tags": ["document-space-controller"],
@@ -9390,7 +9429,7 @@
     "/v2/document-space-dav/{spaceId}/**": {
       "get": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_3",
+        "operationId": "processWebDavCommand_5",
         "parameters": [
           {
             "name": "spaceId",
@@ -9417,7 +9456,7 @@
       },
       "put": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_2",
+        "operationId": "processWebDavCommand_1",
         "parameters": [
           {
             "name": "spaceId",
@@ -9444,7 +9483,7 @@
       },
       "post": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand",
+        "operationId": "processWebDavCommand_6",
         "parameters": [
           {
             "name": "spaceId",
@@ -9471,7 +9510,7 @@
       },
       "delete": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_6",
+        "operationId": "processWebDavCommand_2",
         "parameters": [
           {
             "name": "spaceId",
@@ -9525,7 +9564,7 @@
       },
       "head": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_5",
+        "operationId": "processWebDavCommand",
         "parameters": [
           {
             "name": "spaceId",
@@ -9552,7 +9591,7 @@
       },
       "patch": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_1",
+        "operationId": "processWebDavCommand_3",
         "parameters": [
           {
             "name": "spaceId",
@@ -10670,6 +10709,10 @@
               "type": "string",
               "enum": ["WRITE", "MEMBERSHIP"]
             }
+          },
+          "name": {
+            "type": "string",
+            "writeOnly": true
           }
         }
       },
@@ -10776,6 +10819,10 @@
             "maxLength": 255,
             "minLength": 0,
             "type": "string"
+          },
+          "existingFileName": {
+            "type": "string",
+            "writeOnly": true
           }
         }
       },
@@ -11208,6 +11255,45 @@
           }
         }
       },
+      "RecentDocumentDto": {
+        "required": ["documentSpace", "id", "key", "lastModifiedDate", "parentFolderId"],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "key": {
+            "type": "string"
+          },
+          "lastActivityBy": {
+            "type": "string"
+          },
+          "parentFolderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "documentSpace": {
+            "$ref": "#/components/schemas/DocumentSpaceResponseDto"
+          }
+        }
+      },
+      "RecentDocumentDtoResponseWrapper": {
+        "required": ["data"],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecentDocumentDto"
+            }
+          }
+        }
+      },
       "DocumentSpaceFolderInfoDto": {
         "required": ["count", "documentSpaceId", "itemId", "itemName", "size"],
         "type": "object",
@@ -11264,6 +11350,10 @@
           "hasContents": {
             "type": "boolean"
           },
+          "lastActivity": {
+            "type": "string",
+            "format": "date-time"
+          },
           "folder": {
             "type": "boolean"
           }
@@ -11310,7 +11400,7 @@
         }
       },
       "DocumentSpaceUserCollectionResponseDto": {
-        "required": ["documentSpaceId", "id", "itemId", "key", "lastModifiedDate", "metadata"],
+        "required": ["documentSpaceId", "id", "itemId", "key", "lastActivity", "lastModifiedDate", "metadata"],
         "type": "object",
         "properties": {
           "id": {
@@ -11339,6 +11429,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "lastActivity": {
+            "type": "string",
+            "format": "date-time"
+          },
           "metadata": {
             "$ref": "#/components/schemas/DocumentMetadata"
           },
@@ -11355,42 +11449,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentSpaceUserCollectionResponseDto"
-            }
-          }
-        }
-      },
-      "RecentDocumentDto": {
-        "required": ["documentSpace", "id", "key", "lastModifiedDate", "parentFolderId"],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "key": {
-            "type": "string"
-          },
-          "parentFolderId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "lastModifiedDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "documentSpace": {
-            "$ref": "#/components/schemas/DocumentSpaceResponseDto"
-          }
-        }
-      },
-      "RecentDocumentDtoResponseWrapper": {
-        "required": ["data"],
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RecentDocumentDto"
             }
           }
         }
@@ -11456,6 +11514,10 @@
           },
           "hasContents": {
             "type": "boolean"
+          },
+          "lastActivity": {
+            "type": "string",
+            "format": "date-time"
           },
           "elementUniqueId": {
             "type": "string",

@@ -1,5 +1,5 @@
 import { createState, State, useState } from '@hookstate/core';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto } from '../../openapi';
+import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto, RecentDocumentDto } from '../../openapi';
 import DocumentSpaceService from './document-space-service';
 import DocumentSpaceMembershipService from './memberships/document-space-membership-service';
 import { globalOpenapiConfig } from '../../api/openapi-config';
@@ -66,6 +66,7 @@ const spacesPageState = createState<SpacesPageState>({
   isDefaultDocumentSpaceSettingsOpen: false,
   sideDrawerSize: SideDrawerSize.WIDE,
   favorites: [],
+  recentUploads: [],
   showNoChosenSpace: false,
   spaceNotFound: false,
   showFolderSizeDialog: false,

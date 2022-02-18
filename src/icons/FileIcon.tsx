@@ -1,8 +1,17 @@
-export default function FileIcon() {
+import { getSvgIconColorClassname } from "./icon-util";
+import { IconProps } from "./IconProps";
+import { SvgIconProps } from "./SvgIconProps";
+
+export default function FileIcon(props: IconProps & SvgIconProps) {
   return (
     <svg
-      width="19"
-      height="24"
+      className={
+        `svg-icon close-nav-icon` +
+        `${getSvgIconColorClassname(props.style, props.disabled, props.fill)} ` +
+        `${props.className ?? ''}`
+      }
+      width={props.size * 19}
+      height={props.size * 24}
       viewBox="0 0 19 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

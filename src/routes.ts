@@ -177,7 +177,7 @@ export const routes: RouteItem[] = [
             },
             {
                 path: RoutePath.DOCUMENT_SPACE_RECENTS,
-                name: 'Recents',
+                name: 'My Recent Uploads',
                 component: DocumentSpaceRecentsPage,
                 requiredPrivileges: [
                     PrivilegeType.DOCUMENT_SPACE_USER,

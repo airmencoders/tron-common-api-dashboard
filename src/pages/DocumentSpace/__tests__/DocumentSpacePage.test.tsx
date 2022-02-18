@@ -105,6 +105,7 @@ describe('Test Document Space Page', () => {
       fileToDelete: '',
       selectedFile: undefined,
       selectedFiles: [],
+      recentUploads: [],
       membershipsState: {
         isOpen: false
       },
@@ -145,6 +146,7 @@ describe('Test Document Space Page', () => {
     fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
+    jest.spyOn(documentSpaceService, 'getRecentUploadsForSpace').mockImplementation(() => Promise.resolve([]));
   }
 
   afterEach(() => {

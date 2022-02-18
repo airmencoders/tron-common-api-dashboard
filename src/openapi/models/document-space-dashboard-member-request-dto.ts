@@ -32,6 +32,12 @@ export interface DocumentSpaceDashboardMemberRequestDto {
      * @memberof DocumentSpaceDashboardMemberRequestDto
      */
     privileges: Array<DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum>;
+    /**
+     * 
+     * @type {string}
+     * @memberof DocumentSpaceDashboardMemberRequestDto
+     */
+    name?: string;
 }
 
 /**

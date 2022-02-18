@@ -130,7 +130,7 @@
   },
   "resolutions": {
     "remark-parse": "9.0.0",
-    "url-parse": "1.5.3",
+    "url-parse": "1.5.6",
     "tar": "6.1.7",
     "path-parse": "1.0.7",
     "axios": "0.21.4",
@@ -140,8 +140,9 @@
     "immer": "9.0.6",
     "nth-check": "2.0.1",
     "postcss": "7.0.36",
-    "follow-redirects": "1.14.7",
+    "follow-redirects": "1.14.8",
     "postcss-safe-parser": "4.0.2",
-    "tmpl": "1.0.5"
+    "tmpl": "1.0.5",
+    "node-forge": "1.0.0"
   }
 }

@@ -57,6 +57,9 @@ import InfoIcon from '../../icons/InfoIcon';
 import CopyContentIcon from '../../icons/CopyContentIcon';
 import CutIcon from '../../icons/CutIcon';
 import InfoNotice from '../../components/InfoNotice/InfoNotice';
+import RecentDocumentTile from '../../components/RecentDocumentTile/RecentDocumentTile';
+import FileIcon from '../../icons/FileIcon';
+import RecentsBar from './RecentSpaceUploadsBar/RecentsBar';
 
 function DocumentSpacePage() {
   const location = useLocation();
@@ -359,27 +362,27 @@ function DocumentSpacePage() {
 
   return (
     <PageFormat pageTitle="Document Space" className="document-space-page">
-        {
-          localClipboardState.value && localClipboardState.value.items && localClipboardState.value.items.length > 0 ? 
-          <div className='clipboard-notification'>
-            <InfoNotice
-              type={'success'}
-              slim={true}
+      {localClipboardState.value && localClipboardState.value.items && localClipboardState.value.items.length > 0 ? (
+        <div className="clipboard-notification">
+          <InfoNotice type={'success'} slim={true}>
+            {`${localClipboardState.value.items.length} items on clipboard`}&nbsp;
+            <Button
+              data-testid="clear-clipboard-button"
+              unstyled
+              type={'button'}
+              onClick={() => localClipboardState.set(undefined)}
             >
-              {`${localClipboardState.value.items.length} items on clipboard`}&nbsp;
-                <Button 
-                  data-testid='clear-clipboard-button'
-                  unstyled 
-                  type={'button'}
-                  onClick={() => localClipboardState.set(undefined)}
-                >
-                  Clear
-                </Button>      
-            </InfoNotice>
-          </div>
-          : null
-        }
-      <FormGroup labelName="document-space" labelText="Spaces" isError={false} className="document-space-page__space-select">
+              Clear
+            </Button>
+          </InfoNotice>
+        </div>
+      ) : null}
+      <FormGroup
+        labelName="document-space"
+        labelText="Spaces"
+        isError={false}
+        className="document-space-page__space-select"
+      >
         <div className="add-space-container">
           <div>
             <DocumentSpaceSelector
@@ -387,7 +390,7 @@ function DocumentSpacePage() {
               isDocumentSpacesErrored={isDocumentSpacesErrored}
               documentSpaceService={documentSpaceService}
               selectedSpace={pageService.state.selectedSpace?.value}
-              onUnreachableSpace={pageService.state.spaceNotFound.value || pageService.state.showNoChosenSpace.value }
+              onUnreachableSpace={pageService.state.spaceNotFound.value || pageService.state.showNoChosenSpace.value}
             />
             {isAdmin && !documentSpacePrivilegesService.isPromised && (
               <Button
@@ -400,21 +403,23 @@ function DocumentSpacePage() {
               </Button>
             )}
 
-            {documentSpaceService.documentSpaces.length > 0 && !(pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value) && (
-              <Button
+            {documentSpaceService.documentSpaces.length > 0 &&
+              !(pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value) && (
+                <Button
                   className="document-space-page__space-user-settings"
                   data-testid="doc-space-my-settings__btn"
                   type="button"
                   unstyled
                   disableMobileFullWidth
                   onClick={() => pageService.state.isDefaultDocumentSpaceSettingsOpen.set(true)}
-              >
-                <UserIcon size={0} />
-              </Button>
-            )}
+                >
+                  <UserIcon size={0} />
+                </Button>
+              )}
           </div>
         </div>
       </FormGroup>
+      <RecentsBar recents={pageService.state.recentUploads.get()} />
       {pageService.state.selectedSpace.value != null &&
         pageService.state.datasource.value &&
         documentSpacePrivilegesService.isAuthorizedForAction(
@@ -449,12 +454,11 @@ function DocumentSpacePage() {
               documentPageService={pageService}
             />
           </div>
-      )}
-      {pageService.state.selectedSpace.value != null &&
-        pageService.state.datasource.ornull &&
+        )}
+      {pageService.state.selectedSpace.value != null && pageService.state.datasource.ornull && (
         <FullPageInfiniteGrid
           columns={documentDtoColumns.attach(Downgraded).value}
-          datasource={{...pageService.state.datasource.ornull.attach(Downgraded).value}}
+          datasource={{ ...pageService.state.datasource.ornull.attach(Downgraded).value }}
           cacheBlockSize={generateInfiniteScrollLimit(pageService.infiniteScrollOptions)}
           maxBlocksInCache={pageService.infiniteScrollOptions.maxBlocksInCache}
           maxConcurrentDatasourceRequests={pageService.infiniteScrollOptions.maxConcurrentDatasourceRequests}
@@ -467,13 +471,13 @@ function DocumentSpacePage() {
           suppressRowClickSelection
           autoResizeColumns
         />
-        }
-      <SpaceNotFoundDialog 
-        shouldShow={pageService.state.spaceNotFound.value} 
+      )}
+      <SpaceNotFoundDialog
+        shouldShow={pageService.state.spaceNotFound.value}
         onHide={() => {
-          pageService.state.spaceNotFound.set(false)          
-          pageService.state.showNoChosenSpace.set(true)  // force user to user space drop down 
-        }} 
+          pageService.state.spaceNotFound.set(false);
+          pageService.state.showNoChosenSpace.set(true); // force user to user space drop down
+        }}
       />
 
       <SideDrawer
@@ -508,7 +512,7 @@ function DocumentSpacePage() {
               pageService.mergeState({
                 showErrorMessage: false,
                 createEditElementOpType: CreateEditOperationType.NONE,
-                selectedFile: undefined
+                selectedFile: undefined,
               })
             }
             onSubmit={pageService.submitElementName.bind(pageService)}
@@ -521,7 +525,7 @@ function DocumentSpacePage() {
           />
         )}
       </SideDrawer>
-      { pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value ? null :
+      {pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value ? null : (
         <SideDrawer
           isLoading={false}
           title="My Settings"
@@ -545,7 +549,7 @@ function DocumentSpacePage() {
             onDocumentSpaceDeleted={loadSpaceOnDeletion}
           />
         </SideDrawer>
-      }
+      )}
 
       <ArchiveDialog
         show={pageService.state.showDeleteDialog.get()}
@@ -561,14 +565,18 @@ function DocumentSpacePage() {
         items={pageService.state.selectedFiles.value}
       />
 
-      { pageService.state.selectedItemForSize && pageService.state.showFolderSizeDialog.get() &&
+      {pageService.state.selectedItemForSize && pageService.state.showFolderSizeDialog.get() && (
         <FolderSizeDialog
           show={pageService.state.showFolderSizeDialog.get()}
           onClose={() => pageService.mergeState({ selectedItemForSize: undefined, showFolderSizeDialog: false })}
           spaceId={pageService.state.selectedItemForSize.get()!.spaceId}
-          folderPath={(pageService.state.selectedItemForSize.get()!.path + '/' + pageService.state.selectedItemForSize.get()!.key).replace(/[\/]+/g, '/')}
+          folderPath={(
+            pageService.state.selectedItemForSize.get()!.path +
+            '/' +
+            pageService.state.selectedItemForSize.get()!.key
+          ).replace(/[\/]+/g, '/')}
         />
-      }        
+      )}
 
       {pageService.state.selectedSpace.value &&
         !documentSpacePrivilegesService.isPromised &&

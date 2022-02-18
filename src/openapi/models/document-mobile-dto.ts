@@ -73,6 +73,12 @@ export interface DocumentMobileDto {
      * @type {string}
      * @memberof DocumentMobileDto
      */
+    lastActivity?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DocumentMobileDto
+     */
     elementUniqueId?: string;
     /**
      * 

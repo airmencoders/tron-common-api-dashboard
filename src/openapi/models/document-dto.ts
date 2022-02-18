@@ -70,6 +70,12 @@ export interface DocumentDto {
     hasContents?: boolean;
     /**
      * 
+     * @type {string}
+     * @memberof DocumentDto
+     */
+    lastActivity?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof DocumentDto
      */
