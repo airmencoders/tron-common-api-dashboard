@@ -38,8 +38,15 @@ function PageFormat(props: any) {
   }
 
   useEffect(() => {
+
+    // on first load, collapse the nav bar if on mobile
+    if (deviceInfo.isMobile) {
+      setIsNavCollapsed(true);
+    }
+
     appInfoService.fetchVersion();
   }, []);
+
   return (
       <div className={`page-format ${props.className ?? ''}`}>
         <div className={`page-format__nav-menu ${getBackgroundClass()} 
