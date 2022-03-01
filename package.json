@@ -144,6 +144,6 @@
     "postcss-safe-parser": "4.0.2",
     "tmpl": "1.0.5",
     "node-forge": "1.0.0",
-    "prism-js": "1.25.0"
+    "prism-js": "1.26.0"
   }
 }
