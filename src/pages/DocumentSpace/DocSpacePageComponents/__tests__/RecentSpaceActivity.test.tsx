@@ -195,11 +195,14 @@ describe('Recent Activity Tests', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(page.getByText('Recent Activity')).toBeVisible);
+    await waitFor(() => expect(page.getByText('Recent Activity')).toBeVisible());
     fireEvent.click(page.getByText('Recent Activity'));
 
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
+
     // see that our recent file populates in the grid
-    await waitFor(() => expect(page.getByText('testFile')).toBeVisible, { timeout: 5000 });
+    await waitFor(() => expect(page.getByText('testFile')).toBeVisible(), { timeout: 5000 });
 
   });
 });

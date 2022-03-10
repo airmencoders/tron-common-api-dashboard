@@ -228,6 +228,9 @@ describe('Search Space Tests', () => {
     await waitFor(() => expect(page.getByText('Browse')).toBeVisible);
     fireEvent.click(page.getByText('Browse'));
 
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
+
     // see that our contents render
     await waitFor(() => expect(page.getByText('testFile')).toBeVisible);
 

@@ -201,6 +201,9 @@ describe('Search Space Tests', () => {
     await waitFor(() => expect(page.getByText('Search')).toBeVisible);
     fireEvent.click(page.getByText('Search'));
 
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
+
     // check that the search button is disabled
     await waitFor(() => expect(page.getByTestId('search-space-button')).toBeDisabled);
 
