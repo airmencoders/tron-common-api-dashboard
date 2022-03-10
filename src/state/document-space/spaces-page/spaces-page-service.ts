@@ -117,7 +117,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         if (onNoSpaceFound !== undefined) {
           onNoSpaceFound();
         }
-        this.spacesState.spaceNotFound.set(true);
+        this.mergeState({ spaceNotFound: true });
         return;
       }
 
@@ -237,7 +237,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         documentSpace.id
       );
 
-      this.spacesState.merge({
+      this.mergeState({
         selectedSpace: documentSpace,
         shouldUpdateDatasource: true,
         shouldUpdateRecentsDatasource: true,
@@ -262,7 +262,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         createTextToast(ToastType.ERROR, 'Could not load privileges for the selected Document Space');
       }
 
-      this.spacesState.merge({
+      this.mergeState({
         selectedSpace: undefined,
         datasource: undefined,
         recentsDatasource: undefined,

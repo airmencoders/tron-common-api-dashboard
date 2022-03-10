@@ -156,7 +156,9 @@ describe('Test Document Space Page', () => {
   });
 
   it('should show loading select when first retrieving Document Spaces', async () => {
+    jest.spyOn(documentSpaceService, 'isDocumentSpacesStateErrored', 'get').mockReturnValue(false);
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
+    jest.spyOn(documentSpacePageService, 'resetState').mockImplementation(() => {});
 
     const page = render(
       <MemoryRouter>
@@ -164,11 +166,11 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(page.getByTestId('document-space-selector')).toBeInTheDocument());
+    await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(page.queryByTestId('document-space-selector')).toBeInTheDocument());
     const documentSpacesSelect = page.getByTestId('document-space-selector');
     expect(documentSpacesSelect.className).toContain('disabled');
     expect(documentSpacesSelect.textContent).toContain('Loading...');
-
   });
 
   it('should show error select when retrieving Document Spaces fails', async () => {
@@ -215,7 +217,7 @@ describe('Test Document Space Page', () => {
     expect(documentSpacesSelect).toBeInTheDocument()
   });
 
-  it('should not show Upload Files button while spaces are loading (no space selected)', () => {
+  it('should not show Upload Files button while spaces are loading (no space selected)', async () => {
     jest.spyOn(documentSpaceService, 'isDocumentSpacesStatePromised', 'get').mockReturnValue(true);
 
     const page = render(
@@ -224,6 +226,8 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
+    await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
+    await waitFor(() => expect(page.queryByTestId('document-space-selector')).toBeInTheDocument());
     expect(page.queryByTitle("Upload Files")).not.toBeInTheDocument();
   });
 
@@ -380,7 +384,8 @@ describe('Test Document Space Page', () => {
   });
   
   describe('Test conditional actions based on document space privilege', () => {
-    it('should show Add New Space button with DASHBOARD_ADMIN privilege', () => {
+
+    it('should show Add New Space button with DASHBOARD_ADMIN privilege', async () => {
       jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
 
       const page = render(
@@ -389,11 +394,12 @@ describe('Test Document Space Page', () => {
         </MemoryRouter>
       );
 
+      await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
       const addBtn = page.getByText('Add New Space');
       expect(addBtn).toBeVisible();
     });
 
-    it('should not show Add New Space button when missing DASHBOARD_ADMIN privilege', () => {
+    it('should not show Add New Space button when missing DASHBOARD_ADMIN privilege', async () => {
       jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(false);
 
       const page = render(
@@ -402,6 +408,7 @@ describe('Test Document Space Page', () => {
         </MemoryRouter>
       );
 
+      await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
       const addBtn = page.queryByText('Add New Space');
       expect(addBtn).not.toBeInTheDocument();
     });

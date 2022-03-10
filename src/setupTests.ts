@@ -22,16 +22,28 @@ function returnDefaultResponse(req: MockedRequest<DefaultRequestBodyType, Reques
 }
 
 const server = setupServer(
-  rest.get('/api/v2/userinfo', (req, res, ctx) => {
+  rest.get(/\/api\/v2\/userinfo/, (req, res, ctx) => {
     return res(ctx.json({}))
   }),
-  rest.get('/api/v2/userinfo/existing-person', (req, res, ctx) => {
+  rest.get(/\/api\/v2\/userinfo\/existing-person/, (req, res, ctx) => {
     return res(ctx.json({}))
   }),
-  rest.get('/api/v2/version', (req, res, ctx) => {
+  rest.get(/\/api\/v2\/document-space\/spaces\/files\/recently-uploaded/, (req, res, ctx) => {
+    return res(ctx.json({ data: [] }));
+  }),
+  rest.get(/api\/v2\/document-space\/spaces\/.*?\/contents/, (req, res, ctx) => {
+    return res(ctx.json({ documents: [] }));
+  }),
+  rest.get(/api\/v2\/document-space\/spaces\/.*\/users\/dashboard\/privileges\/self/, (req, res, ctx) => {
+    return res(ctx.json({ type: 'MEMBERSHIP' }));
+  }),
+  rest.get(/\/api\/v2\/version/, (req, res, ctx) => {
     return res(ctx.json({ version: 'sdfsf', enclave: 'il2', environment: 'staging' }))
   }),
-  rest.get('/api/v2/privilege', (req, res, ctx) => {
+  rest.get(/\/api\/v2\/document-space\/spaces\/.*?\/collection\/favorite/, (req, res, ctx) => {
+    return res(ctx.json({ data: [] }));
+  }),
+  rest.get(/\/api\/v2\/privilege/, (req, res, ctx) => {
     return res(ctx.json({
       "data": [
         {
@@ -79,10 +91,10 @@ const server = setupServer(
       "data": Object.values(PrivilegeType).map((item : any) => ({id: counter++, name: item }))
     }))
   }),
-  rest.post('/api/v2/person/find', (req, res, ctx) => {
+  rest.post(/\api\/v2\/person\/find/, (req, res, ctx) => {
     return res(ctx.json({}));
   }),
-  rest.get('/api/v1/app-source/spec/*', (req, res, ctx) => {
+  rest.get(/\/api\/v1\/app-source\/spec\/.*/, (req, res, ctx) => {
     return res(ctx.json({}));
   }),
   rest.get(/\/api\/v2\/logs/, (req, res, ctx) => {

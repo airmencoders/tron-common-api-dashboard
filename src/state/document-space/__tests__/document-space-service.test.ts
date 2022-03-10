@@ -99,6 +99,7 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create datasource and fetch documents', (done) => {
+    const badRequestError = createGenericAxiosRequestErrorResponse(500);
     documentSpaceApi.dumpContentsAtPath = jest.fn(() => {
       return Promise.resolve(listObjectsResponse);
     });
@@ -143,7 +144,7 @@ describe('Test Document Space Service', () => {
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
 
     const apiSpy = documentSpaceApi.dumpContentsAtPath = jest.fn(() => {
-      return Promise.reject();
+      return Promise.reject(badRequestError);
     });
 
     documentSpaceService.createDatasource(
@@ -166,6 +167,8 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create datasource for archived items', (done) => {
+    const badRequestError = createGenericAxiosRequestErrorResponse(500);
+
     let apiSpy = documentSpaceApi.getAllArchivedFilesForAuthUser = jest.fn(() => {
       return Promise.resolve(listObjectsResponse);
     });
@@ -210,7 +213,7 @@ describe('Test Document Space Service', () => {
     apiSpy.mockReset();
 
     apiSpy = documentSpaceApi.getAllArchivedFilesForAuthUser = jest.fn(() => {
-      return Promise.reject()
+      return Promise.reject(badRequestError)
     });
 
     datasource = documentSpaceService.createDatasource(
@@ -654,6 +657,7 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create search datasource', (done) => {
+    const badRequestError = createGenericAxiosRequestErrorResponse(500);
     const resultsList: DocumentMobileDto[] = [{
         spaceId: 'docSpaceId',
         key: 'key',
@@ -714,7 +718,7 @@ describe('Test Document Space Service', () => {
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
 
     const apiSpy = documentSpaceApi.searchDocumentSpace = jest.fn(() => {
-      return Promise.reject();
+      return Promise.reject(badRequestError);
     });
 
     datasource = documentSpaceService.createSearchDatasource(
@@ -737,6 +741,7 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create recent uploads datasource', (done) => {
+    const badRequestError = createGenericAxiosRequestErrorResponse(500);
     const resultsList: RecentDocumentDto[] = [{
         id: 'dssd',
         documentSpace: { id: 'sdfsdf', name: 'sdfsfs'},
@@ -794,7 +799,7 @@ describe('Test Document Space Service', () => {
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
 
     const apiSpy = documentSpaceApi.getRecentsForSpace = jest.fn(() => {
-      return Promise.reject();
+      return Promise.reject(badRequestError);
     });
 
     datasource = documentSpaceService.createRecentUploadsForSpaceDatasource(

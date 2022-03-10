@@ -77,6 +77,7 @@ function Sidebar({ items }: { items: RouteItem[] }) {
                     return (item.childRoutes != null && item.childRoutes.length > 0) ?
                         <SidebarItemWithChildren
                             item={item}
+                            key={item.name}
                             isNavCollapsed={isNavCollapsed}
                             onToggleClicked={handleMenuToggleClicked}
                             openedMenu={openedMenu}

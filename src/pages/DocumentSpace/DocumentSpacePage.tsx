@@ -2,6 +2,7 @@ import { useHookstate } from '@hookstate/core';
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
+import { Tab } from 'semantic-ui-react';
 import Button from '../../components/Button/Button';
 import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
@@ -103,18 +104,16 @@ function DocumentSpacePage() {
 
   useEffect(() => {
     mountedRef.current = true;
-
     loadSpaceOnInit();
 
     return function cleanup() {
       mountedRef.current = false;
-
       pageService.resetState();
     };
   }, []);
 
   useEffect(() => {
-    pageService.loadDocSpaceFromLocation(location.search, ()=> pageService.state.spaceNotFound.set(true));
+    pageService.loadDocSpaceFromLocation(location.search, () => pageService.state.spaceNotFound.set(true));
   }, [location.search]);
 
   async function handleDocumentSpaceCreation(space: DocumentSpaceRequestDto) {
@@ -190,35 +189,19 @@ function DocumentSpacePage() {
           </div>
         </div>
       </FormGroup>
-      <TabBar
-        selectedIndex={selectedTab.value}
-        items={[
+      <Tab
+        panes={[
           {
-            text: 'Browse',
-            onClick: () => {
-              selectedTab.set(DocumentPageTabsEnum.FILES_AND_FOLDERS);
-            },
-            content: <MyFilesAndFolders 
-              pageService={pageService} 
-            />,
+            menuItem: 'Browse',
+            render: () => <MyFilesAndFolders pageService={pageService} />,
           },
           {
-            text: "Recent Activity",
-            content: <RecentSpaceActivity 
-              pageService={pageService} 
-            />,
-            onClick: () => { 
-              selectedTab.set(DocumentPageTabsEnum.RECENT_ACTIVITY);
-            }
+            menuItem: "Recent Activity",
+            render: () => <RecentSpaceActivity pageService={pageService} />,
           },
           {
-            text: "Search",
-            content: <SearchSpace 
-              pageService={pageService} 
-            />,
-            onClick: () => { 
-              selectedTab.set(DocumentPageTabsEnum.SEARCH);
-            }
+            menuItem: "Search",
+            render: () => <SearchSpace pageService={pageService} />,
           }
         ]}
       />

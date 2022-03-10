@@ -10,6 +10,7 @@ import {
   DocumentDto,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
+  DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceResponseDto,
   S3PaginationDto
 } from '../../../openapi';
@@ -19,10 +20,13 @@ import DocumentSpaceMembershipService from '../../../state/document-space/member
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import {
   documentSpaceMembershipService,
+  useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../utils/TestUtils/test-utils';
 import DocumentSpaceArchivedItemsPage from '../DocumentSpaceArchivedItemsPage';
+import DocumentSpacePrivilegeService from '../../../state/document-space/document-space-privilege-service';
+import { attempt } from 'cypress/types/lodash';
 
 jest.mock('../../../state/document-space/document-space-state');
 jest.mock('../../../state/authorized-user/authorized-user-state');
@@ -36,6 +40,7 @@ describe('Document Space Archive Items Page Tests', () => {
       size: 20000,
       lastModifiedBy: '',
       lastModifiedDate: '2021-09-17T15:09:10.154Z',
+      lastActivity: new Date().toISOString(),
     },
   ];
 
@@ -53,7 +58,9 @@ describe('Document Space Archive Items Page Tests', () => {
   });
 
   let documentSpacesState: State<DocumentSpaceResponseDto[]> & StateMethodsDestroy;
+  let documentSpacePrivilegeState: State<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>> & StateMethodsDestroy;
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
+  let documentSpacePrivilegeService: DocumentSpacePrivilegeService;
   let documentSpaceService: DocumentSpaceService;
 
   let membershipService: DocumentSpaceMembershipService;
@@ -66,7 +73,7 @@ describe('Document Space Archive Items Page Tests', () => {
     documentSpacesState = createState<DocumentSpaceResponseDto[]>([]);
     documentSpaceApi = new DocumentSpaceControllerApi();
     documentSpaceService = new DocumentSpaceService(documentSpaceApi, documentSpacesState);
-
+    documentSpacePrivilegeService = new DocumentSpacePrivilegeService(documentSpaceApi, documentSpacePrivilegeState);
     membershipService = new DocumentSpaceMembershipService(documentSpaceApi);
 
     authorizedUserState = createState<DashboardUserDto | undefined>(undefined);
@@ -75,6 +82,7 @@ describe('Document Space Archive Items Page Tests', () => {
 
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
+    (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
     (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
   });
 
@@ -83,6 +91,8 @@ describe('Document Space Archive Items Page Tests', () => {
     jest
       .spyOn(documentSpaceApi, 'getAllArchivedFilesForAuthUser')
       .mockReturnValue(Promise.resolve(listObjectsResponse));
+    jest.spyOn(documentSpaceService, 'resetState').mockImplementation(() => {});
+    jest.spyOn(documentSpacePrivilegeService, 'resetState').mockImplementation(() => {});
     jest.spyOn(documentSpaceService, 'deleteItems').mockImplementation(mockDelete);
     jest.spyOn(authorizedUserService, 'authorizedUserHasPrivilege').mockReturnValue(true);
 
@@ -91,6 +101,9 @@ describe('Document Space Archive Items Page Tests', () => {
         <DocumentSpaceArchivedItemsPage />
       </MemoryRouter>
     );
+
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
     await waitFor(() => expect(page.getByText('Document Space Archived Items')).toBeVisible());
   });
 });
