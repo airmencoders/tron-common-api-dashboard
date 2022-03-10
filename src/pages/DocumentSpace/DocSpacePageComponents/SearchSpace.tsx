@@ -16,15 +16,12 @@ import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import StarHollowIcon from '../../../icons/StarHollowIcon';
 import StarIcon from '../../../icons/StarIcon';
-import { DocumentDto, DocumentSpacePrivilegeDtoTypeEnum } from '../../../openapi';
-import {
-  useDocumentSpacePrivilegesState
-} from '../../../state/document-space/document-space-state';
+import { DocumentDto } from '../../../openapi';
 import SpacesPageService from '../../../state/document-space/spaces-page/spaces-page-service';
-import { formatDocumentSpaceDate } from '../../../utils/date-utils';
 import { CreateEditOperationType } from '../../../utils/document-space-utils';
 import { formatBytesToString, formatPath } from '../../../utils/file-utils';
 import DocumentDownloadCellRenderer from '../DocumentDownloadCellRenderer';
+import { formatAgGridDateCell } from './MyFilesAndFolders';
 
 export interface SearchSpaceProps {
   pageService: SpacesPageService;
@@ -37,7 +34,6 @@ export interface SearchSpaceProps {
 
 export default function SearchSpace({ pageService }: SearchSpaceProps) {
   const searchQuery = useHookstate<string | undefined>(undefined);
-  const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const deviceInfo = useDeviceInfo();
 
   const documentDtoColumns = useHookstate<GridColumn[]>([
@@ -79,11 +75,7 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
           return new Date(params.data.lastModifiedDate); // return value as a JS Date that ag-grid likes for sorting
         }
       },
-      valueFormatter: function (params: ValueFormatterParams) {
-        if (params.value) {
-          return formatDocumentSpaceDate(params.value);
-        }
-      },
+      valueFormatter: formatAgGridDateCell,
     }),
     new GridColumn({
       field: 'lastModifiedBy',

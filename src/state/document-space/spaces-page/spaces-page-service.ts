@@ -153,9 +153,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
     if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.DESKTOP) {
       hideableColumns.forEach(column => {
-        if (!column.hide.value) {
-          column.hide.set(true)
-        }
+        column.hide.set(true)
       });
 
       // Get the "More" actions column
@@ -184,9 +182,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       }
     } else {
       hideableColumns.forEach(column => {
-        if (column.hide.value) {
-          column.hide.set(false)
-        }
+        column.hide.set(false)
       });
 
       // if we're full width, unhide everything in case hideableColumns was empty
