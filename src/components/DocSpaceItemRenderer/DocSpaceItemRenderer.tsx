@@ -1,6 +1,6 @@
 import React from 'react';
 import FolderIcon from '../../icons/FolderIcon';
-import {DocumentDto} from '../../openapi';
+import {DocumentDto, RecentDocumentDto} from '../../openapi';
 import Button from '../Button/Button';
 import Spinner from '../Spinner/Spinner';
 import './DocSpaceItemRenderer.scss';
@@ -21,10 +21,16 @@ export interface DocSpaceItemRendererProps {
 function DocSpaceItemRenderer(props: Partial<ICellRendererParams> & ClickableCellRenderer & DocSpaceItemRendererProps) {
   const downloadUrlService = documentSpaceDownloadUrlService();
 
-  const data = props.node?.data as DocumentDto;
+  const data = props.node?.data as DocumentDto & RecentDocumentDto;
   const path = data?.path;
   const fileKey = data?.key;
-  const space = data?.spaceId;
+  let space = data?.spaceId;
+
+  // if we didn't get spaceId then perhaps its a RecentDocumentDto, in which
+  //  case we need to look in a different place
+  if (!!!space) {
+    space = data?.documentSpace?.id;
+  }
 
   if (!data) {
     return <Spinner small />;

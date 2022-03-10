@@ -11,10 +11,10 @@ import DocumentSpaceDownloadUrlService from './document-space-download-url-servi
 import { accessAuthorizedUserState } from '../authorized-user/authorized-user-state';
 import AuthorizedUserService from '../authorized-user/authorized-user-service';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from './document-space-global-service';
-import { CreateEditOperationType } from './document-space-utils';
 import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import { SpacesPageState } from './spaces-page/spaces-page-state';
 import SpacesPageService from './spaces-page/spaces-page-service';
+import { CreateEditOperationType } from '../../utils/document-space-utils';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -52,6 +52,10 @@ const spacesPageState = createState<SpacesPageState>({
   selectedSpace: undefined,
   shouldUpdateDatasource: false,
   datasource: undefined,
+  shouldUpdateRecentsDatasource: false,
+  recentsDatasource: undefined,
+  shouldUpdateSearchDatasource: false,
+  searchDatasource: undefined,
   showUploadDialog: false,
   showDeleteDialog: false,
   fileToDelete: '',
@@ -66,7 +70,6 @@ const spacesPageState = createState<SpacesPageState>({
   isDefaultDocumentSpaceSettingsOpen: false,
   sideDrawerSize: SideDrawerSize.WIDE,
   favorites: [],
-  recentUploads: [],
   showNoChosenSpace: false,
   spaceNotFound: false,
   showFolderSizeDialog: false,

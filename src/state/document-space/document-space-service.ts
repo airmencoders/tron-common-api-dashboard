@@ -7,12 +7,12 @@ import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createFailedDataFetchToast, createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import {
   DocumentDto,
+  DocumentMobileDto,
   DocumentSpaceControllerApiInterface, DocumentSpacePathItemsDto,
   DocumentSpaceRenameFileDto,
   DocumentSpaceRenameFolderDto,
   DocumentSpaceRequestDto,
-  DocumentSpaceResponseDto,
-  DocumentSpaceUserCollectionResponseDto,
+  DocumentSpaceResponseDto, DocumentSpaceUserCollectionResponseDto,
   FilePathSpec,
   RecentDocumentDto,
   S3PaginationDto
@@ -38,13 +38,8 @@ export default class DocumentSpaceService {
 
   private fetchSpacesRequest?: CancellableDataRequest<DocumentSpaceResponseDto[]> = undefined;
 
-  createDatasource(
-    spaceName: string,
-    path: string,
-    infiniteScrollOptions: InfiniteScrollOptions,
-    status: ArchivedStatus = ArchivedStatus.NOT_ARCHIVED
-  ): IDatasource {
-    const datasource: IDatasource = {
+  createDatasource(spaceName: string, path: string, infiniteScrollOptions: InfiniteScrollOptions, status: ArchivedStatus = ArchivedStatus.NOT_ARCHIVED): IDatasource {
+    return {
       getRows: async (params: IGetRowsParams) => {
         try {
           const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
@@ -62,7 +57,7 @@ export default class DocumentSpaceService {
 
           // until we get true paginated, infinite scroll, we sort here
           const dataItems: DocumentDto[] = applySortCriteria(data.documents, params.sortModel[0]);
-
+  
           let lastRow = -1;
 
           /**
@@ -78,7 +73,7 @@ export default class DocumentSpaceService {
 
           /**
            * Don't error out the state here. If the request fails for some reason, just show nothing.
-           *
+           * 
            * Call the success callback as a hack to prevent
            * ag grid from showing an infinite loading state on failure.
            */
@@ -99,8 +94,6 @@ export default class DocumentSpaceService {
         }
       },
     };
-
-    return datasource;
   }
 
    /**
@@ -143,10 +136,7 @@ export default class DocumentSpaceService {
     return items;
   }
 
-  createFavoritesDocumentsDatasource(
-    documentSpaceId: string,
-    infiniteScrollOptions: InfiniteScrollOptions
-  ): IDatasource {
+  createFavoritesDocumentsDatasource(documentSpaceId: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
     return {
       getRows: async (params: IGetRowsParams) => {
         try {
@@ -156,6 +146,110 @@ export default class DocumentSpaceService {
             await this.documentSpaceApi.getFavorites(documentSpaceId)
           ).data.data;
 
+          let lastRow = -1;
+
+          /**
+           * Last page, calculate the last row
+           */
+          if (data.length === 0 || data.length < limit) {
+            lastRow = page * limit + data.length;
+          }
+
+          params.successCallback(data, lastRow);
+        } catch (err) {
+          params.failCallback();
+
+          /**
+           * Don't error out the state here. If the request fails for some reason, just show nothing.
+           *
+           * Call the success callback as a hack to prevent
+           * ag grid from showing an infinite loading state on failure.
+           */
+          params.successCallback([], 0);
+
+          const requestErr = prepareRequestError(err);
+
+          if (requestErr.status != null) {
+            createFailedDataFetchToast();
+            return;
+          }
+
+          /**
+           * Something else went wrong... the request did not leave
+           */
+          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
+          return;
+        }
+      },
+    };
+  }
+
+  createRecentUploadsForSpaceDatasource(documentSpaceId: string, infiniteScrollOptions: InfiniteScrollOptions): IDatasource {
+    return {
+      getRows: async (params: IGetRowsParams) => {
+        try {
+          const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
+          const page = Math.floor(params.startRow / limit);
+          const data: RecentDocumentDto[] = (await this.documentSpaceApi.getRecentsForSpace(documentSpaceId, undefined, page, limit)).data.data;
+
+          let lastRow = -1;
+
+          /**
+           * Last page, calculate the last row
+           */
+          if (data.length === 0 || data.length < limit) {
+            lastRow = (page * limit) + data.length;
+          }
+
+          params.successCallback(data, lastRow);
+        } catch (err) {
+          params.failCallback();
+
+          /**
+           * Don't error out the state here. If the request fails for some reason, just show nothing.
+           *
+           * Call the success callback as a hack to prevent
+           * ag grid from showing an infinite loading state on failure.
+           */
+          params.successCallback([], 0);
+
+          const requestErr = prepareRequestError(err);
+
+          if (requestErr.status != null) {
+            createFailedDataFetchToast();
+            return;
+          }
+
+          /**
+           * Something else went wrong... the request did not leave
+           */
+          createTextToast(ToastType.ERROR, requestErr.message, { autoClose: false });
+          return;
+        }
+      }
+    }
+  }
+
+  /**
+   * Creates the ag-grid datasource for the document space search page
+   * @param documentSpaceId the document space id
+   * @param infiniteScrollOptions scrolling settings
+   * @param searchString the search query    
+   * @returns datasource
+   */
+  createSearchDatasource(documentSpaceId: string, infiniteScrollOptions: InfiniteScrollOptions, searchString: string|undefined): IDatasource {
+    return {
+      getRows: async (params: IGetRowsParams) => {
+        try {
+          const limit = generateInfiniteScrollLimit(infiniteScrollOptions);
+          const page = Math.floor(params.startRow / limit);
+          let data: DocumentMobileDto[];
+          if (!!searchString) {
+            data = (await this.documentSpaceApi.searchDocumentSpace(documentSpaceId, { query: searchString }, page, limit)).data.data;
+          } else {
+            data = [];
+          }
+          
           let lastRow = -1;
 
           /**
@@ -483,15 +577,6 @@ export default class DocumentSpaceService {
       return Promise.resolve();
     }
     catch (error) {
-      return Promise.reject(prepareRequestError(error).message);
-    }
-  }
-
-  async getRecentUploadsForSpace(spaceId: string): Promise<RecentDocumentDto[]> {
-    try {
-      // leave date undefined to let the server use current date/time
-      return (await this.documentSpaceApi.getRecentsForSpace(spaceId, undefined, 0, 10)).data.data;
-    } catch (error) {
       return Promise.reject(prepareRequestError(error).message);
     }
   }

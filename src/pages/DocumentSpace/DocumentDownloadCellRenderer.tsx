@@ -8,7 +8,14 @@ function DocumentDownloadCellRenderer(props: Partial<ICellRendererParams>) {
 
   const path = props.node?.data?.path;
   const fileKey = props.node?.data?.key;
-  const space = props.node?.data?.spaceId;
+  let space = props.node?.data?.spaceId;
+
+  // if we didn't get spaceId then perhaps its a RecentDocumentDto, in which
+  //  case we need to look in a different place
+  if (!!!space) {
+    space = props.node?.data?.documentSpace?.id;
+  }
+  
   const isFolder = props.node?.data?.folder;
 
   return (

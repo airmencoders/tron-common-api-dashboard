@@ -1,238 +1,65 @@
-import { Downgraded, none, State, useHookstate } from '@hookstate/core';
-import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
+import { useHookstate } from '@hookstate/core';
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import BreadCrumbTrail from '../../components/BreadCrumbTrail/BreadCrumbTrail';
 import Button from '../../components/Button/Button';
-import DocSpaceItemRenderer from '../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
-import DocumentRowActionCellRenderer, { PopupMenuItem } from '../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
-import DocumentSpaceActions from '../../components/documentspace/Actions/DocumentSpaceActions';
 import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
+import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
 import FormGroup from '../../components/forms/FormGroup/FormGroup';
-import FullPageInfiniteGrid from "../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
-import GridColumn from '../../components/Grid/GridColumn';
-import { generateInfiniteScrollLimit } from '../../components/Grid/GridUtils/grid-utils';
+import InfoNotice from '../../components/InfoNotice/InfoNotice';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
+import TabBar from '../../components/TabBar/TabBar';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
-import { DeviceSize, useDeviceInfo } from '../../hooks/PageResizeHook';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
-import CircleMinusIcon from '../../icons/CircleMinusIcon';
-import DownloadMaterialIcon from '../../icons/DownloadMaterialIcon';
-import EditIcon from '../../icons/EditIcon';
-import StarHollowIcon from '../../icons/StarHollowIcon';
-import StarIcon from '../../icons/StarIcon';
 import UserIcon from "../../icons/UserIcon";
 import UserIconCircle from "../../icons/UserIconCircle";
 import {
-  DocumentDto,
   DocumentSpacePrivilegeDtoTypeEnum,
-  DocumentSpaceRequestDto,
+  DocumentSpaceRequestDto
 } from '../../openapi';
 import { useAuthorizedUserState } from '../../state/authorized-user/authorized-user-state';
 import { FormActionType } from '../../state/crud-page/form-action-type';
 import {
-  clipBoardState,
-  documentSpaceDownloadUrlService,
-  useDocumentSpacePageState,
+  clipBoardState, useDocumentSpacePageState,
   useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../state/document-space/document-space-state';
-import {CreateEditOperationType, getCreateEditTitle } from '../../state/document-space/document-space-utils';
-import { formatDocumentSpaceDate } from '../../utils/date-utils';
+import { CreateEditOperationType, getCreateEditTitle } from '../../utils/document-space-utils';
 import { prepareRequestError } from '../../utils/ErrorHandling/error-handling-utils';
-import { formatBytesToString, joinPathParts } from '../../utils/file-utils';
-import DocumentDownloadCellRenderer from './DocumentDownloadCellRenderer';
+import MyFilesAndFolders from './DocSpacePageComponents/MyFilesAndFolders';
+import RecentSpaceActivity from './DocSpacePageComponents/RecentSpaceActivity';
+import SearchSpace from './DocSpacePageComponents/SearchSpace';
 import DocumentSpaceCreateEditForm from './DocumentSpaceCreateEditForm';
 import DocumentSpaceEditForm from './DocumentSpaceEditForm';
 import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
-import DocumentSpaceSelector, { pathQueryKey, spaceIdQueryKey } from "./DocumentSpaceSelector";
-import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
-import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
+import DocumentSpaceSelector from "./DocumentSpaceSelector";
 import FolderSizeDialog from './FolderSizeDialog';
-import InfoIcon from '../../icons/InfoIcon';
-import CopyContentIcon from '../../icons/CopyContentIcon';
-import CutIcon from '../../icons/CutIcon';
-import InfoNotice from '../../components/InfoNotice/InfoNotice';
-import RecentDocumentTile from '../../components/RecentDocumentTile/RecentDocumentTile';
-import FileIcon from '../../icons/FileIcon';
-import RecentsBar from './RecentSpaceUploadsBar/RecentsBar';
+import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
+
+export enum DocumentPageTabsEnum {
+  FILES_AND_FOLDERS=0,
+  RECENT_ACTIVITY=1,
+  SEARCH=2,
+}
+
+export interface DocumentSpacePageProps {
+  selectedTab?: DocumentPageTabsEnum
+}
 
 function DocumentSpacePage() {
   const location = useLocation();
   const history = useHistory();
-
-  const mountedRef = useRef(false);
-
-  const pageService = useDocumentSpacePageState(mountedRef);
   const localClipboardState = useHookstate(clipBoardState);
+  const mountedRef = useRef(false);
+  const pageService = useDocumentSpacePageState(mountedRef);  
   const documentSpaceService = useDocumentSpaceState();
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
-  const downloadUrlService = documentSpaceDownloadUrlService();
   const authorizedUserService = useAuthorizedUserState();
-
   const isAdmin = pageService.isAdmin();
-
-  const deviceInfo = useDeviceInfo();
-
-  const documentDtoColumns = useHookstate<GridColumn[]>([
-    new GridColumn({
-      field: 'key',
-      headerName: 'Name',
-      resizable: true,
-      sortable: true,
-      sort: 'asc',
-      sortingOrder: ['asc', 'desc'],
-      cellRenderer: DocSpaceItemRenderer,
-      checkboxSelection: true,
-      initialWidth: 400,
-      cellRendererParams: {
-        onClick: (folder: string) => {
-          const newPath = pageService.state.get().path + '/' + folder;
-          const queryParams = new URLSearchParams(location.search);
-          queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
-          queryParams.set(pathQueryKey, newPath);
-          history.push({ search: queryParams.toString() });
-        },
-        isFavorited: (document: DocumentDto) => {
-          return pageService.getFavoritesShouldShow.bind(pageService, document, false)();
-        }
-      }
-    }),
-    new GridColumn({
-      field: 'lastModifiedDate',
-      headerName: 'Last Modified',
-      sortable: true,
-      sortingOrder: ['asc', 'desc'],
-      resizable: true,
-      initialWidth: 250,
-      valueGetter: function (params: ValueGetterParams) {
-        if (params.data != null) {
-          return new Date(params.data.lastModifiedDate);  // return value as a JS Date that ag-grid likes for sorting
-        }
-      },
-      valueFormatter: function (params: ValueFormatterParams) {
-        if (params.value) {
-          return formatDocumentSpaceDate(params.value);
-        }
-      }
-    }),
-    new GridColumn({
-      field: 'lastModifiedBy',
-      headerName: 'Last Modified By',
-      resizable: true,
-    }),
-    new GridColumn({
-      field: 'size',
-      headerName: 'Size',
-      resizable: true,
-      valueFormatter: function (params: ValueFormatterParams) {
-        if (params.value != null) {
-          return params.value ? formatBytesToString(params.value) : '';
-        }
-      }
-    }),
-    new GridColumn({
-      valueGetter: GridColumn.defaultValueGetter,
-      headerName: 'Download',
-      headerClass: 'header-center',
-      resizable: true,
-      cellRenderer: DocumentDownloadCellRenderer
-    }),
-    new GridColumn({
-      valueGetter: GridColumn.defaultValueGetter,
-      headerName: 'More',
-      headerClass: 'header-center',
-      cellRenderer: DocumentRowActionCellRenderer,
-      cellRendererParams: {
-        menuItems: [
-          {
-            title: 'Add to favorites',
-            icon: StarIcon,
-            shouldShow: (doc: DocumentDto) => pageService.getFavoritesShouldShow.bind(pageService, doc, true)(),
-            isAuthorized: () => true,
-            onClick: pageService.addToFavorites.bind(pageService),
-          },
-          {
-            title: 'Remove from favorites',
-            icon: StarHollowIcon,
-            iconProps: {
-              size: 1.1
-            },
-            shouldShow: (doc: DocumentDto) => pageService.getFavoritesShouldShow.bind(pageService, doc, false)(),
-            isAuthorized: () => true,
-            onClick: pageService.removeFromFavorites.bind(pageService),
-          },
-          {
-            title: 'Remove',
-            icon: CircleMinusIcon,
-            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
-          },
-          {
-            title: 'Rename Folder',
-            icon: EditIcon,
-            shouldShow: (doc: DocumentDto) => doc && doc.folder,
-            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => pageService.mergeState({
-              selectedFile: doc,
-              createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME,
-            })
-          },
-          {
-            title: 'Get Folder Size',
-            icon: InfoIcon,
-            shouldShow: (doc: DocumentDto) => doc && doc.folder,
-            isAuthorized: () => true,
-            onClick: (doc: DocumentDto) => {
-              pageService.mergeState({ selectedItemForSize: doc, showFolderSizeDialog: true })
-            }
-          },
-          {
-            title: 'Rename File',
-            icon: EditIcon,
-            shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => pageService.mergeState({
-              selectedFile: doc,
-              createEditElementOpType: CreateEditOperationType.EDIT_FILENAME,
-            })
-          },
-          {
-            title: 'Cut',
-            icon: CutIcon,
-            shouldShow: () => true,
-            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => {
-              localClipboardState.set({
-                sourceSpace: doc.spaceId,
-                isCopy: false,
-                items: [ joinPathParts(doc.path, doc.key) ]
-              });
-              createTextToast(ToastType.SUCCESS, 'Items selected for CUT');
-            }
-          },
-          {
-            title: 'Copy',
-            icon: CopyContentIcon,
-            shouldShow: () => true,
-            isAuthorized: (doc: DocumentDto) => doc != null && documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId, DocumentSpacePrivilegeDtoTypeEnum.Write),
-            onClick: (doc: DocumentDto) => {
-              localClipboardState.set({
-                sourceSpace: doc.spaceId,
-                isCopy: true,
-                items: [ joinPathParts(doc.path, doc.key) ]
-              });
-              createTextToast(ToastType.SUCCESS, 'Items selected for COPY');
-            }
-          }
-        ] as PopupMenuItem<DocumentDto>[],
-      },
-    })
-  ]);
+  const selectedTab = useHookstate<DocumentPageTabsEnum>(DocumentPageTabsEnum.FILES_AND_FOLDERS);  
 
   async function fetchSpaces() {
     try {
@@ -290,60 +117,6 @@ function DocumentSpacePage() {
     pageService.loadDocSpaceFromLocation(location.search, ()=> pageService.state.spaceNotFound.set(true));
   }, [location.search]);
 
-  function conditionalMenuDownloadOnClick (doc: DocumentDto) {
-    if(doc.folder && !doc.hasContents){
-      createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents')
-    }else{
-      window.location.href = downloadUrlService.createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc])
-    }
-  }
-  // Handle hiding columns on resize
-  useEffect(() => {
-    const hideableColumns = documentDtoColumns.filter(column => column.field.value !== 'key' && column.field.value !== 'lastModifiedDate' && column.headerName.value !== 'More');
-    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.TABLET) {
-      hideableColumns.forEach(column => {
-        if (!column.hide.value) {
-          column.hide.set(true)
-        }
-      });
-
-      // Get the "More" actions column
-      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
-
-      // Check if "Download" action already exists
-      const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>);
-      const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
-
-      if (downloadAction == null) {
-        cellRendererParams.set(state => {
-          state.menuItems.splice(0, 0, {
-            title: 'Download',
-            icon: DownloadMaterialIcon,
-            iconProps: {
-              style: 'primary',
-              fill: true
-            },
-            shouldShow: (doc: DocumentDto) => doc != null,
-            isAuthorized: () => true,
-            onClick: conditionalMenuDownloadOnClick
-          });
-
-          return state;
-        });
-      }
-    } else {
-      hideableColumns.forEach(column => {
-        if (column.hide.value) {
-          column.hide.set(false)
-        }
-      });
-
-      // Remove Download from "More" actions cell renderer
-      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
-      (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>).menuItems.find(menuItem => menuItem.title.value === 'Download')?.set(none);
-    }
-  }, [deviceInfo.isMobile, deviceInfo.deviceBySize]);
-
   async function handleDocumentSpaceCreation(space: DocumentSpaceRequestDto) {
     try {
       const createdSpace = await pageService.submitDocumentSpace(space);
@@ -355,10 +128,8 @@ function DocumentSpacePage() {
     }
   }
 
-  const isDocumentSpacesLoading =
-    documentSpaceService.isDocumentSpacesStatePromised;
-  const isDocumentSpacesErrored =
-    documentSpaceService.isDocumentSpacesStateErrored;
+  const isDocumentSpacesLoading = documentSpaceService.isDocumentSpacesStatePromised;
+  const isDocumentSpacesErrored = documentSpaceService.isDocumentSpacesStateErrored;
 
   return (
     <PageFormat pageTitle="Document Space" className="document-space-page">
@@ -419,59 +190,39 @@ function DocumentSpacePage() {
           </div>
         </div>
       </FormGroup>
-      <RecentsBar recents={pageService.state.recentUploads.get()} />
-      {pageService.state.selectedSpace.value != null &&
-        pageService.state.datasource.value &&
-        documentSpacePrivilegesService.isAuthorizedForAction(
-          pageService.state.selectedSpace.value.id,
-          DocumentSpacePrivilegeDtoTypeEnum.Read
-        ) && (
-          <div className="breadcrumb-area">
-            <BreadCrumbTrail
-              path={pageService.state.get().path}
-              onNavigate={(newPath) => {
-                const queryParams = new URLSearchParams(location.search);
-                queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
-                if (newPath !== '') {
-                  queryParams.set(pathQueryKey, newPath);
-                } else {
-                  queryParams.delete(pathQueryKey);
-                }
-                history.push({ search: queryParams.toString() });
-              }}
-            />
-            <DocumentSpaceActions
-              show={pageService.state.selectedSpace.value != null && !documentSpacePrivilegesService.isPromised}
-              isMobile={deviceInfo.deviceBySize <= DeviceSize.TABLET || deviceInfo.isMobile}
-              selectedSpace={pageService.state.selectedSpace}
-              path={pageService.state.nested('path')}
-              shouldUpdateDatasource={pageService.state.shouldUpdateDatasource}
-              createEditElementOpType={pageService.state.createEditElementOpType}
-              membershipsState={pageService.state.membershipsState}
-              selectedFiles={pageService.state.selectedFiles}
-              showDeleteSelectedDialog={pageService.state.showDeleteSelectedDialog}
-              className="content-controls"
-              documentPageService={pageService}
-            />
-          </div>
-        )}
-      {pageService.state.selectedSpace.value != null && pageService.state.datasource.ornull && (
-        <FullPageInfiniteGrid
-          columns={documentDtoColumns.attach(Downgraded).value}
-          datasource={{ ...pageService.state.datasource.ornull.attach(Downgraded).value }}
-          cacheBlockSize={generateInfiniteScrollLimit(pageService.infiniteScrollOptions)}
-          maxBlocksInCache={pageService.infiniteScrollOptions.maxBlocksInCache}
-          maxConcurrentDatasourceRequests={pageService.infiniteScrollOptions.maxConcurrentDatasourceRequests}
-          suppressCellSelection
-          updateDatasource={pageService.state.shouldUpdateDatasource.value}
-          updateDatasourceCallback={pageService.onDatasourceUpdateCallback.bind(pageService)}
-          getRowNodeId={pageService.getDocumentUniqueKey.bind(pageService)}
-          onRowSelected={pageService.onDocumentRowSelected.bind(pageService)}
-          rowSelection="multiple"
-          suppressRowClickSelection
-          autoResizeColumns
-        />
-      )}
+      <TabBar
+        selectedIndex={selectedTab.value}
+        items={[
+          {
+            text: 'Browse',
+            onClick: () => {
+              selectedTab.set(DocumentPageTabsEnum.FILES_AND_FOLDERS);
+            },
+            content: <MyFilesAndFolders 
+              pageService={pageService} 
+            />,
+          },
+          {
+            text: "Recent Activity",
+            content: <RecentSpaceActivity 
+              pageService={pageService} 
+            />,
+            onClick: () => { 
+              selectedTab.set(DocumentPageTabsEnum.RECENT_ACTIVITY);
+            }
+          },
+          {
+            text: "Search",
+            content: <SearchSpace 
+              pageService={pageService} 
+            />,
+            onClick: () => { 
+              selectedTab.set(DocumentPageTabsEnum.SEARCH);
+            }
+          }
+        ]}
+      />
+
       <SpaceNotFoundDialog
         shouldShow={pageService.state.spaceNotFound.value}
         onHide={() => {
@@ -499,6 +250,7 @@ function DocumentSpacePage() {
           />
         )}
       </SideDrawer>
+
       <SideDrawer
         isLoading={false}
         title={getCreateEditTitle(pageService.state.createEditElementOpType.get())}
@@ -525,6 +277,7 @@ function DocumentSpacePage() {
           />
         )}
       </SideDrawer>
+
       {pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value ? null : (
         <SideDrawer
           isLoading={false}

@@ -12,7 +12,7 @@ import RemoveIcon from '../../../../icons/RemoveIcon';
 import UploadMaterialIcon from '../../../../icons/UploadMaterialIcon';
 import { DocumentSpacePrivilegeDtoTypeEnum } from '../../../../openapi';
 import { clipBoardState, ClipBoardState, documentSpaceDownloadUrlService, useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
-import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
+import { CreateEditOperationType } from '../../../../utils/document-space-utils';
 import Button from '../../../Button/Button';
 import DropDown from '../../../DropDown/DropDown';
 import FileUpload from '../../FileUpload/FileUpload';

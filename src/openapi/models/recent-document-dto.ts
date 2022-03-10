@@ -50,6 +50,12 @@ export interface RecentDocumentDto {
      * @type {string}
      * @memberof RecentDocumentDto
      */
+    path: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecentDocumentDto
+     */
     lastModifiedDate: string;
     /**
      * 

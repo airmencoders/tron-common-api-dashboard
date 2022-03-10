@@ -1,6 +1,10 @@
 @import "../../styles/base";
 @import "~uswds/dist/scss/components/accordions";
 
+.usa-accordion__content {
+  overflow: hidden;
+}
+
 .accordion {
   &__item {
     margin-bottom: 1rem;

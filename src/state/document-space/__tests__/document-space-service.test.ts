@@ -1,9 +1,11 @@
-import {createState, State} from '@hookstate/core';
-import {AxiosResponse} from 'axios';
-import {InfiniteScrollOptions} from '../../../components/DataCrudFormPage/infinite-scroll-options';
-import {generateInfiniteScrollLimit} from '../../../components/Grid/GridUtils/grid-utils';
+import { createState, State } from '@hookstate/core';
+import { AxiosResponse } from 'axios';
+import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
+import { generateInfiniteScrollLimit } from '../../../components/Grid/GridUtils/grid-utils';
 import {
   DocumentDto,
+  DocumentMobileDto,
+  DocumentMobileDtoResponseWrapper,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
   DocumentSpaceFolderInfoDto,
@@ -17,17 +19,17 @@ import {
   FilePathSpecWrapper,
   GenericStringArrayResponseWrapper,
   RecentDocumentDto,
+  RecentDocumentDtoResponseWrapper,
   S3PaginationDto
 } from '../../../openapi';
 import * as cancellableDataRequestImp from '../../../utils/cancellable-data-request';
 import {prepareRequestError} from '../../../utils/ErrorHandling/error-handling-utils';
-import RequestError from '../../../utils/ErrorHandling/request-error';
 import {
   createAxiosNoContentResponse,
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse
 } from '../../../utils/TestUtils/test-utils';
-import DocumentSpaceService, {ArchivedStatus} from '../document-space-service';
+import DocumentSpaceService, { ArchivedStatus } from '../document-space-service';
 
 describe('Test Document Space Service', () => {
   const infiniteScrollOptions: InfiniteScrollOptions = {
@@ -113,12 +115,21 @@ describe('Test Document Space Service', () => {
         done(err);
       }
     });
-    const onFail = jest.fn();
-    const datasource = documentSpaceService.createDatasource(
+
+    const onFail = jest.fn(() => {
+      try {
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+
+    let datasource = documentSpaceService.createDatasource(
       spaceName,
       "",
       infiniteScrollOptions
     );
+
     datasource.getRows({
       successCallback: onSuccess,
       failCallback: onFail,
@@ -130,10 +141,32 @@ describe('Test Document Space Service', () => {
     });
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+
+    const apiSpy = documentSpaceApi.dumpContentsAtPath = jest.fn(() => {
+      return Promise.reject();
+    });
+
+    documentSpaceService.createDatasource(
+      spaceName,
+      "",
+      infiniteScrollOptions
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiSpy).toHaveBeenCalled();
   });
 
   it('should create datasource for archived items', (done) => {
-    documentSpaceApi.getAllArchivedFilesForAuthUser = jest.fn(() => {
+    let apiSpy = documentSpaceApi.getAllArchivedFilesForAuthUser = jest.fn(() => {
       return Promise.resolve(listObjectsResponse);
     });
 
@@ -147,13 +180,22 @@ describe('Test Document Space Service', () => {
         done(err);
       }
     });
-    const onFail = jest.fn();
-    const datasource = documentSpaceService.createDatasource(
+
+    const onFail = jest.fn(() => {
+      try {
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+
+    let datasource = documentSpaceService.createDatasource(
       spaceName,
       "",
       infiniteScrollOptions,
       ArchivedStatus.ARCHIVED
     );
+
     datasource.getRows({
       successCallback: onSuccess,
       failCallback: onFail,
@@ -163,6 +205,32 @@ describe('Test Document Space Service', () => {
       filterModel: {},
       context: undefined,
     });
+
+    expect(apiSpy).toHaveBeenCalled();
+    apiSpy.mockReset();
+
+    apiSpy = documentSpaceApi.getAllArchivedFilesForAuthUser = jest.fn(() => {
+      return Promise.reject()
+    });
+
+    datasource = documentSpaceService.createDatasource(
+      spaceName,
+      "",
+      infiniteScrollOptions,
+      ArchivedStatus.ARCHIVED
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiSpy).toHaveBeenCalled();
   });
 
   it('should create datasource and fail on server error response', (done) => {
@@ -450,6 +518,17 @@ describe('Test Document Space Service', () => {
     expect(response.name).toEqual('test');
   });
 
+  it('should allow deletion of a space', async () => {
+    const mock = jest.spyOn(documentSpaceApi, 'deleteSpace').mockReturnValue(
+      Promise.resolve(
+        createAxiosNoContentResponse()
+      )
+    );
+
+    const response = await documentSpaceService.deleteDocumentSpace('test');
+    expect(mock).toHaveBeenCalled();
+  });
+
   it('should allow file deletion by Document Space and Parent', async () => {
     const mock = jest.spyOn(documentSpaceApi, 'deleteFileBySpaceAndParent').mockReturnValue(
       Promise.resolve(
@@ -494,8 +573,7 @@ describe('Test Document Space Service', () => {
   });
 
   it('should create favorites datasource', (done) => {
-    const favoritesList: DocumentSpaceUserCollectionResponseDto[] = [
-      {
+    const favoritesList: DocumentSpaceUserCollectionResponseDto[] = [{
         id: 'id',
         itemId: 'itemId',
         documentSpaceId: 'docSpaceId',
@@ -507,11 +585,11 @@ describe('Test Document Space Service', () => {
         lastActivity: new Date().toISOString(),
       },
     ];
-    const favoritesResponse: AxiosResponse<DocumentSpaceUserCollectionResponseDtoWrapper> = createAxiosSuccessResponse(
-      {
+    const favoritesResponse: AxiosResponse<DocumentSpaceUserCollectionResponseDtoWrapper> = createAxiosSuccessResponse({
         data: favoritesList,
       }
     );
+
     documentSpaceApi.getFavorites = jest.fn(() => {
       return Promise.resolve(favoritesResponse);
     });
@@ -528,8 +606,15 @@ describe('Test Document Space Service', () => {
         done(err);
       }
     });
-    const onFail = jest.fn();
-    const datasource = documentSpaceService.createFavoritesDocumentsDatasource(
+    const onFail = jest.fn(jest.fn(() => {
+      try {
+        done();
+      } catch (err) {
+        done(err);
+      }
+    }));
+
+    let datasource = documentSpaceService.createFavoritesDocumentsDatasource(
       spaceName,
       infiniteScrollOptions
     );
@@ -544,6 +629,190 @@ describe('Test Document Space Service', () => {
     });
 
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+    
+    const badRequestError = createGenericAxiosRequestErrorResponse(500);
+    const apiSpy = documentSpaceApi.getFavorites = jest.fn(() => {
+      return Promise.reject(badRequestError);
+    });
+
+    datasource = documentSpaceService.createFavoritesDocumentsDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiSpy).toHaveBeenCalled();
+  });
+
+  it('should create search datasource', (done) => {
+    const resultsList: DocumentMobileDto[] = [{
+        spaceId: 'docSpaceId',
+        key: 'key',
+        parentId: 'parentId',
+        lastModifiedDate: '',
+        lastModifiedBy: 'santa',
+        path: '',
+        size: 0,
+        folder: true,
+        lastActivity: new Date().toISOString(),
+      },
+    ];
+    const searchResponse: AxiosResponse<DocumentMobileDtoResponseWrapper> = createAxiosSuccessResponse({
+        data: resultsList,
+      }
+    );
+    documentSpaceApi.searchDocumentSpace = jest.fn(() => {
+      return Promise.resolve(searchResponse);
+    });
+
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'searchDocumentSpace');
+
+    const onSuccess = jest.fn((data) => {
+      try {
+        expect(data).toEqual(
+          expect.arrayContaining(searchResponse.data.data)
+        );
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+
+    const onFail = jest.fn(jest.fn(() => {
+      try {
+        done();
+      } catch (err) {
+        done(err);
+      }
+    }));
+
+    let datasource = documentSpaceService.createSearchDatasource(
+      spaceName,
+      infiniteScrollOptions,
+      'test.txt'
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+
+    const apiSpy = documentSpaceApi.searchDocumentSpace = jest.fn(() => {
+      return Promise.reject();
+    });
+
+    datasource = documentSpaceService.createSearchDatasource(
+      spaceName,
+      infiniteScrollOptions,
+      'test.txt'
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiSpy).toHaveBeenCalled();
+  });
+
+  it('should create recent uploads datasource', (done) => {
+    const resultsList: RecentDocumentDto[] = [{
+        id: 'dssd',
+        documentSpace: { id: 'sdfsdf', name: 'sdfsfs'},
+        key: 'key',
+        parentFolderId: 'parentId',
+        path: '',
+        lastModifiedDate: new Date().toISOString(),
+      },
+    ];
+    const recentResponse: AxiosResponse<RecentDocumentDtoResponseWrapper> = createAxiosSuccessResponse({
+        data: resultsList,
+      }
+    );
+
+    documentSpaceApi.getRecentsForSpace = jest.fn(() => {
+      return Promise.resolve(recentResponse);
+    });
+
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getRecentsForSpace');
+
+    const onSuccess = jest.fn((data) => {
+      try {
+        expect(data).toEqual(
+          expect.arrayContaining(recentResponse.data.data)
+        );
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+
+    const onFail = jest.fn(jest.fn(() => {
+      try {
+        done();
+      } catch (err) {
+        done(err);
+      }
+    }));
+
+    let datasource = documentSpaceService.createRecentUploadsForSpaceDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+
+    const apiSpy = documentSpaceApi.getRecentsForSpace = jest.fn(() => {
+      return Promise.reject();
+    });
+
+    datasource = documentSpaceService.createRecentUploadsForSpaceDatasource(
+      spaceName,
+      infiniteScrollOptions
+    );
+
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiSpy).toHaveBeenCalled();
   });
 
 
@@ -708,38 +977,5 @@ describe('Test Document Space Service', () => {
     catch (e) {
       expect(e).toEqual('System down');
     }
-  });
-
-  it('should get most recent uploads for a given space', async () => {
-    jest
-    .spyOn(documentSpaceApi, 'getRecentsForSpace')
-    .mockReturnValue(
-      Promise.resolve(
-        {
-          data: [
-            { id: 'some id',
-              key: 'some file',
-              documentSpace: { name: 'some space', id: 'space id' },
-              lastModifiedDate: new Date().toISOString(),
-              parentFolderId: 'some parent id',
-            } as RecentDocumentDto
-          ]
-        } as AxiosResponse
-      )
-    );
-
-    let response = await documentSpaceService.getRecentUploadsForSpace('some id');
-    expect(response).resolves;
-
-    jest
-      .spyOn(documentSpaceApi, 'getRecentsForSpace')
-      .mockRejectedValue({ reason: 'It Broke', status: 400, message: 'System down', });
-
-    try {
-      response = await documentSpaceService.getRecentUploadsForSpace('some id');
-    }
-    catch (e) {
-      expect(e).toEqual('System down');
-    }
-  });
+  }); 
 });

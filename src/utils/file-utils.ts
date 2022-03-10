@@ -56,6 +56,29 @@ export function reduceDocumentDtoListToUnique(list: DocumentDto[]): UniqueSpaceA
 }
 
 /**
+ * Helper to make sure path starts with a / and does not end with a /
+ * @param path 
+ */
+export function formatPath(path: string): string {
+
+  // if falsey/blank return just a slash
+  if (!!!path) return '/';
+
+  // if already a slash then return just that
+  if (path === '/') return path;
+
+  // must start with slash
+  if (!/^\//.test(path)) {
+    path = '/' + path;
+  }
+
+  // can't end with a slash
+  path = path.replace(/\/$/, '');
+  
+  return path;
+}
+
+/**
  * Helper to concat elements together to form a path suitable for the backend
  * @param items path components
  */

@@ -1,22 +1,23 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import { waitFor } from '@testing-library/dom';
-import { _ } from 'ag-grid-community';
 import axios from 'axios';
-import { flatMap } from 'cypress/types/lodash';
 import { MutableRefObject } from 'react';
+import GridColumn from '../../../../components/Grid/GridColumn';
 import { SideDrawerSize } from '../../../../components/SideDrawer/side-drawer-size';
 import { ToastType } from '../../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../../components/Toast/ToastUtils/ToastUtils';
+import { DeviceSize } from '../../../../hooks/PageResizeHook';
+import StarIcon from '../../../../icons/StarIcon';
 import { DashboardUserControllerApi, DashboardUserDto, DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface, DocumentSpacePrivilegeDtoTypeEnum, DocumentSpaceResponseDto, DocumentSpaceUserCollectionResponseDto } from '../../../../openapi';
 import { pathQueryKey, spaceIdQueryKey } from '../../../../pages/DocumentSpace/DocumentSpaceSelector';
 import AuthorizedUserService from '../../../../state/authorized-user/authorized-user-service';
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../../state/document-space/document-space-service';
 import { CancellableDataRequest } from '../../../../utils/cancellable-data-request';
+import { CreateEditOperationType } from '../../../../utils/document-space-utils';
 import { createGenericAxiosRequestErrorResponse } from '../../../../utils/TestUtils/test-utils';
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../document-space-global-service';
 import { ClipBoardState } from '../../document-space-state';
-import { CreateEditOperationType } from '../../document-space-utils';
 import SpacesPageService from '../spaces-page-service';
 import { SpacesPageState } from '../spaces-page-state';
 
@@ -30,6 +31,7 @@ describe('Spaces Page Service Test', () => {
       spaceId: '1426ed7e-b782-4ee4-80d9-e9f5c8ec2398',
       spaceName: undefined,
       size: 5849936,
+      lastActivity: '2021-12-03T07:44:48.824Z',
       lastModifiedDate: '2021-12-03T07:44:48.824Z',
       lastModifiedBy: 'dnakamoto.ctr@revacomm.com',
       hasContents: false,
@@ -41,6 +43,7 @@ describe('Spaces Page Service Test', () => {
       spaceId: '1426ed7e-b782-4ee4-80d9-e9f5c8ec2322',
       spaceName: undefined,
       size: 123123,
+      lastActivity:  '2021-12-10T07:44:48.824Z',
       lastModifiedDate: '2021-12-10T07:44:48.824Z',
       lastModifiedBy: 'dnakamoto.ctr@revacomm.com',
       hasContents: false,
@@ -54,6 +57,7 @@ describe('Spaces Page Service Test', () => {
       itemId: 'itemId1',
       documentSpaceId: documents[0].spaceId,
       key: documents[0].key,
+      lastActivity: documents[0].lastModifiedDate,
       lastModifiedDate: documents[0].lastModifiedDate,
       folder: documents[0].folder,
       metadata: {},
@@ -128,6 +132,10 @@ describe('Spaces Page Service Test', () => {
       errorMessage: '',
       selectedSpace: undefined,
       shouldUpdateDatasource: false,
+      shouldUpdateRecentsDatasource: false,
+      recentsDatasource: undefined,
+      shouldUpdateSearchDatasource: false,
+      searchDatasource: undefined,
       datasource: undefined,
       showUploadDialog: false,
       showDeleteDialog: false,
@@ -821,8 +829,135 @@ describe('Spaces Page Service Test', () => {
     expect(spacesState.showErrorMessage.value).toEqual(true);
   });
 
-  it('should copy selected files to the clipboard', async () => {
-    
+  describe('search submission', () => {
+    it('should submit search query', () => {
+      spacesService.state.selectedSpace.set({ id: 'some id', name: 'some space' });
+      spacesService.submitSearchQuery('test.txt');
+      expect(spacesState.shouldUpdateSearchDatasource.value).toEqual(true);
+      expect(spacesState.searchDatasource.value).toBeTruthy();
+    });
+    it('should not search query on falsy query', () => {
+      spacesService.submitSearchQuery(undefined);
+      expect(spacesState.shouldUpdateSearchDatasource.value).toEqual(false);
+      expect(spacesState.searchDatasource.value).toBeFalsy();
+
+      spacesService.submitSearchQuery('     ');
+      expect(spacesState.shouldUpdateSearchDatasource.value).toEqual(false);
+      expect(spacesState.searchDatasource.value).toBeFalsy();
+    });
+  });
+
+  describe('should handle screen resizes for ag-grid', () => {
+
+    let columnState = createState<GridColumn[]>([]);
+    beforeEach(() => {
+      columnState = createState<GridColumn[]>([
+        new GridColumn({
+          field: 'key',
+          headerName: 'Name',
+          resizable: true,
+          sortable: true
+        }),
+        new GridColumn({
+          field: 'path',
+          headerName: 'Path',         
+        }),
+        new GridColumn({
+          field: 'lastModifiedDate',
+          headerName: 'Last Modified',          
+        }),
+        new GridColumn({
+          field: 'lastModifiedBy',
+          headerName: 'Last Modified By',
+          resizable: true,
+        }),
+        new GridColumn({
+          field: 'size',          
+        }),
+        new GridColumn({
+          headerName: 'Download',
+        }),
+        new GridColumn({
+          headerName: 'More',
+          cellRendererParams: {
+            menuItems: [
+              {
+                title: 'Add to favorites',
+                icon: StarIcon,
+                shouldShow: (doc: DocumentDto) => spacesService.getFavoritesShouldShow.bind(spacesService, doc, true)(),
+                isAuthorized: () => true,
+                onClick: spacesService.addToFavorites.bind(spacesService),
+              },
+            ]},
+        }),
+      ]);
+    });
+
+    it('should hide all columns save for 2 on mobile', () => {  
+      spacesService.handleColumnsOnResize(columnState, {
+        deviceBySize: DeviceSize.MOBILE,
+        isMobile: true,
+        windowSize: {height: 0, width: 0}
+      });
+
+      expect(columnState.get().filter(item => !item.hide)).toHaveLength(2);
+    });
+
+    it('should hide all columns save for 3 on tablet', () => {
+      spacesService.handleColumnsOnResize(columnState, {
+        deviceBySize: DeviceSize.TABLET,
+        isMobile: true,
+        windowSize: {height: 0, width: 0}
+      });
+
+      expect(columnState.get().filter(item => !item.hide)).toHaveLength(3);
+    });
+
+    it('should hide no columns on WIDE desktop', () => {
+      spacesService.handleColumnsOnResize(columnState, {
+        deviceBySize: DeviceSize.WIDE,
+        isMobile: false,
+        windowSize: {height: 0, width: 0}
+      });
+
+      expect(columnState.get().filter(item => !item.hide)).toHaveLength(columnState.length);
+    });
+  });
+
+  describe('open file tests', () => {
+    it('should refuse to open an empty folder', () => {
+      global.window = Object.create(window);
+      const url = "http://test.mil";
+      Object.defineProperty(window, "location", {
+          value: {
+            href: url
+          },
+          writable: true
+      });
+
+      const dto = {
+        key: 'file5.txt',
+        path: '',
+        spaceId: '1426ed7e-b782-4ee4-80d9-e9f5c8ec2398',
+        spaceName: undefined,
+        size: 5849936,
+        lastActivity: '2021-12-03T07:44:48.824Z',
+        lastModifiedDate: '2021-12-03T07:44:48.824Z',
+        lastModifiedBy: 'dnakamoto.ctr@revacomm.com',
+        hasContents: false,
+        folder: true
+      };
+
+      // assert that the download never happened
+      spacesService.conditionalMenuDownloadOnClick(dto);
+      expect(window.location.href).toEqual(url);
+
+      // assert download happens
+      dto.hasContents = true;
+      spacesService.conditionalMenuDownloadOnClick(dto);
+      expect(window.location.href).not.toEqual(url);
+    });
+
   });
 
   it('should reset state', () => {
@@ -833,6 +968,10 @@ describe('Spaces Page Service Test', () => {
       errorMessage: 'some msg',
       selectedSpace: undefined,
       shouldUpdateDatasource: true,
+      shouldUpdateRecentsDatasource: false,
+      recentsDatasource: undefined,
+      shouldUpdateSearchDatasource: false,
+      searchDatasource: undefined,
       datasource: undefined,
       showUploadDialog: true,
       showDeleteDialog: true,
@@ -868,13 +1007,16 @@ describe('Spaces Page Service Test', () => {
       errorMessage: '',
       selectedSpace: undefined,
       shouldUpdateDatasource: false,
+      shouldUpdateRecentsDatasource: false,
+      recentsDatasource: undefined,
+      shouldUpdateSearchDatasource: false,
+      searchDatasource: undefined,
       datasource: undefined,
       showUploadDialog: false,
       showDeleteDialog: false,
       fileToDelete: '',
       selectedFile: undefined,
       selectedFiles: [],
-      recentUploads: [],
       membershipsState: {
         isOpen: false
       },

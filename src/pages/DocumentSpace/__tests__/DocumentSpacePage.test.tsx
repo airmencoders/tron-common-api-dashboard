@@ -20,11 +20,11 @@ import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../s
 import DocumentSpacePrivilegeService from '../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
 import { ClipBoardState, documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
-import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
 import DocumentSpaceMembershipService from '../../../state/document-space/memberships/document-space-membership-service';
 import SpacesPageService from '../../../state/document-space/spaces-page/spaces-page-service';
 import { SpacesPageState } from '../../../state/document-space/spaces-page/spaces-page-state';
 import { CancellableDataRequest } from '../../../utils/cancellable-data-request';
+import { CreateEditOperationType } from '../../../utils/document-space-utils';
 import { createAxiosSuccessResponse, createGenericAxiosRequestErrorResponse } from '../../../utils/TestUtils/test-utils';
 import DocumentSpacePage from '../DocumentSpacePage';
 
@@ -100,12 +100,15 @@ describe('Test Document Space Page', () => {
       selectedSpace: undefined,
       shouldUpdateDatasource: false,
       datasource: undefined,
+      shouldUpdateRecentsDatasource: false,
+      recentsDatasource: undefined,
+      shouldUpdateSearchDatasource: false,
+      searchDatasource: undefined,
       showUploadDialog: false,
       showDeleteDialog: false,
       fileToDelete: '',
       selectedFile: undefined,
       selectedFiles: [],
-      recentUploads: [],
       membershipsState: {
         isOpen: false
       },
@@ -146,7 +149,6 @@ describe('Test Document Space Page', () => {
     fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
-    jest.spyOn(documentSpaceService, 'getRecentUploadsForSpace').mockImplementation(() => Promise.resolve([]));
   }
 
   afterEach(() => {
