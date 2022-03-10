@@ -12,6 +12,7 @@ import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
 import {
   DocumentDto,
   DocumentSpacePathItemsDto,
+  DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
@@ -47,25 +48,23 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     super(spacesState);
   }
 
-  get infiniteScrollOptions(): InfiniteScrollOptions {
+  private scrollOptions(): InfiniteScrollOptions {
     return {
       enabled: true,
       limit: 100,
     };
   }
 
+  get infiniteScrollOptions(): InfiniteScrollOptions {
+    return this.scrollOptions();
+  }
+
   get recentUploadsScrollOptions(): InfiniteScrollOptions {
-    return {
-      enabled: true,
-      limit: 100,
-    }
+    return this.scrollOptions();
   }
 
   get searchScrollOptions(): InfiniteScrollOptions {
-    return {
-      enabled: true,
-      limit: 100,
-    }
+    return this.scrollOptions();
   }
 
   isAdmin() {
@@ -276,6 +275,12 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
   getDocumentUniqueKey(data: DocumentDto): string {
     return data.path + '__' + data.key;
+  }
+
+  userIsAuthorizedForWriteInSpace(doc: DocumentDto): boolean {
+    return doc != null && this.documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId,
+      DocumentSpacePrivilegeDtoTypeEnum.Write
+    );
   }
 
   onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {

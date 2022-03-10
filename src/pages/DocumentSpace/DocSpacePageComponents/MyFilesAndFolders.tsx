@@ -32,6 +32,14 @@ export interface MyFilesAndFoldersProps {
   pageService: SpacesPageService;
 }
 
+export function formatAgGridDateCell(params: ValueFormatterParams): string {
+  if (params.value) {
+    return formatDocumentSpaceDate(params.value);
+  }
+
+  return "";
+}
+
 /**
  * This component basically just helps declutter an otherwise overly-bloated DocumentSpacePage
  * component... it specifically houses the regular, document/folder browsing grid and logic
@@ -73,11 +81,7 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
       headerName: 'Last Uploaded',
       resizable: true,
       initialWidth: 250,
-      valueFormatter: function (params: ValueFormatterParams) {
-        if (params.value) {
-          return formatDocumentSpaceDate(params.value);
-        }
-      },
+      valueFormatter: formatAgGridDateCell,
     }), 
     new GridColumn({
       field: 'lastModifiedDate',
@@ -91,11 +95,7 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
           return new Date(params.data.lastModifiedDate); // return value as a JS Date that ag-grid likes for sorting
         }
       },
-      valueFormatter: function (params: ValueFormatterParams) {
-        if (params.value) {
-          return formatDocumentSpaceDate(params.value);
-        }
-      },
+      valueFormatter: formatAgGridDateCell,
     }),
     new GridColumn({
       field: 'lastModifiedBy',
@@ -146,24 +146,14 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
           {
             title: 'Remove',
             icon: CircleMinusIcon,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
           },
           {
             title: 'Rename Folder',
             icon: EditIcon,
             shouldShow: (doc: DocumentDto) => doc && doc.folder,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) =>
               pageService.mergeState({
                 selectedFile: doc,
@@ -183,12 +173,7 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
             title: 'Rename File',
             icon: EditIcon,
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) =>
               pageService.mergeState({
                 selectedFile: doc,
@@ -199,12 +184,7 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
             title: 'Cut',
             icon: CutIcon,
             shouldShow: () => true,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) => {
               localClipboardState.set({
                 sourceSpace: doc.spaceId,
@@ -218,12 +198,7 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
             title: 'Copy',
             icon: CopyContentIcon,
             shouldShow: () => true,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) => {
               localClipboardState.set({
                 sourceSpace: doc.spaceId,

@@ -134,24 +134,14 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
           {
             title: 'Remove',
             icon: CircleMinusIcon,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
           },
           {
             title: 'Rename File',
             icon: EditIcon,
             shouldShow: (doc: DocumentDto) => doc && !doc.folder,
-            isAuthorized: (doc: DocumentDto) =>
-              doc != null &&
-              documentSpacePrivilegesService.isAuthorizedForAction(
-                doc.spaceId,
-                DocumentSpacePrivilegeDtoTypeEnum.Write
-              ),
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) =>
               pageService.mergeState({
                 selectedFile: doc,

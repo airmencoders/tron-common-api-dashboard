@@ -40,16 +40,6 @@ import DocumentSpaceSelector from "./DocumentSpaceSelector";
 import FolderSizeDialog from './FolderSizeDialog';
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 
-export enum DocumentPageTabsEnum {
-  FILES_AND_FOLDERS=0,
-  RECENT_ACTIVITY=1,
-  SEARCH=2,
-}
-
-export interface DocumentSpacePageProps {
-  selectedTab?: DocumentPageTabsEnum
-}
-
 function DocumentSpacePage() {
   const location = useLocation();
   const history = useHistory();
@@ -60,7 +50,6 @@ function DocumentSpacePage() {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const authorizedUserService = useAuthorizedUserState();
   const isAdmin = pageService.isAdmin();
-  const selectedTab = useHookstate<DocumentPageTabsEnum>(DocumentPageTabsEnum.FILES_AND_FOLDERS);  
 
   async function fetchSpaces() {
     try {
