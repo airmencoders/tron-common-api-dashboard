@@ -1,7 +1,7 @@
 import { IDatasource } from 'ag-grid-community';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import { DocumentDto, DocumentSpaceResponseDto, DocumentSpaceUserCollectionResponseDto, RecentDocumentDto } from '../../../openapi';
-import { CreateEditOperationType } from '../document-space-utils';
+import { CreateEditOperationType } from '../../../utils/document-space-utils';
 
 export interface SpacesPageState {
   drawerOpen: boolean;
@@ -11,12 +11,15 @@ export interface SpacesPageState {
   selectedSpace?: DocumentSpaceResponseDto;
   shouldUpdateDatasource: boolean;
   datasource?: IDatasource;
+  shouldUpdateRecentsDatasource: boolean;
+  recentsDatasource?: IDatasource;
+  shouldUpdateSearchDatasource: boolean;
+  searchDatasource?: IDatasource;
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
   fileToDelete: string;
   selectedFile?: DocumentDto;
   selectedFiles: DocumentDto[];
-  recentUploads: RecentDocumentDto[];
   membershipsState: {
     isOpen: boolean;
   },

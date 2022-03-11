@@ -3,7 +3,7 @@ import { fireEvent, render } from '@testing-library/react';
 import DocumentSpaceCreateEditForm, { DocumentSpaceCreateEditFormProps } from '../DocumentSpaceCreateEditForm';
 import { MemoryRouter } from 'react-router';
 import { waitFor } from '@testing-library/dom';
-import { CreateEditOperationType } from '../../../state/document-space/document-space-utils';
+import { CreateEditOperationType } from '../../../utils/document-space-utils';
 
 
 describe('Doc Space Create Edit form test', () => {

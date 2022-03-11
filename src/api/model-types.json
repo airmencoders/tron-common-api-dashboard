@@ -971,6 +971,21 @@
       ],
       "type": "object"
     },
+    "DocumentMobileDtoResponseWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentMobileDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "DocumentSpaceArchiveItemsDto": {
       "additionalProperties": false,
       "properties": {
@@ -1252,6 +1267,18 @@
       },
       "required": [
         "data"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceSearchDto": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
       ],
       "type": "object"
     },
@@ -2687,12 +2714,16 @@
         },
         "parentFolderId": {
           "type": "string"
+        },
+        "path": {
+          "type": "string"
         }
       },
       "required": [
         "id",
         "key",
         "parentFolderId",
+        "path",
         "lastModifiedDate",
         "documentSpace"
       ],

@@ -23,12 +23,12 @@ import EditIcon from '../../../icons/EditIcon';
 import { DeviceSize, useDeviceInfo } from '../../../hooks/PageResizeHook';
 import { performActionWhenMounted } from '../../../utils/component-utils';
 import SideDrawer from '../../../components/SideDrawer/SideDrawer';
-import { CreateEditOperationType, getCreateEditTitle } from '../../../state/document-space/document-space-utils';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import DocumentSpaceCreateEditForm from '../DocumentSpaceCreateEditForm';
 import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
 import ArchiveDialog from '../../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import FullPageInfiniteGrid from "../../../components/Grid/FullPageInifiniteGrid/FullPageInfiniteGrid";
+import { CreateEditOperationType, getCreateEditTitle } from '../../../utils/document-space-utils';
 
 const infiniteScrollOptions: InfiniteScrollOptions = {
   enabled: true,

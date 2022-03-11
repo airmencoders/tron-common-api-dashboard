@@ -19,6 +19,8 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { DocumentMobileDtoResponseWrapper } from '../models';
+// @ts-ignore
 import { DocumentSpaceArchiveItemsDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceCreateFolderDto } from '../models';
@@ -42,6 +44,8 @@ import { DocumentSpaceRequestDto } from '../models';
 import { DocumentSpaceResponseDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceResponseDtoResponseWrapper } from '../models';
+// @ts-ignore
+import { DocumentSpaceSearchDto } from '../models';
 // @ts-ignore
 import { DocumentSpaceUnArchiveItemsDto } from '../models';
 // @ts-ignore
@@ -1881,6 +1885,78 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Requester must have at least READ access to provided Space.  Query is case-insensitive and is treated like a filename that \'contains\'...
+         * @summary Search a document space for a filename or part of a filename
+         * @param {string} id Space UUID
+         * @param {DocumentSpaceSearchDto} documentSpaceSearchDto 
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchDocumentSpace: async (id: string, documentSpaceSearchDto: DocumentSpaceSearchDto, page?: number, size?: number, sort?: Array<string>, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling searchDocumentSpace.');
+            }
+            // verify required parameter 'documentSpaceSearchDto' is not null or undefined
+            if (documentSpaceSearchDto === null || documentSpaceSearchDto === undefined) {
+                throw new RequiredError('documentSpaceSearchDto','Required parameter documentSpaceSearchDto was null or undefined when calling searchDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/search`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
+            }
+
+            if (sort) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof documentSpaceSearchDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(documentSpaceSearchDto !== undefined ? documentSpaceSearchDto : {})
+                : (documentSpaceSearchDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Similar to usage of the Unix stat command
          * @summary Get info about a file(s) at given path
          * @param {string} id 
@@ -2589,6 +2665,24 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Requester must have at least READ access to provided Space.  Query is case-insensitive and is treated like a filename that \'contains\'...
+         * @summary Search a document space for a filename or part of a filename
+         * @param {string} id Space UUID
+         * @param {DocumentSpaceSearchDto} documentSpaceSearchDto 
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchDocumentSpace(id: string, documentSpaceSearchDto: DocumentSpaceSearchDto, page?: number, size?: number, sort?: Array<string>, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentMobileDtoResponseWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).searchDocumentSpace(id, documentSpaceSearchDto, page, size, sort, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Similar to usage of the Unix stat command
          * @summary Get info about a file(s) at given path
          * @param {string} id 
@@ -3032,6 +3126,20 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).renameFolder(id, documentSpaceRenameFolderDto, options).then((request) => request(axios, basePath));
         },
         /**
+         * Requester must have at least READ access to provided Space.  Query is case-insensitive and is treated like a filename that \'contains\'...
+         * @summary Search a document space for a filename or part of a filename
+         * @param {string} id Space UUID
+         * @param {DocumentSpaceSearchDto} documentSpaceSearchDto 
+         * @param {number} [page] Zero-based page index (0..N)
+         * @param {number} [size] The size of the page to be returned
+         * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchDocumentSpace(id: string, documentSpaceSearchDto: DocumentSpaceSearchDto, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<DocumentMobileDtoResponseWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).searchDocumentSpace(id, documentSpaceSearchDto, page, size, sort, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Similar to usage of the Unix stat command
          * @summary Get info about a file(s) at given path
          * @param {string} id 
@@ -3461,6 +3569,20 @@ export interface DocumentSpaceControllerApiInterface {
      * @memberof DocumentSpaceControllerApiInterface
      */
     renameFolder(id: string, documentSpaceRenameFolderDto: DocumentSpaceRenameFolderDto, options?: any): AxiosPromise<DocumentSpaceRenameFolderDto>;
+
+    /**
+     * Requester must have at least READ access to provided Space.  Query is case-insensitive and is treated like a filename that \'contains\'...
+     * @summary Search a document space for a filename or part of a filename
+     * @param {string} id Space UUID
+     * @param {DocumentSpaceSearchDto} documentSpaceSearchDto 
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    searchDocumentSpace(id: string, documentSpaceSearchDto: DocumentSpaceSearchDto, page?: number, size?: number, sort?: Array<string>, options?: any): AxiosPromise<DocumentMobileDtoResponseWrapper>;
 
     /**
      * Similar to usage of the Unix stat command
@@ -3961,6 +4083,22 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public renameFolder(id: string, documentSpaceRenameFolderDto: DocumentSpaceRenameFolderDto, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).renameFolder(id, documentSpaceRenameFolderDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Requester must have at least READ access to provided Space.  Query is case-insensitive and is treated like a filename that \'contains\'...
+     * @summary Search a document space for a filename or part of a filename
+     * @param {string} id Space UUID
+     * @param {DocumentSpaceSearchDto} documentSpaceSearchDto 
+     * @param {number} [page] Zero-based page index (0..N)
+     * @param {number} [size] The size of the page to be returned
+     * @param {Array<string>} [sort] Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public searchDocumentSpace(id: string, documentSpaceSearchDto: DocumentSpaceSearchDto, page?: number, size?: number, sort?: Array<string>, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).searchDocumentSpace(id, documentSpaceSearchDto, page, size, sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

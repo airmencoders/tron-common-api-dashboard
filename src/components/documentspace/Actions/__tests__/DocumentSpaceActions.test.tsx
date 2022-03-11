@@ -5,7 +5,7 @@ import { DocumentDto, DocumentSpaceControllerApi, DocumentSpaceControllerApiInte
 import DocumentSpacePrivilegeService from '../../../../state/document-space/document-space-privilege-service';
 import { useDocumentSpacePrivilegesState } from '../../../../state/document-space/document-space-state';
 import DocumentSpaceActions from '../DocumentSpaceActions';
-import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
+import { CreateEditOperationType } from '../../../../utils/document-space-utils';
 
 
 jest.mock('../../../../state/document-space/document-space-state');

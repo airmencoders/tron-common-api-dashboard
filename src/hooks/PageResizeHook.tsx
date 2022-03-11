@@ -10,7 +10,8 @@ export enum DeviceSize {
   UNKNOWN = 0,
   MOBILE = 576,
   TABLET = 768,
-  DESKTOP = 992
+  DESKTOP = 992,
+  WIDE = Infinity,
 }
 
 export interface DeviceInfo {
@@ -71,7 +72,17 @@ export function useDeviceInfo(debounceTime = 100) {
         return;
       }
   
-      if (width > DeviceSize.TABLET) {
+      if (width > DeviceSize.DESKTOP) {
+        setDeviceInfo({
+          deviceBySize: DeviceSize.WIDE,
+          isMobile: isMobile,
+          windowSize: {
+            width,
+            height
+          }
+        });
+      }
+      else if (width > DeviceSize.TABLET) {
         setDeviceInfo({
           deviceBySize: DeviceSize.DESKTOP,
           isMobile: isMobile,

@@ -51,7 +51,8 @@ describe('Document Space Favorites Page Tests', () => {
       key: 'title',
       lastModifiedDate: '',
       folder: false,
-      metadata: {}
+      metadata: {},
+      lastActivity: new Date().toISOString()
     }, 
     {
       id: 'id2',
@@ -61,7 +62,8 @@ describe('Document Space Favorites Page Tests', () => {
       lastModifiedDate: '',
       parentId: 'parentFolderId',
       folder: true,
-      metadata: {}
+      metadata: {},
+      lastActivity: new Date().toISOString()
     },
     {
       id: 'id3',
@@ -71,7 +73,8 @@ describe('Document Space Favorites Page Tests', () => {
       lastModifiedDate: '',
       parentId: 'parentFolderId',
       folder: false,
-      metadata: {}
+      metadata: {},
+      lastActivity: new Date().toISOString()
     },
   ];
 
@@ -134,13 +137,15 @@ describe('Document Space Favorites Page Tests', () => {
     })
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
 
-    const {getByText} = render(
+    const page = render(
       <MemoryRouter>
         <DocumentSpaceFavoritesPage />
       </MemoryRouter>
     );
 
-    await waitFor(() => expect(getByText('Favorite files and folders')).toBeVisible());
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
+    await waitFor(() => expect(page.getByText('Favorite files and folders')).toBeVisible());
   });
 
   it('can list favorites for a space', async () => {
@@ -162,6 +167,9 @@ describe('Document Space Favorites Page Tests', () => {
         <DocumentSpaceFavoritesPage />
       </MemoryRouter>
     );
+
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
 
     await waitFor(() => expect(page.getByTestId('document-space-selector')).toBeInTheDocument());
     await waitFor(() => expect(page.getAllByText('space1')[0]).toBeVisible());

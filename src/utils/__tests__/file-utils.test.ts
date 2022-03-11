@@ -1,5 +1,6 @@
 import { DocumentDto } from '../../openapi';
-import { formatBytesToString, getPathFileName, joinPathParts, reduceDocumentDtoListToUnique } from '../file-utils';
+import { CreateEditOperationType, getCreateEditTitle } from '../document-space-utils';
+import { formatBytesToString, formatPath, getPathFileName, joinPathParts, reduceDocumentDtoListToUnique } from '../file-utils';
 
 describe('File Utils Test', () => {
   it('should return formatted string from number of bytes', () => {
@@ -42,5 +43,19 @@ describe('File Utils Test', () => {
     expect(getPathFileName('/some/docs/file.txt')).toEqual('file.txt');
     expect(getPathFileName('file.txt')).toEqual('file.txt');
     expect(getPathFileName('/file.txt')).toEqual('file.txt');
-  })
+  });
+
+  it('should format a path with a leading slash and no trailing slash', () => {
+    expect(formatPath('')).toEqual('/');
+    expect(formatPath('/')).toEqual('/');
+    expect(formatPath('some/path/')).toEqual('/some/path');
+  });
+
+  it('should resolve a CreateEditOperationType to a readable string', () => {
+    expect(getCreateEditTitle(CreateEditOperationType.CREATE_FOLDER)).toEqual("New Folder");
+    expect(getCreateEditTitle(CreateEditOperationType.EDIT_FOLDERNAME)).toEqual("Edit Folder Name");
+    expect(getCreateEditTitle(CreateEditOperationType.EDIT_FILENAME)).toEqual("Edit File Name");
+    expect(getCreateEditTitle(('blah' as unknown) as CreateEditOperationType)).toEqual("Unknown");
+    
+  });
 });

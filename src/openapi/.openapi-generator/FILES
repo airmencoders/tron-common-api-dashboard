@@ -56,6 +56,7 @@ models/dashboard-user-dto-response-wrapper.ts
 models/dashboard-user-dto.ts
 models/document-dto.ts
 models/document-metadata.ts
+models/document-mobile-dto-response-wrapper.ts
 models/document-mobile-dto.ts
 models/document-space-archive-items-dto.ts
 models/document-space-create-folder-dto.ts
@@ -72,6 +73,7 @@ models/document-space-rename-folder-dto.ts
 models/document-space-request-dto.ts
 models/document-space-response-dto-response-wrapper.ts
 models/document-space-response-dto.ts
+models/document-space-search-dto.ts
 models/document-space-un-archive-items-dto.ts
 models/document-space-user-collection-response-dto-wrapper.ts
 models/document-space-user-collection-response-dto.ts

@@ -1,13 +1,18 @@
 import { none, State } from '@hookstate/core';
 import { MutableRefObject } from 'react';
 import { InfiniteScrollOptions } from '../../../components/DataCrudFormPage/infinite-scroll-options';
+import { PopupMenuItem } from '../../../components/DocumentRowActionCellRenderer/DocumentRowActionCellRenderer';
 import { GridSelectionType } from '../../../components/Grid/grid-selection-type';
+import GridColumn from '../../../components/Grid/GridColumn';
 import { SideDrawerSize } from '../../../components/SideDrawer/side-drawer-size';
 import { ToastType } from '../../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../../components/Toast/ToastUtils/ToastUtils';
+import { DeviceInfo, DeviceSize } from '../../../hooks/PageResizeHook';
+import DownloadMaterialIcon from '../../../icons/DownloadMaterialIcon';
 import {
   DocumentDto,
   DocumentSpacePathItemsDto,
+  DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
   DocumentSpaceUserCollectionResponseDto,
@@ -15,19 +20,22 @@ import {
 } from '../../../openapi';
 import { pathQueryKey, spaceIdQueryKey } from '../../../pages/DocumentSpace/DocumentSpaceSelector';
 import { performActionWhenMounted } from '../../../utils/component-utils';
+import { CreateEditOperationType } from '../../../utils/document-space-utils';
 import { prepareRequestError } from '../../../utils/ErrorHandling/error-handling-utils';
 import { getPathFileName, joinPathParts } from '../../../utils/file-utils';
 import AuthorizedUserService from '../../authorized-user/authorized-user-service';
 import { AbstractGlobalStateService } from '../../global-service/abstract-global-state-service';
 import { PrivilegeType } from '../../privilege/privilege-type';
+import DocumentSpaceDownloadUrlService from '../document-space-download-url-service';
 import DocumentSpaceGlobalService from '../document-space-global-service';
 import DocumentSpacePrivilegeService from '../document-space-privilege-service';
 import DocumentSpaceService from '../document-space-service';
 import { ClipBoardState } from '../document-space-state';
-import { CreateEditOperationType } from '../document-space-utils';
 import { SpacesPageState } from './spaces-page-state';
 
 export default class SpacesPageService extends AbstractGlobalStateService<SpacesPageState> {
+  private downloadService = new DocumentSpaceDownloadUrlService();
+
   constructor(
     public spacesState: State<SpacesPageState>,
     private mountedRef: MutableRefObject<boolean>,
@@ -40,11 +48,23 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     super(spacesState);
   }
 
-  get infiniteScrollOptions(): InfiniteScrollOptions {
+  private scrollOptions(): InfiniteScrollOptions {
     return {
       enabled: true,
       limit: 100,
     };
+  }
+
+  get infiniteScrollOptions(): InfiniteScrollOptions {
+    return this.scrollOptions();
+  }
+
+  get recentUploadsScrollOptions(): InfiniteScrollOptions {
+    return this.scrollOptions();
+  }
+
+  get searchScrollOptions(): InfiniteScrollOptions {
+    return this.scrollOptions();
   }
 
   isAdmin() {
@@ -96,7 +116,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         if (onNoSpaceFound !== undefined) {
           onNoSpaceFound();
         }
-        this.spacesState.spaceNotFound.set(true);
+        this.mergeState({ spaceNotFound: true });
         return;
       }
 
@@ -107,6 +127,96 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       ) {
         this.setStateOnDocumentSpaceAndPathChange(selectedDocumentSpace, path);
       }
+    }
+  }
+
+  // helper to handle the column resizing action - it is bound to the appropriate effect
+  // in the calling functional component - it basically hides everything except the item name and its "more" column
+  // and moves the download action cell into the "more" menu on small screens
+  handleColumnsOnResize(documentDtoColumns: State<GridColumn[]>, deviceInfo: DeviceInfo) {
+    let columnsToKeep: string[];
+    
+    if (deviceInfo.deviceBySize <= DeviceSize.MOBILE) {      
+      columnsToKeep = [ 'key' ];
+    } else if (deviceInfo.deviceBySize <= DeviceSize.DESKTOP) {
+      columnsToKeep = [ 'key', 'lastModifiedDate' ];
+    } else {
+      columnsToKeep = documentDtoColumns.map(column => column.field.value);
+    }
+
+    // sometimes on initial render, if ag-grid isn't up, the width is shown to be 0, which is
+    // invalid, so just don't do anything
+    if (deviceInfo.deviceBySize === 0) return;
+
+    const hideableColumns = documentDtoColumns.filter(column => !columnsToKeep.includes(column.field.value)
+      && column.headerName.value !== 'More');
+
+    if (deviceInfo.isMobile || deviceInfo.deviceBySize <= DeviceSize.DESKTOP) {
+      hideableColumns.forEach(column => {
+        column.hide.set(true)
+      });
+
+      // Get the "More" actions column
+      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
+
+      // Check if "Download" action already exists
+      const cellRendererParams = (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>);
+      const downloadAction = cellRendererParams.menuItems.find(menuItem => menuItem.title.value === 'Download');
+
+      if (downloadAction == null) {
+        cellRendererParams.set(state => {
+          state.menuItems.splice(0, 0, {
+            title: 'Download',
+            icon: DownloadMaterialIcon,
+            iconProps: {
+              style: 'primary',
+              fill: true
+            },
+            shouldShow: (doc: DocumentDto) => doc != null,
+            isAuthorized: () => true,
+            onClick: (doc: DocumentDto) => this.conditionalMenuDownloadOnClick(doc)
+          });
+
+          return state;
+        });
+      }
+    } else {
+      hideableColumns.forEach(column => {
+        column.hide.set(false)
+      });
+
+      // if we're full width, unhide everything in case hideableColumns was empty
+      //  this state can happen on expanding the screen back to wider than desktop
+      if (hideableColumns && hideableColumns.length === 0) {
+        documentDtoColumns.forEach(column => column.hide.set(false));
+      }
+
+      // Remove Download from "More" actions cell renderer
+      const moreActionsColumn = documentDtoColumns.find(column => column.headerName.value === 'More');
+      (moreActionsColumn?.cellRendererParams as State<{ menuItems: PopupMenuItem<DocumentDto>[] }>).menuItems.find(menuItem => menuItem.title.value === 'Download')?.set(none);
+    }
+  }
+
+  // receive the search query and creates a datasource around it to initiate the API call/results
+  submitSearchQuery(query: string | undefined) {
+    if (this.spacesState && this.spacesState.selectedSpace.value != undefined && query) {
+      this.spacesState.merge({
+        shouldUpdateSearchDatasource: true,
+        searchDatasource: this.documentSpaceService.createSearchDatasource(this.spacesState.selectedSpace.value.id, this.searchScrollOptions, query),
+      });
+    }
+  }
+
+  // helper to decide what happens on a download link click - nothing, if its a folder and has no contents...
+  //  note the use of "new DocumentSpaceDownloadUrlService()" here, this is because of some funkiness with calling
+  //  bound functions from a functional component's hook it seems
+  conditionalMenuDownloadOnClick(doc: DocumentDto) {
+    if (doc.folder && !doc.hasContents) {
+      createTextToast(ToastType.WARNING, 'Unable to download a folder with no contents');
+    } else if (doc.folder) {
+      window.location.href = new DocumentSpaceDownloadUrlService().createRelativeFilesDownloadUrl(doc.spaceId, doc.path, [doc]);
+    } else {
+      window.location.href = new DocumentSpaceDownloadUrlService().createRelativeDownloadFileUrl(doc.spaceId, doc.path, doc.key, true);
     }
   }
 
@@ -121,15 +231,16 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       const favorites: DocumentSpaceUserCollectionResponseDto[] = await this.documentSpaceService.getFavorites(
         documentSpace.id
       );
-      const recents: RecentDocumentDto[] = await this.documentSpaceService.getRecentUploadsForSpace(documentSpace.id);
 
-      this.spacesState.merge({
+      this.mergeState({
         selectedSpace: documentSpace,
         shouldUpdateDatasource: true,
+        shouldUpdateRecentsDatasource: true,
         datasource: this.documentSpaceService.createDatasource(documentSpace.id, path, this.infiniteScrollOptions),
+        recentsDatasource: this.documentSpaceService.createRecentUploadsForSpaceDatasource(documentSpace.id, this.recentUploadsScrollOptions),
+        searchDatasource: this.documentSpaceService.createSearchDatasource(documentSpace.id, this.searchScrollOptions, undefined),
         path,
         selectedFiles: [],
-        recentUploads: recents,
         showNoChosenSpace: false,
         favorites,
       });
@@ -146,10 +257,12 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         createTextToast(ToastType.ERROR, 'Could not load privileges for the selected Document Space');
       }
 
-      this.spacesState.merge({
+      this.mergeState({
         selectedSpace: undefined,
         datasource: undefined,
+        recentsDatasource: undefined,
         shouldUpdateDatasource: false,
+        shouldUpdateRecentsDatasource: false,
         showNoChosenSpace: false,
         selectedFiles: [],
       });
@@ -158,6 +271,12 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
   getDocumentUniqueKey(data: DocumentDto): string {
     return data.path + '__' + data.key;
+  }
+
+  userIsAuthorizedForWriteInSpace(doc: DocumentDto): boolean {
+    return doc != null && this.documentSpacePrivilegesService.isAuthorizedForAction(doc.spaceId,
+      DocumentSpacePrivilegeDtoTypeEnum.Write
+    );
   }
 
   onDocumentRowSelected(data: DocumentDto, selectionEvent: GridSelectionType) {
@@ -229,6 +348,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
+              shouldUpdateRecentsDatasource: true,
               selectedFile: undefined,
             });
             createTextToast(ToastType.SUCCESS, 'Folder renamed');
@@ -244,6 +364,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
+              shouldUpdateRecentsDatasource: true,
             });
             createTextToast(ToastType.SUCCESS, 'Folder created');
           })
@@ -266,6 +387,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               isSubmitting: false,
               showErrorMessage: false,
               shouldUpdateDatasource: true,
+              shouldUpdateRecentsDatasource: true,
               selectedFile: undefined,
             });
             createTextToast(ToastType.SUCCESS, 'File renamed');
@@ -347,6 +469,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   setStateOnArchive() {
     this.spacesState.merge((state) => {
       state.shouldUpdateDatasource = true;
+      state.shouldUpdateRecentsDatasource = true;
       state.datasource = this.documentSpaceService.createDatasource(
         this.spacesState.get().selectedSpace?.id ?? '',
         this.spacesState.get().path,
@@ -420,6 +543,18 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     });
   }
 
+  onRecentsDatasourceUpdateCallback() {
+    this.mergeState({
+      shouldUpdateRecentsDatasource: false,
+    });
+  }
+
+  onSearchDatasourceUpdateCallback() {
+    this.mergeState({
+      shouldUpdateSearchDatasource: false,
+    });
+  }
+
   setPageStateOnException(message: string) {
     this.mergeState({
       isSubmitting: false,
@@ -474,7 +609,8 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         createTextToast(ToastType.ERROR, e as string);
       } finally {
         this.documentSpaceClipboardState.set(undefined);
-        this.mergeState({ shouldUpdateDatasource: true });
+        this.mergeState({ shouldUpdateDatasource: true, 
+          shouldUpdateRecentsDatasource: true });
       }
     } else {
       createTextToast(ToastType.WARNING, 'Nothing to paste!');
@@ -490,6 +626,10 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       selectedSpace: undefined,
       shouldUpdateDatasource: false,
       datasource: undefined,
+      shouldUpdateRecentsDatasource: false,
+      recentsDatasource: undefined,
+      shouldUpdateSearchDatasource: false,
+      searchDatasource: undefined,
       showUploadDialog: false,
       showDeleteDialog: false,
       fileToDelete: '',
@@ -504,7 +644,6 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       isDefaultDocumentSpaceSettingsOpen: false,
       sideDrawerSize: SideDrawerSize.WIDE,
       favorites: [],
-      recentUploads: [],
       spaceNotFound: false,
       showNoChosenSpace: false,
       showFolderSizeDialog: false,

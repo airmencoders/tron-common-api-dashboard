@@ -9,9 +9,9 @@ import SubmitActions from '../../components/forms/SubmitActions/SubmitActions';
 import SuccessErrorMessage from '../../components/forms/SuccessErrorMessage/SuccessErrorMessage';
 import TextInput from '../../components/forms/TextInput/TextInput';
 import { FormActionType } from '../../state/crud-page/form-action-type';
-import { CreateEditOperationType } from '../../state/document-space/document-space-utils';
 import { validateFolderName } from '../../utils/validation-utils';
 import InfoNotice from '../../components/InfoNotice/InfoNotice';
+import { CreateEditOperationType } from '../../utils/document-space-utils';
 
 export interface DocumentSpaceCreateEditFormProps {
   opType: CreateEditOperationType;

@@ -1,19 +1,23 @@
+import { DocumentSpaceResponseDto } from '../../../src/openapi';
 import { documentSpaceApiBase } from '../../support';
 import AgGridFunctions, { FavoritesGridColId, SpacesGridColId } from '../../support/ag-grid-functions';
 import Funcs, { MoreActionsType, OverwriteAction } from '../../support/document-space-functions';
 import UtilityFunctions from '../../support/utility-functions';
 
 describe('Document Space File Upload test', () => {
+  const space = '@space';
   const spaceIdAlias = '@spaceId';
 
   beforeEach(() => {
-    Funcs.createOrReturnExistingDocumentSpace().as('spaceId');
-
-    // Go to the cypress e2e document space 
-    cy.get<string>(spaceIdAlias)
-      .then((cypressSpaceId) =>
-        Funcs.visitDocumentSpace(cypressSpaceId)
-      );
+    Funcs.createOrReturnExistingDocumentSpace()
+      .then((value) => {
+        cy.wrap(value).as('space');
+        cy.wrap(value.id).as('spaceId');
+      })
+      .then(() => {
+        // Go to the cypress e2e document space
+        cy.get<string>(spaceIdAlias).then((cypressSpaceId) => Funcs.visitDocumentSpace(cypressSpaceId));
+      });
   });
 
   after(() => {
@@ -135,10 +139,10 @@ describe('Document Space File Upload test', () => {
   });
 
   it('should allow favorite/unfavorite', () => {
-    cy.get<string>(spaceIdAlias)
-      .then(cypressSpaceId => {
+    cy.get<DocumentSpaceResponseDto>(space)
+      .then(cypressSpace => {
         // Upload a file
-        Funcs.uploadTestFileAtCurrentLocation(cypressSpaceId).as('filename');
+        Funcs.uploadTestFileAtCurrentLocation(cypressSpace.id).as('filename');
 
         cy.get<string>('@filename')
           .then(filename => {
@@ -146,7 +150,7 @@ describe('Document Space File Upload test', () => {
             Funcs.clickMoreActionsButton(filename, MoreActionsType.FAVORITE);
 
             // Check to make sure it now exists in favorites page
-            Funcs.visitFavoritePage(cypressSpaceId);
+            Funcs.visitFavoritePage(cypressSpace.name);
             AgGridFunctions.getRowWithColIdContainingValue(FavoritesGridColId.NAME, filename);
 
             // Unfavorite it

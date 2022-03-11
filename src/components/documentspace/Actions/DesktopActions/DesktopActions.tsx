@@ -10,13 +10,13 @@ import DropDown from '../../../DropDown/DropDown';
 import DownloadMaterialIcon from '../../../../icons/DownloadMaterialIcon';
 import RemoveIcon from '../../../../icons/RemoveIcon';
 import { ActionsProps } from '../ActionsProps';
-import { CreateEditOperationType } from '../../../../state/document-space/document-space-utils';
 import { useHookstate } from '@hookstate/core';
 import { createTextToast } from '../../../Toast/ToastUtils/ToastUtils';
 import { ToastType } from '../../../Toast/ToastUtils/toast-type';
 import PasteIcon from '../../../../icons/PasteIcon';
 import CutIcon from '../../../../icons/CutIcon';
 import CopyContentIcon from '../../../../icons/CopyContentIcon';
+import { CreateEditOperationType } from '../../../../utils/document-space-utils';
 
 /**
  * Helper to check a list of selected rows (DocumentDto objects) to see if we only have one
