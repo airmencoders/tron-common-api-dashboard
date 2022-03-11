@@ -2,18 +2,22 @@ import AgGridFunctions, { SpacesManageMembersColId } from '../../support/ag-grid
 import Funcs from '../../support/document-space-functions';
 
 describe('Document Space Member Management', () => {
+  const space = '@space';
   const spaceId = 'spaceId';
   const spaceIdAlias = `@${spaceId}`;
 
   const cypressEmailPrefix = 'cypress_documentspace';
 
   beforeEach(() => {
-    Funcs.createOrReturnExistingDocumentSpace().as(spaceId);
-    // Go to the cypress e2e document space 
-    cy.get<string>(spaceIdAlias)
-      .then((cypressSpaceId) =>
-        Funcs.visitDocumentSpace(cypressSpaceId)
-      );
+    Funcs.createOrReturnExistingDocumentSpace()
+      .then((value) => {
+        cy.wrap(value).as('space');
+        cy.wrap(value.id).as('spaceId');
+      })
+      .then(() => {
+        // Go to the cypress e2e document space
+        cy.get<string>(spaceIdAlias).then((cypressSpaceId) => Funcs.visitDocumentSpace(cypressSpaceId));
+      });
   });
 
   after(() => {

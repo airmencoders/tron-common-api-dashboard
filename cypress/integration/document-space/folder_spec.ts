@@ -3,24 +3,28 @@ import Funcs, { MoreActionsType } from '../../support/document-space-functions';
 import UtilityFunctions from '../../support/utility-functions';
 
 describe('Document Space Folder test', () => {
+  const space = '@space';
   const spaceId = 'spaceId';
   const spaceIdAlias = `@${spaceId}`;
   const testFolder = 'testFolder';
   const testFolderAlias = `@${testFolder}`;
 
   beforeEach(() => {
-    Funcs.createOrReturnExistingDocumentSpace().as(spaceId);
-
-    // Go to the cypress e2e document space 
-    cy.get<string>(spaceIdAlias)
-      .then((cypressSpaceId) =>
-        Funcs.visitDocumentSpace(cypressSpaceId)
-      );
-
-    // Create the test folder
-    cy.get<string>(spaceIdAlias)
-      .then(cypressSpaceId => {
-        Funcs.createFolderAtCurrentLocation(cypressSpaceId).as(testFolder);
+    Funcs.createOrReturnExistingDocumentSpace()
+      .then((value) => {
+        cy.wrap(value).as('space');
+        cy.wrap(value.id).as('spaceId');
+      })
+      .then(() => {
+        // Go to the cypress e2e document space
+        cy.get<string>(spaceIdAlias)
+          .then((cypressSpaceId) => Funcs.visitDocumentSpace(cypressSpaceId))
+          .then(() => {
+            // Create the test folder
+            cy.get<string>(spaceIdAlias).then((cypressSpaceId) => {
+              Funcs.createFolderAtCurrentLocation(cypressSpaceId).as(testFolder);
+            });
+          });
       });
   });
 

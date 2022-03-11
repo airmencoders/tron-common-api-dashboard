@@ -37,11 +37,11 @@ export default class DocumentSpaceFunctions {
         }).then(response => {
           expect(response.status).to.eq(201);
 
-          return cy.wrap(response.body.id);
+          return cy.wrap(response.body);
         });
       }
 
-      return cy.wrap(cypressSpace.id);
+      return cy.wrap(cypressSpace);
     });
   }
 
@@ -237,11 +237,11 @@ export default class DocumentSpaceFunctions {
     return visitSite;
   }
 
-  static visitFavoritePage(spaceId?: string) {
+  static visitFavoritePage(spaceName?: string) {
     const visitSite = UtilityFunctions.visitSite(`${documentSpaceDashboardUrl}/favorites`, { headers: { "authorization": adminJwt, "x-forwarded-client-cert": ssoXfcc } });
 
-    if (spaceId != null) {
-      return this.selectDocumentSpaceOption(spaceId);
+    if (spaceName != null) {
+      return this.selectDocumentSpaceOption(spaceName);
     }
 
     return visitSite;
@@ -260,11 +260,12 @@ export default class DocumentSpaceFunctions {
     return AgGridFunctions.getRowWithColIdContainingValue(SpacesGridColId.NAME, name).find('[data-testid=document-row-action-cell-renderer] > [data-testid=more_action]').should('have.length', 1);
   }
 
-  static selectDocumentSpaceOption(spaceId: string) {
-    return cy.get('[data-testid=document-space-selector]').find('option:selected').invoke('val')
+  static selectDocumentSpaceOption(spaceName: string) {
+    return cy.get('[data-testid=document-space-selector]').click()
+    .then(() => cy.get('div.active.selected.item').find('span').invoke('text'))
       .then(selected => {
-        if (selected !== spaceId) {
-          return cy.get('[data-testid=document-space-selector]').select(spaceId);
+        if (selected !== spaceName) {
+          return cy.get('[data-testid=document-space-selector]').select(spaceName);
         }
       });
   }
