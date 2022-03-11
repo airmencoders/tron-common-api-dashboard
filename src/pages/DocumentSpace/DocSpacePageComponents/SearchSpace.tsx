@@ -33,7 +33,6 @@ export interface SearchSpaceProps {
  */
 
 export default function SearchSpace({ pageService }: SearchSpaceProps) {
-  const searchQuery = useHookstate<string | undefined>(undefined);
   const deviceInfo = useDeviceInfo();
 
   const documentDtoColumns = useHookstate<GridColumn[]>([
@@ -155,7 +154,7 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
       <div>
         <Form
           onSubmit={(event) => {
-            pageService.submitSearchQuery(searchQuery.value);
+            pageService.submitSearchQuery(pageService.state.searchQuery.value);
             event.preventDefault();
           }}
         >
@@ -164,14 +163,15 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
               id="search-space-field"
               data-testid="search-space-field"
               name="search-space-field"
-              onChange={(event: ChangeEvent<HTMLInputElement>) => searchQuery.set(event.target.value)}
+              value={pageService.state.searchQuery.value ?? ''}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => pageService.state.searchQuery.set(event.target.value)}
               type="search"
             />
             <Button
               className="docspace-search-button"
               type="button"
-              onClick={() => pageService.submitSearchQuery(searchQuery.value)}
-              disabled={!!!searchQuery.value || !!!searchQuery.value.trim()}
+              onClick={() => pageService.submitSearchQuery(pageService.state.searchQuery.value)}
+              disabled={!!!pageService.state.searchQuery.value || !!!pageService.state.searchQuery.value.trim()}
               data-testid="search-space-button"
             >
               Search

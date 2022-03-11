@@ -15,8 +15,7 @@ import {
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
-  DocumentSpaceUserCollectionResponseDto,
-  RecentDocumentDto
+  DocumentSpaceUserCollectionResponseDto
 } from '../../../openapi';
 import { pathQueryKey, spaceIdQueryKey } from '../../../pages/DocumentSpace/DocumentSpaceSelector';
 import { performActionWhenMounted } from '../../../utils/component-utils';
@@ -33,8 +32,12 @@ import DocumentSpaceService from '../document-space-service';
 import { ClipBoardState } from '../document-space-state';
 import { SpacesPageState } from './spaces-page-state';
 
+/**
+ * This is the service that backs the DocumentSpacePage and its three sub-tabs - Browse, Recent Uploads, and Search
+ * Since the page is so massive, it needed its logic extracted out to its own testable service
+ */
+
 export default class SpacesPageService extends AbstractGlobalStateService<SpacesPageState> {
-  private downloadService = new DocumentSpaceDownloadUrlService();
 
   constructor(
     public spacesState: State<SpacesPageState>,
@@ -240,6 +243,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         recentsDatasource: this.documentSpaceService.createRecentUploadsForSpaceDatasource(documentSpace.id, this.recentUploadsScrollOptions),
         searchDatasource: this.documentSpaceService.createSearchDatasource(documentSpace.id, this.searchScrollOptions, undefined),
         path,
+        searchQuery: undefined,
         selectedFiles: [],
         showNoChosenSpace: false,
         favorites,
@@ -260,6 +264,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       this.mergeState({
         selectedSpace: undefined,
         datasource: undefined,
+        searchQuery: undefined,
         recentsDatasource: undefined,
         shouldUpdateDatasource: false,
         shouldUpdateRecentsDatasource: false,
@@ -648,6 +653,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     this.documentSpaceService.resetState();

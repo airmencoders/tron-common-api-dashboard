@@ -74,6 +74,7 @@ const spacesPageState = createState<SpacesPageState>({
   spaceNotFound: false,
   showFolderSizeDialog: false,
   selectedItemForSize: undefined,
+  searchQuery: undefined,
 });
 
 const globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({

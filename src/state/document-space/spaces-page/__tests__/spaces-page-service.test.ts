@@ -155,6 +155,7 @@ describe('Spaces Page Service Test', () => {
       showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     spacesService = new SpacesPageService(
@@ -991,6 +992,7 @@ describe('Spaces Page Service Test', () => {
       showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     const documentSpaceServiceResetSpy = jest.spyOn(documentSpaceService, 'resetState');

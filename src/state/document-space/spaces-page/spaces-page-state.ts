@@ -17,6 +17,7 @@ export interface SpacesPageState {
   searchDatasource?: IDatasource;
   showUploadDialog: boolean;
   showDeleteDialog: boolean;
+  searchQuery: string|undefined;
   fileToDelete: string;
   selectedFile?: DocumentDto;
   selectedFiles: DocumentDto[];

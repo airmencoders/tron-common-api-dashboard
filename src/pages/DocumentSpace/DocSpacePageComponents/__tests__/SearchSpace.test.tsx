@@ -139,6 +139,7 @@ describe('Search Space Tests', () => {
       showNoChosenSpace: false, // state we get into if we nav to an non-exist or private space
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     documentSpacePageService = new SpacesPageService(
