@@ -155,6 +155,7 @@ describe('Spaces Page Service Test', () => {
       showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     spacesService = new SpacesPageService(
@@ -832,16 +833,19 @@ describe('Spaces Page Service Test', () => {
   describe('search submission', () => {
     it('should submit search query', () => {
       spacesService.state.selectedSpace.set({ id: 'some id', name: 'some space' });
-      spacesService.submitSearchQuery('test.txt');
+      spacesService.state.searchQuery.set('test');
+      spacesService.submitSearchQuery();
       expect(spacesState.shouldUpdateSearchDatasource.value).toEqual(true);
       expect(spacesState.searchDatasource.value).toBeTruthy();
     });
     it('should not search query on falsy query', () => {
-      spacesService.submitSearchQuery(undefined);
+      spacesService.state.searchQuery.set(undefined);
+      spacesService.submitSearchQuery();
       expect(spacesState.shouldUpdateSearchDatasource.value).toEqual(false);
       expect(spacesState.searchDatasource.value).toBeFalsy();
 
-      spacesService.submitSearchQuery('     ');
+      spacesService.state.searchQuery.set('     ');
+      spacesService.submitSearchQuery();
       expect(spacesState.shouldUpdateSearchDatasource.value).toEqual(false);
       expect(spacesState.searchDatasource.value).toBeFalsy();
     });
@@ -991,6 +995,7 @@ describe('Spaces Page Service Test', () => {
       showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     const documentSpaceServiceResetSpy = jest.spyOn(documentSpaceService, 'resetState');

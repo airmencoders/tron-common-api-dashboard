@@ -1,4 +1,4 @@
-import { Downgraded, useHookstate } from '@hookstate/core';
+import { Downgraded, State, useHookstate } from '@hookstate/core';
 import { ValueFormatterParams } from 'ag-grid-community';
 import { useEffect } from 'react';
 import DocSpaceItemRenderer from '../../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
@@ -18,10 +18,12 @@ import SpacesPageService from '../../../state/document-space/spaces-page/spaces-
 import { CreateEditOperationType } from '../../../utils/document-space-utils';
 import { formatPath } from '../../../utils/file-utils';
 import DocumentDownloadCellRenderer from '../DocumentDownloadCellRenderer';
+import { DocumentSpacePageTabEnum } from '../DocumentSpacePage';
 import { formatAgGridDateCell } from './MyFilesAndFolders';
 
 export interface RecentSpaceActivityProps {
   pageService: SpacesPageService;
+  tabState?: State<DocumentSpacePageTabEnum>;
 }
 
 /**
@@ -107,7 +109,11 @@ export default function RecentSpaceActivity({ pageService }: RecentSpaceActivity
             title: 'Remove',
             icon: CircleMinusIcon,
             isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
-            onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
+            onClick: (doc: DocumentDto) => pageService.mergeState({ 
+              path: doc.path ?? '',
+              selectedFile: doc, 
+              showDeleteDialog: true 
+            }),
           },
           {
             title: 'Rename File',
@@ -116,6 +122,7 @@ export default function RecentSpaceActivity({ pageService }: RecentSpaceActivity
             isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) =>
               pageService.mergeState({
+                path: doc.path ?? '',
                 selectedFile: doc,
                 createEditElementOpType: CreateEditOperationType.EDIT_FILENAME,
               }),

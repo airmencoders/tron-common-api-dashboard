@@ -15,8 +15,7 @@ import {
   DocumentSpacePrivilegeDtoTypeEnum,
   DocumentSpaceRequestDto,
   DocumentSpaceResponseDto,
-  DocumentSpaceUserCollectionResponseDto,
-  RecentDocumentDto
+  DocumentSpaceUserCollectionResponseDto
 } from '../../../openapi';
 import { pathQueryKey, spaceIdQueryKey } from '../../../pages/DocumentSpace/DocumentSpaceSelector';
 import { performActionWhenMounted } from '../../../utils/component-utils';
@@ -33,8 +32,12 @@ import DocumentSpaceService from '../document-space-service';
 import { ClipBoardState } from '../document-space-state';
 import { SpacesPageState } from './spaces-page-state';
 
+/**
+ * This is the service that backs the DocumentSpacePage and its three sub-tabs - Browse, Recent Uploads, and Search
+ * Since the page is so massive, it needed its logic extracted out to its own testable service
+ */
+
 export default class SpacesPageService extends AbstractGlobalStateService<SpacesPageState> {
-  private downloadService = new DocumentSpaceDownloadUrlService();
 
   constructor(
     public spacesState: State<SpacesPageState>,
@@ -198,11 +201,14 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   // receive the search query and creates a datasource around it to initiate the API call/results
-  submitSearchQuery(query: string | undefined) {
-    if (this.spacesState && this.spacesState.selectedSpace.value != undefined && query) {
+  submitSearchQuery() {
+    if (this.spacesState 
+      && this.spacesState.selectedSpace.value != undefined 
+      && this.spacesState.searchQuery.value
+      && !!this.spacesState.searchQuery.value.trim()) {
       this.spacesState.merge({
         shouldUpdateSearchDatasource: true,
-        searchDatasource: this.documentSpaceService.createSearchDatasource(this.spacesState.selectedSpace.value.id, this.searchScrollOptions, query),
+        searchDatasource: this.documentSpaceService.createSearchDatasource(this.spacesState.selectedSpace.value.id, this.searchScrollOptions, this.spacesState.searchQuery.value),
       });
     }
   }
@@ -260,6 +266,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       this.mergeState({
         selectedSpace: undefined,
         datasource: undefined,
+        searchQuery: undefined,
         recentsDatasource: undefined,
         shouldUpdateDatasource: false,
         shouldUpdateRecentsDatasource: false,
@@ -351,6 +358,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               shouldUpdateRecentsDatasource: true,
               selectedFile: undefined,
             });
+            this.submitSearchQuery();
             createTextToast(ToastType.SUCCESS, 'Folder renamed');
           })
           .catch((message) => this.setPageStateOnException(message));
@@ -366,6 +374,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               shouldUpdateDatasource: true,
               shouldUpdateRecentsDatasource: true,
             });
+            this.submitSearchQuery();
             createTextToast(ToastType.SUCCESS, 'Folder created');
           })
           .catch((message) => this.setPageStateOnException(message));
@@ -390,6 +399,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               shouldUpdateRecentsDatasource: true,
               selectedFile: undefined,
             });
+            this.submitSearchQuery();
             createTextToast(ToastType.SUCCESS, 'File renamed');
           })
           .catch((message) => this.setPageStateOnException(message));
@@ -420,7 +430,11 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
         performActionWhenMounted(this.mountedRef.current, () => {
           this.spacesState.favorites.merge([placeHolderResponse]);
+
+          // update all the datasource so this shows/reflects the favorites change
           this.spacesState.shouldUpdateDatasource.set(true);
+          this.spacesState.shouldUpdateRecentsDatasource.set(true);
+          this.submitSearchQuery();
 
           createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
         });
@@ -442,7 +456,11 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
             this.spacesState.favorites.set((favorites) => {
               return favorites.filter((f) => f.key !== doc.key);
             });
+
+            // update all the datasource so this shows/reflects the favorites change
             this.spacesState.shouldUpdateDatasource.set(true);
+            this.spacesState.shouldUpdateRecentsDatasource.set(true);
+            this.submitSearchQuery();
 
             createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
           });
@@ -470,6 +488,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     this.spacesState.merge((state) => {
       state.shouldUpdateDatasource = true;
       state.shouldUpdateRecentsDatasource = true;
+      this.submitSearchQuery();
       state.datasource = this.documentSpaceService.createDatasource(
         this.spacesState.get().selectedSpace?.id ?? '',
         this.spacesState.get().path,
@@ -648,6 +667,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
       showNoChosenSpace: false,
       showFolderSizeDialog: false,
       selectedItemForSize: undefined,
+      searchQuery: undefined,
     });
 
     this.documentSpaceService.resetState();

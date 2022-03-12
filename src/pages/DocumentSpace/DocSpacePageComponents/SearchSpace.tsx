@@ -1,6 +1,7 @@
-import { Downgraded, useHookstate } from '@hookstate/core';
+import { Downgraded, State, useHookstate } from '@hookstate/core';
 import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import { ChangeEvent, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import Button from '../../../components/Button/Button';
 import DocSpaceItemRenderer from '../../../components/DocSpaceItemRenderer/DocSpaceItemRenderer';
 import DocumentRowActionCellRenderer, {
@@ -16,15 +17,18 @@ import CircleMinusIcon from '../../../icons/CircleMinusIcon';
 import EditIcon from '../../../icons/EditIcon';
 import StarHollowIcon from '../../../icons/StarHollowIcon';
 import StarIcon from '../../../icons/StarIcon';
-import { DocumentDto } from '../../../openapi';
+import { DocumentDto, DocumentMobileDto } from '../../../openapi';
 import SpacesPageService from '../../../state/document-space/spaces-page/spaces-page-service';
 import { CreateEditOperationType } from '../../../utils/document-space-utils';
 import { formatBytesToString, formatPath } from '../../../utils/file-utils';
 import DocumentDownloadCellRenderer from '../DocumentDownloadCellRenderer';
+import { DocumentSpacePageTabEnum } from '../DocumentSpacePage';
+import { pathQueryKey, spaceIdQueryKey } from '../DocumentSpaceSelector';
 import { formatAgGridDateCell } from './MyFilesAndFolders';
 
 export interface SearchSpaceProps {
   pageService: SpacesPageService;
+  tabState?: State<DocumentSpacePageTabEnum>;
 }
 
 /**
@@ -32,9 +36,9 @@ export interface SearchSpaceProps {
  * component... it specifically houses search space functionality
  */
 
-export default function SearchSpace({ pageService }: SearchSpaceProps) {
-  const searchQuery = useHookstate<string | undefined>(undefined);
+export default function SearchSpace({ pageService, tabState }: SearchSpaceProps) {
   const deviceInfo = useDeviceInfo();
+  const history = useHistory();
 
   const documentDtoColumns = useHookstate<GridColumn[]>([
     new GridColumn({
@@ -48,6 +52,18 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
       checkboxSelection: true,
       initialWidth: 400,
       cellRendererParams: {
+        onClick: (doc: DocumentMobileDto) => {
+
+          // clicking on a folder here - will take us back to the browse tab to that location
+          const newPath = doc.path;
+          const queryParams = new URLSearchParams(location.search);
+          queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
+          queryParams.set(pathQueryKey, newPath);
+          history.push({ search: queryParams.toString() });
+
+          // switch back to Browse mode
+          tabState?.set(DocumentSpacePageTabEnum.BROWSE);
+        },
         isFavorited: (document: DocumentDto) => {
           return pageService.getFavoritesShouldShow.bind(pageService, document, false)();
         },
@@ -127,7 +143,23 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
             title: 'Remove',
             icon: CircleMinusIcon,
             isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
-            onClick: (doc: DocumentDto) => pageService.mergeState({ selectedFile: doc, showDeleteDialog: true }),
+            onClick: (doc: DocumentDto) => pageService.mergeState({
+              path: doc.path ?? '',
+              selectedFile: doc,
+              showDeleteDialog: true 
+            }),
+          },
+          {
+            title: 'Rename Folder',
+            icon: EditIcon,
+            shouldShow: (doc: DocumentDto) => doc && doc.folder,
+            isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
+            onClick: (doc: DocumentDto) =>
+              pageService.mergeState({
+                path: doc.path ?? '',
+                selectedFile: doc,
+                createEditElementOpType: CreateEditOperationType.EDIT_FOLDERNAME,
+              }),
           },
           {
             title: 'Rename File',
@@ -136,6 +168,7 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
             isAuthorized: pageService.userIsAuthorizedForWriteInSpace.bind(pageService),
             onClick: (doc: DocumentDto) =>
               pageService.mergeState({
+                path: doc.path ?? '',
                 selectedFile: doc,
                 createEditElementOpType: CreateEditOperationType.EDIT_FILENAME,
               }),
@@ -155,7 +188,7 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
       <div>
         <Form
           onSubmit={(event) => {
-            pageService.submitSearchQuery(searchQuery.value);
+            pageService.submitSearchQuery();
             event.preventDefault();
           }}
         >
@@ -164,14 +197,15 @@ export default function SearchSpace({ pageService }: SearchSpaceProps) {
               id="search-space-field"
               data-testid="search-space-field"
               name="search-space-field"
-              onChange={(event: ChangeEvent<HTMLInputElement>) => searchQuery.set(event.target.value)}
+              value={pageService.state.searchQuery.value ?? ''}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => pageService.state.searchQuery.set(event.target.value)}
               type="search"
             />
             <Button
               className="docspace-search-button"
               type="button"
-              onClick={() => pageService.submitSearchQuery(searchQuery.value)}
-              disabled={!!!searchQuery.value || !!!searchQuery.value.trim()}
+              onClick={() => pageService.submitSearchQuery()}
+              disabled={!!!pageService.state.searchQuery.value || !!!pageService.state.searchQuery.value.trim()}
               data-testid="search-space-button"
             >
               Search
