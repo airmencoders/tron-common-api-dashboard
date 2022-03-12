@@ -201,11 +201,14 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
   }
 
   // receive the search query and creates a datasource around it to initiate the API call/results
-  submitSearchQuery(query: string | undefined) {
-    if (this.spacesState && this.spacesState.selectedSpace.value != undefined && query) {
+  submitSearchQuery() {
+    if (this.spacesState 
+      && this.spacesState.selectedSpace.value != undefined 
+      && this.spacesState.searchQuery.value
+      && !!this.spacesState.searchQuery.value.trim()) {
       this.spacesState.merge({
         shouldUpdateSearchDatasource: true,
-        searchDatasource: this.documentSpaceService.createSearchDatasource(this.spacesState.selectedSpace.value.id, this.searchScrollOptions, query),
+        searchDatasource: this.documentSpaceService.createSearchDatasource(this.spacesState.selectedSpace.value.id, this.searchScrollOptions, this.spacesState.searchQuery.value),
       });
     }
   }
@@ -243,7 +246,6 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
         recentsDatasource: this.documentSpaceService.createRecentUploadsForSpaceDatasource(documentSpace.id, this.recentUploadsScrollOptions),
         searchDatasource: this.documentSpaceService.createSearchDatasource(documentSpace.id, this.searchScrollOptions, undefined),
         path,
-        searchQuery: undefined,
         selectedFiles: [],
         showNoChosenSpace: false,
         favorites,
@@ -356,6 +358,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               shouldUpdateRecentsDatasource: true,
               selectedFile: undefined,
             });
+            this.submitSearchQuery();
             createTextToast(ToastType.SUCCESS, 'Folder renamed');
           })
           .catch((message) => this.setPageStateOnException(message));
@@ -371,6 +374,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               shouldUpdateDatasource: true,
               shouldUpdateRecentsDatasource: true,
             });
+            this.submitSearchQuery();
             createTextToast(ToastType.SUCCESS, 'Folder created');
           })
           .catch((message) => this.setPageStateOnException(message));
@@ -395,6 +399,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
               shouldUpdateRecentsDatasource: true,
               selectedFile: undefined,
             });
+            this.submitSearchQuery();
             createTextToast(ToastType.SUCCESS, 'File renamed');
           })
           .catch((message) => this.setPageStateOnException(message));
@@ -425,7 +430,11 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
 
         performActionWhenMounted(this.mountedRef.current, () => {
           this.spacesState.favorites.merge([placeHolderResponse]);
+
+          // update all the datasource so this shows/reflects the favorites change
           this.spacesState.shouldUpdateDatasource.set(true);
+          this.spacesState.shouldUpdateRecentsDatasource.set(true);
+          this.submitSearchQuery();
 
           createTextToast(ToastType.SUCCESS, 'Successfully added to favorites');
         });
@@ -447,7 +456,11 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
             this.spacesState.favorites.set((favorites) => {
               return favorites.filter((f) => f.key !== doc.key);
             });
+
+            // update all the datasource so this shows/reflects the favorites change
             this.spacesState.shouldUpdateDatasource.set(true);
+            this.spacesState.shouldUpdateRecentsDatasource.set(true);
+            this.submitSearchQuery();
 
             createTextToast(ToastType.SUCCESS, 'Successfully removed from favorites');
           });
@@ -475,6 +488,7 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     this.spacesState.merge((state) => {
       state.shouldUpdateDatasource = true;
       state.shouldUpdateRecentsDatasource = true;
+      this.submitSearchQuery();
       state.datasource = this.documentSpaceService.createDatasource(
         this.spacesState.get().selectedSpace?.id ?? '',
         this.spacesState.get().path,

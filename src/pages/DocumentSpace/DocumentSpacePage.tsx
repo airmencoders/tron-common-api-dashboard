@@ -2,7 +2,7 @@ import { useHookstate } from '@hookstate/core';
 import React, { useEffect, useRef } from 'react';
 import { useHistory } from 'react-router';
 import { useLocation } from 'react-router-dom';
-import { Tab } from 'semantic-ui-react';
+import { Tab, TabProps } from 'semantic-ui-react';
 import Button from '../../components/Button/Button';
 import ArchiveDialog from '../../components/documentspace/ArchiveDialog/ArchiveDialog';
 import SpaceNotFoundDialog from "../../components/documentspace/SpaceNotFoundDialog/SpaceNotFoundDialog";
@@ -40,6 +40,12 @@ import DocumentSpaceSelector from "./DocumentSpaceSelector";
 import FolderSizeDialog from './FolderSizeDialog';
 import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
 
+export enum DocumentSpacePageTabEnum {
+  BROWSE=0,
+  RECENT=1,
+  SEARCH=2,
+}
+
 function DocumentSpacePage() {
   const location = useLocation();
   const history = useHistory();
@@ -50,6 +56,7 @@ function DocumentSpacePage() {
   const documentSpacePrivilegesService = useDocumentSpacePrivilegesState();
   const authorizedUserService = useAuthorizedUserState();
   const isAdmin = pageService.isAdmin();
+  const selectedTab = useHookstate<DocumentSpacePageTabEnum>(DocumentSpacePageTabEnum.BROWSE);
 
   async function fetchSpaces() {
     try {
@@ -179,10 +186,12 @@ function DocumentSpacePage() {
         </div>
       </FormGroup>
       <Tab
+        activeIndex={selectedTab.get()}
+        onTabChange={(_, data: TabProps) => { selectedTab.set(data.activeIndex as DocumentSpacePageTabEnum ?? DocumentSpacePageTabEnum.BROWSE)}}
         panes={[
           {
             menuItem: 'Browse',
-            render: () => <MyFilesAndFolders pageService={pageService} />,
+            render: () => <MyFilesAndFolders pageService={pageService} />,            
           },
           {
             menuItem: "Recent Activity",
@@ -190,7 +199,7 @@ function DocumentSpacePage() {
           },
           {
             menuItem: "Search",
-            render: () => <SearchSpace pageService={pageService} />,
+            render: () => <SearchSpace pageService={pageService} tabState={selectedTab} />,
           }
         ]}
       />
@@ -223,6 +232,7 @@ function DocumentSpacePage() {
         )}
       </SideDrawer>
 
+      {/* side drawer for creating new folders and editing folder/filenames */}
       <SideDrawer
         isLoading={false}
         title={getCreateEditTitle(pageService.state.createEditElementOpType.get())}
@@ -250,6 +260,7 @@ function DocumentSpacePage() {
         )}
       </SideDrawer>
 
+      {/* side drawer for managing one's own personal space settings */}
       {pageService.state.showNoChosenSpace.value || pageService.state.spaceNotFound.value ? null : (
         <SideDrawer
           isLoading={false}
@@ -276,6 +287,7 @@ function DocumentSpacePage() {
         </SideDrawer>
       )}
 
+      {/* archiving a single file */}
       <ArchiveDialog
         show={pageService.state.showDeleteDialog.get()}
         onCancel={pageService.closeRemoveDialog.bind(pageService)}
@@ -283,6 +295,7 @@ function DocumentSpacePage() {
         items={pageService.state.selectedFile.value}
       />
 
+      {/* archiving multiple items at once */}
       <ArchiveDialog
         show={pageService.state.showDeleteSelectedDialog.get()}
         onCancel={pageService.closeRemoveDialog.bind(pageService)}
@@ -290,6 +303,7 @@ function DocumentSpacePage() {
         items={pageService.state.selectedFiles.value}
       />
 
+      {/* shows folder size */}
       {pageService.state.selectedItemForSize && pageService.state.showFolderSizeDialog.get() && (
         <FolderSizeDialog
           show={pageService.state.showFolderSizeDialog.get()}
@@ -303,6 +317,7 @@ function DocumentSpacePage() {
         />
       )}
 
+      {/* the document space member management side drawer */}
       {pageService.state.selectedSpace.value &&
         !documentSpacePrivilegesService.isPromised &&
         documentSpacePrivilegesService.isAuthorizedForAction(

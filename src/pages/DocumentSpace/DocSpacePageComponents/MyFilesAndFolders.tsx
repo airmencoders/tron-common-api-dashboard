@@ -1,4 +1,4 @@
-import { Downgraded, useHookstate } from '@hookstate/core';
+import { Downgraded, State, useHookstate } from '@hookstate/core';
 import { ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -26,10 +26,12 @@ import { formatDocumentSpaceDate } from '../../../utils/date-utils';
 import { CreateEditOperationType } from '../../../utils/document-space-utils';
 import { formatBytesToString, joinPathParts } from '../../../utils/file-utils';
 import DocumentDownloadCellRenderer from '../DocumentDownloadCellRenderer';
+import { DocumentSpacePageTabEnum } from '../DocumentSpacePage';
 import { pathQueryKey, spaceIdQueryKey } from '../DocumentSpaceSelector';
 
 export interface MyFilesAndFoldersProps {
   pageService: SpacesPageService;
+  tabState?: State<DocumentSpacePageTabEnum>;
 }
 
 export function formatAgGridDateCell(params: ValueFormatterParams): string {
@@ -64,8 +66,8 @@ export default function MyFilesAndFolders({ pageService }: MyFilesAndFoldersProp
       checkboxSelection: true,
       initialWidth: 400,
       cellRendererParams: {
-        onClick: (folder: string) => {
-          const newPath = pageService.state.get().path + '/' + folder;
+        onClick: (doc: DocumentDto) => {
+          const newPath = pageService.state.get().path + '/' + doc.key;
           const queryParams = new URLSearchParams(location.search);
           queryParams.set(spaceIdQueryKey, pageService.state.get().selectedSpace?.id ?? '');
           queryParams.set(pathQueryKey, newPath);

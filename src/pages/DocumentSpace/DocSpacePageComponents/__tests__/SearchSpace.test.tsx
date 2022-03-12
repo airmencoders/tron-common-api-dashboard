@@ -174,11 +174,10 @@ describe('Search Space Tests', () => {
   });
 
   it('should render searched items', async () => {
-    let retVal = {
-      id: 'dssd',
+    let retVal = [{
       spaceId: 'sdfdsf',
       key: 'testFile',
-      parentFolderId: 'parentId',
+      parentId: 'parentId',
       path: '',
       size: 0,
       lastModifiedBy: 'homer',
@@ -186,10 +185,33 @@ describe('Search Space Tests', () => {
       lastActivity: new Date().toISOString(),
       hasContents: false,
       folder: false,
-    } as DocumentMobileDto;
+    },{
+      spaceId: 'sdfdsf',
+      key: 'testFolder',
+      parentId: 'parentId',
+      path: '',
+      size: 0,
+      lastModifiedBy: 'homer',
+      lastModifiedDate: new Date().toISOString(),
+      lastActivity: new Date().toISOString(),
+      hasContents: true,
+      folder: true,
+    },
+    {
+      spaceId: 'sdfdsf',
+      key: 'testEmptyFolder',
+      parentId: 'parentId',
+      path: '',
+      size: 0,
+      lastModifiedBy: 'homer',
+      lastModifiedDate: new Date().toISOString(),
+      lastActivity: new Date().toISOString(),
+      hasContents: false,
+      folder: true,
+    }] as DocumentMobileDto[];
 
-    jest.spyOn(documentSpaceService, 'createSearchDatasource').mockReturnValue(
-      { getRows: async (params: IGetRowsParams) => { params.successCallback([retVal], 1); } }
+    const dataMock = jest.spyOn(documentSpaceService, 'createSearchDatasource').mockReturnValue(
+      { getRows: async (params: IGetRowsParams) => { params.successCallback(retVal, 3); } }
     );
 
     const page = render(
@@ -202,11 +224,11 @@ describe('Search Space Tests', () => {
     await waitFor(() => expect(page.getByText('Search')).toBeVisible);
     fireEvent.click(page.getByText('Search'));
 
-    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
-    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
-
     // check that the search button is disabled
     await waitFor(() => expect(page.getByTestId('search-space-button')).toBeDisabled);
+
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
 
     // add text - check for button to not be disabled
     await waitFor(() => expect(page.getByTestId('search-space-field')));
@@ -217,6 +239,30 @@ describe('Search Space Tests', () => {
 
     // see that our search results populate in the grid
     fireEvent.click(page.getByTestId('search-space-button'));
-    await waitFor(() => expect(page.getByText('testFile')).toBeVisible, { timeout: 5000 });
+    await waitFor(() => expect(dataMock).toHaveBeenCalled());    
+    await waitFor(() => expect(page.getByText('testFile')).toBeVisible);
+
+    // check search state is preserved switching away from the search tab
+    await waitFor(() => expect(page.getByText('Browse')).toBeVisible);
+    fireEvent.click(page.getByText('Browse'));
+
+    // come back to search tab
+    await waitFor(() => expect(page.getByText('Search')).toBeVisible);
+    fireEvent.click(page.getByText('Search'));
+
+    // check search query still there
+    await waitFor(() => expect(page.getByTestId('search-space-field')).toHaveDisplayValue('test'));
+
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
+
+    // test that we can interact with the search results
+    // click on the testFolder - should nav to the Browse tab in that path
+    await waitFor(() => expect(page.getByText(/testFolder/)).toBeVisible);
+    fireEvent.click(page.getByText(/testFolder/));
+
+    // test we're in the Browse files tab
+    await waitFor(() => expect(page.getByText('My Folders')).toBeVisible);  
+
   });
 });
