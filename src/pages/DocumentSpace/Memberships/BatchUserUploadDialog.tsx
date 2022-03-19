@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../../../components/Button/Button';
 import {documentSpaceMembershipService} from '../../../state/document-space/document-space-state';
 import { State, useHookstate } from "@hookstate/core";
-import {BatchUploadState} from "./DocumentSpaceMemberships";
+import {BatchUploadState} from "./DocumentSpaceMembershipsDrawer";
 import {createTextToast} from "../../../components/Toast/ToastUtils/ToastUtils";
 import {ToastType} from "../../../components/Toast/ToastUtils/toast-type";
 import UploadIcon from '../../../icons/UploadIcon';

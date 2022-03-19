@@ -2,7 +2,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import BatchUserUploadDialog from '../BatchUserUploadDialog';
 import {createState} from '@hookstate/core';
-import {BatchUploadState} from '../DocumentSpaceMemberships';
+import {BatchUploadState} from '../DocumentSpaceMembershipsDrawer';
 import {createAxiosSuccessResponse} from '../../../../utils/TestUtils/test-utils';
 import {DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface} from '../../../../openapi';
 import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';

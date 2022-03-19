@@ -38,7 +38,7 @@ import DocumentSpaceMySettingsForm from "./DocumentSpaceMySettingsForm";
 import './DocumentSpacePage.scss';
 import DocumentSpaceSelector from "./DocumentSpaceSelector";
 import FolderSizeDialog from './FolderSizeDialog';
-import DocumentSpaceMemberships from './Memberships/DocumentSpaceMemberships';
+import DocumentSpaceMembershipsDrawer from './Memberships/DocumentSpaceMembershipsDrawer';
 
 export enum DocumentSpacePageTabEnum {
   BROWSE=0,
@@ -324,7 +324,7 @@ function DocumentSpacePage() {
           pageService.state.selectedSpace.value.id,
           DocumentSpacePrivilegeDtoTypeEnum.Membership
         ) && (
-          <DocumentSpaceMemberships
+          <DocumentSpaceMembershipsDrawer
             documentSpaceId={pageService.state.selectedSpace.value.id}
             isOpen={pageService.state.membershipsState.isOpen.value}
             onSubmit={() => pageService.state.membershipsState.isOpen.set(false)}

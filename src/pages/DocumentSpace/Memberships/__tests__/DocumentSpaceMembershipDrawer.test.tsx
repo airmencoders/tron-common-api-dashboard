@@ -5,12 +5,12 @@ import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from 
 import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';
 import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
 import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
-import DocumentSpaceMemberships from '../DocumentSpaceMemberships';
+import DocumentSpaceMembershipsDrawer from '../DocumentSpaceMembershipsDrawer';
 
 jest.mock('../../../../openapi/apis/document-space-controller-api');
 jest.mock('../../../../state/document-space/document-space-state');
 
-describe('Document Space Membership Test', () => {
+describe('Document Space Membership Drawer Tests', () => {
   const documentSpaceId = 'b8529a48-a61c-45a7-b0d1-2eb5d429d3bf';
 
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
@@ -23,10 +23,10 @@ describe('Document Space Membership Test', () => {
     (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
   });
 
-  it('should close modal when Submit(close) button pressed', () => {
+  it('should close modal when Submit(close) button pressed', async () => {
     const onClose = jest.fn();
     const page = render(
-      <DocumentSpaceMemberships
+      <DocumentSpaceMembershipsDrawer
         documentSpaceId={documentSpaceId}
         onSubmit={jest.fn()}
         isOpen={true}
@@ -35,14 +35,14 @@ describe('Document Space Membership Test', () => {
     );
 
     expect(page.queryByText('Member Management')).toBeInTheDocument();
-    userEvent.click(page.getByText('Close'));
-    expect(onClose).toHaveBeenCalledTimes(1);
+    userEvent.click(page.getAllByText('Close')[0]);
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
   });
 
   it('should trigger infinite cache update on member change', async () => {
     const onSubmit = jest.fn();
     const page = render(
-      <DocumentSpaceMemberships
+      <DocumentSpaceMembershipsDrawer
         documentSpaceId={documentSpaceId}
         onSubmit={onSubmit}
         isOpen={true}
@@ -61,11 +61,11 @@ describe('Document Space Membership Test', () => {
     expect(emailField).toBeInTheDocument();
     userEvent.type(emailField, 'test@email.com');
 
-    const writePrivilegeCheckbox = page.getByLabelText('Editor');
+    const writePrivilegeCheckbox = page.getByTestId('privilege_WRITE');
     expect(writePrivilegeCheckbox).toBeInTheDocument();
     userEvent.click(writePrivilegeCheckbox);
 
-    const addBtn = page.getByText('Add');
+    const addBtn = page.getByText('Add User');
     expect(addBtn).toBeEnabled();
     userEvent.click(addBtn);
 
@@ -81,7 +81,7 @@ describe('Document Space Membership Test', () => {
     })));
 
     const page = render(
-      <DocumentSpaceMemberships
+      <DocumentSpaceMembershipsDrawer
         documentSpaceId={documentSpaceId}
         onSubmit={onSubmit}
         isOpen={true}

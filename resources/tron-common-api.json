@@ -3231,6 +3231,115 @@
         }
       }
     },
+    "/v2/document-space/spaces/{id}/app-client": {
+      "post": {
+        "tags": ["document-space-controller"],
+        "summary": "Adds an App Client to a Document Space",
+        "description": "Adds an App Client to a Document Space with specified privileges",
+        "operationId": "addAppClientToDocumentSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentSpaceAppClientMemberRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires Membership privilege to document space, or DASHBOARD_ADMIN)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["document-space-controller"],
+        "summary": "Removes one or more App Client(s) from a Document Space",
+        "description": "Removes App Client(s) from a Document Space and their privileges",
+        "operationId": "removeAppClientFromDocumentSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "appClientId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/subscriptions": {
       "get": {
         "tags": ["subscriber-controller"],
@@ -6962,6 +7071,57 @@
         }
       }
     },
+    "/v2/document-space/spaces/{id}/available-app-clients": {
+      "get": {
+        "tags": ["document-space-controller"],
+        "summary": "Gets list of App Clients that are available to assignment to given doc space",
+        "description": "The list includes those that are not associated currently with given space",
+        "operationId": "getAppClientsForAssignmentToDocumentSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppClientSummaryDtoResponseWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires Membership privilege to document space, or DASHBOARD_ADMIN)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/document-space/spaces/{id}/archived/contents": {
       "get": {
         "tags": ["document-space-controller"],
@@ -7002,6 +7162,57 @@
           },
           "404": {
             "description": "Not Found - space not found or part of supplied path does not exist",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/document-space/spaces/{id}/app-clients": {
+      "get": {
+        "tags": ["document-space-controller"],
+        "summary": "Gets the App Clients that can access a given Document Space",
+        "description": "Gets the App Clients that can access a space and their privileges",
+        "operationId": "getAppClientUsersForDocumentSpace",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSpaceAppClientResponseDtoWrapper"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Requires Membership privilege to document space, or DASHBOARD_ADMIN)",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - space not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -9525,7 +9736,7 @@
     "/v2/document-space-dav/{spaceId}/**": {
       "get": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand",
+        "operationId": "processWebDavCommand_4",
         "parameters": [
           {
             "name": "spaceId",
@@ -9552,7 +9763,7 @@
       },
       "put": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_3",
+        "operationId": "processWebDavCommand",
         "parameters": [
           {
             "name": "spaceId",
@@ -9606,7 +9817,7 @@
       },
       "delete": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_2",
+        "operationId": "processWebDavCommand_1",
         "parameters": [
           {
             "name": "spaceId",
@@ -9633,7 +9844,7 @@
       },
       "options": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_6",
+        "operationId": "processWebDavCommand_3",
         "parameters": [
           {
             "name": "spaceId",
@@ -9660,7 +9871,7 @@
       },
       "head": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_1",
+        "operationId": "processWebDavCommand_2",
         "parameters": [
           {
             "name": "spaceId",
@@ -9687,7 +9898,7 @@
       },
       "patch": {
         "tags": ["document-space-web-dav-controller"],
-        "operationId": "processWebDavCommand_4",
+        "operationId": "processWebDavCommand_6",
         "parameters": [
           {
             "name": "spaceId",
@@ -10994,6 +11205,23 @@
           }
         }
       },
+      "DocumentSpaceAppClientMemberRequestDto": {
+        "required": ["appClientId", "privileges"],
+        "type": "object",
+        "properties": {
+          "appClientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "privileges": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["WRITE", "MEMBERSHIP"]
+            }
+          }
+        }
+      },
       "SubscriberDto": {
         "required": ["appClientUser", "subscribedEvent"],
         "type": "object",
@@ -11624,6 +11852,50 @@
           }
         }
       },
+      "AppClientSummaryDtoResponseWrapper": {
+        "required": ["data"],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppClientSummaryDto"
+            }
+          }
+        }
+      },
+      "DocumentSpaceAppClientResponseDto": {
+        "required": ["appClientId", "appClientName", "privileges"],
+        "type": "object",
+        "properties": {
+          "appClientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "appClientName": {
+            "type": "string"
+          },
+          "privileges": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["READ", "WRITE", "MEMBERSHIP"]
+            }
+          }
+        }
+      },
+      "DocumentSpaceAppClientResponseDtoWrapper": {
+        "required": ["data"],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentSpaceAppClientResponseDto"
+            }
+          }
+        }
+      },
       "DocumentSpaceMobileResponseDto": {
         "type": "object",
         "properties": {
@@ -11837,18 +12109,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AppSourceDto"
-            }
-          }
-        }
-      },
-      "AppClientSummaryDtoResponseWrapper": {
-        "required": ["data"],
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AppClientSummaryDto"
             }
           }
         }

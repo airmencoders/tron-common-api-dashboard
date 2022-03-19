@@ -986,6 +986,78 @@
       ],
       "type": "object"
     },
+    "DocumentSpaceAppClientMemberRequestDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientId": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "appClientId",
+        "privileges"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum": {
+      "enum": [
+        "WRITE",
+        "MEMBERSHIP"
+      ],
+      "type": "string"
+    },
+    "DocumentSpaceAppClientResponseDto": {
+      "additionalProperties": false,
+      "properties": {
+        "appClientId": {
+          "type": "string"
+        },
+        "appClientName": {
+          "type": "string"
+        },
+        "privileges": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceAppClientResponseDtoPrivilegesEnum"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "appClientId",
+        "appClientName",
+        "privileges"
+      ],
+      "type": "object"
+    },
+    "DocumentSpaceAppClientResponseDtoPrivilegesEnum": {
+      "enum": [
+        "READ",
+        "WRITE",
+        "MEMBERSHIP"
+      ],
+      "type": "string"
+    },
+    "DocumentSpaceAppClientResponseDtoWrapper": {
+      "additionalProperties": false,
+      "properties": {
+        "data": {
+          "items": {
+            "$ref": "model-types.json#/definitions/DocumentSpaceAppClientResponseDto"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "type": "object"
+    },
     "DocumentSpaceArchiveItemsDto": {
       "additionalProperties": false,
       "properties": {
