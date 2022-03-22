@@ -1,11 +1,23 @@
-import { fireEvent, render, waitFor, screen } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DocumentSpaceDashboardMemberResponseDto } from '../../../../openapi';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from '../../../../openapi/apis/document-space-controller-api';
-import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';
-import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
-import { createAxiosSuccessResponse } from '../../../../utils/TestUtils/test-utils';
+import {
+  DocumentSpaceControllerApi,
+  DocumentSpaceControllerApiInterface
+} from '../../../../openapi/apis/document-space-controller-api';
+import DocumentSpaceMembershipService
+  from '../../../../state/document-space/memberships/document-space-membership-service';
+import {
+  documentSpaceMembershipService,
+  useDocumentSpaceMembershipsPageState
+} from '../../../../state/document-space/document-space-state';
 import DocumentSpaceMembershipsDrawer from '../DocumentSpaceMembershipsDrawer';
+import {
+  BatchUploadState,
+  DocumentSpaceMembershipsState
+} from '../../../../state/document-space/memberships-page/memberships-page-state';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
+import DocumentSpaceMembershipsPageService
+  from '../../../../state/document-space/memberships-page/memberships-page-service';
 
 jest.mock('../../../../openapi/apis/document-space-controller-api');
 jest.mock('../../../../state/document-space/document-space-state');
@@ -15,12 +27,61 @@ describe('Document Space Membership Drawer Tests', () => {
 
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
   let membershipService: DocumentSpaceMembershipService;
+  let membershipPageState: State<DocumentSpaceMembershipsState> & StateMethodsDestroy;
+  let uploadState: State<BatchUploadState> & StateMethodsDestroy;
 
   beforeEach(() => {
     documentSpaceApi = new DocumentSpaceControllerApi();
     membershipService = new DocumentSpaceMembershipService(documentSpaceApi);
+    membershipPageState = createState<DocumentSpaceMembershipsState>({
+      datasourceState: {
+        datasource: undefined,
+        shouldUpdateDatasource: true,
+      },
+      membersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false,
+        },
+        membersToUpdate: [],
+        submitting: false,
+        memberUpdateSuccessMessage: '',
+        memberUpdateFailMessage: '',
+        showUpdateFailMessage: false,
+        showUpdateSuccessMessage: true,
+      },
+      appClientsDatasourceState: {
+        datasource: undefined,
+        shouldUpdateDatasource: true,
+      },
+      appClientMembersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false,
+        },
+        membersToUpdate: [],
+        submitting: false,
+        memberUpdateSuccessMessage: '',
+        memberUpdateFailMessage: '',
+        showUpdateFailMessage: false,
+        showUpdateSuccessMessage: false,
+      },
+      selectedTab: 0,
+    });
+
+    uploadState = createState<BatchUploadState>({
+      successErrorState: {
+        successMessage: 'Successfully added members to Document Space',
+        errorMessage: '',
+        showSuccessMessage: false,
+        showErrorMessage: false,
+        showCloseButton: true,
+      }
+    });
 
     (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
+    (useDocumentSpaceMembershipsPageState as jest.Mock)
+      .mockReturnValue(new DocumentSpaceMembershipsPageService(membershipPageState, uploadState, membershipService));
   });
 
   it('should close modal when Submit(close) button pressed', async () => {
@@ -39,7 +100,7 @@ describe('Document Space Membership Drawer Tests', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
   });
 
-  it('should trigger infinite cache update on member change', async () => {
+  it('should render the initial memberships drawer state', async () => {
     const onSubmit = jest.fn();
     const page = render(
       <DocumentSpaceMembershipsDrawer
@@ -50,47 +111,11 @@ describe('Document Space Membership Drawer Tests', () => {
       />
     );
 
-    expect(page.queryByText('Member Management')).toBeInTheDocument();
-
-    const response = jest.fn(() => {
-      return Promise.resolve(createAxiosSuccessResponse({}));
-    });
-    const addMemberSpy = jest.spyOn(membershipService, 'addDocumentSpaceMember').mockImplementation(response);
-
-    const emailField = page.getByLabelText('Email');
-    expect(emailField).toBeInTheDocument();
-    userEvent.type(emailField, 'test@email.com');
-
-    const writePrivilegeCheckbox = page.getByTestId('privilege_WRITE');
-    expect(writePrivilegeCheckbox).toBeInTheDocument();
-    userEvent.click(writePrivilegeCheckbox);
-
-    const addBtn = page.getByText('Add User');
-    expect(addBtn).toBeEnabled();
-    userEvent.click(addBtn);
-
-    await waitFor(() => expect(response).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(addMemberSpy).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(page.queryByText('Add New Member')).toBeInTheDocument());
+    await waitFor(() => expect(page.queryByText('Add New App Client')).toBeInTheDocument());
+    await waitFor(() => expect(page.queryByText('Add Member')).toBeInTheDocument());
+    await waitFor(() => expect(page.queryByText('Manage Members')).toBeInTheDocument());
+    await waitFor(() => expect(page.queryByText('Manage App Clients')).toBeInTheDocument());
   });
 
-  it('should allow managing of members privileges', async () => {
-    const onSubmit = jest.fn();
-
-    jest.spyOn(documentSpaceApi, 'getDashboardUsersForDocumentSpace').mockReturnValue(Promise.resolve(createAxiosSuccessResponse({ 
-      data: [ { email: 'joe@test.com', id: 'blah', privileges: [ { id: 'fsdf', type: 'WRITE' }] } ] as DocumentSpaceDashboardMemberResponseDto[]
-    })));
-
-    const page = render(
-      <DocumentSpaceMembershipsDrawer
-        documentSpaceId={documentSpaceId}
-        onSubmit={onSubmit}
-        isOpen={true}
-        onCloseHandler={jest.fn()}
-      />
-    );
-
-    fireEvent.click(page.getByText('Manage Members'));
-    await waitFor(() => expect(page.getByText('Assigned Members')).toBeVisible());
-    await waitFor(() => expect(page.getByText('joe@test.com')).toBeVisible());
-  });
 });

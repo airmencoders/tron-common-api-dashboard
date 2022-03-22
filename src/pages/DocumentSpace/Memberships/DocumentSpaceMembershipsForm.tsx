@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import './DocumentSpaceMembershipsForm.scss';
 import AddDocumentSpaceAppClientMember from './AddMembershipSubForms/AddDocumentSpaceAppClientMember';
 import AddDocumentSpaceUserMember from './AddMembershipSubForms/AddDocumentSpaceUserMember';
+import { useDocumentSpaceMembershipsPageState } from '../../../state/document-space/document-space-state';
 
 /**
  * Hosts the sub components for adding new users and appclients to a doc space
@@ -9,31 +10,22 @@ import AddDocumentSpaceUserMember from './AddMembershipSubForms/AddDocumentSpace
 
 export interface DocumentSpaceMembershipsFormProps {
   documentSpaceId: string;
-  onMemberChangeCallback: () => void;
   onCloseHandler?: () => void;
 }
 
 function DocumentSpaceMembershipsForm(props: DocumentSpaceMembershipsFormProps) {  
-  const mountedRef = useRef(false);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return function cleanup() {
-      mountedRef.current = false;
-    };
-  }, []); 
-
+  const pageState = useDocumentSpaceMembershipsPageState();
   return (
-    <React.Fragment>
+    <>
       <AddDocumentSpaceUserMember documentSpaceId={props.documentSpaceId}
         onCloseHandler={props.onCloseHandler}
-        onMemberChangeCallback={props.onMemberChangeCallback}
+        onMemberChangeCallback={pageState.onMemberChangeCallback.bind(pageState)}
       />
       <AddDocumentSpaceAppClientMember documentSpaceId={props.documentSpaceId}
         onCloseHandler={props.onCloseHandler}
-        onMemberChangeCallback={props.onMemberChangeCallback}
+        onMemberChangeCallback={pageState.onMemberChangeCallback.bind(pageState)}
       />
-    </React.Fragment>
+    </>
   );
 }
 

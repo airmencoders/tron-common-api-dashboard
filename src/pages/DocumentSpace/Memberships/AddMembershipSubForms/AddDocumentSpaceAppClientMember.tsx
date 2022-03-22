@@ -16,6 +16,7 @@ import { AppClientSummaryDto, DocumentSpaceAppClientMemberRequestDto, DocumentSp
 import { FormActionType } from '../../../../state/crud-page/form-action-type';
 import { documentSpaceMembershipService } from '../../../../state/document-space/document-space-state';
 import { DocumentSpacePrivilegeNiceName } from '../../../../state/document-space/memberships/document-space-privilege-nice-name';
+import { resolvePrivName, unResolvePrivName } from '../../../../utils/document-space-utils';
 import { prepareRequestError } from '../../../../utils/ErrorHandling/error-handling-utils';
 import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified } from '../../../../utils/validation-utils';
 
@@ -125,7 +126,7 @@ export default function AddDocumentSpaceAppClientMember(props: DocumentSpaceAppC
   function onAppClientPrivilegeChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {      
       membershipState.appClientMember.privileges.set(
-        membershipService.unResolvePrivName(membershipService.resolvePrivName(event.target.name)) as DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum[]
+        unResolvePrivName(resolvePrivName(event.target.name)) as DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum[]
       ); // will grant the selected priv and any below it
     } else {
       membershipState.appClientMember.privileges.merge((prev) => {

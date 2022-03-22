@@ -15,6 +15,8 @@ import { SideDrawerSize } from '../../components/SideDrawer/side-drawer-size';
 import { SpacesPageState } from './spaces-page/spaces-page-state';
 import SpacesPageService from './spaces-page/spaces-page-service';
 import { CreateEditOperationType } from '../../utils/document-space-utils';
+import { BatchUploadState, DocumentSpaceMembershipsState } from './memberships-page/memberships-page-state';
+import DocumentSpaceMembershipsPageService from './memberships-page/memberships-page-service';
 
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
@@ -76,6 +78,65 @@ const spacesPageState = createState<SpacesPageState>({
   selectedItemForSize: undefined,
   searchQuery: undefined,
 });
+
+const membershipsPageState = createState<DocumentSpaceMembershipsState>({
+  datasourceState: {
+    datasource: undefined,
+    shouldUpdateDatasource: false,
+  },
+  membersState: {
+    selected: [],
+    deletionState: {
+      isConfirmationOpen: false,
+    },
+    membersToUpdate: [],
+    submitting: false,
+    memberUpdateSuccessMessage: '',
+    memberUpdateFailMessage: '',
+    showUpdateFailMessage: false,
+    showUpdateSuccessMessage: true,
+  },
+  appClientsDatasourceState: {
+    datasource: undefined,
+    shouldUpdateDatasource: false,
+  },
+  appClientMembersState: {
+    selected: [],
+    deletionState: {
+      isConfirmationOpen: false,
+    },
+    membersToUpdate: [],
+    submitting: false,
+    memberUpdateSuccessMessage: '',
+    memberUpdateFailMessage: '',
+    showUpdateFailMessage: false,
+    showUpdateSuccessMessage: false,
+  },
+  selectedTab: 0,
+});
+
+const batchUploadState = createState<BatchUploadState>({
+  successErrorState: {
+    successMessage: 'Successfully added members to Document Space',
+    errorMessage: '',
+    showSuccessMessage: false,
+    showErrorMessage: false,
+    showCloseButton: true,
+  },
+}); 
+
+const wrapDocumentSpaceMembershipsPageState = (
+  membershipsPageState: State<DocumentSpaceMembershipsState>,
+  batchUploadState: State<BatchUploadState>,
+  membershipsService: DocumentSpaceMembershipService) => {
+    return new DocumentSpaceMembershipsPageService(membershipsPageState, batchUploadState, membershipsService);
+  }
+
+export const useDocumentSpaceMembershipsPageState = () => wrapDocumentSpaceMembershipsPageState(
+  useState(membershipsPageState),
+  useState(batchUploadState),
+  documentSpaceMembershipService()
+);
 
 const globalDocumentSpaceState = createState<DocumentSpaceGlobalState>({
   currentDocumentSpace: undefined

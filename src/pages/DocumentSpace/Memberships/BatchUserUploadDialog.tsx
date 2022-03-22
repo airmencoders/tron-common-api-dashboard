@@ -2,7 +2,6 @@ import React from 'react';
 import Button from '../../../components/Button/Button';
 import {documentSpaceMembershipService} from '../../../state/document-space/document-space-state';
 import { State, useHookstate } from "@hookstate/core";
-import {BatchUploadState} from "./DocumentSpaceMembershipsDrawer";
 import {createTextToast} from "../../../components/Toast/ToastUtils/ToastUtils";
 import {ToastType} from "../../../components/Toast/ToastUtils/toast-type";
 import UploadIcon from '../../../icons/UploadIcon';
@@ -13,6 +12,7 @@ import ModalFooterSubmit from '../../../components/Modal/ModalFooterSubmit';
 import Accordion from '../../../components/Accordion/Accordion';
 import './BatchUserUploadDialog.scss';
 import InfoNotice from '../../../components/InfoNotice/InfoNotice';
+import { BatchUploadState } from '../../../state/document-space/memberships-page/memberships-page-state';
 
 
 export interface DocumentUploadProps {

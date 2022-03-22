@@ -17,6 +17,7 @@ import { DocumentSpaceDashboardMemberRequestDto, DocumentSpaceDashboardMemberReq
 import { FormActionType } from "../../../../state/crud-page/form-action-type";
 import { documentSpaceMembershipService } from "../../../../state/document-space/document-space-state";
 import { DocumentSpacePrivilegeNiceName } from "../../../../state/document-space/memberships/document-space-privilege-nice-name";
+import { resolvePrivName, unResolvePrivName } from "../../../../utils/document-space-utils";
 import { prepareRequestError } from "../../../../utils/ErrorHandling/error-handling-utils";
 import { failsHookstateValidation, generateStringErrorMessages, isFormFieldModified, isFormModified, validateEmail, validateRequiredString, validationErrors } from "../../../../utils/validation-utils";
 
@@ -125,7 +126,7 @@ export default function AddDocumentSpaceUserMember(props: DocumentSpaceUserMembe
   function onPrivilegeChange(event: ChangeEvent<HTMLInputElement>) {
     if (event.target.checked) {
       membershipState.member.privileges.set(
-        membershipService.unResolvePrivName(membershipService.resolvePrivName(event.target.name)) as DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum[]
+        unResolvePrivName(resolvePrivName(event.target.name)) as DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum[]
       ); // will grant the selected priv and any below it
     } else {
       membershipState.member.privileges.merge((prev) => {

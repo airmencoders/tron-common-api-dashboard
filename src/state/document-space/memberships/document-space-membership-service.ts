@@ -1,5 +1,4 @@
 import {IDatasource, IGetRowsParams} from 'ag-grid-community';
-import { utimes } from 'fs';
 import {InfiniteScrollOptions} from '../../../components/DataCrudFormPage/infinite-scroll-options';
 import {convertAgGridSortToQueryParams, generateInfiniteScrollLimit} from '../../../components/Grid/GridUtils/grid-utils';
 import {ToastType} from '../../../components/Toast/ToastUtils/toast-type';
@@ -179,61 +178,5 @@ export default class DocumentSpaceMembershipService {
 
   batchAddUserToDocumentSpace(id: string, file?: any) {
     return this.documentSpaceApi.batchAddUserToDocumentSpace(id, file);
-  }
-
-  // converts backend priv names to friendlier names for UI/users per mocks
-  resolvePrivName(privName: DocumentSpacePrivilegeDtoTypeEnum 
-      | DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum 
-      | string): string {
-        
-    if (privName === DocumentSpacePrivilegeDtoTypeEnum.Membership) {
-      return DocumentSpacePrivilegeNiceName.ADMIN;
-    } else if (privName === DocumentSpacePrivilegeDtoTypeEnum.Write) {
-      return DocumentSpacePrivilegeNiceName.EDITOR;
-    } else {
-      return DocumentSpacePrivilegeNiceName.VIEWER;
-    }
-  }
-
-  // converts friendly priv names from the UI to the needed one(s) for the backend
-  //  it also gives any of the "free" implicit ones that come with a higher privilege (e.g. ADMIN gives EDITOR AND VIEWER)
-  unResolvePrivName(privilegeNiceName: DocumentSpacePrivilegeNiceName | string):
-     (DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum | DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum)[] {
-
-    if (privilegeNiceName === DocumentSpacePrivilegeNiceName.ADMIN) {
-      return [ DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write ];
-    } else if (privilegeNiceName === DocumentSpacePrivilegeNiceName.EDITOR) {
-      return [ DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write ]
-    } else {
-      return [];
-    }
-  }
-
-  /**
-   * Determines the most privileged privilege in a list of privileges
-   * e.g. WRITE priv would result from a set containing [ READ, WRITE ]..
-   * @param data 
-   * @returns the most privileged (highest) privilege
-   */
-  getHighestPriv(data: DocumentSpacePrivilegeDtoTypeEnum[]): string {
-    if (!data) return '';
-
-    if (data.find((item) => item === DocumentSpacePrivilegeDtoTypeEnum.Membership))
-      return this.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership);
-    else if (data.find((item) => item === DocumentSpacePrivilegeDtoTypeEnum.Write))
-      return this.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write);
-    else return this.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read);
-  }
-
-  // callback for the combobox renderer to decide what item is selected, go with highest priv if more than one..
-  getHighestPrivForMember(data: DocumentSpaceDashboardMemberResponseDto): string {
-    if (!data) return '';
-    return this.getHighestPriv(data.privileges.map(item => item.type));
-  }
-
-  // callback for an appclient member's combobox renderer to decide what item is selected, go with highest priv if more than one..
-  getHighestPrivForAppCLientMember(data: DocumentSpaceAppClientResponseDto): string {
-    if (!data) return '';
-    return this.getHighestPriv(data.privileges.map(item => item.toUpperCase()) as DocumentSpacePrivilegeDtoTypeEnum[]);
-  }
+  }  
 }
