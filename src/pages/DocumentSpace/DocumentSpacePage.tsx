@@ -10,7 +10,6 @@ import FormGroup from '../../components/forms/FormGroup/FormGroup';
 import InfoNotice from '../../components/InfoNotice/InfoNotice';
 import PageFormat from '../../components/PageFormat/PageFormat';
 import SideDrawer from '../../components/SideDrawer/SideDrawer';
-import TabBar from '../../components/TabBar/TabBar';
 import { ToastType } from '../../components/Toast/ToastUtils/toast-type';
 import { createTextToast } from '../../components/Toast/ToastUtils/ToastUtils';
 import AddMaterialIcon from '../../icons/AddMaterialIcon';
@@ -327,8 +326,8 @@ function DocumentSpacePage() {
           <DocumentSpaceMembershipsDrawer
             documentSpaceId={pageService.state.selectedSpace.value.id}
             isOpen={pageService.state.membershipsState.isOpen.value}
-            onSubmit={() => pageService.state.membershipsState.isOpen.set(false)}
-            onCloseHandler={() => pageService.state.membershipsState.isOpen.set(false)}
+            onSubmit={pageService.closeMembershipsDrawer.bind(pageService)}
+            onCloseHandler={pageService.closeMembershipsDrawer.bind(pageService)}
           />
         )}
     </PageFormat>

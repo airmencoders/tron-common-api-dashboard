@@ -548,6 +548,10 @@ export default class SpacesPageService extends AbstractGlobalStateService<Spaces
     this.spacesState.merge({ isDefaultDocumentSpaceSettingsOpen: false });
   }
 
+  closeMembershipsDrawer(): void {
+    this.spacesState.membershipsState.merge({ isOpen: false });
+  }
+
   closeErrorMsg(): void {
     this.spacesState.merge({ showErrorMessage: false });
   }

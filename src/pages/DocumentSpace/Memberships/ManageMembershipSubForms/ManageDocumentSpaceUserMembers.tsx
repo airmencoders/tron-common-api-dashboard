@@ -74,7 +74,7 @@ export default function ManageDocumentSpaceUserMembers(props: ManageDocumentSpac
   }
 
   return (
-    <Form onSubmit={(event) => pageState.saveMembers.bind(pageState, props.documentSpaceId, event)()}className="edit-members-form">
+    <Form id="docspace-members-add-form" onSubmit={(event) => pageState.saveMembers.bind(pageState, props.documentSpaceId, event)()} className="edit-members-form">
       <div className="document-space-members">
         <div className="document-space-members__header">
           <h4 className="header__title">Assigned Members</h4>

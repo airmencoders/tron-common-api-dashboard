@@ -28,10 +28,13 @@ import {
   documentSpaceDownloadUrlService,
   documentSpaceMembershipService,
   useDocumentSpaceGlobalState,
+  useDocumentSpaceMembershipsPageState,
   useDocumentSpacePageState,
   useDocumentSpacePrivilegesState,
   useDocumentSpaceState
 } from '../../../../state/document-space/document-space-state';
+import DocumentSpaceMembershipsPageService from '../../../../state/document-space/memberships-page/memberships-page-service';
+import { DocumentSpaceMembershipsState, BatchUploadState } from '../../../../state/document-space/memberships-page/memberships-page-state';
 import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';
 import SpacesPageService from '../../../../state/document-space/spaces-page/spaces-page-service';
 import { SpacesPageState } from '../../../../state/document-space/spaces-page/spaces-page-state';
@@ -69,6 +72,8 @@ describe('Search Space Tests', () => {
   let documentSpacePrivilegeService: DocumentSpacePrivilegeService;
 
   let membershipService: DocumentSpaceMembershipService;
+  let membershipPageState: State<DocumentSpaceMembershipsState> & StateMethodsDestroy;
+  let uploadState: State<BatchUploadState> & StateMethodsDestroy;
 
   let globalDocumentSpaceState: State<DocumentSpaceGlobalState>;
   let globalDocumentSpaceService: DocumentSpaceGlobalService;
@@ -152,6 +157,52 @@ describe('Search Space Tests', () => {
       clipboardStateLocal
     );
 
+    membershipPageState = createState<DocumentSpaceMembershipsState>({
+      datasourceState: {
+        datasource: undefined,
+        shouldUpdateDatasource: true,
+      },
+      membersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false,
+        },
+        membersToUpdate: [],
+        submitting: false,
+        memberUpdateSuccessMessage: '',
+        memberUpdateFailMessage: '',
+        showUpdateFailMessage: false,
+        showUpdateSuccessMessage: true,
+      },
+      appClientsDatasourceState: {
+        datasource: undefined,
+        shouldUpdateDatasource: true,
+      },
+      appClientMembersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false,
+        },
+        membersToUpdate: [],
+        submitting: false,
+        memberUpdateSuccessMessage: '',
+        memberUpdateFailMessage: '',
+        showUpdateFailMessage: false,
+        showUpdateSuccessMessage: false,
+      },
+      selectedTab: 0,
+    });
+
+    uploadState = createState<BatchUploadState>({
+      successErrorState: {
+        successMessage: 'Successfully added members to Document Space',
+        errorMessage: '',
+        showSuccessMessage: false,
+        showErrorMessage: false,
+        showCloseButton: true,
+      }
+    });
+
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
@@ -159,6 +210,9 @@ describe('Search Space Tests', () => {
     (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
     (useDocumentSpacePageState as jest.Mock).mockReturnValue(documentSpacePageService);
     (documentSpaceDownloadUrlService as jest.Mock).mockReturnValue(new DocumentSpaceDownloadUrlService());
+    (useDocumentSpaceMembershipsPageState as jest.Mock)
+      .mockReturnValue(new DocumentSpaceMembershipsPageService(membershipPageState, uploadState, membershipService));
+      
     setupDefaultMocks();
   });
 
@@ -166,6 +220,7 @@ describe('Search Space Tests', () => {
   function setupDefaultMocks() {
     fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(membershipService, 'getAvailableAppClientsForDocumentSpace').mockReturnValue(Promise.resolve([]));
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
   }
 

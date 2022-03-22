@@ -14,6 +14,7 @@ import {
   DocumentSpaceDashboardMemberResponseDtoResponseWrapper,
   DocumentSpacePrivilegeDtoTypeEnum
 } from '../../../../openapi';
+import { resolvePrivName, unResolvePrivName, getHighestPrivForMember } from '../../../../utils/document-space-utils';
 import {
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse,
@@ -338,26 +339,26 @@ describe('Test Document Space Membership Service', () => {
   });
 
   it('should resolve Document Space Privileges to nice names', () => {
-    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership)).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
-    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
-    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read)).toEqual(DocumentSpacePrivilegeNiceName.VIEWER);
+    expect(resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership)).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
+    expect(resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
+    expect(resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read)).toEqual(DocumentSpacePrivilegeNiceName.VIEWER);
   });
 
   it('should resolve privilege nice names to Document Space Privileges', () => {
-    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.ADMIN)).toEqual([
+    expect(unResolvePrivName(DocumentSpacePrivilegeNiceName.ADMIN)).toEqual([
       DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
     ]);
-    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.EDITOR)).toEqual([
+    expect(unResolvePrivName(DocumentSpacePrivilegeNiceName.EDITOR)).toEqual([
       DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
     ]);
-    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.VIEWER)).toEqual([]);
+    expect(unResolvePrivName(DocumentSpacePrivilegeNiceName.VIEWER)).toEqual([]);
   });
 
   it('should get the highest privilege level for Document Space member', () => {
-    expect(membershipService.getHighestPrivForMember(members[0])).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
-    expect(membershipService.getHighestPrivForMember(members[1])).toEqual(DocumentSpacePrivilegeNiceName.VIEWER);
-    expect(membershipService.getHighestPrivForMember(members[2])).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
-    expect(membershipService.getHighestPrivForMember(undefined as any)).toEqual('');
+    expect(getHighestPrivForMember(members[0])).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
+    expect(getHighestPrivForMember(members[1])).toEqual(DocumentSpacePrivilegeNiceName.VIEWER);
+    expect(getHighestPrivForMember(members[2])).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
+    expect(getHighestPrivForMember(undefined as any)).toEqual('');
   });
 
   it('should get list of app clients available to assign to a doc space', async () => {
