@@ -140,6 +140,7 @@ describe('Membership Page Service Tests', () => {
 
     apiSpy.mockReset();
     apiSpy = jest.spyOn(membershipService, 'removeDocumentSpaceDashboardMembers').mockReturnValue(Promise.reject({}) as AxiosPromise);
+    membershipPageService.onMemberDeleteConfirmation('id', true);
     expect(membershipPageState.datasourceState.shouldUpdateDatasource.get()).toBeFalsy();
   });
 
@@ -236,6 +237,7 @@ describe('Membership Page Service Tests', () => {
 
     apiSpy.mockReset();
     apiSpy = jest.spyOn(membershipService, 'removeDocumentSpaceAppClientMember').mockReturnValue(Promise.reject({}) as AxiosPromise);
+    membershipPageService.onAppClientMemberDeleteConfirmation('id', true);
     expect(membershipPageState.appClientsDatasourceState.shouldUpdateDatasource.get()).toBeFalsy();
   });
 
