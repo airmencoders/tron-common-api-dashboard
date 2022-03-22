@@ -18,6 +18,10 @@ import { CreateEditOperationType } from '../../utils/document-space-utils';
 import { BatchUploadState, DocumentSpaceMembershipsState } from './memberships-page/memberships-page-state';
 import DocumentSpaceMembershipsPageService from './memberships-page/memberships-page-service';
 
+/**
+ * Holds all state objects (hookstate global states) used by all the document space pages/services
+ */
+
 const spacesState = createState<DocumentSpaceResponseDto[]>(new Array<DocumentSpaceResponseDto>());
 const privilegeState = createState<Record<string, Record<DocumentSpacePrivilegeDtoTypeEnum, boolean>>>({});
 
@@ -126,10 +130,10 @@ const batchUploadState = createState<BatchUploadState>({
 }); 
 
 const wrapDocumentSpaceMembershipsPageState = (
-  membershipsPageState: State<DocumentSpaceMembershipsState>,
+  membershipPageState: State<DocumentSpaceMembershipsState>,
   batchUploadState: State<BatchUploadState>,
   membershipsService: DocumentSpaceMembershipService) => {
-    return new DocumentSpaceMembershipsPageService(membershipsPageState, batchUploadState, membershipsService);
+    return new DocumentSpaceMembershipsPageService(membershipPageState, batchUploadState, membershipsService);
   }
 
 export const useDocumentSpaceMembershipsPageState = () => wrapDocumentSpaceMembershipsPageState(
