@@ -131,9 +131,9 @@ const batchUploadState = createState<BatchUploadState>({
 
 const wrapDocumentSpaceMembershipsPageState = (
   membershipPageState: State<DocumentSpaceMembershipsState>,
-  batchUploadState: State<BatchUploadState>,
+  uploadState: State<BatchUploadState>,
   membershipsService: DocumentSpaceMembershipService) => {
-    return new DocumentSpaceMembershipsPageService(membershipPageState, batchUploadState, membershipsService);
+    return new DocumentSpaceMembershipsPageService(membershipPageState, uploadState, membershipsService);
   }
 
 export const useDocumentSpaceMembershipsPageState = () => wrapDocumentSpaceMembershipsPageState(
