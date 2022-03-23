@@ -1,4 +1,4 @@
-FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/nodejs14:14.15.5 AS builder
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/nodejs16:16.3.0 AS builder
 USER node 
 WORKDIR /home/node
 COPY --chown=node:node . /home/node/

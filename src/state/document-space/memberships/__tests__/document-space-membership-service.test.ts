@@ -2,6 +2,11 @@ import { waitFor } from '@testing-library/dom';
 import { AxiosResponse } from 'axios';
 import { InfiniteScrollOptions } from '../../../../components/DataCrudFormPage/infinite-scroll-options';
 import {
+  AppClientSummaryDtoResponseWrapper,
+  DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum,
+  DocumentSpaceAppClientResponseDto,
+  DocumentSpaceAppClientResponseDtoPrivilegesEnum,
+  DocumentSpaceAppClientResponseDtoWrapper,
   DocumentSpaceControllerApi,
   DocumentSpaceControllerApiInterface,
   DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum,
@@ -9,11 +14,12 @@ import {
   DocumentSpaceDashboardMemberResponseDtoResponseWrapper,
   DocumentSpacePrivilegeDtoTypeEnum
 } from '../../../../openapi';
+import { resolvePrivName, unResolvePrivName, getHighestPrivForMember } from '../../../../utils/document-space-utils';
 import {
   createAxiosSuccessResponse,
   createGenericAxiosRequestErrorResponse,
 } from '../../../../utils/TestUtils/test-utils';
-import DocumentSpaceMembershipService from '../document-space-membership-service';
+import DocumentSpaceMembershipService, { MemberTypeEnum } from '../document-space-membership-service';
 import { DocumentSpacePrivilegeNiceName } from '../document-space-privilege-nice-name';
 
 describe('Test Document Space Membership Service', () => {
@@ -23,6 +29,21 @@ describe('Test Document Space Membership Service', () => {
   };
 
   const documentSpaceId = 'b8529a48-a61c-45a7-b0d1-2eb5d429d3bf';
+
+  const appClientMembers: DocumentSpaceAppClientResponseDto[] = [
+    {
+      appClientId: 'some app id1',
+      appClientName: 'app1',
+      privileges: [ DocumentSpaceAppClientResponseDtoPrivilegesEnum.Membership,
+        DocumentSpaceAppClientResponseDtoPrivilegesEnum.Read,
+        DocumentSpaceAppClientResponseDtoPrivilegesEnum.Write
+      ]
+    }, {
+      appClientId: 'some app id2',
+      appClientName: 'app2',
+      privileges: [ DocumentSpaceAppClientResponseDtoPrivilegesEnum.Read ]
+    },
+  ];
 
   const members: DocumentSpaceDashboardMemberResponseDto[] = [
     {
@@ -64,6 +85,12 @@ describe('Test Document Space Membership Service', () => {
   const membersResponse: AxiosResponse<DocumentSpaceDashboardMemberResponseDtoResponseWrapper> = createAxiosSuccessResponse(
     {
       data: members
+    }
+  );
+
+  const appClientMembersResponse: AxiosResponse<DocumentSpaceAppClientResponseDtoWrapper> = createAxiosSuccessResponse(
+    {
+      data: appClientMembers
     }
   );
 
@@ -111,6 +138,43 @@ describe('Test Document Space Membership Service', () => {
     expect(apiRequestSpy).toHaveBeenCalledTimes(1);
   });
 
+  it('should create datasource and fetch app client members', (done) => {
+    documentSpaceApi.getAppClientUsersForDocumentSpace = jest.fn(() => {
+      return Promise.resolve(appClientMembersResponse);
+    });
+
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getAppClientUsersForDocumentSpace');
+
+    const onSuccess = jest.fn((data, lastRow) => {
+      try {
+        expect(data).toEqual(
+          expect.arrayContaining(appClientMembersResponse.data.data)
+        );
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+    const onFail = jest.fn();
+    const datasource = membershipService.createMembersDatasource(
+      documentSpaceId,
+      infiniteScrollOptions,
+      MemberTypeEnum.APP_CLIENT
+    );
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+  });
+
+
   it('should create datasource and fail on server error response', (done) => {
     const badRequestError = createGenericAxiosRequestErrorResponse(500);
 
@@ -131,6 +195,41 @@ describe('Test Document Space Membership Service', () => {
     const datasource = membershipService.createMembersDatasource(
       documentSpaceId,
       infiniteScrollOptions
+    );
+    datasource.getRows({
+      successCallback: onSuccess,
+      failCallback: onFail,
+      startRow: 0,
+      endRow: 100,
+      sortModel: [],
+      filterModel: {},
+      context: undefined,
+    });
+
+    expect(apiRequestSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should create datasource and fail on server error respons for app client members', (done) => {
+    const badRequestError = createGenericAxiosRequestErrorResponse(500);
+
+    documentSpaceApi.getAppClientUsersForDocumentSpace = jest.fn(() => {
+      return Promise.reject(badRequestError);
+    });
+
+    const apiRequestSpy = jest.spyOn(documentSpaceApi, 'getAppClientUsersForDocumentSpace');
+
+    const onSuccess = jest.fn();
+    const onFail = jest.fn(() => {
+      try {
+        done();
+      } catch (err) {
+        done(err);
+      }
+    });
+    const datasource = membershipService.createMembersDatasource(
+      documentSpaceId,
+      infiniteScrollOptions,
+      MemberTypeEnum.APP_CLIENT
     );
     datasource.getRows({
       successCallback: onSuccess,
@@ -193,6 +292,23 @@ describe('Test Document Space Membership Service', () => {
     await waitFor(() => expect(addMemberApiSpy).toHaveBeenCalledTimes(1));
   });
 
+  it('should add new app client member', async () => {
+    const response = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse({}));
+    });
+    const addMemberApiSpy = jest.spyOn(documentSpaceApi, 'addAppClientToDocumentSpace').mockImplementation(response);
+
+    // add new app client member with using its app client ID and privilege (none is READ only)
+    membershipService.addDocumentSpaceAppClientMember(documentSpaceId, {
+      appClientId: 'some id3',
+      privileges: [
+        DocumentSpaceAppClientMemberRequestDtoPrivilegesEnum.Write
+      ]
+    });
+
+    await waitFor(() => expect(addMemberApiSpy).toHaveBeenCalledTimes(1));
+  });
+
   it('should remove members', async () => {
     const response = jest.fn(() => {
       return Promise.resolve(createAxiosSuccessResponse({}));
@@ -213,26 +329,80 @@ describe('Test Document Space Membership Service', () => {
     await waitFor(() => expect(removeMemberApiSpy).toHaveBeenCalledTimes(1));
   });
 
+  it('should remove app client members', async () => {
+    const response = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse({}));
+    });
+    const removeMemberApiSpy = jest.spyOn(documentSpaceApi, 'removeAppClientFromDocumentSpace').mockImplementation(response);
+    membershipService.removeDocumentSpaceAppClientMember(documentSpaceId, 'some id3');
+    await waitFor(() => expect(removeMemberApiSpy).toHaveBeenCalledTimes(1));
+  });
+
   it('should resolve Document Space Privileges to nice names', () => {
-    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership)).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
-    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
-    expect(membershipService.resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read)).toEqual(DocumentSpacePrivilegeNiceName.VIWER);
+    expect(resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Membership)).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
+    expect(resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Write)).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
+    expect(resolvePrivName(DocumentSpacePrivilegeDtoTypeEnum.Read)).toEqual(DocumentSpacePrivilegeNiceName.VIEWER);
   });
 
   it('should resolve privilege nice names to Document Space Privileges', () => {
-    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.ADMIN)).toEqual([
+    expect(unResolvePrivName(DocumentSpacePrivilegeNiceName.ADMIN)).toEqual([
       DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Membership, DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
     ]);
-    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.EDITOR)).toEqual([
+    expect(unResolvePrivName(DocumentSpacePrivilegeNiceName.EDITOR)).toEqual([
       DocumentSpaceDashboardMemberRequestDtoPrivilegesEnum.Write
     ]);
-    expect(membershipService.unResolvePrivName(DocumentSpacePrivilegeNiceName.VIWER)).toEqual([]);
+    expect(unResolvePrivName(DocumentSpacePrivilegeNiceName.VIEWER)).toEqual([]);
   });
 
   it('should get the highest privilege level for Document Space member', () => {
-    expect(membershipService.getHighestPrivForMember(members[0])).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
-    expect(membershipService.getHighestPrivForMember(members[1])).toEqual(DocumentSpacePrivilegeNiceName.VIWER);
-    expect(membershipService.getHighestPrivForMember(members[2])).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
-    expect(membershipService.getHighestPrivForMember(undefined as any)).toEqual('');
+    expect(getHighestPrivForMember(members[0])).toEqual(DocumentSpacePrivilegeNiceName.ADMIN);
+    expect(getHighestPrivForMember(members[1])).toEqual(DocumentSpacePrivilegeNiceName.VIEWER);
+    expect(getHighestPrivForMember(members[2])).toEqual(DocumentSpacePrivilegeNiceName.EDITOR);
+    expect(getHighestPrivForMember(undefined as any)).toEqual('');
+  });
+
+  it('should get list of app clients available to assign to a doc space', async () => {
+    const response = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse<AppClientSummaryDtoResponseWrapper>({
+        data: [{
+          id: 'some appid',
+          name: 'app10'
+        }]
+      }));
+    });
+    const spy = jest.spyOn(documentSpaceApi, 'getAppClientsForAssignmentToDocumentSpace').mockImplementation(response);
+    await membershipService.getAvailableAppClientsForDocumentSpace('doc space');
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should get list of app clients available to assign to a doc space on error', async () => {
+    const response = jest.fn(() => {
+      return Promise.reject(createGenericAxiosRequestErrorResponse(500));
+    });
+    jest.spyOn(documentSpaceApi, 'getAppClientsForAssignmentToDocumentSpace').mockImplementation(response);
+    expect(membershipService.getAvailableAppClientsForDocumentSpace('doc space')).rejects.toEqual(createGenericAxiosRequestErrorResponse().response.data.reason);
+  });
+
+  it('should get list of app clients already assigned to a doc space', async () => {
+    const response = jest.fn(() => {
+      return Promise.resolve(createAxiosSuccessResponse<DocumentSpaceAppClientResponseDtoWrapper>({
+        data: [{
+          appClientId: 'some appid',
+          appClientName: 'app10',
+          privileges: [ DocumentSpaceAppClientResponseDtoPrivilegesEnum.Read ]
+        }]
+      }));
+    });
+    const spy = jest.spyOn(documentSpaceApi, 'getAppClientUsersForDocumentSpace').mockImplementation(response);
+    await membershipService.getAssignedAppClientsForDocumentSpace('doc space');
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should get list of app clients already assigned to a doc space on error', async () => {
+    const response = jest.fn(() => {
+      return Promise.reject(createGenericAxiosRequestErrorResponse(500));
+    });
+    jest.spyOn(documentSpaceApi, 'getAppClientUsersForDocumentSpace').mockImplementation(response);
+    expect(membershipService.getAssignedAppClientsForDocumentSpace('doc space')).rejects.toEqual(createGenericAxiosRequestErrorResponse().response.data.reason);
   });
 });

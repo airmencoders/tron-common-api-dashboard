@@ -29,7 +29,7 @@ function SideDrawer(props: SideDrawerProps) {
           {props.preTitleNode}
           <h4 className="header__title" style={props.titleStyle}>{props.title}</h4>
           {props.postTitleNode}
-          <button disabled={props.isLoading} className="header__close-icon close-btn" onClick={props.onCloseHandler} title="close-sidedrawer">
+          <button disabled={props.isLoading} className="header__close-icon close-btn" onClick={props.onCloseHandler} title={`Close ${props.title}`}>
             <CloseIcon size={1.75} />
           </button>
         </div>

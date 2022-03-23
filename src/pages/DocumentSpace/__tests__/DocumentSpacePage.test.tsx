@@ -1,6 +1,5 @@
 import { createState, State, StateMethodsDestroy } from '@hookstate/core';
-import { act, render, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import axios, { AxiosResponse } from 'axios';
 import { MutableRefObject } from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
@@ -19,7 +18,9 @@ import { useAuthorizedUserState } from '../../../state/authorized-user/authorize
 import DocumentSpaceGlobalService, { DocumentSpaceGlobalState } from '../../../state/document-space/document-space-global-service';
 import DocumentSpacePrivilegeService from '../../../state/document-space/document-space-privilege-service';
 import DocumentSpaceService from '../../../state/document-space/document-space-service';
-import { ClipBoardState, documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import { ClipBoardState, documentSpaceMembershipService, useDocumentSpaceGlobalState, useDocumentSpaceMembershipsPageState, useDocumentSpacePageState, useDocumentSpacePrivilegesState, useDocumentSpaceState } from '../../../state/document-space/document-space-state';
+import DocumentSpaceMembershipsPageService from '../../../state/document-space/memberships-page/memberships-page-service';
+import { BatchUploadState, DocumentSpaceMembershipsState } from '../../../state/document-space/memberships-page/memberships-page-state';
 import DocumentSpaceMembershipService from '../../../state/document-space/memberships/document-space-membership-service';
 import SpacesPageService from '../../../state/document-space/spaces-page/spaces-page-service';
 import { SpacesPageState } from '../../../state/document-space/spaces-page/spaces-page-state';
@@ -53,6 +54,9 @@ describe('Test Document Space Page', () => {
   let documentSpacePrivilegeService: DocumentSpacePrivilegeService;
 
   let membershipService: DocumentSpaceMembershipService;
+  let membershipPageState: State<DocumentSpaceMembershipsState> & StateMethodsDestroy;
+  let uploadState: State<BatchUploadState> & StateMethodsDestroy;
+
 
   let globalDocumentSpaceState: State<DocumentSpaceGlobalState>;
   let globalDocumentSpaceService: DocumentSpaceGlobalService;
@@ -135,12 +139,60 @@ describe('Test Document Space Page', () => {
       clipboardStateLocal
     );
 
+    membershipPageState = createState<DocumentSpaceMembershipsState>({
+      datasourceState: {
+        datasource: undefined,
+        shouldUpdateDatasource: true,
+      },
+      membersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false,
+        },
+        membersToUpdate: [],
+        submitting: false,
+        memberUpdateSuccessMessage: '',
+        memberUpdateFailMessage: '',
+        showUpdateFailMessage: false,
+        showUpdateSuccessMessage: true,
+      },
+      appClientsDatasourceState: {
+        datasource: undefined,
+        shouldUpdateDatasource: true,
+      },
+      appClientMembersState: {
+        selected: [],
+        deletionState: {
+          isConfirmationOpen: false,
+        },
+        membersToUpdate: [],
+        submitting: false,
+        memberUpdateSuccessMessage: '',
+        memberUpdateFailMessage: '',
+        showUpdateFailMessage: false,
+        showUpdateSuccessMessage: false,
+      },
+      selectedTab: 0,
+    });
+
+    uploadState = createState<BatchUploadState>({
+      successErrorState: {
+        successMessage: 'Successfully added members to Document Space',
+        errorMessage: '',
+        showSuccessMessage: false,
+        showErrorMessage: false,
+        showCloseButton: true,
+      }
+    });
+
     (useAuthorizedUserState as jest.Mock).mockReturnValue(authorizedUserService);
     (useDocumentSpaceState as jest.Mock).mockReturnValue(documentSpaceService);
     (documentSpaceMembershipService as jest.Mock).mockReturnValue(membershipService);
     (useDocumentSpacePrivilegesState as jest.Mock).mockReturnValue(documentSpacePrivilegeService);
     (useDocumentSpaceGlobalState as jest.Mock).mockReturnValue(globalDocumentSpaceService);
     (useDocumentSpacePageState as jest.Mock).mockReturnValue(documentSpacePageService);
+    (useDocumentSpaceMembershipsPageState as jest.Mock)
+      .mockReturnValue(new DocumentSpaceMembershipsPageService(membershipPageState, uploadState, membershipService));
 
     setupDefaultMocks();
   });
@@ -149,6 +201,7 @@ describe('Test Document Space Page', () => {
   function setupDefaultMocks() {
     fetchSpacesSpy = jest.spyOn(documentSpaceService, 'fetchAndStoreSpaces');
     jest.spyOn(documentSpaceApi, 'getSpaces').mockReturnValue(Promise.resolve(getSpacesResponse));
+    jest.spyOn(membershipService, 'getAvailableAppClientsForDocumentSpace').mockReturnValue(Promise.resolve([]));
     jest.spyOn(documentSpacePrivilegeService, 'isAuthorizedForAction').mockReturnValue(true);
   }
 
@@ -170,8 +223,8 @@ describe('Test Document Space Page', () => {
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(page.queryByTestId('document-space-selector')).toBeInTheDocument());
     const documentSpacesSelect = page.getByTestId('document-space-selector');
-    expect(documentSpacesSelect.className).toContain('disabled');
-    expect(documentSpacesSelect.textContent).toContain('Loading...');
+    await waitFor(() => expect(documentSpacesSelect.className).toContain('disabled'));
+    await waitFor(() => expect(documentSpacesSelect.textContent).toContain('Loading...'));
   });
 
   it('should show error select when retrieving Document Spaces fails', async () => {
@@ -188,8 +241,8 @@ describe('Test Document Space Page', () => {
     await waitFor(() => expect(page.getByTestId('document-space-selector')).toBeInTheDocument());
     
     const documentSpacesSelect = page.getByTestId('document-space-selector');
-    expect(documentSpacesSelect.className).toContain('disabled');
-    expect(documentSpacesSelect.textContent).toContain('Could not load spaces');
+    await waitFor(() => expect(documentSpacesSelect.className).toContain('disabled'));
+    await waitFor(() => expect(documentSpacesSelect.textContent).toContain('Could not load spaces'));
   });
 
   it('should show Document Spaces options select with first item in state when state is not promised or errored', async () => {
@@ -202,8 +255,8 @@ describe('Test Document Space Page', () => {
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
     await waitFor(() => expect(page.findByTestId('document-space-selector')).resolves.toBeInTheDocument());
     const documentSpacesSelect = page.getByTestId('document-space-selector');
-    expect(documentSpacesSelect).toBeEnabled();
-    expect(documentSpacesSelect.textContent).toContain(documentSpaces[0].name);
+    await waitFor(() => expect(documentSpacesSelect).toBeEnabled());
+    await waitFor(() => expect(documentSpacesSelect.textContent).toContain(documentSpaces[0].name));
   });
 
   it('should show DocumentSpaceMySettingButton when the user has at least one document space', async () => {
@@ -215,7 +268,7 @@ describe('Test Document Space Page', () => {
 
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
     const documentSpacesSelect = page.getByTestId('doc-space-my-settings__btn');
-    expect(documentSpacesSelect).toBeInTheDocument()
+    await waitFor(() => expect(documentSpacesSelect).toBeInTheDocument());
   });
 
   it('should not show Upload Files button while spaces are loading (no space selected)', async () => {
@@ -229,7 +282,7 @@ describe('Test Document Space Page', () => {
 
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
     await waitFor(() => expect(page.queryByTestId('document-space-selector')).toBeInTheDocument());
-    expect(page.queryByTitle("Upload Files")).not.toBeInTheDocument();
+    await waitFor(() => expect(page.queryByTitle("Upload Files")).not.toBeInTheDocument());
   });
 
   it('should allow to change space', async () => {
@@ -239,26 +292,25 @@ describe('Test Document Space Page', () => {
       </MemoryRouter>
     );
 
+    await waitFor(() => expect(page.container.querySelector(".ag-root-wrapper")).toBeInTheDocument());
+    await waitFor(() => expect(page.container.querySelector(".ag-overlay-no-rows-center")).toBeNull());
     
     await waitFor(() => expect(fetchSpacesSpy).toHaveBeenCalled());
 
     const documentSpacesSelect = page.getByTestId('document-space-selector');
-    expect(documentSpacesSelect).toBeEnabled();
+    await waitFor(() => expect(documentSpacesSelect).toBeEnabled());
     await waitFor(() => expect(documentSpacesSelect.textContent).toContain(documentSpaces[0].name));
     
-    act(() => {
-      userEvent.click(documentSpacesSelect);
-    });
+    fireEvent.click(documentSpacesSelect);
     await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));
     const item2 = page.getByTestId(documentSpaces[1].name);
-    act(() => {
-      userEvent.click(item2);
-    })
+    fireEvent.click(item2);
     await waitFor(() => expect(item2.textContent).toContain(documentSpaces[1].name));
-
   });
 
   it('should open/close Document Space Memberships side drawer', async () => {
+    const closeSpy = jest.spyOn(documentSpacePageService, 'closeMembershipsDrawer').mockImplementation(() => {});
+
     const getPrivilegesSpy = jest.spyOn(documentSpacePrivilegeService, 'fetchAndStoreDashboardUserDocumentSpacePrivileges').mockReturnValue({
       promise: Promise.resolve({
         'id': {
@@ -280,30 +332,23 @@ describe('Test Document Space Page', () => {
     
     const documentSpacesSelect = page.getByTestId('document-space-selector');
     expect(documentSpacesSelect).toBeEnabled();
-    act(() => 
-    {
-      userEvent.click(documentSpacesSelect);
-    });
+    fireEvent.click(documentSpacesSelect);
     await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));
     const item2 = page.getByTestId(documentSpaces[1].name);
-    act(() => {
-      userEvent.click(item2);
-    })
+    fireEvent.click(item2);
     await waitFor(() => expect(getPrivilegesSpy).toHaveBeenCalled());
 
-    await waitFor(()=>expect(page.getByTitle('Manage Users')).toBeInTheDocument())
-
+    await waitFor(() => expect(page.getByTitle('Manage Users')).toBeInTheDocument());
     const membersButton = page.getByTitle('Manage Users');
-    expect(membersButton).toBeInTheDocument();
 
     // Open the panel
-    userEvent.click(membersButton);
-    await waitFor(() => expect(page.getByText('Add Member')).toBeVisible());
+    fireEvent.click(membersButton);
+    await waitFor(() => expect(page.getByText('Member Management')).toBeVisible());
 
-    // close the panel
-    const closeButton = page.getByText('Close');
-    expect(closeButton).toBeInTheDocument();
-    userEvent.click(closeButton);
+    // close the panel via the "X" button
+    await waitFor(() => expect(page.getByTitle('Close Member Management')).toBeVisible());
+    fireEvent.click(page.getByTitle('Close Member Management'));
+    await waitFor(() => expect(closeSpy).toHaveBeenCalled());
   });
 
   describe('Test error behaviors for document space privilege retrieval', () => {
@@ -436,16 +481,12 @@ describe('Test Document Space Page', () => {
     const documentSpacesSelect = page.getByTestId("document-space-selector"); 
     expect(documentSpacesSelect).toBeEnabled();
     await waitFor(() => expect(page.queryAllByText(documentSpaces[0].name)).toBeTruthy())
-    act(() => {
-      userEvent.click(documentSpacesSelect)
-    });
+    fireEvent.click(documentSpacesSelect);
     await waitFor(() => expect(page.getByTestId(documentSpaces[1].name)));
     const item2 = page.getByTestId(documentSpaces[1].name);
-    act(() => {
-      userEvent.click(item2);
-    })
+    fireEvent.click(item2);
 
     const queryParams = new URLSearchParams(testLocation?.search);
-    expect(queryParams.get('spaceId')).toEqual(documentSpaces[1].id);
+    await waitFor(() => expect(queryParams.get('spaceId')).toEqual(documentSpaces[1].id));
   });
 });

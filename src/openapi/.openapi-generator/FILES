@@ -58,6 +58,9 @@ models/document-dto.ts
 models/document-metadata.ts
 models/document-mobile-dto-response-wrapper.ts
 models/document-mobile-dto.ts
+models/document-space-app-client-member-request-dto.ts
+models/document-space-app-client-response-dto-wrapper.ts
+models/document-space-app-client-response-dto.ts
 models/document-space-archive-items-dto.ts
 models/document-space-create-folder-dto.ts
 models/document-space-dashboard-member-request-dto.ts

@@ -1,22 +1,28 @@
 import { render, waitFor } from '@testing-library/react';
-import { DocumentSpaceControllerApi, DocumentSpaceControllerApiInterface } from '../../../../openapi';
+import userEvent from '@testing-library/user-event';
+import {
+  DocumentSpaceControllerApi,
+  DocumentSpaceControllerApiInterface
+} from '../../../../openapi/apis/document-space-controller-api';
+import DocumentSpaceMembershipService
+  from '../../../../state/document-space/memberships/document-space-membership-service';
 import {
   documentSpaceMembershipService,
   useDocumentSpaceMembershipsPageState
 } from '../../../../state/document-space/document-space-state';
-import DocumentSpaceMembershipService from '../../../../state/document-space/memberships/document-space-membership-service';
-import DocumentSpaceMembershipsForm from '../DocumentSpaceMembershipsForm';
-import { createState, State, StateMethodsDestroy } from '@hookstate/core';
+import DocumentSpaceMembershipsDrawer from '../DocumentSpaceMembershipsDrawer';
 import {
   BatchUploadState,
   DocumentSpaceMembershipsState
 } from '../../../../state/document-space/memberships-page/memberships-page-state';
+import { createState, State, StateMethodsDestroy } from '@hookstate/core';
 import DocumentSpaceMembershipsPageService
   from '../../../../state/document-space/memberships-page/memberships-page-service';
 
+jest.mock('../../../../openapi/apis/document-space-controller-api');
 jest.mock('../../../../state/document-space/document-space-state');
 
-describe('Document Space Membership Form Test', () => {
+describe('Document Space Membership Drawer Tests', () => {
   const documentSpaceId = 'b8529a48-a61c-45a7-b0d1-2eb5d429d3bf';
 
   let documentSpaceApi: DocumentSpaceControllerApiInterface;
@@ -78,23 +84,38 @@ describe('Document Space Membership Form Test', () => {
       .mockReturnValue(new DocumentSpaceMembershipsPageService(membershipPageState, uploadState, membershipService));
   });
 
-  it('should render form', async () => {
-    jest.spyOn(membershipService, 'getAvailableAppClientsForDocumentSpace')
-      .mockReturnValue(Promise.resolve([
-          {
-            id: 'sdfdsfsdf',
-            name: 'app1',
-          }
-      ])
+  it('should close modal when Submit(close) button pressed', async () => {
+    const onClose = jest.fn();
+    const page = render(
+      <DocumentSpaceMembershipsDrawer
+        documentSpaceId={documentSpaceId}
+        onSubmit={jest.fn()}
+        isOpen={true}
+        onCloseHandler={onClose}
+      />
     );
 
+    expect(page.queryByText('Member Management')).toBeInTheDocument();
+    userEvent.click(page.getAllByText('Close')[0]);
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+  });
+
+  it('should render the initial memberships drawer state', async () => {
+    const onSubmit = jest.fn();
     const page = render(
-      <DocumentSpaceMembershipsForm
+      <DocumentSpaceMembershipsDrawer
         documentSpaceId={documentSpaceId}
+        onSubmit={onSubmit}
+        isOpen={true}
+        onCloseHandler={jest.fn()}
       />
     );
 
     await waitFor(() => expect(page.queryByText('Add New Member')).toBeInTheDocument());
     await waitFor(() => expect(page.queryByText('Add New App Client')).toBeInTheDocument());
-  });  
+    await waitFor(() => expect(page.queryByText('Add Member')).toBeInTheDocument());
+    await waitFor(() => expect(page.queryByText('Manage Members')).toBeInTheDocument());
+    await waitFor(() => expect(page.queryByText('Manage App Clients')).toBeInTheDocument());
+  });
+
 });

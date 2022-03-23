@@ -19,7 +19,13 @@ import { Configuration } from '../configuration';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
+import { AppClientSummaryDtoResponseWrapper } from '../models';
+// @ts-ignore
 import { DocumentMobileDtoResponseWrapper } from '../models';
+// @ts-ignore
+import { DocumentSpaceAppClientMemberRequestDto } from '../models';
+// @ts-ignore
+import { DocumentSpaceAppClientResponseDtoWrapper } from '../models';
 // @ts-ignore
 import { DocumentSpaceArchiveItemsDto } from '../models';
 // @ts-ignore
@@ -66,6 +72,63 @@ import { S3PaginationDto } from '../models';
  */
 export const DocumentSpaceControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Adds an App Client to a Document Space with specified privileges
+         * @summary Adds an App Client to a Document Space
+         * @param {string} id 
+         * @param {DocumentSpaceAppClientMemberRequestDto} documentSpaceAppClientMemberRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addAppClientToDocumentSpace: async (id: string, documentSpaceAppClientMemberRequestDto: DocumentSpaceAppClientMemberRequestDto, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling addAppClientToDocumentSpace.');
+            }
+            // verify required parameter 'documentSpaceAppClientMemberRequestDto' is not null or undefined
+            if (documentSpaceAppClientMemberRequestDto === null || documentSpaceAppClientMemberRequestDto === undefined) {
+                throw new RequiredError('documentSpaceAppClientMemberRequestDto','Required parameter documentSpaceAppClientMemberRequestDto was null or undefined when calling addAppClientToDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/app-client`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const nonString = typeof documentSpaceAppClientMemberRequestDto !== 'string';
+            const needsSerialization = nonString && configuration && configuration.isJsonMime
+                ? configuration.isJsonMime(localVarRequestOptions.headers['Content-Type'])
+                : nonString;
+            localVarRequestOptions.data =  needsSerialization
+                ? JSON.stringify(documentSpaceAppClientMemberRequestDto !== undefined ? documentSpaceAppClientMemberRequestDto : {})
+                : (documentSpaceAppClientMemberRequestDto || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
@@ -1055,6 +1118,92 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Gets the App Clients that can access a space and their privileges
+         * @summary Gets the App Clients that can access a given Document Space
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientUsersForDocumentSpace: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getAppClientUsersForDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/app-clients`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * The list includes those that are not associated currently with given space
+         * @summary Gets list of App Clients that are available to assignment to given doc space
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientsForAssignmentToDocumentSpace: async (id: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling getAppClientsForAssignmentToDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/available-app-clients`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Gets members for a Document Space. Pagination enabled.
          * @summary Gets the members for a Document Space
          * @param {string} id 
@@ -1608,6 +1757,58 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
             };
         },
         /**
+         * Removes App Client(s) from a Document Space and their privileges
+         * @summary Removes one or more App Client(s) from a Document Space
+         * @param {string} id 
+         * @param {string} appClientId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeAppClientFromDocumentSpace: async (id: string, appClientId: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            if (id === null || id === undefined) {
+                throw new RequiredError('id','Required parameter id was null or undefined when calling removeAppClientFromDocumentSpace.');
+            }
+            // verify required parameter 'appClientId' is not null or undefined
+            if (appClientId === null || appClientId === undefined) {
+                throw new RequiredError('appClientId','Required parameter appClientId was null or undefined when calling removeAppClientFromDocumentSpace.');
+            }
+            const localVarPath = `/v2/document-space/spaces/{id}/app-client`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (appClientId !== undefined) {
+                localVarQueryParameter['appClientId'] = appClientId;
+            }
+
+
+    
+            const queryParameters = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                queryParameters.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.query) {
+                queryParameters.set(key, options.query[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(queryParameters)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Removes an entry from a favorites collection.
          * @param {string} id 
@@ -2137,6 +2338,21 @@ export const DocumentSpaceControllerApiAxiosParamCreator = function (configurati
 export const DocumentSpaceControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
+         * Adds an App Client to a Document Space with specified privileges
+         * @summary Adds an App Client to a Document Space
+         * @param {string} id 
+         * @param {DocumentSpaceAppClientMemberRequestDto} documentSpaceAppClientMemberRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addAppClientToDocumentSpace(id: string, documentSpaceAppClientMemberRequestDto: DocumentSpaceAppClientMemberRequestDto, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).addAppClientToDocumentSpace(id, documentSpaceAppClientMemberRequestDto, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * 
          * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
          * @param {string} id 
@@ -2422,6 +2638,34 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Gets the App Clients that can access a space and their privileges
+         * @summary Gets the App Clients that can access a given Document Space
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAppClientUsersForDocumentSpace(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DocumentSpaceAppClientResponseDtoWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getAppClientUsersForDocumentSpace(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * The list includes those that are not associated currently with given space
+         * @summary Gets list of App Clients that are available to assignment to given doc space
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAppClientsForAssignmentToDocumentSpace(id: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AppClientSummaryDtoResponseWrapper>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).getAppClientsForAssignmentToDocumentSpace(id, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * Gets members for a Document Space. Pagination enabled.
          * @summary Gets the members for a Document Space
          * @param {string} id 
@@ -2590,6 +2834,21 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
             };
         },
         /**
+         * Removes App Client(s) from a Document Space and their privileges
+         * @summary Removes one or more App Client(s) from a Document Space
+         * @param {string} id 
+         * @param {string} appClientId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeAppClientFromDocumentSpace(id: string, appClientId: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await DocumentSpaceControllerApiAxiosParamCreator(configuration).removeAppClientFromDocumentSpace(id, appClientId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: (configuration?.basePath || basePath) + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
          * 
          * @summary Removes an entry from a favorites collection.
          * @param {string} id 
@@ -2737,6 +2996,17 @@ export const DocumentSpaceControllerApiFp = function(configuration?: Configurati
  */
 export const DocumentSpaceControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     return {
+        /**
+         * Adds an App Client to a Document Space with specified privileges
+         * @summary Adds an App Client to a Document Space
+         * @param {string} id 
+         * @param {DocumentSpaceAppClientMemberRequestDto} documentSpaceAppClientMemberRequestDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addAppClientToDocumentSpace(id: string, documentSpaceAppClientMemberRequestDto: DocumentSpaceAppClientMemberRequestDto, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).addAppClientToDocumentSpace(id, documentSpaceAppClientMemberRequestDto, options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
@@ -2947,6 +3217,26 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).getAllArchivedFilesForAuthUser(options).then((request) => request(axios, basePath));
         },
         /**
+         * Gets the App Clients that can access a space and their privileges
+         * @summary Gets the App Clients that can access a given Document Space
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientUsersForDocumentSpace(id: string, options?: any): AxiosPromise<DocumentSpaceAppClientResponseDtoWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).getAppClientUsersForDocumentSpace(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * The list includes those that are not associated currently with given space
+         * @summary Gets list of App Clients that are available to assignment to given doc space
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAppClientsForAssignmentToDocumentSpace(id: string, options?: any): AxiosPromise<AppClientSummaryDtoResponseWrapper> {
+            return DocumentSpaceControllerApiFp(configuration).getAppClientsForAssignmentToDocumentSpace(id, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Gets members for a Document Space. Pagination enabled.
          * @summary Gets the members for a Document Space
          * @param {string} id 
@@ -3071,6 +3361,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
             return DocumentSpaceControllerApiFp(configuration).patchSelfDocumentSpaceDefault(id, options).then((request) => request(axios, basePath));
         },
         /**
+         * Removes App Client(s) from a Document Space and their privileges
+         * @summary Removes one or more App Client(s) from a Document Space
+         * @param {string} id 
+         * @param {string} appClientId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeAppClientFromDocumentSpace(id: string, appClientId: string, options?: any): AxiosPromise<object> {
+            return DocumentSpaceControllerApiFp(configuration).removeAppClientFromDocumentSpace(id, appClientId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Removes an entry from a favorites collection.
          * @param {string} id 
@@ -3182,6 +3483,17 @@ export const DocumentSpaceControllerApiFactory = function (configuration?: Confi
  * @interface DocumentSpaceControllerApi
  */
 export interface DocumentSpaceControllerApiInterface {
+    /**
+     * Adds an App Client to a Document Space with specified privileges
+     * @summary Adds an App Client to a Document Space
+     * @param {string} id 
+     * @param {DocumentSpaceAppClientMemberRequestDto} documentSpaceAppClientMemberRequestDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    addAppClientToDocumentSpace(id: string, documentSpaceAppClientMemberRequestDto: DocumentSpaceAppClientMemberRequestDto, options?: any): AxiosPromise<object>;
+
     /**
      * 
      * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
@@ -3392,6 +3704,26 @@ export interface DocumentSpaceControllerApiInterface {
     getAllArchivedFilesForAuthUser(options?: any): AxiosPromise<S3PaginationDto>;
 
     /**
+     * Gets the App Clients that can access a space and their privileges
+     * @summary Gets the App Clients that can access a given Document Space
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    getAppClientUsersForDocumentSpace(id: string, options?: any): AxiosPromise<DocumentSpaceAppClientResponseDtoWrapper>;
+
+    /**
+     * The list includes those that are not associated currently with given space
+     * @summary Gets list of App Clients that are available to assignment to given doc space
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    getAppClientsForAssignmentToDocumentSpace(id: string, options?: any): AxiosPromise<AppClientSummaryDtoResponseWrapper>;
+
+    /**
      * Gets members for a Document Space. Pagination enabled.
      * @summary Gets the members for a Document Space
      * @param {string} id 
@@ -3516,6 +3848,17 @@ export interface DocumentSpaceControllerApiInterface {
     patchSelfDocumentSpaceDefault(id: string, options?: any): AxiosPromise<void>;
 
     /**
+     * Removes App Client(s) from a Document Space and their privileges
+     * @summary Removes one or more App Client(s) from a Document Space
+     * @param {string} id 
+     * @param {string} appClientId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApiInterface
+     */
+    removeAppClientFromDocumentSpace(id: string, appClientId: string, options?: any): AxiosPromise<object>;
+
+    /**
      * 
      * @summary Removes an entry from a favorites collection.
      * @param {string} id 
@@ -3627,6 +3970,19 @@ export interface DocumentSpaceControllerApiInterface {
  * @extends {BaseAPI}
  */
 export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpaceControllerApiInterface {
+    /**
+     * Adds an App Client to a Document Space with specified privileges
+     * @summary Adds an App Client to a Document Space
+     * @param {string} id 
+     * @param {DocumentSpaceAppClientMemberRequestDto} documentSpaceAppClientMemberRequestDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public addAppClientToDocumentSpace(id: string, documentSpaceAppClientMemberRequestDto: DocumentSpaceAppClientMemberRequestDto, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).addAppClientToDocumentSpace(id, documentSpaceAppClientMemberRequestDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Adds a new entry to a favorites collection. If no collection exists, it also creates one.
@@ -3875,6 +4231,30 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
     }
 
     /**
+     * Gets the App Clients that can access a space and their privileges
+     * @summary Gets the App Clients that can access a given Document Space
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public getAppClientUsersForDocumentSpace(id: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).getAppClientUsersForDocumentSpace(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * The list includes those that are not associated currently with given space
+     * @summary Gets list of App Clients that are available to assignment to given doc space
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public getAppClientsForAssignmentToDocumentSpace(id: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).getAppClientsForAssignmentToDocumentSpace(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Gets members for a Document Space. Pagination enabled.
      * @summary Gets the members for a Document Space
      * @param {string} id 
@@ -4018,6 +4398,19 @@ export class DocumentSpaceControllerApi extends BaseAPI implements DocumentSpace
      */
     public patchSelfDocumentSpaceDefault(id: string, options?: any) {
         return DocumentSpaceControllerApiFp(this.configuration).patchSelfDocumentSpaceDefault(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Removes App Client(s) from a Document Space and their privileges
+     * @summary Removes one or more App Client(s) from a Document Space
+     * @param {string} id 
+     * @param {string} appClientId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DocumentSpaceControllerApi
+     */
+    public removeAppClientFromDocumentSpace(id: string, appClientId: string, options?: any) {
+        return DocumentSpaceControllerApiFp(this.configuration).removeAppClientFromDocumentSpace(id, appClientId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
